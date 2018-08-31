@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
+import { initAllUserContent } from "@dashboard/app/user-content";
 
 interface IUserContent {
     className?: string;
@@ -20,5 +21,9 @@ export default class UserContent extends React.Component<IUserContent> {
                 dangerouslySetInnerHTML={{ __html: this.props.content }}
             />
         );
+    }
+
+    public componentDidMount() {
+        initAllUserContent();
     }
 }
