@@ -9,17 +9,15 @@ import { match } from "react-router";
 import { t } from "@dashboard/application";
 import { connect } from "react-redux";
 import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
-import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
-import PanelLayout from "@knowledge/layouts/PanelLayout";
-import PanelWidget from "@knowledge/components/PanelWidget";
+import Breadcrumbs, { ICrumb } from "@knowledge/components/Breadcrumbs";
 import PageHeading from "@knowledge/components/PageHeading";
 import UserContent from "@knowledge/components/UserContent";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
-import { Devices } from "@knowledge/components/DeviceChecker";
 import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
 import { LoadStatus } from "@dashboard/@types/api";
+import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -50,45 +48,40 @@ export class ArticlePage extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Container>
-                    <PanelLayout
-                        device={this.props.device}
-                        breadcrumbs={this.dummyBreadcrumbData}
-                        toggleMobileMenu={toggleMobileMenu}
-                    >
-                        {{
-                            leftTopComponents: (
-                                <PanelWidget>
-                                    <PageHeading title={t("Actions")} />
-                                </PanelWidget>
-                            ),
-                            leftBottomComponents: (
-                                <React.Fragment>
-                                    <PanelWidget>
-                                        <PageHeading title={t("Navigation")} />
-                                    </PanelWidget>
-                                </React.Fragment>
-                            ),
-                            middleTopComponents: (
-                                <PanelWidget>
-                                    <PageHeading title={article.name} />
-                                </PanelWidget>
-                            ),
-                            middleBottomComponents: (
-                                <PanelWidget>
-                                    <UserContent content={this.dummyPostData} />
-                                </PanelWidget>
-                            ),
-                            rightTopComponents: (
-                                <PanelWidget>
-                                    <PageHeading title={t("Table of Contents")} />
-                                </PanelWidget>
-                            ),
-                            rightBottomComponents: (
-                                <PanelWidget>
-                                    <PageHeading title={t("Related Articles")} />
-                                </PanelWidget>
-                            ),
-                        }}
+                    <PanelLayout device={this.props.device} toggleMobileMenu={toggleMobileMenu}>
+                        <PanelLayout.Breadcrumbs>
+                            <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
+                        </PanelLayout.Breadcrumbs>
+                        <PanelLayout.LeftTop>
+                            <PanelWidget>
+                                <PageHeading title={t("Actions")} />
+                            </PanelWidget>
+                        </PanelLayout.LeftTop>
+                        <PanelLayout.LeftBottom>
+                            <PanelWidget>
+                                <PageHeading title={t("Navigation")} />
+                            </PanelWidget>
+                        </PanelLayout.LeftBottom>
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>
+                                <PageHeading title={article.name} />
+                            </PanelWidget>
+                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidget>
+                                <UserContent content={this.dummyPostData} />
+                            </PanelWidget>
+                        </PanelLayout.MiddleBottom>
+                        <PanelLayout.RightTop>
+                            <PanelWidget>
+                                <PageHeading title={t("Table of Contents")} />
+                            </PanelWidget>
+                        </PanelLayout.RightTop>
+                        <PanelLayout.RightBottom>
+                            <PanelWidget>
+                                <PageHeading title={t("Related Articles")} />
+                            </PanelWidget>
+                        </PanelLayout.RightBottom>
                     </PanelLayout>
                 </Container>
             </React.Fragment>
@@ -108,35 +101,33 @@ export class ArticlePage extends React.Component<IProps, IState> {
         }
     }
 
-    private get dummyBreadcrumbData(): IBreadcrumbsProps {
-        return {
-            children: [
-                {
-                    name: "one",
-                    url: "#",
-                },
-                {
-                    name: "two",
-                    url: "#",
-                },
-                {
-                    name: "three",
-                    url: "#",
-                },
-                {
-                    name: "four",
-                    url: "#",
-                },
-                {
-                    name: "five",
-                    url: "#",
-                },
-                {
-                    name: "six",
-                    url: "#",
-                },
-            ],
-        };
+    private get dummyBreadcrumbData(): ICrumb[] {
+        return [
+            {
+                name: "Home",
+                url: "/kb",
+            },
+            {
+                name: "two",
+                url: "#",
+            },
+            {
+                name: "three",
+                url: "#",
+            },
+            {
+                name: "four",
+                url: "#",
+            },
+            {
+                name: "five",
+                url: "#",
+            },
+            {
+                name: "six",
+                url: "#",
+            },
+        ];
     }
 }
 
