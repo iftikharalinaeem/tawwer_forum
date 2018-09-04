@@ -1,6 +1,7 @@
 /**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
 import * as actions from "@knowledge/pages/article/articlePageActions";

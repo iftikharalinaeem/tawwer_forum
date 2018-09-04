@@ -39,7 +39,7 @@ function createDummyArticleData() {
         locale: "en",
         body: "[{}]", // This shouldn't be needed for the view page.
         format: Format.RICH,
-        articleCategoryID: 0,
+        knowledgeCategoryID: 0,
         seoName: "Knowledge Base Site Name - Test Dummy Article",
         seoDescription:
             "You will find a common format across all the hosting directories. We have information structured on three bits – Shared Unix or Shared Linux Packages, Shared Windows Packages, Reseller Packages.",
@@ -67,7 +67,6 @@ function createDummyArticleData() {
 }
 
 const dummyArticleContent = `
-<div class="_userContent">
     <h3 class="_pageSubTitle">Overview</h3>
 
     <p>You will find a common format across all the hosting directories. We have information structured on three bits – Shared Unix or Shared Linux Packages, Shared Windows Packages, Reseller Packages. Each Hosting Directory <s>Strikethrough</s> has a list of plans. Each plan is accompanies by a short synopsis of the plan details. Hence, expect to find the price, the web <strong>Bold</strong>, Data This is a <a href="#">link</a> and the <em>Italic</em> platform.</p>
@@ -109,5 +108,4 @@ const dummyArticleContent = `
     </ol>
 
     <p>Unlike some of the other web hosting reviews, this website offers you reviews for free. You just do need to pay us a dime for all the information you get. It does not matter if you search Shared Unix, Shared Linux Packages or Shared Windows Packages. Our idea is to provide you quality information. We leave the decision up to you once we think we have done a good job of the deal.</p>
-</div>
 `;

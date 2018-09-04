@@ -1,26 +1,19 @@
-$subSubtitle_textTransform: uppercase;
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
 
 @include headings {
   @include headingFontStyle;
 }
 
 .pageTitle {
-  @include headingFontStyle;
   font-size: $global-title_fontSize;
-
-  + .pageSubTitle {
-    display: block;
-  }
 }
 
 .pageSubTitle {
   font-size: $global-subTitle_fontSize;
-}
-
-.pageSubSubTitle {
-  font-size: $global-medium_fontSize;
-  font-weight: $global-bold_fontWeight;
-  text-transform: $subSubtitle_textTransform;
 }
 
 .componentSubTitle {

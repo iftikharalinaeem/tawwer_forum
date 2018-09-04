@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 $pageHeading-cta_margin                      : 100px !default;
 $pageHeading-dropdown_width                  : 150px !default;
 
@@ -5,17 +11,17 @@ $pageHeading-dropdown_width                  : 150px !default;
   display: flex;
   width: 100%;
   align-items: center;
-
-  .pageTitle {
-    display: block;
-    margin: {
-      top: 0;
-      bottom: 0;
-    }
-  }
-
   + .pageMetas {
     margin-top: $utility-baseUnit * 2;
+  }
+}
+
+.pageTitle {
+  //@include lineHeightAdjustment($global-base_lineHeight, $global-heading_capitalLineHeightPercentage);
+  display: block;
+  margin: {
+    top: 0;
+    bottom: 0;
   }
 }
 
@@ -53,7 +59,7 @@ $pageHeading-dropdown_width                  : 150px !default;
 }
 
 
-.pageHeading-back {
+.pageHeading-backLink {
   @include absolute-topLeft;
   overflow: visible;
   width: $icon-default_size;
@@ -68,7 +74,7 @@ $pageHeading-dropdown_width                  : 150px !default;
   }
 }
 
-.pageHeading-backLink {
+.pageHeading-link {
   display: block;
   height: $icon-default_size;
   width: $icon-default_size;

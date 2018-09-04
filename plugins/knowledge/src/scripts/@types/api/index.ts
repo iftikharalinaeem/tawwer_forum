@@ -5,3 +5,4 @@
  */
 
 export * from "@knowledge/@types/api/article";
+export * from "@knowledge/@types/api/kbCategory";

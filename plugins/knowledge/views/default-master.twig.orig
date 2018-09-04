@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="{{ meta.seo.locale }}">
+    <head>
+<<<<<<< HEAD
+        <title>{{ meta.seo.title }}</title>
+
+        {% for meta in meta.tags -%}
+            <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
+
+        {% for script in scripts -%}
+            <script defer src="{{ script }}"></script>
+        {% endfor %}
+
+        {% for script in inlineScripts -%}
+            <script>
+                {{- script|raw -}}
+            </script>
+        {% endfor %}
+=======
+        <title>{{ meta.title }}</title>
+{% for meta in meta.tags %}
+        <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+
+{% for script in scripts %}
+        <script defer src="{{ script.src }}"></script>
+{% endfor %}
+
+{% for script in inlineScripts %}
+        <script>
+            {{ script.content|raw }}
+        </script>
+
+{% endfor %}
+{% for stylesheet in styles %}
+        <link href="{{ stylesheet.src }}" rel="stylesheet" type="text/css" />
+
+{% endfor %}
+{% for stylesheet in inlineStyles %}
+        <style>{{ stylesheet.content|raw }}</style>
+
+{% endfor %}
+{% for link in meta.links %}
+        <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+>>>>>>> master
+
+        <script type="application/ld+json">
+            {{ meta.seo.breadcrumb|raw }}
+
+        </script>
+
+        {% for stylesheet in styles -%}
+            <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />
+        {% endfor -%}
+        {% for link in meta.links -%}
+            <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
+
+    </head>
+    <body class="{{ page.classes|join(' ') }}">
+        <div class="page">
+<<<<<<< HEAD
+            <div id="headerContainer">
+                {{ include('partials/header.twig') }}
+            </div>
+=======
+            <div id="headerContainer">{{ include('partials/header.twig') }}</div>
+>>>>>>> master
+            <div class="page-minHeight">
+                <div id="app">
+                    <noscript>
+                        {{ page.content|raw }}
+                    </noscript>
+                </div>
+<<<<<<< HEAD
+            </div>
+            <div id="footerContainer">
+                {{ include('partials/footer.twig') }}
+=======
+>>>>>>> master
+            </div>
+        </div>
+        <div id="modals"></div>
+    </body>
+</html>

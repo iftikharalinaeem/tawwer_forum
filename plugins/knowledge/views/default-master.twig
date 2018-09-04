@@ -2,6 +2,18 @@
 <html lang="{{ meta.seo.locale }}">
     <head>
         <title>{{ meta.seo.title }}</title>
+{% for meta in meta.tags %}
+        <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+
+{% for script in scripts %}
+        <script defer src="{{ script.src }}"></script>
+{% endfor %}
+
+{% for script in inlineScripts %}
+        <script>
+            {{ script.content|raw }}
+        </script>
 
         {% for meta in meta.tags -%}
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />

@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 @mixin singleLineEllipsis {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -5,18 +11,11 @@
   max-width: 100%;
 }
 
-@mixin breakWord {
-  word-break: break-all;
-  word-break: break-word;
-}
-
 @mixin longWordEllipsis {
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
 }
-
-
 
 @mixin headings($from: 1, $to: 6){
   @for $i from $from through $to{
@@ -26,16 +25,13 @@
   }
 }
 
-@mixin headingFontStyle($marginBottom: $utility-baseUnit) {
-  @include longWordEllipsis;
-  display: inline-block;
+@mixin headingFontStyle() {
+  display: block;
   font-family: $global-heading_fontFamily;
   font-weight: $global-heading_fontWeight;
   font-size: $global-medium_fontSize;
-  margin: {
-    top: -$global-lineHeight_offset;
-    bottom: $marginBottom;
-  }
+  line-height: $global-condensed_lineHeight;
+  margin: 0;
 }
 
 @mixin bodyFontStyle() {
@@ -50,4 +46,29 @@
   &:visited {
     @content;
   }
+}
+
+
+// Some fonts don't set the capital letter to take the whole line height.
+// $lineHeight: The ratio is a value from 0 to 1 to set how much of the line height the capital takes. Example, if it takes 3/4 of the line height, set .75
+// $baseLine: Sometimes the base line isn't centered, 0 remove from top, .5 use font default, 1 remove from bottom
+@mixin lineHeightAdjustment($lineHeight, $capitalLetterRatio: 1, $baseLineOffset: .5) {
+  $topOffset: $baseLineOffset * 1em;
+  $bottomOffset: 1 - $topOffset;
+
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    height: 0;
+    width: 0;
+  }
+
+  &::before {
+    margin-top: #{$capitalLetterRatio - $lineHeight * -$topOffset};
+  }
+
+  //&::after {
+  //  margin-bottom: #{$capitalLetterRatio - $lineHeight * $topOffset};
+  //}
 }

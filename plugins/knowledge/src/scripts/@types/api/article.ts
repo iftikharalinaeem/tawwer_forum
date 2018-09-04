@@ -1,10 +1,10 @@
-import { IUserFragment } from "@dashboard/@types/api";
-
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
+
+import { IUserFragment } from "@dashboard/@types/api";
 
 export enum Format {
     TEXT = "text",
@@ -21,7 +21,7 @@ interface IArticleRequiredData {
     locale: string; // The locale the article was written in
     body: string; // The content of the article.
     format: Format; // The format of the article.
-    articleCategoryID: number; //The category the article belongs in.
+    knowledgeCategoryID: number; //The category the article belongs in.
 }
 
 interface IArticleDefaultedData {
@@ -43,9 +43,10 @@ interface IArticleServerManagedData {
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
     bodyRendered: string;
+    categoryAncestorIDs?: number[]; // The tree of parent category IDs as a flay array.;
 }
 
-type ArticleExpandFields = "user";
+type ArticleExpandFields = "user" | "ancestors";
 
 // The record
 export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, IArticleServerManagedData {}
@@ -66,5 +67,4 @@ export interface IArticleFragment {
     name: string; //The title of the article
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
-    slug: string; // The path to the article from an import used to support redirects. This is not editable within the UI, but should be accessable via API in case we decide to make it an advanced option.
 }
