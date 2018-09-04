@@ -17,7 +17,7 @@ $pageHeading-dropdown_width                  : 150px !default;
 }
 
 .pageTitle {
-  @include lineHeightAdjustment($global-base_lineHeight, $global-heading_capitalLineHeightPercentage);
+  //@include lineHeightAdjustment($global-base_lineHeight, $global-heading_capitalLineHeightPercentage);
   display: block;
   margin: {
     top: 0;

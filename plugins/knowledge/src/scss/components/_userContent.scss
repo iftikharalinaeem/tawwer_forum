@@ -9,9 +9,9 @@
   @include orderedListStyle;
   @include unorderedListStyle;
 
-  @include headings {
-    @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_capitalLineHeightPercentage);
-  }
+  //@include headings {
+  //  @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_capitalLineHeightPercentage);
+  //}
 
   display: block;
   position: relative;
