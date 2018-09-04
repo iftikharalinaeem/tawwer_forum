@@ -11,20 +11,12 @@ import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";
 import DeviceContext from "@knowledge/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
 
+/**
+ * Top level application component for knowledge.
+ * This is made to mounted with ReactDOM.
+ */
 export default class KnowledgeApp extends React.Component {
     public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
-
-    constructor(props) {
-        super(props);
-        this.doUpdate = this.doUpdate.bind(this);
-    }
-
-    /**
-     * Function to force rerendering
-     */
-    public doUpdate() {
-        this.forceUpdate();
-    }
 
     /**
      * Device checker detects device and calls a force update if needed to update the current device.
@@ -45,7 +37,17 @@ export default class KnowledgeApp extends React.Component {
         );
     }
 
+    /**
+     * After the component mounts we need to update it so the results from the deviceChecker ref get passed through.
+     */
     public componentDidMount() {
-        this.forceUpdate();
+        this.doUpdate();
     }
+
+    /**
+     * Function to force rerendering
+     */
+    private doUpdate = () => {
+        this.forceUpdate();
+    };
 }

@@ -11,7 +11,7 @@ import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@dashboard/@types/api";
-import { thunks, nonApiActions } from "@knowledge/pages/article/articlePageActions";
+import { componentActions } from "@knowledge/pages/article/articlePageActions";
 import NotFoundPage from "@dashboard/components/NotFoundPage";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
 
@@ -20,10 +20,13 @@ interface IProps extends IDeviceProps {
         slug: string;
     }>;
     articlePageState: IArticlePageState;
-    getArticle: typeof thunks.getArticle;
-    clearPageState: typeof nonApiActions.clearArticlePageState;
+    getArticle: typeof componentActions.getArticle;
+    clearPageState: typeof componentActions.clearArticlePageState;
 }
 
+/**
+ * Page component for an article.
+ */
 export class ArticlePage extends React.Component<IProps> {
     /**
      * Render not found or the article.
@@ -103,8 +106,8 @@ function mapStateToProps(state: IStoreState) {
  */
 function mapDispatchToProps(dispatch) {
     return {
-        getArticle: options => dispatch(thunks.getArticle(options)),
-        clearPageState: () => dispatch(nonApiActions.clearArticlePageState()),
+        getArticle: options => dispatch(componentActions.getArticle(options)),
+        clearPageState: () => dispatch(componentActions.clearArticlePageState()),
     };
 }
 
