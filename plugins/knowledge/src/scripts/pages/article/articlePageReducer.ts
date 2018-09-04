@@ -36,6 +36,8 @@ export default function articlePageReducer(
                 status: LoadStatus.ERROR,
                 error: action.payload,
             };
+        case actions.CLEAR_ARTICLE_PAGE_STATE:
+            return initialState;
         default:
             return state;
     }

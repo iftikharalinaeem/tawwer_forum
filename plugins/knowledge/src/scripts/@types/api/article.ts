@@ -57,7 +57,7 @@ export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<I
 export interface IPostArticleResponseBody extends IArticle {}
 
 export interface IGetArticleRequestBody {
-    id: number;
+    id: string;
     expand?: ArticleExpandFields[];
 }
 

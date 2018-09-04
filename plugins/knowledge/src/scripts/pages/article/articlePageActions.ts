@@ -4,7 +4,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk } from "@dashboard/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@dashboard/state/utility";
 import { IGetArticleRequestBody, IGetArticleResponseBody } from "@knowledge/@types/api";
 
 // Getting an article
@@ -21,8 +21,18 @@ export const getArticleActions = generateApiActionCreators(
     {} as IGetArticleRequestBody,
 );
 
-export function getArticle(options: IGetArticleRequestBody) {
+function getArticle(options: IGetArticleRequestBody) {
     return apiThunk("get", `/articles/${options.id}`, getArticleActions, options);
 }
 
-export type ActionTypes = ActionsUnion<typeof getArticleActions>;
+export const thunks = {
+    getArticle,
+};
+
+export const CLEAR_ARTICLE_PAGE_STATE = "CLEAR_ARTICLE_PAGE_STATE";
+
+export const nonApiActions = {
+    clearArticlePageState: () => createAction(CLEAR_ARTICLE_PAGE_STATE),
+};
+
+export type ActionTypes = ActionsUnion<typeof getArticleActions & typeof nonApiActions>;
