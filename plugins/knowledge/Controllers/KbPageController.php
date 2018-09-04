@@ -57,7 +57,7 @@ class KbPageController extends PageController {
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
         $this->data['title'] = 'Knowledge Base Title';
         $this->data['seoTemplate'] = "seo/pages/home.twig";
-        $this->meta->setSeo('template', 'seo/home.twig');
+        $this->meta->setSeo('template', 'seo/pages/home.twig');
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
 
@@ -70,7 +70,7 @@ class KbPageController extends PageController {
     public function index_articles(string $path) {
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
         $this->data['title'] = 'Knowledge Base Title';
-        $this->meta->setSeo('template', 'seo/article.twig');
+        $this->meta->setSeo('template', 'seo/pages/article.twig');
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
 
