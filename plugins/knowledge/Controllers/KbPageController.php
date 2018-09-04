@@ -37,7 +37,7 @@ class KbPageController extends PageController {
      */
     private function getStaticData() {
         $data = [
-            'debug' => \Gdn::config('debug'),
+            'debug' => \Gdn::config('Debug'),
             'scripts' => $this->getScripts(),
             'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
