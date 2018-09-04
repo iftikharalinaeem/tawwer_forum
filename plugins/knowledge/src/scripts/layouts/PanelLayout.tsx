@@ -142,11 +142,11 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 {isMobile && (
                                     <PanelArea className="panelAndNav-mobileMiddle">{children.leftTop}</PanelArea>
                                 )}
-                                {isDesktop && (
+                                {!isDesktop && (
                                     <PanelArea className="panelAndNav-tabletMiddle">{children.rightTop}</PanelArea>
                                 )}
                                 <PanelArea className="panelAndNav-middleBottom">{children.middleBottom}</PanelArea>
-                                {isDesktop && (
+                                {!isDesktop && (
                                     <PanelArea className="panelAndNav-tabletBottom">{children.rightBottom}</PanelArea>
                                 )}
                             </main>
@@ -192,6 +192,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     break;
                 case this.childIsOfType(child, PanelLayout.RightTop):
                     rightTop = child;
+                    break;
                 case this.childIsOfType(child, PanelLayout.RightBottom):
                     rightBottom = child;
                     break;
