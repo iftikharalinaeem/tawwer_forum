@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\PageController;
 
 class KbPageController extends PageController {
@@ -16,8 +17,11 @@ class KbPageController extends PageController {
      *
      * @param \AssetModel $assetModel AssetModel to get js and css
      */
-    public function __construct(\AssetModel $assetModel) {
+    public function __construct(
+        \AssetModel $assetModel,
+        ArticlesApiController $articlesApiController) {
         parent::__construct();
+        $this->api = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
@@ -66,6 +70,8 @@ class KbPageController extends PageController {
      * Render out the /kb/articles/:path page.
      */
     public function index_articles(string $path) {
+        $id = $this->detectArticleId($path);
+        $this->data['page'] = $this->api->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
         $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
@@ -92,6 +98,20 @@ class KbPageController extends PageController {
      */
     public function getBreadcrumb(string $format = 'json') {
         return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
+    }
+
+    /**
+     * Get article id
+     *
+     * @return string
+     */
+    public function detectArticleId($path) {
+        $matches = [];
+        if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
+            throw new \Exception('Can\'t detect article id!');
+        }
+        $id = (int)$matches[1];
+        return $id;
     }
 
 }
