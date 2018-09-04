@@ -14,10 +14,6 @@ interface IHeading {
 }
 
 export default class PageTitle extends React.Component<IHeading> {
-    public static defaultProps = {
-        isForWidget: true,
-    };
-
     public render() {
         const Tag = `h${this.props.depth}`;
         return (

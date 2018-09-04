@@ -11,17 +11,17 @@ $pageHeading-dropdown_width                  : 150px !default;
   display: flex;
   width: 100%;
   align-items: center;
-
-  .pageTitle {
-    display: block;
-    margin: {
-      top: 0;
-      bottom: 0;
-    }
-  }
-
   + .pageMetas {
     margin-top: $utility-baseUnit * 2;
+  }
+}
+
+.pageTitle {
+  //@include lineHeightAdjustment($global-base_lineHeight, $global-heading_capitalLineHeightPercentage);
+  display: block;
+  margin: {
+    top: 0;
+    bottom: 0;
   }
 }
 

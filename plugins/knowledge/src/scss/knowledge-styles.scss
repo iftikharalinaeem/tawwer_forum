@@ -1,11 +1,11 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
- */
-
 @import "~dashboard-scss/core-variables";
 @import "~normalize.css";
+
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 // Temporarily import editor variables and mixins. We will need to resolve how we will split these out.
 @import "~dashboard-scss/editor/variables";
@@ -31,6 +31,7 @@
 @import "layouts/page";
 @import "layouts/container";
 @import "layouts/panelLayout";
+@import "layouts/panelWidget";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
 //@import "layouts/section";
