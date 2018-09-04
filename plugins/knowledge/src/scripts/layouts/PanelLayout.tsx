@@ -15,6 +15,7 @@ interface IPanelLayoutProps {
     children: React.ReactNode;
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
+    contentTag?: string;
 }
 
 /**
@@ -74,7 +75,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     public static Breadcrumbs = Breadcrumbs;
 
     public static defaultProps = {
-        isMain: false,
+        contentTag: "div",
     };
 
     public render() {
@@ -101,6 +102,8 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { noLeftPanel: !shouldRenderLeftPanel },
             this.props.className,
         );
+
+        const ContentTag = this.props.contentTag;
 
         return (
             <div className={panelClasses}>
@@ -132,8 +135,10 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                             </Panel>
                         )}
 
-                        <div className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}>
-                            <main
+                        <main
+                            className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}
+                        >
+                            <ContentTag
                                 className={classNames("panelLayout-middle", {
                                     hasAdjacentPanel: shouldRenderRightPanel,
                                 })}
@@ -149,14 +154,14 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 {!isDesktop && (
                                     <PanelArea className="panelAndNav-tabletBottom">{children.rightBottom}</PanelArea>
                                 )}
-                            </main>
+                            </ContentTag>
                             {shouldRenderRightPanel && (
                                 <Panel className="panelLayout-right">
                                     <PanelArea className="panelArea-rightTop">{children.rightTop}</PanelArea>
                                     <PanelArea className="panelArea-rightBottom">{children.rightBottom}</PanelArea>
                                 </Panel>
                             )}
-                        </div>
+                        </main>
                     </div>
                 </div>
             </div>

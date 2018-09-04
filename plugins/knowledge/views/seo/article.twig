@@ -1,0 +1,14 @@
+<pre>
+    {{ dump() }}
+</pre>
+
+<main>
+    <article>
+        {% include 'seo/components/title.twig' with {'title': meta.seo.title} only %}
+        {% include 'seo/components/userContents.twig' with  %}
+    </article>
+</main>
+
+
+{#{% include '../components/relatedArticles.twig' with relatedArticles %}#}
+{#{% include '../components/navigation.twig' with navigation %}#}

@@ -48,7 +48,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Container>
-                    <PanelLayout device={this.props.device} toggleMobileMenu={toggleMobileMenu}>
+                    <PanelLayout device={this.props.device} toggleMobileMenu={toggleMobileMenu} contentTag="article">
                         <PanelLayout.Breadcrumbs>
                             <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
                         </PanelLayout.Breadcrumbs>
