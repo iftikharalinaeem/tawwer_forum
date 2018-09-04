@@ -7,59 +7,23 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-class KbPageController {
+use Vanilla\Knowledge\PageController;
 
-    /** @var \Twig_Environment */
-    protected $twig;
-
-    /** @var \AssetModel */
-    private $assetModel;
-
-    /** @var \Gdn_Configuration */
-    private $configuration;
-
+class KbPageController extends PageController {
+    use \Garden\TwigTrait;
     /**
      * KnowledgePageController constructor.
      *
-     * @param \AssetModel $assetModel
+     * @param \AssetModel $assetModel AssetModel to get js and css
      */
-    public function __construct(\AssetModel $assetModel, \Gdn_Configuration $configuration) {
-        $this->assetModel = $assetModel;
-        $this->configuration = $configuration;
-        $loader = new \Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
-        $this->twig = new \Twig_Environment($loader);
-    }
-
-    /**
-     * Use the asset model to get the JS assets for the knowledge section.
-     */
-    private function getScripts() {
-        $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
-        $webpackJSFiles = $this->assetModel->getWebpackJsFiles('knowledge');
-        $scripts = [[
-            'content' => $polyfillContent,
-        ]];
-
-        foreach ($webpackJSFiles as $webpackJSFile) {
-            $scripts[] = [
-                'src' => $webpackJSFile,
-            ];
+    public function __construct(\AssetModel $assetModel) {
+        parent::__construct();
+        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
+        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
+        if (\Gdn::config('HotReload.Enabled', false) === false) {
+            $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
-
-        return $scripts;
-    }
-
-    /**
-     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
-     */
-    private function getStyles() {
-        // Don't load the production stylesheets in a development build.
-        if ($this->configuration->get('HotReload.Enabled', false) === true) {
-            return [];
-        }
-        return [[
-            'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
-        ]];
+        $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
@@ -69,74 +33,32 @@ class KbPageController {
      * echo-ing it out.
      */
     private function getStaticData() {
-        return [
-            'meta' => [
-                'title' => 'Knowledge Base Title',
-                'locale' => 'en',
-                'tags' => [
-                    [
-                        'charset' => 'utf-8'
-                    ],[
-                        'http-equiv' => 'X-UA-Compatible',
-                        'content' => 'IE=edge',
-                    ],[
-                        'name' => 'viewport',
-                        'content' => 'width=device-width, initial-scale=1',
-                    ],[
-                        'name' => 'format-detection',
-                        'content' => 'telephone=no',
-                    ],[
-                        'property' => 'og:site_name',
-                        'content' => 'Vanilla',
-                    ]
-                ],
-                'links' => [ // Can be for canonical urls, alternate urls, next/previous, etc
-                    [
-                        'rel' => 'canonical',
-                        'href' => '/',
-                    ],[
-                        'locale' => 'fr',
-                        'title' => 'Français',
-                        'url' => '/fr',
-                        'rel' => 'alternate'
-                    ],[
-                        'locale' => 'de',
-                        'title' => 'German',
-                        'url' => '/de',
-                        'rel' => 'alternate',
-                    ],[
-                        'href' => '/feed.rss',
-                        'title' => 'Example RSS',
-                        'type' => 'application/rss+xml',
-                        'rel' => 'alternate',
-                    ],[
-                        'rel' => 'next',
-                        'href' => '/discussions/p3'
-                    ],[
-                        'rel' => 'prev',
-                        'href' => '/discussions/p1'
-                    ]
-                ],
-                'breadcrumb' => "{\"@context\":\"http://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Books\",\"item\":\"https://example.com/books\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Authors\",\"item\":\"https://example.com/books/authors\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Ann Leckie\",\"item\":\"https://example.com/books/authors/annleckie\"},{\"@type\":\"ListItem\",\"position\":4,\"name\":\"Ancillary Justice\",\"item\":\"https://example.com/books/authors/ancillaryjustice\"}]}",
-            ],
-            'page' => [
-                'classes' => [
-                    'testClass',
-                    'testClass2'
-                ],
-                'content' => '<p>Put SEO friendly content here</p>'
-            ],
+        $data = [
+            'debug' => Gdn::config('debug'),
             'scripts' => $this->getScripts(),
+            'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
+            'inlineStyles' => $this->getInlineStyles(),
         ];
+        $this->pageMetaInit();
+
+        $this->setSeoMetaData();
+        $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
+
+        $data['meta'] = $this->meta->getPageMeta();
+
+        return $data;
     }
 
     /**
      * Render out the /kb page.
      */
     public function index() {
+        $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+        $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
+
         echo $this->twig->render('default-master.twig', $data);
     }
 
@@ -144,8 +66,32 @@ class KbPageController {
      * Render out the /kb/articles/:path page.
      */
     public function index_articles(string $path) {
+        $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+        $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
+
         echo $this->twig->render('default-master.twig', $data);
     }
+
+    /**
+     * Get canonical link
+     *
+     * @return string
+     */
+    public function getCanonicalLink() {
+        return '/kb/';
+    }
+
+    /**
+     * Get breadcrumb.
+     *
+     * @param string $format Breadcrumb format: array, json etc. Default is json
+     *
+     * @return string
+     */
+    public function getBreadcrumb(string $format = 'json') {
+        return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
+    }
+
 }

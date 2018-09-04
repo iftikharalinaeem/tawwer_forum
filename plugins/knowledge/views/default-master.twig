@@ -1,40 +1,39 @@
 <!DOCTYPE html>
-<html lang="{{ meta.locale }}">
+<html lang="{{ meta.seo.locale }}">
     <head>
-        <title>{{ meta.title }}</title>
-{% for meta in meta.tags %}
-        <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
-{% endfor %}
+        <title>{{ meta.seo.title }}</title>
 
-{% for script in scripts %}
-        <script defer src="{{ script.src }}"></script>
-{% endfor %}
+        {% for meta in meta.tags -%}
+            <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
 
-{% for script in inlineScripts %}
-        <script>
-            {{ script.content|raw }}
-        </script>
+        {% for script in scripts -%}
+            <script defer src="{{ script }}"></script>
+        {% endfor %}
 
-{% endfor %}
-{% for stylesheet in styles %}
-        <link href="{{ stylesheet.src }}" rel="stylesheet" type="text/css" />
-
-{% endfor %}
-{% for stylesheet in inlineStyles %}
-        <style>{{ stylesheet.content|raw }}</style>
-
-{% endfor %}
-{% for link in meta.links %}
-        <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
-{% endfor %}
+        {% for script in inlineScripts -%}
+            <script>
+                {{- script|raw -}}
+            </script>
+        {% endfor %}
 
         <script type="application/ld+json">
-            {{ meta.breadcrumb|raw }}
+            {{ meta.seo.breadcrumb|raw }}
         </script>
+
+        {% for stylesheet in styles -%}
+            <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />
+        {% endfor -%}
+        {% for link in meta.links -%}
+            <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
+
     </head>
     <body class="{{ page.classes|join(' ') }}">
         <div class="page">
-            <div id="headerContainer">{{ include('partials/header.twig') }}</div>
+            <div id="headerContainer">
+                {{ include('partials/header.twig') }}
+            </div>
             <div class="page-minHeight">
                 <div id="app">
                     <noscript>
@@ -42,7 +41,9 @@
                     </noscript>
                 </div>
             </div>
-            <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
+            <div id="footerContainer">
+                {{ include('partials/footer.twig') }}
+            </div>
         </div>
         <div id="modals"></div>
     </body>
