@@ -39,7 +39,7 @@ function createDummyArticleData() {
         locale: "en",
         body: "[{}]", // This shouldn't be needed for the view page.
         format: Format.RICH,
-        articleCategoryID: 0,
+        knowledgeCategoryID: 0,
         seoName: "Knowledge Base Site Name - Test Dummy Article",
         seoDescription:
             "You will find a common format across all the hosting directories. We have information structured on three bits – Shared Unix or Shared Linux Packages, Shared Windows Packages, Reseller Packages.",
