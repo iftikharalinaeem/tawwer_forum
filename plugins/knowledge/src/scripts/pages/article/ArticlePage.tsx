@@ -62,7 +62,12 @@ export class ArticlePage extends React.Component<IProps> {
             return;
         }
 
-        getArticle({ id });
+        const numericID = parseInt(id, 10);
+        if (!Number.isInteger(numericID)) {
+            return;
+        }
+
+        getArticle({ id: numericID });
     }
 
     /**

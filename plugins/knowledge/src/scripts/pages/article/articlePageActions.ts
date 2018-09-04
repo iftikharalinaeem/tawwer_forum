@@ -11,7 +11,7 @@ import { IGetArticleRequestBody, IGetArticleResponseBody } from "@knowledge/@typ
 export const GET_ARTICLE_REQUEST = "GET_ARTICLE_REQUEST";
 export const GET_ARTICLE_SUCCESS = "GET_ARTICLE_SUCCESS";
 export const GET_ARTICLE_ERROR = "GET_ARTICLE_ERROR";
-export const CLEAR_ARTICLE_PAGE_STATE = "CLEAR_ARTICLE_PAGE_STATE";
+export const RESET_PAGE_STATE = "RESET_ARTICLE_PAGE_STATE";
 
 // Raw actions for getting an article
 const getArticleActions = generateApiActionCreators(
@@ -30,7 +30,7 @@ function getArticle(options: IGetArticleRequestBody) {
 
 // Non-api related actions for the page.
 const nonApiActions = {
-    clearArticlePageState: () => createAction(CLEAR_ARTICLE_PAGE_STATE),
+    clearArticlePageState: () => createAction(RESET_PAGE_STATE),
 };
 
 // Actions made for components to use.
@@ -39,6 +39,10 @@ export const componentActions = {
     ...nonApiActions,
 };
 
-export const reducer;
+// Actions exposed purely for testing purposes.
+// You probably should not be using them yourself.
+export const _rawApiActions = {
+    getArticleActions,
+};
 
 export type ActionTypes = ActionsUnion<typeof getArticleActions & typeof nonApiActions>;
