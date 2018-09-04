@@ -11,6 +11,7 @@ use Vanilla\Knowledge\PageController;
 
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
+
     /**
      * KnowledgePageController constructor.
      *

@@ -10,6 +10,11 @@ import { Omit } from "@knowledge/@types/typeUtils";
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
 
+/**
+ * HOC to inject DeviceContext as props.
+ *
+ * @param WrappedComponent - The component to wrap
+ */
 export function withDevice<T extends IDeviceProps = IDeviceProps>(
     WrappedComponent: React.ComponentClass<IDeviceProps>,
 ) {
