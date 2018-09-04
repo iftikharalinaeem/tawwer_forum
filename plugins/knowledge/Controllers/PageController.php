@@ -83,26 +83,40 @@ class PageController extends \Garden\Controller {
      *
      * @param string $key Data key to get
      *
-     * @return array
+     * @return mixed Return page data key value
      */
     public function getData(string $key) {
         return $this->data[$key] ?? '';
     }
 
+    /**
+     * Initialize page meta tags default values
+     *
+     * @return $this
+     */
     public function pageMetaInit() {
         $this->meta
             ->setTag('charset', ['charset' => 'utf-8'])
             ->setTag('IE=edge', ['http-equiv' => 'X-UA-Compatible', 'content' => 'IE=edge'])
             ->setTag('viewport', ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1'])
             ->setTag('format-detection', ['name' => 'format-detection', 'content' => 'telephone=no']);
+        return $this;
     }
 
+    /**
+     * Initialize page SEO meta data.
+     *
+     * (temporary solution, need to be extended and/or refactored later)
+     *
+     * @return $this
+     */
     public function setSeoMetaData() {
         $this->meta
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
         $this->meta->setSeo('title', $this->getData('title'))
             ->setSeo('locale', 'en')
             ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
+        return $this;
     }
 
     /**
