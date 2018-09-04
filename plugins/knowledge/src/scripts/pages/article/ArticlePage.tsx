@@ -6,143 +6,119 @@
 
 import React from "react";
 import { match } from "react-router";
-import { t } from "@dashboard/application";
 import { connect } from "react-redux";
 import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
-import Breadcrumbs, { ICrumb } from "@knowledge/components/Breadcrumbs";
-import PageHeading from "@knowledge/components/PageHeading";
-import UserContent from "@knowledge/components/UserContent";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import Container from "@knowledge/layouts/components/Container";
-import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
 import { LoadStatus } from "@dashboard/@types/api";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import { componentActions } from "@knowledge/pages/article/articlePageActions";
+import NotFoundPage from "@dashboard/components/NotFoundPage";
+import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
 
 interface IProps extends IDeviceProps {
     match: match<{
-        id: string;
+        slug: string;
     }>;
     articlePageState: IArticlePageState;
+    getArticle: typeof componentActions.getArticle;
+    clearPageState: typeof componentActions.clearArticlePageState;
 }
 
-interface IState {
-    menuOpen: boolean;
-}
-
-export class ArticlePage extends React.Component<IProps, IState> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            menuOpen: false,
-        };
-    }
-
+/**
+ * Page component for an article.
+ */
+export class ArticlePage extends React.Component<IProps> {
+    /**
+     * Render not found or the article.
+     */
     public render() {
-        if (this.props.articlePageState.status !== LoadStatus.SUCCESS) {
+        const { articlePageState } = this.props;
+        const id = this.parseIDFromSlug();
+
+        if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
+            return <NotFoundPage type="Page" />;
+        }
+
+        if (articlePageState.status !== LoadStatus.SUCCESS) {
             return null;
         }
 
-        const article = this.props.articlePageState.data.article;
+        const { article } = articlePageState.data;
 
-        return (
-            <React.Fragment>
-                <Container>
-                    <PanelLayout device={this.props.device} toggleMobileMenu={toggleMobileMenu} contentTag="article">
-                        <PanelLayout.Breadcrumbs>
-                            <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
-                        </PanelLayout.Breadcrumbs>
-                        <PanelLayout.LeftTop>
-                            <PanelWidget>
-                                <PageHeading title={t("Actions")} />
-                            </PanelWidget>
-                        </PanelLayout.LeftTop>
-                        <PanelLayout.LeftBottom>
-                            <PanelWidget>
-                                <PageHeading title={t("Navigation")} />
-                            </PanelWidget>
-                        </PanelLayout.LeftBottom>
-                        <PanelLayout.MiddleTop>
-                            <PanelWidget>
-                                <PageHeading title={article.name} />
-                            </PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
-                            <PanelWidget>
-                                <UserContent content={this.dummyPostData} />
-                            </PanelWidget>
-                        </PanelLayout.MiddleBottom>
-                        <PanelLayout.RightTop>
-                            <PanelWidget>
-                                <PageHeading title={t("Table of Contents")} />
-                            </PanelWidget>
-                        </PanelLayout.RightTop>
-                        <PanelLayout.RightBottom>
-                            <PanelWidget>
-                                <PageHeading title={t("Related Articles")} />
-                            </PanelWidget>
-                        </PanelLayout.RightBottom>
-                    </PanelLayout>
-                </Container>
-            </React.Fragment>
-        );
+        return <ArticleLayout article={article} />;
     }
 
-    private get dummyPostData(): string {
-        switch (this.props.match.params.id) {
-            case "test-post-1":
-                return dummyTestPost1;
-            case "test-post-2":
-                return dummyTestPost2;
-            case "test-post-all":
-                return dummyPostEverything;
-            default:
-                return "No dummy post data exists for this URL";
+    /**
+     * If the component mounts without any data we need to fetch request it.
+     */
+    public componentDidMount() {
+        const { articlePageState, getArticle } = this.props;
+        if (articlePageState.status !== LoadStatus.PENDING) {
+            return;
         }
+
+        const id = this.parseIDFromSlug();
+        if (id === null) {
+            return;
+        }
+
+        const numericID = parseInt(id, 10);
+        if (!Number.isInteger(numericID)) {
+            return;
+        }
+
+        getArticle({ id: numericID });
     }
 
-    private get dummyBreadcrumbData(): ICrumb[] {
-        return [
-            {
-                name: "Home",
-                url: "/kb",
-            },
-            {
-                name: "two",
-                url: "#",
-            },
-            {
-                name: "three",
-                url: "#",
-            },
-            {
-                name: "four",
-                url: "#",
-            },
-            {
-                name: "five",
-                url: "#",
-            },
-            {
-                name: "six",
-                url: "#",
-            },
-        ];
+    /**
+     * When the component unmounts we need to be sure to clear out the data we requested in componentDidMount.
+     */
+    public componentWillUnmount() {
+        this.props.clearPageState();
+    }
+
+    /**
+     * Parse the ID of the request article out of the slug in the URL.
+     *
+     * Slugs for an article can be almost anything.
+     * The contents of the last trailing slash represent the ID of the resource.
+     *
+     * @returns The ID or null if an ID could not be parsed out.
+     */
+    private parseIDFromSlug(): string | null {
+        const slug = this.props.match.params.slug;
+        const idRegex = /.+-(\d+)/;
+        const id = idRegex.exec(slug);
+        if (id && id[0]) {
+            return id[1];
+        } else {
+            return null;
+        }
     }
 }
 
+/**
+ * Map in the state from the redux store.
+ */
 function mapStateToProps(state: IStoreState) {
     return {
         articlePageState: state.knowledge.articlePage,
     };
 }
 
-function toggleMobileMenu(open: boolean = !this.state.open) {
-    this.setState({
-        menuOpen: open,
-    });
+/**
+ * Map in action dispatchable action creators from the store.
+ */
+function mapDispatchToProps(dispatch) {
+    return {
+        getArticle: options => dispatch(componentActions.getArticle(options)),
+        clearPageState: () => dispatch(componentActions.clearArticlePageState()),
+    };
 }
 
-const withRedux = connect(mapStateToProps);
+const withRedux = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+);
 
 export default withRedux(withDevice(ArticlePage));
