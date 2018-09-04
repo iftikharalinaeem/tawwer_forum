@@ -25,13 +25,9 @@ interface IProps extends IDeviceProps {
 }
 
 export class ArticlePage extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            menuOpen: false,
-        };
-    }
-
+    /**
+     * Render not found or the article.
+     */
     public render() {
         const { articlePageState } = this.props;
         const id = this.parseIDFromSlug();
@@ -50,7 +46,7 @@ export class ArticlePage extends React.Component<IProps> {
     }
 
     /**
-     * If the component mounts without any data
+     * If the component mounts without any data we need to fetch request it.
      */
     public componentDidMount() {
         const { articlePageState, getArticle } = this.props;
@@ -93,12 +89,18 @@ export class ArticlePage extends React.Component<IProps> {
     }
 }
 
+/**
+ * Map in the state from the redux store.
+ */
 function mapStateToProps(state: IStoreState) {
     return {
         articlePageState: state.knowledge.articlePage,
     };
 }
 
+/**
+ * Map in action dispatchable action creators from the store.
+ */
 function mapDispatchToProps(dispatch) {
     return {
         getArticle: options => dispatch(thunks.getArticle(options)),
