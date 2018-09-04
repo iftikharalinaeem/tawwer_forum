@@ -9,6 +9,9 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\Knowledge\PageController;
 
+/**
+ * Knowledge base controller for article view.
+ */
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
     /**
