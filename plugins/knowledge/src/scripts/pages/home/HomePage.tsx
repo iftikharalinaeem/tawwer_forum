@@ -14,13 +14,17 @@ export default class HomePage extends React.Component {
             <div>
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
-                    <Link to="/kb/articles/test-post-1">{t("/articles/test-post-1")}</Link>
+                    <Link to="/kb/articles/test-articles--text-post-1">{t("Test Article - Text Post")}</Link>
                 </p>
                 <p>
-                    <Link to="/kb/articles/test-post-2">{t("/articles/test-post-2")}</Link>
+                    <Link to="/kb/articles/test-articles--another-test-post-2">
+                        {t("Test Article - Another Text Post")}
+                    </Link>
                 </p>
                 <p>
-                    <Link to="/kb/articles/test-post-all">{t("/articles/test-post-all")}</Link>
+                    <Link to="/kb/articles/test-articles--all-formatting--embeds-3">
+                        {t("Test Article - All Formatting & Embeds")}
+                    </Link>
                 </p>
             </div>
         );
