@@ -17,6 +17,53 @@ interface IPanelLayoutProps {
     toggleMobileMenu?: (isOpen: boolean) => void;
 }
 
+/**
+ * A responsive configurable Panel Layout.
+ *
+ * This works by declaring certain sections and having the layout place them for you.
+ * See the example for usage. Just provide the sections you want to work with and the layout
+ * will attempt to place them all in the best possible way.
+ *
+ * @layout Desktop
+ * |            | Breadcrumbs  |             |
+ * | LeftTop    | MiddleTop    | RightTop    |
+ * | LeftBottom | MiddleBottom | RightBottom |
+ *
+ * @layout Tablet
+ * |            | Breadcrumbs
+ * | LeftTop    | RightTop
+ * | LeftBottom | MiddleTop
+ * |            | MiddelBottom
+ * |            | RightBottom
+ *
+ * @layout Mobile
+ *
+ * HamburgerMenu / Panel - LeftBottom
+ *
+ * | Breadcrumbs  |
+ * | LeftTop      |
+ * | RightTop     |
+ * | MiddleTop    |
+ * | MiddleBottom |
+ * | RightBottom  |
+ *
+ *
+ * @example
+ *  <PanelLayout>
+ *      <PanelLayout.BreadCrumbs>
+ *          <p>Put any component here</p>
+ *      </PanelLayout.BreadCrumbs>
+ *      <PanelLayout.LeftTop>
+ *          <p>Put any component here</p>
+ *      </PanelLayout.LeftTop>
+ *      <PanelLayout.LeftBottom>
+ *          <p>Put any component here</p>
+ *      </PanelLayout.LeftBottom>
+ *      <PanelLayout.MiddleBottom>
+ *          <p>Put any component here</p>
+ *      </PanelLayout.MiddleBottom>
+ * </PanelLayout>
+ */
 export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     public static LeftTop = LeftTop;
     public static LeftBottom = LeftBottom;
@@ -184,7 +231,7 @@ export function PanelWidget(props: IContainerProps) {
     return <div className={className("panelWidget", props.className)}>{props.children}</div>;
 }
 
-// The components that make up the
+// The components that make up the Layout itself.
 interface IPanelItemProps {
     children?: React.ReactNode;
 }
