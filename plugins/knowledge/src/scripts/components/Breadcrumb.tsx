@@ -6,13 +6,13 @@
 
 import * as React from "react";
 import className from "classnames";
+import { Link } from "react-router-dom";
 
 export interface IBreadcrumbProps {
     className?: string;
     lastElement: boolean;
     url: string;
     name: string;
-    key?: number | string;
 }
 
 export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
@@ -23,9 +23,8 @@ export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
         }
 
         return (
-            <a
-                href={this.props.url}
-                key={this.props.key}
+            <Link
+                to={this.props.url}
                 title={this.props.name}
                 aria-current={ariaCurrent}
                 className={className("breadcrumb-link", this.props.className)}
@@ -36,7 +35,7 @@ export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
                 <span className="breadcrumb-label" itemProp="name">
                     {this.props.name}
                 </span>
-            </a>
+            </Link>
         );
     }
 }

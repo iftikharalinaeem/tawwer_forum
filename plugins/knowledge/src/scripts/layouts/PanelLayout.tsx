@@ -31,8 +31,96 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     };
 
     public render() {
-        const { children, device } = this.props;
+        const { device } = this.props;
+        const children = this.getParsedChildren();
 
+        // Calculate some rendering variables.
+        const isMobile = device === Devices.MOBILE;
+        const isDesktop = device === Devices.DESKTOP;
+        const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || children.leftBottom);
+        const shouldRenderRightPanel: boolean = isDesktop && !!(children.rightTop || children.rightBottom);
+        const renderMobilePanel: boolean = isMobile && !!children.leftBottom;
+
+        // Determine the classes we want to display.
+        const panelClasses = className(
+            "panelLayout",
+            { noLeftPanel: !shouldRenderLeftPanel },
+            { noRightPanel: !shouldRenderLeftPanel },
+            this.props.className,
+        );
+
+        const crumbClasses = className(
+            "panelLayout-top",
+            { noLeftPanel: !shouldRenderLeftPanel },
+            this.props.className,
+        );
+
+        return (
+            <div className={panelClasses}>
+                {children.breadcrumbs && (
+                    <div className={crumbClasses}>
+                        <div className="panelLayout-container">
+                            {shouldRenderLeftPanel && (
+                                <Panel className="panelLayout-left">
+                                    <PanelArea className="panelArea-breadcrumbsSpacer" />
+                                </Panel>
+                            )}
+                            <Panel
+                                className={className("panelLayout-breadcrumbs", {
+                                    hasAdjacentPanel: shouldRenderLeftPanel,
+                                })}
+                            >
+                                <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
+                            </Panel>
+                        </div>
+                    </div>
+                )}
+
+                <div className="panelLayout-main">
+                    <div className="panelLayout-container">
+                        {shouldRenderLeftPanel && (
+                            <Panel className="panelLayout-left">
+                                <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                            </Panel>
+                        )}
+
+                        <div className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}>
+                            <main
+                                className={classNames("panelLayout-middle", {
+                                    hasAdjacentPanel: shouldRenderRightPanel,
+                                })}
+                            >
+                                <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
+                                {isMobile && (
+                                    <PanelArea className="panelAndNav-mobileMiddle">{children.leftTop}</PanelArea>
+                                )}
+                                {isDesktop && (
+                                    <PanelArea className="panelAndNav-tabletMiddle">{children.rightTop}</PanelArea>
+                                )}
+                                <PanelArea className="panelAndNav-middleBottom">{children.middleBottom}</PanelArea>
+                                {isDesktop && (
+                                    <PanelArea className="panelAndNav-tabletBottom">{children.rightBottom}</PanelArea>
+                                )}
+                            </main>
+                            {shouldRenderRightPanel && (
+                                <Panel className="panelLayout-right">
+                                    <PanelArea className="panelArea-rightTop">{children.rightTop}</PanelArea>
+                                    <PanelArea className="panelArea-rightBottom">{children.rightBottom}</PanelArea>
+                                </Panel>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    /**
+     * Parse out a specific subset of children. This is fast enough,
+     * but should not be called more than once per render.
+     */
+    private getParsedChildren() {
         let leftTop: React.ReactNode = null;
         let leftBottom: React.ReactNode = null;
         let middleTop: React.ReactNode = null;
@@ -41,7 +129,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         let rightBottom: React.ReactNode = null;
         let breadcrumbs: React.ReactNode = null;
 
-        React.Children.forEach(children, child => {
+        React.Children.forEach(this.props.children, child => {
             switch (true) {
                 case this.childIsOfType(child, PanelLayout.LeftTop):
                     leftTop = child;
@@ -66,81 +154,19 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             }
         });
 
-        const isMobile = device === Devices.MOBILE;
-        const isDesktop = device === Devices.DESKTOP;
-        const shouldRenderLeftPanel: boolean = !isMobile && !!(leftTop || leftBottom);
-        const shouldRenderRightPanel: boolean = isDesktop && !!(rightTop || rightBottom);
-        const renderMobilePanel: boolean = isMobile && !!leftBottom;
-
-        const crumbClasses = className(
-            "panelLayout-top",
-            { noLeftPanel: !shouldRenderLeftPanel },
-            this.props.className,
-        );
-
-        return (
-            <div
-                className={className(
-                    "panelLayout",
-                    { noLeftPanel: !shouldRenderLeftPanel },
-                    { noRightPanel: !shouldRenderLeftPanel },
-                    this.props.className,
-                )}
-            >
-                {breadcrumbs && (
-                    <div className={crumbClasses}>
-                        <div className="panelLayout-container">
-                            {shouldRenderLeftPanel && (
-                                <Panel className="panelLayout-left">
-                                    <PanelArea className="panelArea-breadcrumbsSpacer" />
-                                </Panel>
-                            )}
-                            <Panel
-                                className={className("panelLayout-breadcrumbs", {
-                                    hasAdjacentPanel: shouldRenderLeftPanel,
-                                })}
-                            >
-                                <PanelArea className="panelArea-breadcrumbs">{breadcrumbs}</PanelArea>
-                            </Panel>
-                        </div>
-                    </div>
-                )}
-
-                <div className="panelLayout-main">
-                    <div className="panelLayout-container">
-                        {shouldRenderLeftPanel && (
-                            <Panel className="panelLayout-left">
-                                <PanelArea className="panelArea-leftTop">{leftTop}</PanelArea>
-                                <PanelArea className="panelArea-leftBottom">{leftBottom}</PanelArea>
-                            </Panel>
-                        )}
-
-                        <div className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}>
-                            <main
-                                className={classNames("panelLayout-middle", {
-                                    hasAdjacentPanel: shouldRenderRightPanel,
-                                })}
-                            >
-                                <PanelArea className="panelAndNav-middleTop">{middleTop}</PanelArea>
-                                {isMobile && <PanelArea className="panelAndNav-mobileMiddle">{leftTop}</PanelArea>}
-                                {isDesktop && <PanelArea className="panelAndNav-tabletMiddle">{rightTop}</PanelArea>}
-                                <PanelArea className="panelAndNav-middleBottom">{middleBottom}</PanelArea>
-                                {isDesktop && <PanelArea className="panelAndNav-tabletBottom">{rightBottom}</PanelArea>}
-                            </main>
-                            {shouldRenderRightPanel && (
-                                <Panel className="panelLayout-right">
-                                    <PanelArea className="panelArea-rightTop">{rightTop}</PanelArea>
-                                    <PanelArea className="panelArea-rightBottom">{rightBottom}</PanelArea>
-                                </Panel>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        return {
+            leftTop,
+            leftBottom,
+            middleTop,
+            middleBottom,
+            rightTop,
+            rightBottom,
+            breadcrumbs,
+        };
     }
 }
 
+// Simple container components.
 interface IContainerProps {
     className?: string;
     children?: React.ReactNode;
@@ -158,6 +184,7 @@ export function PanelWidget(props: IContainerProps) {
     return <div className={className("panelWidget", props.className)}>{props.children}</div>;
 }
 
+// The components that make up the
 interface IPanelItemProps {
     children?: React.ReactNode;
 }

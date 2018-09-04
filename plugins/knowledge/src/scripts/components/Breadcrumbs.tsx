@@ -26,11 +26,6 @@ export default class Breadcrumbs extends React.Component<IBreadcrumbsProps> {
             const crumbs = this.props.children.map((crumb, index) => {
                 const lastElement = index === crumbCount;
                 const crumbSeparator = `›`;
-                let ariaCurrent;
-
-                if (lastElement) {
-                    ariaCurrent = `page`;
-                }
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
                         <Breadcrumb lastElement={lastElement} name={crumb.name} url={crumb.url} />
