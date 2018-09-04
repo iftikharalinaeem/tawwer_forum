@@ -4,8 +4,5 @@
         "shave": "^2.4.0",
         "swiper": "^4.3.5"
     },
-    "devDependencies": {
-        "@types/react": "^16.4.13",
-        "@vanillaforums/babel-preset": "^1.0.5"
-    }
+    "devDependencies": {}
 }

@@ -36,7 +36,7 @@ export class ArticlePage extends React.Component<IProps> {
         const id = this.parseIDFromSlug();
 
         if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
-            return <NotFoundPage />;
+            return <NotFoundPage type="Page" />;
         }
 
         if (articlePageState.status !== LoadStatus.SUCCESS) {
