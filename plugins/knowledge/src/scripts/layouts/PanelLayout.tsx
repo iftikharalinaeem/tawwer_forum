@@ -103,7 +103,8 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             this.props.className,
         );
 
-        const ContentTag = this.props.contentTag;
+        // If applicable, set semantic tag, like "article"
+        const ContentTag = `${this.props.contentTag}`;
 
         return (
             <div className={panelClasses}>
@@ -126,44 +127,54 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     </div>
                 )}
 
-                <div className="panelLayout-main">
+                <main className="panelLayout-main">
                     <div className="panelLayout-container">
                         {shouldRenderLeftPanel && (
-                            <Panel className="panelLayout-left">
+                            <Panel className="panelLayout-left" tag="aside">
                                 <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
                                 <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
                             </Panel>
                         )}
 
-                        <main
+                        <ContentTag
                             className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}
                         >
-                            <ContentTag
+                            <div
                                 className={classNames("panelLayout-middle", {
                                     hasAdjacentPanel: shouldRenderRightPanel,
                                 })}
                             >
                                 <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
                                 {isMobile && (
-                                    <PanelArea className="panelAndNav-mobileMiddle">{children.leftTop}</PanelArea>
+                                    <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
+                                        {children.leftTop}
+                                    </PanelArea>
                                 )}
                                 {!isDesktop && (
-                                    <PanelArea className="panelAndNav-tabletMiddle">{children.rightTop}</PanelArea>
+                                    <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
+                                        {children.rightTop}
+                                    </PanelArea>
                                 )}
                                 <PanelArea className="panelAndNav-middleBottom">{children.middleBottom}</PanelArea>
                                 {!isDesktop && (
-                                    <PanelArea className="panelAndNav-tabletBottom">{children.rightBottom}</PanelArea>
+                                    <PanelArea className="panelAndNav-tabletBottom" tag="aside">
+                                        {children.rightBottom}
+                                    </PanelArea>
                                 )}
-                            </ContentTag>
+                            </div>
                             {shouldRenderRightPanel && (
                                 <Panel className="panelLayout-right">
-                                    <PanelArea className="panelArea-rightTop">{children.rightTop}</PanelArea>
-                                    <PanelArea className="panelArea-rightBottom">{children.rightBottom}</PanelArea>
+                                    <PanelArea className="panelArea-rightTop" tag="aside">
+                                        {children.rightTop}
+                                    </PanelArea>
+                                    <PanelArea className="panelArea-rightBottom" tag="aside">
+                                        {children.rightBottom}
+                                    </PanelArea>
                                 </Panel>
                             )}
-                        </main>
+                        </ContentTag>
                     </div>
-                </div>
+                </main>
             </div>
         );
     }
@@ -223,14 +234,17 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 interface IContainerProps {
     className?: string;
     children?: React.ReactNode;
+    tag?: string;
 }
 
 export function Panel(props: IContainerProps) {
-    return <div className={className("panelLayout-panel", props.className)}>{props.children}</div>;
+    const Tag = `${props.tag ? props.tag : "div"}`;
+    return <Tag className={className("panelLayout-panel", props.className)}>{props.children}</Tag>;
 }
 
 export function PanelArea(props: IContainerProps) {
-    return <div className={className("panelArea", props.className)}>{props.children}</div>;
+    const Tag = `${props.tag ? props.tag : "div"}`;
+    return <Tag className={className("panelArea", props.className)}>{props.children}</Tag>;
 }
 
 export function PanelWidget(props: IContainerProps) {
