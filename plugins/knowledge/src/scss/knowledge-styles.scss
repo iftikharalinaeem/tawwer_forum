@@ -1,11 +1,11 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
- */
-
 @import "~dashboard-scss/core-variables";
 @import "~normalize.css";
+
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 // Temporarily import editor variables and mixins. We will need to resolve how we will split these out.
 @import "~dashboard-scss/editor/variables";
@@ -28,16 +28,19 @@
 @import "base/scaffolding";
 @import "base/typography";
 
-@import "layouts/layout";
+@import "layouts/page";
+@import "layouts/container";
 @import "layouts/panelLayout";
+@import "layouts/panelWidget";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
 //@import "layouts/section";
+@import "layouts/mobileMenu";
 @import "layouts/deviceChecker";
 //
 //@import "components/widgets";
 //@import "components/metas";
-//@import "components/icons";
+@import "components/icons";
 //@import "components/buttons";
 //@import "components/buttonGroups";
 //@import "components/fullBackground";
@@ -49,7 +52,7 @@
 //@import "components/inputBlock";
 //@import "components/inputText";
 //@import "components/newArticle";
-//@import "components/pageHeading";
+@import "components/pageHeading";
 //@import "components/helpful";
 //@import "components/attachment";
 //@import "components/navMenu";
@@ -61,7 +64,7 @@
 //@import "components/formatIcons";
 //@import "components/pagination";
 //@import "components/pageMetas";
-//@import "components/breadcrumbs"; // Temporary
+@import "components/breadcrumbs";
 //@import "components/radioButtonsAsTabs";
 //@import "components/autoComplete";
 //@import "components/layoutWidget";

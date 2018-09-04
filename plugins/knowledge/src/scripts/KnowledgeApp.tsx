@@ -44,4 +44,8 @@ export default class KnowledgeApp extends React.Component {
             </Provider>
         );
     }
+
+    public componentDidMount() {
+        this.forceUpdate();
+    }
 }

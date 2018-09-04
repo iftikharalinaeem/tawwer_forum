@@ -74,11 +74,12 @@ mark {
 }
 
 
-//a {
-//  @include allLinkStates {
-//    text-decoration: none;
-//  }
-//
+a {
+  @include allLinkStates {
+    text-decoration: none;
+  }
+}
+
 //  color: $link_default-color;
 //
 //  &:not(.isDisabled):not([disabled]):hover {

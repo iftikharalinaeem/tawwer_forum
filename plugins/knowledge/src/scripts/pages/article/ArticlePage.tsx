@@ -17,6 +17,7 @@ import UserContent from "@knowledge/components/UserContent";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
+import { Devices } from "@knowledge/components/DeviceChecker";
 import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
 import { LoadStatus } from "@dashboard/@types/api";
 
@@ -27,7 +28,18 @@ interface IProps extends IDeviceProps {
     articlePageState: IArticlePageState;
 }
 
-export class ArticlePage extends React.Component<IProps> {
+interface IState {
+    menuOpen: boolean;
+}
+
+export class ArticlePage extends React.Component<IProps, IState> {
+    constructor(props) {
+        super(props);
+        this.state = {
+            menuOpen: false,
+        };
+    }
+
     public render() {
         if (this.props.articlePageState.status !== LoadStatus.SUCCESS) {
             return null;
@@ -36,44 +48,50 @@ export class ArticlePage extends React.Component<IProps> {
         const article = this.props.articlePageState.data.article;
 
         return (
-            <Container>
-                <PanelLayout device={this.props.device} breadcrumbs={this.dummyBreadcrumbData}>
-                    {{
-                        leftTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Actions")} />
-                            </PanelWidget>
-                        ),
-                        leftBottomComponents: (
-                            <React.Fragment>
+            <React.Fragment>
+                <Container>
+                    <PanelLayout
+                        device={this.props.device}
+                        breadcrumbs={this.dummyBreadcrumbData}
+                        toggleMobileMenu={toggleMobileMenu}
+                    >
+                        {{
+                            leftTopComponents: (
                                 <PanelWidget>
-                                    <PageHeading title={t("Navigation")} />
+                                    <PageHeading title={t("Actions")} />
                                 </PanelWidget>
-                            </React.Fragment>
-                        ),
-                        middleTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={article.name} />
-                            </PanelWidget>
-                        ),
-                        middleBottomComponents: (
-                            <PanelWidget>
-                                <UserContent content={this.dummyPostData} />
-                            </PanelWidget>
-                        ),
-                        rightTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Table of Contents")} />
-                            </PanelWidget>
-                        ),
-                        rightBottomComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Related Articles")} />
-                            </PanelWidget>
-                        ),
-                    }}
-                </PanelLayout>
-            </Container>
+                            ),
+                            leftBottomComponents: (
+                                <React.Fragment>
+                                    <PanelWidget>
+                                        <PageHeading title={t("Navigation")} />
+                                    </PanelWidget>
+                                </React.Fragment>
+                            ),
+                            middleTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={article.name} />
+                                </PanelWidget>
+                            ),
+                            middleBottomComponents: (
+                                <PanelWidget>
+                                    <UserContent content={this.dummyPostData} />
+                                </PanelWidget>
+                            ),
+                            rightTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Table of Contents")} />
+                                </PanelWidget>
+                            ),
+                            rightBottomComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Related Articles")} />
+                                </PanelWidget>
+                            ),
+                        }}
+                    </PanelLayout>
+                </Container>
+            </React.Fragment>
         );
     }
 
@@ -126,6 +144,12 @@ function mapStateToProps(state: IStoreState) {
     return {
         articlePageState: state.knowledge.articlePage,
     };
+}
+
+function toggleMobileMenu(open: boolean = !this.state.open) {
+    this.setState({
+        menuOpen: open,
+    });
 }
 
 const withRedux = connect(mapStateToProps);
