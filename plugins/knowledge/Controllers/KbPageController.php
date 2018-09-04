@@ -23,7 +23,7 @@ class KbPageController extends PageController {
         if (\Gdn::config('HotReload.Enabled', false) === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
-        $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
@@ -34,7 +34,7 @@ class KbPageController extends PageController {
      */
     private function getStaticData() {
         $data = [
-            'debug' => Gdn::config('debug'),
+            'debug' => \Gdn::config('debug'),
             'scripts' => $this->getScripts(),
             'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
