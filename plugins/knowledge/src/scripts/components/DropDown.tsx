@@ -16,8 +16,8 @@ interface IDropDown {
 
 export default class DropDown extends React.Component<IDropDown> {
     public render() {
-        return (
-            {/* TODO */}
-        );
+        return {
+            /* TODO */
+        };
     }
 }

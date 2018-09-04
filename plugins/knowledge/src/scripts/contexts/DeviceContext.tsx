@@ -6,10 +6,9 @@
 
 import * as React from "react";
 import { Devices, IDeviceProps } from "@knowledge/components/DeviceChecker";
+import { Omit } from "@knowledge/@types/typeUtils";
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
-
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export function withDevice<T extends IDeviceProps = IDeviceProps>(
     WrappedComponent: React.ComponentClass<IDeviceProps>,

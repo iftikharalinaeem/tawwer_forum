@@ -9,13 +9,13 @@ import className from "classnames";
 import { t } from "@dashboard/application";
 import Breadcrumb from "@knowledge/components/Breadcrumb";
 
-interface IBreadcrumbProps {
+export interface ICrumb {
     name: string;
     url: string;
 }
 
 export interface IBreadcrumbsProps {
-    children: IBreadcrumbProps[];
+    children: ICrumb[];
     className?: string;
 }
 
@@ -26,11 +26,6 @@ export default class Breadcrumbs extends React.Component<IBreadcrumbsProps> {
             const crumbs = this.props.children.map((crumb, index) => {
                 const lastElement = index === crumbCount;
                 const crumbSeparator = `›`;
-                let ariaCurrent;
-
-                if (lastElement) {
-                    ariaCurrent = `page`;
-                }
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
                         <Breadcrumb lastElement={lastElement} name={crumb.name} url={crumb.url} />
