@@ -6,8 +6,10 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
-use \Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
 /**
@@ -17,6 +19,9 @@ class ArticlesApiController extends \AbstractApiController {
 
     /** @var \Garden\Schema\Schema */
     private $articleFragmentSchema;
+
+    /** @var \Garden\Schema\Schema */
+    private $articlePostSchema;
 
     /** @var \Garden\Schema\Schema */
     private $articleSchema;
@@ -46,12 +51,12 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleByID(int $id): array {
         $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article");
+            throw new NotFoundException("Article");
         }
         $row = reset($resultSet);
         return $row;
@@ -76,16 +81,39 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
+     * Get a article schema with minimal add/edit fields.
+     *
+     * @param string $type The type of schema.
+     * @return \Garden\Schema\Schema Returns a schema object.
+     */
+    public function articlePostSchema(string $type = ""): \Garden\Schema\Schema {
+        if ($this->articlePostSchema === null) {
+            $this->articlePostSchema = $this->schema(
+                \Garden\Schema\Schema::parse([
+                    "name",
+                    "locale?",
+                    "body",
+                    "format",
+                    "knowledgeCategoryID",
+                    "sort?",
+                ])->add($this->articleSchema()),
+                "ArticlePost"
+            );
+        }
+        return $this->schema($this->articlePostSchema, $type);
+    }
+
+    /**
      * Get an article revision by its numeric ID.
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleRevisionByID(int $id): array {
         $resultSet = $this->articleRevisionModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article Revision");
+            throw new NotFoundException("Article Revision");
         }
         $row = reset($resultSet);
         return $row;
@@ -94,20 +122,40 @@ class ArticlesApiController extends \AbstractApiController {
     /**
      * Get the full schema for an article. This includes current revision fields.
      *
+     * @param string $type
      * @return \Garden\Schema\Schema
      */
-    public function articleSchema(): \Garden\Schema\Schema {
+    public function articleSchema(string $type = ""): \Garden\Schema\Schema {
+        return $this->schema($this->fullSchema(), $type);
+    }
+
+    /**
+     * Get a schema representing the combined available fields from articles and revisions.
+     *
+     * @return \Garden\Schema\Schema
+     */
+    private function fullSchema(): \Garden\Schema\Schema {
         if ($this->articleSchema === null) {
             $this->articleSchema = $this->schema([
                 "articleID:i" => "Unique article ID.",
-                "name:s" => "Title of the article.",
+                "name:s" => [
+                    "allowNull" => true,
+                    "description" => "Title of the article.",
+                ],
                 "locale:s" => [
                     "allowNull" => true,
                     "description" => "Locale the article was written in.",
                 ],
-                "body:s" => "Raw body contents.",
-                "bodyRendered:s" => "Rendered body contents.",
+                "body:s" => [
+                    "allowNull" => true,
+                    "description" => "Raw body contents.",
+                ],
+                "bodyRendered:s" => [
+                    "allowNull" => true,
+                    "description" => "Rendered body contents.",
+                ],
                 "format:s" => [
+                    "allowNull" => true,
                     "enum" => ["text", "textex", "markdown", "wysiwyg", "html", "bbcode", "rich"],
                     "description" => "Format of the raw body content.",
                 ],
@@ -142,7 +190,6 @@ class ArticlesApiController extends \AbstractApiController {
         }
         return $this->articleSchema;
     }
-
     /**
      * Handle GET requests to the root of the endpoint.
      *
@@ -161,12 +208,6 @@ class ArticlesApiController extends \AbstractApiController {
         $query = $in->validate($query);
 
         $article = $this->articleByID($id);
-        $articleRevisionID = $article["articleRevisionID"] ?? null;
-        if ($articleRevisionID) {
-            $articleRevision = $this->articleRevisionByID($articleRevisionID);
-            $article = array_merge($articleRevision, $article);
-        }
-
         $article = $this->normalizeOutput($article, $query["expand"] ?: []);
         $result = $out->validate($article);
         return $result;
@@ -189,27 +230,169 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
+     * Massage article row data for useful API output.
+     *
      * @param array $row
      * @param array $expand
      * @return array
+     * @throws ServerException If no article ID was found in the row.
      */
     public function normalizeOutput(array $row, array $expand = []): array {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
-            throw new \Garden\Web\Exception\ServerException("No ID in article row.");
+            throw new ServerException("No ID in article row.");
         }
-        $slug = \Gdn_Format::url($row["name"] ?? "example-slug");
+
+        $slug = \Gdn_Format::url($row["name"] ? "{$row['name']}-{$row['articleID']}" : $row["articleID"]);
+        $row["url"] = url("/kb/articles/{$slug}", true);
+
+        // Merge in the current revision.
+        $revision = [
+            "name" => null,
+            "locale" => null,
+            "body" => null,
+            "bodyRendered" => null,
+            "format" => null,
+        ];
+
+        $revisionResult = $this->articleRevisionModel->get([
+            "articleID" => $row["articleID"],
+            "status" => "published"
+        ]);
+        if ($revisionResult) {
+            $revisionRow = reset($revisionResult);
+            $revision = $revisionRow + $revision;
+        }
+        $row = array_merge($revision, $row);
 
         // Placeholder data.
         $row["seoName"] = "Example SEO Name";
         $row["seoDescription"] = "Example SEO description.";
         $row["slug"] = $slug;
-        $row["url"] = url("/kb/articles/{$slug}-{$articleID}", true);
-
         if ($this->isExpandField("ancestors", $expand)) {
             $row["categoryAncestorIDs"] = [1, 2, 3];
         }
 
         return $row;
+    }
+
+    /**
+     * Update an existing article.
+     *
+     * @param array $body
+     */
+    public function patch(int $id, array $body): array {
+        $this->permission();
+
+        $in = $this->articlePostSchema("in");
+        $out = $this->articleSchema("out");
+
+        $body = $in->validate($body);
+        $body["articleID"] = $id;
+        $articleID = $this->save($body);
+        $row = $this->articleByID($articleID);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Create a new article.
+     *
+     * @param array $body
+     */
+    public function post(array $body): array {
+        $this->permission();
+
+        $in = $this->articlePostSchema("in");
+        $out = $this->articleSchema("out");
+
+        $body = $in->validate($body);
+        $articleID = $this->save($body);
+        $row = $this->articleByID($articleID);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Save an article, diverting the data to its respective models.
+     *
+     * @param array $fields
+     */
+    private function save(array $fields): int {
+        // Save data to the article table.
+        $articleFields = [
+            "articleID",
+            "knowledgeCategoryID",
+            "sort",
+        ];
+        $article = array_intersect_key($fields, array_flip($articleFields));
+        $articleID = $this->saveArticle($article);
+
+        // Save data to the revision table.
+        $revisionFields = [
+            "name",
+            "format",
+            "body",
+            "locale",
+        ];
+        $revision = array_intersect_key($fields, array_flip($revisionFields));
+        if ($revision) {
+            $revision["articleID"] = $articleID;
+            $this->saveRevision($revision);
+        }
+
+        return $articleID;
+    }
+
+    /**
+     * Insert or update an article row.
+     *
+     * @param array $data
+     * @return int
+     */
+    private function saveArticle(array $data): int {
+        $articleID = $data["articleID"] ?? null;
+        $userID = $this->getSession()->UserID;
+
+        if ($articleID) {
+            // Update
+            $data["updateUserID"] = $userID;
+            $data["dateUpdated"] = new \DateTimeImmutable("now");
+            $this->articleModel->update($data, ["articleID" => $articleID]);
+        } else {
+            // Insert
+            $data["insertUserID"] = $data["updateUserID"] = $userID;
+            $data["dateInserted"] = $data["dateUpdated"] = new \DateTimeImmutable("now");
+            $articleID = $this->articleModel->insert($data);
+        }
+
+        return $articleID;
+    }
+
+    /**
+     * Save a new article revision.
+     *
+     * @param array $data
+     * @return int
+     */
+    private function saveRevision(array $data): int {
+        $data["bodyRendered"] = \Gdn_Format::to($data["body"], $data["format"]);
+        $data["insertUserID"] = $this->getSession()->UserID;
+        $data["dateInserted"] = new \DateTimeImmutable("now");
+        $revisionID = $this->articleRevisionModel->insert($data);
+
+        // Remove the "published" flag from the currently-published revision.
+        $this->articleRevisionModel->update(
+            ["status" => null],
+            ["articleID" => $data["articleID"], "status" => "published"]
+        );
+        // Publish this revision.
+        $this->articleRevisionModel->update(
+            ["status" => "published"],
+            ["articleRevisionID" => $revisionID]
+        );
+        return $revisionID;
     }
 }
