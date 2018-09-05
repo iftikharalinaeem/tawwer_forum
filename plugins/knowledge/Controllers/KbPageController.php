@@ -64,6 +64,7 @@ class KbPageController extends PageController {
         $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
+        $data['template'] = 'seo/pages/home.twig';
 
         echo $this->twig->render('default-master.twig', $data);
     }
@@ -79,6 +80,7 @@ class KbPageController extends PageController {
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
+        $data['template'] = 'seo/pages/article.twig';
 
         echo $this->twig->render('default-master.twig', $data);
     }
