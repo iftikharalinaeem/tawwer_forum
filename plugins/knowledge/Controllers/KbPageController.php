@@ -13,28 +13,27 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\SiteContextModel;
 use Vanilla\Knowledge\PageController;
 
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
-//    use ReduxTrait;
-
-    /** @var ArticlesApiController */
-    private $articlesApi;
 
     /** @var bool */
     private $hotReloadEnabled;
 
     /** @var ArticlesApiController */
-    private $articlesApiController;
+    private $articlesApi;
 
     /**
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param ArticlesApiController $articlesApiController To fetch article resources.
      * @param \Gdn_Configuration $config To read some configuration values.
+     * @param SiteContextModel $siteContext Get data about the site.
+     * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
         \AssetModel $assetModel,
@@ -105,14 +104,18 @@ class KbPageController extends PageController {
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
 
-        $this->data[self::API_PAGE_KEY] = $this->articlesApiController->get($id);
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
 
+        // Put together pre-loaded redux actions.
         $reduxActions = [
-            $this->createReduxAction("GET_ARTICLE_SUCCESS",  $this->data[self::API_PAGE_KEY]),
+            $this->createReduxAction(
+                ArticlesApiActions::GET_ARTICLE_SUCCESS,
+                $this->data[self::API_PAGE_KEY]
+            ),
         ];
 
-        $reduxActionScript = $this->createInlineJavascriptVariable("__ACTIONS__", $reduxActions);
+        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
         $this->inlineScripts[] = $reduxActionScript;
 
         // We'll need to be able to set all of this dynamically in the future.
@@ -121,35 +124,14 @@ class KbPageController extends PageController {
         echo $this->twig->render('default-master.twig', $data);
     }
 
-    private function createInlineJavascriptVariable(string $variableName, array $contents) {
-        return 'window["' . $variableName . '"]='.json_encode($contents).";\n";
-    }
-
-    private function gatherSiteContext() {
-        return [
-            'host' => Gdn::request()->domain(),
-            'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
-            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
-        ];
-    }
-
-    private function createReduxAction(string $type, array &$data) {
-        return [
-            "type" => $type,
-            "payload" => [
-                "data" => $data,
-            ],
-        ];
-    }
-
     /**
-     * Get breadcrumb.
+     * Get breadcrumb data.
      *
      * @param string $format Breadcrumb format: array, json etc. Default is json
      *
      * @return string
      */
-    public function getBreadcrumb(string $format = 'json') {
+    public function getBreadcrumbData(string $format = 'json') {
         return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
     }
 

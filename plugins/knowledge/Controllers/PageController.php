@@ -7,14 +7,16 @@
 
 namespace Vanilla\Knowledge;
 
+use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
+use Vanilla\Knowledge\Models\SiteContextModel;
 
 /**
  * Knowledge Base base controller class.
  *
  * This controller expects most content to come from api
  */
-class PageController extends \Garden\Controller {
+class PageController extends \Garden\Controller implements InjectableInterface {
     const API_PAGE_KEY = 'page';
 
     protected $data = [];
@@ -34,6 +36,22 @@ class PageController extends \Garden\Controller {
      */
     public function __construct() {
         $this->meta = new PageMetaModel();
+    }
+
+    /**
+     * Get dependencies injected by the container.
+     *
+     * @param SiteContextModel $siteContext Needed to pass data to the frontend.
+     */
+    public function setDependencies(SiteContextModel $siteContext) {
+        // Assemble our site context for the frontend.
+        $gdnData = [
+            'meta' => [
+                'context' => $siteContext->getContext(),
+            ],
+        ];
+
+        $this->inlineScripts[] = $this->createInlineScriptContent("gdn", $gdnData);
     }
 
     /**
@@ -134,6 +152,32 @@ class PageController extends \Garden\Controller {
             ->setSeo('locale', $this->getApiPageData('locale'))
             ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
         return $this;
+    }
+
+    /**
+     * Create some inline script content.
+     *
+     * @param string $variableName The name of the variable on window to set.
+     * @param array $contents The data to JSON encode as the value of the variable.
+     * @return string The script contents.
+     */
+    protected function createInlineScriptContent(string $variableName, $contents) {
+        return 'window["' . $variableName . '"]='.json_encode($contents).";\n";
+    }
+
+    /**
+     * Create an action
+     * @param string $type
+     * @param array $data
+     * @return array
+     */
+    protected function createReduxAction(string $type, array &$data) {
+        return [
+            "type" => $type,
+            "payload" => [
+                "data" => $data,
+            ],
+        ];
     }
 
     /**
