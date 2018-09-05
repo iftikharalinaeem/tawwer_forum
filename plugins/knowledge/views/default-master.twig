@@ -2,6 +2,7 @@
 <html lang="{{ meta.seo.locale }}">
     <head>
         <title>{{ meta.seo.title }}</title>
+        <meta name="description" content="{{ meta.seo.description }}">
 
         {% for meta in meta.tags -%}
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />

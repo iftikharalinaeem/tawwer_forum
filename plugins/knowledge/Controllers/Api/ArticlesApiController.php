@@ -6,7 +6,12 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 use \Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -46,12 +51,12 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleByID(int $id): array {
         $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article");
+            throw new NotFoundException("Article");
         }
         $row = reset($resultSet);
         return $row;
@@ -80,12 +85,12 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleRevisionByID(int $id): array {
         $resultSet = $this->articleRevisionModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article Revision");
+            throw new NotFoundException("Article Revision");
         }
         $row = reset($resultSet);
         return $row;
@@ -192,11 +197,13 @@ class ArticlesApiController extends \AbstractApiController {
      * @param array $row
      * @param array $expand
      * @return array
+     *
+     * @throws ServerException
      */
     public function normalizeOutput(array $row, array $expand = []): array {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
-            throw new \Garden\Web\Exception\ServerException("No ID in article row.");
+            throw new ServerException("No ID in article row.");
         }
         $slug = \Gdn_Format::url($row["name"] ?? "example-slug");
 
