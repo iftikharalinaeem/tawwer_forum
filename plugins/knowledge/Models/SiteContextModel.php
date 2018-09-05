@@ -28,6 +28,9 @@ class SiteContextModel {
      */
     public function __construct(\Gdn_Request $request) {
         $this->host = $request->domain();
+
+        // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
+        // But never with a trailing slash.
         $this->basePath = rtrim('/'.trim($request->webRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->assetRoot(), '/'), '/');
     }
