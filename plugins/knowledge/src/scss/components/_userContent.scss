@@ -22,4 +22,14 @@
   > *:not(:last-child) {
     margin-bottom: $global-block_margin;
   }
+
+  p {
+    margin: 0;
+    a {
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+  }
 }
