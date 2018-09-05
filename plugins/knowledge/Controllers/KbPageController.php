@@ -18,6 +18,9 @@ use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\SiteContextModel;
 use Vanilla\Knowledge\PageController;
 
+/**
+ * Knowledge base controller for article view.
+ */
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
 
@@ -48,7 +51,7 @@ class KbPageController extends PageController {
         if ($this->hotReloadEnabled === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
-        $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
