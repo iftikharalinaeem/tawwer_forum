@@ -7,28 +7,44 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\SiteContextModel;
 use Vanilla\Knowledge\PageController;
 
+/**
+ * Knowledge base controller for article view.
+ */
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
+
+    /** @var ArticlesApiController */
+    private $articlesApi;
 
     /**
      * KnowledgePageController constructor.
      *
-     * @param \AssetModel $assetModel AssetModel to get js and css
+     * @param \AssetModel $assetModel AssetModel To get js and css.
+     * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
         \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController) {
+        ArticlesApiController $articlesApiController
+    ) {
         parent::__construct();
-        $this->api = $articlesApiController;
+        $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
-        $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
@@ -66,27 +82,40 @@ class KbPageController extends PageController {
         $data = $this->getStaticData();
         $data['template'] = 'seo/pages/home.twig';
 
-        echo $this->twig->render('default-master.twig', $data);
+        echo $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
      * Render out the /kb/articles/:path page.
      *
-     * @param string $path URI slug page action string
+     * @param string $path URI slug page action string.
      */
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
-        $this->data[self::API_PAGE_KEY] = $this->api->get($id);
+
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+
+        // Put together pre-loaded redux actions.
+        $reduxActions = [
+            $this->createReduxAction(
+                ArticlesApiActions::GET_ARTICLE_SUCCESS,
+                $this->data[self::API_PAGE_KEY]
+            ),
+        ];
+
+        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
+        $this->inlineScripts[] = $reduxActionScript;
+
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twig->render('default-master.twig', $data);
+        echo $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
-     * Get breadcrumb.
+     * Get breadcrumb data.
      *
      * @param string $format Breadcrumb format: array, json etc. Default is json
      *
@@ -100,11 +129,12 @@ class KbPageController extends PageController {
      * Get article id
      *
      * @return string
+     * @throws ClientException If the URL can't be parsed properly.
      */
     public function detectArticleId($path) {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
-            throw new \Exception('Can\'t detect article id!');
+            throw new ClientException('Can\'t detect article id!', 400);
         }
         $id = (int)$matches[1];
         return $id;

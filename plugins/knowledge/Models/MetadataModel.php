@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL v2
+ * @license GPL-2.0-only
  */
 
 namespace Vanilla\Knowledge\Models;
@@ -64,5 +64,4 @@ class PageMetaModel {
             'seo' => $this->seo
         ];
     }
-
 }

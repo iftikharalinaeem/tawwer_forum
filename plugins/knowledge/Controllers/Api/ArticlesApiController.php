@@ -105,6 +105,7 @@ class ArticlesApiController extends \AbstractApiController {
                 "ArticlePost"
             );
         }
+
         return $this->schema($this->articlePostSchema, $type);
     }
 
