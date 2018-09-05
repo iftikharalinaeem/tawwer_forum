@@ -6,12 +6,17 @@
 
 import * as React from "react";
 import Breadcrumbs, { ICrumb } from "@knowledge/components/Breadcrumbs";
+import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 
 interface IProps {}
 
 export default class ArticleBreadcrumbs extends React.Component<IProps> {
     public render() {
-        return <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>;
+        return (
+            <PanelWidget>
+                <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
+            </PanelWidget>
+        );
     }
 
     /**

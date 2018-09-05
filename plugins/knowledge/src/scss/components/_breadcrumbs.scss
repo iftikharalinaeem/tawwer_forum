@@ -21,16 +21,17 @@ $breadcrumbs-activeLink_opacity: 1;
 
 .breadcrumb-link {
   @include singleLineEllipsis;
+  display: inline-block;
   line-height: 1;
   color: inherit;
 
   &:hover {
     color: $breadcrumbs-accentColor;
+    text-decoration: underline;
   }
 }
 
 .breadcrumb-current {
-  line-height: 1;
   color: inherit;
   opacity: $breadcrumbs-activeLink_opacity;
 }
@@ -40,7 +41,7 @@ $breadcrumbs-activeLink_opacity: 1;
 }
 
 .breadcrumbs-separatorIcon {
-  font-family: arial, Sans-Serif !important; // Make sure character exists, no matter what the body font is
+  font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
   margin: 0 .5em;
   opacity: .5;
   position: relative;
