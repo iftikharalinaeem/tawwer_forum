@@ -39,6 +39,7 @@ class KbPageController extends PageController {
     private function getStaticData() {
         $data = [
             'debug' => \Gdn::config('Debug'),
+            'page' => &$this->data[self::API_PAGE_KEY],
             'scripts' => $this->getScripts(),
             'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
@@ -68,25 +69,17 @@ class KbPageController extends PageController {
 
     /**
      * Render out the /kb/articles/:path page.
+     *
+     * @param string $path URI slug page action string
      */
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
-        $this->data['page'] = $this->api->get($id);
+        $this->data[self::API_PAGE_KEY] = $this->api->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
-        $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
 
         echo $this->twig->render('default-master.twig', $data);
-    }
-
-    /**
-     * Get canonical link
-     *
-     * @return string
-     */
-    public function getCanonicalLink() {
-        return '/kb/';
     }
 
     /**
