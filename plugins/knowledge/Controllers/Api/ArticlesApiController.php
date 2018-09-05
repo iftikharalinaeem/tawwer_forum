@@ -6,9 +6,13 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Exception;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -52,6 +56,7 @@ class ArticlesApiController extends \AbstractApiController {
      * @param int $id Article ID.
      * @return array
      * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If a fetched row fails to validate against the article schema.
      */
     private function articleByID(int $id): array {
         $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
@@ -101,22 +106,6 @@ class ArticlesApiController extends \AbstractApiController {
             );
         }
         return $this->schema($this->articlePostSchema, $type);
-    }
-
-    /**
-     * Get an article revision by its numeric ID.
-     *
-     * @param int $id Article ID.
-     * @return array
-     * @throws NotFoundException If the article could not be found.
-     */
-    private function articleRevisionByID(int $id): array {
-        $resultSet = $this->articleRevisionModel->get(["ArticleID" => $id], ["limit" => 1]);
-        if (empty($resultSet)) {
-            throw new NotFoundException("Article Revision");
-        }
-        $row = reset($resultSet);
-        return $row;
     }
 
     /**
@@ -190,11 +179,20 @@ class ArticlesApiController extends \AbstractApiController {
         }
         return $this->articleSchema;
     }
+
     /**
      * Handle GET requests to the root of the endpoint.
      *
      * @param int $id
+     * @param array $query
      * @return array
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ValidationException If input validation fails.
+     * @throws ValidationException If output validation fails.
+     * @throws NotFoundException If the article could not be found.
+     * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
         $this->permission();
@@ -236,6 +234,8 @@ class ArticlesApiController extends \AbstractApiController {
      * @param array $expand
      * @return array
      * @throws ServerException If no article ID was found in the row.
+     * @throws ValidationException If a fetched article fails to validate against the article schema.
+     * @throws ValidationException If a fetched article revision fails to validate against the article revision schema.
      */
     public function normalizeOutput(array $row, array $expand = []): array {
         $articleID = $row["articleID"] ?? null;
@@ -279,9 +279,14 @@ class ArticlesApiController extends \AbstractApiController {
     /**
      * Update an existing article.
      *
+     * @param int $id
      * @param array $body
+     * @return array
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch(int $id, array $body): array {
+    public function patch(int $id, array $body = []): array {
         $this->permission();
 
         $in = $this->articlePostSchema("in");
@@ -300,6 +305,10 @@ class ArticlesApiController extends \AbstractApiController {
      * Create a new article.
      *
      * @param array $body
+     * @return array
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body): array {
         $this->permission();
@@ -319,6 +328,7 @@ class ArticlesApiController extends \AbstractApiController {
      * Save an article, diverting the data to its respective models.
      *
      * @param array $fields
+     * @return int
      */
     private function save(array $fields): int {
         // Save data to the article table.
@@ -351,6 +361,7 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param array $data
      * @return int
+     * @throws Exception If saving the article fails.
      */
     private function saveArticle(array $data): int {
         $articleID = $data["articleID"] ?? null;
@@ -376,6 +387,7 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param array $data
      * @return int
+     * @throws Exception If saving the article revision fails.
      */
     private function saveRevision(array $data): int {
         $data["bodyRendered"] = \Gdn_Format::to($data["body"], $data["format"]);
