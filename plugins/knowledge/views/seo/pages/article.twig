@@ -2,6 +2,6 @@
 <main>
     <article>
         {% include 'seo/components/title.twig' with {'title': meta.seo.title} %}
-        {{ page.content|raw }}
+        {{ page.bodyRendered|raw }}
     </article>
 </main>
