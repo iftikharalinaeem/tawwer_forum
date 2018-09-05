@@ -123,7 +123,7 @@ class KbPageController extends PageController {
         $data = $this->getStaticData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twig->render('default-master.twig', $data);
+        echo $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
@@ -133,7 +133,7 @@ class KbPageController extends PageController {
      *
      * @return string
      */
-    public function getBreadcrumbData(string $format = 'json') {
+    public function getBreadcrumb(string $format = 'json') {
         return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
     }
 
