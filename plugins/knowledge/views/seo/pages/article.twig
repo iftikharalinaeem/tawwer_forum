@@ -1,7 +1,7 @@
 
 <main>
     <article>
-        {% include 'seo/components/title.twig' with {'title': meta.seo.title} %}
+        {% include 'seo/components/title.twig' with {'title': page.name} %}
         {{ page.bodyRendered|raw }}
     </article>
 </main>
