@@ -329,6 +329,8 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param array $fields
      * @return int
+     * @throws Exception If there was an error saving the article row.
+     * @throws Exception If there was an error saving the article revision row.
      */
     private function save(array $fields): int {
         // Save data to the article table.
