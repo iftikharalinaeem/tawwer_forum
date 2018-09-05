@@ -49,6 +49,9 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   flex-wrap: nowrap;
 }
 
+.panelLayout-top {
+  margin-bottom: $global-gutter_halfSize;
+}
 
 
 // Left Section
@@ -80,6 +83,11 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 .panelLayout-breadcrumbs {
+  padding: {
+    right: $global-gutter_quarterSize;
+    left: $global-gutter_quarterSize;
+  }
+
   &.hasAdjacentPanel {
     flex-basis: calc(100% - #{$global-panel_width});
     max-width: calc(100% - #{$global-panel_width});

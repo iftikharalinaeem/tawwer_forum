@@ -14,15 +14,15 @@ $panelArea-gap: $global-gutter_halfSize;
 }
 
 .panelArea-rightTop {
-  margin-bottom: $global-gutter_halfSize;
+  margin-bottom: $panelArea-gap;
 }
 
 .panelArea-leftTop {
-  margin-bottom: $global-gutter_halfSize;
+  margin-bottom: $panelArea-gap;
   position: relative;
 }
 
 .panelArea-leftBottom {
-  margin-bottom: $global-gutter_halfSize;
+  margin-bottom: $panelArea-gap;
   position: relative;
 }
