@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import Heading from "@knowledge/components/Heading";
 import { t } from "@dashboard/application";
-import PageHeading from "@knowledge/components/PageHeading";
 
 interface IProps {}
 
@@ -15,7 +15,8 @@ export default class ArticleActions extends React.Component<IProps> {
     public render() {
         return (
             <PanelWidget>
-                <PageHeading title={t("Actions")} />
+                <Heading title={t("Top Left")} />
+                <p>{`${"(Actions)"}`}</p>
             </PanelWidget>
         );
     }

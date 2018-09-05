@@ -4,6 +4,9 @@
  * @license GPL-2.0-only
  */
 
+$panelLayout_topMargin                               : $utility-baseUnit * 4;
+$panelLayout_bottomMargin                            : $utility-baseUnit * 16;
+
 $panelLayout-twoColumn_breakpoint                    : $global-main_paddedWidth !default;
 $panelLayout-oneColumn_breakpoint                    : $global-twoColumn_breakpoint !default;
 
@@ -26,6 +29,10 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 
 .panelLayout {
   display: block;
+  margin: {
+    top: $panelLayout_topMargin;
+    bottom: $panelLayout_bottomMargin;
+  }
 }
 
 
@@ -40,6 +47,10 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 .panelLayout-container {
   display: flex;
   flex-wrap: nowrap;
+}
+
+.panelLayout-top {
+  margin-bottom: $global-gutter_halfSize;
 }
 
 
@@ -72,6 +83,11 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 .panelLayout-breadcrumbs {
+  padding: {
+    right: $global-gutter_quarterSize;
+    left: $global-gutter_quarterSize;
+  }
+
   &.hasAdjacentPanel {
     flex-basis: calc(100% - #{$global-panel_width});
     max-width: calc(100% - #{$global-panel_width});
@@ -103,6 +119,10 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 // Middle Column
 .panelLayout-middle {
   flex-grow: 1;
+  padding: {
+    right: $global-gutter_quarterSize;
+    left: $global-gutter_quarterSize;
+  }
 
   &.hasAdjacentPanel {
     flex-basis: calc(100% - #{$global-panel_width});
@@ -121,19 +141,7 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   flex-basis: $global-panel_width;
 }
 
-.panelArea-rightTop {
-  margin-bottom: $global-gutter_halfSize;
-}
 
-.panelArea-leftTop {
-  margin-bottom: $global-gutter_halfSize;
-  position: relative;
-}
-
-.panelArea-leftBottom {
-  margin-bottom: $global-gutter_halfSize;
-  position: relative;
-}
 
 @include mediaQuery-panelLayout_oneColumn {
   .panelLayout-sticky {

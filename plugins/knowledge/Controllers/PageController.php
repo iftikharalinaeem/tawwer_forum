@@ -148,7 +148,9 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     public function setSeoMetaData() {
         $this->meta
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
-        $this->meta->setSeo('title', $this->getApiPageData('seoName'))
+        $this->meta
+            ->setSeo('title', $this->getApiPageData('seoName'))
+            ->setSeo('description', $this->getApiPageData('seoDescription'))
             ->setSeo('locale', $this->getApiPageData('locale'))
             ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
         return $this;

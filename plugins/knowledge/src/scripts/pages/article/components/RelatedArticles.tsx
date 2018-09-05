@@ -7,7 +7,7 @@
 import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@dashboard/application";
-import PageHeading from "@knowledge/components/PageHeading";
+import Heading from "@knowledge/components/Heading";
 
 interface IProps {}
 
@@ -15,7 +15,8 @@ export default class RelatedArticles extends React.Component<IProps> {
     public render() {
         return (
             <PanelWidget>
-                <PageHeading title={t("Related Articles")} />
+                <Heading title={t("Right Bottom")} />
+                <p>{`${"(Table of contents)"}`}</p>
             </PanelWidget>
         );
     }
