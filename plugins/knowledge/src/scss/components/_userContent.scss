@@ -24,8 +24,16 @@
   }
 
   p {
-    margin: 0;
-    @include lineHeightAdjustment($global-base_lineHeight, $global-body_lineHeightRatio);
+    margin: {
+      top: 0;
+      bottom: 0;
+    };
+
+    &:not(:first-child) {
+      margin: {
+        top: $global-block_margin * .5;
+      };
+    }
   }
 
   p,

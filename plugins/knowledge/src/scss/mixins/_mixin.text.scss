@@ -54,7 +54,7 @@
 // $baseLineOffset: Sometimes the base line isn't centered, 0 remove from top, .5 use font default, 1 remove from bottom
 // $bottomOffset: Also adjust bottom margin
 @mixin lineHeightAdjustment($lineHeight, $capitalLetterRatio: 1, $baseLineOffset: .5, $bottomOffset: false) {
-  $topOffset: abs($baseLineOffset) * 1em;
+  $topOffset: $baseLineOffset * 1em;
 
   &::before,
   &::after {
