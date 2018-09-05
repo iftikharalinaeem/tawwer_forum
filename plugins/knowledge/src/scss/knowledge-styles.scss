@@ -9,7 +9,6 @@
 
 // Temporarily import editor variables and mixins. We will need to resolve how we will split these out.
 @import "~dashboard-scss/editor/variables";
-@import "~dashboard-scss/editor/mixins";
 
 @import "mixins/mixin.utilities";
 @import "mixins/mixin.text";
@@ -22,6 +21,14 @@
 @import "mixins/mixin.backLink";
 @import "mixins/mixin.transitions";
 
+
+// Editor styles. The location of these should be pulled up in the future.
+@import "~dashboard-scss/editor/mixins";
+@import "~dashboard-scss/editor/spoiler";
+@import "~dashboard-scss/editor/atMention";
+@import "~dashboard-scss/editor/blockquote";
+@import "~dashboard-scss/editor/emoji";
+@import "~dashboard-scss/editor/codeBlocks";
 // Embed styles. The location of these should be pulled up in the future.
 @import "~dashboard-scss/embeds/embeds";
 
@@ -31,6 +38,7 @@
 @import "layouts/page";
 @import "layouts/container";
 @import "layouts/panelLayout";
+@import "layouts/panelArea";
 @import "layouts/panelWidget";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
