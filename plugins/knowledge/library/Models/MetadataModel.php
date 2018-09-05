@@ -64,5 +64,4 @@ class PageMetaModel {
             'seo' => $this->seo
         ];
     }
-
 }
