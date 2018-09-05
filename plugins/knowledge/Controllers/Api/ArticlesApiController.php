@@ -6,7 +6,12 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 use \Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -148,6 +153,13 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id
      * @return array
+     *
+     * @throws \Exception if no session is available.
+     * @throws HttpException if a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException if the user does not have the specified permission(s).
+     * @throws ValidationException If the output is not properly validated.
+     * @throws NotFoundException If the requested resource is not found.
+     * @throws ServerException If malformed data was passed to normalization.
      */
     public function get(int $id, array $query = []) {
         $this->permission();
@@ -192,11 +204,13 @@ class ArticlesApiController extends \AbstractApiController {
      * @param array $row
      * @param array $expand
      * @return array
+     *
+     * @throws ServerException
      */
     public function normalizeOutput(array $row, array $expand = []): array {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
-            throw new \Garden\Web\Exception\ServerException("No ID in article row.");
+            throw new ServerException("No ID in article row.");
         }
         $slug = \Gdn_Format::url($row["name"] ?? "example-slug");
 

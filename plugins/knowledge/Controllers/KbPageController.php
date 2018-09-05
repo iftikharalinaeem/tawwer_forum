@@ -7,7 +7,12 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Vanilla\Browser\ReduxTrait;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\PageController;
 
@@ -20,6 +25,9 @@ class KbPageController extends PageController {
 
     /** @var bool */
     private $hotReloadEnabled;
+
+    /** @var ArticlesApiController */
+    private $articlesApiController;
 
     /**
      * KnowledgePageController constructor.
@@ -84,11 +92,20 @@ class KbPageController extends PageController {
     /**
      * Render out the /kb/articles/:path page.
      *
-     * @param string $path URI slug page action string
+     * @param string $path URI slug page action string.
+     *
+     * @throws \Exception if no session is available.
+     * @throws ClientException If the URL can't be parsed properly.
+     * @throws HttpException If the resource could not be fetched from the API endpoint.
+     * @throws PermissionException If the resource could not be fetched from the API endpoint.
+     * @throws ValidationException If the resource could not be fetched from the API endpoint.
+     * @throws NotFoundException If the resource could not be fetched from the API endpoint.
+     * @throws ServerException If the resource could not be fetched from the API endpoint.
      */
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
-        $this->data[self::API_PAGE_KEY] = $this->api->get($id);
+
+        $this->data[self::API_PAGE_KEY] = $this->articlesApiController->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
 
         $reduxActions = [
@@ -140,11 +157,12 @@ class KbPageController extends PageController {
      * Get article id
      *
      * @return string
+     * @throws ClientException If the URL can't be parsed properly.
      */
     public function detectArticleId($path) {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
-            throw new \Exception('Can\'t detect article id!');
+            throw new ClientException('Can\'t detect article id!', 400);
         }
         $id = (int)$matches[1];
         return $id;
