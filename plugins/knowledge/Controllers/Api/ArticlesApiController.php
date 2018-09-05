@@ -244,7 +244,7 @@ class ArticlesApiController extends \AbstractApiController {
         }
 
         $slug = \Gdn_Format::url($row["name"] ? "{$row['name']}-{$row['articleID']}" : $row["articleID"]);
-        $row["url"] = url("/kb/articles/{$slug}", true);
+        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
 
         // Merge in the current revision.
         $revision = [
