@@ -8,6 +8,10 @@ $panelArea-gap: $global-gutter_halfSize;
 
 .panelArea {
 
+  .heading {
+    @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
+  }
+
   + .panelArea {
     margin-top: $panelArea-gap;
   }
