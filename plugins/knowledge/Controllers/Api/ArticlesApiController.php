@@ -86,7 +86,7 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
-     * Get a article schema with minimal add/edit fields.
+     * Get an article schema with minimal add/edit fields.
      *
      * @param string $type The type of schema.
      * @return \Garden\Schema\Schema Returns a schema object.
