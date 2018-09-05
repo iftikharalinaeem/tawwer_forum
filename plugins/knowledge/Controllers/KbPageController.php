@@ -35,7 +35,6 @@ class KbPageController extends PageController {
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
      * @param \Gdn_Configuration $config To read some configuration values.
-     * @param SiteContextModel $siteContext Get data about the site.
      * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
