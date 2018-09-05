@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
