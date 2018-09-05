@@ -7,25 +7,38 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Vanilla\Browser\ReduxTrait;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\PageController;
 
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
+//    use ReduxTrait;
+
+    /** @var ArticlesApiController */
+    private $articlesApi;
+
+    /** @var bool */
+    private $hotReloadEnabled;
 
     /**
      * KnowledgePageController constructor.
      *
-     * @param \AssetModel $assetModel AssetModel to get js and css
+     * @param \AssetModel $assetModel AssetModel To get js and css.
+     * @param ArticlesApiController $articlesApiController To fetch article resources.
+     * @param \Gdn_Configuration $config To read some configuration values.
      */
     public function __construct(
         \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController) {
+        \Gdn_Configuration $config,
+        ArticlesApiController $articlesApiController
+    ) {
         parent::__construct();
-        $this->api = $articlesApiController;
+        $this->hotReloadEnabled = $config->get('HotReload.Enabled', false);
+        $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        if (\Gdn::config('HotReload.Enabled', false) === false) {
+        if ($this->hotReloadEnabled === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
         $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
@@ -65,7 +78,7 @@ class KbPageController extends PageController {
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
 
-        echo $this->twig->render('default-master.twig', $data);
+        echo $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
@@ -77,10 +90,39 @@ class KbPageController extends PageController {
         $id = $this->detectArticleId($path);
         $this->data[self::API_PAGE_KEY] = $this->api->get($id);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+
+        $reduxActions = [
+            $this->createReduxAction("GET_ARTICLE_SUCCESS",  $this->data[self::API_PAGE_KEY]),
+        ];
+
+        $reduxActionScript = $this->createInlineJavascriptVariable("__ACTIONS__", $reduxActions);
+        $this->inlineScripts[] = $reduxActionScript;
+
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
 
         echo $this->twig->render('default-master.twig', $data);
+    }
+
+    private function createInlineJavascriptVariable(string $variableName, array $contents) {
+        return 'window["' . $variableName . '"]='.json_encode($contents).";\n";
+    }
+
+    private function gatherSiteContext() {
+        return [
+            'host' => Gdn::request()->domain(),
+            'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
+            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
+        ];
+    }
+
+    private function createReduxAction(string $type, array &$data) {
+        return [
+            "type" => $type,
+            "payload" => [
+                "data" => $data,
+            ],
+        ];
     }
 
     /**
