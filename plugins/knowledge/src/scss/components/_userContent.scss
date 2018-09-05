@@ -9,15 +9,15 @@
   @include orderedListStyle;
   @include unorderedListStyle;
 
-  //@include headings {
-  //  @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_capitalLineHeightPercentage);
-  //}
-
   display: block;
   position: relative;
   width: 100%;
   word-break: break-word;
   line-height: $global-base_lineHeight;
+
+  @include headings {
+    @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
+  }
 
   > *:not(:last-child) {
     margin-bottom: $global-block_margin;
@@ -25,14 +25,27 @@
 
   p {
     margin: 0;
+    @include lineHeightAdjustment($global-base_lineHeight, $global-body_lineHeightRatio);
   }
 
   p,
   li {
     a {
-      &:hover,
-      &:focus {
+      color: $link_default-color;
+
+
+      &:hover {
+        color: $link_default_hover-color;
         text-decoration: underline;
+      }
+
+      &:focus {
+        color: $link_default_focus-color;
+        text-decoration: underline;
+      }
+
+      &:visited {
+        color: $link_default_visited-color;
       }
     }
   }
