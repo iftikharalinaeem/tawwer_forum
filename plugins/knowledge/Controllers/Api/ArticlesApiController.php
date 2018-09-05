@@ -51,12 +51,12 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleByID(int $id): array {
         $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article");
+            throw new NotFoundException("Article");
         }
         $row = reset($resultSet);
         return $row;
@@ -85,12 +85,12 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id Article ID.
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the article could not be found.
+     * @throws NotFoundException If the article could not be found.
      */
     private function articleRevisionByID(int $id): array {
         $resultSet = $this->articleRevisionModel->get(["ArticleID" => $id], ["limit" => 1]);
         if (empty($resultSet)) {
-            throw new \Garden\Web\Exception\NotFoundException("Article Revision");
+            throw new NotFoundException("Article Revision");
         }
         $row = reset($resultSet);
         return $row;
@@ -153,13 +153,6 @@ class ArticlesApiController extends \AbstractApiController {
      *
      * @param int $id
      * @return array
-     *
-     * @throws \Exception if no session is available.
-     * @throws HttpException if a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException if the user does not have the specified permission(s).
-     * @throws ValidationException If the output is not properly validated.
-     * @throws NotFoundException If the requested resource is not found.
-     * @throws ServerException If malformed data was passed to normalization.
      */
     public function get(int $id, array $query = []) {
         $this->permission();

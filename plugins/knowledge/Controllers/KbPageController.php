@@ -24,9 +24,6 @@ use Vanilla\Knowledge\PageController;
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
 
-    /** @var bool */
-    private $hotReloadEnabled;
-
     /** @var ArticlesApiController */
     private $articlesApi;
 
@@ -34,20 +31,17 @@ class KbPageController extends PageController {
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param \Gdn_Configuration $config To read some configuration values.
      * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
         \AssetModel $assetModel,
-        \Gdn_Configuration $config,
         ArticlesApiController $articlesApiController
     ) {
         parent::__construct();
-        $this->hotReloadEnabled = $config->get('HotReload.Enabled', false);
         $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        if ($this->hotReloadEnabled === false) {
+        if (\Gdn::config('HotReload.Enabled', false) === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
@@ -95,14 +89,6 @@ class KbPageController extends PageController {
      * Render out the /kb/articles/:path page.
      *
      * @param string $path URI slug page action string.
-     *
-     * @throws \Exception if no session is available.
-     * @throws ClientException If the URL can't be parsed properly.
-     * @throws HttpException If the resource could not be fetched from the API endpoint.
-     * @throws PermissionException If the resource could not be fetched from the API endpoint.
-     * @throws ValidationException If the resource could not be fetched from the API endpoint.
-     * @throws NotFoundException If the resource could not be fetched from the API endpoint.
-     * @throws ServerException If the resource could not be fetched from the API endpoint.
      */
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
