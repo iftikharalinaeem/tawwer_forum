@@ -5,4 +5,11 @@
  */
 
 .panelWidget {
+  position: relative;
+  padding: {
+    top: $global-widgetInner_padding;
+    right: $global-widgetInner_padding;
+    bottom: $global-widgetInner_padding;
+    left: $global-widgetInner_padding;
+  }
 }

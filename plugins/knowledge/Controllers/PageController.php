@@ -9,7 +9,14 @@ namespace Vanilla\Knowledge;
 
 use Vanilla\Knowledge\Models\PageMetaModel;
 
+/**
+ * Knowledge Base base controller class.
+ *
+ * This controller expects most content to come from api
+ */
 class PageController extends \Garden\Controller {
+    const API_PAGE_KEY = 'page';
+
     protected $data = [];
 
     protected $scripts = [];
@@ -90,6 +97,16 @@ class PageController extends \Garden\Controller {
     }
 
     /**
+     * Get the page data from api response array
+     *
+     * @param string $key Data key to get
+     *
+     * @return array
+     */
+    public function getApiPageData(string $key) {
+        return $this->data[self::API_PAGE_KEY][$key] ?? '';
+    }
+    /**
      * Initialize page meta tags default values
      *
      * @return $this
@@ -113,8 +130,10 @@ class PageController extends \Garden\Controller {
     public function setSeoMetaData() {
         $this->meta
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
-        $this->meta->setSeo('title', $this->getData('title'))
-            ->setSeo('locale', 'en')
+        $this->meta
+            ->setSeo('title', $this->getApiPageData('seoName'))
+            ->setSeo('description', $this->getApiPageData('seoDescription'))
+            ->setSeo('locale', $this->getApiPageData('locale'))
             ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
         return $this;
     }
@@ -125,7 +144,7 @@ class PageController extends \Garden\Controller {
      * @return string
      */
     public function getCanonicalLink() {
-        return '/';
+        return $this->data[self::API_PAGE_KEY]['url'] ?? '/';
     }
 
     /**
