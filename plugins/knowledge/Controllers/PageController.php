@@ -151,7 +151,7 @@ class PageController extends \Garden\Controller implements InjectableInterface {
         $this->meta
             ->setSeo('title', $this->getApiPageData('seoName'))
             ->setSeo('description', $this->getApiPageData('seoDescription'))
-            ->setSeo('locale', $this->getApiPageData('locale'))
+            ->setSeo('locale', \Gdn::locale()->current())
             ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
         return $this;
     }
