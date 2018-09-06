@@ -23,19 +23,21 @@ export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
         }
 
         return (
-            <Link
-                to={this.props.url}
-                title={this.props.name}
-                aria-current={ariaCurrent}
-                className={className("breadcrumb-link", this.props.className)}
-                itemScope
-                itemType="http://schema.org/Thing"
-                itemProp="item"
-            >
-                <span className="breadcrumb-label" itemProp="name">
-                    {this.props.name}
-                </span>
-            </Link>
+            <li className="breadcrumb">
+                <Link
+                    to={this.props.url}
+                    title={this.props.name}
+                    aria-current={ariaCurrent}
+                    className={className("breadcrumb-link", this.props.className)}
+                    itemScope
+                    itemType="http://schema.org/Thing"
+                    itemProp="item"
+                >
+                    <span className="breadcrumb-label" itemProp="name">
+                        {this.props.name}
+                    </span>
+                </Link>
+            </li>
         );
     }
 }
