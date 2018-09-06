@@ -42,13 +42,13 @@ class KbPageController extends PageController {
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
+            $this->styles = ['/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css'];
         }
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
-     * This function is for testing purposes only. This data all should be assembed dynamically.
+     * This function is for testing purposes only. This data all should be assembled dynamically.
      *
      * @todo Break down this creation of the data array, and implement a better method of rendering the view than
      * echo-ing it out.

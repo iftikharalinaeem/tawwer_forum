@@ -26,14 +26,12 @@ function Loading({ error, pastDelay, retry }) {
 
 const ArticlePage = Loadable({
     loading: Loading,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
 });
 
 const HomePage = Loadable({
     loading: Loading,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/index" */ "@knowledge/pages/home/HomePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/home/HomePage"),
 });
 
 export default function KnowledgeRoutes() {
