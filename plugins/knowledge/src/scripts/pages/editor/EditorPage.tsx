@@ -7,15 +7,16 @@
 import React from "react";
 import uniqueId from "lodash/uniqueId";
 import Editor from "@rich-editor/components/editor/Editor";
+import { t } from "@dashboard/application";
 
-export default class HomePage extends React.Component {
+export default class EditorPage extends React.Component {
     public render() {
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
 
         return (
             <div>
-                Hello Editor
+                {t("Hello Editor")}
                 {/* TODO: Remove the need for these wrappers. Currently the focus module depends on them. */}
                 <div className="FormWrapper">
                     <div className="richEditor">
