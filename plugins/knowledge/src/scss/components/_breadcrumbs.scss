@@ -18,10 +18,29 @@ $breadcrumbs-activeLink_opacity: 1;
   justify-content: flex-start;
 }
 
+.breadcrumbs-separator {
+  user-select: none;
+}
+
+.breadcrumbs-separatorIcon {
+  font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
+  margin: 0 .5em;
+  opacity: .5;
+  position: relative;
+  top: 0.04em;
+  color: inherit;
+}
+
+
+.breadcrumb {
+  display: inline-flex;
+  line-height: 1;
+}
+
 
 .breadcrumb-link {
   @include singleLineEllipsis;
-  display: inline-block;
+  display: inline-flex;
   line-height: 1;
   color: inherit;
 
@@ -34,17 +53,4 @@ $breadcrumbs-activeLink_opacity: 1;
 .breadcrumb-current {
   color: inherit;
   opacity: $breadcrumbs-activeLink_opacity;
-}
-
-.breadcrumbs-separator {
-  user-select: none;
-}
-
-.breadcrumbs-separatorIcon {
-  font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
-  margin: 0 .5em;
-  opacity: .5;
-  position: relative;
-  top: 0.04em;
-  color: inherit;
 }
