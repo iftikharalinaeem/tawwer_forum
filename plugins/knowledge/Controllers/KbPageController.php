@@ -114,6 +114,12 @@ class KbPageController extends PageController {
         echo $this->twigInit()->render('default-master.twig', $data);
     }
 
+    public function index_editor() {
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getStaticData();
+        echo $this->twigInit()->render('default-master.twig', $data);
+    }
+
     /**
      * Get breadcrumb data.
      *

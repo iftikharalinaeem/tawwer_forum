@@ -36,12 +36,19 @@ const HomePage = Loadable({
         import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/index" */ "@knowledge/pages/home/HomePage"),
 });
 
+const EditorPage = Loadable({
+    loading: Loading,
+    loader: () =>
+        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
+});
+
 export default function KnowledgeRoutes() {
     return (
         <BrowserRouter>
             <React.Fragment>
                 <Route exact path="/kb" component={HomePage} />
                 <Route path="/kb/articles/:slug" component={ArticlePage} />
+                <Route path="/kb/editor" component={EditorPage} />
             </React.Fragment>
         </BrowserRouter>
     );

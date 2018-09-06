@@ -37,9 +37,12 @@
             </div>
             <div class="page-minHeight">
                 <div id="app">
+                    {% if template %}
                     <noscript>
                         {{ include(template) }}
                     </noscript>
+
+                    {% endif %}
                 </div>
             </div>
             <div id="footerContainer">
