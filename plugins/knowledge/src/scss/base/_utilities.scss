@@ -11,3 +11,9 @@
 .isHidden {
   display: none;
 }
+
+.inheritHeight {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}

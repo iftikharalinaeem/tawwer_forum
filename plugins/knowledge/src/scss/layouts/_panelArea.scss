@@ -15,6 +15,12 @@ $panelArea-gap: $global-gutter_halfSize;
   + .panelArea {
     margin-top: $panelArea-gap;
   }
+
+  &.inheritHeight {
+    > .panelWidget {
+      flex-grow: 1;
+    }
+  }
 }
 
 .panelArea-rightTop {

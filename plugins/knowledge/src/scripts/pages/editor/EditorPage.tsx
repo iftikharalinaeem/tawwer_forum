@@ -8,22 +8,51 @@ import React from "react";
 import uniqueId from "lodash/uniqueId";
 import Editor from "@rich-editor/components/editor/Editor";
 import { t } from "@dashboard/application";
+import Container from "@knowledge/layouts/components/Container";
+import PanelLayout from "@knowledge/layouts/PanelLayout";
+import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PageHeading from "@knowledge/components/PageHeading";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { Devices } from "@knowledge/components/DeviceChecker";
+import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
-export default class EditorPage extends React.Component {
+interface IProps {
+    device: Devices;
+}
+
+export class EditorPage extends React.Component<IProps> {
     public render() {
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
 
         return (
-            <div>
-                {t("Hello Editor")}
-                {/* TODO: Remove the need for these wrappers. Currently the focus module depends on them. */}
-                <div className="FormWrapper">
-                    <div className="richEditor">
-                        <Editor editorID={editorID} editorDescriptionID={editorDescriptionId} isPrimaryEditor={true} />
-                    </div>
-                </div>
-            </div>
+            <Container className="inheritHeight">
+                <PanelLayout growMiddleBottom={true} device={this.props.device}>
+                    <PanelLayout.MiddleTop>
+                        <PanelWidget>
+                            <PageHeading title={t("Write Discussion")} />
+                        </PanelWidget>
+                    </PanelLayout.MiddleTop>
+                    <PanelLayout.MiddleBottom>
+                        <PanelWidget>
+                            <div className="FormWrapper inheritHeight">
+                                <form className="inheritHeight">
+                                    <InputTextBlock label={t("")} required={true} value="" />
+                                    <div className="richEditor inheritHeight">
+                                        <Editor
+                                            editorID={editorID}
+                                            editorDescriptionID={editorDescriptionId}
+                                            isPrimaryEditor={true}
+                                        />
+                                    </div>
+                                </form>
+                            </div>
+                        </PanelWidget>
+                    </PanelLayout.MiddleBottom>
+                </PanelLayout>
+            </Container>
         );
     }
 }
+
+export default withDevice<IProps>(EditorPage);
