@@ -14,7 +14,6 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@knowledge/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@knowledge/components/DeviceChecker";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
 interface IProps {
     device: Devices;
@@ -37,7 +36,9 @@ export class EditorPage extends React.Component<IProps> {
                         <PanelWidget>
                             <div className="FormWrapper inheritHeight">
                                 <form className="inheritHeight">
-                                    <InputTextBlock label={t("")} required={true} value="" />
+                                    <div className="inputBlock">
+                                        <input className="inputBlock-inputText inputText" type="text" />
+                                    </div>
                                     <div className="richEditor inheritHeight">
                                         <Editor
                                             editorID={editorID}
