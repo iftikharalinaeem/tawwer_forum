@@ -93,7 +93,7 @@ class KbPageController extends PageController {
     public function index_articles(string $path) {
         $id = $this->detectArticleId($path);
 
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id);
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
         $this->data['breadcrumb-json'] = $this->getBreadcrumb();
 
         // Put together pre-loaded redux actions.

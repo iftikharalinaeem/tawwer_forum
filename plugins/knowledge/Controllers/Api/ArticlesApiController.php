@@ -85,24 +85,6 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
-     * Get the schema for articles joined to records.
-     *
-     * @return \Garden\Schema\Schema Returns a schema.
-     */
-    public function articleFragmentSchema(): \Garden\Schema\Schema {
-        if ($this->articleFragmentSchema === null) {
-            $this->articleFragmentSchema = $this->schema([
-                "articleID:i" => "The ID of the article.",
-                "name:s" => "Name of the article.",
-                "updateUser" => $this->getUserFragmentSchema(),
-                "slug:s" => "Unique path slug for the article.",
-                "url:s" => "Full URL to the article.",
-            ], "ArticleFragment");
-        }
-        return $this->articleFragmentSchema;
-    }
-
-    /**
      * Get an article schema with minimal add/edit fields.
      *
      * @param string $type The type of schema.
