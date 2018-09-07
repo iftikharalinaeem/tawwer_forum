@@ -213,7 +213,7 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
-     * Get an ID-only discussion record schema.
+     * Get an ID-only article schema.
      *
      * @param string $type The type of schema.
      * @return \Garden\Schema\Schema Returns a schema object.
