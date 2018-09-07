@@ -36,4 +36,13 @@ class ArticleRevisionModel extends \Vanilla\Models\Model {
         $result = parent::insert($set);
         return $result;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function update(array $set, array $where): bool {
+        $set["updateUserID"] = $this->session->UserID;
+        $set["dateUpdated"] = new DateTimeImmutable("now");
+        return parent::update($set, $where);
+    }
 }
