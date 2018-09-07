@@ -18,7 +18,7 @@ export default class ArticleTitle extends React.Component<IProps> {
         const { article } = this.props;
         return (
             <PanelWidget>
-                <PageHeading title={article.name} />
+                <PageHeading title={article.articleRevision.name} />
             </PanelWidget>
         );
     }
