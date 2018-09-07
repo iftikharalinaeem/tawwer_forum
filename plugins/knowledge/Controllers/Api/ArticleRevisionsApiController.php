@@ -26,6 +26,9 @@ class ArticleRevisionsApiController extends AbstractApiController {
     private $articleRevisionPostSchema;
 
     /** @var Schema */
+    private $articleRevisionFragmentSchema;
+
+    /** @var Schema */
     private $articleRevisionSchema;
 
     /** @var Schema */
@@ -94,6 +97,31 @@ class ArticleRevisionsApiController extends AbstractApiController {
      */
     public function articleRevisionSchema(string $type = ""): Schema {
         return $this->schema($this->fullSchema(), $type);
+    }
+
+    /**
+     * Get a schema suitable for including an article revision fragment.
+     *
+     * @return Schema
+     */
+    public function articleRevisionFragmentSchema(): Schema {
+        if ($this->articleRevisionFragmentSchema === null) {
+            $this->articleRevisionFragmentSchema = $this->schema(
+                Schema::parse([
+                    "articleRevisionID",
+                    "articleID",
+                    "status",
+                    "name",
+                    "format",
+                    "bodyRendered",
+                    "locale",
+                    "insertUser",
+                    "dateInserted",
+                ])->add($this->articleRevisionSchema()),
+                "ArticleRevisionFragment"
+            );
+        }
+        return $this->articleRevisionFragmentSchema;
     }
 
     /**
