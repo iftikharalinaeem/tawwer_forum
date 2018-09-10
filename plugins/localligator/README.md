@@ -5,6 +5,8 @@ one of the source files. In order for this plugin to work properly, you must hav
 into your web root, or at very least the tx-source directory should be symlinked into your locales directory in your
 web root.
 
+> This plign requere dev environemnt to be in debug mode. 
+
 Works with four different configuration-type files to manage translations.
 
 In the locales repo's tx-source:
