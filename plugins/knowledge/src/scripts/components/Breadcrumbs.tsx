@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import Breadcrumb from "@knowledge/components/Breadcrumb";
 
 export interface ICrumb {

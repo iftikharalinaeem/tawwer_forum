@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 import { componentActions } from "@knowledge/pages/article/articlePageActions";
 import NotFoundPage from "@dashboard/components/NotFoundPage";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";

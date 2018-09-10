@@ -5,7 +5,7 @@
  */
 
 import * as actions from "@knowledge/pages/article/articlePageActions";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 import { IArticlePageState } from "@knowledge/@types/state";
 
 export const initialState: IArticlePageState = {
