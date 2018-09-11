@@ -10,14 +10,14 @@ import { IArticleFragment } from "@knowledge/@types/api";
 enum KbCategoryDisplayType {
     HELP = "help",
     GUIDE = "guide",
-    SEARCH = "search"
+    SEARCH = "search",
 }
 
 enum KbCategorySortMode {
     NAME = "name",
     DATE_INSERTED = "dateInserted",
     DATE_INSERTED_DESC = "dateInsertedDesc",
-    MANUAL = "manual"
+    MANUAL = "manual",
 }
 
 interface IKbCategoryRequiredData {
@@ -50,15 +50,10 @@ interface IKbCategoryServerManagedData {
 type KbCategoryExpandFields = "user" | "lastArticle";
 
 // The record
-export interface IKbCategory
-    extends IKbCategoryRequiredData,
-        IKbCategoryDefaultedData,
-        IKbCategoryServerManagedData {}
+export interface IKbCategory extends IKbCategoryRequiredData, IKbCategoryDefaultedData, IKbCategoryServerManagedData {}
 
 // Request/Response interfaces
-export interface IPostKbCategoryRequestBody
-    extends IKbCategoryRequiredData,
-        Partial<IKbCategoryDefaultedData> {}
+export interface IPostKbCategoryRequestBody extends IKbCategoryRequiredData, Partial<IKbCategoryDefaultedData> {}
 
 export interface IPostKbCategoryResponseBody extends IKbCategory {}
 

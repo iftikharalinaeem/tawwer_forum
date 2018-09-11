@@ -5,12 +5,7 @@
  */
 
 import { IGetArticleResponseBody } from "@knowledge/@types/api";
-import {
-    generateApiActionCreators,
-    ActionsUnion,
-    apiThunk,
-    createAction
-} from "@library/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
 
 // Action constants
 export const GET_ARTICLE_REQUEST = "GET_ARTICLE_REQUEST";
@@ -25,7 +20,7 @@ const getArticleActions = generateApiActionCreators(
     GET_ARTICLE_ERROR,
     // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
     {} as IGetArticleResponseBody,
-    {}
+    {},
 );
 
 // Usable action for getting an article
@@ -35,21 +30,19 @@ function getArticle(id: number) {
 
 // Non-api related actions for the page.
 const nonApiActions = {
-    clearArticlePageState: () => createAction(RESET_PAGE_STATE)
+    clearArticlePageState: () => createAction(RESET_PAGE_STATE),
 };
 
 // Actions made for components to use.
 export const componentActions = {
     getArticle,
-    ...nonApiActions
+    ...nonApiActions,
 };
 
 // Actions exposed purely for testing purposes.
 // You probably should not be using them yourself.
 export const _rawApiActions = {
-    getArticleActions
+    getArticleActions,
 };
 
-export type ActionTypes = ActionsUnion<
-    typeof getArticleActions & typeof nonApiActions
->;
+export type ActionTypes = ActionsUnion<typeof getArticleActions & typeof nonApiActions>;
