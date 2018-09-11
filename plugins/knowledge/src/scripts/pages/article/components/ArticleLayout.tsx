@@ -9,7 +9,7 @@ import { IArticle } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@knowledge/components/DeviceChecker";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import ArticleBreadcrumbs from "@knowledge/pages/article/components/ArticleBreadcrumbs";
 import ArticleActions from "@knowledge/pages/article/components/ArticleActions";
 import ArticleNavigation from "@knowledge/pages/article/components/ArticleNavigation";

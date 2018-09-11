@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
-import { initAllUserContent } from "@dashboard/app/user-content";
+import { initAllUserContent } from "@library/user-content";
 
 interface IUserContent {
     className?: string;

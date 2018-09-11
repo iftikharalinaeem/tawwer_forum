@@ -12,8 +12,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // Our own libraries
-import { onReady } from "@dashboard/application";
-import { registerReducer } from "@dashboard/state/reducerRegistry";
+import { onReady } from "@library/application";
+import { registerReducer } from "@library/state/reducerRegistry";
 
 // Knowledge Modules
 import rootReducer from "@knowledge/rootReducer";

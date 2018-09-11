@@ -6,7 +6,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 
 export default class HomePage extends React.Component {
     public render() {
