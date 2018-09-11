@@ -5,22 +5,9 @@
  */
 
 import { IUserFragment } from "@dashboard/@types/api";
-
-export enum Format {
-    TEXT = "text",
-    TEXTEX = "textex",
-    MARKDOWN = "markdown",
-    WYSIWYG = "wysiwyg",
-    HTML = "html",
-    BBCODE = "bbcode",
-    RICH = "rich",
-}
+import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {
-    name: string; // The title of the article
-    locale: string; // The locale the article was written in
-    body: string; // The content of the article.
-    format: Format; // The format of the article.
     knowledgeCategoryID: number; //The category the article belongs in.
 }
 
@@ -33,6 +20,8 @@ interface IArticleDefaultedData {
 
 interface IArticleServerManagedData {
     articleID: number;
+    articleRevisionID: number;
+    articleRevision: IArticleRevisionFragment;
     insertUserID: number;
     updateUserID: number;
     insertUser?: IUserFragment;
@@ -42,11 +31,8 @@ interface IArticleServerManagedData {
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
-    bodyRendered: string;
     categoryAncestorIDs?: number[]; // The tree of parent category IDs as a flay array.;
 }
-
-type ArticleExpandFields = "user" | "ancestors";
 
 // The record
 export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, IArticleServerManagedData {}
@@ -55,11 +41,6 @@ export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, I
 export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
 
 export interface IPostArticleResponseBody extends IArticle {}
-
-export interface IGetArticleRequestBody {
-    id: number;
-    expand?: ArticleExpandFields[];
-}
 
 export interface IGetArticleResponseBody extends IArticle {}
 

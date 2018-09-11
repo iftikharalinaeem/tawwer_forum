@@ -18,7 +18,7 @@ export default class ArticleContent extends React.Component<IProps> {
         const { article } = this.props;
         return (
             <PanelWidget>
-                <UserContent content={article.bodyRendered} />
+                <UserContent content={article.articleRevision.bodyRendered} />
             </PanelWidget>
         );
     }

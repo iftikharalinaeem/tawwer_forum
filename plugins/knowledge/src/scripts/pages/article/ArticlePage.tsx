@@ -67,7 +67,7 @@ export class ArticlePage extends React.Component<IProps> {
             return;
         }
 
-        getArticle({ id: numericID });
+        getArticle(numericID);
     }
 
     /**
