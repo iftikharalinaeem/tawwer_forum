@@ -4,8 +4,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@dashboard/state/utility";
 import { IGetArticleResponseBody } from "@knowledge/@types/api";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
 
 // Action constants
 export const GET_ARTICLE_REQUEST = "GET_ARTICLE_REQUEST";
