@@ -18,12 +18,4 @@ printf "\nSymlinking plugins from the knowledge repo..."
 cd "$TRAVIS_BUILD_DIR/vanilla/plugins"
 ln -s ../../plugins/* ./
 
-printf "\nInstalling node_modules for vanilla..."
-cd "$TRAVIS_BUILD_DIR/vanilla/"
-yarn install --pure-lockfile
-
-composer self-update
-composer install --optimize-autoloader
-yarn build
-
 cd "$TRAVIS_BUILD_DIR"
