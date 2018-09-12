@@ -15,7 +15,7 @@ jobs:
           - vanilla.test
       before_script:
         - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
-        - travis/install.sh
+        - ./travis/install.sh
         - cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
@@ -35,7 +35,7 @@ jobs:
       before_script:
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
         - export PATH=$HOME/.yarn/bin:$PATH
-        - travis/install.sh
+        - ./travis/install.sh
         - yarn install --pure-lockfile
       cache:
         directories:
