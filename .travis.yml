@@ -27,7 +27,7 @@ jobs:
           - ./vendor/bin/phpunit --exclude-group=large
           - ./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla -p  ./plugins/knowledge/**/*.php
     # Frontend JS Job
-    - name: JS Build / Test
+    - name: JS Build & Test
       language: node_js
       node_js: 10.9
       addons:
