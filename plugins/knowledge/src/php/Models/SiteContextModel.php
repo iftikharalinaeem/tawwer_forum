@@ -35,6 +35,9 @@ class SiteContextModel {
         $this->assetPath = rtrim('/'.trim($request->assetRoot(), '/'), '/');
     }
 
+    /**
+     * @return array
+     */
     public function getContext(): array {
         return [
             'host' => $this->assetPath,

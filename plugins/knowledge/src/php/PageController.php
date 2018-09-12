@@ -169,6 +169,7 @@ class PageController extends \Garden\Controller implements InjectableInterface {
 
     /**
      * Create an action
+     *
      * @param string $type
      * @param array $data
      * @return array
