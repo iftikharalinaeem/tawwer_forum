@@ -1,7 +1,7 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  */
 
 import { IUserFragment } from "@dashboard/@types/api";
@@ -35,10 +35,15 @@ interface IArticleServerManagedData {
 }
 
 // The record
-export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, IArticleServerManagedData {}
+export interface IArticle
+    extends IArticleRequiredData,
+        IArticleDefaultedData,
+        IArticleServerManagedData {}
 
 // Request/Response interfaces
-export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
+export interface IPostArticleRequestBody
+    extends IArticleRequiredData,
+        Partial<IArticleDefaultedData> {}
 
 export interface IPostArticleResponseBody extends IArticle {}
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license Proprietary
  */
 
 namespace Vanilla\Knowledge\Models;

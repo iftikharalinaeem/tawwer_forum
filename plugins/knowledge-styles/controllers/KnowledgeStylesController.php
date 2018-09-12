@@ -2,7 +2,7 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license Proprietary
  */
 
 class KnowledgeStylesController extends VanillaController {
