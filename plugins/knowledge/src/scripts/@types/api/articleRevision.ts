@@ -1,6 +1,6 @@
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  */
 
 import { IUserFragment } from "@dashboard/@types/api";
@@ -12,7 +12,7 @@ export enum Format {
     WYSIWYG = "wysiwyg",
     HTML = "html",
     BBCODE = "bbcode",
-    RICH = "rich",
+    RICH = "rich"
 }
 
 export interface IArticleRevisionFragment {

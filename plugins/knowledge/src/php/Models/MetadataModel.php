@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 namespace Vanilla\Knowledge\Models;
