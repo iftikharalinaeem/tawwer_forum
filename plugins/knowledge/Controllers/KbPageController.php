@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
  * Knowledge base controller for article view.
