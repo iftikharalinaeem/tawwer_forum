@@ -44,6 +44,9 @@ jobs:
           - $TRAVIS_BUILD_DIR/vanilla/node_modules
         yarn: true
       script:
+        # This next line is only needed until https://github.com/vanilla/vanilla/pull/7738 is merged
+        # There we no longer read a PHP config in production builds.
+        - touch conf/config.php
         - yarn build -i
         - yarn test
 
