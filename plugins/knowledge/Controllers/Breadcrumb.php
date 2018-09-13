@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Knowledge;
+namespace Vanilla\Knowledge\Controllers;
 
 /**
  * A class for dealing with Breadcrumb data.

@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Knowledge;
+namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;

@@ -12,7 +12,7 @@ export enum Format {
     WYSIWYG = "wysiwyg",
     HTML = "html",
     BBCODE = "bbcode",
-    RICH = "rich"
+    RICH = "rich",
 }
 
 export interface IArticleRevisionFragment {
