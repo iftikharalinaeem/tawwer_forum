@@ -7,17 +7,9 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\HttpException;
-use Garden\Web\Exception\NotFoundException;
-use Garden\Web\Exception\ServerException;
-use Vanilla\Exception\PermissionException;
-use Vanilla\Knowledge\Breadcrumb;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
-use Vanilla\Knowledge\Models\SiteContextModel;
-use Vanilla\Knowledge\PageController;
 
 /**
  * Knowledge base controller for article view.
