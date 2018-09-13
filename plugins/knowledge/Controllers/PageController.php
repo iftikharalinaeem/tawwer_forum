@@ -191,20 +191,4 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     public function getCanonicalLink() {
         return $this->data[self::API_PAGE_KEY]['url'] ?? '/';
     }
-
-    /**
-     * Get breadcrumb. Placeholder at the moment.
-     *
-     * @param string $format Breadcrumb format: array, json etc. Default is json
-     *
-     * @return string
-     */
-    public function getBreadcrumb(string $format = 'json') {
-        return '{
-                 "@context": "http://schema.org",
-                 "@type": "BreadcrumbList",
-                 "itemListElement":
-                 []
-                }';
-    }
 }
