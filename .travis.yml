@@ -24,8 +24,8 @@ jobs:
           - $HOME/.composer/cache/files
       script:
           - ./vendor/bin/phpunit --exclude-group=large
-          - ./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla -p  ./plugins/knowledge/**/*.php
-    # Frontend JS Job
+          - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
+  # Frontend JS Job
     - name: JS Build & Test
       language: node_js
       node_js: 10.9
@@ -64,7 +64,7 @@ sudo: false
 script:
   - cd vanilla
   - ./vendor/bin/phpunit --exclude-group=large
-  - ./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla -p  ./plugins/knowledge/**/*.php
+  - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
   - yarn build
 
 env:
