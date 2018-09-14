@@ -28,7 +28,7 @@ class ArticleModel extends \Vanilla\Models\Model {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function insert(array $set) {
         $set["insertUserID"] = $set["updateUserID"] = $this->session->UserID;
@@ -39,7 +39,7 @@ class ArticleModel extends \Vanilla\Models\Model {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function update(array $set, array $where): bool {
         $set["updateUserID"] = $this->session->UserID;

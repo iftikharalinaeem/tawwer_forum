@@ -35,15 +35,10 @@ interface IArticleServerManagedData {
 }
 
 // The record
-export interface IArticle
-    extends IArticleRequiredData,
-        IArticleDefaultedData,
-        IArticleServerManagedData {}
+export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, IArticleServerManagedData {}
 
 // Request/Response interfaces
-export interface IPostArticleRequestBody
-    extends IArticleRequiredData,
-        Partial<IArticleDefaultedData> {}
+export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
 
 export interface IPostArticleResponseBody extends IArticle {}
 
