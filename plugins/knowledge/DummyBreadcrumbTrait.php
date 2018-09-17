@@ -11,7 +11,7 @@ use Vanilla\Knowledge\Models\Breadcrumb;
 
 trait DummyBreadcrumbTrait {
     /**
-     * Get breadcrumb data.
+     * Get dummy breadcrumb data.
      *
      * @return array Returns array of dummy breadcrumb data
      */
