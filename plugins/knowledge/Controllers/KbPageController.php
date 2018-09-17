@@ -22,7 +22,6 @@ class KbPageController extends PageController {
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
         \AssetModel $assetModel
@@ -39,6 +38,8 @@ class KbPageController extends PageController {
 
     /**
      * Gather the data array to render a page with.
+     *
+     * @return array
      */
     private function getPageData() {
         $data = [
