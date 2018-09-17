@@ -7,16 +7,10 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\HttpException;
-use Garden\Web\Exception\NotFoundException;
-use Garden\Web\Exception\ServerException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
-use Vanilla\Knowledge\Models\SiteContextModel;
-use Vanilla\Knowledge\PageController;
+use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
  * Knowledge base controller for article view.
@@ -48,12 +42,9 @@ class KbPageController extends PageController {
     }
 
     /**
-     * This function is for testing purposes only. This data all should be assembed dynamically.
-     *
-     * @todo Break down this creation of the data array, and implement a better method of rendering the view than
-     * echo-ing it out.
+     * Gather the data array to render a page with.
      */
-    private function getStaticData() {
+    private function getPageData() {
         $data = [
             'debug' => \Gdn::config('Debug'),
             'page' => &$this->data[self::API_PAGE_KEY],
@@ -76,10 +67,10 @@ class KbPageController extends PageController {
      * Render out the /kb page.
      */
     public function index() {
-        $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
         $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getStaticData();
+        $data = $this->getPageData();
         $data['template'] = 'seo/pages/home.twig';
 
         echo $this->twigInit()->render('default-master.twig', $data);
@@ -94,7 +85,7 @@ class KbPageController extends PageController {
         $id = $this->detectArticleId($path);
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
 
         // Put together pre-loaded redux actions.
         $reduxActions = [
@@ -108,7 +99,7 @@ class KbPageController extends PageController {
         $this->inlineScripts[] = $reduxActionScript;
 
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getStaticData();
+        $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
         echo $this->twigInit()->render('default-master.twig', $data);
@@ -122,28 +113,31 @@ class KbPageController extends PageController {
 
     /**
      * Get breadcrumb data.
-     *
-     * @param string $format Breadcrumb format: array, json etc. Default is json
-     *
-     * @return string
      */
-    public function getBreadcrumb(string $format = 'json') {
-        return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
+    public function getDummyBreadcrumbData(): array {
+        return [
+            new Breadcrumb('Books', 'https://example.com/books'),
+            new Breadcrumb('Authors', 'https://example.com/books/authors'),
+            new Breadcrumb('Ann Leckie', 'https://example.com/books/authors/annleckie'),
+            new Breadcrumb('Ancillary Justice', 'https://example.com/books/authors/ancillaryjustice'),
+        ];
     }
 
     /**
-     * Get article id
+     * Get article id.
+     *
+     * @param string $path The path of the article.
      *
      * @return string
      * @throws ClientException If the URL can't be parsed properly.
      */
-    public function detectArticleId($path) {
+    public function detectArticleId(string $path) {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
         }
         $id = (int)$matches[1];
+
         return $id;
     }
-
 }
