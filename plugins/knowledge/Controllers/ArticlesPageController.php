@@ -53,6 +53,7 @@ class ArticlesPageController extends PageController {
             'styles' => $this->getStyles(),
             'inlineStyles' => $this->getInlineStyles(),
         ];
+        $data['page']['classes'][] = 'isLoading';
         $this->pageMetaInit();
 
         $this->setSeoMetaData();
