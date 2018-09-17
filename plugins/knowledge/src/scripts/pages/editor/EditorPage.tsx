@@ -7,7 +7,7 @@
 import React from "react";
 import uniqueId from "lodash/uniqueId";
 import Editor from "@rich-editor/components/editor/Editor";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
