@@ -4,16 +4,16 @@
  * @license Proprietary
  */
 
-@import "~library-scss/_variables";
+@import "~library-scss/_coreVariables";
 @import "~library-scss/mixins/_mixins";
 @import "~normalize.css";
 
 // Editor styles. The location of these should be pulled up in the future.
-@import "~library-scss/user-content/_spoiler";
-@import "~library-scss/user-content/_atMention";
-@import "~library-scss/user-content/_blockquote";
-@import "~library-scss/user-content/_emoji";
-@import "~library-scss/user-content/_codeBlocks";
+@import "~library-scss/userContent/_spoiler";
+@import "~library-scss/userContent/_atMention";
+@import "~library-scss/userContent/_blockquote";
+@import "~library-scss/userContent/_emoji";
+@import "~library-scss/userContent/_codeBlocks";
 // Embed styles. The location of these should be pulled up in the future.
 @import "~library-scss/embeds/_embeds";
 
