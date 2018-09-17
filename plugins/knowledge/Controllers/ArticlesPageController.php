@@ -45,6 +45,8 @@ class ArticlesPageController extends PageController {
 
     /**
      * Gather the data array to render a page with.
+     *
+     * @return array
      */
     private function getPageData() {
         $data = [
@@ -100,7 +102,7 @@ class ArticlesPageController extends PageController {
     /**
      * Render out the /kb/articles/edit/{id}   path page.
      *
-     * @param string $path URI slug page action string.
+     * @param int $id URI article id .
      */
     public function get_editor(int $id) {
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
@@ -144,5 +146,4 @@ class ArticlesPageController extends PageController {
 
         return $id;
     }
-
 }
