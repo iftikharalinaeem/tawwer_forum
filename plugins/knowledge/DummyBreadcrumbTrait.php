@@ -6,11 +6,14 @@
  */
 
 namespace Vanilla\Knowledge;
+
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 trait DummyBreadcrumbTrait {
     /**
      * Get breadcrumb data.
+     *
+     * @return array Returns array of dummy breadcrumb data
      */
     public static function getDummyBreadcrumbData(): array {
         return [
