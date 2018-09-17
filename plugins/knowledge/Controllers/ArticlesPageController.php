@@ -128,6 +128,21 @@ class ArticlesPageController extends PageController {
     }
 
     /**
+     * Render out the /kb/articles/add   path page.
+     */
+    public function get_add() {
+        $this->data[self::API_PAGE_KEY] = [];
+
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getPageData();
+        $data['template'] = 'seo/pages/article.twig';
+
+        echo $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
      * Get article id.
      *
      * @param string $path The path of the article.
