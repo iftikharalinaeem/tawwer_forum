@@ -99,9 +99,7 @@ class ArticlesPageController extends PageController {
      *
      * @param string $path URI slug page action string.
      */
-    public function get_editor(string $path) {
-        $id = $this->detectArticleId($path, 'edit');
-
+    public function get_editor(int $id) {
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
@@ -147,16 +145,8 @@ class ArticlesPageController extends PageController {
      */
     protected function detectArticleId(string $path, string $action = 'view') {
         $matches = [];
-        switch ($action) {
-            case 'edit':
-                if (preg_match('/^\/(\d*)$/', $path, $matches) === 0) {
-                    throw new ClientException('Can\'t detect article id!', 400);
-                }
-                break;
-            default:
-                if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
-                    throw new ClientException('Can\'t detect article id!', 400);
-                }
+        if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
+            throw new ClientException('Can\'t detect article id!', 400);
         }
 
         $id = (int)$matches[1];
