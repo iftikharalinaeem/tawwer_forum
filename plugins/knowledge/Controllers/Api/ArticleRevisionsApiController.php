@@ -12,12 +12,19 @@ use UserModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Exception\PermissionException;
 
 /**
  * API controller for managing the article revisions resource.
  */
 class ArticleRevisionsApiController extends AbstractApiController {
+
+    /** @var ArticleModel */
+    private $articleModel;
 
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
@@ -41,11 +48,30 @@ class ArticleRevisionsApiController extends AbstractApiController {
      * ArticleRevisionsApiController constructor.
      *
      * @param ArticleRevisionModel $articleRevisionModel
+     * @param ArticleModel $articleModel
      * @param UserModel $userModel
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, UserModel $userModel) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel) {
         $this->articleRevisionModel = $articleRevisionModel;
+        $this->articleModel = $articleModel;
         $this->userModel = $userModel;
+    }
+
+    /**
+     * Get an article by its numeric ID.
+     *
+     * @param int $id Article ID.
+     * @return array
+     * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If a fetched row fails to validate against the article schema.
+     */
+    private function articleByID(int $id): array {
+        $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
+        if (empty($resultSet)) {
+            throw new NotFoundException("Article");
+        }
+        $row = reset($resultSet);
+        return $row;
     }
 
     /**
@@ -63,6 +89,25 @@ class ArticleRevisionsApiController extends AbstractApiController {
         }
         $row = reset($resultSet);
         return $row;
+    }
+
+    /**
+     * Given an article row, determine if the current user has permission to modify it.
+     *
+     * @param array $article An article row.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have access to edit the article.
+     * @throws ServerException If the article row does not have a valid user ID.
+     */
+    private function articleEditPermission(array $article) {
+        $insertUserID = $article["insertUserID"] ?? null;
+        if ($insertUserID === null) {
+            throw new ServerException("Unable to determine value of insertUserID");
+        } elseif ($insertUserID === $this->getSession()->UserID) {
+            $this->permission("knowledge.articles.add");
+        } else {
+            $this->permission("knowledge.articles.manage");
+        }
     }
 
     /**
@@ -181,7 +226,7 @@ class ArticleRevisionsApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the current user does not have sufficient permissions.
      */
     public function get($id): array {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema()->setDescription("Get an article revision.");
         $out = $this->articleRevisionSchema("out");
@@ -227,13 +272,17 @@ class ArticleRevisionsApiController extends AbstractApiController {
         $out = $this->articleRevisionSchema("out");
 
         $body = $in->validate($body);
+
+        $article = $this->articleByID($body["articleID"]);
+        $this->articleEditPermission($article);
+
         $body["bodyRendered"] = Formatter::to($body["body"], $body["format"]);
         $articleRevisionID = $this->articleRevisionModel->insert($body);
 
         // Remove the "published" flag from the currently-published revision.
         $this->articleRevisionModel->update(
             ["status" => null],
-            ["articleID" => $body["articleID"], "status" => "published"]
+            ["articleID" => $article["articleID"], "status" => "published"]
         );
         // Publish this revision.
         $this->articleRevisionModel->update(

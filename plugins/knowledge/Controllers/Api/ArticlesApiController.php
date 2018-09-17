@@ -24,9 +24,6 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 class ArticlesApiController extends \AbstractApiController {
 
     /** @var \Garden\Schema\Schema */
-    private $articleFragmentSchema;
-
-    /** @var \Garden\Schema\Schema */
     private $articlePostSchema;
 
     /** @var \Garden\Schema\Schema */
@@ -82,6 +79,25 @@ class ArticlesApiController extends \AbstractApiController {
         }
         $row = reset($resultSet);
         return $row;
+    }
+
+    /**
+     * Given an article row, determine if the current user has permission to modify it.
+     *
+     * @param array $article An article row.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have access to edit the article.
+     * @throws ServerException If the article row does not have a valid user ID.
+     */
+    private function editPermission(array $article) {
+        $insertUserID = $article["insertUserID"] ?? null;
+        if ($insertUserID === null) {
+            throw new ServerException("Unable to determine value of insertUserID");
+        } elseif ($insertUserID === $this->getSession()->UserID) {
+            $this->permission("knowledge.articles.add");
+        } else {
+            $this->permission("knowledge.articles.manage");
+        }
     }
 
     /**
@@ -175,7 +191,7 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -276,6 +292,8 @@ class ArticlesApiController extends \AbstractApiController {
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
 
+        $article = $this->articleByID($id);
+        $this->editPermission($article);
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
         $row = $this->articleByID($id);
@@ -294,7 +312,7 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body): array {
-        $this->permission();
+        $this->permission(["knowledge.articles.add", "knowledge.articles.manage"]);
 
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
