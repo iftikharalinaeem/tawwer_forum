@@ -100,7 +100,7 @@ class ArticlesPageController extends PageController {
 
 
     /**
-     * Render out the /kb/articles/edit/{id}   path page.
+     * Render out the /kb/articles/{id}/editor   path page.
      *
      * @param int $id URI article id .
      */
