@@ -7,9 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\ControllerActionAutodetectInterface;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
