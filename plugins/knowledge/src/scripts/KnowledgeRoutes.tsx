@@ -48,7 +48,8 @@ export default function KnowledgeRoutes() {
             <React.Fragment>
                 <Route exact path="/kb" component={HomePage} />
                 <Route path="/kb/articles/:slug" component={ArticlePage} />
-                <Route path="/kb/editor" component={EditorPage} />
+                <Route path="/kb/articles/editor" component={EditorPage} />
+                <Route path="/kb/articles/:id/editor" component={EditorPage} />
             </React.Fragment>
         </BrowserRouter>
     );
