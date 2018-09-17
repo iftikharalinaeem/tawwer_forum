@@ -26,6 +26,9 @@ export default class HomePage extends React.Component {
                         {t("Test Article - All Formatting & Embeds")}
                     </Link>
                 </p>
+                <p>
+                    <Link to="/kb/articles/add">{t("Add article")}</Link>
+                </p>
             </div>
         );
     }

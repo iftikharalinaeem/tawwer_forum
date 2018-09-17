@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Loadable from "react-loadable";
 import { t } from "@library/application";
 
@@ -45,12 +45,12 @@ const EditorPage = Loadable({
 export default function KnowledgeRoutes() {
     return (
         <BrowserRouter>
-            <React.Fragment>
+            <Switch>
                 <Route exact path="/kb" component={HomePage} />
-                <Route path="/kb/articles/:slug" component={ArticlePage} />
-                <Route path="/kb/articles/editor" component={EditorPage} />
+                <Route path="/kb/articles/add" component={EditorPage} />
                 <Route path="/kb/articles/:id/editor" component={EditorPage} />
-            </React.Fragment>
+                <Route path="/kb/articles/:slug" component={ArticlePage} />
+            </Switch>
         </BrowserRouter>
     );
 }

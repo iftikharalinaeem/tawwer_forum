@@ -5,43 +5,37 @@
  */
 
 import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
+import { IPostArticleResponseBody } from "@knowledge/@types/api";
 
 // Action constants
-export const GET_ARTICLE_REQUEST = "GET_ARTICLE_REQUEST";
-export const GET_ARTICLE_SUCCESS = "GET_ARTICLE_SUCCESS";
-export const GET_ARTICLE_ERROR = "GET_ARTICLE_ERROR";
-export const RESET_PAGE_STATE = "RESET_ARTICLE_PAGE_STATE";
+export const POST_ARTICLE_REQUEST = "POST_ARTICLE_REQUEST";
+export const POST_ARTICLE_RESPONSE = "POST_ARTICLE_RESPONSE";
+export const POST_ARTICLE_ERROR = "POST_ARTICLE_ERROR";
 
 // Raw actions for getting an article
-const getArticleActions = generateApiActionCreators(
-    GET_ARTICLE_REQUEST,
-    GET_ARTICLE_SUCCESS,
-    GET_ARTICLE_ERROR,
+const postArticleActions = generateApiActionCreators(
+    POST_ARTICLE_REQUEST,
+    POST_ARTICLE_RESPONSE,
+    POST_ARTICLE_ERROR,
     // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-    {} as IGetArticleResponseBody,
+    {} as IPostArticleResponseBody,
     {},
 );
 
 // Usable action for getting an article
-function getArticle(id: number) {
-    return apiThunk("get", `/articles/${id}?expand=all`, getArticleActions, {});
+function postArticle(id: number) {
+    return apiThunk("post", `/articles/${id}?expand=all`, postArticleActions, {});
 }
-
-// Non-api related actions for the page.
-const nonApiActions = {
-    clearArticlePageState: () => createAction(RESET_PAGE_STATE),
-};
 
 // Actions made for components to use.
 export const componentActions = {
-    getArticle,
-    ...nonApiActions,
+    postArticle,
 };
 
 // Actions exposed purely for testing purposes.
 // You probably should not be using them yourself.
 export const _rawApiActions = {
-    getArticleActions,
+    postArticleActions,
 };
 
-export type ActionTypes = ActionsUnion<typeof getArticleActions & typeof nonApiActions>;
+export type ActionTypes = ActionsUnion<typeof postArticleActions>;
