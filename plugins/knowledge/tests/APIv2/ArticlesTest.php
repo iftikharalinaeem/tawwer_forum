@@ -49,7 +49,7 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Grab values for inserting a new record.
+     * Grab values for inserting a new article.
      *
      * @return array
      */
