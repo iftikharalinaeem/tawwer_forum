@@ -23,6 +23,11 @@ class KnowledgePlugin extends Gdn_Plugin {
         $this->database = $database;
     }
 
+    /**
+     * Initialize controller class detection under Knowledge base application
+     *
+     * @param \Garden\Container\Container $container Container to support dependency injection
+     */
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(\Garden\Web\Dispatcher::class)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-article"), 'kb-article']);
