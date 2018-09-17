@@ -49,30 +49,7 @@ class ResourceRoute extends \Garden\Web\ResourceRoute {
                 }
             }
         };
-        $methodNames = $this->getControllerMethodNames($request->getMethod(), $pathArgs);
-        foreach ($methodNames as list($methodName, $omit)) {
-            if ($callback = $this->findMethod($controller, $methodName)) {
-                $args = $pathArgs;
-                if ($omit !== null) {
-                    unset($args[$omit]);
-                }
-                $method = $this->reflectCallback($callback);
-
-                if (!$this->checkMethodCase($method->getName(), $methodName, $controller, true)) {
-                    continue;
-                }
-
-                $callbackArgs = $this->matchArgs($method, $request, $args, $controller);
-
-                if ($callbackArgs !== null) {
-                    $result = new Action($callback, $callbackArgs);
-                    $result->setMeta('method', $request->getMethod());
-                    $result->setMeta('action', $result->getCallback()[1]);
-                    return $result;
-                }
-            }
-        }
-        return null;
+        return parent::findAction($controller, $request, $pathArgs);
     }
 
 }
