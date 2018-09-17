@@ -7,9 +7,8 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Web\Exception\ClientException;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\DummyBreadcrumbTrait;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
@@ -17,22 +16,16 @@ use Vanilla\Knowledge\Models\Breadcrumb;
  */
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
-
-    /** @var ArticlesApiController */
-    private $articlesApi;
+    use DummyBreadcrumbTrait;
 
     /**
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
-    public function __construct(
-        \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController
-    ) {
+    public function __construct(\AssetModel $assetModel) {
         parent::__construct();
-        $this->articlesApi = $articlesApiController;
+
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
@@ -43,6 +36,8 @@ class KbPageController extends PageController {
 
     /**
      * Gather the data array to render a page with.
+     *
+     * @return array
      */
     private function getPageData() {
         $data = [
@@ -53,6 +48,7 @@ class KbPageController extends PageController {
             'styles' => $this->getStyles(),
             'inlineStyles' => $this->getInlineStyles(),
         ];
+        $data['page']['classes'][] = 'isLoading';
         $this->pageMetaInit();
 
         $this->setSeoMetaData();
@@ -74,64 +70,5 @@ class KbPageController extends PageController {
         $data['template'] = 'seo/pages/home.twig';
 
         echo $this->twigInit()->render('default-master.twig', $data);
-    }
-
-    /**
-     * Render out the /kb/articles/:path page.
-     *
-     * @param string $path URI slug page action string.
-     */
-    public function index_articles(string $path) {
-        $id = $this->detectArticleId($path);
-
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
-
-        // Put together pre-loaded redux actions.
-        $reduxActions = [
-            $this->createReduxAction(
-                ArticlesApiActions::GET_ARTICLE_SUCCESS,
-                $this->data[self::API_PAGE_KEY]
-            ),
-        ];
-
-        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
-        $this->inlineScripts[] = $reduxActionScript;
-
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getPageData();
-        $data['template'] = 'seo/pages/article.twig';
-
-        echo $this->twigInit()->render('default-master.twig', $data);
-    }
-
-    /**
-     * Get breadcrumb data.
-     */
-    public function getDummyBreadcrumbData(): array {
-        return [
-            new Breadcrumb('Books', 'https://example.com/books'),
-            new Breadcrumb('Authors', 'https://example.com/books/authors'),
-            new Breadcrumb('Ann Leckie', 'https://example.com/books/authors/annleckie'),
-            new Breadcrumb('Ancillary Justice', 'https://example.com/books/authors/ancillaryjustice'),
-        ];
-    }
-
-    /**
-     * Get article id.
-     *
-     * @param string $path The path of the article.
-     *
-     * @return string
-     * @throws ClientException If the URL can't be parsed properly.
-     */
-    public function detectArticleId(string $path) {
-        $matches = [];
-        if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
-            throw new ClientException('Can\'t detect article id!', 400);
-        }
-        $id = (int)$matches[1];
-
-        return $id;
     }
 }
