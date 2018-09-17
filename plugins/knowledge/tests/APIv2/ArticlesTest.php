@@ -65,6 +65,7 @@ class ArticlesTest extends AbstractResourceTest {
      * Test DELETE /articles/<id>.
      */
     public function testDelete() {
+        $this->fail("This is a failed test in the Knowledge addon.");
         if (!method_exists(ArticlesApiController::class, "delete")) {
             $this->markTestSkipped("Deleting an article is not implemented.");
         } else {
