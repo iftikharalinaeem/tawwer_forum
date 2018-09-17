@@ -23,9 +23,7 @@ class KbPageController extends PageController {
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
      */
-    public function __construct(
-        \AssetModel $assetModel
-    ) {
+    public function __construct(\AssetModel $assetModel) {
         parent::__construct();
 
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
@@ -73,6 +71,4 @@ class KbPageController extends PageController {
 
         echo $this->twigInit()->render('default-master.twig', $data);
     }
-
-
 }
