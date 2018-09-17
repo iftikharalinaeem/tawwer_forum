@@ -13,7 +13,7 @@ use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
- * Knowledge base controller for article view.
+ * Knowledge base Articles controller for article view.
  */
 class ArticlesPageController extends PageController {
     use \Garden\TwigTrait;
