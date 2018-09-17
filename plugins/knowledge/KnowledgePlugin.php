@@ -27,7 +27,7 @@ class KnowledgePlugin extends Gdn_Plugin {
         $container->rule(\Garden\Web\Dispatcher::class)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-article-edit"), 'kb-article-edit']);
         $container->rule('@kb-article-edit')
-            ->setClass(\Vanilla\Knowledge\ResourceRoute::class)
+            ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/kb/', '*\\Knowledge\\Controllers\\%sPageController'])
             ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8']);
     }

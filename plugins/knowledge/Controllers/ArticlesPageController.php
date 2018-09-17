@@ -7,7 +7,6 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\ControllerActionAutodetectInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
@@ -16,7 +15,7 @@ use Vanilla\Knowledge\Models\Breadcrumb;
 /**
  * Knowledge base controller for article view.
  */
-class KbPageController extends PageController {
+class ArticlesPageController extends PageController {
     use \Garden\TwigTrait;
 
     /** @var ArticlesApiController */
@@ -65,14 +64,62 @@ class KbPageController extends PageController {
     }
 
     /**
-     * Render out the /kb page.
+     * Render out the /kb/articles/title-slug{id} :path page.
+     *
+     * @param string $path URI slug page action string.
      */
-    public function index() {
+    public function index(string $path) {
+        $id = $this->detectArticleId($path);
+
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
-        $this->data['title'] = 'Knowledge Base Title';
+
+        // Put together pre-loaded redux actions.
+        $reduxActions = [
+            $this->createReduxAction(
+                ArticlesApiActions::GET_ARTICLE_SUCCESS,
+                $this->data[self::API_PAGE_KEY]
+            ),
+        ];
+
+        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
+        $this->inlineScripts[] = $reduxActionScript;
+
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getPageData();
-        $data['template'] = 'seo/pages/home.twig';
+        $data['template'] = 'seo/pages/article.twig';
+
+        echo $this->twigInit()->render('default-master.twig', $data);
+    }
+
+
+    /**
+     * Render out the /kb/articles/edit/{id}   path page.
+     *
+     * @param string $path URI slug page action string.
+     */
+    public function get_editor(string $path) {
+        $id = $this->detectArticleId($path, 'edit');
+
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
+
+        // Put together pre-loaded redux actions.
+        $reduxActions = [
+            $this->createReduxAction(
+                ArticlesApiActions::GET_ARTICLE_SUCCESS,
+                $this->data[self::API_PAGE_KEY]
+            ),
+        ];
+
+        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
+        $this->inlineScripts[] = $reduxActionScript;
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getPageData();
+        $data['template'] = 'seo/pages/article.twig';
 
         echo $this->twigInit()->render('default-master.twig', $data);
     }
@@ -87,6 +134,34 @@ class KbPageController extends PageController {
             new Breadcrumb('Ann Leckie', 'https://example.com/books/authors/annleckie'),
             new Breadcrumb('Ancillary Justice', 'https://example.com/books/authors/ancillaryjustice'),
         ];
+    }
+
+    /**
+     * Get article id.
+     *
+     * @param string $path The path of the article.
+     * @param string $action Action to apply different pattern to detect article id
+     *
+     * @return string
+     * @throws ClientException If the URL can't be parsed properly.
+     */
+    protected function detectArticleId(string $path, string $action = 'view') {
+        $matches = [];
+        switch ($action) {
+            case 'edit':
+                if (preg_match('/^\/(\d*)$/', $path, $matches) === 0) {
+                    throw new ClientException('Can\'t detect article id!', 400);
+                }
+                break;
+            default:
+                if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
+                    throw new ClientException('Can\'t detect article id!', 400);
+                }
+        }
+
+        $id = (int)$matches[1];
+
+        return $id;
     }
 
 }
