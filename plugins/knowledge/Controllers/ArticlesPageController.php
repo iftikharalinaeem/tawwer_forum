@@ -131,12 +131,11 @@ class ArticlesPageController extends PageController {
      * Get article id.
      *
      * @param string $path The path of the article.
-     * @param string $action Action to apply different pattern to detect article id
      *
      * @return string
      * @throws ClientException If the URL can't be parsed properly.
      */
-    protected function detectArticleId(string $path, string $action = 'view') {
+    protected function detectArticleId(string $path) {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
