@@ -14,6 +14,7 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@knowledge/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@knowledge/components/DeviceChecker";
+import AriaModal from "react-aria-modal";
 
 interface IProps {
     device: Devices;
@@ -23,36 +24,37 @@ export class EditorPage extends React.Component<IProps> {
     public render() {
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
+        return "Hello Editor";
 
-        return (
-            <Container className="inheritHeight">
-                <PanelLayout growMiddleBottom={true} device={this.props.device}>
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <PageHeading title={t("Write Discussion")} />
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidget>
-                            <div className="FormWrapper inheritHeight">
-                                <form className="inheritHeight">
-                                    <div className="inputBlock">
-                                        <input className="inputBlock-inputText inputText" type="text" />
-                                    </div>
-                                    <div className="richEditor inheritHeight">
-                                        <Editor
-                                            editorID={editorID}
-                                            editorDescriptionID={editorDescriptionId}
-                                            isPrimaryEditor={true}
-                                        />
-                                    </div>
-                                </form>
-                            </div>
-                        </PanelWidget>
-                    </PanelLayout.MiddleBottom>
-                </PanelLayout>
-            </Container>
-        );
+        // return (
+        // <Container className="inheritHeight">
+        //     <PanelLayout growMiddleBottom={true} device={this.props.device}>
+        //         <PanelLayout.MiddleTop>
+        //             <PanelWidget>
+        //                 <PageHeading title={t("Write Discussion")} />
+        //             </PanelWidget>
+        //         </PanelLayout.MiddleTop>
+        //         <PanelLayout.MiddleBottom>
+        //             <PanelWidget>
+        //                 <div className="FormWrapper inheritHeight">
+        //                     <form className="inheritHeight">
+        //                         <div className="inputBlock">
+        //                             <input className="inputBlock-inputText inputText" type="text" />
+        //                         </div>
+        //                         <div className="richEditor inheritHeight">
+        //                             <Editor
+        //                                 editorID={editorID}
+        //                                 editorDescriptionID={editorDescriptionId}
+        //                                 isPrimaryEditor={true}
+        //                             />
+        //                         </div>
+        //                     </form>
+        //                 </div>
+        //             </PanelWidget>
+        //         </PanelLayout.MiddleBottom>
+        //     </PanelLayout>
+        // </Container>
+        // );
     }
 }
 

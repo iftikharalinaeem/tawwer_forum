@@ -14,10 +14,14 @@ import ReactDOM from "react-dom";
 // Our own libraries
 import { onReady } from "@library/application";
 import { registerReducer } from "@library/state/reducerRegistry";
+import { debug } from "@library/utility";
+import { getMeta } from "@library/application";
 
 // Knowledge Modules
 import rootReducer from "@knowledge/rootReducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
+
+debug(getMeta("context.debug"));
 
 onReady(() => {
     registerReducer("knowledge", rootReducer);

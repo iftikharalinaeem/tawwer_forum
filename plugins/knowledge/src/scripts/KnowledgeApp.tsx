@@ -7,9 +7,10 @@
 import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
-import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";
+import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import DeviceContext from "@knowledge/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
+import { Route, BrowserRouter } from "react-router-dom";
 
 /**
  * Top level application component for knowledge.
@@ -30,7 +31,9 @@ export default class KnowledgeApp extends React.Component {
                     <DeviceContext.Provider
                         value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
                     >
-                        <KnowledgeRoutes />
+                        <BrowserRouter>
+                            <Route component={KnowledgeRoutes} />
+                        </BrowserRouter>
                     </DeviceContext.Provider>
                 </React.Fragment>
             </Provider>

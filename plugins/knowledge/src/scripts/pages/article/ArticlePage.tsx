@@ -17,7 +17,7 @@ import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
 
 interface IProps extends IDeviceProps {
     match: match<{
-        slug: string;
+        id: number;
     }>;
     articlePageState: IArticlePageState;
     getArticle: typeof componentActions.getArticle;
@@ -33,7 +33,7 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public render() {
         const { articlePageState } = this.props;
-        const id = this.parseIDFromSlug();
+        const { id } = this.props.match.params;
 
         if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
             return <NotFoundPage type="Page" />;
@@ -53,21 +53,16 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public componentDidMount() {
         const { articlePageState, getArticle } = this.props;
+        const { id } = this.props.match.params;
         if (articlePageState.status !== LoadStatus.PENDING) {
             return;
         }
 
-        const id = this.parseIDFromSlug();
         if (id === null) {
             return;
         }
 
-        const numericID = parseInt(id, 10);
-        if (!Number.isInteger(numericID)) {
-            return;
-        }
-
-        getArticle(numericID);
+        getArticle(id);
     }
 
     /**
@@ -85,16 +80,16 @@ export class ArticlePage extends React.Component<IProps> {
      *
      * @returns The ID or null if an ID could not be parsed out.
      */
-    private parseIDFromSlug(): string | null {
-        const slug = this.props.match.params.slug;
-        const idRegex = /.+-(\d+)/;
-        const id = idRegex.exec(slug);
-        if (id && id[0]) {
-            return id[1];
-        } else {
-            return null;
-        }
-    }
+    // private parseIDFromSlug(): string | null {
+    //     const slug = this.props.match.params.slug;
+    //     const idRegex = /.+-(\d+)/;
+    //     const id = idRegex.exec(slug);
+    //     if (id && id[0]) {
+    //         return id[1];
+    //     } else {
+    //         return null;
+    //     }
+    // }
 }
 
 /**

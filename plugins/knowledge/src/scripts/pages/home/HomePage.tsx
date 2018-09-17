@@ -10,6 +10,7 @@ import { t } from "@library/application";
 
 export default class HomePage extends React.Component {
     public render() {
+        console.log("hello home");
         return (
             <div>
                 <p>{t("Hello Home Page. Links are below:")}</p>
@@ -28,6 +29,11 @@ export default class HomePage extends React.Component {
                 </p>
                 <p>
                     <Link to="/kb/articles/add">{t("Add article")}</Link>
+                </p>
+                <p>
+                    <Link to={{ pathname: "/kb/articles/add", state: { modal: true } }}>
+                        {t("Add article (in 'modal')")}
+                    </Link>
                 </p>
             </div>
         );

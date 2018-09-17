@@ -21,18 +21,23 @@ class SiteContextModel {
     /** @var string */
     private $assetPath;
 
+    /** @var bool */
+    private $debugModeEnabled;
+
     /**
      * SiteContextModel constructor.
      *
      * @param \Gdn_Request $request The request to gather data from.
+     * @param \Gdn_Configuration $config The configuration object.
      */
-    public function __construct(\Gdn_Request $request) {
+    public function __construct(\Gdn_Request $request, \Gdn_Configuration $config) {
         $this->host = $request->domain();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
         // But never with a trailing slash.
         $this->basePath = rtrim('/'.trim($request->webRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->assetRoot(), '/'), '/');
+        $this->debugModeEnabled = $config->get('Debug');
     }
 
     /**
@@ -43,6 +48,7 @@ class SiteContextModel {
             'host' => $this->assetPath,
             'basePath' => $this->basePath,
             'assetPath' => $this->assetPath,
+            'debug' => $this->debugModeEnabled,
         ];
     }
 
@@ -65,5 +71,12 @@ class SiteContextModel {
      */
     public function getAssetPath(): string {
         return $this->assetPath;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDebugModeEnabled(): bool {
+        return $this->debugModeEnabled;
     }
 }
