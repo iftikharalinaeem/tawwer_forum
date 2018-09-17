@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\DummyBreadcrumbTrait;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
@@ -17,6 +18,7 @@ use Vanilla\Knowledge\Models\Breadcrumb;
  */
 class ArticlesPageController extends PageController {
     use \Garden\TwigTrait;
+    use DummyBreadcrumbTrait;
 
     /** @var ArticlesApiController */
     private $articlesApi;
@@ -121,18 +123,6 @@ class ArticlesPageController extends PageController {
         $data['template'] = 'seo/pages/article.twig';
 
         echo $this->twigInit()->render('default-master.twig', $data);
-    }
-
-    /**
-     * Get breadcrumb data.
-     */
-    public function getDummyBreadcrumbData(): array {
-        return [
-            new Breadcrumb('Books', 'https://example.com/books'),
-            new Breadcrumb('Authors', 'https://example.com/books/authors'),
-            new Breadcrumb('Ann Leckie', 'https://example.com/books/authors/annleckie'),
-            new Breadcrumb('Ancillary Justice', 'https://example.com/books/authors/ancillaryjustice'),
-        ];
     }
 
     /**

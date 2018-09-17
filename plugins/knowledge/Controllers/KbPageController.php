@@ -7,8 +7,8 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\DummyBreadcrumbTrait;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
@@ -16,9 +16,7 @@ use Vanilla\Knowledge\Models\Breadcrumb;
  */
 class KbPageController extends PageController {
     use \Garden\TwigTrait;
-
-    /** @var ArticlesApiController */
-    private $articlesApi;
+    use DummyBreadcrumbTrait;
 
     /**
      * KnowledgePageController constructor.
@@ -27,11 +25,10 @@ class KbPageController extends PageController {
      * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
-        \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController
+        \AssetModel $assetModel
     ) {
         parent::__construct();
-        $this->articlesApi = $articlesApiController;
+
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
@@ -76,16 +73,5 @@ class KbPageController extends PageController {
         echo $this->twigInit()->render('default-master.twig', $data);
     }
 
-    /**
-     * Get breadcrumb data.
-     */
-    public function getDummyBreadcrumbData(): array {
-        return [
-            new Breadcrumb('Books', 'https://example.com/books'),
-            new Breadcrumb('Authors', 'https://example.com/books/authors'),
-            new Breadcrumb('Ann Leckie', 'https://example.com/books/authors/annleckie'),
-            new Breadcrumb('Ancillary Justice', 'https://example.com/books/authors/ancillaryjustice'),
-        ];
-    }
 
 }
