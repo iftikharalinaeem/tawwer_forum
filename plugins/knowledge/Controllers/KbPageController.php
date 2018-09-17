@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\ControllerActionAutodetectInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
@@ -15,7 +16,9 @@ use Vanilla\Knowledge\Models\Breadcrumb;
 /**
  * Knowledge base controller for article view.
  */
-class KbPageController extends PageController {
+class KbPageController
+    extends PageController
+    implements ControllerActionAutodetectInterface {
     use \Garden\TwigTrait;
 
     /** @var ArticlesApiController */
@@ -85,6 +88,37 @@ class KbPageController extends PageController {
         $id = $this->detectArticleId($path);
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
+
+        // Put together pre-loaded redux actions.
+        $reduxActions = [
+            $this->createReduxAction(
+                ArticlesApiActions::GET_ARTICLE_SUCCESS,
+                $this->data[self::API_PAGE_KEY]
+            ),
+        ];
+
+        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
+        $this->inlineScripts[] = $reduxActionScript;
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getPageData();
+        $data['template'] = 'seo/pages/article.twig';
+
+        echo $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * Render out the /kb/articles/{id}/edit   path page.
+     *
+     * @param string $path URI slug page action string.
+     */
+    public function editArticle(string $path) {
+        $id = $this->detectArticleId($path, 'edit');
+
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
 
         // Put together pre-loaded redux actions.
@@ -121,17 +155,51 @@ class KbPageController extends PageController {
      * Get article id.
      *
      * @param string $path The path of the article.
+     * @param string $action Action to apply different pattern to detect article id
      *
      * @return string
      * @throws ClientException If the URL can't be parsed properly.
      */
-    public function detectArticleId(string $path) {
+    protected function detectArticleId(string $path, string $action = 'view') {
         $matches = [];
-        if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
-            throw new ClientException('Can\'t detect article id!', 400);
+        switch ($action) {
+            case 'edit':
+                if (preg_match('/^\/articles\/(\d*)\/edit$/', $path, $matches) === 0) {
+                    throw new ClientException('Can\'t detect article id!', 400);
+                }
+                break;
+            default:
+                if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
+                    throw new ClientException('Can\'t detect article id!', 400);
+                }
         }
+
         $id = (int)$matches[1];
 
         return $id;
+    }
+
+    /**
+     * To implement ControllerActionAutodetectInterface
+     *
+     * @param RequestInterface $request Request
+     * @param array $pathArgs Uri path params
+     * @return string  Action method name
+     */
+    public static function detectAction(\Gdn_Request $request, array $pathArgs) : string {
+        if ($request->getMethod() == 'GET') {
+            if (count($pathArgs) === 0) {
+                return 'index';
+            } elseif (count($pathArgs) === 2) {
+                if ($pathArgs[0] == 'articles') {
+                    return 'index_articles';
+                }
+            } elseif (count($pathArgs) === 3) {
+                if ($pathArgs[0] == 'articles' && $pathArgs[2] == 'edit') {
+                    return 'editArticle';
+                }
+            }
+        }
+        throw new ClientException('Can not detect action for '.__CLASS__.' with '.implode($pathArgs));
     }
 }

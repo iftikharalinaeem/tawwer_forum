@@ -23,6 +23,15 @@ class KnowledgePlugin extends Gdn_Plugin {
         $this->database = $database;
     }
 
+    public function container_init(\Garden\Container\Container $container) {
+        $container->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-article-edit"), 'kb-article-edit']);
+        $container->rule('@kb-article-edit')
+            ->setClass(\Vanilla\Knowledge\ResourceRoute::class)
+            ->setConstructorArgs(['/kb/', '*\\Knowledge\\Controllers\\%sPageController'])
+            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8']);
+    }
+
     /**
      * Setup routine for the addon.
      *
