@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { leftChevron } from "@knowledge/components/Icons";
+import { leftChevron } from "@library/components/Icons";
 
 interface IBackLink {
     url?: string;
