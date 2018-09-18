@@ -79,7 +79,7 @@ class ArticlesPageController extends PageController {
      *
      * @param string $path URI slug page action string.
      */
-    public function index(string $path) {
+    public function index(string $path) : string {
         $id = $this->detectArticleId($path);
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
@@ -101,7 +101,7 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
 
@@ -110,7 +110,7 @@ class ArticlesPageController extends PageController {
      *
      * @param int $id URI article id .
      */
-    public function get_editor(int $id) {
+    public function get_editor(int $id) : string {
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
@@ -133,13 +133,13 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
      * Render out the /kb/articles/add   path page.
      */
-    public function get_add() {
+    public function get_add() : string {
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/add');
         }
@@ -151,7 +151,7 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
