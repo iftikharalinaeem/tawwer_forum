@@ -196,4 +196,13 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     public function getCanonicalLink() {
         return $this->data[self::API_PAGE_KEY]['url'] ?? '/';
     }
+
+    /**
+     * This method receives redirest user to sign in page
+     *
+     * @param string $uri URI user should be redirected back when log in
+     */
+    public static function signInFirst(string $uri) {
+        header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
+    }
 }
