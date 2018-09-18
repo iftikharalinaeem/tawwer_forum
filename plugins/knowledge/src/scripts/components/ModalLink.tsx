@@ -21,7 +21,7 @@ export class ModalLink extends React.Component<IProps> {
                 lastLocation: this.props.location,
             },
         };
-        return <Link {...this.props} to={to} />;
+        return <Link to={to} children={this.props.children} />;
     }
 }
 
