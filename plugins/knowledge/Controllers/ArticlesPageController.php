@@ -112,7 +112,7 @@ class ArticlesPageController extends PageController {
      */
     public function get_editor(int $id) {
         if (!$this->session->isValid()) {
-            self::signInFirst('kb/articles/'$id.'/editor');
+            self::signInFirst('kb/articles/'.$id.'/editor');
         }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
