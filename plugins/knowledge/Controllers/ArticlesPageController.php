@@ -51,7 +51,7 @@ class ArticlesPageController extends PageController {
      *
      * @return array
      */
-    private function getPageData() {
+    private function getPageData() : array {
         $data = [
             'debug' => \Gdn::config('Debug'),
             'page' => &$this->data[self::API_PAGE_KEY],
@@ -156,10 +156,10 @@ class ArticlesPageController extends PageController {
      *
      * @param string $path The path of the article.
      *
-     * @return string
+     * @return int Returns article id as int
      * @throws ClientException If the URL can't be parsed properly.
      */
-    protected function detectArticleId(string $path) {
+    protected function detectArticleId(string $path) : int {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
