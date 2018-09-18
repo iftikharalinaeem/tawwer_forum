@@ -29,7 +29,6 @@ class ArticlesPageController extends PageController {
      * @param \AssetModel $assetModel AssetModel To get js and css.
      * @param ArticlesApiController $articlesApiController To fetch article resources.
      * @param \Gdn_Session $session Session DI object
-     * @param \Gdn_Request $request Request DI object
      */
     public function __construct(
         \AssetModel $assetModel,
