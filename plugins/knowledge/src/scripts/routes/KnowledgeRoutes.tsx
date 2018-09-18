@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import { Switch, RouteComponentProps } from "react-router-dom";
-import { getPageRoutes } from "@knowledge/routes/pageRoutes";
-import { getModalRoutes } from "@knowledge/routes/modalRoutes";
+import { Switch, RouteComponentProps, RouteProps, Route } from "react-router-dom";
+import { getPageRouteData } from "@knowledge/routes/pageRoutes";
+import { getModalRouteData } from "@knowledge/routes/modalRoutes";
 
-type IProps = RouteComponentProps<{}>;
+interface IProps extends RouteComponentProps<{}> {}
 
 /**
  * Routing component for pages in modals in the /kb directory.
@@ -20,10 +20,18 @@ export default class KnowledgeRoutes extends React.Component<IProps> {
 
         return (
             <React.Fragment>
-                <Switch location={this.isModal ? this.lastLocation : location}>{getPageRoutes(this.isModal)}</Switch>
-                <Switch>{this.isModal ? getModalRoutes() : null}</Switch>
+                <Switch location={this.isModal ? this.lastLocation : location}>
+                    {this.makeRoutes(getPageRouteData(this.isModal))}
+                </Switch>
+                <Switch>{this.isModal ? this.makeRoutes(getModalRouteData()) : null}</Switch>
             </React.Fragment>
         );
+    }
+
+    private makeRoutes(routeData: RouteProps[]): React.ReactNode {
+        return routeData.map((route, index) => {
+            return <Route {...route} key={index} />;
+        });
     }
 
     private get lastLocation() {

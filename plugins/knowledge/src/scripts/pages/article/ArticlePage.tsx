@@ -14,7 +14,7 @@ import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
 import { componentActions } from "@knowledge/pages/article/articlePageActions";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
-import PageLoading from "@library/components/PageLoading";
+import PageLoader from "@library/components/PageLoader";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -47,9 +47,9 @@ export class ArticlePage extends React.Component<IProps> {
         const { article } = articlePageState.data;
 
         return (
-            <PageLoading {...articlePageState}>
+            <PageLoader {...articlePageState}>
                 <ArticleLayout article={article} />
-            </PageLoading>
+            </PageLoader>
         );
     }
 
