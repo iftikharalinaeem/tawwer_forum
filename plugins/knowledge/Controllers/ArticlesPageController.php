@@ -61,6 +61,7 @@ class ArticlesPageController extends PageController {
             'inlineStyles' => $this->getInlineStyles(),
         ];
         $data['page']['classes'][] = 'isLoading';
+        $data['page']['userSignedIn'] = $this->session->isValid();
         $this->pageMetaInit();
 
         $this->setSeoMetaData();
@@ -72,9 +73,10 @@ class ArticlesPageController extends PageController {
     }
 
     /**
-     * Render out the /kb/articles/title-slug{id} :path page.
+     * Render out the /kb/articles/title-slug-{id} :path page.
      *
      * @param string $path URI slug page action string.
+     * @return string Returns HTML page content
      */
     public function index(string $path) : string {
         $id = $this->detectArticleId($path);
@@ -105,7 +107,8 @@ class ArticlesPageController extends PageController {
     /**
      * Render out the /kb/articles/{id}/editor   path page.
      *
-     * @param int $id URI article id .
+     * @param int $id URI article id.
+     * @return string Returns HTML page content
      */
     public function get_editor(int $id) : string {
         if (!$this->session->isValid()) {
@@ -135,6 +138,7 @@ class ArticlesPageController extends PageController {
 
     /**
      * Render out the /kb/articles/add   path page.
+     * @return string Returns HTML page content
      */
     public function get_add() : string {
         if (!$this->session->isValid()) {
