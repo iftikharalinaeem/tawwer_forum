@@ -20,7 +20,7 @@ export class EditorPage extends React.Component<IProps> {
                     onExit={this.dismissModal}
                     applicationNode={this.getApplicationNode()}
                     titleText="Editor Page"
-                    dialogClass="dialogue dialogue-full dialogue-editor"
+                    dialogClass="dialogue dialogue-full dialogue-editor inheritHeight"
                 >
                     <EditorLayout />
                 </AriaModal>
