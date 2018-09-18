@@ -1,0 +1,43 @@
+@mixin singleLineEllipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+@mixin longWordEllipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+@mixin headings($from: 1, $to: 6){
+  @for $i from $from through $to{
+    h#{$i}{
+      @content
+    }
+  }
+}
+
+@mixin headingFontStyle($marginBottom: $utility-baseUnit) {
+  @include longWordEllipsis;
+  display: block;
+  word-break: break-word;
+  font-family: $global-heading_fontFamily;
+  font-weight: $global-heading_fontWeight;
+  font-size: $global-medium_fontSize;
+}
+
+@mixin bodyFontStyle() {
+  font-family: $global-body_fontFamily;
+  font-weight: $global-body_fontWeight;
+}
+
+@mixin allLinkStates {
+  &,
+  &:hover,
+  &:active,
+  &:visited {
+    @content;
+  }
+}
