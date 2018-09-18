@@ -44,6 +44,7 @@ export class EditorLayout extends React.Component<IProps> {
                                             editorID={editorID}
                                             editorDescriptionID={editorDescriptionId}
                                             isPrimaryEditor={true}
+                                            legacyMode={false}
                                         />
                                     </div>
                                 </form>
