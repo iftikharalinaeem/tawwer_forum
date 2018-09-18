@@ -31,9 +31,13 @@ class ArticlesPageController extends PageController {
      */
     public function __construct(
         \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController
+        ArticlesApiController $articlesApiController,
+        \Gdn_Session $session,
+        \Gdn_Request $request
     ) {
         parent::__construct();
+        $this->session = $session;
+        $this->request = $request;
         $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
@@ -105,6 +109,9 @@ class ArticlesPageController extends PageController {
      * @param int $id URI article id .
      */
     public function get_editor(int $id) {
+        if (!$this->session->isValid()) {
+            redirectTo('/entry/signin?Target='.urlencode($this->request->pathAndQuery()));
+        }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
@@ -131,6 +138,9 @@ class ArticlesPageController extends PageController {
      * Render out the /kb/articles/add   path page.
      */
     public function get_add() {
+        if (!$this->session->isValid()) {
+            redirectTo('/entry/signin?Target='.urlencode($this->request->pathAndQuery()));
+        }
         $this->data[self::API_PAGE_KEY] = [];
 
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());

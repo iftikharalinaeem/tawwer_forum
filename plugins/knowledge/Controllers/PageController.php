@@ -18,6 +18,11 @@ use Vanilla\Knowledge\Models\SiteContextModel;
  */
 class PageController extends \Garden\Controller implements InjectableInterface {
     const API_PAGE_KEY = 'page';
+    /** @var Gdn_Session */
+    protected $session;
+
+    /** @var Gdn_Request Reference to the Request object that spawned this controller. */
+    protected $request;
 
     protected $data = [];
 
