@@ -28,12 +28,15 @@ class ArticlesPageController extends PageController {
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
      * @param ArticlesApiController $articlesApiController To fetch article resources.
+     * @param \Gdn_Session $session Session DI object
      */
     public function __construct(
         \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController
+        ArticlesApiController $articlesApiController,
+        \Gdn_Session $session
     ) {
         parent::__construct();
+        $this->session = $session;
         $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
@@ -48,7 +51,7 @@ class ArticlesPageController extends PageController {
      *
      * @return array
      */
-    private function getPageData() {
+    private function getPageData() : array {
         $data = [
             'debug' => \Gdn::config('Debug'),
             'page' => &$this->data[self::API_PAGE_KEY],
@@ -58,6 +61,8 @@ class ArticlesPageController extends PageController {
             'inlineStyles' => $this->getInlineStyles(),
         ];
         $data['page']['classes'][] = 'isLoading';
+        $data['page']['userSignedIn'] = $this->session->isValid();
+        $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';
         $this->pageMetaInit();
 
         $this->setSeoMetaData();
@@ -69,11 +74,12 @@ class ArticlesPageController extends PageController {
     }
 
     /**
-     * Render out the /kb/articles/title-slug{id} :path page.
+     * Render out the /kb/articles/title-slug-{id} :path page.
      *
      * @param string $path URI slug page action string.
+     * @return string Returns HTML page content
      */
-    public function index(string $path) {
+    public function index(string $path) : string {
         $id = $this->detectArticleId($path);
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
@@ -95,16 +101,20 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
 
     /**
      * Render out the /kb/articles/{id}/editor   path page.
      *
-     * @param int $id URI article id .
+     * @param int $id URI article id.
+     * @return string Returns HTML page content
      */
-    public function get_editor(int $id) {
+    public function get_editor(int $id) : string {
+        if (!$this->session->isValid()) {
+            self::signInFirst('kb/articles/'.$id.'/editor');
+        }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
@@ -124,13 +134,17 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
      * Render out the /kb/articles/add   path page.
+     * @return string Returns HTML page content
      */
-    public function get_add() {
+    public function get_add() : string {
+        if (!$this->session->isValid()) {
+            self::signInFirst('kb/articles/add');
+        }
         $this->data[self::API_PAGE_KEY] = [];
 
         $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
@@ -139,7 +153,7 @@ class ArticlesPageController extends PageController {
         $data = $this->getPageData();
         $data['template'] = 'seo/pages/article.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
@@ -147,10 +161,10 @@ class ArticlesPageController extends PageController {
      *
      * @param string $path The path of the article.
      *
-     * @return string
+     * @return int Returns article id as int
      * @throws ClientException If the URL can't be parsed properly.
      */
-    protected function detectArticleId(string $path) {
+    protected function detectArticleId(string $path) : int {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
