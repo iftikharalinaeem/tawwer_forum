@@ -11,12 +11,15 @@ import Modal from "@knowledge/components/Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 
+/**
+ * Page for editing an article.
+ */
 export class EditorPage extends React.Component<IProps> {
     public render() {
         if (this.isModal) {
             return (
                 <Modal
-                    onClose={this.dismissModal}
+                    exitHandler={this.navigateToBacklink}
                     appContainer={document.getElementById("app")!}
                     container={document.getElementById("modals")!}
                 >
@@ -36,8 +39,11 @@ export class EditorPage extends React.Component<IProps> {
         return !!(location && location.state && location.state.modal);
     }
 
-    private dismissModal = () => {
-        this.props.history.push(this.props.location.state.lastLocation || "/");
+    /**
+     * Route back to the previous location if its available.
+     */
+    private navigateToBacklink = () => {
+        this.props.history.push(this.props.location.state.lastLocation || "/kb");
     };
 }
 

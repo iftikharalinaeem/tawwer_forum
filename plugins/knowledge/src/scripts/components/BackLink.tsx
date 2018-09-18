@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-// import { leftChevron } from "@library/components/Icons";
+import { leftChevron } from "@library/components/Icons";
 
 interface IBackLink {
     url?: string;
@@ -29,7 +29,7 @@ export default class BackLink extends React.Component<IBackLink> {
                         title={this.props.title}
                         className="backLink-link"
                     >
-                        {/* {leftChevron("backLink-icon")} */}
+                        {leftChevron("backLink-icon")}
                     </a>
                 </div>
             );

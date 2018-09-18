@@ -12,12 +12,18 @@ interface IProps extends LinkProps, RouteComponentProps<{}> {
     to: string;
 }
 
+/**
+ * A link that opens the linked item in a modal.
+ */
 export class ModalLink extends React.Component<IProps> {
     public render() {
         const to: LocationDescriptor = {
             pathname: this.props.to,
             state: {
                 modal: true,
+
+                // Pass along the "previous" location so the router can display
+                // The old route underneath the modal when clicked.
                 lastLocation: this.props.location,
             },
         };

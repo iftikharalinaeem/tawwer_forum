@@ -12,7 +12,7 @@ import { getModalRouteData } from "@knowledge/routes/modalRoutes";
 interface IProps extends RouteComponentProps<{}> {}
 
 /**
- * Routing component for pages in modals in the /kb directory.
+ * Routing component for pages and modals in the /kb directory.
  */
 export default class KnowledgeRoutes extends React.Component<IProps> {
     public render() {

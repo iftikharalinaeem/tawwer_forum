@@ -6,11 +6,19 @@
 
 import { RouteProps } from "react-router-dom";
 import Loadable from "react-loadable";
+import ModalLoader from "@knowledge/components/ModalLoader";
 import FullPageLoader from "@library/components/FullPageLoader";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
     loading: FullPageLoader,
+    loader: () =>
+        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
+});
+
+/** A loadable version of the Editor Page */
+const ModalEditorPage = Loadable({
+    loading: ModalLoader,
     loader: () =>
         import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
 });
@@ -22,17 +30,19 @@ const EditorPage = Loadable({
  * only looks at its direct children. Trying to join separate components of routes using
  * <React.Fragment> does not currently work.
  *
+ * @param forModal Whether or not theses routes will be displaying in a modal or not.
+ *
  * @returns Data can that can be passed into a Route component.
  */
-export function getModalRouteData(): RouteProps[] {
+export function getModalRouteData(forModal: boolean = true): RouteProps[] {
     return [
         {
             path: "/kb/articles/add",
-            component: EditorPage,
+            component: forModal ? ModalEditorPage : EditorPage,
         },
         {
             path: "/kb/articles/:id/editor",
-            component: EditorPage,
+            component: forModal ? ModalEditorPage : EditorPage,
         },
     ];
 }

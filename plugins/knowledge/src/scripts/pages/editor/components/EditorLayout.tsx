@@ -19,6 +19,9 @@ interface IProps {
     device: Devices;
 }
 
+/**
+ * Page layout for the Editor.
+ */
 export class EditorLayout extends React.Component<IProps> {
     public render() {
         const editorID = uniqueId();

@@ -26,6 +26,7 @@ const HomePage = Loadable({
 /** The route data for routes that appear in only the in the normal page. */
 const pageRoutes: RouteProps[] = [
     {
+        exact: true,
         path: "/kb",
         component: HomePage,
     },
@@ -52,6 +53,6 @@ export function getPageRouteData(isCurrentRouteModal: boolean) {
     if (isCurrentRouteModal) {
         return pageRoutes;
     } else {
-        return [...pageRoutes, ...getModalRouteData()];
+        return [...pageRoutes, ...getModalRouteData(false)];
     }
 }
