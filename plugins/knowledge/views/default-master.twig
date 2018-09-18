@@ -36,11 +36,13 @@
                 {{ include('partials/header.twig') }}
             </div>
             <div id="app" class="page-minHeight">
-                {% if template %}
-                    <noscript>
-                        {{ include(template) }}
-                    </noscript>
-                {% endif %}
+                <div class="fullPageLoader">
+                    {% if template %}
+                        <noscript>
+                            {{ include(template) }}
+                        </noscript>
+                    {% endif %}
+                </div>
             </div>
             <div id="footerContainer">
                 {{ include('partials/footer.twig') }}

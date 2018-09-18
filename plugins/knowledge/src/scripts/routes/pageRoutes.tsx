@@ -6,18 +6,18 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import Loading from "@knowledge/components/Loading";
 import Loadable from "react-loadable";
 import { getModalRoutes } from "@knowledge/routes/modalRoutes";
+import FullPageLoader from "@library/components/FullPageLoader";
 
 const ArticlePage = Loadable({
-    loading: Loading,
+    loading: FullPageLoader,
     loader: () =>
         import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
 });
 
 const HomePage = Loadable({
-    loading: Loading,
+    loading: FullPageLoader,
     loader: () =>
         import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/index" */ "@knowledge/pages/home/HomePage"),
 });

@@ -6,11 +6,11 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import Loading from "@knowledge/components/Loading";
 import Loadable from "react-loadable";
+import FullPageLoader from "@library/components/FullPageLoader";
 
 const EditorPage = Loadable({
-    loading: Loading,
+    loading: FullPageLoader,
     loader: () =>
         import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
 });
