@@ -14,11 +14,13 @@
 @import "~library-scss/userContent/_blockquote";
 @import "~library-scss/userContent/_emoji";
 @import "~library-scss/userContent/_codeBlocks";
+@import "~library-scss/userContent/_accessibility";
 // Embed styles. The location of these should be pulled up in the future.
 @import "~library-scss/embeds/_embeds";
 
 @import "base/scaffolding";
 @import "base/typography";
+@import "base/utilities";
 
 @import "layouts/page";
 @import "layouts/container";
