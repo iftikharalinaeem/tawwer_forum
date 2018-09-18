@@ -34,12 +34,10 @@ class ArticlesPageController extends PageController {
     public function __construct(
         \AssetModel $assetModel,
         ArticlesApiController $articlesApiController,
-        \Gdn_Session $session,
-        \Gdn_Request $request
+        \Gdn_Session $session
     ) {
         parent::__construct();
         $this->session = $session;
-        $this->request = $request;
         $this->articlesApi = $articlesApiController;
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
