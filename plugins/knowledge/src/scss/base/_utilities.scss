@@ -1,0 +1,19 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.sr-only {
+  @include sr-only;
+}
+
+.isHidden {
+  display: none;
+}
+
+.inheritHeight {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}

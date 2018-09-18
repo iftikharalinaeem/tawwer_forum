@@ -18,6 +18,8 @@ use Vanilla\Knowledge\Models\SiteContextModel;
  */
 class PageController extends \Garden\Controller implements InjectableInterface {
     const API_PAGE_KEY = 'page';
+    /** @var Gdn_Session */
+    protected $session;
 
     protected $data = [];
 
@@ -190,5 +192,15 @@ class PageController extends \Garden\Controller implements InjectableInterface {
      */
     public function getCanonicalLink() {
         return $this->data[self::API_PAGE_KEY]['url'] ?? '/';
+    }
+
+    /**
+     * Redirect user to sign in page
+     *
+     * @param string $uri URI user should be redirected back when log in
+     */
+    public static function signInFirst(string $uri) {
+        header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
+        exit();
     }
 }

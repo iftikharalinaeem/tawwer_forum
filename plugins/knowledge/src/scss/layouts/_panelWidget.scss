@@ -5,6 +5,8 @@
  */
 
 .panelWidget {
+  display: flex;
+  flex-direction: column;
   position: relative;
   padding: {
     top: $global-widgetInner_padding;

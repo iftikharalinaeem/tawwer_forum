@@ -1,9 +1,0 @@
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
- */
-
-@mixin defaultTransition($properties...) {
-  transition: $properties, $global-default_timing, $global-default_easing;
-}

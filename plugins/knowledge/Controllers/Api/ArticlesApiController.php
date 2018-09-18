@@ -192,6 +192,31 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get an article for editing.
+     *
+     * @param int $id
+     * @return array
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If the output fails to validate against the schema.
+     */
+    public function get_edit(int $id): array {
+        $this->permission();
+
+        $this->idParamSchema();
+        $out = $this->schema(\Garden\Schema\Schema::parse([
+            "articleID",
+            "knowledgeCategoryID",
+            "sort",
+        ])->add($this->fullSchema()), "out")->setDescription("Get an article for editing.");
+
+        $article = $this->articleByID($id);
+        $result = $out->validate($article);
+        return $result;
+    }
+
+    /**
      * Get an ID-only article schema.
      *
      * @param string $type The type of schema.
