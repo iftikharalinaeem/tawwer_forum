@@ -198,7 +198,7 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     }
 
     /**
-     * This method receives redirest user to sign in page
+     * Redirect user to sign in page
      *
      * @param string $uri URI user should be redirected back when log in
      */
