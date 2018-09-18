@@ -204,5 +204,6 @@ class PageController extends \Garden\Controller implements InjectableInterface {
      */
     public static function signInFirst(string $uri) {
         header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
+        exit();
     }
 }
