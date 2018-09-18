@@ -37,7 +37,11 @@ export class EditorLayout extends React.Component<IProps> {
                             <div className="FormWrapper inheritHeight">
                                 <form className="inheritHeight">
                                     <div className="inputBlock">
-                                        <input className="inputBlock-inputText inputText" type="text" />
+                                        <input
+                                            className="inputBlock-inputText inputText"
+                                            type="text"
+                                            placeholder={t("Title")}
+                                        />
                                     </div>
                                     <div className="richEditor inheritHeight">
                                         <Editor

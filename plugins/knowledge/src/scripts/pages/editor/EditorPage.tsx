@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import AriaModal from "react-aria-modal";
 import EditorLayout from "@knowledge/pages/editor/components/EditorLayout";
 import { withRouter, RouteComponentProps } from "react-router-dom";
+import Modal from "@knowledge/components/Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 
@@ -15,15 +15,13 @@ export class EditorPage extends React.Component<IProps> {
     public render() {
         if (this.isModal) {
             return (
-                <AriaModal
-                    includeDefaultStyles={false}
-                    onExit={this.dismissModal}
-                    applicationNode={this.getApplicationNode()}
-                    titleText="Editor Page"
-                    dialogClass="dialogue dialogue-full dialogue-editor inheritHeight"
+                <Modal
+                    onClose={this.dismissModal}
+                    appContainer={document.getElementById("app")!}
+                    container={document.getElementById("modals")!}
                 >
                     <EditorLayout />
-                </AriaModal>
+                </Modal>
             );
         } else {
             return <EditorLayout />;
@@ -37,10 +35,6 @@ export class EditorPage extends React.Component<IProps> {
         const { location } = this.props;
         return !!(location && location.state && location.state.modal);
     }
-
-    private getApplicationNode = () => {
-        return document.getElementById("app")!;
-    };
 
     private dismissModal = () => {
         this.props.history.push(this.props.location.state.lastLocation || "/");
