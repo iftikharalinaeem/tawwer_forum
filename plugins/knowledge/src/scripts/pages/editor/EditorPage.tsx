@@ -5,57 +5,46 @@
  */
 
 import React from "react";
-import uniqueId from "lodash/uniqueId";
-import Editor from "@rich-editor/components/editor/Editor";
-import { t } from "@library/application";
-import Container from "@knowledge/layouts/components/Container";
-import PanelLayout from "@knowledge/layouts/PanelLayout";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageHeading from "@knowledge/components/PageHeading";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { Devices } from "@knowledge/components/DeviceChecker";
 import AriaModal from "react-aria-modal";
+import EditorLayout from "@knowledge/pages/editor/components/EditorLayout";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 
-interface IProps {
-    device: Devices;
-}
+interface IProps extends RouteComponentProps<{}> {}
 
 export class EditorPage extends React.Component<IProps> {
     public render() {
-        const editorID = uniqueId();
-        const editorDescriptionId = "editorDescription-" + editorID;
-        return "Hello Editor";
-
-        // return (
-        // <Container className="inheritHeight">
-        //     <PanelLayout growMiddleBottom={true} device={this.props.device}>
-        //         <PanelLayout.MiddleTop>
-        //             <PanelWidget>
-        //                 <PageHeading title={t("Write Discussion")} />
-        //             </PanelWidget>
-        //         </PanelLayout.MiddleTop>
-        //         <PanelLayout.MiddleBottom>
-        //             <PanelWidget>
-        //                 <div className="FormWrapper inheritHeight">
-        //                     <form className="inheritHeight">
-        //                         <div className="inputBlock">
-        //                             <input className="inputBlock-inputText inputText" type="text" />
-        //                         </div>
-        //                         <div className="richEditor inheritHeight">
-        //                             <Editor
-        //                                 editorID={editorID}
-        //                                 editorDescriptionID={editorDescriptionId}
-        //                                 isPrimaryEditor={true}
-        //                             />
-        //                         </div>
-        //                     </form>
-        //                 </div>
-        //             </PanelWidget>
-        //         </PanelLayout.MiddleBottom>
-        //     </PanelLayout>
-        // </Container>
-        // );
+        if (this.isModal) {
+            return (
+                <AriaModal
+                    includeDefaultStyles={false}
+                    onExit={this.dismissModal}
+                    applicationNode={this.getApplicationNode()}
+                    titleText="Editor Page"
+                    dialogClass="dialogue dialogue-full dialogue-editor"
+                >
+                    <EditorLayout />
+                </AriaModal>
+            );
+        } else {
+            return <EditorLayout />;
+        }
     }
+
+    /**
+     * Whether or not the we are navigated inside of a router.
+     */
+    private get isModal(): boolean {
+        const { location } = this.props;
+        return !!(location && location.state && location.state.modal);
+    }
+
+    private getApplicationNode = () => {
+        return document.getElementById("app")!;
+    };
+
+    private dismissModal = () => {
+        this.props.history.push(this.props.location.state.lastLocation || "/");
+    };
 }
 
-export default withDevice<IProps>(EditorPage);
+export default withRouter(EditorPage);
