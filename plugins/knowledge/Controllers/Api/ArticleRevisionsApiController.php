@@ -6,23 +6,19 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
-use AbstractApiController;
 use Exception;
 use Gdn_Format as Formatter;
 use UserModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
-use Garden\Web\Exception\HttpException;
-use Garden\Web\Exception\ServerException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
-use Vanilla\Exception\PermissionException;
 
 /**
  * API controller for managing the article revisions resource.
  */
-class ArticleRevisionsApiController extends AbstractApiController {
+class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
     /** @var ArticleModel */
     private $articleModel;
@@ -67,7 +63,7 @@ class ArticleRevisionsApiController extends AbstractApiController {
      */
     private function articleByID(int $id): array {
         try {
-            $article = $this->articleModel->get($id);
+            $article = $this->articleModel->getID($id);
         } catch (Exception $e) {
             throw new NotFoundException("Article");
         }
@@ -89,25 +85,6 @@ class ArticleRevisionsApiController extends AbstractApiController {
         }
         $row = reset($resultSet);
         return $row;
-    }
-
-    /**
-     * Given an article row, determine if the current user has permission to modify it.
-     *
-     * @param array $article An article row.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have access to edit the article.
-     * @throws ServerException If the article row does not have a valid user ID.
-     */
-    private function articleEditPermission(array $article) {
-        $insertUserID = $article["insertUserID"] ?? null;
-        if ($insertUserID === null) {
-            throw new ServerException("Unable to determine value of insertUserID");
-        } elseif ($insertUserID === $this->getSession()->UserID) {
-            $this->permission("knowledge.articles.add");
-        } else {
-            $this->permission("knowledge.articles.manage");
-        }
     }
 
     /**
@@ -274,7 +251,7 @@ class ArticleRevisionsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $article = $this->articleByID($body["articleID"]);
-        $this->articleEditPermission($article);
+        $this->editPermission($article["insertUserID"]);
 
         $body["bodyRendered"] = Formatter::to($body["body"], $body["format"]);
         $articleRevisionID = $this->articleRevisionModel->insert($body);

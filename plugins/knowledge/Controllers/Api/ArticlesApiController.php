@@ -21,7 +21,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 /**
  * API controller for managing the articles resource.
  */
-class ArticlesApiController extends \AbstractApiController {
+class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /** @var \Garden\Schema\Schema */
     private $articlePostSchema;
@@ -73,30 +73,11 @@ class ArticlesApiController extends \AbstractApiController {
      */
     private function articleByID(int $id): array {
         try {
-            $article = $this->articleModel->get($id);
+            $article = $this->articleModel->getID($id);
         } catch (Exception $e) {
             throw new NotFoundException("Article");
         }
         return $article;
-    }
-
-    /**
-     * Given an article row, determine if the current user has permission to modify it.
-     *
-     * @param array $article An article row.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have access to edit the article.
-     * @throws ServerException If the article row does not have a valid user ID.
-     */
-    private function editPermission(array $article) {
-        $insertUserID = $article["insertUserID"] ?? null;
-        if ($insertUserID === null) {
-            throw new ServerException("Unable to determine value of insertUserID");
-        } elseif ($insertUserID === $this->getSession()->UserID) {
-            $this->permission("knowledge.articles.add");
-        } else {
-            $this->permission("knowledge.articles.manage");
-        }
     }
 
     /**
@@ -292,7 +273,7 @@ class ArticlesApiController extends \AbstractApiController {
         $out = $this->articleSchema("out");
 
         $article = $this->articleByID($id);
-        $this->editPermission($article);
+        $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
         $row = $this->articleByID($id);
