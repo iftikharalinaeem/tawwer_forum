@@ -110,7 +110,7 @@ class ArticlesPageController extends PageController {
      */
     public function get_editor(int $id) {
         if (!$this->session->isValid()) {
-            redirectTo('/entry/signin?Target='.urlencode($this->request->pathAndQuery()));
+            header('Location: /entry/signin?Target='.urlencode('kb/articles/'.$id.'/editor'), true, 302);
         }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
@@ -139,7 +139,7 @@ class ArticlesPageController extends PageController {
      */
     public function get_add() {
         if (!$this->session->isValid()) {
-            redirectTo('/entry/signin?Target='.urlencode($this->request->pathAndQuery()));
+            header('Location: /entry/signin?Target='.urlencode('kb/articles/add'), true, 302);
         }
         $this->data[self::API_PAGE_KEY] = [];
 
