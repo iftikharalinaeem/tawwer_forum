@@ -7,7 +7,9 @@
 namespace Vanilla\Knowledge\Models;
 
 use DateTimeImmutable;
+use Garden\Schema\ValidationException;
 use Gdn_Session;
+use Exception;
 
 /**
  * A model for managing articles.
@@ -25,6 +27,23 @@ class ArticleModel extends \Vanilla\Models\Model {
     public function __construct(Gdn_Session $session) {
         parent::__construct('article');
         $this->session = $session;
+    }
+
+    /**
+     * Get a single article row by its ID.
+     *
+     * @param int $articleID
+     * @return array
+     * @throws ValidationException If the result fails schema validation.
+     * @throws Exception If the article could not be found.
+     */
+    public function getID(int $articleID): array {
+        $resultSet = $this->get(["ArticleID" => $articleID], ["limit" => 1]);
+        if (empty($resultSet)) {
+            throw new Exception("An article with that ID could not be found.");
+        }
+        $row = reset($resultSet);
+        return $row;
     }
 
     /**

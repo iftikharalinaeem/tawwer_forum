@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use AbstractApiController;
+use Exception;
 use Gdn_Format as Formatter;
 use UserModel;
 use Garden\Schema\Schema;
@@ -63,15 +64,14 @@ class ArticleRevisionsApiController extends AbstractApiController {
      * @param int $id Article ID.
      * @return array
      * @throws NotFoundException If the article could not be found.
-     * @throws ValidationException If a fetched row fails to validate against the article schema.
      */
     private function articleByID(int $id): array {
-        $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
-        if (empty($resultSet)) {
+        try {
+            $article = $this->articleModel->get($id);
+        } catch (Exception $e) {
             throw new NotFoundException("Article");
         }
-        $row = reset($resultSet);
-        return $row;
+        return $article;
     }
 
     /**
