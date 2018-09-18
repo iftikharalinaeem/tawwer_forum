@@ -62,6 +62,7 @@ class ArticlesPageController extends PageController {
         ];
         $data['page']['classes'][] = 'isLoading';
         $data['page']['userSignedIn'] = $this->session->isValid();
+        $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';
         $this->pageMetaInit();
 
         $this->setSeoMetaData();
