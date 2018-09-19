@@ -25,7 +25,6 @@ interface IOwnProps
 interface IProps extends IOwnProps {
     initArticle: () => void;
     getArticle: (id: number) => void;
-    getRevision: (id: number) => void;
     postRevision: typeof revisionActions.postRevision;
     pageState: IEditorPageState;
     clearPageState: () => void;
@@ -37,8 +36,12 @@ interface IProps extends IOwnProps {
 export class EditorPage extends React.Component<IProps> {
     public render() {
         const { article, revision } = this.props.pageState;
+
+        // If we have an article and revision posted we should redirect to that article.
+        // Right now the workflow for getting the canonical URL is a bit tedious so I'm redirecting
+        // To a non-canonical version. This should be fixed later.
         if (article.status === LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
-            return <Redirect to={this.getUrlPath(article.data.url)} />;
+            return <Redirect to={`/kb/articles/-${article.data.articleID}`} />;
         }
 
         if (this.isModal) {
@@ -56,21 +59,34 @@ export class EditorPage extends React.Component<IProps> {
         }
     }
 
+    /**
+     * Initial setup for the page.
+     */
     public componentDidMount() {
         this.ensureArticle();
         this.ensureCorrectURL();
-        this.checkRevision();
     }
 
+    /**
+     * Continuous checking as we get new data for the page.
+     */
     public componentDidUpdate() {
         this.ensureCorrectURL();
-        this.checkRevision();
     }
 
+    /**
+     * Cleanup the page contents.
+     */
     public componentWillUnmount() {
         this.props.clearPageState();
     }
 
+    /**
+     * Ensure that the page is on the correct URL.
+     *
+     * If we're on /articles/add and have now created an article we need to change the URL.
+     * This replacement should be seemless and not create a new history entry.
+     */
     private ensureCorrectURL() {
         const { history, pageState } = this.props;
         const { article } = pageState;
@@ -84,6 +100,10 @@ export class EditorPage extends React.Component<IProps> {
         }
     }
 
+    /**
+     * Ensure that we have an article for the editor.
+     * Either fetch one if we have an ID in the URL or create a new one.
+     */
     private ensureArticle() {
         const { pageState, initArticle, getArticle, match } = this.props;
         if (pageState.article.status === LoadStatus.PENDING) {
@@ -95,6 +115,9 @@ export class EditorPage extends React.Component<IProps> {
         }
     }
 
+    /**
+     * Handle the form submission for a revision.
+     */
     private formSubmit = (content: DeltaOperation[], title: string) => {
         const { pageState, postRevision } = this.props;
         const { article } = pageState;
@@ -109,24 +132,6 @@ export class EditorPage extends React.Component<IProps> {
             postRevision(data);
         }
     };
-
-    private checkRevision() {
-        const { pageState, getRevision } = this.props;
-        const { article, revision } = pageState;
-        if (
-            article.status === LoadStatus.SUCCESS &&
-            article.data.articleRevisionID &&
-            revision.status === LoadStatus.PENDING
-        ) {
-            getRevision(article.data.articleRevisionID);
-        }
-    }
-
-    private getUrlPath(url: string): string {
-        const el = document.createElement("a");
-        el.href = url;
-        return el.pathname;
-    }
 
     /**
      * Whether or not the we are navigated inside of a router.
@@ -159,7 +164,6 @@ function mapStateToProps(state: IStoreState) {
 function mapDispatchToProps(dispatch, props: IOwnProps) {
     return {
         getArticle: (id: number) => dispatch(articleActions.getArticle(id)),
-        getRevision: (id: number) => dispatch(revisionActions.getRevision(id)),
         postRevision: (body: IPostArticleRevisionRequestBody) => dispatch(revisionActions.postRevision(body)),
         initArticle: () => dispatch(articleActions.postArticle({ knowledgeCategoryID: 0 })),
         clearPageState: () => dispatch(pageActions.clearEditorPageState()),

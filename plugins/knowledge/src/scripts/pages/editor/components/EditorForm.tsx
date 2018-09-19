@@ -71,6 +71,9 @@ export class EditorForm extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
+     */
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         const content = this.editor.current!.getEditorContent()!;
