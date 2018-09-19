@@ -18,6 +18,7 @@ import { DeltaOperation } from "quill/core";
 
 interface IProps {
     device: Devices;
+    backUrl: string;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
 }
 
@@ -37,7 +38,7 @@ export class EditorForm extends React.Component<IProps> {
                 <PanelLayout growMiddleBottom={true} device={this.props.device}>
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
-                            <PageHeading title={t("Write Discussion")} />
+                            <PageHeading backUrl={this.props.backUrl} title={t("Write Discussion")} />
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>

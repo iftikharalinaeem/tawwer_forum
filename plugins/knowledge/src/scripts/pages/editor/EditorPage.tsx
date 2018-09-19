@@ -44,6 +44,8 @@ export class EditorPage extends React.Component<IProps> {
             return <Redirect to={`/kb/articles/-${article.data.articleID}`} />;
         }
 
+        const editorForm = <EditorForm backUrl={this.backLink} submitHandler={this.formSubmit} />;
+
         if (this.isModal) {
             return (
                 <Modal
@@ -51,11 +53,11 @@ export class EditorPage extends React.Component<IProps> {
                     appContainer={document.getElementById("app")!}
                     container={document.getElementById("modals")!}
                 >
-                    <EditorForm submitHandler={this.formSubmit} />
+                    {editorForm}
                 </Modal>
             );
         } else {
-            return <EditorForm submitHandler={this.formSubmit} />;
+            return editorForm;
         }
     }
 
@@ -141,11 +143,16 @@ export class EditorPage extends React.Component<IProps> {
         return !!(location && location.state && location.state.modal);
     }
 
+    private get backLink(): string {
+        const { lastLocation } = this.props.location.state;
+        return lastLocation ? lastLocation.pathname : "/kb";
+    }
+
     /**
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        this.props.history.push(this.props.location.state.lastLocation || "/kb");
+        this.props.history.push(this.backLink);
     };
 }
 
