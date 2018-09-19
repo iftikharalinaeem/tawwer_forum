@@ -20,6 +20,6 @@ export type IEditorPageState = ILoadable<{
 export interface IStoreState {
     knowledge: {
         articlePage: IArticlePageState;
-        addArticlePage: IEditorPageState;
+        editorPage: IEditorPageState;
     };
 }

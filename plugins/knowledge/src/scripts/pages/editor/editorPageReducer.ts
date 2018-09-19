@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import * as actions from "@knowledge/pages/editor/editorPageActions";
+import * as articleActions from "@knowledge/state/articleActions";
 import { LoadStatus } from "@library/@types/api";
 import { IEditorPageState } from "@knowledge/@types/state";
 
@@ -14,31 +14,34 @@ export const initialState: IEditorPageState = {
 
 export default function editorPageReducer(
     state: IEditorPageState = initialState,
-    action: actions.ActionTypes,
+    action: articleActions.ActionTypes,
 ): IEditorPageState {
     switch (action.type) {
-        case actions.POST_ARTICLE_REQUEST:
+        case articleActions.POST_ARTICLE_REQUEST:
             return {
                 status: LoadStatus.LOADING,
             };
-        case actions.POST_ARTICLE_RESPONSE:
+        case articleActions.POST_ARTICLE_RESPONSE: {
+            const newArticleId = action.payload.data.articleID;
+
             return {
                 status: LoadStatus.SUCCESS,
                 data: {
                     article: action.payload.data,
                 },
             };
-        case actions.POST_ARTICLE_ERROR:
+        }
+        case articleActions.POST_ARTICLE_ERROR:
             return {
                 status: LoadStatus.ERROR,
                 error: action.payload,
             };
-        case actions.POST_REVISION_ERROR:
+        case articleActions.POST_REVISION_ERROR:
             return {
                 status: LoadStatus.ERROR,
                 error: action.payload,
             };
-        case actions.POST_REVISION_RESPONSE:
+        case articleActions.POST_REVISION_RESPONSE:
             return {
                 status: LoadStatus.SUCCESS,
                 data: {
