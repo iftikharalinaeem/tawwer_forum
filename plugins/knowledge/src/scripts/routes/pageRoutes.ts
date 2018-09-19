@@ -31,7 +31,7 @@ const pageRoutes: RouteProps[] = [
         component: HomePage,
     },
     {
-        path: "/kb/articles/(.*)-:id(d+)",
+        path: "/kb/articles/(.*)-:id(\\d+)",
         component: ArticlePage,
     },
 ];
