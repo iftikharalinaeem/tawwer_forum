@@ -76,25 +76,6 @@ export class ArticlePage extends React.Component<IProps> {
     public componentWillUnmount() {
         this.props.clearPageState();
     }
-
-    /**
-     * Parse the ID of the request article out of the slug in the URL.
-     *
-     * Slugs for an article can be almost anything.
-     * The contents of the last trailing slash represent the ID of the resource.
-     *
-     * @returns The ID or null if an ID could not be parsed out.
-     */
-    // private parseIDFromSlug(): string | null {
-    //     const slug = this.props.match.params.slug;
-    //     const idRegex = /.+-(\d+)/;
-    //     const id = idRegex.exec(slug);
-    //     if (id && id[0]) {
-    //         return id[1];
-    //     } else {
-    //         return null;
-    //     }
-    // }
 }
 
 /**

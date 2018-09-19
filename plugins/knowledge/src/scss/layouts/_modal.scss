@@ -1,4 +1,4 @@
-$dialogue-bgColor: $global-color_white !default;
+$modal-bgColor: $global-color_white !default;
 
 .modal {
     position: fixed;
@@ -8,5 +8,5 @@ $dialogue-bgColor: $global-color_white !default;
     left: 0;
     right: 0;
     bottom: 0;
-    background: $dialogue-bgColor;
+    background: $modal-bgColor;
 }
