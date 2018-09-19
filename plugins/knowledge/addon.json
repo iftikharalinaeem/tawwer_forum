@@ -23,5 +23,10 @@
         "entries": {
             "app": "./src/scripts/knowledge"
         }
+    },
+    "registerPermissions": {
+        "knowledge.kb.view": "Garden.SignIn.Allow",
+        "0": "knowledge.articles.add",
+        "knowledge.articles.manage": "Garden.Moderation.Manage"
     }
 }

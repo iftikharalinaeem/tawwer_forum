@@ -1,7 +1,8 @@
 <?php
 /**
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 /**
@@ -20,6 +21,20 @@ class KnowledgePlugin extends Gdn_Plugin {
     public function __construct(Gdn_Database $database) {
         parent::__construct();
         $this->database = $database;
+    }
+
+    /**
+     * Initialize controller class detection under Knowledge base application
+     *
+     * @param \Garden\Container\Container $container Container to support dependency injection
+     */
+    public function container_init(\Garden\Container\Container $container) {
+        $container->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-article"), 'kb-article']);
+        $container->rule('@kb-article')
+            ->setClass(\Garden\Web\ResourceRoute::class)
+            ->setConstructorArgs(['/kb/', '*\\Knowledge\\Controllers\\%sPageController'])
+            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8']);
     }
 
     /**

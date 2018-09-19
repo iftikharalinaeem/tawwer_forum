@@ -1,20 +1,39 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license Proprietary
  */
 
 namespace Vanilla\Knowledge\Models;
+
+use DateTimeImmutable;
+use Gdn_Session;
 
 /**
  * A model for managing article revisions.
  */
 class ArticleRevisionModel extends \Vanilla\Models\Model {
 
+    private $session;
+
     /**
      * ArticleModel constructor.
+     *
+     * @param Gdn_Session $session
      */
-    public function __construct() {
+    public function __construct(Gdn_Session $session) {
         parent::__construct('articleRevision');
+        $this->session = $session;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function insert(array $set) {
+        $set["insertUserID"] = $this->session->UserID;
+        $set["dateInserted"] = new DateTimeImmutable("now");
+
+        $result = parent::insert($set);
+        return $result;
     }
 }

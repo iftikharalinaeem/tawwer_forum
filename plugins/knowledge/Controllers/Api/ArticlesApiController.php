@@ -1,12 +1,14 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license Proprietary
  */
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
+use Gdn_Format;
+use UserModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
@@ -19,10 +21,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 /**
  * API controller for managing the articles resource.
  */
-class ArticlesApiController extends \AbstractApiController {
-
-    /** @var \Garden\Schema\Schema */
-    private $articleFragmentSchema;
+class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /** @var \Garden\Schema\Schema */
     private $articlePostSchema;
@@ -36,18 +35,33 @@ class ArticlesApiController extends \AbstractApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
+    /** @var ArticleRevisionsApiController */
+    private $articleRevisionsApiController;
+
     /** @var \Garden\Schema\Schema */
     private $idParamSchema;
+
+    /** @var UserModel */
+    private $userModel;
 
     /**
      * ArticlesApiController constructor.
      *
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
+     * @param ArticleRevisionsApiController $articleRevisionsApiController
+     * @param UserModel $userModel
      */
-    public function __construct(ArticleModel $articleModel, ArticleRevisionModel $articleRevisionModel) {
+    public function __construct(
+        ArticleModel $articleModel,
+        ArticleRevisionModel $articleRevisionModel,
+        ArticleRevisionsApiController $articleRevisionsApiController,
+        UserModel $userModel
+    ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
+        $this->articleRevisionsApiController = $articleRevisionsApiController;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -56,33 +70,14 @@ class ArticlesApiController extends \AbstractApiController {
      * @param int $id Article ID.
      * @return array
      * @throws NotFoundException If the article could not be found.
-     * @throws ValidationException If a fetched row fails to validate against the article schema.
      */
     private function articleByID(int $id): array {
-        $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
-        if (empty($resultSet)) {
+        try {
+            $article = $this->articleModel->getID($id);
+        } catch (Exception $e) {
             throw new NotFoundException("Article");
         }
-        $row = reset($resultSet);
-        return $row;
-    }
-
-    /**
-     * Get the schema for articles joined to records.
-     *
-     * @return \Garden\Schema\Schema Returns a schema.
-     */
-    public function articleFragmentSchema(): \Garden\Schema\Schema {
-        if ($this->articleFragmentSchema === null) {
-            $this->articleFragmentSchema = $this->schema([
-                "articleID:i" => "The ID of the article.",
-                "name:s" => "Name of the article.",
-                "updateUser" => $this->getUserFragmentSchema(),
-                "slug:s" => "Unique path slug for the article.",
-                "url:s" => "Full URL to the article.",
-            ], "ArticleFragment");
-        }
-        return $this->articleFragmentSchema;
+        return $article;
     }
 
     /**
@@ -95,10 +90,6 @@ class ArticlesApiController extends \AbstractApiController {
         if ($this->articlePostSchema === null) {
             $this->articlePostSchema = $this->schema(
                 \Garden\Schema\Schema::parse([
-                    "name",
-                    "locale?",
-                    "body",
-                    "format",
                     "knowledgeCategoryID",
                     "sort?",
                 ])->add($this->articleSchema()),
@@ -128,28 +119,12 @@ class ArticlesApiController extends \AbstractApiController {
         if ($this->articleSchema === null) {
             $this->articleSchema = $this->schema([
                 "articleID:i" => "Unique article ID.",
-                "name:s" => [
-                    "allowNull" => true,
-                    "description" => "Title of the article.",
-                ],
-                "locale:s" => [
-                    "allowNull" => true,
-                    "description" => "Locale the article was written in.",
-                ],
-                "body:s" => [
-                    "allowNull" => true,
-                    "description" => "Raw body contents.",
-                ],
-                "bodyRendered:s" => [
-                    "allowNull" => true,
-                    "description" => "Rendered body contents.",
-                ],
-                "format:s" => [
-                    "allowNull" => true,
-                    "enum" => ["text", "textex", "markdown", "wysiwyg", "html", "bbcode", "rich"],
-                    "description" => "Format of the raw body content.",
-                ],
                 "knowledgeCategoryID:i" => "Category the article belongs in.",
+                "articleRevisionID:i" => [
+                    "allowNull" => true,
+                    "description" => "Unique ID of the published revision."
+                ],
+                "articleRevision?" => $this->articleRevisionsApiController->articleRevisionFragmentSchema(),
                 "seoName:s" => [
                     "allowNull" => true,
                     "description" => "SEO-optimized name for the article.",
@@ -166,15 +141,15 @@ class ArticlesApiController extends \AbstractApiController {
                     "allowNull" => true,
                     "description" => "Manual sort order of the article.",
                 ],
+                "score:i" => "Score of the article.",
+                "views:i" => "How many times the article has been viewed.",
+                "url:s" => "Full URL to the article.",
                 "insertUserID:i" => "Unique ID of the user who originally created the article.",
                 "dateInserted:dt" => "When the article was created.",
                 "updateUserID:i" => "Unique ID of the last user to update the article.",
                 "dateUpdated:dt" => "When the article was last updated.",
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "updateUser?" => $this->getUserFragmentSchema(),
-                "score:i" => "Score of the article.",
-                "views:i" => "How many times the article has been viewed.",
-                "url:s" => "Full URL to the article.",
                 "categoryAncestorIDs:a?" => "integer",
             ], "Article");
         }
@@ -196,24 +171,53 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema();
         $in = $this->schema([
-            "expand" => ApiUtils::getExpandDefinition(["ancestors", "all", "user"]),
+            "expand" => ApiUtils::getExpandDefinition(["all", "ancestors", "articleRevision"]),
         ], "in")->setDescription("Get an article.");
         $out = $this->schema($this->articleSchema(), "out");
 
         $query = $in->validate($query);
 
         $article = $this->articleByID($id);
+        $this->userModel->expandUsers(
+            $article,
+            ["insertUserID", "updateUserID"]
+        );
         $article = $this->normalizeOutput($article, $query["expand"] ?: []);
         $result = $out->validate($article);
         return $result;
     }
 
     /**
-     * Get an ID-only discussion record schema.
+     * Get an article for editing.
+     *
+     * @param int $id
+     * @return array
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If the output fails to validate against the schema.
+     */
+    public function get_edit(int $id): array {
+        $this->permission();
+
+        $this->idParamSchema();
+        $out = $this->schema(\Garden\Schema\Schema::parse([
+            "articleID",
+            "knowledgeCategoryID",
+            "sort",
+        ])->add($this->fullSchema()), "out")->setDescription("Get an article for editing.");
+
+        $article = $this->articleByID($id);
+        $result = $out->validate($article);
+        return $result;
+    }
+
+    /**
+     * Get an ID-only article schema.
      *
      * @param string $type The type of schema.
      * @return \Garden\Schema\Schema Returns a schema object.
@@ -244,27 +248,27 @@ class ArticlesApiController extends \AbstractApiController {
             throw new ServerException("No ID in article row.");
         }
 
-        $slug = \Gdn_Format::url($row["name"] ? "{$row['name']}-{$row['articleID']}" : $row["articleID"]);
-        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
-
-        // Merge in the current revision.
-        $revision = [
-            "name" => null,
-            "locale" => null,
-            "body" => null,
-            "bodyRendered" => null,
-            "format" => null,
-        ];
-
-        $revisionResult = $this->articleRevisionModel->get([
+        $publishedRevision = $this->articleRevisionModel->get([
             "articleID" => $row["articleID"],
             "status" => "published"
         ]);
-        if ($revisionResult) {
-            $revisionRow = reset($revisionResult);
-            $revision = $revisionRow + $revision;
+        $articleRevision = reset($publishedRevision) ?: null;
+        if ($articleRevision) {
+            $this->userModel->expandUsers(
+                $articleRevision,
+                ["insertUserID"]
+            );
+            $row["articleRevisionID"] = $articleRevision["articleRevisionID"];
+            $slug = Gdn_Format::url($articleRevision["name"] ? "{$articleRevision['name']}-{$row['articleID']}" : $row["articleID"]);
+        } else {
+            $row["articleRevisionID"] = null;
+            $slug = null;
         }
-        $row = array_merge($revision, $row);
+        if ($this->isExpandField("articleRevision", $expand)) {
+            $row["articleRevision"] = $articleRevision;
+        }
+
+        $row["url"] = \Gdn::request()->url("/kb/articles/".($slug ?: $row["articleID"]), true);
 
         // Placeholder data.
         $row["seoName"] = "Example SEO Name";
@@ -293,10 +297,11 @@ class ArticlesApiController extends \AbstractApiController {
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
 
-        $body = $in->validate($body);
-        $body["articleID"] = $id;
-        $articleID = $this->save($body);
-        $row = $this->articleByID($articleID);
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
+        $body = $in->validate($body, true);
+        $this->articleModel->update($body, ["articleID" => $id]);
+        $row = $this->articleByID($id);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
@@ -312,102 +317,16 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body): array {
-        $this->permission();
+        $this->permission(["knowledge.articles.add", "knowledge.articles.manage"]);
 
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body);
-        $articleID = $this->save($body);
+        $articleID = $this->articleModel->insert($body);
         $row = $this->articleByID($articleID);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * Save an article, diverting the data to its respective models.
-     *
-     * @param array $fields
-     * @return int
-     * @throws Exception If there was an error saving the article row.
-     * @throws Exception If there was an error saving the article revision row.
-     */
-    private function save(array $fields): int {
-        // Save data to the article table.
-        $articleFields = [
-            "articleID",
-            "knowledgeCategoryID",
-            "sort",
-        ];
-        $article = array_intersect_key($fields, array_flip($articleFields));
-        $articleID = $this->saveArticle($article);
-
-        // Save data to the revision table.
-        $revisionFields = [
-            "name",
-            "format",
-            "body",
-            "locale",
-        ];
-        $revision = array_intersect_key($fields, array_flip($revisionFields));
-        if ($revision) {
-            $revision["articleID"] = $articleID;
-            $this->saveRevision($revision);
-        }
-
-        return $articleID;
-    }
-
-    /**
-     * Insert or update an article row.
-     *
-     * @param array $data
-     * @return int
-     * @throws Exception If saving the article fails.
-     */
-    private function saveArticle(array $data): int {
-        $articleID = $data["articleID"] ?? null;
-        $userID = $this->getSession()->UserID;
-
-        if ($articleID) {
-            // Update
-            $data["updateUserID"] = $userID;
-            $data["dateUpdated"] = new \DateTimeImmutable("now");
-            $this->articleModel->update($data, ["articleID" => $articleID]);
-        } else {
-            // Insert
-            $data["insertUserID"] = $data["updateUserID"] = $userID;
-            $data["dateInserted"] = $data["dateUpdated"] = new \DateTimeImmutable("now");
-            $articleID = $this->articleModel->insert($data);
-        }
-
-        return $articleID;
-    }
-
-    /**
-     * Save a new article revision.
-     *
-     * @param array $data
-     * @return int
-     * @throws Exception If saving the article revision fails.
-     */
-    private function saveRevision(array $data): int {
-        $data["bodyRendered"] = \Gdn_Format::to($data["body"], $data["format"]);
-        $data["insertUserID"] = $this->getSession()->UserID;
-        $data["dateInserted"] = new \DateTimeImmutable("now");
-        $revisionID = $this->articleRevisionModel->insert($data);
-
-        // Remove the "published" flag from the currently-published revision.
-        $this->articleRevisionModel->update(
-            ["status" => null],
-            ["articleID" => $data["articleID"], "status" => "published"]
-        );
-        // Publish this revision.
-        $this->articleRevisionModel->update(
-            ["status" => "published"],
-            ["articleRevisionID" => $revisionID]
-        );
-        return $revisionID;
     }
 }

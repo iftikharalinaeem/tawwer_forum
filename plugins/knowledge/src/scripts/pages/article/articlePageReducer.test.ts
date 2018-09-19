@@ -1,18 +1,18 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import { expect } from "chai";
+import { RESET_PAGE_STATE, componentActions as articlePageActions } from "@knowledge/pages/article/articlePageActions";
 import {
     GET_ARTICLE_SUCCESS,
     GET_ARTICLE_ERROR,
     GET_ARTICLE_REQUEST,
-    RESET_PAGE_STATE,
-    componentActions,
+    componentActions as articleActions,
     _rawApiActions,
-} from "@knowledge/pages/article/articlePageActions";
+} from "@knowledge/state/articleActions";
 import { LoadStatus } from "@library/@types/api";
 import reducer, { initialState } from "@knowledge/pages/article/articlePageReducer";
 import { IArticlePageState } from "@knowledge/@types/state";
@@ -26,7 +26,7 @@ describe("articleReducer", () => {
 
     it(`handles ${RESET_PAGE_STATE}`, () => {
         const initial = { some: "garbage", data: "garbage data" } as any;
-        const action = componentActions.clearArticlePageState();
+        const action = articlePageActions.clearArticlePageState();
 
         expect(reducer(initial, action)).deep.equals(initialState);
     });

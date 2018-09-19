@@ -1,10 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 .panelWidget {
+  display: flex;
+  flex-direction: column;
   position: relative;
   padding: {
     top: $global-widgetInner_padding;

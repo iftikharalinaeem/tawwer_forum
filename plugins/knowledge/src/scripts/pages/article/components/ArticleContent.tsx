@@ -1,7 +1,7 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import * as React from "react";
@@ -18,7 +18,7 @@ export default class ArticleContent extends React.Component<IProps> {
         const { article } = this.props;
         return (
             <PanelWidget>
-                <UserContent content={article.bodyRendered} />
+                <UserContent content={article.articleRevision.bodyRendered} />
             </PanelWidget>
         );
     }

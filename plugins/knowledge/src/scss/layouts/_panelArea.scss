@@ -1,7 +1,7 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 $panelArea-gap: $global-gutter_halfSize;
@@ -14,6 +14,12 @@ $panelArea-gap: $global-gutter_halfSize;
 
   + .panelArea {
     margin-top: $panelArea-gap;
+  }
+
+  &.inheritHeight {
+    > .panelWidget {
+      flex-grow: 1;
+    }
   }
 }
 

@@ -1,8 +1,9 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  */
 
 export * from "@knowledge/@types/api/article";
+export * from "@knowledge/@types/api/articleRevision";
 export * from "@knowledge/@types/api/kbCategory";

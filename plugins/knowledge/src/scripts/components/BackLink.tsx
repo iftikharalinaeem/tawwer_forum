@@ -1,13 +1,14 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { leftChevron } from "@knowledge/components/Icons";
+import { leftChevron } from "@library/components/Icons";
+import { Link } from "react-router-dom";
 
 interface IBackLink {
     url?: string;
@@ -23,14 +24,14 @@ export default class BackLink extends React.Component<IBackLink> {
         if (this.props.url) {
             return (
                 <div className={classNames("backLink", this.props.className)}>
-                    <a
-                        href={this.props.url}
+                    <Link
+                        to={this.props.url}
                         aria-label={this.props.title}
                         title={this.props.title}
                         className="backLink-link"
                     >
                         {leftChevron("backLink-icon")}
-                    </a>
+                    </Link>
                 </div>
             );
         } else {

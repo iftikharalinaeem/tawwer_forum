@@ -2,10 +2,10 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL v2
+ * @license Proprietary
  */
 
-namespace Vanilla\Knowledge;
+namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
@@ -18,6 +18,8 @@ use Vanilla\Knowledge\Models\SiteContextModel;
  */
 class PageController extends \Garden\Controller implements InjectableInterface {
     const API_PAGE_KEY = 'page';
+    /** @var Gdn_Session */
+    protected $session;
 
     protected $data = [];
 
@@ -169,6 +171,7 @@ class PageController extends \Garden\Controller implements InjectableInterface {
 
     /**
      * Create an action
+     *
      * @param string $type
      * @param array $data
      * @return array
@@ -192,18 +195,12 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     }
 
     /**
-     * Get breadcrumb. Placeholder at the moment.
+     * Redirect user to sign in page
      *
-     * @param string $format Breadcrumb format: array, json etc. Default is json
-     *
-     * @return string
+     * @param string $uri URI user should be redirected back when log in
      */
-    public function getBreadcrumb(string $format = 'json') {
-        return '{
-                 "@context": "http://schema.org",
-                 "@type": "BreadcrumbList",
-                 "itemListElement":
-                 []
-                }';
+    public static function signInFirst(string $uri) {
+        header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
+        exit();
     }
 }

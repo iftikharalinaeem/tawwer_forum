@@ -1,7 +1,7 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import * as React from "react";
@@ -16,6 +16,7 @@ interface IPanelLayoutProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
+    growMiddleBottom?: boolean;
 }
 
 /**
@@ -76,6 +77,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 
     public static defaultProps = {
         contentTag: "div",
+        growMiddleBottom: false,
     };
 
     public render() {
@@ -95,6 +97,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { noLeftPanel: !shouldRenderLeftPanel },
             { noRightPanel: !shouldRenderLeftPanel },
             this.props.className,
+            { inheritHeight: this.props.growMiddleBottom },
         );
 
         const crumbClasses = className(
@@ -127,8 +130,10 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     </div>
                 )}
 
-                <main className="panelLayout-main">
-                    <div className="panelLayout-container">
+                <main className={classNames("panelLayout-main", { inheritHeight: this.props.growMiddleBottom })}>
+                    <div
+                        className={classNames("panelLayout-container", { inheritHeight: this.props.growMiddleBottom })}
+                    >
                         {shouldRenderLeftPanel && (
                             <Panel className="panelLayout-left" tag="aside">
                                 <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
@@ -142,6 +147,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                             <div
                                 className={classNames("panelLayout-middle", {
                                     hasAdjacentPanel: shouldRenderRightPanel,
+                                    inheritHeight: this.props.growMiddleBottom,
                                 })}
                             >
                                 <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
@@ -155,7 +161,13 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                         {children.rightTop}
                                     </PanelArea>
                                 )}
-                                <PanelArea className="panelAndNav-middleBottom">{children.middleBottom}</PanelArea>
+                                <PanelArea
+                                    className={classNames("panelAndNav-middleBottom", {
+                                        inheritHeight: this.props.growMiddleBottom,
+                                    })}
+                                >
+                                    {children.middleBottom}
+                                </PanelArea>
                                 {!isDesktop && (
                                     <PanelArea className="panelAndNav-tabletBottom" tag="aside">
                                         {children.rightBottom}
