@@ -144,8 +144,8 @@ export class EditorPage extends React.Component<IProps> {
     }
 
     private get backLink(): string {
-        const { lastLocation } = this.props.location.state;
-        return lastLocation ? lastLocation.pathname : "/kb";
+        const { state } = this.props.location;
+        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
     }
 
     /**
