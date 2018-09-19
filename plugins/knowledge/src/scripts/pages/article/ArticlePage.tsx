@@ -12,7 +12,8 @@ import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
-import { componentActions } from "@knowledge/pages/article/articlePageActions";
+import { componentActions as pageActions } from "@knowledge/pages/article/articlePageActions";
+import { componentActions as articleActions } from "@knowledge/state/articleActions";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
 
@@ -21,8 +22,8 @@ interface IProps extends IDeviceProps {
         id: number;
     }>;
     articlePageState: IArticlePageState;
-    getArticle: typeof componentActions.getArticle;
-    clearPageState: typeof componentActions.clearArticlePageState;
+    getArticle: typeof articleActions.getArticle;
+    clearPageState: typeof pageActions.clearArticlePageState;
 }
 
 /**
@@ -92,8 +93,8 @@ function mapStateToProps(state: IStoreState) {
  */
 function mapDispatchToProps(dispatch) {
     return {
-        getArticle: options => dispatch(componentActions.getArticle(options)),
-        clearPageState: () => dispatch(componentActions.clearArticlePageState()),
+        getArticle: (id: number) => dispatch(articleActions.getArticle(id)),
+        clearPageState: () => dispatch(pageActions.clearArticlePageState()),
     };
 }
 

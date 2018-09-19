@@ -12,14 +12,14 @@ export type IArticlePageState = ILoadable<{
     article: IArticle;
 }>;
 
-export type IEditorPageState = ILoadable<{
-    article?: IArticle;
-    revision?: IArticleRevision;
-}>;
+export interface IEditorPageState {
+    article: ILoadable<IArticle>;
+    revision: ILoadable<IArticleRevision>;
+}
 
 export interface IStoreState {
     knowledge: {
         articlePage: IArticlePageState;
-        addArticlePage: IEditorPageState;
+        editorPage: IEditorPageState;
     };
 }
