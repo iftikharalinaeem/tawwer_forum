@@ -14,10 +14,11 @@ import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
 import { componentActions } from "@knowledge/pages/article/articlePageActions";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
+import PageLoader from "@library/components/PageLoader";
 
 interface IProps extends IDeviceProps {
     match: match<{
-        slug: string;
+        id: number;
     }>;
     articlePageState: IArticlePageState;
     getArticle: typeof componentActions.getArticle;
@@ -33,7 +34,7 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public render() {
         const { articlePageState } = this.props;
-        const id = this.parseIDFromSlug();
+        const { id } = this.props.match.params;
 
         if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
             return <NotFoundPage type="Page" />;
@@ -45,7 +46,11 @@ export class ArticlePage extends React.Component<IProps> {
 
         const { article } = articlePageState.data;
 
-        return <ArticleLayout article={article} />;
+        return (
+            <PageLoader {...articlePageState}>
+                <ArticleLayout article={article} />
+            </PageLoader>
+        );
     }
 
     /**
@@ -53,21 +58,16 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public componentDidMount() {
         const { articlePageState, getArticle } = this.props;
+        const { id } = this.props.match.params;
         if (articlePageState.status !== LoadStatus.PENDING) {
             return;
         }
 
-        const id = this.parseIDFromSlug();
         if (id === null) {
             return;
         }
 
-        const numericID = parseInt(id, 10);
-        if (!Number.isInteger(numericID)) {
-            return;
-        }
-
-        getArticle(numericID);
+        getArticle(id);
     }
 
     /**
@@ -75,25 +75,6 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public componentWillUnmount() {
         this.props.clearPageState();
-    }
-
-    /**
-     * Parse the ID of the request article out of the slug in the URL.
-     *
-     * Slugs for an article can be almost anything.
-     * The contents of the last trailing slash represent the ID of the resource.
-     *
-     * @returns The ID or null if an ID could not be parsed out.
-     */
-    private parseIDFromSlug(): string | null {
-        const slug = this.props.match.params.slug;
-        const idRegex = /.+-(\d+)/;
-        const id = idRegex.exec(slug);
-        if (id && id[0]) {
-            return id[1];
-        } else {
-            return null;
-        }
     }
 }
 

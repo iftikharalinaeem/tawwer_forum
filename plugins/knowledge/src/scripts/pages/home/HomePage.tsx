@@ -7,6 +7,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { t } from "@library/application";
+import ModalLink from "@knowledge/components/ModalLink";
 
 export default class HomePage extends React.Component {
     public render() {
@@ -25,6 +26,12 @@ export default class HomePage extends React.Component {
                     <Link to="/kb/articles/test-articles--all-formatting--embeds-3">
                         {t("Test Article - All Formatting & Embeds")}
                     </Link>
+                </p>
+                <p>
+                    <Link to="/kb/articles/add">{t("Add article")}</Link>
+                </p>
+                <p>
+                    <ModalLink to="/kb/articles/add">{t("Add article (in 'modal')")}</ModalLink>
                 </p>
             </div>
         );
