@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
+use Vanilla\Knowledge\Models\ArticleModel;
 
 /**
  * Test the /api/v2/article-revisions endpoint.
@@ -31,6 +32,14 @@ class ArticleRevisionsTest extends AbstractResourceTest {
     public static function setupBeforeClass() {
         self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
+
+        // We're going to need at least one article to associate these revisions with.
+        /** @var ArticleModel $articleModel */
+        $articleModel = self::container()->get(ArticleModel::class);
+        $articleModel->insert([
+            "knowledgeCategoryID" => 1,
+            "sort" => 1,
+        ]);
     }
 
     /**

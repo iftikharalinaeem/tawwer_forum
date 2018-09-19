@@ -6,18 +6,22 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
-use AbstractApiController;
+use Exception;
 use Gdn_Format as Formatter;
 use UserModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\ArticleModel;
 
 /**
  * API controller for managing the article revisions resource.
  */
-class ArticleRevisionsApiController extends AbstractApiController {
+class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
+
+    /** @var ArticleModel */
+    private $articleModel;
 
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
@@ -41,11 +45,29 @@ class ArticleRevisionsApiController extends AbstractApiController {
      * ArticleRevisionsApiController constructor.
      *
      * @param ArticleRevisionModel $articleRevisionModel
+     * @param ArticleModel $articleModel
      * @param UserModel $userModel
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, UserModel $userModel) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel) {
         $this->articleRevisionModel = $articleRevisionModel;
+        $this->articleModel = $articleModel;
         $this->userModel = $userModel;
+    }
+
+    /**
+     * Get an article by its numeric ID.
+     *
+     * @param int $id Article ID.
+     * @return array
+     * @throws NotFoundException If the article could not be found.
+     */
+    private function articleByID(int $id): array {
+        try {
+            $article = $this->articleModel->getID($id);
+        } catch (Exception $e) {
+            throw new NotFoundException("Article");
+        }
+        return $article;
     }
 
     /**
@@ -181,7 +203,7 @@ class ArticleRevisionsApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the current user does not have sufficient permissions.
      */
     public function get($id): array {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema()->setDescription("Get an article revision.");
         $out = $this->articleRevisionSchema("out");
@@ -227,13 +249,17 @@ class ArticleRevisionsApiController extends AbstractApiController {
         $out = $this->articleRevisionSchema("out");
 
         $body = $in->validate($body);
+
+        $article = $this->articleByID($body["articleID"]);
+        $this->editPermission($article["insertUserID"]);
+
         $body["bodyRendered"] = Formatter::to($body["body"], $body["format"]);
         $articleRevisionID = $this->articleRevisionModel->insert($body);
 
         // Remove the "published" flag from the currently-published revision.
         $this->articleRevisionModel->update(
             ["status" => null],
-            ["articleID" => $body["articleID"], "status" => "published"]
+            ["articleID" => $article["articleID"], "status" => "published"]
         );
         // Publish this revision.
         $this->articleRevisionModel->update(

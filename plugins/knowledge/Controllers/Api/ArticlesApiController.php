@@ -21,10 +21,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 /**
  * API controller for managing the articles resource.
  */
-class ArticlesApiController extends \AbstractApiController {
-
-    /** @var \Garden\Schema\Schema */
-    private $articleFragmentSchema;
+class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /** @var \Garden\Schema\Schema */
     private $articlePostSchema;
@@ -73,15 +70,14 @@ class ArticlesApiController extends \AbstractApiController {
      * @param int $id Article ID.
      * @return array
      * @throws NotFoundException If the article could not be found.
-     * @throws ValidationException If a fetched row fails to validate against the article schema.
      */
     private function articleByID(int $id): array {
-        $resultSet = $this->articleModel->get(["ArticleID" => $id], ["limit" => 1]);
-        if (empty($resultSet)) {
+        try {
+            $article = $this->articleModel->getID($id);
+        } catch (Exception $e) {
             throw new NotFoundException("Article");
         }
-        $row = reset($resultSet);
-        return $row;
+        return $article;
     }
 
     /**
@@ -175,7 +171,7 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -301,6 +297,8 @@ class ArticlesApiController extends \AbstractApiController {
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
 
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
         $row = $this->articleByID($id);
@@ -319,7 +317,7 @@ class ArticlesApiController extends \AbstractApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body): array {
-        $this->permission();
+        $this->permission(["knowledge.articles.add", "knowledge.articles.manage"]);
 
         $in = $this->articlePostSchema("in");
         $out = $this->articleSchema("out");
