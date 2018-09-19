@@ -5,14 +5,17 @@
  */
 
 import React from "react";
-import EditorLayout from "@knowledge/pages/editor/components/EditorLayout";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import EditorForm from "@knowledge/pages/editor/components/EditorForm";
+import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import Modal from "@knowledge/components/Modal";
 import { componentActions as pageActions } from "@knowledge/pages/editor/editorPageActions";
 import { componentActions as articleActions } from "@knowledge/state/articleActions";
+import { componentActions as revisionActions } from "@knowledge/state/revisionActions";
 import { connect } from "react-redux";
 import { IStoreState, IEditorPageState } from "@knowledge/@types/state";
 import { LoadStatus } from "@library/@types/api";
+import { DeltaOperation } from "quill/core";
+import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -21,6 +24,9 @@ interface IOwnProps
 
 interface IProps extends IOwnProps {
     initArticle: () => void;
+    getArticle: (id: number) => void;
+    getRevision: (id: number) => void;
+    postRevision: typeof revisionActions.postRevision;
     pageState: IEditorPageState;
     clearPageState: () => void;
 }
@@ -30,6 +36,11 @@ interface IProps extends IOwnProps {
  */
 export class EditorPage extends React.Component<IProps> {
     public render() {
+        const { article, revision } = this.props.pageState;
+        if (article.status === LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
+            return <Redirect to={this.getUrlPath(article.data.url)} />;
+        }
+
         if (this.isModal) {
             return (
                 <Modal
@@ -37,21 +48,23 @@ export class EditorPage extends React.Component<IProps> {
                     appContainer={document.getElementById("app")!}
                     container={document.getElementById("modals")!}
                 >
-                    <EditorLayout />
+                    <EditorForm submitHandler={this.formSubmit} />
                 </Modal>
             );
         } else {
-            return <EditorLayout />;
+            return <EditorForm submitHandler={this.formSubmit} />;
         }
     }
 
     public componentDidMount() {
         this.ensureArticle();
         this.ensureCorrectURL();
+        this.checkRevision();
     }
 
     public componentDidUpdate() {
         this.ensureCorrectURL();
+        this.checkRevision();
     }
 
     public componentWillUnmount() {
@@ -60,8 +73,9 @@ export class EditorPage extends React.Component<IProps> {
 
     private ensureCorrectURL() {
         const { history, pageState } = this.props;
-        if (history.location.pathname === "/kb/articles/add" && pageState.data && pageState.data!.article) {
-            const replacementUrl = `/kb/articles/${pageState.data!.article!.articleID}/editor`;
+        const { article } = pageState;
+        if (history.location.pathname === "/kb/articles/add" && article.status === LoadStatus.SUCCESS) {
+            const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
             const newLocation = {
                 ...history.location,
                 pathname: replacementUrl,
@@ -71,14 +85,47 @@ export class EditorPage extends React.Component<IProps> {
     }
 
     private ensureArticle() {
-        const { pageState, initArticle, match } = this.props;
-        if (pageState.status === LoadStatus.PENDING) {
+        const { pageState, initArticle, getArticle, match } = this.props;
+        if (pageState.article.status === LoadStatus.PENDING) {
             if (match.params.id != null) {
-                // fetchArticle();
+                getArticle(match.params.id);
             } else {
                 initArticle();
             }
         }
+    }
+
+    private formSubmit = (content: DeltaOperation[], title: string) => {
+        const { pageState, postRevision } = this.props;
+        const { article } = pageState;
+
+        if (article.status === LoadStatus.SUCCESS) {
+            const data: IPostArticleRevisionRequestBody = {
+                articleID: article.data.articleID,
+                name: title,
+                body: JSON.stringify(content),
+                format: Format.RICH,
+            };
+            postRevision(data);
+        }
+    };
+
+    private checkRevision() {
+        const { pageState, getRevision } = this.props;
+        const { article, revision } = pageState;
+        if (
+            article.status === LoadStatus.SUCCESS &&
+            article.data.articleRevisionID &&
+            revision.status === LoadStatus.PENDING
+        ) {
+            getRevision(article.data.articleRevisionID);
+        }
+    }
+
+    private getUrlPath(url: string): string {
+        const el = document.createElement("a");
+        el.href = url;
+        return el.pathname;
     }
 
     /**
@@ -111,6 +158,9 @@ function mapStateToProps(state: IStoreState) {
  */
 function mapDispatchToProps(dispatch, props: IOwnProps) {
     return {
+        getArticle: (id: number) => dispatch(articleActions.getArticle(id)),
+        getRevision: (id: number) => dispatch(revisionActions.getRevision(id)),
+        postRevision: (body: IPostArticleRevisionRequestBody) => dispatch(revisionActions.postRevision(body)),
         initArticle: () => dispatch(articleActions.postArticle({ knowledgeCategoryID: 0 })),
         clearPageState: () => dispatch(pageActions.clearEditorPageState()),
     };

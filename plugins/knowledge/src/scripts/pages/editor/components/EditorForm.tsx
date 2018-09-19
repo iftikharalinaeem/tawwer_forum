@@ -6,7 +6,7 @@
 
 import React from "react";
 import uniqueId from "lodash/uniqueId";
-import Editor from "@rich-editor/components/editor/Editor";
+import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
@@ -14,15 +14,20 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@knowledge/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@knowledge/components/DeviceChecker";
+import { DeltaOperation } from "quill/core";
 
 interface IProps {
     device: Devices;
+    submitHandler: (editorContent: DeltaOperation[], title: string) => void;
 }
 
 /**
  * Page layout for the Editor.
  */
-export class EditorLayout extends React.Component<IProps> {
+export class EditorForm extends React.Component<IProps> {
+    private editor: React.RefObject<Editor> = React.createRef();
+    private title: React.RefObject<HTMLInputElement> = React.createRef();
+
     public render() {
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
@@ -38,9 +43,10 @@ export class EditorLayout extends React.Component<IProps> {
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
                             <div className="FormWrapper inheritHeight">
-                                <form className="inheritHeight">
+                                <form className="inheritHeight" onSubmit={this.onSubmit}>
                                     <div className="inputBlock">
                                         <input
+                                            ref={this.title}
                                             className="inputBlock-inputText inputText"
                                             type="text"
                                             placeholder={t("Title")}
@@ -48,12 +54,14 @@ export class EditorLayout extends React.Component<IProps> {
                                     </div>
                                     <div className="richEditor inheritHeight">
                                         <Editor
+                                            ref={this.editor}
                                             editorID={editorID}
                                             editorDescriptionID={editorDescriptionId}
                                             isPrimaryEditor={true}
                                             legacyMode={false}
                                         />
                                     </div>
+                                    <button type="submit">{t("Submit")}</button>
                                 </form>
                             </div>
                         </PanelWidget>
@@ -62,6 +70,13 @@ export class EditorLayout extends React.Component<IProps> {
             </Container>
         );
     }
+
+    private onSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        const content = this.editor.current!.getEditorContent()!;
+        const title = this.title.current!.value;
+        this.props.submitHandler(content, title);
+    };
 }
 
-export default withDevice<IProps>(EditorLayout);
+export default withDevice<IProps>(EditorForm);
