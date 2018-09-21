@@ -12,15 +12,13 @@ import FullPageLoader from "@library/components/FullPageLoader";
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
     loading: FullPageLoader,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
 });
 
 /** A loadable version of the Editor Page */
 const ModalEditorPage = Loadable({
     loading: ModalLoader,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/pages/editor/EditorPage"),
 });
 
 /**

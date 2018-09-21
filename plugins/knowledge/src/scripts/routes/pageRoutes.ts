@@ -12,15 +12,13 @@ import FullPageLoader from "@library/components/FullPageLoader";
 /** A loadable version of the article page. */
 const ArticlePage = Loadable({
     loading: FullPageLoader,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
 });
 
 /** A loadable version of the HomePage component. */
 const HomePage = Loadable({
     loading: FullPageLoader,
-    loader: () =>
-        import(/* webpackChunkName: "plugins/knowledge/js/webpack/pages/kb/index" */ "@knowledge/pages/home/HomePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/home/HomePage"),
 });
 
 /** The route data for routes that appear in only the in the normal page. */

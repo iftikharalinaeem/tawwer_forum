@@ -29,7 +29,7 @@ class KbPageController extends PageController {
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
         if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
+            $this->styles = ['/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css'];
         }
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }

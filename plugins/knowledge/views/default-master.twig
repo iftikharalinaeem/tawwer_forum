@@ -8,14 +8,14 @@
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
-        {% for script in scripts -%}
-            <script defer src="{{ script }}"></script>
-        {% endfor %}
-
         {% for script in inlineScripts -%}
             <script>
                 {{- script|raw -}}
             </script>
+        {% endfor %}
+
+        {% for script in scripts -%}
+            <script defer src="{{ script }}"></script>
         {% endfor %}
 
         <script type="application/ld+json">
