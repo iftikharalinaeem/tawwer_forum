@@ -352,9 +352,13 @@ class AnalyticsData extends Gdn_Model {
                     $roles[] = [
                         'name' => $currentRole->Name,
                         'roleID' => $currentRole->RoleID,
-                        'type' => $currentRole->Type
+//                        'type' => $currentRole->Type
                     ];
                 }
+
+                usort($roles, function ($a, $b) {
+                    return ($a['roleID'] <=> $b['roleID']);
+                });
             }
 
             $roleType = self::getRoleType($user);
