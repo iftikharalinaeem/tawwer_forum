@@ -1418,25 +1418,32 @@ class KeenIOTracker implements TrackerInterface {
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
 
-        // Make sure we have the structure we need.
-        if (!array_key_exists('keen', $eventData)) {
-            $eventData['keen'] = [
-                'addons' => []
-            ];
-        } elseif (!array_key_exists('addons', $eventData['keen'])) {
-            $eventData['keen']['addons'] = [];
-        }
 
-        if (!empty($eventData['referrer'])) {
-            $eventData['keen']['addons'][] = [
-                'name' => 'keen:referrer_parser',
-                'input' => [
-                    'referrer_url' => 'referrer',
-                    'page_url' => 'url'
-                ],
-                'output' => 'referrerParsed'
-            ];
-        }
+        // Make sure we have the structure we need.
+        $eventData += [
+            'keen' => [],
+            'userAgent' => '${keen.user_agent}',
+        ];
+        $eventData['keen'] += ['addons' => []];
+
+
+        $eventData['keen']['addons'][] = [
+            'name' => 'keen:ua_parser',
+            'input' => [
+                'ua_string' => 'userAgent'
+            ],
+            'output' => 'userAgentParsed'
+        ];
+
+        // The referrer is added by javascript.
+        $eventData['keen']['addons'][] = [
+            'name' => 'keen:referrer_parser',
+            'input' => [
+                'referrer_url' => 'referrer',
+                'page_url' => 'url'
+            ],
+            'output' => 'referrerParsed'
+        ];
 
         if ($inDashboard) {
             $controller->addDefinition('keenio.readKey', $this->client->getReadKey());
