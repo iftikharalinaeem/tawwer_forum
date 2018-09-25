@@ -1419,24 +1419,20 @@ class KeenIOTracker implements TrackerInterface {
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
 
         // Make sure we have the structure we need.
-        if (!array_key_exists('keen', $eventData)) {
-            $eventData['keen'] = [
-                'addons' => []
-            ];
-        } elseif (!array_key_exists('addons', $eventData['keen'])) {
-            $eventData['keen']['addons'] = [];
-        }
+        $eventData += [
+            'keen' => [],
+        ];
+        $eventData['keen'] += ['addons' => []];
 
-        if (!empty($eventData['referrer'])) {
-            $eventData['keen']['addons'][] = [
-                'name' => 'keen:referrer_parser',
-                'input' => [
-                    'referrer_url' => 'referrer',
-                    'page_url' => 'url'
-                ],
-                'output' => 'referrerParsed'
-            ];
-        }
+        // The referrer is added by javascript.
+        $eventData['keen']['addons'][] = [
+            'name' => 'keen:referrer_parser',
+            'input' => [
+                'referrer_url' => 'referrer',
+                'page_url' => 'url'
+            ],
+            'output' => 'referrerParsed'
+        ];
 
         if ($inDashboard) {
             $controller->addDefinition('keenio.readKey', $this->client->getReadKey());
@@ -1468,8 +1464,8 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Overwrite and append default key/value pairs to incoming array.
      *
-     * @link https://keen.io/docs/api/#data-enrichment
      * @param array $defaults List of default data pairs for all events.
+     * @link https://keen.io/docs/api/#data-enrichment
      * @return array
      */
     public function addDefaults(array $defaults = []) {
@@ -1496,8 +1492,8 @@ class KeenIOTracker implements TrackerInterface {
 
         $defaults = array_merge($defaults, $additionalDefaults);
 
-        if (!empty($eventData['userAgent'])) {
-            $eventData['keen']['addons'][] = [
+        if (!empty($defaults['userAgent'])) {
+            $defaults['keen']['addons'][] = [
                 'name' => 'keen:ua_parser',
                 'input' => [
                     'ua_string' => 'userAgent'

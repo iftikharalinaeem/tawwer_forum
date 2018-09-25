@@ -46,7 +46,9 @@ interface TrackerInterface {
     public function addDefaults(array $defaults = []);
 
     /**
-     * Add wiget configurations to the ongoing list.
+     * Add widget configurations to the ongoing list.
+     *
+     * These are javascript widgets for drawing analytics graphs, leaderboards, etc.
      *
      * @param array $widgets Incoming array of widgets to add to.
      */
