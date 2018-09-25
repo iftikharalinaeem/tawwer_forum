@@ -6,11 +6,12 @@
 
 import React from "react";
 import { Provider } from "react-redux";
-import getStore from "@library/state/getStore";
+import getStore, { getHistory } from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import DeviceContext from "@knowledge/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
-import { Route, BrowserRouter } from "react-router-dom";
+import { Route } from "react-router-dom";
+import { ConnectedRouter } from "connected-react-router";
 
 /**
  * Top level application component for knowledge.
@@ -24,6 +25,7 @@ export default class KnowledgeApp extends React.Component {
      */
     public render() {
         const store = getStore();
+        const history = getHistory();
         return (
             <Provider store={store}>
                 <React.Fragment>
@@ -31,9 +33,9 @@ export default class KnowledgeApp extends React.Component {
                     <DeviceContext.Provider
                         value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
                     >
-                        <BrowserRouter>
+                        <ConnectedRouter history={history}>
                             <Route component={KnowledgeRoutes} />
-                        </BrowserRouter>
+                        </ConnectedRouter>
                     </DeviceContext.Provider>
                 </React.Fragment>
             </Provider>

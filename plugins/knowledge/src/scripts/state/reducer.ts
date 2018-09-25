@@ -5,12 +5,12 @@
  */
 
 import { combineReducers } from "redux";
-import articlePageReducer from "@knowledge/pages/article/articlePageReducer";
-import editorPageReducer from "@knowledge/pages/editor/editorPageReducer";
+import { reducer as articleReducer } from "@knowledge/modules/article/state";
+import { reducer as editorReducer } from "@knowledge/modules/editor/state";
 
 const knowledgeReducer = combineReducers({
-    articlePage: articlePageReducer,
-    editorPage: editorPageReducer,
+    articlePage: articleReducer,
+    editor: editorReducer,
 });
 
 export default knowledgeReducer;

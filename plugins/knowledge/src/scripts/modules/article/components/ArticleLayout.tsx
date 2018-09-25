@@ -10,13 +10,15 @@ import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@knowledge/components/DeviceChecker";
 import { t } from "@library/application";
-import ArticleBreadcrumbs from "@knowledge/pages/article/components/ArticleBreadcrumbs";
-import ArticleActions from "@knowledge/pages/article/components/ArticleActions";
-import ArticleNavigation from "@knowledge/pages/article/components/ArticleNavigation";
-import ArticleTitle from "@knowledge/pages/article/components/ArticleTitle";
-import ArticleContent from "@knowledge/pages/article/components/ArticleContent";
-import ArticleTOC from "@knowledge/pages/article/components/ArticleTOC";
-import RelatedArticles from "@knowledge/pages/article/components/RelatedArticles";
+import {
+    ArticleBreadcrumbs,
+    ArticleActions,
+    ArticleNavigation,
+    ArticleTitle,
+    ArticleContent,
+    ArticleTOC,
+    RelatedArticles,
+} from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 
 interface IProps {

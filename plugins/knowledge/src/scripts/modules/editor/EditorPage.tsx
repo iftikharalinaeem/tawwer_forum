@@ -5,16 +5,15 @@
  */
 
 import React from "react";
-import EditorForm from "@knowledge/pages/editor/components/EditorForm";
 import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
-import Modal from "@knowledge/components/Modal";
-import { componentActions as pageActions } from "@knowledge/pages/editor/editorPageActions";
-import { componentActions as articleActions } from "@knowledge/state/articleActions";
-import { componentActions as revisionActions } from "@knowledge/state/revisionActions";
+import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { IStoreState, IEditorPageState } from "@knowledge/@types/state";
-import { LoadStatus } from "@library/@types/api";
 import { DeltaOperation } from "quill/core";
+import Modal from "@knowledge/components/Modal";
+import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
+import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
 
 interface IOwnProps
@@ -23,11 +22,10 @@ interface IOwnProps
         }> {}
 
 interface IProps extends IOwnProps {
-    initArticle: () => void;
-    getArticle: (id: number) => void;
-    postRevision: typeof revisionActions.postRevision;
-    pageState: IEditorPageState;
+    initPageFromLocation: typeof thunks.initPageFromLocation;
+    pageState: model.IState;
     clearPageState: () => void;
+    postRevision: (data: IPostArticleRevisionRequestBody) => void;
 }
 
 /**
@@ -44,7 +42,11 @@ export class EditorPage extends React.Component<IProps> {
             return <Redirect to={`/kb/articles/-${article.data.articleID}`} />;
         }
 
-        const editorForm = <EditorForm backUrl={this.backLink} submitHandler={this.formSubmit} />;
+        const pageContent = (
+            <EditorLayout backUrl={this.backLink}>
+                <EditorForm submitHandler={this.formSubmit} />
+            </EditorLayout>
+        );
 
         if (this.isModal) {
             return (
@@ -53,11 +55,11 @@ export class EditorPage extends React.Component<IProps> {
                     appContainer={document.getElementById("app")!}
                     container={document.getElementById("modals")!}
                 >
-                    {editorForm}
+                    {pageContent}
                 </Modal>
             );
         } else {
-            return editorForm;
+            return pageContent;
         }
     }
 
@@ -65,15 +67,7 @@ export class EditorPage extends React.Component<IProps> {
      * Initial setup for the page.
      */
     public componentDidMount() {
-        this.ensureArticle();
-        this.ensureCorrectURL();
-    }
-
-    /**
-     * Continuous checking as we get new data for the page.
-     */
-    public componentDidUpdate() {
-        this.ensureCorrectURL();
+        this.props.initPageFromLocation(this.props.location);
     }
 
     /**
@@ -89,39 +83,39 @@ export class EditorPage extends React.Component<IProps> {
      * If we're on /articles/add and have now created an article we need to change the URL.
      * This replacement should be seemless and not create a new history entry.
      */
-    private ensureCorrectURL() {
-        const { history, pageState } = this.props;
-        const { article } = pageState;
-        if (history.location.pathname === "/kb/articles/add" && article.status === LoadStatus.SUCCESS) {
-            const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
-            const newLocation = {
-                ...history.location,
-                pathname: replacementUrl,
-            };
-            history.replace(newLocation);
-        }
-    }
+    // private ensureCorrectURL() {
+    //     const { history, pageState } = this.props;
+    //     const { article } = pageState;
+    //     if (history.location.pathname === "/kb/articles/add" && article.status === LoadStatus.SUCCESS) {
+    //         const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
+    //         const newLocation = {
+    //             ...history.location,
+    //             pathname: replacementUrl,
+    //         };
+    //         history.replace(newLocation);
+    //     }
+    // }
 
     /**
      * Ensure that we have an article for the editor.
      * Either fetch one if we have an ID in the URL or create a new one.
      */
-    private ensureArticle() {
-        const { pageState, initArticle, getArticle, match } = this.props;
-        if (pageState.article.status === LoadStatus.PENDING) {
-            if (match.params.id != null) {
-                getArticle(match.params.id);
-            } else {
-                initArticle();
-            }
-        }
-    }
+    // private ensureArticle() {
+    //     const { pageState, initArticle, getArticle, match } = this.props;
+    //     if (pageState.article.status === LoadStatus.PENDING) {
+    //         if (match.params.id != null) {
+    //             getArticle(match.params.id);
+    //         } else {
+    //             initArticle();
+    //         }
+    //     }
+    // }
 
     /**
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, postRevision } = this.props;
+        const { pageState } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
@@ -131,7 +125,7 @@ export class EditorPage extends React.Component<IProps> {
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            postRevision(data);
+            this.props.postRevision(data);
         }
     };
 
@@ -161,20 +155,17 @@ export class EditorPage extends React.Component<IProps> {
  */
 function mapStateToProps(state: IStoreState) {
     return {
-        pageState: state.knowledge.editorPage,
+        pageState: state.knowledge.editor,
     };
 }
 
 /**
  * Map in action dispatchable action creators from the store.
  */
-function mapDispatchToProps(dispatch, props: IOwnProps) {
-    return {
-        getArticle: (id: number) => dispatch(articleActions.getArticle(id)),
-        postRevision: (body: IPostArticleRevisionRequestBody) => dispatch(revisionActions.postRevision(body)),
-        initArticle: () => dispatch(articleActions.postArticle({ knowledgeCategoryID: 0 })),
-        clearPageState: () => dispatch(pageActions.clearEditorPageState()),
-    };
+function mapDispatchToProps(dispatch) {
+    const { initPageFromLocation, postRevision } = thunks;
+    const { clearPageState } = actions;
+    return bindActionCreators({ initPageFromLocation, postRevision, clearPageState }, dispatch);
 }
 
 const withRedux = connect(

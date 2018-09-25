@@ -5,12 +5,10 @@
  */
 
 import { produce, Draft } from "immer";
-import * as articleActions from "@knowledge/state/articleActions";
-import * as revisionActions from "@knowledge/state/revisionActions";
 import { LoadStatus } from "@library/@types/api";
-import { IEditorPageState } from "@knowledge/@types/state";
+import { model, actions, constants } from "@knowledge/modules/editor/state";
 
-export const initialState: IEditorPageState = {
+export const initialState: model.IState = {
     article: {
         status: LoadStatus.PENDING,
     },
@@ -20,33 +18,33 @@ export const initialState: IEditorPageState = {
 };
 
 export default function editorPageReducer(
-    state: IEditorPageState = initialState,
-    action: articleActions.ActionTypes | revisionActions.ActionTypes,
-): IEditorPageState {
-    return produce(state, (draft: Draft<IEditorPageState>) => {
+    state: model.IState = initialState,
+    action: actions.ActionTypes,
+): model.IState {
+    return produce(state, (draft: Draft<model.IState>) => {
         switch (action.type) {
-            case articleActions.POST_ARTICLE_REQUEST:
-            case articleActions.GET_ARTICLE_REQUEST:
+            case constants.POST_ARTICLE_REQUEST:
+                // case constants.GET_ARTICLE_REQUEST:
                 draft.article.status = LoadStatus.LOADING;
                 break;
-            case articleActions.POST_ARTICLE_RESPONSE:
-            case articleActions.GET_ARTICLE_SUCCESS:
+            case constants.POST_ARTICLE_RESPONSE:
+                // case constants.GET_ARTICLE_SUCCESS:
                 draft.article.status = LoadStatus.SUCCESS;
                 draft.article.data = action.payload.data;
                 break;
-            case articleActions.GET_ARTICLE_ERROR:
-            case articleActions.POST_ARTICLE_ERROR:
+            // case constants.GET_ARTICLE_ERROR:
+            case constants.POST_ARTICLE_ERROR:
                 draft.article.status = LoadStatus.ERROR;
                 draft.article.error = action.payload;
                 break;
-            case revisionActions.GET_REVISION_REQUEST:
+            case constants.GET_REVISION_REQUEST:
                 draft.revision.status = LoadStatus.LOADING;
                 break;
-            case revisionActions.POST_REVISION_ERROR:
+            case constants.POST_REVISION_ERROR:
                 draft.revision.status = LoadStatus.ERROR;
                 draft.revision.error = action.payload;
                 break;
-            case revisionActions.POST_REVISION_RESPONSE:
+            case constants.POST_REVISION_RESPONSE:
                 draft.revision.status = LoadStatus.SUCCESS;
                 draft.revision.data = action.payload.data;
                 break;

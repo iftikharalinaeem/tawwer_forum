@@ -5,25 +5,25 @@
  */
 
 import React from "react";
+import { bindActionCreators } from "redux";
 import { match } from "react-router";
 import { connect } from "react-redux";
-import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
+import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
-import { componentActions as pageActions } from "@knowledge/pages/article/articlePageActions";
-import { componentActions as articleActions } from "@knowledge/state/articleActions";
-import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
+import { actions, thunks, model } from "@knowledge/modules/article/state";
+import { ArticleLayout } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
 
 interface IProps extends IDeviceProps {
     match: match<{
         id: number;
     }>;
-    articlePageState: IArticlePageState;
-    getArticle: typeof articleActions.getArticle;
-    clearPageState: typeof pageActions.clearArticlePageState;
+    articlePageState: model.IState;
+    getArticle: typeof thunks.getArticle;
+    clearPageState: typeof actions.clearPageState;
 }
 
 /**
@@ -92,10 +92,9 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    return {
-        getArticle: (id: number) => dispatch(articleActions.getArticle(id)),
-        clearPageState: () => dispatch(pageActions.clearArticlePageState()),
-    };
+    const { getArticle } = thunks;
+    const { clearPageState } = actions;
+    return bindActionCreators({ getArticle, clearPageState }, dispatch);
 }
 
 const withRedux = connect(

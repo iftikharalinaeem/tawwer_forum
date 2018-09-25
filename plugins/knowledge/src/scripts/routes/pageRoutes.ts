@@ -8,17 +8,18 @@ import { RouteProps } from "react-router-dom";
 import Loadable from "react-loadable";
 import { getModalRouteData } from "@knowledge/routes/modalRoutes";
 import FullPageLoader from "@library/components/FullPageLoader";
+import { constants as articleConstants } from "@knowledge/modules/article/state";
 
 /** A loadable version of the article page. */
 const ArticlePage = Loadable({
     loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/pages/article/ArticlePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/modules/article/ArticlePage"),
 });
 
 /** A loadable version of the HomePage component. */
 const HomePage = Loadable({
     loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/home/HomePage"),
+    loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
 });
 
 /** The route data for routes that appear in only the in the normal page. */
@@ -29,7 +30,7 @@ const pageRoutes: RouteProps[] = [
         component: HomePage,
     },
     {
-        path: "/kb/articles/(.*)-:id(\\d+)",
+        path: articleConstants.ARTICLE_ROUTE,
         component: ArticlePage,
     },
 ];

@@ -5,66 +5,55 @@
  */
 
 import { expect } from "chai";
-import { RESET_PAGE_STATE, componentActions as articlePageActions } from "@knowledge/pages/article/articlePageActions";
-import {
-    GET_ARTICLE_SUCCESS,
-    GET_ARTICLE_ERROR,
-    GET_ARTICLE_REQUEST,
-    componentActions as articleActions,
-    _rawApiActions,
-} from "@knowledge/state/articleActions";
+import { actions, model, constants, reducer, initialState } from "@knowledge/modules/article/state";
 import { LoadStatus } from "@library/@types/api";
-import reducer, { initialState } from "@knowledge/pages/article/articlePageReducer";
-import { IArticlePageState } from "@knowledge/@types/state";
-
-const { getArticleActions } = _rawApiActions;
 
 describe("articleReducer", () => {
     it("should return the initial state", () => {
         expect(reducer(undefined, {} as any)).deep.equals(initialState);
     });
 
-    it(`handles ${RESET_PAGE_STATE}`, () => {
+    it(`handles ${constants.RESET_PAGE_STATE}`, () => {
         const initial = { some: "garbage", data: "garbage data" } as any;
-        const action = articlePageActions.clearArticlePageState();
+        const action = actions.clearPageState();
 
         expect(reducer(initial, action)).deep.equals(initialState);
     });
 
-    describe(`handling ${GET_ARTICLE_REQUEST}`, () => {
+    describe(`handling ${constants.GET_ARTICLE_REQUEST}`, () => {
         it("sets the status to loading", () => {
-            const action = getArticleActions.request({ id: 17 });
-            const expected: IArticlePageState = {
+            const action = actions.getArticle.request({ id: 17 });
+            const expected: model.IState = {
                 status: LoadStatus.LOADING,
             };
             expect(reducer(undefined, action)).deep.equals(expected);
         });
 
         it("clears the current error and data contents", () => {
-            const action = getArticleActions.request({ id: 17 });
+            const action = actions.getArticle.request({ id: 17 });
             const error = { message: "Test error" } as any;
             const data = { data: "Some data" } as any;
-            const initial: IArticlePageState = {
+            const initial: model.IState = {
                 status: LoadStatus.ERROR,
                 error,
                 data,
             };
-            const expected: IArticlePageState = {
+            const expected: model.IState = {
                 status: LoadStatus.LOADING,
             };
             expect(reducer(initial, action)).deep.equals(expected);
         });
     });
 
-    it(`handles ${GET_ARTICLE_SUCCESS}`, () => {
+    it(`handles ${constants.GET_ARTICLE_RESPONSE}`, () => {
         const article = { articleTitle: "Some Title" } as any;
-        const action = getArticleActions.success({ data: article, status: 200, headers: {} });
+        const action = actions.getArticle.success({ data: article, status: 200, headers: {} });
         const error = { message: "Test error" } as any;
-        const initial: IArticlePageState = {
+        const initial: model.IState = {
             status: LoadStatus.ERROR,
             error,
         };
-        const expected: IArticlePageState = {
+        const expected: model.IState = {
             status: LoadStatus.SUCCESS,
             data: {
                 article,
@@ -73,16 +62,16 @@ describe("articleReducer", () => {
         expect(reducer(initial, action)).deep.equals(expected);
     });
 
-    it(`handles ${GET_ARTICLE_ERROR}`, () => {
+    it(`handles ${constants.GET_ARTICLE_ERROR}`, () => {
         const error = { message: "Test error" } as any;
-        const action = getArticleActions.error(error);
-        const initial: IArticlePageState = {
+        const action = actions.getArticle.error(error);
+        const initial: model.IState = {
             status: LoadStatus.SUCCESS,
             data: {
                 article: {} as any,
             },
         };
-        const expected: IArticlePageState = {
+        const expected: model.IState = {
             status: LoadStatus.ERROR,
             error,
         };
