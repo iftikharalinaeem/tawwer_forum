@@ -13,7 +13,7 @@ interface IPageHeading {
     title: string;
     backUrl?: string; // back link
     className?: string;
-    actions?: JSX.Element; // possible "actions" like a dropdown menu or other
+    menu?: JSX.Element;
 }
 
 export default class PageHeading extends React.Component<IPageHeading> {
@@ -25,7 +25,7 @@ export default class PageHeading extends React.Component<IPageHeading> {
                     {/* Will not render if no url is passed */}
                     <Heading title={this.props.title} depth={1} />
                 </div>
-                {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
+                {this.props.menu && <div className="pageHeading-actions">{this.props.menu}</div>}
             </div>
         );
     }

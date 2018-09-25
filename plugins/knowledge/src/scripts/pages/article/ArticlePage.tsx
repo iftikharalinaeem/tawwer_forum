@@ -16,6 +16,8 @@ import { componentActions as pageActions } from "@knowledge/pages/article/articl
 import { componentActions as articleActions } from "@knowledge/state/articleActions";
 import ArticleLayout from "@knowledge/pages/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
+import { t } from "@library/application";
+import ArticleMenu from "@knowledge/pages/article/components/ArticleMenu";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -47,9 +49,11 @@ export class ArticlePage extends React.Component<IProps> {
 
         const { article } = articlePageState.data;
 
+        const menu = <ArticleMenu />; // hard coded for now
+
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} />
+                <ArticleLayout article={article} menu={menu} />
             </PageLoader>
         );
     }
