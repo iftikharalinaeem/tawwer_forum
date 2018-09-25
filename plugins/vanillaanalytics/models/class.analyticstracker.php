@@ -172,7 +172,7 @@ class AnalyticsTracker {
 
         // Grab the browser's user agent value, if available.
         $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
-        $eventData['userAgent'] = $userAgent ?: null;
+        $defaults['userAgent'] = $userAgent ?: null;
 
         if ($trackerDefaults) {
             foreach ($this->trackers as $tracker) {

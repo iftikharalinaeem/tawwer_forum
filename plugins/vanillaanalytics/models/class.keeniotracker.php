@@ -1418,22 +1418,11 @@ class KeenIOTracker implements TrackerInterface {
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
 
-
         // Make sure we have the structure we need.
         $eventData += [
             'keen' => [],
-            'userAgent' => '${keen.user_agent}',
         ];
         $eventData['keen'] += ['addons' => []];
-
-
-        $eventData['keen']['addons'][] = [
-            'name' => 'keen:ua_parser',
-            'input' => [
-                'ua_string' => 'userAgent'
-            ],
-            'output' => 'userAgentParsed'
-        ];
 
         // The referrer is added by javascript.
         $eventData['keen']['addons'][] = [
@@ -1475,8 +1464,8 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Overwrite and append default key/value pairs to incoming array.
      *
-     * @link https://keen.io/docs/api/#data-enrichment
      * @param array $defaults List of default data pairs for all events.
+     * @link https://keen.io/docs/api/#data-enrichment
      * @return array
      */
     public function addDefaults(array $defaults = []) {
@@ -1503,8 +1492,8 @@ class KeenIOTracker implements TrackerInterface {
 
         $defaults = array_merge($defaults, $additionalDefaults);
 
-        if (!empty($eventData['userAgent'])) {
-            $eventData['keen']['addons'][] = [
+        if (!empty($defaults['userAgent'])) {
+            $defaults['keen']['addons'][] = [
                 'name' => 'keen:ua_parser',
                 'input' => [
                     'ua_string' => 'userAgent'
