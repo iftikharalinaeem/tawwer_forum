@@ -210,5 +210,4 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             new Breadcrumb('Knowledge', $this->getCanonicalLink()),
         ];
     }
-
 }
