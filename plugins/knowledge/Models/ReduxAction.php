@@ -43,6 +43,4 @@ abstract class ReduxAction {
             ],
         ];
     }
-
-
 }
