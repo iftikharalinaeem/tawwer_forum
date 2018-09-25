@@ -16,7 +16,7 @@ import { t } from "@library/application";
 
 export interface IProps {
     id: string;
-    name: string;
+    name?: string;
     className?: string;
 }
 
@@ -25,6 +25,10 @@ export interface IState {
 }
 
 export default class DropDownActions extends React.PureComponent<IProps, IState> {
+    public static defaultProps = {
+        name: t("Article Options"),
+    };
+
     public render() {
         // Hard coded for now
         const buttonClick = () => {
@@ -32,7 +36,11 @@ export default class DropDownActions extends React.PureComponent<IProps, IState>
         };
 
         return (
-            <DropDown name={this.props.name} className={classNames("articlePage-options", this.props.className)}>
+            <DropDown
+                id={this.props.id}
+                name={this.props.name!}
+                className={classNames("articlePage-options", this.props.className)}
+            >
                 <DropDownItemButton name={t("Test Button")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Test Button")} onClick={buttonClick}>
                     <p>{t("Some HTML - Button")}</p>

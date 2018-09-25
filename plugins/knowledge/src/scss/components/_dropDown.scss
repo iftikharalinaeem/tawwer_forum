@@ -4,9 +4,22 @@
  * @license GPL-2.0-only
  */
 
-$dropDown-width                                : 200px;
+$dropDown_width                                : 200px;
+$dropDown_borderRadius                         : 1px;
+$dropdown_bg                                   : $global-color_bg;
 
 
 .dropDown {
-    width: $dropDown-width;
+    position: relative;
+    z-index: 1;
+}
+
+.dropDown-contents {
+    position: absolute;
+    width: $dropDown_width;
+    background-color: $dropdown_bg;
+    box-shadow: $menu_dropShadow;
+    border: {
+        radius: $global_borderRadius;
+    }
 }
