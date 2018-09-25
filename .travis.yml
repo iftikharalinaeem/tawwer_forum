@@ -24,6 +24,8 @@ jobs:
           - $HOME/.composer/cache/files
       script:
           - ./vendor/bin/phpunit --exclude-group=large
+      env:
+        - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
   # Frontend JS Job
     - name: JS Build & Test
       language: node_js
