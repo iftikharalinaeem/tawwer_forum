@@ -7,68 +7,72 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
-use Vanilla\Knowledge\DummyBreadcrumbTrait;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
  * Knowledge base controller for article view.
  */
-class KbPageController extends PageController {
-    use \Garden\TwigTrait;
-    use DummyBreadcrumbTrait;
-
-    /**
-     * KnowledgePageController constructor.
-     *
-     * @param \AssetModel $assetModel AssetModel To get js and css.
-     */
-    public function __construct(\AssetModel $assetModel) {
-        parent::__construct();
-
-        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
-        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = ['/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css'];
-        }
-        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
-    }
-
+class KbPageController extends KnowledgeTwigPageController {
     /**
      * Gather the data array to render a page with.
      *
      * @return array
      */
-    private function getPageData() {
-        $data = [
-            'debug' => \Gdn::config('Debug'),
-            'page' => &$this->data[self::API_PAGE_KEY],
-            'scripts' => $this->getScripts(),
-            'inlineScripts' => $this->getInlineScripts(),
-            'styles' => $this->getStyles(),
-            'inlineStyles' => $this->getInlineStyles(),
-        ];
-        $data['page']['classes'][] = 'isLoading';
-        $this->pageMetaInit();
-
+    private function getViewData() {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
-
-        $data['meta'] = $this->meta->getPageMeta();
-
+        $data = $this->getWebViewResources();
         return $data;
     }
 
     /**
      * Render out the /kb page.
      */
-    public function index() {
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
+    public function index() : string {
+        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs());
         $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getPageData();
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
         $data['template'] = 'seo/pages/home.twig';
 
-        echo $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * Initialize page SEO meta data.
+     *
+     * (temporary solution, need to be extended and/or refactored later)
+     *
+     * @return $this
+     */
+    public function setSeoMetaData() {
+        $this->meta
+            ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
+        $this->meta
+            ->setSeo('title', $this->data['title'] ?? 'Knowledge')
+            ->setSeo('description', $this->data['description'] ?? 'Knowledge Base')
+            ->setSeo('locale', \Gdn::locale()->current())
+            ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCanonicalLink() : string {
+        return \Gdn::request()->url('/kb/', true);
+    }
+
+    /**
+     * Get Breadcrubs data array
+     *
+     * @return array
+     */
+    public function getBreadcrumbs(): array {
+        return [
+            new Breadcrumb('Home', \Gdn::request()->url('/', true)),
+            new Breadcrumb('Knowledge', $this->getCanonicalLink()),
+        ];
     }
 }
