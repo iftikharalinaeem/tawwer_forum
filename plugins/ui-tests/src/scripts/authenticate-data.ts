@@ -1,5 +1,6 @@
 import { IPasswordState, IAuthenticatorState, IRequestPasswordState } from "@dashboard/@types/state";
-import { LoadStatus, IUserAuthenticator } from "@dashboard/@types/api";
+import { IUserAuthenticator } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 /**
  * Authenticate components stub data.
