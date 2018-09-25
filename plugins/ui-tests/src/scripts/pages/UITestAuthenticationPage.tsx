@@ -6,10 +6,10 @@
  */
 
 import React from "react";
-import SSOMethods from "@dashboard/app/authenticate/components/SSOMethods";
-import { PasswordForm } from "@dashboard/app/authenticate/components/PasswordForm";
-import { RecoverPasswordPage } from "@dashboard/app/authenticate/RecoverPasswordPage";
-import { formatUrl } from "@dashboard/application";
+import { formatUrl } from "@library/application";
+import SSOMethods from "@dashboard/pages/authenticate/components/SSOMethods";
+import { PasswordForm } from "@dashboard/pages/authenticate/components/PasswordForm";
+import { RecoverPasswordPage } from "@dashboard/pages/recoverPassword/RecoverPasswordPage";
 import {
     ssoMethodsData1,
     passwordFormPlausibleErrors,
