@@ -1,31 +1,77 @@
-# Cache Composer package files.
-cache:
-  directories:
-    - $HOME/.composer/cache/files
-    - node_modules
-  yarn: true
+# Configure the build.
+jobs:
+  fast_finish: true
+  include:
+    # PHP 7.2 Job. This should always run.
+    - name: PHP 7.2
+      language: php
+      php: 7.2
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      before_script:
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
+        - ./travis/install.sh
+        - cd vanilla
+        - composer self-update
+        - composer install --optimize-autoloader
+      cache:
+        directories:
+          - $HOME/.composer/cache/files
+      script:
+          - ./vendor/bin/phpunit --exclude-group=large
+  # Frontend JS Job
+    - name: JS Build & Test
+      language: node_js
+      node_js: 10.9
+      addons:
+        chrome: stable
+      env:
+        - TEST_FILE_ROOTS=()
+      before_script:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
+        - ./travis/install.sh
+        - cd vanilla
+        - yarn install --pure-lockfile
+      cache:
+        directories:
+          - $TRAVIS_BUILD_DIR/vanilla/node_modules
+        yarn: true
+      script:
+        - yarn build -i
+        - yarn test
 
 # No additional system dependencies to install. Skip the install step.
-install:
-  - ./travis/install.sh
+install: true
 
-# The project's primary programming language. This will affect default dependency availability.
-language: php
-
-# Configure the build.
-matrix:
-  fast_finish: true
-
-# The versions of PHP to test the project under.
-php:
-  - 7.2
-  - 7.1
-  - 7.0
-
-# Steps of the build script.
-script:
-  - cd vanilla
-  - ./vendor/bin/phpunit --exclude-group=large
+# Send status update notifications to a HipChat room.
+notifications:
+  hipchat:
+    format: html
+    on_success: change
+    rooms:
+      - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
+    template:
+      - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
 
 # Run build in a Docker container.  Reduces time between commit and start of build.
 sudo: false
+
+notifications:
+  hipchat:
+    rooms:
+      secure: nsgPkFc5PvdyGOYpH2MkZCrmIw3OnfjldV+wAskqvhTQt726OjlF3aeeu1zVpkEYy0GaWbASdz7QffzMTwdoSdyC0VfG+PcJN7MbthGn+7s2eSo87v23MdxmZO1SH4LpDZU0w0hvVIn5BN9WajJC6fFbEqXT555vUoMN/ATu1+g=
+    template:
+      - >
+        Build <a href="%{build_url}">#%{build_number}</a>
+        (<a href="%{compare_url}">%{commit}</a>)
+        of <a href="https://github.com/%{repository}/tree/%{branch}">%{repository}@%{branch}</a>
+        by %{author}: %{message}
+    format: html
+  slack:
+    secure: "EMwrufwlxpr5UqV93dJr55ngTD415lZGXx3J3PP6CJKLasGHea7ZnYX2JN5TRTrkT3C+eDFiiQdoz2u9eQU8BuqrUNQdAphMUhnWwjQqddudEvSiwH6GmwOG9Bc/m0mMUfK3/qCA+2wpDfHHsdaZmSeylfKClHpSwVgjYxOB7xA="
