@@ -5,21 +5,21 @@
  */
 
 .deviceChecker {
-  visibility: hidden !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 3px;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 3px;
 }
 
 @include mediaQuery-panelLayout_twoColumn {
-  .deviceChecker {
-    width: 2px;
-  }
+    .deviceChecker {
+        width: 2px;
+    }
 }
 
 @include mediaQuery-panelLayout_oneColumn {
-  .deviceChecker {
-    width: 1px;
-  }
+    .deviceChecker {
+        width: 1px;
+    }
 }

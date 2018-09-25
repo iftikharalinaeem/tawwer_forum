@@ -7,9 +7,9 @@
 // Temporary file, we can get rid of it when we have a way to differentiate "legacy" editor from new editor
 
 .richEditor {
-  border: {
-    width: $formElement_borderWidth;
-    style: solid;
-    color: $formElement_borderColor;
-  }
+    border: {
+        width: $formElement_borderWidth;
+        style: solid;
+        color: $formElement_borderColor;
+    }
 }

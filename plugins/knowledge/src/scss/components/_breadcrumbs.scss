@@ -8,49 +8,49 @@ $breadcrumbs-accentColor: $global-color_primary;
 $breadcrumbs-activeLink_opacity: 1;
 
 .breadcrumbs {
-  display: block;
+    display: block;
 }
 
 .breadcrumbs-list {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: flex-start;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
 .breadcrumbs-separator {
-  user-select: none;
+    user-select: none;
 }
 
 .breadcrumbs-separatorIcon {
-  font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
-  margin: 0 .5em;
-  opacity: .5;
-  position: relative;
-  top: 0.04em;
-  color: inherit;
+    font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
+    margin: 0 .5em;
+    opacity: .5;
+    position: relative;
+    top: 0.04em;
+    color: inherit;
 }
 
 
 .breadcrumb {
-  display: inline-flex;
-  line-height: 1;
+    display: inline-flex;
+    line-height: 1;
 }
 
 
 .breadcrumb-link {
-  @include singleLineEllipsis;
-  display: inline-flex;
-  line-height: 1;
-  color: inherit;
+    @include singleLineEllipsis;
+    display: inline-flex;
+    line-height: 1;
+    color: inherit;
 
-  &:hover {
-    color: $breadcrumbs-accentColor;
-    text-decoration: underline;
-  }
+    &:hover {
+        color: $breadcrumbs-accentColor;
+        text-decoration: underline;
+    }
 }
 
 .breadcrumb-current {
-  color: inherit;
-  opacity: $breadcrumbs-activeLink_opacity;
+    color: inherit;
+    opacity: $breadcrumbs-activeLink_opacity;
 }

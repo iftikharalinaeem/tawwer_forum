@@ -5,13 +5,13 @@
  */
 
 .panelWidget {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: {
-    top: $global-widgetInner_padding;
-    right: $global-widgetInner_padding;
-    bottom: $global-widgetInner_padding;
-    left: $global-widgetInner_padding;
-  }
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: {
+        top: $global-widgetInner_padding;
+        right: $global-widgetInner_padding;
+        bottom: $global-widgetInner_padding;
+        left: $global-widgetInner_padding;
+    }
 }

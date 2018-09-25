@@ -4,60 +4,60 @@
  * @license Proprietary
  */
 
-$metas_verticalMargin: $utility-baseUnit * 2;
-$metas_color: mix($global-color_fg, $global-color_bg, 50%) !default;
-$meta_spacing: $global-gutter_quarterSize;
+$metas_verticalMargin         : $utility-baseUnit * 2;
+$metas_color                  : mix($global-color_fg, $global-color_bg, 50%) !default;
+$meta_spacing                 : $global-gutter_quarterSize;
 
 .metas {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  color: $metas_color;
-  width: calc(100% + #{$meta_spacing * 2});
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    color: $metas_color;
+    width: calc(100% + #{$meta_spacing * 2});
 
-  margin: {
-    left: -#{$meta_spacing};
-    right: $meta_spacing;
-  }
+    margin: {
+        left: -#{$meta_spacing};
+        right: $meta_spacing;
+    }
 
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .meta {
-  display: block;
-  margin: 0 $utility-baseUnit;
-  font-size: $metaText_fontSize;
-  color: $metas_color;
+    display: block;
+    margin: 0 $utility-baseUnit;
+    font-size: $metaText_fontSize;
+    color: $metas_color;
 }
 
 a.meta {
-  color: $link-default_color;
-  &:hover {
-    color: $link-default_hover-color;
-    text-shadow: none;
-  }
-  &:focus {
-    color: $link-default_focus-color;
-  }
+    color: $link-default_color;
+    &:hover {
+        color: $link-default_hover-color;
+        text-shadow: none;
+    }
+    &:focus {
+        color: $link-default_focus-color;
+    }
 }
 
 .meta-text {
-  color: inherit;
-  display: inline-block;
-  line-height: inherit;
-  vertical-align: middle;
+    color: inherit;
+    display: inline-block;
+    line-height: inherit;
+    vertical-align: middle;
 }
 
 .meta-textPart {
-  display: inline-block;
-  vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .metaBreadcrumb {
-  display: inline;
+    display: inline;
 }
 
 .metaBreadcrumb-item {
-  display: inline;
+    display: inline;
 }
