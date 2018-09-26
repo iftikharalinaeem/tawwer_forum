@@ -61,6 +61,7 @@ export function clearPageState() {
 
 export type ActionTypes =
     | ActionsUnion<typeof postRevision>
-    | ActionsUnion<typeof getRevision>
     | ActionsUnion<typeof postArticle>
+    | ActionsUnion<typeof getRevision>
+    | ActionsUnion<typeof getArticle>
     | ReturnType<typeof clearPageState>;

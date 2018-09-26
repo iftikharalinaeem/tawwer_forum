@@ -25,7 +25,7 @@ interface IProps extends IOwnProps {
     initPageFromLocation: typeof thunks.initPageFromLocation;
     pageState: model.IState;
     clearPageState: () => void;
-    postRevision: (data: IPostArticleRevisionRequestBody) => void;
+    submitNewRevision: (data: IPostArticleRevisionRequestBody) => void;
 }
 
 /**
@@ -33,15 +33,6 @@ interface IProps extends IOwnProps {
  */
 export class EditorPage extends React.Component<IProps> {
     public render() {
-        const { article, revision } = this.props.pageState;
-
-        // If we have an article and revision posted we should redirect to that article.
-        // Right now the workflow for getting the canonical URL is a bit tedious so I'm redirecting
-        // To a non-canonical version. This should be fixed later.
-        if (article.status === LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
-            return <Redirect to={`/kb/articles/-${article.data.articleID}`} />;
-        }
-
         const pageContent = (
             <EditorLayout backUrl={this.backLink}>
                 <EditorForm submitHandler={this.formSubmit} />
@@ -78,40 +69,6 @@ export class EditorPage extends React.Component<IProps> {
     }
 
     /**
-     * Ensure that the page is on the correct URL.
-     *
-     * If we're on /articles/add and have now created an article we need to change the URL.
-     * This replacement should be seemless and not create a new history entry.
-     */
-    // private ensureCorrectURL() {
-    //     const { history, pageState } = this.props;
-    //     const { article } = pageState;
-    //     if (history.location.pathname === "/kb/articles/add" && article.status === LoadStatus.SUCCESS) {
-    //         const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
-    //         const newLocation = {
-    //             ...history.location,
-    //             pathname: replacementUrl,
-    //         };
-    //         history.replace(newLocation);
-    //     }
-    // }
-
-    /**
-     * Ensure that we have an article for the editor.
-     * Either fetch one if we have an ID in the URL or create a new one.
-     */
-    // private ensureArticle() {
-    //     const { pageState, initArticle, getArticle, match } = this.props;
-    //     if (pageState.article.status === LoadStatus.PENDING) {
-    //         if (match.params.id != null) {
-    //             getArticle(match.params.id);
-    //         } else {
-    //             initArticle();
-    //         }
-    //     }
-    // }
-
-    /**
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
@@ -125,7 +82,7 @@ export class EditorPage extends React.Component<IProps> {
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            this.props.postRevision(data);
+            this.props.submitNewRevision(data);
         }
     };
 
@@ -163,9 +120,9 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    const { initPageFromLocation, postRevision } = thunks;
+    const { initPageFromLocation, submitNewRevision } = thunks;
     const { clearPageState } = actions;
-    return bindActionCreators({ initPageFromLocation, postRevision, clearPageState }, dispatch);
+    return bindActionCreators({ initPageFromLocation, submitNewRevision, clearPageState }, dispatch);
 }
 
 const withRedux = connect(

@@ -5,13 +5,16 @@
  */
 
 import { actions, constants } from "@knowledge/modules/editor/state";
+import { thunks as articleThunks } from "@knowledge/modules/article/state";
 import { Location } from "history";
 import {
     IPostArticleRevisionRequestBody,
     IPostArticleRequestBody,
     IPostArticleResponseBody,
+    IPostArticleRevisionResponseBody,
+    IGetArticleResponseBody,
 } from "@knowledge/@types/api";
-import { replace } from "connected-react-router";
+import { replace, push } from "connected-react-router";
 import { apiThunk } from "@library/state/utility";
 import pathToRegexp from "path-to-regexp";
 import { AxiosResponse } from "axios";
@@ -21,36 +24,75 @@ function postArticle(data: IPostArticleRequestBody) {
     return apiThunk("post", `/articles`, actions.postArticle, data);
 }
 
-function getArticle(id: string) {
+// Usable action for getting an article
+function getRevision(id: number | string) {
+    return apiThunk("get", `/article-revisions/${id}`, actions.getRevision, {});
+}
+
+// Usable action for getting an article
+function postRevision(data: IPostArticleRevisionRequestBody) {
+    return apiThunk("post", `/article-revisions`, actions.postArticle, data);
+}
+
+function getEditArticle(id: string) {
     return apiThunk("get", `/articles/${id}`, actions.getArticle, {});
 }
 
+/**
+ * Initialize the editor page data based on our path.
+ *
+ * We have to scenarios:
+ *
+ * - /articles/add - Initialize a new article
+ * - /articles/:id/editor - We already have a new article. Go fetch it.
+ *
+ * @param location - The page location.
+ */
 export function initPageFromLocation(location: Location) {
-    return (dispatch: any) => {
+    return async dispatch => {
         // Use the same path regex as our router.
         const addRegex = pathToRegexp(constants.ADD_ROUTE);
         const editRegex = pathToRegexp(constants.EDIT_ROUTE);
 
         // Check url
         if (addRegex.test(location.pathname)) {
-            dispatch(postArticle({ knowledgeCategoryID: 0 })).then(
-                (article: AxiosResponse<IPostArticleResponseBody>) => {
-                    const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
-                    const newLocation = {
-                        ...location,
-                        pathname: replacementUrl,
-                    };
-
-                    dispatch(replace(newLocation));
-                },
+            // We don't have an article so go create one.
+            const article: AxiosResponse<IPostArticleResponseBody> = await dispatch(
+                postArticle({ knowledgeCategoryID: 0 }),
             );
+            const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
+            const newLocation = {
+                ...location,
+                pathname: replacementUrl,
+            };
+
+            dispatch(replace(newLocation));
         } else if (editRegex.test(location.pathname)) {
+            // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
-            dispatch(getArticle(articleID));
+            const article: AxiosResponse<IGetArticleResponseBody> = await dispatch(getEditArticle(articleID));
+            dispatch(getRevision(article.data.articleRevisionID));
         }
     };
 }
 
-export function postRevision(body: IPostArticleRevisionRequestBody) {
-    return;
+/**
+ * Submit the editor's form data to the API.
+ *
+ * @param body - The body of the submit request.
+ */
+export function submitNewRevision(body: IPostArticleRevisionRequestBody) {
+    return async dispatch => {
+        const result: AxiosResponse<IPostArticleRevisionResponseBody> = await dispatch(postRevision(body));
+        const { articleID } = result.data;
+        const newArticle: AxiosResponse<IGetArticleResponseBody> = await dispatch(articleThunks.getArticle(articleID));
+        const { url } = newArticle.data;
+
+        // Make the URL relative to the root of the site.
+        const link = document.createElement("a");
+        link.href = url;
+
+        // Redirect to the new url.
+        dispatch(push(link.pathname));
+    };
 }
