@@ -4,19 +4,26 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+// Route constants
 export const EDIT_ROUTE = "/kb/articles/:id/editor";
 export const ADD_ROUTE = "/kb/articles/add";
 
-export const POST_ARTICLE_REQUEST = "@@editor/POST_ARTICLE_REQUEST";
-export const POST_ARTICLE_RESPONSE = "@@editor/POST_ARTICLE_RESPONSE";
-export const POST_ARTICLE_ERROR = "@@editor/POST_ARTICLE_ERROR";
-export const POST_REVISION_REQUEST = "@@editor/POST_REVISION_REQUEST";
-export const POST_REVISION_RESPONSE = "@@editor/POST_REVISION_RESPONSE";
-export const POST_REVISION_ERROR = "@@editor/POST_REVISION_ERROR";
-export const GET_ARTICLE_REQUEST = "@@editor/GET_ARTICLE_REQUEST";
-export const GET_ARTICLE_RESPONSE = "@@editor/GET_ARTICLE_RESPONSE";
-export const GET_ARTICLE_ERROR = "@@editor/GET_ARTICLE_ERROR";
-export const GET_REVISION_REQUEST = "@@editor/GET_REVISION_REQUEST";
-export const GET_REVISION_RESPONSE = "@@editor/GET_REVISION_RESPONSE";
-export const GET_REVISION_ERROR = "@@editor/GET_REVISION_ERROR";
-export const CLEAR_PAGE_STATE = "@@editor/CLEAR_PAGE_STATE";
+// API actions
+export const POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
+export const POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
+export const POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
+
+export const POST_REVISION_REQUEST = "@@articleEditor/POST_REVISION_REQUEST";
+export const POST_REVISION_RESPONSE = "@@articleEditor/POST_REVISION_RESPONSE";
+export const POST_REVISION_ERROR = "@@articleEditor/POST_REVISION_ERROR";
+
+export const GET_ARTICLE_REQUEST = "@@articleEditor/GET_ARTICLE_REQUEST";
+export const GET_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
+export const GET_ARTICLE_ERROR = "@@articleEditor/GET_ARTICLE_ERROR";
+
+export const GET_REVISION_REQUEST = "@@articleEditor/GET_REVISION_REQUEST";
+export const GET_REVISION_RESPONSE = "@@articleEditor/GET_REVISION_RESPONSE";
+export const GET_REVISION_ERROR = "@@articleEditor/GET_REVISION_ERROR";
+
+// Frontend only actions
+export const CLEAR_PAGE_STATE = "@@articleEditor/CLEAR_PAGE_STATE";

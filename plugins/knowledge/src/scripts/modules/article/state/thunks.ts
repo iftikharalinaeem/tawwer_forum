@@ -9,5 +9,5 @@ import { apiThunk } from "@library/state/utility";
 
 // Usable action for getting an article
 export function getArticle(id: number) {
-    return apiThunk("get", `/articles/${id}?expand=all`, actions.getArticle, {});
+    return apiThunk("get", `/articles/${id}?expand=all`, actions.getArticleActions, {});
 }

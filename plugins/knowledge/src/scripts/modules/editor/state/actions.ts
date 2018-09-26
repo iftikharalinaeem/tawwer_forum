@@ -15,11 +15,7 @@ import {
 } from "@knowledge/@types/api";
 import { generateApiActionCreators, createAction, ActionsUnion } from "@library/state/utility";
 
-///
-/// Simple actions
-///
-
-export const getArticle = generateApiActionCreators(
+export const getArticleActions = generateApiActionCreators(
     constants.GET_ARTICLE_REQUEST,
     constants.GET_ARTICLE_RESPONSE,
     constants.GET_ARTICLE_ERROR,
@@ -28,7 +24,7 @@ export const getArticle = generateApiActionCreators(
     {} as any,
 );
 
-export const postArticle = generateApiActionCreators(
+export const postArticleActions = generateApiActionCreators(
     constants.POST_ARTICLE_REQUEST,
     constants.POST_ARTICLE_RESPONSE,
     constants.POST_ARTICLE_ERROR,
@@ -37,7 +33,7 @@ export const postArticle = generateApiActionCreators(
     {} as IPostArticleRequestBody,
 );
 
-export const getRevision = generateApiActionCreators(
+export const getRevisionActions = generateApiActionCreators(
     constants.GET_REVISION_REQUEST,
     constants.GET_REVISION_RESPONSE,
     constants.GET_REVISION_ERROR,
@@ -46,7 +42,7 @@ export const getRevision = generateApiActionCreators(
     {} as IGetArticleRevisionRequestBody,
 );
 
-export const postRevision = generateApiActionCreators(
+export const postRevisionActions = generateApiActionCreators(
     constants.POST_REVISION_REQUEST,
     constants.POST_REVISION_RESPONSE,
     constants.POST_REVISION_ERROR,
@@ -60,8 +56,8 @@ export function clearPageState() {
 }
 
 export type ActionTypes =
-    | ActionsUnion<typeof postRevision>
-    | ActionsUnion<typeof postArticle>
-    | ActionsUnion<typeof getRevision>
-    | ActionsUnion<typeof getArticle>
+    | ActionsUnion<typeof postRevisionActions>
+    | ActionsUnion<typeof postArticleActions>
+    | ActionsUnion<typeof getRevisionActions>
+    | ActionsUnion<typeof getArticleActions>
     | ReturnType<typeof clearPageState>;

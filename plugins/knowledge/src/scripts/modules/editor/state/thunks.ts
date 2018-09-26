@@ -21,21 +21,21 @@ import { AxiosResponse } from "axios";
 
 // Usable action for getting an article
 function postArticle(data: IPostArticleRequestBody) {
-    return apiThunk("post", `/articles`, actions.postArticle, data);
+    return apiThunk("post", `/articles`, actions.postArticleActions, data);
 }
 
 // Usable action for getting an article
 function getRevision(id: number | string) {
-    return apiThunk("get", `/article-revisions/${id}`, actions.getRevision, {});
+    return apiThunk("get", `/article-revisions/${id}`, actions.getRevisionActions, {});
 }
 
 // Usable action for getting an article
 function postRevision(data: IPostArticleRevisionRequestBody) {
-    return apiThunk("post", `/article-revisions`, actions.postArticle, data);
+    return apiThunk("post", `/article-revisions`, actions.postArticleActions, data);
 }
 
 function getEditArticle(id: string) {
-    return apiThunk("get", `/articles/${id}`, actions.getArticle, {});
+    return apiThunk("get", `/articles/${id}`, actions.getArticleActions, {});
 }
 
 /**

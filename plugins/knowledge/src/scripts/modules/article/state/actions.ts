@@ -13,7 +13,7 @@ export function clearPageState() {
 }
 
 // Raw actions for getting an article
-export const getArticle = generateApiActionCreators(
+export const getArticleActions = generateApiActionCreators(
     constants.GET_ARTICLE_REQUEST,
     constants.GET_ARTICLE_RESPONSE,
     constants.GET_ARTICLE_ERROR,
@@ -22,4 +22,4 @@ export const getArticle = generateApiActionCreators(
     {},
 );
 
-export type ActionTypes = ActionsUnion<typeof getArticle> | ReturnType<typeof clearPageState>;
+export type ActionTypes = ActionsUnion<typeof getArticleActions> | ReturnType<typeof clearPageState>;

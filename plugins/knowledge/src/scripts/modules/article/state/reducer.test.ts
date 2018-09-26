@@ -22,7 +22,7 @@ describe("articleReducer", () => {
 
     describe(`handling ${constants.GET_ARTICLE_REQUEST}`, () => {
         it("sets the status to loading", () => {
-            const action = actions.getArticle.request({ id: 17 });
+            const action = actions.getArticleActions.request({ id: 17 });
             const expected: model.IState = {
                 status: LoadStatus.LOADING,
             };
@@ -30,7 +30,7 @@ describe("articleReducer", () => {
         });
 
         it("clears the current error and data contents", () => {
-            const action = actions.getArticle.request({ id: 17 });
+            const action = actions.getArticleActions.request({ id: 17 });
             const error = { message: "Test error" } as any;
             const data = { data: "Some data" } as any;
             const initial: model.IState = {
@@ -47,7 +47,7 @@ describe("articleReducer", () => {
 
     it(`handles ${constants.GET_ARTICLE_RESPONSE}`, () => {
         const article = { articleTitle: "Some Title" } as any;
-        const action = actions.getArticle.success({ data: article, status: 200, headers: {} });
+        const action = actions.getArticleActions.success({ data: article, status: 200, headers: {} });
         const error = { message: "Test error" } as any;
         const initial: model.IState = {
             status: LoadStatus.ERROR,
@@ -64,7 +64,7 @@ describe("articleReducer", () => {
 
     it(`handles ${constants.GET_ARTICLE_ERROR}`, () => {
         const error = { message: "Test error" } as any;
-        const action = actions.getArticle.error(error);
+        const action = actions.getArticleActions.error(error);
         const initial: model.IState = {
             status: LoadStatus.SUCCESS,
             data: {
