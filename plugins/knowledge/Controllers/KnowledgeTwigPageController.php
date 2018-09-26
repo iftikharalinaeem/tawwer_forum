@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Container\Container;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 
 /**
@@ -18,24 +19,23 @@ abstract class KnowledgeTwigPageController extends PageController {
     use \Garden\TwigTrait;
 
     const API_PAGE_KEY = 'page';
-    /** @var ArticlesApiController */
-    protected $articlesApi;
+    /** @var Garden\Container */
+    protected $container;
+    /**
+     * @var mixed Gdn_Session
+     */
+    protected $session;
 
     /**
-     * KnowledgePageController constructor.
+     * KnowledgeTwigPageController constructor.
      *
-     * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param \Gdn_Session $session Session DI object
-     * @param ArticlesApiController $articlesApiController To fetch article resources
+     * @param \Garden\Container $container Interface to DI container.
      */
-    public function __construct(
-        \AssetModel $assetModel,
-        \Gdn_Session $session,
-        ArticlesApiController $articlesApiController
-    ) {
+    public function __construct(Container $container) {
         parent::__construct();
-        $this->articlesApi = $articlesApiController;
-        $this->session = $session;
+        $this->container = $container;
+        $this->session = $this->container->get(\Gdn_Session::class);
+        $assetModel = $this->container->get(\AssetModel::class);
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');

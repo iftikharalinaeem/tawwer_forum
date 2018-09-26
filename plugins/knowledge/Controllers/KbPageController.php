@@ -7,12 +7,14 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Container\Container;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
  * Knowledge base controller for article view.
  */
 class KbPageController extends KnowledgeTwigPageController {
+
     /**
      * Gather the data array to render a page with.
      *
@@ -29,7 +31,6 @@ class KbPageController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs());
         $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -53,7 +54,7 @@ class KbPageController extends KnowledgeTwigPageController {
             ->setSeo('title', $this->data['title'] ?? 'Knowledge')
             ->setSeo('description', $this->data['description'] ?? 'Knowledge Base')
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
         return $this;
     }
 

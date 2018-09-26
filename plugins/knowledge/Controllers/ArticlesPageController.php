@@ -7,8 +7,11 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Container\Container;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Knowledge\Models\ArticlesGetReduxAction;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
@@ -18,6 +21,18 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     const ACTION_VIEW = 'view';
     const ACTION_ADD = 'add';
     const ACTION_EDIT = 'edit';
+
+    /** @var ArticlesApiController */
+    protected $articlesApi;
+
+    /**
+     * ArticlesPageController constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container) {
+        parent::__construct($container);
+        $this->articlesApi = $this->container->get(ArticlesApiController::class);
+    }
 
     /**
      * @var $action view | editor | add etc...
@@ -40,10 +55,8 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs());
-
         // Put together pre-loaded redux actions.
-        $articlesGetRedux = new ArticlesGetReduxAction($this->data[self::API_PAGE_KEY]);
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_SUCCESS, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
             $articlesGetRedux->getReduxAction(),
         ];
@@ -70,10 +83,9 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs());
 
         // Put together pre-loaded redux actions.
-        $articlesGetRedux = new ArticlesGetReduxAction($this->data[self::API_PAGE_KEY]);
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_SUCCESS, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
             $articlesGetRedux->getReduxAction(),
         ];
@@ -96,7 +108,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             self::signInFirst('kb/articles/add');
         }
         $this->data[self::API_PAGE_KEY] = [];
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs());
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -155,7 +166,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
         return $this;
     }
 

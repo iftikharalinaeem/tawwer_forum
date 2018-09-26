@@ -10,8 +10,7 @@ namespace Vanilla\Knowledge\Models;
 /**
  * Class ReduxAction.
  */
-abstract class ReduxAction {
-    const SUCCESS = 'SUCCESS';
+class ReduxAction {
     /**
      * @var string $type Redux action type
      */
@@ -23,10 +22,11 @@ abstract class ReduxAction {
     /**
      * Create an redux action
      *
+     * @param string $type Redux action type to create
      * @param array $data Redux payload data
      */
-    public function __construct(array $data) {
-        $this->type = self::SUCCESS;
+    public function __construct(string $type, array $data) {
+        $this->type = $type;
         $this->payload = $data;
     }
 
