@@ -28,6 +28,9 @@ $dropDown-item_minHeight                       : 45px;
     box-shadow: $menu_dropShadow;
     border: {
         radius: $global_borderRadius;
+        style: solid;
+        width: 1px;
+        color: $menu-border_color;
     }
 }
 
