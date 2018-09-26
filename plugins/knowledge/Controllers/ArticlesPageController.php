@@ -39,7 +39,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      */
     private $action;
     /**
-     * @var int $articleId Article id of current action
+     * @var int $articleId Article id of current action.
      */
     private $articleId;
 
@@ -60,7 +60,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $reduxActions = [
             $articlesGetRedux->getReduxAction(),
         ];
-        $this->addIlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -71,7 +71,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
 
     /**
-     * Render out the /kb/articles/{id}/editor   path page.
+     * Render out the /kb/articles/{id}/editor path page.
      *
      * @param int $id URI article id.
      * @return string Returns HTML page content
@@ -89,7 +89,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $reduxActions = [
             $articlesGetRedux->getReduxAction(),
         ];
-        $this->addIlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -99,8 +99,8 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     }
 
     /**
-     * Render out the /kb/articles/add   path page.
-     * @return string Returns HTML page content
+     * Render out the /kb/articles/add path page.
+     * @return string Returns HTML page content.
      */
     public function get_add() : string {
         $this->action = self::ACTION_ADD;
@@ -121,7 +121,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      *
      * @param string $path The path of the article.
      *
-     * @return int Returns article id as int
+     * @return int Returns article id as int.
      * @throws ClientException If the URL can't be parsed properly.
      */
     protected function detectArticleId(string $path) : int {
@@ -152,7 +152,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     /**
      * Initialize page SEO meta data.
      *
-     * (temporary solution, need to be extended and/or refactored later)
+     * (temporary solution, need to be extended and/or refactored later).
      *
      * @return $this
      */
@@ -203,13 +203,13 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      *
      * @param string $key Data key to get
      *
-     * @return array
+     * @return string
      */
     public function getApiPageData(string $key) {
         return $this->data[self::API_PAGE_KEY][$key] ?? '';
     }
     /**
-     * Get Breadcrubs data array
+     * Get Breadcrumbs data array
      * This is temporary implementation need to be refactored
      *
      * @return array
