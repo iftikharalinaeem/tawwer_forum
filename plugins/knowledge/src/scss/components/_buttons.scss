@@ -39,6 +39,10 @@
         min-width: $formElement-height;
         padding: 0;
         border: 0;
+
+        &.isOpen {
+            color: $global-color_primary;
+        }
     }
 
     &.buttonNoBorder {

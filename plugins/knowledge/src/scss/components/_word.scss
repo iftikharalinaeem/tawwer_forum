@@ -1,0 +1,17 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.word {
+  color: inherit;
+  font-size: inherit;
+}
+
+a.word {
+  &:focus,
+  &:hover {
+    text-decoration: underline;
+  }
+}

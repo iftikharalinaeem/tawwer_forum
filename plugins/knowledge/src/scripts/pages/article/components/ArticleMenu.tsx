@@ -8,11 +8,10 @@ import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import classNames from "classnames";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
-import DropDownItemMeta from "@library/components/dropdown/items/DropDownItemMeta";
-import DropDownItemRadio from "@library/components/dropdown/items/DropDownItemRadio";
+import DropDownItemMetas from "@library/components/dropdown/items/DropDownItemMetas";
 import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
 import { t } from "@library/application";
+import { InlineTypes } from "@library/components/Sentence";
 
 export interface IProps {
     id: string;
@@ -30,10 +29,52 @@ export default class DropDownActions extends React.PureComponent<IProps, IState>
     };
 
     public render() {
-        // Hard coded for now
+        // Hard coded data/functions
         const buttonClick = () => {
-            alert("test");
+            alert("Click works");
         };
+
+        const publishedMeta = [
+            {
+                type: InlineTypes.TEXT,
+                contents: "Published ",
+            },
+            {
+                type: InlineTypes.DATETIME,
+                timeStamp: "2017-05-20 10:00",
+                contents: "20th May, 2018 10:00 AM",
+            },
+            {
+                type: InlineTypes.TEXT,
+                contents: t(" by "),
+            },
+            {
+                type: InlineTypes.LINK,
+                to: "#user/Todd_Burry",
+                contents: "Todd Burry",
+            },
+        ];
+
+        const updatedMeta = [
+            {
+                type: InlineTypes.TEXT,
+                contents: "Updated ",
+            },
+            {
+                type: InlineTypes.DATETIME,
+                timeStamp: "2017-05-20 10:00",
+                contents: "20th May, 2018 10:00 AM",
+            },
+            {
+                type: InlineTypes.TEXT,
+                contents: t(" by "),
+            },
+            {
+                type: InlineTypes.LINK,
+                to: "#user/Todd_Burry",
+                contents: "Todd Burry",
+            },
+        ];
 
         return (
             <DropDown
@@ -41,19 +82,15 @@ export default class DropDownActions extends React.PureComponent<IProps, IState>
                 name={this.props.name!}
                 className={classNames("articlePage-options", this.props.className)}
             >
-                <DropDownItemButton name={t("Test Button")} onClick={buttonClick} />
-                <DropDownItemButton name={t("Test Button")} onClick={buttonClick}>
-                    <p>{t("Some HTML - Button")}</p>
-                </DropDownItemButton>
-                <DropDownItemLink url="/kb/" name={t("Test Link")} />
-                <DropDownItemLink url="/kb/" name={t("Test Link")}>
-                    <p>{t("Some HTML - Link")}</p>
-                </DropDownItemLink>
-                <DropDownItemMeta>
-                    <React.Fragment />
-                </DropDownItemMeta>
-                <DropDownItemRadio />
+                <DropDownItemMetas contents={publishedMeta} />
+                <DropDownItemMetas contents={updatedMeta} />
                 <DropDownItemSeparator />
+                <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
+                <DropDownItemButton name={t("Move")} onClick={buttonClick} />
+                <DropDownItemSeparator />
+                <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
+                <DropDownItemSeparator />
+                <DropDownItemButton name={t("Delete")} onClick={buttonClick} />
             </DropDown>
         );
     }
