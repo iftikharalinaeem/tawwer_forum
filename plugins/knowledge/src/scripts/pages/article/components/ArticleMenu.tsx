@@ -12,6 +12,7 @@ import DropDownItemMetas from "@library/components/dropdown/items/DropDownItemMe
 import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
+import { getRequiredID } from "@library/componentIDs";
 
 export interface IProps {
     id: string;
@@ -30,6 +31,13 @@ export default class DropDownActions extends React.PureComponent<IProps, IState>
     public static defaultProps = {
         name: t("Article Options"),
     };
+
+    public constructor(props) {
+        super(props);
+        this.state = {
+            id: getRequiredID(props, "articleMenuDropDown"),
+        };
+    }
 
     public render() {
         // Hard coded data/functions
@@ -81,7 +89,7 @@ export default class DropDownActions extends React.PureComponent<IProps, IState>
 
         return (
             <DropDown
-                id={this.props.id}
+                id={this.state.id}
                 name={this.props.name!}
                 className={classNames("articlePage-options", this.props.className)}
             >
