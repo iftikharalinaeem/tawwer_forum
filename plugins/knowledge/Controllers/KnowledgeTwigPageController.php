@@ -26,7 +26,7 @@ abstract class KnowledgeTwigPageController extends PageController {
      *
      * @param \AssetModel $assetModel AssetModel To get js and css.
      * @param \Gdn_Session $session Session DI object
-     * @param ArticlesApiController $articlesApiController To fetch article resources
+     * @param ArticlesApiController $articlesApiController To fetch article resources.
      */
     public function __construct(
         \AssetModel $assetModel,

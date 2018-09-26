@@ -12,16 +12,19 @@ namespace Vanilla\Knowledge\Models;
  */
 abstract class ReduxAction {
     const SUCCESS = 'SUCCESS';
+
     /**
      * @var string $type Redux action type
      */
     protected $type;
+
     /**
      * @var array $payload Redux action payload
      */
     protected $payload;
+
     /**
-     * Create an redux action
+     * Create an redux action.
      *
      * @param array $data Redux payload data
      */

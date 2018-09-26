@@ -17,7 +17,7 @@ use Vanilla\Knowledge\Models\SiteContextModel;
  * This controller expects most content to come from api
  */
 abstract class PageController extends \Garden\Controller implements InjectableInterface {
-    /** @var Gdn_Session */
+    /** @var \Gdn_Session */
     protected $session;
 
     protected $data = [];
@@ -58,7 +58,7 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
             ],
         ];
 
-        $this->addIlineScript($this->createInlineScriptContent("gdn", $gdnData));
+        $this->addInlineScript($this->createInlineScriptContent("gdn", $gdnData));
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
      *
      * @param string $script Script string to be inlined.
      */
-    public function addIlineScript(string $script) {
+    public function addInlineScript(string $script) {
         $this->inlineScripts[] = $script;
     }
     /**
@@ -104,7 +104,7 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     }
 
     /**
-     * Return array of js scripts to outputinline
+     * Return array of js scripts to output inline.
      *
      * @return array
      */
@@ -133,16 +133,16 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     /**
      * Get the page data.
      *
-     * @param string $key Data key to get
+     * @param string $key Data key to get.
      *
-     * @return mixed Return page data key value
+     * @return mixed Return page data key value.
      */
     public function getData(string $key) {
         return $this->data[$key] ?? '';
     }
 
     /**
-     * Initialize page meta tags default values
+     * Initialize page meta tags default values.
      *
      * @return $this
      */
@@ -156,16 +156,16 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     }
 
     /**
-     * Get canonical link
+     * Get canonical link.
      *
      * @return string
      */
     abstract public function getCanonicalLink() : string;
 
     /**
-     * Redirect user to sign in page
+     * Redirect user to sign in page.
      *
-     * @param string $uri URI user should be redirected back when log in
+     * @param string $uri URI user should be redirected back when log in.
      */
     public static function signInFirst(string $uri) {
         header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
