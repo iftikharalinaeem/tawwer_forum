@@ -16,9 +16,8 @@ use Vanilla\Knowledge\Models\SiteContextModel;
  *
  * This controller expects most content to come from api
  */
-class PageController extends \Garden\Controller implements InjectableInterface {
-    const API_PAGE_KEY = 'page';
-    /** @var Gdn_Session */
+abstract class PageController extends \Garden\Controller implements InjectableInterface {
+    /** @var \Gdn_Session */
     protected $session;
 
     protected $data = [];
@@ -34,10 +33,16 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     protected $meta;
 
     /**
+     * @var string $_CanonicalUrl
+     */
+    protected $canonicalUrl;
+
+    /**
      * PageController constructor.
      */
     public function __construct() {
         $this->meta = new PageMetaModel();
+        $this->pageMetaInit();
     }
 
     /**
@@ -53,7 +58,27 @@ class PageController extends \Garden\Controller implements InjectableInterface {
             ],
         ];
 
-        $this->inlineScripts[] = $this->createInlineScriptContent("gdn", $gdnData);
+        $this->addInlineScript($this->createInlineScriptContent("gdn", $gdnData));
+    }
+
+    /**
+     * Add inline script content.
+     *
+     * @param string $script Script string to be inlined.
+     */
+    public function addInlineScript(string $script) {
+        $this->inlineScripts[] = $script;
+    }
+    /**
+     * Add new element to js window object with some inline script content.
+     *
+     * @param string $variableName The name of the variable on window to set.
+     * @param array $contents The data to JSON encode as the value of the variable.
+     *
+     * @return string The script contents.
+     */
+    public static function createInlineScriptContent(string $variableName, $contents) {
+        return 'window["' . $variableName . '"]='.json_encode($contents).";\n";
     }
 
     /**
@@ -79,7 +104,7 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     }
 
     /**
-     * Return array of js scripts to outputinline
+     * Return array of js scripts to output inline.
      *
      * @return array
      */
@@ -108,26 +133,16 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     /**
      * Get the page data.
      *
-     * @param string $key Data key to get
+     * @param string $key Data key to get.
      *
-     * @return mixed Return page data key value
+     * @return mixed Return page data key value.
      */
     public function getData(string $key) {
         return $this->data[$key] ?? '';
     }
 
     /**
-     * Get the page data from api response array
-     *
-     * @param string $key Data key to get
-     *
-     * @return array
-     */
-    public function getApiPageData(string $key) {
-        return $this->data[self::API_PAGE_KEY][$key] ?? '';
-    }
-    /**
-     * Initialize page meta tags default values
+     * Initialize page meta tags default values.
      *
      * @return $this
      */
@@ -141,63 +156,16 @@ class PageController extends \Garden\Controller implements InjectableInterface {
     }
 
     /**
-     * Initialize page SEO meta data.
-     *
-     * (temporary solution, need to be extended and/or refactored later)
-     *
-     * @return $this
-     */
-    public function setSeoMetaData() {
-        $this->meta
-            ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
-        $this->meta
-            ->setSeo('title', $this->getApiPageData('seoName'))
-            ->setSeo('description', $this->getApiPageData('seoDescription'))
-            ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
-        return $this;
-    }
-
-    /**
-     * Create some inline script content.
-     *
-     * @param string $variableName The name of the variable on window to set.
-     * @param array $contents The data to JSON encode as the value of the variable.
-     * @return string The script contents.
-     */
-    protected function createInlineScriptContent(string $variableName, $contents) {
-        return 'window["' . $variableName . '"]='.json_encode($contents).";\n";
-    }
-
-    /**
-     * Create an action
-     *
-     * @param string $type
-     * @param array $data
-     * @return array
-     */
-    protected function createReduxAction(string $type, array &$data) {
-        return [
-            "type" => $type,
-            "payload" => [
-                "data" => $data,
-            ],
-        ];
-    }
-
-    /**
-     * Get canonical link
+     * Get canonical link.
      *
      * @return string
      */
-    public function getCanonicalLink() {
-        return $this->data[self::API_PAGE_KEY]['url'] ?? '/';
-    }
+    abstract public function getCanonicalLink() : string;
 
     /**
-     * Redirect user to sign in page
+     * Redirect user to sign in page.
      *
-     * @param string $uri URI user should be redirected back when log in
+     * @param string $uri URI user should be redirected back when log in.
      */
     public static function signInFirst(string $uri) {
         header('Location: /entry/signin?Target='.urlencode($uri), true, 302);
