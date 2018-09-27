@@ -11,6 +11,6 @@ import { model as articleModel } from "@knowledge/modules/article/state";
 export interface IStoreState {
     knowledge: {
         articlePage: articleModel.IState;
-        editor: editorModel.IState;
+        editorPage: editorModel.IState;
     };
 }

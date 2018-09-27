@@ -112,7 +112,7 @@ export class EditorPage extends React.Component<IProps> {
  */
 function mapStateToProps(state: IStoreState) {
     return {
-        pageState: state.knowledge.editor,
+        pageState: state.knowledge.editorPage,
     };
 }
 
