@@ -30,7 +30,7 @@ export default class Breadcrumbs extends React.Component<IBreadcrumbsProps> {
                     <React.Fragment key={`breadcrumb-${index}`}>
                         <Breadcrumb lastElement={lastElement} name={crumb.name} url={crumb.url} />
                         {!lastElement && (
-                            <li className="breadcrumb-item breadcrumbs-separator">
+                            <li aria-hidden={true} className="breadcrumb-item breadcrumbs-separator">
                                 <span className="breadcrumbs-separatorIcon">{crumbSeparator}</span>
                             </li>
                         )}

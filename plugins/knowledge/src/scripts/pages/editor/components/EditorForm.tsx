@@ -15,6 +15,7 @@ import PageHeading from "@knowledge/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@knowledge/components/DeviceChecker";
 import { DeltaOperation } from "quill/core";
+import PageLocation from "@knowledge/components/PageLocation";
 
 interface IProps {
     device: Devices;
@@ -30,6 +31,19 @@ export class EditorForm extends React.Component<IProps> {
     private title: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
+        const dummyArticleLocationData = {
+            children: [
+                {
+                    name: "Docs",
+                    url: "/docs",
+                },
+                {
+                    name: "Installation",
+                    url: "/docs/installation",
+                },
+            ],
+        };
+
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
 
@@ -38,7 +52,10 @@ export class EditorForm extends React.Component<IProps> {
                 <PanelLayout growMiddleBottom={true} device={this.props.device}>
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
-                            <PageHeading backUrl={this.props.backUrl} title={t("Write Discussion")} />
+                            <div className="sr-only">
+                                <PageHeading backUrl={this.props.backUrl} title={t("Write Discussion")} />
+                            </div>
+                            <PageLocation {...dummyArticleLocationData} />
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
