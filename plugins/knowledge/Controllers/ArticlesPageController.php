@@ -7,71 +7,41 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Container\Container;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
-use Vanilla\Knowledge\DummyBreadcrumbTrait;
+use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
  * Knowledge base Articles controller for article view.
  */
-class ArticlesPageController extends PageController {
-    use \Garden\TwigTrait;
-    use DummyBreadcrumbTrait;
+class ArticlesPageController extends KnowledgeTwigPageController {
+    const ACTION_VIEW = 'view';
+    const ACTION_ADD = 'add';
+    const ACTION_EDIT = 'edit';
 
     /** @var ArticlesApiController */
-    private $articlesApi;
+    protected $articlesApi;
 
     /**
-     * KnowledgePageController constructor.
-     *
-     * @param \AssetModel $assetModel AssetModel To get js and css.
-     * @param ArticlesApiController $articlesApiController To fetch article resources.
-     * @param \Gdn_Session $session Session DI object
+     * ArticlesPageController constructor.
+     * @param Container $container
      */
-    public function __construct(
-        \AssetModel $assetModel,
-        ArticlesApiController $articlesApiController,
-        \Gdn_Session $session
-    ) {
-        parent::__construct();
-        $this->session = $session;
-        $this->articlesApi = $articlesApiController;
-        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
-        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
-        }
-        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+    public function __construct(Container $container) {
+        parent::__construct($container);
+        $this->articlesApi = $this->container->get(ArticlesApiController::class);
     }
 
     /**
-     * Gather the data array to render a page with.
-     *
-     * @return array
+     * @var $action view | editor | add etc...
      */
-    private function getPageData() : array {
-        $data = [
-            'debug' => \Gdn::config('Debug'),
-            'page' => &$this->data[self::API_PAGE_KEY],
-            'scripts' => $this->getScripts(),
-            'inlineScripts' => $this->getInlineScripts(),
-            'styles' => $this->getStyles(),
-            'inlineStyles' => $this->getInlineStyles(),
-        ];
-        $data['page']['classes'][] = 'isLoading';
-        $data['page']['userSignedIn'] = $this->session->isValid();
-        $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';
-        $this->pageMetaInit();
-
-        $this->setSeoMetaData();
-        $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
-
-        $data['meta'] = $this->meta->getPageMeta();
-
-        return $data;
-    }
+    private $action;
+    /**
+     * @var int $articleId Article id of current action.
+     */
+    private $articleId;
 
     /**
      * Render out the /kb/articles/title-slug-{id} :path page.
@@ -80,25 +50,20 @@ class ArticlesPageController extends PageController {
      * @return string Returns HTML page content
      */
     public function index(string $path) : string {
-        $id = $this->detectArticleId($path);
+        $this->action = self::ACTION_VIEW;
+        $this->articleId = $id = $this->detectArticleId($path);
 
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
-
         // Put together pre-loaded redux actions.
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_SUCCESS, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
-            $this->createReduxAction(
-                ArticlesApiActions::GET_ARTICLE_SUCCESS,
-                $this->data[self::API_PAGE_KEY]
-            ),
+            $articlesGetRedux->getReduxAction(),
         ];
-
-        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
-        $this->inlineScripts[] = $reduxActionScript;
+        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getPageData();
+        $data = $this->getViewData();
         $data['template'] = 'seo/pages/article.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
@@ -106,51 +71,46 @@ class ArticlesPageController extends PageController {
 
 
     /**
-     * Render out the /kb/articles/{id}/editor   path page.
+     * Render out the /kb/articles/{id}/editor path page.
      *
      * @param int $id URI article id.
      * @return string Returns HTML page content
      */
     public function get_editor(int $id) : string {
+        $this->action = self::ACTION_EDIT;
+        $this->articleId = $id;
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
-
         // Put together pre-loaded redux actions.
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_SUCCESS, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
-            $this->createReduxAction(
-                ArticlesApiActions::GET_ARTICLE_SUCCESS,
-                $this->data[self::API_PAGE_KEY]
-            ),
+            $articlesGetRedux->getReduxAction(),
         ];
-
-        $reduxActionScript = $this->createInlineScriptContent("__ACTIONS__", $reduxActions);
-        $this->inlineScripts[] = $reduxActionScript;
+        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getPageData();
+        $data = $this->getViewData();
         $data['template'] = 'seo/pages/article.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
-     * Render out the /kb/articles/add   path page.
-     * @return string Returns HTML page content
+     * Render out the /kb/articles/add path page.
+     * @return string Returns HTML page content.
      */
     public function get_add() : string {
+        $this->action = self::ACTION_ADD;
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/add');
         }
         $this->data[self::API_PAGE_KEY] = [];
 
-        $this->data['breadcrumb-json'] = Breadcrumb::crumbsAsJsonLD($this->getDummyBreadcrumbData());
-
         // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getPageData();
+        $data = $this->getViewData();
         $data['template'] = 'seo/pages/article.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
@@ -161,7 +121,7 @@ class ArticlesPageController extends PageController {
      *
      * @param string $path The path of the article.
      *
-     * @return int Returns article id as int
+     * @return int Returns article id as int.
      * @throws ClientException If the URL can't be parsed properly.
      */
     protected function detectArticleId(string $path) : int {
@@ -173,5 +133,92 @@ class ArticlesPageController extends PageController {
         $id = (int)$matches[1];
 
         return $id;
+    }
+    /**
+     * Gather the data array to render a page with.
+     *
+     * @return array
+     */
+    private function getViewData() : array {
+        $this->setSeoMetaData();
+        $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
+        $data = $this->getWebViewResources();
+        $data['page'] = $this->data[self::API_PAGE_KEY] ?? [];
+        $data['page']['classes'][] = 'isLoading';
+        $data['page']['userSignedIn'] = $this->session->isValid();
+        $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';
+        return $data;
+    }
+    /**
+     * Initialize page SEO meta data.
+     *
+     * (temporary solution, need to be extended and/or refactored later).
+     *
+     * @return $this
+     */
+    public function setSeoMetaData() {
+        $this->meta
+            ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
+        if ($this->action === self::ACTION_VIEW) {
+            $this->meta
+                ->setSeo('title', $this->getApiPageData('seoName'))
+                ->setSeo('description', $this->getApiPageData('seoDescription'));
+        }
+        $this->meta
+            ->setSeo('locale', \Gdn::locale()->current())
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCanonicalLink() : string {
+        $url = $this->canonicalUrl;
+        if ($url === null) {
+            switch ($this->action) {
+                case self::ACTION_VIEW:
+                    if ($apiUrl = $this->data[self::API_PAGE_KEY]['url'] ?? false) {
+                        $url = $apiUrl;
+                    } else {
+                        $url = \Gdn::request()->url('/kb/articles/-'.$this->articleId, true);
+                    }
+                    break;
+                case self::ACTION_EDIT:
+                    $url = \Gdn::request()->url('/kb/articles/'.$this->articleId.'/editor', true);
+                    break;
+                case self::ACTION_ADD:
+                    $url = \Gdn::request()->url('/kb/articles/add', true);
+                    break;
+                default:
+                    $url = \Gdn::request()->url('/', true);
+            }
+            $this->canonicalUrl = $url;
+        }
+        return $url;
+    }
+
+    /**
+     * Get the page data from api response array
+     *
+     * @param string $key Data key to get
+     *
+     * @return string
+     */
+    public function getApiPageData(string $key) {
+        return $this->data[self::API_PAGE_KEY][$key] ?? '';
+    }
+    /**
+     * Get Breadcrumbs data array
+     * This is temporary implementation need to be refactored
+     *
+     * @return array
+     */
+    public function getBreadcrumbs(): array {
+        return [
+            new Breadcrumb('Home', \Gdn::request()->url('/', true)),
+            new Breadcrumb('Knowledge', \Gdn::request()->url('/kb/', true)),
+            new Breadcrumb('Knowledge', $this->getCanonicalLink()),
+        ];
     }
 }
