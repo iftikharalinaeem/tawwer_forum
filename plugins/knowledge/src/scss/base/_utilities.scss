@@ -17,3 +17,8 @@
   flex-direction: column;
   flex-grow: 1;
 }
+
+.u-noInteraction {
+  user-select: none;
+  pointer-events: none;
+}

@@ -16,7 +16,7 @@ export default class RelatedArticles extends React.Component<IProps> {
         return (
             <PanelWidget>
                 <Heading title={t("Right Bottom")} />
-                <p>{`${"(Table of contents)"}`}</p>
+                <p>{`${"(Related Articles)"}`}</p>
             </PanelWidget>
         );
     }

@@ -11,6 +11,7 @@ import { IArticle } from "@knowledge/@types/api";
 
 interface IProps {
     article: IArticle;
+    menu?: JSX.Element;
 }
 
 export default class ArticleTitle extends React.Component<IProps> {
@@ -18,7 +19,7 @@ export default class ArticleTitle extends React.Component<IProps> {
         const { article } = this.props;
         return (
             <PanelWidget>
-                <PageHeading title={article.articleRevision.name} />
+                <PageHeading title={article.articleRevision.name} menu={this.props.menu} />
             </PanelWidget>
         );
     }

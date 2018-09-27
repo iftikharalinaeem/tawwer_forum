@@ -1,0 +1,84 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$dropDown_width                                : 200px;
+$dropDown_borderRadius                         : 1px;
+$dropdown_bg                                   : $global-color_bg;
+
+$dropDown-metas_verticalPadding                : 6px;
+$dropDown-metas_horizontalPadding              : 18px;
+
+$dropDown-item_verticalPadding                 : 6px;
+$dropDown-item_horizontalPadding               : 36px;
+
+$dropDown-item_minHeight                       : 45px;
+
+.dropDown {
+    position: relative;
+    z-index: 1;
+}
+
+.dropDown-contents {
+    position: absolute;
+    width: $dropDown_width;
+    background-color: $dropdown_bg;
+    box-shadow: $menu_dropShadow;
+    border: {
+        radius: $global_borderRadius;
+        style: solid;
+        width: 1px;
+        color: $menu-border_color;
+    }
+}
+
+.dropDownItems {
+    font-size: $global-medium_fontSize;
+}
+
+.dropDown-metasItem {
+    font-size: $metaText_fontSize;
+    color: $metaText_color;
+    padding: {
+        top: $dropDown-metas_verticalPadding * 2.5;
+        right: $dropDown-metas_horizontalPadding;
+        bottom: $dropDown-metas_verticalPadding * 2;
+        left: $dropDown-metas_horizontalPadding;
+    }
+
+    + .dropDown-metasItem {
+        padding: {
+            top: $dropDown-metas_verticalPadding;
+        }
+    }
+}
+
+.dropDown-item {
+    text-align: left;
+}
+
+.dropDownItem-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    min-height: $dropDown-item_minHeight;
+    padding: {
+        top: $dropDown-item_verticalPadding;
+        right: $dropDown-item_horizontalPadding;
+        bottom: $dropDown-item_verticalPadding;
+        left: $dropDown-item_horizontalPadding;
+    }
+
+    &:hover,
+    &:focus {
+        background-color: $global-color_active_primaryBg;
+    }
+}
+
+
+.dropDown-separator {
+    height: $global-separator_width;
+    background-color: $global-separator_color;
+}

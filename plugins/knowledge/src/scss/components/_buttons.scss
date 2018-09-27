@@ -5,71 +5,75 @@
  */
 
 .button {
-  @include singleLineEllipsis;
-  @include generateButtonClass($button-basic);
-  @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
-  @include outlineStyling;
-  display: inline-block;
-  position: relative;
-  text-align: center;
-  white-space: nowrap;
-  outline: 0;
-  vertical-align: middle;
-  touch-action: manipulation;
-  min-width: $global-button_minWidth;
-  user-select: none;
-  overflow: hidden;
-  cursor: pointer;
-  border: {
-    width: $formElement_borderWidth;
-    radius: $global-button_radius;
-    style: solid;
-  }
-
-  &.button-fullWidth {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  &.button-icon {
-    align-items: center;
-    justify-content: center;
-    height: $formElement-height;
-    width: $formElement-height;
-    min-width: $formElement-height;
-    padding: 0;
-    border: 0;
-  }
-
-  &.buttonNoBorder {
-    border: 0;
-    min-width: $formElement-height;
-    padding: {
-      left: 0;
-      right: 0;
+    @include singleLineEllipsis;
+    @include generateButtonClass($button-basic);
+    @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
+    @include outlineStyling;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    outline: 0;
+    vertical-align: middle;
+    touch-action: manipulation;
+    min-width: $global-button_minWidth;
+    user-select: none;
+    overflow: hidden;
+    cursor: pointer;
+    border: {
+        width: $formElement_borderWidth;
+        radius: $global-button_radius;
+        style: solid;
     }
-  }
+
+    &.button-fullWidth {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &.button-icon {
+        align-items: center;
+        justify-content: center;
+        height: $formElement-height;
+        width: $formElement-height;
+        min-width: $formElement-height;
+        padding: 0;
+        border: 0;
+
+        &.isOpen {
+            color: $global-color_primary;
+        }
+    }
+
+    &.buttonNoBorder {
+        border: 0;
+        min-width: $formElement-height;
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
 }
 
 .button-callToAction {
-  @include generateButtonClass($buttonPrimary);
+    @include generateButtonClass($buttonPrimary);
 }
 
 
 .button-icon {
-  display: flex;
-  min-width: $formElement-height;
+    display: flex;
+    min-width: $formElement-height;
 }
 
 
 .button-fakeLink {
-  color: $link_default-color;
+    color: $link_default-color;
 
-  &:hover {
-    color: $link_default_hover-color
-  }
+    &:hover {
+        color: $link_default_hover-color
+    }
 
-  &:focus {
-    color: $link_default_focus-color;
-  }
+    &:focus {
+        color: $link_default_focus-color;
+    }
 }

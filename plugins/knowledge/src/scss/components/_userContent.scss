@@ -5,56 +5,56 @@
  */
 
 .userContent {
-  @include clearfix;
-  @include orderedListStyle;
-  @include unorderedListStyle;
+    @include clearfix;
+    @include orderedListStyle;
+    @include unorderedListStyle;
 
-  display: block;
-  position: relative;
-  width: 100%;
-  word-break: break-word;
-  line-height: $global-base_lineHeight;
+    display: block;
+    position: relative;
+    width: 100%;
+    word-break: break-word;
+    line-height: $global-base_lineHeight;
 
-  @include headings {
-    @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
-  }
-
-  > *:not(:last-child) {
-    margin-bottom: $global-block_margin;
-  }
-
-  p {
-    margin: {
-      top: 0;
-      bottom: 0;
-    };
-
-    &:not(:first-child) {
-      margin: {
-        top: $global-block_margin * .5;
-      };
+    @include headings {
+        @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
     }
-  }
 
-  p,
-  li {
-    a {
-      color: $link_default-color;
-
-
-      &:hover {
-        color: $link_default_hover-color;
-        text-decoration: underline;
-      }
-
-      &:focus {
-        color: $link_default_focus-color;
-        text-decoration: underline;
-      }
-
-      &:visited {
-        color: $link_default_visited-color;
-      }
+    > *:not(:last-child) {
+        margin-bottom: $global-block_margin;
     }
-  }
+
+    p {
+        margin: {
+            top: 0;
+            bottom: 0;
+        };
+
+        &:not(:first-child) {
+            margin: {
+                top: $global-block_margin * .5;
+            };
+        }
+    }
+
+    p,
+    li {
+        a {
+            color: $link_default-color;
+
+
+            &:hover {
+                color: $link_default_hover-color;
+                text-decoration: underline;
+            }
+
+            &:focus {
+                color: $link_default_focus-color;
+                text-decoration: underline;
+            }
+
+            &:visited {
+                color: $link_default_visited-color;
+            }
+        }
+    }
 }
