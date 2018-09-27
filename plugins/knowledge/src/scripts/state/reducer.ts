@@ -10,7 +10,7 @@ import { reducer as editorReducer } from "@knowledge/modules/editor/state";
 
 const knowledgeReducer = combineReducers({
     articlePage: articleReducer,
-    editor: editorReducer,
+    editorPage: editorReducer,
 });
 
 export default knowledgeReducer;
