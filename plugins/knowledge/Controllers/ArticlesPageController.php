@@ -85,7 +85,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
 
         // Put together pre-loaded redux actions.
-        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_SUCCESS, $this->data[self::API_PAGE_KEY]);
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
             $articlesGetRedux->getReduxAction(),
         ];

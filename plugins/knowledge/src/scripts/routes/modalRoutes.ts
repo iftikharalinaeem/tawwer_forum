@@ -40,11 +40,7 @@ const ModalEditorPage = Loadable({
 export function getModalRouteData(forModal: boolean = true): RouteProps[] {
     return [
         {
-            path: editorConstants.ADD_ROUTE,
-            component: forModal ? ModalEditorPage : EditorPage,
-        },
-        {
-            path: editorConstants.EDIT_ROUTE,
+            path: editorConstants.ADD_EDIT_ROUTE,
             component: forModal ? ModalEditorPage : EditorPage,
         },
     ];

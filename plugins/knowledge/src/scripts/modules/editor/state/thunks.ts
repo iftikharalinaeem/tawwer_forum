@@ -6,7 +6,7 @@
 
 import { actions, constants } from "@knowledge/modules/editor/state";
 import { thunks as articleThunks } from "@knowledge/modules/article/state";
-import { Location, History } from "history";
+import { History } from "history";
 import {
     IPostArticleRevisionRequestBody,
     IPostArticleRequestBody,
@@ -30,7 +30,7 @@ function getRevision(id: number | string) {
 
 // Usable action for getting an article
 function postRevision(data: IPostArticleRevisionRequestBody) {
-    return apiThunk("post", `/article-revisions`, actions.postArticleActions, data);
+    return apiThunk("post", `/article-revisions`, actions.postRevisionActions, data);
 }
 
 function getEditArticle(id: string) {
@@ -84,8 +84,17 @@ export function initPageFromLocation(history: History) {
 export function submitNewRevision(body: IPostArticleRevisionRequestBody, history: History) {
     return async dispatch => {
         const result: AxiosResponse<IPostArticleRevisionResponseBody> = await dispatch(postRevision(body));
+        // Our API request has failed
+        if (!result) {
+            return;
+        }
+
         const { articleID } = result.data;
         const newArticle: AxiosResponse<IGetArticleResponseBody> = await dispatch(articleThunks.getArticle(articleID));
+        // Our API request failed.
+        if (!newArticle) {
+            return;
+        }
         const { url } = newArticle.data;
 
         // Make the URL relative to the root of the site.
