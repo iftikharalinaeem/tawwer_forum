@@ -420,6 +420,7 @@ EOT
             $result = $statusModel->upsert(val('Name', $data), val('State', $data), val('IsDefault', $data), $statusID);
             $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
+                $statusModel->clearStatusesCache();
                 $sender->informMessage(t('Your changes have been saved.'));
                 $sender->setRedirectTo('/settings/statuses');
                 $sender->setData('Status', StatusModel::instance()->getStatus($result));
@@ -448,9 +449,12 @@ EOT
 
         if ($sender->Form->authenticatedPostBack()) {
             $statusModel = new StatusModel();
-            $statusModel->delete(['StatusID' => $statusID]);
-            $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
-            $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
+            $result = $statusModel->delete(['StatusID' => $statusID]);
+            if ($result) {
+                $statusModel->clearStatusesCache();
+                $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
+                $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
+            }
         }
         $sender->render('blank', 'utility', 'dashboard');
     }
