@@ -15,7 +15,7 @@ import PageHeading from "@knowledge/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@knowledge/components/DeviceChecker";
 import { DeltaOperation } from "quill/core";
-import PageLocation from "@knowledge/components/PageLocation";
+import PageLocation from "@knowledge/components/locationPicker/PageLocation";
 
 interface IProps {
     device: Devices;

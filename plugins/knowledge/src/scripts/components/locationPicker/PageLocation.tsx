@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
+import { t } from "../../../../../../library/src/scripts/application";
 import classNames from "classnames";
-import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
+import { IBreadcrumbsProps } from "../Breadcrumbs";
 
 /**
  * Opens modal with the LocationChooser
@@ -72,7 +72,7 @@ export default class PageLocation extends React.Component<IBreadcrumbsProps, ISt
                         {t("To:")}
                     </span>
                 </legend>
-                <button title={crumbTitle} type="button" className="pageLocation-button" onClick={openLocationChooser}>
+                <button title={crumbTitle} type="button" className="pageLocation" onClick={openLocationChooser}>
                     {content}
                 </button>
             </fieldset>
