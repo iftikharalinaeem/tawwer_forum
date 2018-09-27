@@ -27,7 +27,7 @@ export interface IState {
 /**
  * Generates drop down menu for Article page
  */
-export default class DropDownActions extends React.PureComponent<IProps, IState> {
+export default class ArticleMenu extends React.PureComponent<IProps, IState> {
     public static defaultProps = {
         name: t("Article Options"),
     };
