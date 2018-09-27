@@ -6,7 +6,7 @@
 
 import { actions, constants } from "@knowledge/modules/editor/state";
 import { thunks as articleThunks } from "@knowledge/modules/article/state";
-import { Location } from "history";
+import { Location, History } from "history";
 import {
     IPostArticleRevisionRequestBody,
     IPostArticleRequestBody,
@@ -14,7 +14,6 @@ import {
     IPostArticleRevisionResponseBody,
     IGetArticleResponseBody,
 } from "@knowledge/@types/api";
-import { replace, push } from "connected-react-router";
 import { apiThunk } from "@library/state/utility";
 import pathToRegexp from "path-to-regexp";
 import { AxiosResponse } from "axios";
@@ -46,10 +45,11 @@ function getEditArticle(id: string) {
  * - /articles/add - Initialize a new article
  * - /articles/:id/editor - We already have a new article. Go fetch it.
  *
- * @param location - The page location.
+ * @param history - The history object.
  */
-export function initPageFromLocation(location: Location) {
+export function initPageFromLocation(history: History) {
     return async dispatch => {
+        const { location } = history;
         // Use the same path regex as our router.
         const addRegex = pathToRegexp(constants.ADD_ROUTE);
         const editRegex = pathToRegexp(constants.EDIT_ROUTE);
@@ -66,7 +66,7 @@ export function initPageFromLocation(location: Location) {
                 pathname: replacementUrl,
             };
 
-            dispatch(replace(newLocation));
+            history.replace(newLocation);
         } else if (editRegex.test(location.pathname)) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
@@ -81,7 +81,7 @@ export function initPageFromLocation(location: Location) {
  *
  * @param body - The body of the submit request.
  */
-export function submitNewRevision(body: IPostArticleRevisionRequestBody) {
+export function submitNewRevision(body: IPostArticleRevisionRequestBody, history: History) {
     return async dispatch => {
         const result: AxiosResponse<IPostArticleRevisionResponseBody> = await dispatch(postRevision(body));
         const { articleID } = result.data;
@@ -93,6 +93,6 @@ export function submitNewRevision(body: IPostArticleRevisionRequestBody) {
         link.href = url;
 
         // Redirect to the new url.
-        dispatch(push(link.pathname));
+        history.push(link.pathname);
     };
 }

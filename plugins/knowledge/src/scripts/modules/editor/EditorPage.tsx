@@ -22,10 +22,10 @@ interface IOwnProps
         }> {}
 
 interface IProps extends IOwnProps {
-    initPageFromLocation: typeof thunks.initPageFromLocation;
     pageState: model.IState;
     clearPageState: () => void;
-    submitNewRevision: (data: IPostArticleRevisionRequestBody) => void;
+    initPageFromLocation: typeof thunks.initPageFromLocation;
+    submitNewRevision: typeof thunks.submitNewRevision;
 }
 
 /**
@@ -58,7 +58,7 @@ export class EditorPage extends React.Component<IProps> {
      * Initial setup for the page.
      */
     public componentDidMount() {
-        this.props.initPageFromLocation(this.props.location);
+        this.props.initPageFromLocation(this.props.history);
     }
 
     /**
@@ -72,7 +72,7 @@ export class EditorPage extends React.Component<IProps> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState } = this.props;
+        const { pageState, history } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
@@ -82,7 +82,7 @@ export class EditorPage extends React.Component<IProps> {
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            this.props.submitNewRevision(data);
+            this.props.submitNewRevision(data, history);
         }
     };
 
