@@ -7,7 +7,8 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import { addRoutes } from "@dashboard/application";
+
 import UITestAuthenticationPage from "./pages/UITestAuthenticationPage";
+import { addRoutes } from "@library/application";
 
 addRoutes([<Route exact path="/uitests/authentication" component={UITestAuthenticationPage} />]);

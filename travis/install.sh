@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
+## Clone vanilla/vanilla so we can test against it
 
 cd $TRAVIS_BUILD_DIR
 
-git clone --depth=50 --branch=master https://github.com/vanilla/vanilla vanilla
+# This directory might already exist (from the cache) but its not a big deal.
+mkdir "$TRAVIS_BUILD_DIR/vanilla"
+cd "$TRAVIS_BUILD_DIR/vanilla"
 
-cd "$TRAVIS_BUILD_DIR/vanilla/applications"
-ln -s ../../applications/* ./
+# Because cached files are already possibly here we can't do a clone.
+printf "\nCloning the main vanilla repository..."
+git init
+git remote add origin https://github.com/vanilla/vanilla
+git pull --depth 50 origin master
+
+# Symlink in plugins
+printf "\nSymlinking plugins from the internal repo..."
 cd "$TRAVIS_BUILD_DIR/vanilla/plugins"
 ln -s ../../plugins/* ./
 
-cd "$TRAVIS_BUILD_DIR/vanilla"
-ls -lah ./applications
-ls -lah ./plugins
-
-composer self-update
-composer install --optimize-autoloader
+cd "$TRAVIS_BUILD_DIR"
