@@ -16,6 +16,8 @@ import NotFoundPage from "@library/components/NotFoundPage";
 import { actions, thunks, model } from "@knowledge/modules/article/state";
 import { ArticleLayout } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
+import { t } from "@library/application";
+import ArticleMenu from "@knowledge/pages/article/components/ArticleMenu";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -47,9 +49,11 @@ export class ArticlePage extends React.Component<IProps> {
 
         const { article } = articlePageState.data;
 
+        const menu = <ArticleMenu id={"articlePage-" + id} />; // hard coded for now
+
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} />
+                <ArticleLayout article={article} menu={menu} />
             </PageLoader>
         );
     }

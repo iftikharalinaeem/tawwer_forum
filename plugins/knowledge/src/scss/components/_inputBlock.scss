@@ -5,83 +5,83 @@
  */
 
 .inputBlock {
-  display: block;
-  margin-bottom: $formElement_margin;
+    display: block;
+    margin-bottom: $formElement_margin;
 
-  &.hasError {
-    .inputText {
-      border-color: $global-error_fg;
-      background-color: $global-error_bg;
-      color: $global-error_fg;
+    &.hasError {
+        .inputText {
+            border-color: $global-error_fg;
+            background-color: $global-error_bg;
+            color: $global-error_fg;
+        }
     }
-  }
 }
 
 .inputBlock-columns {
-  display: flex;
+    display: flex;
 }
 
 .inputBlock-errors {
-  display: block;
-  font-size: $global-small_fontSize;
+    display: block;
+    font-size: $global-small_fontSize;
 }
 
 .inputBlock-error {
-  display: block;
-  color: $global-error_fg;
+    display: block;
+    color: $global-error_fg;
 
-  + .inputBlock-error {
-    margin-top: $utility-baseUnit;
-  }
+    + .inputBlock-error {
+        margin-top: $utility-baseUnit;
+    }
 }
 
 .inputBlock-labelNote {
-  display: block;
-  font-size: $global-small_fontSize;
-  font-weight: $global-normal_fontWeight;
-  opacity: .6;
+    display: block;
+    font-size: $global-small_fontSize;
+    font-weight: $global-normal_fontWeight;
+    opacity: .6;
 }
 
 .inputBlock-labelText {
-  display: block;
-  font-weight: $global-bold_fontWeight;
-  font-size: $global-medium_fontSize;
-  margin-bottom: $utility-baseUnit;
+    display: block;
+    font-weight: $global-bold_fontWeight;
+    font-size: $global-medium_fontSize;
+    margin-bottom: $utility-baseUnit;
 }
 
 .inputBlock-inlineLabel {
-  font-weight: $global-bold_fontWeight;
-  font-size: $global-medium_fontSize;
+    font-weight: $global-bold_fontWeight;
+    font-size: $global-medium_fontSize;
 }
 
 .inputBlock-inputWrap {
-  & + .checkbox,
-  & + .radioButton
-  {
-    margin-top: $utility-baseUnit;
-  }
+    & + .checkbox,
+    & + .radioButton
+    {
+        margin-top: $utility-baseUnit;
+    }
 }
 
 .inputBlock-labelAndDescription {
-  display: block;
-  width: 100%;
+    display: block;
+    width: 100%;
 }
 
 .inputBlock-inlineLabel {
-  height: $formElement-height;
-  line-height: $formElement-height;
-  padding: {
-    left: $formElement_horizontalPadding;
-    right: $formElement_horizontalPadding;
-  }
+    height: $formElement-height;
+    line-height: $formElement-height;
+    padding: {
+        left: $formElement_horizontalPadding;
+        right: $formElement_horizontalPadding;
+    }
 }
 
 
 .inputBlock-miniInputs {
-  display: flex;
-  flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .inputBlock-miniInput {
-  width: $formElement_miniInput_width;
+    width: $formElement_miniInput_width;
 }

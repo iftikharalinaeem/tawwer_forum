@@ -8,31 +8,31 @@ $panelArea-gap: $global-gutter_halfSize;
 
 .panelArea {
 
-  .heading {
-    @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
-  }
-
-  + .panelArea {
-    margin-top: $panelArea-gap;
-  }
-
-  &.inheritHeight {
-    > .panelWidget {
-      flex-grow: 1;
+    .heading {
+        @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
     }
-  }
+
+    + .panelArea {
+        margin-top: $panelArea-gap;
+    }
+
+    &.inheritHeight {
+        > .panelWidget {
+            flex-grow: 1;
+        }
+    }
 }
 
 .panelArea-rightTop {
-  margin-bottom: $panelArea-gap;
+    margin-bottom: $panelArea-gap;
 }
 
 .panelArea-leftTop {
-  margin-bottom: $panelArea-gap;
-  position: relative;
+    margin-bottom: $panelArea-gap;
+    position: relative;
 }
 
 .panelArea-leftBottom {
-  margin-bottom: $panelArea-gap;
-  position: relative;
+    margin-bottom: $panelArea-gap;
+    position: relative;
 }

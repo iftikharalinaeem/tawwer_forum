@@ -24,6 +24,7 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 interface IProps {
     article: IArticle;
     device: Devices;
+    menu: JSX.Element;
 }
 
 interface IState {}
@@ -44,7 +45,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleNavigation />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle article={article} />
+                        <ArticleTitle article={article} menu={this.props.menu} />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <ArticleContent article={article} />

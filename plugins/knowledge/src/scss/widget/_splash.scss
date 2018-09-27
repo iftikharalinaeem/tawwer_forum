@@ -44,56 +44,56 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 
 
 .splash { // All the way to the edges
-  @include bgCover($splash-fullWidth_bgImage);
-  position: relative;
-  background-color: $splash-outer_bg;
+    @include bgCover($splash-fullWidth_bgImage);
+    position: relative;
+    background-color: $splash-outer_bg;
 
-  .searchBar-toggleAdvanced {
-    color: $splash_fg;
-  }
+    .searchBar-toggleAdvanced {
+        color: $splash_fg;
+    }
 }
 
 .splash-main { // Site Width
-  @include bgCover($splash-contentWidth_bgImage);
-  background-color: $splash-inner_bg;
-  padding: {
-    top: $splash_topPadding;
-    right: $splash_rightPadding;
-    bottom: $splash_bottomPadding;
-    left: $splash_leftPadding;
-  }
+    @include bgCover($splash-contentWidth_bgImage);
+    background-color: $splash-inner_bg;
+    padding: {
+        top: $splash_topPadding;
+        right: $splash_rightPadding;
+        bottom: $splash_bottomPadding;
+        left: $splash_leftPadding;
+    }
 }
 
 
 .splash-title {
-  font-size: $splash-title_fontSize;
-  font-weight: $splash-title_fontWeight;
-  color: $splash_fg;
-  margin-bottom: 0;
+    font-size: $splash-title_fontSize;
+    font-weight: $splash-title_fontWeight;
+    color: $splash_fg;
+    margin-bottom: 0;
 }
 
 .splash-text {
-  display: block;
-  color: $splash_fg;
-  width: $splash-text_maxWidth;
-  max-width: 100%;
-  margin: auto auto 0;
-  text-align: center;
+    display: block;
+    color: $splash_fg;
+    width: $splash-text_maxWidth;
+    max-width: 100%;
+    margin: auto auto 0;
+    text-align: center;
 
-  + .searchBar {
-    margin-top: $splash-search_margin;
-  }
+    + .searchBar {
+        margin-top: $splash-search_margin;
+    }
 }
 
 
 .splash-p {
-  font-size: $splash-paragraph_textSize;
-  font-weight: $splash-paragraph_fontWeight;
-  margin-top: $splash-paragraph_margin;
-
-  + .splash-p {
+    font-size: $splash-paragraph_textSize;
+    font-weight: $splash-paragraph_fontWeight;
     margin-top: $splash-paragraph_margin;
-  }
+
+    + .splash-p {
+        margin-top: $splash-paragraph_margin;
+    }
 }
 
 
