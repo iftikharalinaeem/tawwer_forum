@@ -187,7 +187,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 "dateInserted:dt" => "When the article was created.",
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "updateUser?" => $this->getUserFragmentSchema(),
-            ], "Article");
+            ], "ArticleRevision");
         }
         return $this->articleRevisionSchema;
     }
