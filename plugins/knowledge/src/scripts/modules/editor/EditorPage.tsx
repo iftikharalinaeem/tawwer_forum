@@ -96,7 +96,7 @@ export class EditorPage extends React.Component<IProps> {
 
     private get backLink(): string | null {
         const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : null;
+        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
     }
 
     /**

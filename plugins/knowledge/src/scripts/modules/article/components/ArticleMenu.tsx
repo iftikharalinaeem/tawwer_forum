@@ -84,30 +84,13 @@ export class ArticleMenu extends React.PureComponent<IProps> {
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
-                <DropDownItemLink name={t("Edit article")} to={this.editLocation} />
+                <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Delete")} onClick={buttonClick} />
             </DropDown>
         );
-    }
-
-    /**
-     * The location of the edit page for the menu.
-     */
-    private get editLocation(): LocationDescriptor {
-        const editUrl = makeEditUrl(this.props.article.articleID);
-        return {
-            pathname: editUrl,
-            state: {
-                modal: true,
-
-                // Pass along the "previous" location so the router can display
-                // The old route underneath the modal when clicked.
-                lastLocation: this.props.location,
-            },
-        };
     }
 }
 
