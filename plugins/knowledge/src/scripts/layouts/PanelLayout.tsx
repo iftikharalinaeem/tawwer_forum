@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import { Devices } from "@knowledge/components/DeviceChecker";
-import className from "classnames";
 import classNames from "classnames";
 import CompoundComponent from "@knowledge/layouts/CompoundComponent";
 
@@ -92,7 +91,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         const renderMobilePanel: boolean = isMobile && !!children.leftBottom;
 
         // Determine the classes we want to display.
-        const panelClasses = className(
+        const panelClasses = classNames(
             "panelLayout",
             { noLeftPanel: !shouldRenderLeftPanel },
             { noRightPanel: !shouldRenderLeftPanel },
@@ -100,7 +99,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { inheritHeight: this.props.growMiddleBottom },
         );
 
-        const crumbClasses = className(
+        const crumbClasses = classNames(
             "panelLayout-top",
             { noLeftPanel: !shouldRenderLeftPanel },
             this.props.className,
@@ -120,7 +119,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 </Panel>
                             )}
                             <Panel
-                                className={className("panelLayout-breadcrumbs", {
+                                className={classNames("panelLayout-breadcrumbs", {
                                     hasAdjacentPanel: shouldRenderLeftPanel,
                                 })}
                             >
@@ -251,16 +250,16 @@ interface IContainerProps {
 
 export function Panel(props: IContainerProps) {
     const Tag = `${props.tag ? props.tag : "div"}`;
-    return <Tag className={className("panelLayout-panel", props.className)}>{props.children}</Tag>;
+    return <Tag className={classNames("panelLayout-panel", props.className)}>{props.children}</Tag>;
 }
 
 export function PanelArea(props: IContainerProps) {
     const Tag = `${props.tag ? props.tag : "div"}`;
-    return <Tag className={className("panelArea", props.className)}>{props.children}</Tag>;
+    return <Tag className={classNames("panelArea", props.className)}>{props.children}</Tag>;
 }
 
 export function PanelWidget(props: IContainerProps) {
-    return <div className={className("panelWidget", props.className)}>{props.children}</div>;
+    return <div className={classNames("panelWidget", props.className)}>{props.children}</div>;
 }
 
 // The components that make up the Layout itself.

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { t } from "../../../../../../library/src/scripts/application";
+import { t } from "@library/application";
 import classNames from "classnames";
 import { IBreadcrumbsProps } from "../Breadcrumbs";
 

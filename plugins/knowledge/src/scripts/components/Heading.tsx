@@ -7,19 +7,30 @@
 import * as React from "react";
 import classNames from "classnames";
 
-interface IHeading {
-    title: string;
+interface ICommonHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
 }
 
-export default class PageTitle extends React.Component<IHeading> {
+interface IStringTitle extends ICommonHeadingProps {
+    title: string;
+}
+
+interface IComponentTitle extends ICommonHeadingProps {
+    children: JSX.Element;
+}
+
+type IHeadingProps = IStringTitle | IComponentTitle;
+
+export default class PageTitle extends React.Component<IHeadingProps> {
     public static defaultProps = {
         depth: 2,
     };
 
     public render() {
         const Tag = `h${this.props.depth}`;
+        const contents = (this.props.title as IStringTitle) ? this.props.title : this.props.children
+
         return (
             <Tag
                 className={classNames(
@@ -29,7 +40,7 @@ export default class PageTitle extends React.Component<IHeading> {
                     this.props.className,
                 )}
             >
-                {this.props.title}
+                {contnets}
             </Tag>
         );
     }

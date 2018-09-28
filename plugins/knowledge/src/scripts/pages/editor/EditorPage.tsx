@@ -48,11 +48,7 @@ export class EditorPage extends React.Component<IProps> {
 
         if (this.isModal) {
             return (
-                <Modal
-                    exitHandler={this.navigateToBacklink}
-                    appContainer={document.getElementById("app")!}
-                    container={document.getElementById("modals")!}
-                >
+                <Modal exitHandler={this.navigateToBacklink}>
                     {editorForm}
                 </Modal>
             );
