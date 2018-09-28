@@ -34,7 +34,6 @@ interface IState {
  * - Focuses the first focusable element in the Modal.
  */
 export default class Modal extends React.Component<IProps, IState> {
-
     public static defaultProps = {
         appContainer: document.getElementById("app"),
         container: document.getElementById("modals"),

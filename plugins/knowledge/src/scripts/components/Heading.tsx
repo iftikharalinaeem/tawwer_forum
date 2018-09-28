@@ -29,7 +29,7 @@ export default class PageTitle extends React.Component<IHeadingProps> {
 
     public render() {
         const Tag = `h${this.props.depth}`;
-        const contents = (this.props.title as IStringTitle) ? this.props.title : this.props.children
+        const contents = (this.props.title as IStringTitle) ? this.props.title : this.props.children;
 
         return (
             <Tag
@@ -40,7 +40,7 @@ export default class PageTitle extends React.Component<IHeadingProps> {
                     this.props.className,
                 )}
             >
-                {contnets}
+                {contents}
             </Tag>
         );
     }

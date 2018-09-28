@@ -47,11 +47,7 @@ export class EditorPage extends React.Component<IProps> {
         const editorForm = <EditorForm backUrl={this.backLink} submitHandler={this.formSubmit} />;
 
         if (this.isModal) {
-            return (
-                <Modal exitHandler={this.navigateToBacklink}>
-                    {editorForm}
-                </Modal>
-            );
+            return <Modal exitHandler={this.navigateToBacklink}>{editorForm}</Modal>;
         } else {
             return editorForm;
         }
