@@ -7,22 +7,22 @@
 import * as React from "react";
 import classNames from "classnames";
 
-interface ICommonHeadingProps {
+export interface ICommonHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
 }
 
-interface IStringTitle extends ICommonHeadingProps {
+export interface IStringTitle extends ICommonHeadingProps {
     title: string;
 }
 
-interface IComponentTitle extends ICommonHeadingProps {
+export interface IComponentTitle extends ICommonHeadingProps {
     children: JSX.Element | string;
 }
 
-type IHeadingProps = IStringTitle | IComponentTitle;
+export type IHeadingProps = IStringTitle | IComponentTitle;
 
-export default class PageTitle extends React.Component<IHeadingProps> {
+export default class Heading extends React.Component<IHeadingProps> {
     public static defaultProps = {
         depth: 2,
     };

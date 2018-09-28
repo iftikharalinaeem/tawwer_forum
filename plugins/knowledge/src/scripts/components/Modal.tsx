@@ -9,8 +9,10 @@ import ReactDOM from "react-dom";
 import TabHandler from "@library/TabHandler";
 import { logError } from "@library/utility";
 import { getRequiredID } from "@library/componentIDs";
+import classNames from "classnames";
 
 interface IProps {
+    className?: string;
     exitHandler?: () => void;
     appContainer?: Element;
     container?: Element;
@@ -67,18 +69,17 @@ export default class Modal extends React.Component<IProps, IState> {
                 id={this.modalID}
                 role="dialog"
                 aria-modal={true}
-                className="modal inheritHeight"
+                className={classNames("modal", "inheritHeight", this.props.className)}
                 ref={this.selfRef}
                 onKeyDown={this.handleTabbing}
                 aria-describedby={this.descriptionID}
-                tabIndex={-1}
             >
                 <div id={this.descriptionID} className="sr-only">
                     {this.props.description}
                 </div>
                 {this.props.children}
             </div>,
-            this.props.container,
+            this.props.container!,
         );
     }
 
@@ -101,7 +102,7 @@ export default class Modal extends React.Component<IProps, IState> {
         Modal.focusHistory.push(document.activeElement as HTMLElement);
         this.focusInitialElement();
         document.addEventListener("keydown", this.handleEscapeKeyPress);
-        this.props.appContainer.setAttribute("aria-hidden", true);
+        this.props.appContainer!.setAttribute("aria-hidden", true);
         document.body.style.position = "fixed";
     }
 
@@ -109,7 +110,7 @@ export default class Modal extends React.Component<IProps, IState> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
-        this.props.appContainer.removeAttribute("aria-hidden");
+        this.props.appContainer!.removeAttribute("aria-hidden");
         document.removeEventListener("keydown", this.handleEscapeKeyPress);
         document.body.style.position = "initial";
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;

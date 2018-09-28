@@ -8,23 +8,35 @@ import * as React from "react";
 import { t } from "@library/application";
 import classNames from "classnames";
 import { IBreadcrumbsProps } from "../Breadcrumbs";
+import { getRequiredID } from "@library/componentIDs";
+import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
 
-/**
- * Opens modal with the LocationChooser
- */
-function openLocationChooser() {
-    alert("do thing");
+interface IProps extends IBreadcrumbsProps {
+    name: string;
+    displayType?: string;
+    isSection: boolean;
+    url: string;
+    parentID: number;
+    recordID: number;
+    recordType: string;
 }
 
-export interface IState {
-    id: string;
+interface IState {
+    showLocationChooser: boolean;
 }
 
 /**
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class PageLocation extends React.Component<IBreadcrumbsProps, IState> {
+export default class PageLocation extends React.Component<IProps, IState> {
+    public constructor(props) {
+        super(props);
+        this.state = {
+            showLocationChooser: false,
+        };
+    }
+
     public render() {
         const accessibleCrumbSeparator = `/`;
         let content;
@@ -62,20 +74,40 @@ export default class PageLocation extends React.Component<IBreadcrumbsProps, ISt
         }
 
         return (
-            <fieldset className={classNames("pageLocation", this.props.className)}>
-                <legend className="pageLocation-label">
-                    <span className="sr-only">
-                        {/* We need more context for screen readers*/}
-                        {t("Article Location:")}
-                    </span>
+            <React.Fragment>
+                <div className={classNames("pageLocation", this.props.className)}>
                     <span className="pageLocation-label" aria-hidden={true}>
                         {t("To:")}
                     </span>
-                </legend>
-                <button title={crumbTitle} type="button" className="pageLocation" onClick={openLocationChooser}>
-                    {content}
-                </button>
-            </fieldset>
+                    <button
+                        title={crumbTitle}
+                        type="button"
+                        aria-label={t("Article Location:")}
+                        className="pageLocation"
+                        onClick={this.showLocationChooser}
+                    >
+                        {content}
+                    </button>
+                </div>
+                {/*{this.state.showLocationChooser && */}
+                <LocationPicker
+                    {...this.props}
+                    title={this.props.name}
+                    hideLocationChooser={this.hideLocationChooser}
+                />
+            </React.Fragment>
         );
     }
+
+    private showLocationChooser = () => {
+        this.setState({
+            showLocationChooser: true,
+        });
+    };
+
+    private hideLocationChooser = () => {
+        this.setState({
+            showLocationChooser: false,
+        });
+    };
 }

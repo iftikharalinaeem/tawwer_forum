@@ -9,4 +9,5 @@ $modal-bgColor: $global-color_white !default;
     right: 0;
     bottom: 0;
     background: $modal-bgColor;
+    z-index: 1;
 }
