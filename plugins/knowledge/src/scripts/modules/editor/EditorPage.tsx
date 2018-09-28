@@ -9,9 +9,9 @@ import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import Modal from "@knowledge/components/Modal";
+import { Modal } from "@library/components/modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
-import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
+import { thunks, actions, model } from "@knowledge/modules/editor/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
@@ -94,16 +94,20 @@ export class EditorPage extends React.Component<IProps> {
         return !!(location && location.state && location.state.modal);
     }
 
-    private get backLink(): string {
+    private get backLink(): string | null {
         const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
+        return state && state.lastLocation ? state.lastLocation.pathname : null;
     }
 
     /**
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        this.props.history.push(this.backLink);
+        if (this.backLink) {
+            this.props.history.goBack();
+        } else {
+            this.props.history.push("/kb");
+        }
     };
 }
 

@@ -7,7 +7,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { t } from "@library/application";
-import ModalLink from "@knowledge/components/ModalLink";
+import { ModalLink } from "@library/components/modal";
 
 export default class HomePage extends React.Component {
     public render() {

@@ -11,7 +11,7 @@ import Heading from "@knowledge/components/Heading";
 
 interface IPageHeading {
     title: string;
-    backUrl?: string; // back link
+    backUrl?: string | null; // back link
     className?: string;
     menu?: JSX.Element;
 }
