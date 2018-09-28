@@ -12,3 +12,4 @@ export { default as ArticleNavigation } from "./ArticleActions";
 export { default as ArticleTitle } from "./ArticleTitle";
 export { default as ArticleTOC } from "./ArticleTOC";
 export { default as RelatedArticles } from "./RelatedArticles";
+export { default as ArticleMenu } from "./ArticleMenu";

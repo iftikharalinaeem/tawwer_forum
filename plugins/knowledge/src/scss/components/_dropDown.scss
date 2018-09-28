@@ -59,8 +59,11 @@ $dropDown-item_minHeight                       : 45px;
     text-align: left;
 }
 
-.dropDownItem-button {
-    display: block;
+.dropDownItem-button,
+.dropDownItem-link {
+    appearance: none;
+    display: flex;
+    align-items: center;
     width: 100%;
     text-align: left;
     min-height: $dropDown-item_minHeight;
@@ -70,6 +73,7 @@ $dropDown-item_minHeight                       : 45px;
         bottom: $dropDown-item_verticalPadding;
         left: $dropDown-item_horizontalPadding;
     }
+    color: inherit;
 
     &:hover,
     &:focus {

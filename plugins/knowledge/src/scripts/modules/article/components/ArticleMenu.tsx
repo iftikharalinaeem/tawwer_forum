@@ -6,40 +6,28 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import classNames from "classnames";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import DropDownItemMetas from "@library/components/dropdown/items/DropDownItemMetas";
 import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
-import { getRequiredID } from "@library/componentIDs";
+import { IArticle } from "@knowledge/@types/api";
+import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
+import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { LocationDescriptor } from "history";
 
-export interface IProps {
-    id: string;
-    name?: string;
-    className?: string;
-}
-
-export interface IState {
-    id: string;
+export interface IProps extends RouteComponentProps<{}> {
+    article: IArticle;
 }
 
 /**
  * Generates drop down menu for Article page
  */
-export default class ArticleMenu extends React.PureComponent<IProps, IState> {
-    public static defaultProps = {
-        name: t("Article Options"),
-    };
-
-    public constructor(props) {
-        super(props);
-        this.state = {
-            id: getRequiredID(props, "articleMenuDropDown"),
-        };
-    }
-
+export class ArticleMenu extends React.PureComponent<IProps> {
     public render() {
+        const { article } = this.props;
+        const domID = "articleMenuDropDown-" + article.articleID;
         // Hard coded data/functions
         const buttonClick = () => {
             alert("Click works");
@@ -87,17 +75,16 @@ export default class ArticleMenu extends React.PureComponent<IProps, IState> {
             },
         ];
 
+        const editUrl = makeEditUrl(article.articleID);
+
         return (
-            <DropDown
-                id={this.state.id}
-                name={this.props.name!}
-                className={classNames("articlePage-options", this.props.className)}
-            >
+            <DropDown id={domID} name={t("Article Options")} className="articlePage-options">
                 <DropDownItemMetas contents={publishedMeta} />
                 <DropDownItemMetas contents={updatedMeta} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
+                <DropDownItemLink name={t("Edit article")} to={this.editLocation} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
                 <DropDownItemSeparator />
@@ -105,4 +92,23 @@ export default class ArticleMenu extends React.PureComponent<IProps, IState> {
             </DropDown>
         );
     }
+
+    /**
+     * The location of the edit page for the menu.
+     */
+    private get editLocation(): LocationDescriptor {
+        const editUrl = makeEditUrl(this.props.article.articleID);
+        return {
+            pathname: editUrl,
+            state: {
+                modal: true,
+
+                // Pass along the "previous" location so the router can display
+                // The old route underneath the modal when clicked.
+                lastLocation: this.props.location,
+            },
+        };
+    }
 }
+
+export default withRouter(ArticleMenu);

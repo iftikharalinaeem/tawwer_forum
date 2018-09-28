@@ -4,7 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { actions, constants } from "@knowledge/modules/editor/state";
+import { actions } from "@knowledge/modules/editor/state";
+import * as route from "@knowledge/modules/editor/route";
 import { thunks as articleThunks } from "@knowledge/modules/article/state";
 import { History } from "history";
 import {
@@ -51,8 +52,8 @@ export function initPageFromLocation(history: History) {
     return async dispatch => {
         const { location } = history;
         // Use the same path regex as our router.
-        const addRegex = pathToRegexp(constants.ADD_ROUTE);
-        const editRegex = pathToRegexp(constants.EDIT_ROUTE);
+        const addRegex = pathToRegexp(route.ADD_ROUTE);
+        const editRegex = pathToRegexp(route.EDIT_ROUTE);
 
         // Check url
         if (addRegex.test(location.pathname)) {
@@ -60,7 +61,7 @@ export function initPageFromLocation(history: History) {
             const article: AxiosResponse<IPostArticleResponseBody> = await dispatch(
                 postArticle({ knowledgeCategoryID: 0 }),
             );
-            const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
+            const replacementUrl = route.makeEditUrl(article.data.articleID);
             const newLocation = {
                 ...location,
                 pathname: replacementUrl,

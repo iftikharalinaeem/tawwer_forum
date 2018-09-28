@@ -8,7 +8,7 @@ import { RouteProps } from "react-router-dom";
 import Loadable from "react-loadable";
 import ModalLoader from "@knowledge/components/ModalLoader";
 import FullPageLoader from "@library/components/FullPageLoader";
-import { constants as editorConstants } from "@knowledge/modules/editor/state";
+import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
 
 function getDynamicEditorPage() {
     return import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage");
@@ -40,7 +40,7 @@ const ModalEditorPage = Loadable({
 export function getModalRouteData(forModal: boolean = true): RouteProps[] {
     return [
         {
-            path: editorConstants.ADD_EDIT_ROUTE,
+            path: ADD_EDIT_ROUTE,
             component: forModal ? ModalEditorPage : EditorPage,
         },
     ];
