@@ -424,6 +424,8 @@ EOT
                 $sender->informMessage(t('Your changes have been saved.'));
                 $sender->setRedirectTo('/settings/statuses');
                 $sender->setData('Status', StatusModel::instance()->getStatus($result));
+            } else {
+                $sender->informMessage(t('Failed to save your changes.'));
             }
         } elseif ($statusID) {
             // We're about to edit, set up the data from the status.
@@ -454,6 +456,8 @@ EOT
                 $statusModel->clearStatusesCache();
                 $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
                 $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
+            } else {
+                $sender->informMessage(t('Failed to delete status.'));
             }
         }
         $sender->render('blank', 'utility', 'dashboard');
