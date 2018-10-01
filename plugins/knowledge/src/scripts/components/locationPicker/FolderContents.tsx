@@ -10,7 +10,7 @@ import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
 import Button from "@dashboard/components/forms/Button";
 import {rightChevron} from "@library/components/Icons";
-import {check} from "../../../../../../library/src/scripts/components/Icons";
+import {check} from "@library/components/Icons";
 
 interface ICategory {
     name: string;

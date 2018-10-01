@@ -15,6 +15,8 @@ import { thunks, actions, model, constants } from "@knowledge/modules/editor/sta
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
+import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
+import PageLocation from "@knowledge/components/locationPicker/PageLocation";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -26,29 +28,30 @@ interface IProps extends IOwnProps {
     clearPageState: () => void;
     initPageFromLocation: typeof thunks.initPageFromLocation;
     submitNewRevision: typeof thunks.submitNewRevision;
+    data: any; // temp
+}
+
+interface IState {
+    showFolderPicker: boolean;
 }
 
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.Component<IProps> {
+export class EditorPage extends React.Component<IProps, IState> {
     public render() {
         const pageContent = (
-            <EditorLayout backUrl={this.backLink}>
-                <EditorForm submitHandler={this.formSubmit} />
-            </EditorLayout>
+            <React.Fragment>
+                <PageLocation children={this.props.data} />
+                <EditorLayout backUrl={this.backLink}>
+                    <EditorForm submitHandler={this.formSubmit} />
+                </EditorLayout>
+                {this.state.showFolderPicker && <LocationPicker exitHandler={this.hideLocationPicker} />}
+            </React.Fragment>
         );
 
         if (this.isModal) {
-            return (
-                <Modal
-                    exitHandler={this.navigateToBacklink}
-                    appContainer={document.getElementById("app")!}
-                    container={document.getElementById("modals")!}
-                >
-                    {pageContent}
-                </Modal>
-            );
+            return <Modal exitHandler={this.navigateToBacklink}>{pageContent}</Modal>;
         } else {
             return pageContent;
         }
@@ -66,6 +69,18 @@ export class EditorPage extends React.Component<IProps> {
      */
     public componentWillUnmount() {
         this.props.clearPageState();
+    }
+
+    public showLocationPicker() {
+        this.setState({
+            showFolderPicker: true,
+        });
+    }
+
+    public hideLocationPicker() {
+        this.setState({
+            showFolderPicker: false,
+        });
     }
 
     /**

@@ -12,13 +12,19 @@ import { getRequiredID } from "@library/componentIDs";
 import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
 import Button from "@dashboard/components/forms/Button";
 
-interface IProps extends IBreadcrumbsProps {
+interface IPageLocation extends IBreadcrumbsProps {
     displayType?: string;
     isSection?: boolean;
     url?: string;
     parentID?: number;
     recordID?: number;
     recordType?: string;
+    name: string;
+}
+
+interface IProps {
+    children: IPageLocation[];
+    className?: string;
 }
 
 interface IState {
@@ -90,7 +96,7 @@ export default class PageLocation extends React.Component<IProps, IState> {
                     </Button>
                 </div>
                 {/*{this.state.showLocationChooser && */}
-                <LocationPicker {...this.props} dismissFunction={this.hideLocationChooser} />
+                <LocationPicker {...this.props} exitHandler={this.hideLocationChooser} />
             </React.Fragment>
         );
     }
