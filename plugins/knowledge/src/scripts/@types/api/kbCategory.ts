@@ -6,14 +6,15 @@
 
 import { IUserFragment } from "@dashboard/@types/api";
 import { IArticleFragment } from "@knowledge/@types/api";
+import { MultiTypeRecord } from "@library/@types/api";
 
-enum KbCategoryDisplayType {
+export enum KbCategoryDisplayType {
     HELP = "help",
     GUIDE = "guide",
     SEARCH = "search",
 }
 
-enum KbCategorySortMode {
+export enum KbCategorySortMode {
     NAME = "name",
     DATE_INSERTED = "dateInserted",
     DATE_INSERTED_DESC = "dateInsertedDesc",
@@ -72,3 +73,9 @@ export interface IKbCategoryFragment {
     isSection: boolean; // Determines if the category is cutoff point in navigation or not.
     url: string; // Full URL to the resource
 }
+
+export type IKbCategoryMultiTypeFragment = MultiTypeRecord<
+    IKbCategoryFragment,
+    "knowledgeCategoryID",
+    "knowledgeCategory"
+>;

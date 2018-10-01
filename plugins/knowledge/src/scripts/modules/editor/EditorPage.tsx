@@ -1,7 +1,7 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import React from "react";
@@ -39,6 +39,10 @@ interface IState {
  * Page for editing an article.
  */
 export class EditorPage extends React.Component<IProps, IState> {
+    public state = {
+        showFolderPicker: false,
+    };
+
     public render() {
         const pageContent = (
             <React.Fragment>
@@ -46,7 +50,9 @@ export class EditorPage extends React.Component<IProps, IState> {
                 <EditorLayout backUrl={this.backLink}>
                     <EditorForm submitHandler={this.formSubmit} />
                 </EditorLayout>
-                {this.state.showFolderPicker && <LocationPicker exitHandler={this.hideLocationPicker} />}
+                {this.state.showFolderPicker && (
+                    <LocationPicker exitHandler={this.hideLocationPicker} children={[]} selectedCategory={{}} />
+                )}
             </React.Fragment>
         );
 

@@ -23,7 +23,8 @@ import FolderContents from "@knowledge/components/locationPicker/FolderContents"
 interface IProps {
     exitHandler: () => void;
     className?: string;
-    data: any;
+    children: any;
+    selectedCategory: any;
 }
 
 interface IState {
@@ -58,8 +59,8 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         <FrameBody>
                             <FramePanel>
                                 <FolderContents
-                                    children={this.props.data.children}
-                                    currentFolderData={this.props.data.selectedCategory}
+                                    children={this.props.children}
+                                    currentFolderData={this.props.selectedCategory}
                                 />
                             </FramePanel>
                         </FrameBody>

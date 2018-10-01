@@ -11,22 +11,30 @@ import { getRequiredID } from "@library/componentIDs";
 import Button from "@dashboard/components/forms/Button";
 import { rightChevron } from "@library/components/Icons";
 import { check } from "@library/components/Icons";
+import { IKbNavigationItem, IKbCategoryFragment } from "@knowledge/@types/api";
+import { LoadStatus } from "@library/@types/api";
+import { model, thunks, actions } from "@knowledge/modules/locationPicker/state";
+import { IStoreState } from "@knowledge/state/model";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 
-interface ICategory {
-    name: string;
-    displayType?: string;
-    isSection: boolean;
-    url: string;
-    parentID: number;
-    recordID: number;
-    recordType: string;
-    children?: ICategory[];
+interface IOwnProps {
+    initialCategoryID: number;
 }
 
-interface IProps {
-    currentFolderData: any;
-    children: ICategory[];
+interface IReduxProps {
+    locationBreadcrumb: IKbCategoryFragment[];
+    currentFolderItems: IKbNavigationItem[];
+    status: LoadStatus;
 }
+
+interface IReduxDispatch {
+    getKbNavigation: typeof thunks.getKbNavigation;
+    resetNavigation: typeof actions.resetNavigation;
+    navigateToCategory: typeof actions.navigateToCategory;
+}
+
+interface IProps extends IOwnProps, IReduxProps, IReduxDispatch {}
 
 interface IState {
     id: string;
@@ -37,12 +45,11 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class FolderContents extends React.Component<IProps, IState> {
+export class FolderContents extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
             id: getRequiredID(props, "locationPicker"),
-            selectedRecordID: this.props.currentFolderData.recordID,
         };
     }
 
@@ -55,15 +62,18 @@ export default class FolderContents extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const contents = this.props.children.map(item => {
-            const isSelected = !!this.state.selectedRecordID && this.state.selectedRecordID === item.recordID;
+        const { locationBreadcrumb, currentFolderItems, initialCategoryID } = this.props;
+        const currentCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
+        const contents = currentFolderItems.map(item => {
+            const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
             return (
                 <li className="folderContents-item">
                     <label className="folderContents-folder">
                         <input
                             type="radio"
                             className={classNames("folderContents-input", {
-                                initialSelection: this.props.currentFolderData.recordID === this.state.selectedRecordID,
+                                initialSelection:
+                                    item.recordType === "knowledgeCategory" && initialCategoryID === item.recordID,
                             })}
                             name={this.radioName}
                             value={item.recordID}
@@ -75,7 +85,8 @@ export default class FolderContents extends React.Component<IProps, IState> {
                         </span>
                         <span className="dropDownRadio-label">{item.name}</span>
                     </label>
-                    {item.children &&
+                    {item.recordType === "knowledgeCategory" &&
+                        item.children &&
                         item.children.length > 0 && (
                             <Button onClick={this.tempClick}>
                                 {rightChevron()}
@@ -85,10 +96,9 @@ export default class FolderContents extends React.Component<IProps, IState> {
                 </li>
             );
         });
-
         return (
             <fieldset className={classNames("folderContents")}>
-                <legend className="sr-only">{t("Contents of folder: " + this.props.currentFolderData.name)}</legend>
+                <legend className="sr-only">{t("Contents of folder: " + currentCategory.name)}</legend>
                 <ul className="folderContents-items">{contents}</ul>
             </fieldset>
         );
@@ -100,3 +110,30 @@ export default class FolderContents extends React.Component<IProps, IState> {
         });
     };
 }
+
+/**
+ * Map in the state from the redux store.
+ */
+function mapStateToProps(state: IStoreState): IReduxProps {
+    return {
+        locationBreadcrumb: model.getCurrentLocationBreadcrumb(state),
+        currentFolderItems: state.knowledge.locationPicker.currentFolderItems,
+        status: state.knowledge.locationPicker.status,
+    };
+}
+
+/**
+ * Map in action dispatchable action creators from the store.
+ */
+function mapDispatchToProps(dispatch): IReduxDispatch {
+    const { getKbNavigation } = thunks;
+    const { resetNavigation, navigateToCategory } = actions;
+    return bindActionCreators({ getKbNavigation, resetNavigation, navigateToCategory }, dispatch);
+}
+
+const withRedux = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(FolderContents);

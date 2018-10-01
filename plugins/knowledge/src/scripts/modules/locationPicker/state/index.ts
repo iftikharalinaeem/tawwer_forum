@@ -1,5 +1,5 @@
 /**
- * A barrel file for the editor state.
+ * A barrel file for the location picker state.
  *
  * Everything inside of this barrel should use relative paths.
  * Everything outside should use the barrel.
@@ -15,4 +15,5 @@ import reducer from "./reducer";
 import * as model from "./model";
 import * as thunks from "./thunks";
 
+export * from "./types";
 export { actions, thunks, constants, reducer, model };

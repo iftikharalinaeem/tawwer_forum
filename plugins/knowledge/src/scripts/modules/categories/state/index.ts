@@ -1,5 +1,5 @@
 /**
- * A barrel file for the editor state.
+ * A barrel file for the category state.
  *
  * Everything inside of this barrel should use relative paths.
  * Everything outside should use the barrel.
@@ -9,10 +9,9 @@
  * @license Proprietary
  */
 
-import * as actions from "./actions";
 import * as constants from "./constants";
 import reducer from "./reducer";
 import * as model from "./model";
-import * as thunks from "./thunks";
 
-export { actions, thunks, constants, reducer, model };
+export * from "./types";
+export { constants, reducer, model };
