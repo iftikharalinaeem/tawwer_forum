@@ -1,0 +1,26 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$modal-bgColor: $global-color_white !default;
+$modal-large_width: 720px;
+$modal-medium_width: 516px;
+$modal-small_width: 375px;
+$modal-border_radius: $global-borderRadius;
+
+
+.frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.frameHeader {}
+
+.frameBody {}
+
+.framePanel {}
+.frameFooter {}

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IKbCategoriesState } from "./IKbCategiesState";
+import { IKbCategoriesState } from "./types";
 import { dummyData } from "./dummyData";
 
 export default function categoriesReducer(state: IKbCategoriesState = dummyData, action: any): IKbCategoriesState {

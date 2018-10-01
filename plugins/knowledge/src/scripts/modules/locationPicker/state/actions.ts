@@ -17,7 +17,7 @@ export const getKbNavigationActions = generateApiActionCreators(
     {} as IKbNavigationRequest,
 );
 
-export function clearPageState() {
+export function resetNavigation() {
     return createAction(constants.RESET_NAVIGATION);
 }
 
@@ -27,5 +27,5 @@ export function navigateToCategory(categoryID: number) {
 
 export type ActionTypes =
     | ActionsUnion<typeof getKbNavigationActions>
-    | ReturnType<typeof clearPageState>
+    | ReturnType<typeof resetNavigation>
     | ReturnType<typeof navigateToCategory>;

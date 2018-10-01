@@ -10,5 +10,4 @@ export const GET_KB_NAVIGATION_RESPONSE = "@@locationPicker/GET_KB_NAVIGATION_RE
 export const GET_KB_NAVIGATION_ERROR = "@@locationPicker/GET_KB_NAVIGATION_ERROR";
 
 export const NAVIGATE_TO_CATEGORY = "@@locationPicker/NAVIGATE_TO_CATEGORY";
-
 export const RESET_NAVIGATION = "@@locationPicker/RESET_NAVIGATION";

@@ -6,8 +6,6 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
-import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import Modal from "@knowledge/components/Modal";
 import Frame from "@library/components/frame/Frame";
@@ -19,6 +17,7 @@ import FramePanel from "@library/components/frame/FramePanel";
 import NewFolder from "@knowledge/components/locationPicker/NewFolder";
 import { newFolder } from "@library/components/Icons";
 import FolderContents from "@knowledge/components/locationPicker/FolderContents";
+import { ModalSizes } from "@knowledge/components/Modal";
 
 interface IProps {
     exitHandler: () => void;
@@ -51,17 +50,18 @@ export default class LocationPicker extends React.Component<IProps, IState> {
     public render() {
         return (
             <React.Fragment>
-                <Modal className={classNames(this.props.className)} description={t("Choose a location for this page.")}>
+                <Modal
+                    size={ModalSizes.SMALL}
+                    className={classNames(this.props.className)}
+                    description={t("Choose a location for this page.")}
+                >
                     <Frame>
                         <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                             {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                         </FrameHeader>
                         <FrameBody>
                             <FramePanel>
-                                <FolderContents
-                                    children={this.props.children}
-                                    currentFolderData={this.props.selectedCategory}
-                                />
+                                <FolderContents initialCategoryID={1} />
                             </FramePanel>
                         </FrameBody>
                         <FrameFooter>

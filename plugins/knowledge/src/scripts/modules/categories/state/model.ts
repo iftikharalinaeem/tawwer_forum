@@ -21,7 +21,7 @@ export function getKbCategoryMixedRecord(state: IStoreState, id: string): IKbCat
 }
 
 export function getKbCategoryBreadcrumb(state: IStoreState, id: number): IKbCategoryFragment[] {
-    let crumbs: IKbCategoryFragment[] = [];
+    const crumbs: IKbCategoryFragment[] = [];
     let complete = false;
     let lookupID = id;
 
