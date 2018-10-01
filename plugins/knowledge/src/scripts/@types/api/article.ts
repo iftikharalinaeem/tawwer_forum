@@ -45,6 +45,7 @@ export interface IPostArticleResponseBody extends IArticle {}
 export interface IGetArticleResponseBody extends IArticle {}
 
 export interface IArticleFragment {
+    articleID: number;
     name: string; //The title of the article
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
