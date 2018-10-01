@@ -48,42 +48,42 @@ export default class ArticleMenu extends React.PureComponent<IProps, IState> {
         const publishedMeta = [
             {
                 type: InlineTypes.TEXT,
-                contents: "Published ",
+                children: "Published ",
             },
             {
                 type: InlineTypes.DATETIME,
                 timeStamp: "2017-05-20 10:00",
-                contents: "20th May, 2018 10:00 AM",
+                children: "20th May, 2018 10:00 AM",
             },
             {
                 type: InlineTypes.TEXT,
-                contents: t(" by "),
+                children: t(" by "),
             },
             {
                 type: InlineTypes.LINK,
                 to: "#user/Todd_Burry",
-                contents: "Todd Burry",
+                children: "Todd Burry",
             },
         ];
 
         const updatedMeta = [
             {
                 type: InlineTypes.TEXT,
-                contents: "Updated ",
+                children: "Updated ",
             },
             {
                 type: InlineTypes.DATETIME,
                 timeStamp: "2017-05-20 10:00",
-                contents: "20th May, 2018 10:00 AM",
+                children: "20th May, 2018 10:00 AM",
             },
             {
                 type: InlineTypes.TEXT,
-                contents: t(" by "),
+                children: t(" by "),
             },
             {
                 type: InlineTypes.LINK,
                 to: "#user/Todd_Burry",
-                contents: "Todd Burry",
+                children: "Todd Burry",
             },
         ];
 
@@ -93,8 +93,8 @@ export default class ArticleMenu extends React.PureComponent<IProps, IState> {
                 name={this.props.name!}
                 className={classNames("articlePage-options", this.props.className)}
             >
-                <DropDownItemMetas contents={publishedMeta} />
-                <DropDownItemMetas contents={updatedMeta} />
+                <DropDownItemMetas>{publishedMeta}</DropDownItemMetas>
+                <DropDownItemMetas>{updatedMeta}</DropDownItemMetas>
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />

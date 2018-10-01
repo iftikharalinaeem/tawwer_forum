@@ -29,7 +29,8 @@ export default class Heading extends React.Component<IHeadingProps> {
 
     public render() {
         const Tag = `h${this.props.depth}`;
-        const contents = "title" in this.props ? this.props.title : this.props.children;
+        const stringTitle = "title" in this.props ? this.props.title : this.props.children;
+        const componentTitle = "children" in this.props ? this.props.children : null;
 
         return (
             <Tag
@@ -40,7 +41,7 @@ export default class Heading extends React.Component<IHeadingProps> {
                     this.props.className,
                 )}
             >
-                {contents}
+                {stringTitle || componentTitle}
             </Tag>
         );
     }

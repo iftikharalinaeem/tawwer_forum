@@ -15,24 +15,29 @@ import FrameHeader from "@library/components/frame/FrameHeader";
 import FrameBody from "@library/components/frame/FrameBody";
 import FrameFooter from "@library/components/frame/FrameFooter";
 import Button from "@dashboard/components/forms/Button";
+import FramePanel from "@library/components/frame/FramePanel";
+import NewFolder from "@knowledge/components/locationPicker/NewFolder";
 
 interface IProps {
-    hideLocationChooser: () => void;
-    title: string | JSX.Element;
+    dismissFunction: () => void;
     className?: string;
 }
 
 interface IState {
-    selectedCategory?: object;
+    selectedCategory?: any;
+    showNewFolderModal: boolean;
 }
 
 /**
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class LocationPicker extends React.Component<IProps> {
+export default class LocationPicker extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
+        this.state = {
+            showNewFolderModal: false,
+        };
     }
 
     public tempClick = () => {
@@ -40,24 +45,49 @@ export default class LocationPicker extends React.Component<IProps> {
     };
 
     public render() {
-        // noinspection HtmlDeprecatedTag
         return (
-            <Modal className={classNames(this.props.className)}>
-                <Frame>
-                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.hideLocationChooser}>
-                        {t("New Category")}
-                    </FrameHeader>
-                    <FrameBody>
-                        <p>{t("in panel")}</p>
-                        <p>{t("in panel")}</p>
-                        <p>{t("in panel")}</p>
-                        <p>{t("in panel")}</p>
-                    </FrameBody>
-                    <FrameFooter>
-                        <Button>{t("Choose")}</Button>
-                    </FrameFooter>
-                </Frame>
-            </Modal>
+            <React.Fragment>
+                <Modal className={classNames(this.props.className)}>
+                    <Frame>
+                        <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.dismissFunction}>
+                            {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
+                        </FrameHeader>
+                        <FrameBody>
+                            <FramePanel>{t("body")}</FramePanel>
+                        </FrameBody>
+                        <FrameFooter>
+                            <Button
+                                disabled={!!this.state.selectedCategory}
+                                className="locationPicker-validate"
+                                onClick={this.tempClick}
+                            >
+                                {t("Choose")}
+                            </Button>
+                            <Button
+                                title={t("New Folder")}
+                                className="locationPicker-newFolder"
+                                onClick={this.showNewFolderModal}
+                            >
+                                {t("Choose")}
+                            </Button>
+                        </FrameFooter>
+                    </Frame>
+                </Modal>
+                // Second modal level
+                {!!this.state.selectedCategory && <NewFolder dismissFunction={this.hideNewFolderModal} />}
+            </React.Fragment>
         );
     }
+
+    private showNewFolderModal = () => {
+        this.setState({
+            showNewFolderModal: true,
+        });
+    };
+
+    private hideNewFolderModal = () => {
+        this.setState({
+            showNewFolderModal: false,
+        });
+    };
 }

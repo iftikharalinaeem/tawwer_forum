@@ -10,15 +10,15 @@ import classNames from "classnames";
 import { IBreadcrumbsProps } from "../Breadcrumbs";
 import { getRequiredID } from "@library/componentIDs";
 import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
+import Button from "@dashboard/components/forms/Button";
 
 interface IProps extends IBreadcrumbsProps {
-    name: string;
     displayType?: string;
-    isSection: boolean;
-    url: string;
-    parentID: number;
-    recordID: number;
-    recordType: string;
+    isSection?: boolean;
+    url?: string;
+    parentID?: number;
+    recordID?: number;
+    recordType?: string;
 }
 
 interface IState {
@@ -79,7 +79,7 @@ export default class PageLocation extends React.Component<IProps, IState> {
                     <span className="pageLocation-label" aria-hidden={true}>
                         {t("To:")}
                     </span>
-                    <button
+                    <Button
                         title={crumbTitle}
                         type="button"
                         aria-label={t("Article Location:")}
@@ -87,14 +87,10 @@ export default class PageLocation extends React.Component<IProps, IState> {
                         onClick={this.showLocationChooser}
                     >
                         {content}
-                    </button>
+                    </Button>
                 </div>
                 {/*{this.state.showLocationChooser && */}
-                <LocationPicker
-                    {...this.props}
-                    title={this.props.name}
-                    hideLocationChooser={this.hideLocationChooser}
-                />
+                <LocationPicker {...this.props} dismissFunction={this.hideLocationChooser} />
             </React.Fragment>
         );
     }
