@@ -17,6 +17,7 @@ import FrameFooter from "@library/components/frame/FrameFooter";
 import Button from "@dashboard/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import NewFolder from "@knowledge/components/locationPicker/NewFolder";
+import { newFolder } from "@library/components/Icons";
 
 interface IProps {
     exitHandler: () => void;
@@ -47,7 +48,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
     public render() {
         return (
             <React.Fragment>
-                <Modal className={classNames(this.props.className)}>
+                <Modal className={classNames(this.props.className)} description={t("Choose a location for this page.")}>
                     <Frame>
                         <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                             {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
@@ -68,12 +69,12 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                                 className="locationPicker-newFolder"
                                 onClick={this.showNewFolderModal}
                             >
-                                {t("Choose")}
+                                {newFolder()}
                             </Button>
                         </FrameFooter>
                     </Frame>
                 </Modal>
-                {!!this.state.selectedCategory && <NewFolder exitHandler={this.hideNewFolderModal} />}
+                {!!this.state.showNewFolderModal && <NewFolder exitHandler={this.hideNewFolderModal} />}
             </React.Fragment>
         );
     }
