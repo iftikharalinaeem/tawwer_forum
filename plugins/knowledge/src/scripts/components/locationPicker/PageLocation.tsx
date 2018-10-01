@@ -8,22 +8,12 @@ import * as React from "react";
 import { t } from "@library/application";
 import classNames from "classnames";
 import { IBreadcrumbsProps } from "../Breadcrumbs";
-import { getRequiredID } from "@library/componentIDs";
 import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
 import Button from "@dashboard/components/forms/Button";
+import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
+import LocationBreadcrumbs from "@knowledge/components/locationPicker/LocationBreadcrumbs";
 
-interface IPageLocation extends IBreadcrumbsProps {
-    displayType?: string;
-    isSection?: boolean;
-    url?: string;
-    parentID?: number;
-    recordID?: number;
-    recordType?: string;
-    name: string;
-}
-
-interface IProps {
-    children: IPageLocation[];
+interface IProps extends ILocationPickerProps {
     className?: string;
 }
 
@@ -35,7 +25,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class PageLocation extends React.Component<IProps, IState> {
+export class PageLocation extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -44,40 +34,10 @@ export default class PageLocation extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const accessibleCrumbSeparator = `/`;
-        let content;
-        let crumbTitle;
+        const { locationBreadcrumb } = this.props;
 
-        if (this.props.children && this.props.children.length > 0) {
-            const crumbCount = this.props.children.length - 1;
-            crumbTitle = t("Page Location: ") + accessibleCrumbSeparator;
-            const crumbs = this.props.children.map((crumb, index) => {
-                const lastElement = index === crumbCount;
-                const crumbSeparator = `›`;
-                crumbTitle += crumb.name;
-                if (!lastElement) {
-                    crumbTitle += accessibleCrumbSeparator;
-                }
-                return (
-                    <React.Fragment key={`locationBreadcrumb-${index}`}>
-                        <span className="breadcrumb-link">{crumb.name}</span>
-                        {!lastElement && (
-                            <span className="breadcrumb-item breadcrumbs-separator">
-                                <span aria-hidden={true} className="breadcrumbs-separatorIcon">
-                                    {crumbSeparator}
-                                </span>
-                                <span className="sr-only">{accessibleCrumbSeparator}</span>
-                            </span>
-                        )}
-                    </React.Fragment>
-                );
-            });
-
-            content = <span className="breadcrumbs">{crumbs}</span>;
-        } else {
-            content = t("Set Page Location");
-            crumbTitle = content;
-        }
+        const content = <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />;
+        const crumbTitle = LocationBreadcrumbs.renderString(locationBreadcrumb);
 
         return (
             <React.Fragment>
@@ -103,6 +63,7 @@ export default class PageLocation extends React.Component<IProps, IState> {
     }
 
     private showLocationChooser = () => {
+        this.props.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
             showLocationChooser: true,
         });
@@ -114,3 +75,5 @@ export default class PageLocation extends React.Component<IProps, IState> {
         });
     };
 }
+
+export default withLocationPicker(PageLocation);

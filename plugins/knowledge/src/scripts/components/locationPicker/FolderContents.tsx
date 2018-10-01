@@ -38,10 +38,11 @@ export class FolderContents extends React.Component<IProps, IState> {
     public render() {
         const { locationBreadcrumb, currentFolderItems } = this.props;
         const currentCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
-        const contents = currentFolderItems.map(item => {
+        const contents = currentFolderItems.map((item, index) => {
             const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
             return (
                 <NavigationItem
+                    key={index}
                     isInitialSelection={false}
                     isSelected={isSelected}
                     name={this.radioName}
