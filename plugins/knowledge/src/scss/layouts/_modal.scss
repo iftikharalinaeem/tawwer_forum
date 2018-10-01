@@ -7,17 +7,11 @@ $modal-border_radius: $global-borderRadius;
 
 .modal {
     position: relative;
-    max-width: 100%;
     max-height: 100%;
-    overflow: auto;
-    background-color: $modal-bgColor;
-    box-shadow: $menu_dropShadow;
+    overflow: hidden;
 
-    border: {
-        style: solid;
-        width: 1px;
-        color: $menu-border_color;
-        radius: $modal-border_radius;
+    &.isFullScreen {
+        overflow: auto;
     }
 
     &.isLarge {

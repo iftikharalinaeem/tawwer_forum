@@ -16,11 +16,53 @@ $modal-border_radius: $global-borderRadius;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
+    height: 100%;
+    max-height: calc(100vh - #{$modal_verticalMargin * 2});
+    background-color: $modal-bgColor;
+    box-shadow: $overlay-dropShadow;
+    overflow: hidden;
+    border: {
+        style: solid;
+        width: 1px;
+        color: $overlay-border_color;
+        radius: $modal-border_radius;
+    }
 }
 
-.frameHeader {}
+.frameHeader {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+}
 
-.frameBody {}
+.frameHeader-backButton {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 1;
+}
 
-.framePanel {}
-.frameFooter {}
+.frameHeader-heading {
+    flex-grow: 1;
+}
+
+.frameBody {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.framePanel {
+    position: relative;
+    height: 100%;
+    background-color: $modal-bgColor;
+    overflow: auto;
+}
+
+.frameFooter {
+    display: flex;
+    flex-wrap: wrap;
+}

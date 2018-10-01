@@ -47,7 +47,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal size={ModalSizes.FULL_SCREEN}>
+            <Modal size={ModalSizes.SMALL}>
                 <Frame>
                     <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                         {t("New Folder")}
