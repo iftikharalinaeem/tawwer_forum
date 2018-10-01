@@ -9,7 +9,7 @@ import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import Modal from "@knowledge/components/Modal";
+import Modal, {ModalSizes} from "@knowledge/components/Modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
 import { IStoreState } from "@knowledge/state/model";
@@ -51,7 +51,7 @@ export class EditorPage extends React.Component<IProps, IState> {
         );
 
         if (this.isModal) {
-            return <Modal exitHandler={this.navigateToBacklink}>{pageContent}</Modal>;
+            return <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>{pageContent}</Modal>;
         } else {
             return pageContent;
         }

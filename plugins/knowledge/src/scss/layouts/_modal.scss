@@ -1,13 +1,23 @@
 $modal-bgColor: $global-color_white !default;
+$modal-large_width: 720px;
+$modal-medium_width: 516px;
+$modal-small_width: 375px;
 
 .modal {
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: $modal-bgColor;
-    z-index: 1;
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+
+    &.isLarge {
+        width: $modal-large_width;
+    }
+
+    &.isMedium {
+        width: $modal-medium_width;
+    }
+
+    &.isSmall {
+        width: $modal-small_width;
+    }
 }
