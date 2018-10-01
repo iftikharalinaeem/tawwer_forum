@@ -462,7 +462,7 @@ class ReactionModel extends Gdn_Model {
         $iDs = [];
         $userIDs = [];
 
-        if (is_object($data) || (is_array($data) && !isset($data[0]))) {
+        if ((is_object($data) && !($data instanceof Gdn_Dataset)) || (is_array($data) && !isset($data[0]))) {
             $data2 = [&$data];
         } else {
             $data2 =& $data;
