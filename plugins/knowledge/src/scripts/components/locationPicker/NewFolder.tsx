@@ -52,7 +52,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
         return (
             <Modal>
                 <Frame>
-                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.hideNewFolderModal}>
+                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.dismissFunction}>
                         {t("New Folder")}
                     </FrameHeader>
                     <FrameBody>
@@ -79,7 +79,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
                             title={t("New Folder")}
                             className="locationPicker-newFolder"
                             onClick={this.tempClick}
-                            disabled={!this.props.valid}
+                            disabled={!this.state.valid}
                         >
                             {newFolder()}
                         </Button>

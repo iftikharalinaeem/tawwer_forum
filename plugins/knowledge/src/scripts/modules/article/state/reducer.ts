@@ -4,37 +4,35 @@
  * @license Proprietary
  */
 
-import * as pageActions from "@knowledge/pages/article/articlePageActions";
-import * as articleActions from "@knowledge/state/articleActions";
+import { model, actions, constants } from "@knowledge/modules/article/state";
 import { LoadStatus } from "@library/@types/api";
-import { IArticlePageState } from "@knowledge/@types/state";
 
-export const initialState: IArticlePageState = {
+export const initialState: model.IState = {
     status: LoadStatus.PENDING,
 };
 
 export default function articlePageReducer(
-    state: IArticlePageState = initialState,
-    action: pageActions.ActionTypes | articleActions.ActionTypes,
-): IArticlePageState {
+    state: model.IState = initialState,
+    action: actions.ActionTypes,
+): model.IState {
     switch (action.type) {
-        case articleActions.GET_ARTICLE_REQUEST:
+        case constants.GET_ARTICLE_REQUEST:
             return {
                 status: LoadStatus.LOADING,
             };
-        case articleActions.GET_ARTICLE_SUCCESS:
+        case constants.GET_ARTICLE_RESPONSE:
             return {
                 status: LoadStatus.SUCCESS,
                 data: {
                     article: action.payload.data,
                 },
             };
-        case articleActions.GET_ARTICLE_ERROR:
+        case constants.GET_ARTICLE_ERROR:
             return {
                 status: LoadStatus.ERROR,
                 error: action.payload,
             };
-        case pageActions.RESET_PAGE_STATE:
+        case constants.RESET_PAGE_STATE:
             return initialState;
         default:
             return state;
