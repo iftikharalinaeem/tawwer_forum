@@ -425,7 +425,7 @@ EOT
                 $sender->setRedirectTo('/settings/statuses');
                 $sender->setData('Status', StatusModel::instance()->getStatus($result));
             } else {
-                $this->informMessage(t('An error occurred.'));
+                $sender->informMessage(t('An error occurred.'));
             }
         } elseif ($statusID) {
             // We're about to edit, set up the data from the status.
@@ -457,7 +457,7 @@ EOT
                 $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
                 $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
             } else {
-                $this->informMessage(t('An error occurred.'));
+                $sender->informMessage(t('An error occurred.'));
             }
         }
         $sender->render('blank', 'utility', 'dashboard');
