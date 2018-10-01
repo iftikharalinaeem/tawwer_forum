@@ -72,18 +72,22 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        return ReactDOM.createPortal((
+        return ReactDOM.createPortal(
             <div className="overlay">
                 <div
                     id={this.modalID}
                     role="dialog"
                     aria-modal={true}
-                    className={classNames("modal", "inheritHeight", {
-                        isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
-                        isLarge: this.props.size === ModalSizes.LARGE,
-                        isMedium: this.props.size === ModalSizes.MEDIUM,
-                        isSmall: this.props.size === ModalSizes.SMALL,
-                    }, this.props.className)}
+                    className={classNames(
+                        "modal",
+                        {
+                            isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
+                            isLarge: this.props.size === ModalSizes.LARGE,
+                            isMedium: this.props.size === ModalSizes.MEDIUM,
+                            isSmall: this.props.size === ModalSizes.SMALL,
+                        },
+                        this.props.className,
+                    )}
                     ref={this.selfRef}
                     onKeyDown={this.handleTabbing}
                     aria-describedby={this.descriptionID}
@@ -93,8 +97,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     </div>
                     {this.props.children}
                 </div>
-            </div>
-            ),
+            </div>,
             this.props.container!,
         );
     }

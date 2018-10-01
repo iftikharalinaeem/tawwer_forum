@@ -9,7 +9,7 @@ import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import Modal, {ModalSizes} from "@knowledge/components/Modal";
+import Modal, { ModalSizes } from "@knowledge/components/Modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
 import { IStoreState } from "@knowledge/state/model";
@@ -46,12 +46,16 @@ export class EditorPage extends React.Component<IProps, IState> {
                 <EditorLayout backUrl={this.backLink}>
                     <EditorForm submitHandler={this.formSubmit} />
                 </EditorLayout>
-                {this.state.showFolderPicker && <LocationPicker exitHandler={this.hideLocationPicker} />}
+                {this.state.showFolderPicker && <LocationPicker data={{}} exitHandler={this.hideLocationPicker} />}
             </React.Fragment>
         );
 
         if (this.isModal) {
-            return <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>{pageContent}</Modal>;
+            return (
+                <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+                    {pageContent}
+                </Modal>
+            );
         } else {
             return pageContent;
         }

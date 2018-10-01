@@ -83,7 +83,7 @@ export default class PageLocation extends React.Component<IProps, IState> {
             <React.Fragment>
                 <div className={classNames("pageLocation", this.props.className)}>
                     <span className="pageLocation-label" aria-hidden={true}>
-                        {t("To:")}
+                        {t("To: ")}
                     </span>
                     <Button
                         title={crumbTitle}

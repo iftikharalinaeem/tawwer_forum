@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Modal, {ModalSizes} from "@knowledge/components/Modal";
+import Modal, { ModalSizes } from "@knowledge/components/Modal";
 import Frame from "@library/components/frame/Frame";
 import FrameHeader from "@library/components/frame/FrameHeader";
 import FrameBody from "@library/components/frame/FrameBody";
