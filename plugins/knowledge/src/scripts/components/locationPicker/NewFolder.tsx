@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Modal from "@knowledge/components/Modal";
+import Modal, {ModalSizes} from "@knowledge/components/Modal";
 import Frame from "@library/components/frame/Frame";
 import FrameHeader from "@library/components/frame/FrameHeader";
 import FrameBody from "@library/components/frame/FrameBody";
@@ -50,7 +50,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal>
+            <Modal size={ModalSizes.FULL_SCREEN}>
                 <Frame>
                     <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                         {t("New Folder")}
