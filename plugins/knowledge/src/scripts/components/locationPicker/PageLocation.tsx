@@ -62,6 +62,10 @@ export class PageLocation extends React.Component<IProps, IState> {
         );
     }
 
+    public componentWillUnmount() {
+        this.props.resetNavigation();
+    }
+
     private showLocationChooser = () => {
         this.props.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({

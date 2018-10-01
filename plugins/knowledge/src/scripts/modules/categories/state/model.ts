@@ -39,5 +39,5 @@ export function getKbCategoryBreadcrumb(state: IStoreState, id: number): IKbCate
         }
     }
 
-    return crumbs;
+    return crumbs.reverse();
 }

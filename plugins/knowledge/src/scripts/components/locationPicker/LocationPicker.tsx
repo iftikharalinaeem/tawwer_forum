@@ -51,6 +51,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Modal
+                    exitHandler={this.props.exitHandler}
                     size={ModalSizes.SMALL}
                     className={classNames(this.props.className)}
                     description={t("Choose a location for this page.")}
