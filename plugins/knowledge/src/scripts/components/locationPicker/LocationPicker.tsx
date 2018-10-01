@@ -18,10 +18,12 @@ import Button from "@dashboard/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import NewFolder from "@knowledge/components/locationPicker/NewFolder";
 import { newFolder } from "@library/components/Icons";
+import FolderContents from "@knowledge/components/locationPicker/FolderContents";
 
 interface IProps {
     exitHandler: () => void;
     className?: string;
+    data: any;
 }
 
 interface IState {
@@ -54,7 +56,12 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                             {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                         </FrameHeader>
                         <FrameBody>
-                            <FramePanel>{t("body")}</FramePanel>
+                            <FramePanel>
+                                <FolderContents
+                                    children={this.props.data.children}
+                                    currentFolderData={this.props.data.selectedCategory}
+                                />
+                            </FramePanel>
                         </FrameBody>
                         <FrameFooter>
                             <Button

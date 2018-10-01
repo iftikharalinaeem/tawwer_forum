@@ -96,7 +96,7 @@ export default class PageLocation extends React.Component<IProps, IState> {
                     </Button>
                 </div>
                 {/*{this.state.showLocationChooser && */}
-                <LocationPicker {...this.props} exitHandler={this.hideLocationChooser} />
+                <LocationPicker {...this.props} data={this.props.children} exitHandler={this.hideLocationChooser} />
             </React.Fragment>
         );
     }

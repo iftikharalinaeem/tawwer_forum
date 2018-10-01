@@ -9,8 +9,8 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
 import Button from "@dashboard/components/forms/Button";
-import {rightChevron} from "@library/components/Icons";
-import {check} from "@library/components/Icons";
+import { rightChevron } from "@library/components/Icons";
+import { check } from "@library/components/Icons";
 
 interface ICategory {
     name: string;
@@ -24,9 +24,8 @@ interface ICategory {
 }
 
 interface IProps {
-    currentFolderName: string;
+    currentFolderData: any;
     children: ICategory[];
-    initialSelection?: number;
 }
 
 interface IState {
@@ -43,7 +42,7 @@ export default class FolderContents extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             id: getRequiredID(props, "locationPicker"),
-            selectedRecordID: this.props.initialSelection,
+            selectedRecordID: this.props.currentFolderData.recordID,
         };
     }
 
@@ -56,14 +55,16 @@ export default class FolderContents extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const contents = this.props.children.map((item) => {
+        const contents = this.props.children.map(item => {
             const isSelected = !!this.state.selectedRecordID && this.state.selectedRecordID === item.recordID;
             return (
                 <li className="folderContents-item">
                     <label className="folderContents-folder">
                         <input
                             type="radio"
-                            className={classNames("folderContents-input", {initialSelection: this.props.initialSelection === this.state.selectedRecordID})}
+                            className={classNames("folderContents-input", {
+                                initialSelection: this.props.currentFolderData.recordID === this.state.selectedRecordID,
+                            })}
                             name={this.radioName}
                             value={item.recordID}
                             checked={isSelected}
@@ -74,22 +75,21 @@ export default class FolderContents extends React.Component<IProps, IState> {
                         </span>
                         <span className="dropDownRadio-label">{item.name}</span>
                     </label>
-                    {item.children && item.children.length > 0 && (
-                        <Button onClick={this.tempClick}>
-                            {rightChevron()}
-                            <span className="sr-only">{t("Sub folder")}</span>
-                        </Button>
-                    )}
+                    {item.children &&
+                        item.children.length > 0 && (
+                            <Button onClick={this.tempClick}>
+                                {rightChevron()}
+                                <span className="sr-only">{t("Sub folder")}</span>
+                            </Button>
+                        )}
                 </li>
             );
         });
 
         return (
             <fieldset className={classNames("folderContents")}>
-                <legend className="sr-only">{t("Contents of folder: " + this.props.currentFolderName)}</legend>
-                <ul className="folderContents-items">
-                    {contents}
-                </ul>
+                <legend className="sr-only">{t("Contents of folder: " + this.props.currentFolderData.name)}</legend>
+                <ul className="folderContents-items">{contents}</ul>
             </fieldset>
         );
     }
