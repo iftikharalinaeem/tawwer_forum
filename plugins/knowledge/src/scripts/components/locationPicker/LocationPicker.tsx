@@ -19,7 +19,7 @@ import FramePanel from "@library/components/frame/FramePanel";
 import NewFolder from "@knowledge/components/locationPicker/NewFolder";
 
 interface IProps {
-    dismissFunction: () => void;
+    exitHandler: () => void;
     className?: string;
 }
 
@@ -49,7 +49,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
             <React.Fragment>
                 <Modal className={classNames(this.props.className)}>
                     <Frame>
-                        <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.dismissFunction}>
+                        <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                             {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                         </FrameHeader>
                         <FrameBody>
@@ -73,8 +73,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         </FrameFooter>
                     </Frame>
                 </Modal>
-                // Second modal level
-                {!!this.state.selectedCategory && <NewFolder dismissFunction={this.hideNewFolderModal} />}
+                {!!this.state.selectedCategory && <NewFolder exitHandler={this.hideNewFolderModal} />}
             </React.Fragment>
         );
     }

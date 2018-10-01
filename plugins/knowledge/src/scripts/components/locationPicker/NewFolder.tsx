@@ -20,7 +20,7 @@ import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import { newFolder } from "@library/components/Icons";
 
 interface IProps {
-    dismissFunction: () => void;
+    exitHandler: () => void;
     className?: string;
 }
 
@@ -52,7 +52,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
         return (
             <Modal>
                 <Frame>
-                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.dismissFunction}>
+                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
                         {t("New Folder")}
                     </FrameHeader>
                     <FrameBody>
@@ -72,7 +72,7 @@ export default class NewFolder extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button className="locationPicker-validate" onClick={this.props.dismissFunction}>
+                        <Button className="locationPicker-validate" onClick={this.props.exitHandler}>
                             {t("Choose")}
                         </Button>
                         <Button
