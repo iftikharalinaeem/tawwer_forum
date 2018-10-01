@@ -47,17 +47,13 @@ export class FolderContents extends React.Component<IProps, IState> {
                     isSelected={isSelected}
                     name={this.radioName}
                     value={item}
-                    onNavigate={this.tempClick}
+                    onNavigate={() => this.props.navigateToCategory(item.recordID)}
                     onSelect={this.onChange}
                 />
             );
         });
         return <NavigationItemList categoryName={currentCategory.name}>{contents}</NavigationItemList>;
     }
-
-    private tempClick = () => {
-        alert("do click");
-    };
 
     private get radioName(): string {
         return "folders-" + this.state.id;
