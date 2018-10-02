@@ -9,7 +9,7 @@ import { bindActionCreators } from "redux";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
-import { IDeviceProps } from "@knowledge/components/DeviceChecker";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";

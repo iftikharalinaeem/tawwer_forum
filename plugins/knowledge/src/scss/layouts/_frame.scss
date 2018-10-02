@@ -12,13 +12,8 @@ $modal-border_radius: $global-borderRadius;
 
 
 .frame {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     position: relative;
-    height: 100%;
-    max-height: calc(100vh - #{$modal_verticalMargin * 2});
+    max-height: 100%;
     background-color: $modal-bgColor;
     box-shadow: $overlay-dropShadow;
     overflow: hidden;
@@ -42,7 +37,7 @@ $modal-border_radius: $global-borderRadius;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    flex-grow: 1;
+    flex-shrink: 1;
 }
 
 .frameHeader-heading {
@@ -51,8 +46,7 @@ $modal-border_radius: $global-borderRadius;
 
 .frameBody {
     position: relative;
-    flex-grow: 1;
-    overflow: hidden;
+    max-height: 100%;
 }
 
 .framePanel {

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Button from "@dashboard/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents } from "@knowledge/modules/locationPicker/components";
@@ -75,12 +75,10 @@ export class LocationPicker extends React.Component<IProps, IState> {
 
     private goBack = () => {
         const { navigateToCategory, locationBreadcrumb } = this.props;
-        console.log(locationBreadcrumb);
         if (locationBreadcrumb.length < 2) {
             return;
         }
 
-        console.log("Go back");
         const lastCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
         navigateToCategory(lastCategory.parentID);
     };

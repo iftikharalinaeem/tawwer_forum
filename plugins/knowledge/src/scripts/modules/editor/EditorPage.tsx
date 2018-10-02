@@ -9,7 +9,7 @@ import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import Modal, { ModalSizes } from "@knowledge/components/Modal";
+import Modal, { ModalSizes } from "@library/components/Modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
 import { IStoreState } from "@knowledge/state/model";

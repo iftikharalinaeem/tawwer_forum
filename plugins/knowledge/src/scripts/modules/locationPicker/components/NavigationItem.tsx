@@ -8,7 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { IKbNavigationItem } from "@knowledge/@types/api";
 import { rightChevron, check } from "@library/components/Icons";
-import Button from "@dashboard/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 
 interface IProps {
@@ -45,7 +45,7 @@ export default class NavigationItem extends React.Component<IProps> {
                 {value.recordType === "knowledgeCategory" &&
                     value.children &&
                     value.children.length > 0 && (
-                        <Button onClick={this.props.onNavigate}>
+                        <Button onClick={this.props.onNavigate} baseClass={ButtonBaseClass.ICON}>
                             {rightChevron()}
                             <span className="sr-only">{t("Sub folder")}</span>
                         </Button>

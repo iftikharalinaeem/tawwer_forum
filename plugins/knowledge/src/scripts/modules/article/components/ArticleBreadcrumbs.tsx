@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import Breadcrumbs, { ICrumb } from "@knowledge/components/Breadcrumbs";
+import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 
 interface IProps {}

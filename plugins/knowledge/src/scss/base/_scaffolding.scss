@@ -137,6 +137,13 @@ li {
   margin: 0;
 }
 
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+
 // Supported browsers only show outlines on focussed elements for keyboard users. Browsers with no support will ignore.
 //noinspection CssInvalidPseudoSelector
 :focus:not(:focus-visible) {

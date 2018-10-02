@@ -7,11 +7,12 @@
 import * as React from "react";
 import classNames from "classnames";
 import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
-import Button from "@dashboard/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
 import { t } from "@library/application";
-import Modal, { ModalSizes } from "@knowledge/components/Modal";
+import Modal, { ModalSizes } from "@library/components/Modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
@@ -45,9 +46,10 @@ export class LocationInput extends React.Component<IProps, IState> {
                     <Button
                         title={LocationBreadcrumbs.renderString(locationBreadcrumb)}
                         type="button"
-                        aria-label={t("Article Location:")}
+                        aria-label={t("Page Location:")}
                         className="pageLocation"
                         onClick={this.showLocationChooser}
+                        baseClass={ButtonBaseClass.CUSTOM}
                     >
                         <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
                     </Button>

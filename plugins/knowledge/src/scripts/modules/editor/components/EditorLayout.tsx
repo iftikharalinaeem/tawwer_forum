@@ -9,9 +9,9 @@ import { t } from "@library/application";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageHeading from "@knowledge/components/PageHeading";
+import PageHeading from "@library/componentsPageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { Devices } from "@knowledge/components/DeviceChecker";
+import { Devices } from "@library/componentsDeviceChecker";
 
 interface IProps {
     device: Devices;

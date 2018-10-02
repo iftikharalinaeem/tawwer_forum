@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Devices } from "@knowledge/components/DeviceChecker";
+import { Devices } from "@library/components/DeviceChecker";
 import classNames from "classnames";
 import CompoundComponent from "@knowledge/layouts/CompoundComponent";
 
