@@ -59,9 +59,9 @@ export class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                         <Button
                             title={t("New Category")}
-                            className="locationPicker-newFolder"
+                            className="locationPicker-newFolder isSquare"
                             onClick={this.showNewCategoryModal}
-                            baseClass={ButtonBaseClass.ICON_BORDERED}
+                            baseClass={ButtonBaseClass.STANDARD}
                         >
                             {newFolder()}
                         </Button>

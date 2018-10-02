@@ -39,9 +39,16 @@
             right: 0;
         }
     }
+
+    &.isSquare {
+        min-width: $formElement-height;
+        padding: {
+            left: $utility-baseUnit;
+            right: $utility-baseUnit;
+        }
+    }
 }
 
-.buttonIconBordered,
 .buttonIcon {
     align-items: center;
     justify-content: center;
@@ -58,14 +65,6 @@
         height: $icon-default_size;
         width: $icon-default_size;
         min-width: $icon-default_size;
-    }
-}
-
-.buttonIconBordered {
-    border: {
-        width: $formElement_borderWidth;
-        radius: $global-button_radius;
-        style: solid;
     }
 }
 
