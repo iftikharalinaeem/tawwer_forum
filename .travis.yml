@@ -25,6 +25,8 @@ jobs:
       script:
           - ./vendor/bin/phpunit --exclude-group=large
           - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
+      env:
+          - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
   # Frontend JS Job
     - name: JS Build & Test
       language: node_js
