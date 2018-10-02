@@ -38,9 +38,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         return (
             <Modal size={ModalSizes.SMALL}>
                 <Frame>
-                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.exitHandler}>
-                        {t("New Folder")}
-                    </FrameHeader>
+                    <FrameHeader closeFrame={this.props.exitHandler}>{t("New Folder")}</FrameHeader>
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock
@@ -59,15 +57,15 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                     </FrameBody>
                     <FrameFooter>
                         <Button className="locationPicker-validate" onClick={this.props.exitHandler}>
-                            {t("Choose")}
+                            {t("Cancel")}
                         </Button>
                         <Button
                             title={t("New Folder")}
-                            className="locationPicker-newFolder"
+                            className="locationPicker-newFolder buttonPrimary"
                             onClick={this.tempClick}
                             disabled={!this.state.valid}
                         >
-                            {newFolder()}
+                            {t("Save")}
                         </Button>
                     </FrameFooter>
                 </Frame>

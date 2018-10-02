@@ -41,15 +41,15 @@ export class LocationPicker extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Frame>
-                    <FrameHeader onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
+                    <FrameHeader className="isShadowed" onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
                         {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                     </FrameHeader>
-                    <FrameBody>
+                    <FrameBody className="isSelfPadded">
                         <FramePanel>
                             <LocationContents initialCategoryID={1} />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
+                    <FrameFooter className="isShadowed">
                         <Button
                             disabled={!!this.state.selectedCategory}
                             className="button-pushLeft"
