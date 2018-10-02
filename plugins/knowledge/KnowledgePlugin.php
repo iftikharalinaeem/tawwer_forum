@@ -92,6 +92,7 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
             ->column("lastUpdatedArticleID", "int", true)
+            ->column("lastUpdatedUserID", "int", true)
             ->column("articleCount", "int", "0")
             ->column("articleCountRecursive", "int", "0")
             ->column("childCategoryCount", "int", "0")
