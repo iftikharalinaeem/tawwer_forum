@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state/context";
+import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
 import NavigationItem from "./NavigationItem";
 import NavigationItemList from "./NavigationItemList";
 
@@ -39,7 +39,7 @@ export class LocationContents extends React.Component<IProps, IState> {
         const contents = currentFolderItems.map((item, index) => {
             const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
             const navigateCallback = () => this.props.navigateToCategory(item.recordID);
-            const selectCallback = () => this.props.navigateToCategory(item.recordID);
+            const selectCallback = () => this.props.setCategory(item.recordID);
             return (
                 <NavigationItem
                     key={index}
@@ -58,13 +58,6 @@ export class LocationContents extends React.Component<IProps, IState> {
     private get radioName(): string {
         return "folders-" + this.state.id;
     }
-
-    private onChange = e => {
-        console.log(e.currentTarget.value);
-        this.setState({
-            selectedRecordID: e.currentTarget.value,
-        });
-    };
 }
 
 export default withLocationPicker<IProps>(LocationContents);

@@ -10,9 +10,10 @@ import Button from "@dashboard/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents } from "@knowledge/modules/locationPicker/components";
+import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
 import NewFolderForm from "@knowledge/modules/locationPicker/components/NewFolderForm";
 
-interface IProps {
+interface IProps extends ILocationPickerProps {
     className?: string;
     onCloseClick: () => void;
 }
@@ -26,7 +27,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class LocationPicker extends React.Component<IProps, IState> {
+export class LocationPicker extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -42,7 +43,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Frame>
-                    <FrameHeader onBackClick={this.tempClick} closeFrame={this.props.onCloseClick}>
+                    <FrameHeader onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
                         {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                     </FrameHeader>
                     <FrameBody>
@@ -72,6 +73,18 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         );
     }
 
+    private goBack = () => {
+        const { navigateToCategory, locationBreadcrumb } = this.props;
+        console.log(locationBreadcrumb);
+        if (locationBreadcrumb.length < 2) {
+            return;
+        }
+
+        console.log("Go back");
+        const lastCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
+        navigateToCategory(lastCategory.parentID);
+    };
+
     private showNewFolderModal = () => {
         this.setState({
             showNewFolderModal: true,
@@ -84,3 +97,5 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         });
     };
 }
+
+export default withLocationPicker(LocationPicker);

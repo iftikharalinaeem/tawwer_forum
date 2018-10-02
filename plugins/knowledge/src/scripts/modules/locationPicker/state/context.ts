@@ -21,7 +21,8 @@ interface IStateProps {
 interface IDispatchProps {
     getKbNavigation: typeof thunks.getKbNavigation;
     resetNavigation: typeof actions.resetNavigation;
-    navigateToCategory: typeof actions.navigateToCategory;
+    navigateToCategory: typeof thunks.navigateToCategory;
+    setCategory: typeof actions.setCategory;
 }
 
 export interface ILocationPickerProps extends IStateProps, IDispatchProps {}
@@ -41,9 +42,9 @@ function mapStateToProps(state: IStoreState): IStateProps {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch): IDispatchProps {
-    const { getKbNavigation } = thunks;
-    const { resetNavigation, navigateToCategory } = actions;
-    return bindActionCreators({ getKbNavigation, resetNavigation, navigateToCategory }, dispatch);
+    const { getKbNavigation, navigateToCategory } = thunks;
+    const { resetNavigation, setCategory } = actions;
+    return bindActionCreators({ getKbNavigation, resetNavigation, setCategory, navigateToCategory }, dispatch);
 }
 
 export const withLocationPicker = connect(
