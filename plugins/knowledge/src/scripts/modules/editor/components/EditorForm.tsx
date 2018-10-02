@@ -64,19 +64,41 @@ export default class EditorForm extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Handle prop changes on the form.
+     *
+     * - If the revision changes from non successful to successful, initialize the form with values from that revision.
+     *
+     * @inheritdoc
+     */
     public componentDidUpdate(oldProps: IProps) {
         const oldRevision = oldProps.revision;
         const revision = this.props.revision;
         if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
-            this.editorRef.current!.setEditorContent(JSON.parse(revision.data.body));
-            this.setState({ name: revision.data.name });
+            this.initFormFromRevision(revision.data);
         }
     }
 
+    /**
+     * Use a revision to initialize form values.
+     *
+     * @param revision - The revision to pull data from.
+     */
+    private initFormFromRevision(revision: IArticleRevision) {
+        this.editorRef.current!.setEditorContent(JSON.parse(revision.body));
+        this.setState({ name: revision.name });
+    }
+
+    /**
+     * Change handler for the editor.
+     */
     private editorChangeHandler = (content: DeltaOperation[]) => {
         this.setState({ body: content });
     };
 
+    /**
+     * Change handler for the title
+     */
     private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.setState({ name: event.target.value });
     };
