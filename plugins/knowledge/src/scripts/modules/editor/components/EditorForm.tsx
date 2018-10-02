@@ -11,6 +11,7 @@ import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
 import { IArticleRevision } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
+import Button from "@library/components/forms/Button";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
@@ -32,6 +33,9 @@ export default class EditorForm extends React.Component<IProps, IState> {
     };
     private editorRef: React.RefObject<Editor> = React.createRef();
 
+    /**
+     * @inheritdoc
+     */
     public render() {
         const editorID = uniqueId();
         const editorDescriptionId = "editorDescription-" + editorID;
@@ -58,7 +62,9 @@ export default class EditorForm extends React.Component<IProps, IState> {
                             legacyMode={false}
                         />
                     </div>
-                    <button type="submit">{t("Submit")}</button>
+                    <Button disabled={!this.canSubmit} type="submit">
+                        {t("Submit")}
+                    </Button>
                 </form>
             </div>
         );
@@ -77,6 +83,19 @@ export default class EditorForm extends React.Component<IProps, IState> {
         if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
             this.initFormFromRevision(revision.data);
         }
+    }
+
+    private get canSubmit(): boolean {
+        if (!this.editorRef.current) {
+            return false;
+        }
+        const minTitleLength = 1;
+        const minBodyLength = 1;
+
+        const title = this.state.name;
+        const body = this.editorRef.current.getEditorText();
+
+        return title.length >= minTitleLength && body.length >= minBodyLength;
     }
 
     /**
