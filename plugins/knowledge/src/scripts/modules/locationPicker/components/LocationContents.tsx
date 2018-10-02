@@ -7,7 +7,7 @@
 import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
-import NavigationItem from "./NavigationItem";
+import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
 
 interface IOwnProps {
@@ -40,7 +40,7 @@ export class LocationContents extends React.Component<IProps, IState> {
             const navigateCallback = () => this.props.navigateToCategory(item.recordID);
             const selectCallback = () => this.props.setCategory(item.recordID);
             return (
-                <NavigationItem
+                <NavigationItemCategory
                     key={index}
                     isInitialSelection={false}
                     isSelected={isSelected}

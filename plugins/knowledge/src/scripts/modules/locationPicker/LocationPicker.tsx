@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
@@ -52,7 +52,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
                     <FrameFooter>
                         <Button
                             disabled={!!this.state.selectedCategory}
-                            className="locationPicker-validate"
+                            className="button-pushLeft"
                             onClick={this.tempClick}
                         >
                             {t("Choose")}
@@ -61,6 +61,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
                             title={t("New Category")}
                             className="locationPicker-newFolder"
                             onClick={this.showNewCategoryModal}
+                            baseClass={ButtonBaseClass.ICON_BORDERED}
                         >
                             {newFolder()}
                         </Button>
