@@ -27,7 +27,6 @@ interface IProps extends IOwnProps {
     clearPageState: () => void;
     initPageFromLocation: typeof thunks.initPageFromLocation;
     submitNewRevision: typeof thunks.submitNewRevision;
-    data: any; // temp
 }
 
 interface IState {
@@ -45,9 +44,9 @@ export class EditorPage extends React.Component<IProps, IState> {
     public render() {
         const pageContent = (
             <React.Fragment>
-                <LocationInput children={this.props.data} />
+                <LocationInput />
                 <EditorLayout backUrl={this.backLink}>
-                    <EditorForm submitHandler={this.formSubmit} />
+                    <EditorForm submitHandler={this.formSubmit} revision={this.props.pageState.revision} />
                 </EditorLayout>
             </React.Fragment>
         );

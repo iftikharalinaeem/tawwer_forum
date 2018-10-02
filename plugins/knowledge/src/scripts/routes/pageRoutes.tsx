@@ -40,8 +40,8 @@ const HomePage = Loadable({
  */
 export function getPageRoutes() {
     return [
-        <Route exact path="/kb" component={HomePage} />,
-        <Route path={articleConstants.ARTICLE_ROUTE} component={ArticlePage} />,
-        <Route path={ADD_EDIT_ROUTE} component={EditorPage} />,
+        <Route exact path="/kb" component={HomePage} key={"/kb"} />,
+        <Route path={articleConstants.ARTICLE_ROUTE} component={ArticlePage} key={articleConstants.ARTICLE_ROUTE} />,
+        <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
     ];
 }

@@ -24,5 +24,5 @@ const ModalEditorPage = Loadable({
  * <React.Fragment> does not currently work
  */
 export function getModalRoutes(): JSX.Element[] {
-    return [<Route path={ADD_EDIT_ROUTE} component={ModalEditorPage} />];
+    return [<Route path={ADD_EDIT_ROUTE} component={ModalEditorPage} key={ADD_EDIT_ROUTE} />];
 }

@@ -9,17 +9,28 @@ import uniqueId from "lodash/uniqueId";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
+import { IArticleRevision } from "@knowledge/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
+    revision: ILoadable<IArticleRevision>;
+}
+
+interface IState {
+    name: string;
+    body: DeltaOperation[];
 }
 
 /**
  * Form for the editor page.
  */
-export default class EditorForm extends React.Component<IProps> {
-    private editor: React.RefObject<Editor> = React.createRef();
-    private title: React.RefObject<HTMLInputElement> = React.createRef();
+export default class EditorForm extends React.Component<IProps, IState> {
+    public state = {
+        name: "",
+        body: [],
+    };
+    private editorRef: React.RefObject<Editor> = React.createRef();
 
     public render() {
         const editorID = uniqueId();
@@ -30,18 +41,20 @@ export default class EditorForm extends React.Component<IProps> {
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
                     <div className="inputBlock">
                         <input
-                            ref={this.title}
                             className="inputBlock-inputText inputText"
                             type="text"
                             placeholder={t("Title")}
+                            value={this.state.name}
+                            onChange={this.titleChangeHandler}
                         />
                     </div>
                     <div className="richEditor inheritHeight">
                         <Editor
-                            ref={this.editor}
+                            ref={this.editorRef}
                             editorID={editorID}
                             editorDescriptionID={editorDescriptionId}
                             isPrimaryEditor={true}
+                            onChange={this.editorChangeHandler}
                             legacyMode={false}
                         />
                     </div>
@@ -51,13 +64,28 @@ export default class EditorForm extends React.Component<IProps> {
         );
     }
 
+    public componentDidUpdate(oldProps: IProps) {
+        const oldRevision = oldProps.revision;
+        const revision = this.props.revision;
+        if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
+            this.editorRef.current!.setEditorContent(JSON.parse(revision.data.body));
+            this.setState({ name: revision.data.name });
+        }
+    }
+
+    private editorChangeHandler = (content: DeltaOperation[]) => {
+        this.setState({ body: content });
+    };
+
+    private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ name: event.target.value });
+    };
+
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        const content = this.editor.current!.getEditorContent()!;
-        const title = this.title.current!.value;
-        this.props.submitHandler(content, title);
+        this.props.submitHandler(this.state.body, this.state.name);
     };
 }
