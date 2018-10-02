@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import React from "react";
 import { LoadStatus } from "@library/@types/api";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { model, thunks, actions } from "@knowledge/modules/locationPicker/state";
@@ -32,7 +31,7 @@ export interface ILocationPickerProps extends IStateProps, IDispatchProps {}
  */
 function mapStateToProps(state: IStoreState): IStateProps {
     return {
-        locationBreadcrumb: model.getCurrentLocationBreadcrumb(state),
+        locationBreadcrumb: model.selectCurrentLocationBreadcrumb(state),
         currentFolderItems: state.knowledge.locationPicker.currentFolderItems,
         status: state.knowledge.locationPicker.status,
     };

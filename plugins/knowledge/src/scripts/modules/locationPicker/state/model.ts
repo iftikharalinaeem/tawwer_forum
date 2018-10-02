@@ -13,7 +13,7 @@ import { IStoreState } from "@knowledge/state/model";
  *
  * @param state - The current top level redux state.
  */
-export function getCurrentLocationBreadcrumb(state: IStoreState): IKbCategoryFragment[] {
+export function selectCurrentLocationBreadcrumb(state: IStoreState): IKbCategoryFragment[] {
     const { locationPicker } = state.knowledge;
-    return categoryModel.getKbCategoryBreadcrumb(state, locationPicker.currentCategoryID);
+    return categoryModel.selectKbCategoryBreadcrumb(state, locationPicker.currentCategoryID);
 }
