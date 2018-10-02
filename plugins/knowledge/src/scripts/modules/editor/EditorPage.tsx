@@ -15,7 +15,7 @@ import { thunks, actions, model, constants } from "@knowledge/modules/editor/sta
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
-import PageLocation from "@knowledge/modules/locationPicker/PageLocation";
+import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -45,7 +45,7 @@ export class EditorPage extends React.Component<IProps, IState> {
     public render() {
         const pageContent = (
             <React.Fragment>
-                <PageLocation children={this.props.data} />
+                <LocationInput children={this.props.data} />
                 <EditorLayout backUrl={this.backLink}>
                     <EditorForm submitHandler={this.formSubmit} />
                 </EditorLayout>

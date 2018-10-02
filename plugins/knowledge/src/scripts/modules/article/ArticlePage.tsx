@@ -16,7 +16,6 @@ import NotFoundPage from "@library/components/NotFoundPage";
 import { actions, thunks, model } from "@knowledge/modules/article/state";
 import { ArticleLayout } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
-import { t } from "@library/application";
 import ArticleMenu from "@knowledge/pages/article/components/ArticleMenu";
 
 interface IProps extends IDeviceProps {

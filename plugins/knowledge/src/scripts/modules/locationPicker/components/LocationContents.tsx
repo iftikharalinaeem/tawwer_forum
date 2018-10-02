@@ -25,7 +25,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export class FolderContents extends React.Component<IProps, IState> {
+export class LocationContents extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -39,6 +39,7 @@ export class FolderContents extends React.Component<IProps, IState> {
         const contents = currentFolderItems.map((item, index) => {
             const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
             const navigateCallback = () => this.props.navigateToCategory(item.recordID);
+            const selectCallback = () => this.props.navigateToCategory(item.recordID);
             return (
                 <NavigationItem
                     key={index}
@@ -47,7 +48,7 @@ export class FolderContents extends React.Component<IProps, IState> {
                     name={this.radioName}
                     value={item}
                     onNavigate={navigateCallback}
-                    onSelect={this.onChange}
+                    onSelect={selectCallback}
                 />
             );
         });
@@ -59,10 +60,11 @@ export class FolderContents extends React.Component<IProps, IState> {
     }
 
     private onChange = e => {
+        console.log(e.currentTarget.value);
         this.setState({
             selectedRecordID: e.currentTarget.value,
         });
     };
 }
 
-export default withLocationPicker<IProps>(FolderContents);
+export default withLocationPicker<IProps>(LocationContents);

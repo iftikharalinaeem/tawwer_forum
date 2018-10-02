@@ -6,10 +6,12 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { LocationPicker, LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
+import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
 import Button from "@dashboard/components/forms/Button";
 import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
 import { t } from "@library/application";
+import Modal, { ModalSizes } from "@knowledge/components/Modal";
+import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
@@ -23,7 +25,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export class PageLocation extends React.Component<IProps, IState> {
+export class LocationInput extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -50,7 +52,16 @@ export class PageLocation extends React.Component<IProps, IState> {
                         <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
                     </Button>
                 </div>
-                {this.state.showLocationChooser && <LocationPicker exitHandler={this.hideLocationChooser} />}
+                {this.state.showLocationChooser && (
+                    <Modal
+                        exitHandler={this.hideLocationChooser}
+                        size={ModalSizes.SMALL}
+                        className={classNames(this.props.className)}
+                        description={t("Choose a location for this page.")}
+                    >
+                        <LocationPicker onCloseClick={this.hideLocationChooser} />
+                    </Modal>
+                )}
             </React.Fragment>
         );
     }
@@ -73,4 +84,4 @@ export class PageLocation extends React.Component<IProps, IState> {
     };
 }
 
-export default withLocationPicker(PageLocation);
+export default withLocationPicker(LocationInput);

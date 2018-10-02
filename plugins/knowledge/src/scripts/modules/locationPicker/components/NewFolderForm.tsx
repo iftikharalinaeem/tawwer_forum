@@ -7,14 +7,11 @@
 import * as React from "react";
 import { t } from "@library/application";
 import Modal, { ModalSizes } from "@knowledge/components/Modal";
-import Frame from "@library/components/frame/Frame";
-import FrameHeader from "@library/components/frame/FrameHeader";
-import FrameBody from "@library/components/frame/FrameBody";
-import FrameFooter from "@library/components/frame/FrameFooter";
 import Button from "@dashboard/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import { newFolder } from "@library/components/Icons";
+import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 
 interface IProps {
     exitHandler: () => void;
@@ -31,7 +28,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Calls the LocationChooser component when clicked.
  */
-export default class NewFolder extends React.Component<IProps, IState> {
+export default class NewFolderForm extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
