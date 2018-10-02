@@ -6,13 +6,15 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import DropDownItemMetas from "@library/components/dropdown/items/DropDownItemMetas";
-import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
 import { IArticle } from "@knowledge/@types/api";
-import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
+import {
+    DropDownItemLink,
+    DropDownItemButton,
+    DropDownItemMetas,
+    DropDownItemSeparator,
+} from "@library/components/dropdown";
 import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export interface IProps {
