@@ -6,7 +6,7 @@
 
 import { RouteProps } from "react-router-dom";
 import Loadable from "react-loadable";
-import ModalLoader from "@knowledge/components/ModalLoader";
+import ModalLoader from "@library/components/ModalLoader";
 import FullPageLoader from "@library/components/FullPageLoader";
 import { constants as editorConstants } from "@knowledge/modules/editor/state";
 

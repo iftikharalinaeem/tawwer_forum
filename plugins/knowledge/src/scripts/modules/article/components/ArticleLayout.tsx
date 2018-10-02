@@ -8,7 +8,7 @@ import * as React from "react";
 import { IArticle } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { Devices } from "@knowledge/components/DeviceChecker";
+import { Devices } from "@library/components/DeviceChecker";
 import { t } from "@library/application";
 import {
     ArticleBreadcrumbs,

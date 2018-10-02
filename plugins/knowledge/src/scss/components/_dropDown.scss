@@ -1,4 +1,4 @@
-/*!
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -25,12 +25,12 @@ $dropDown-item_minHeight                       : 45px;
     position: absolute;
     width: $dropDown_width;
     background-color: $dropdown_bg;
-    box-shadow: $menu_dropShadow;
+    box-shadow: $overlay-dropShadow;
     border: {
         radius: $global_borderRadius;
         style: solid;
         width: 1px;
-        color: $menu-border_color;
+        color: $overlay-border_color;
     }
 }
 

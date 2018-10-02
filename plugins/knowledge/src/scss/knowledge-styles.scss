@@ -26,7 +26,9 @@
 @import "base/utilities";
 
 @import "layouts/page";
+@import "layouts/overlay";
 @import "layouts/modal";
+@import "layouts/frame";
 @import "layouts/container";
 @import "layouts/panelLayout";
 @import "layouts/panelArea";
@@ -70,6 +72,7 @@
 @import "components/editor";
 @import "components/dropDown";
 @import "components/word";
+@import "components/folderContents";
 //
 //@import "widget/splash";
 //@import "widget/searchBar";
