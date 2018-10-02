@@ -8,6 +8,11 @@ import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 
+/**
+ * Selector for picking out breadcrumb data for the current location.
+ *
+ * @param state - The current top level redux state.
+ */
 export function getCurrentLocationBreadcrumb(state: IStoreState): IKbCategoryFragment[] {
     const { locationPicker } = state.knowledge;
     return categoryModel.getKbCategoryBreadcrumb(state, locationPicker.currentCategoryID);

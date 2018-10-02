@@ -19,18 +19,18 @@ interface IProps extends ILocationPickerProps {
 }
 
 interface IState {
-    showLocationChooser: boolean;
+    showLocationPicker: boolean;
 }
 
 /**
  * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
-            showLocationChooser: false,
+            showLocationPicker: false,
         };
     }
 
@@ -48,13 +48,13 @@ export class LocationInput extends React.Component<IProps, IState> {
                         type="button"
                         aria-label={t("Page Location:")}
                         className="pageLocation"
-                        onClick={this.showLocationChooser}
+                        onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
                     >
                         <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
                     </Button>
                 </div>
-                {this.state.showLocationChooser && (
+                {this.state.showLocationPicker && (
                     <Modal
                         exitHandler={this.hideLocationChooser}
                         size={ModalSizes.SMALL}
@@ -68,20 +68,29 @@ export class LocationInput extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Cleanup on unmount.
+     */
     public componentWillUnmount() {
         this.props.resetNavigation();
     }
 
-    private showLocationChooser = () => {
+    /**
+     * Show the location picker modal.
+     */
+    private showLocationPicker = () => {
         this.props.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
-            showLocationChooser: true,
+            showLocationPicker: true,
         });
     };
 
+    /**
+     * Hiders the location picker modal.
+     */
     private hideLocationChooser = () => {
         this.setState({
-            showLocationChooser: false,
+            showLocationPicker: false,
         });
     };
 }

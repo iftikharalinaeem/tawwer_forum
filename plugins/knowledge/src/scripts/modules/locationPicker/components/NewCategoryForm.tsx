@@ -25,21 +25,13 @@ interface IState {
 }
 
 /**
- * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * A modal based new form for adding a new category
  */
-export default class NewFolderForm extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            valid: false,
-            categoryName: "",
-            url: "",
-        };
-    }
-
-    public tempClick = () => {
-        alert("do click");
+export default class NewCategoryForm extends React.Component<IProps, IState> {
+    public state = {
+        valid: false,
+        categoryName: "",
+        url: "",
     };
 
     public render() {
@@ -82,6 +74,13 @@ export default class NewFolderForm extends React.Component<IProps, IState> {
             </Modal>
         );
     }
+
+    /**
+     * Dummy click handler until full functionality is introduced.
+     */
+    private tempClick = () => {
+        alert("do click");
+    };
 
     /**
      * Change handler for the email input.

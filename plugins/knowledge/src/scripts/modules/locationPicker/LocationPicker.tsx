@@ -9,9 +9,8 @@ import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
-import { LocationContents } from "@knowledge/modules/locationPicker/components";
+import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
-import NewFolderForm from "@knowledge/modules/locationPicker/components/NewFolderForm";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
@@ -20,18 +19,17 @@ interface IProps extends ILocationPickerProps {
 
 interface IState {
     selectedCategory?: any;
-    showNewFolderModal: boolean;
+    showNewCategoryModal: boolean;
 }
 
 /**
- * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * Component for choosing a location for a new article.
  */
 export class LocationPicker extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
-            showNewFolderModal: false,
+            showNewCategoryModal: false,
         };
     }
 
@@ -60,19 +58,22 @@ export class LocationPicker extends React.Component<IProps, IState> {
                             {t("Choose")}
                         </Button>
                         <Button
-                            title={t("New Folder")}
+                            title={t("New Category")}
                             className="locationPicker-newFolder"
-                            onClick={this.showNewFolderModal}
+                            onClick={this.showNewCategoryModal}
                         >
                             {newFolder()}
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewFolderModal && <NewFolderForm exitHandler={this.hideNewFolderModal} />}
+                {this.state.showNewCategoryModal && <NewCategoryForm exitHandler={this.hideNewFolderModal} />}
             </React.Fragment>
         );
     }
 
+    /**
+     * Navigate one level up in the category hierarchy.
+     */
     private goBack = () => {
         const { navigateToCategory, locationBreadcrumb } = this.props;
         if (locationBreadcrumb.length < 2) {
@@ -83,15 +84,21 @@ export class LocationPicker extends React.Component<IProps, IState> {
         navigateToCategory(lastCategory.parentID);
     };
 
-    private showNewFolderModal = () => {
+    /**
+     * Display the modal for creating a new category.
+     */
+    private showNewCategoryModal = () => {
         this.setState({
-            showNewFolderModal: true,
+            showNewCategoryModal: true,
         });
     };
 
+    /**
+     * Hide the
+     */
     private hideNewFolderModal = () => {
         this.setState({
-            showNewFolderModal: false,
+            showNewCategoryModal: false,
         });
     };
 }

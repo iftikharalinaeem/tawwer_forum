@@ -14,19 +14,23 @@ interface IProps {
 }
 
 /**
- * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * Displays the current location of a location picker.
  */
 export default class LocationBreadcrumbs extends React.Component<IProps> {
-    public static renderString(data: IKbCategoryFragment[]): string {
-        if (data.length === 0) {
+    /**
+     * Render a string version of a breadcrumb.
+     *
+     * @param breadcrumbData - The category data to render.
+     */
+    public static renderString(breadcrumbData: IKbCategoryFragment[]): string {
+        if (breadcrumbData.length === 0) {
             return t("Set Page Location");
         }
 
         const accessibleCrumbSeparator = `/`;
-        const crumbCount = data.length - 1;
+        const crumbCount = breadcrumbData.length - 1;
         let crumbTitle = t("Page Location: ") + accessibleCrumbSeparator;
-        data.forEach((crumb, index) => {
+        breadcrumbData.forEach((crumb, index) => {
             const lastElement = index === crumbCount;
             crumbTitle += crumb.name;
             if (!lastElement) {
@@ -37,14 +41,13 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         return crumbTitle;
     }
 
+    /**
+     * Render breadcrumbs as normal react components.
+     */
     public render() {
         if (this.props.locationData.length === 0) {
             return t("Set Page Location");
         }
-        return this.renderHTML();
-    }
-
-    private renderHTML() {
         const { locationData } = this.props;
         const accessibleCrumbSeparator = `/`;
         const crumbCount = locationData.length - 1;

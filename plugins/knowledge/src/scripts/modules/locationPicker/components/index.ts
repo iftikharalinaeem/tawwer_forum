@@ -13,4 +13,4 @@ export { default as LocationBreadcrumbs } from "./LocationBreadcrumbs";
 export { default as LocationContents } from "./LocationContents";
 export { default as NavigationItem } from "./NavigationItem";
 export { default as NavigationItemList } from "./NavigationItemList";
-export { default as NewFolder } from "./NewFolderForm";
+export { default as NewCategoryForm } from "./NewCategoryForm";

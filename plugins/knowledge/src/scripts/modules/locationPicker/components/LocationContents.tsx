@@ -22,8 +22,7 @@ interface IState {
 }
 
 /**
- * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
 export class LocationContents extends React.Component<IProps, IState> {
     public constructor(props) {

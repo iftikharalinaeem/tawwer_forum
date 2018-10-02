@@ -8,6 +8,11 @@ import { IKbNavigationRequest } from "@knowledge/@types/api";
 import { getKbNavigationActions, setCategory } from "./actions";
 import { apiThunk } from "@library/state/utility";
 
+/**
+ * Get location data from the server.
+ *
+ * @param options
+ */
 export function getKbNavigation(options: IKbNavigationRequest) {
     return apiThunk(
         "get",
@@ -17,6 +22,13 @@ export function getKbNavigation(options: IKbNavigationRequest) {
     );
 }
 
+/**
+ * Navigate to a particular category.
+ *
+ * Immediately navigates in one level, then requests the data for the next level deeper.
+ *
+ * @param categoryID
+ */
 export function navigateToCategory(categoryID: number) {
     return async dispatch => {
         dispatch(setCategory(categoryID));

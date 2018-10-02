@@ -14,8 +14,7 @@ interface IProps {
 }
 
 /**
- * This component allows to display and edit the location of the current page.
- * Calls the LocationChooser component when clicked.
+ * Represents a list of NavigationItems
  */
 export default class NavigationItemList extends React.Component<IProps> {
     public render() {

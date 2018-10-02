@@ -14,9 +14,8 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
 import { actions, thunks, model } from "@knowledge/modules/article/state";
-import { ArticleLayout } from "@knowledge/modules/article/components";
+import { ArticleLayout, ArticleMenu } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
-import ArticleMenu from "@knowledge/pages/article/components/ArticleMenu";
 
 interface IProps extends IDeviceProps {
     match: match<{

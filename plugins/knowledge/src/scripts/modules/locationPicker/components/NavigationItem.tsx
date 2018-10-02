@@ -20,6 +20,9 @@ interface IProps {
     onSelect: (event: React.SyntheticEvent) => void;
 }
 
+/**
+ * Component representing a single navigation item in a list of navigation items.
+ */
 export default class NavigationItem extends React.Component<IProps> {
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
