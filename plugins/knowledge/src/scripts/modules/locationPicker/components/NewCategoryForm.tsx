@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Modal, { ModalSizes } from "@library/components/Modal";
+import { Modal, ModalSizes } from "@library/components/modal";
 import Button from "@library/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";

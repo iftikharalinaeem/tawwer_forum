@@ -16,6 +16,7 @@ import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLin
 import { makeEditUrl } from "@knowledge/modules/editor/route";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { LocationDescriptor } from "history";
+import classNames from "classnames";
 
 export interface IProps extends RouteComponentProps<{}> {
     article: IArticle;
@@ -78,13 +79,9 @@ export class ArticleMenu extends React.PureComponent<IProps> {
         const editUrl = makeEditUrl(article.articleID);
 
         return (
-            <DropDown
-                id={domID}
-                name={t("Article Options")}
-                className={classNames("articlePage-options", this.props.className)}
-            >
-                <DropDownItemMetas contents={publishedMeta} />
-                <DropDownItemMetas contents={updatedMeta} />
+            <DropDown id={domID} name={t("Article Options")} className={"articlePage-options"}>
+                <DropDownItemMetas>{publishedMeta}</DropDownItemMetas>
+                <DropDownItemMetas>{updatedMeta}</DropDownItemMetas>
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
