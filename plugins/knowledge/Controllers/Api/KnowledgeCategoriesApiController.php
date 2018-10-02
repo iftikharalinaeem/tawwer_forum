@@ -228,7 +228,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema([])->setDescription("List knowledge categories.");
-        $out = $this->schema([":a" => $this->fullSchema()]);
+        $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $rows = $this->knowledgeCategoryModel->get();
         foreach ($rows as &$row) {
@@ -309,7 +309,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeCategoryPostSchema())->setDescription("Update an existing knowledge category.");
-        $out = $this->fullSchema();
+        $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
         if (array_key_exists("isSection", $body)) {
@@ -340,7 +340,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->permission("garden.setttings.manage");
 
         $in = $this->schema($this->knowledgeCategoryPostSchema())->setDescription("Create a new knowledge category.");
-        $out = $this->fullSchema();
+        $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
         $body["isSection"] = intval($body["isSection"]);
