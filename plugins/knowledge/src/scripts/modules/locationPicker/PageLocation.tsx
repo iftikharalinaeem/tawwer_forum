@@ -5,13 +5,11 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
 import classNames from "classnames";
-import { IBreadcrumbsProps } from "../Breadcrumbs";
-import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
+import { LocationPicker, LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
 import Button from "@dashboard/components/forms/Button";
 import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
-import LocationBreadcrumbs from "@knowledge/components/locationPicker/LocationBreadcrumbs";
+import { t } from "@library/application";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
@@ -36,9 +34,6 @@ export class PageLocation extends React.Component<IProps, IState> {
     public render() {
         const { locationBreadcrumb } = this.props;
 
-        const content = <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />;
-        const crumbTitle = LocationBreadcrumbs.renderString(locationBreadcrumb);
-
         return (
             <React.Fragment>
                 <div className={classNames("pageLocation", this.props.className)}>
@@ -46,18 +41,16 @@ export class PageLocation extends React.Component<IProps, IState> {
                         {t("To: ")}
                     </span>
                     <Button
-                        title={crumbTitle}
+                        title={LocationBreadcrumbs.renderString(locationBreadcrumb)}
                         type="button"
                         aria-label={t("Article Location:")}
                         className="pageLocation"
                         onClick={this.showLocationChooser}
                     >
-                        {content}
+                        <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
                     </Button>
                 </div>
-                {this.state.showLocationChooser && (
-                    <LocationPicker {...this.props} data={this.props.children} exitHandler={this.hideLocationChooser} />
-                )}
+                {this.state.showLocationChooser && <LocationPicker exitHandler={this.hideLocationChooser} />}
             </React.Fragment>
         );
     }

@@ -8,22 +8,17 @@ import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Modal from "@knowledge/components/Modal";
-import Frame from "@library/components/frame/Frame";
-import FrameHeader from "@library/components/frame/FrameHeader";
-import FrameBody from "@library/components/frame/FrameBody";
-import FrameFooter from "@library/components/frame/FrameFooter";
 import Button from "@dashboard/components/forms/Button";
-import FramePanel from "@library/components/frame/FramePanel";
-import NewFolder from "@knowledge/components/locationPicker/NewFolder";
+import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
-import FolderContents from "@knowledge/components/locationPicker/FolderContents";
+import NewFolder from "./NewFolder";
+import FolderContents from "./FolderContents";
 import { ModalSizes } from "@knowledge/components/Modal";
 
 interface IProps {
     exitHandler: () => void;
     className?: string;
-    children: any;
-    selectedCategory: any;
+    // selectedCategory: any;
 }
 
 interface IState {

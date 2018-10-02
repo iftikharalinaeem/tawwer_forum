@@ -15,8 +15,7 @@ import { thunks, actions, model, constants } from "@knowledge/modules/editor/sta
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
-import LocationPicker from "@knowledge/components/locationPicker/LocationPicker";
-import PageLocation from "@knowledge/components/locationPicker/PageLocation";
+import PageLocation from "@knowledge/modules/locationPicker/PageLocation";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -50,9 +49,6 @@ export class EditorPage extends React.Component<IProps, IState> {
                 <EditorLayout backUrl={this.backLink}>
                     <EditorForm submitHandler={this.formSubmit} />
                 </EditorLayout>
-                {this.state.showFolderPicker && (
-                    <LocationPicker exitHandler={this.hideLocationPicker} children={[]} selectedCategory={{}} />
-                )}
             </React.Fragment>
         );
 

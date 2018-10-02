@@ -5,12 +5,10 @@
  */
 
 import * as React from "react";
-import classNames from "classnames";
-import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state/context";
-import NavigationItem from "@knowledge/components/locationPicker/NavigationItem";
-import NavigationItemList from "@knowledge/components/locationPicker/NavigationItemList";
+import NavigationItem from "./NavigationItem";
+import NavigationItemList from "./NavigationItemList";
 
 interface IOwnProps {
     initialCategoryID: number;
@@ -40,6 +38,7 @@ export class FolderContents extends React.Component<IProps, IState> {
         const currentCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
         const contents = currentFolderItems.map((item, index) => {
             const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
+            const navigateCallback = () => this.props.navigateToCategory(item.recordID);
             return (
                 <NavigationItem
                     key={index}
@@ -47,7 +46,7 @@ export class FolderContents extends React.Component<IProps, IState> {
                     isSelected={isSelected}
                     name={this.radioName}
                     value={item}
-                    onNavigate={() => this.props.navigateToCategory(item.recordID)}
+                    onNavigate={navigateCallback}
                     onSelect={this.onChange}
                 />
             );

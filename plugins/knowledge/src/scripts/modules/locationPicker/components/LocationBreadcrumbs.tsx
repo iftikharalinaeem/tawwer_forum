@@ -18,13 +18,6 @@ interface IProps {
  * Calls the LocationChooser component when clicked.
  */
 export default class LocationBreadcrumbs extends React.Component<IProps> {
-    public render() {
-        if (this.props.locationData.length === 0) {
-            return t("Set Page Location");
-        }
-        return this.renderHTML();
-    }
-
     public static renderString(data: IKbCategoryFragment[]): string {
         if (data.length === 0) {
             return t("Set Page Location");
@@ -42,6 +35,13 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         });
 
         return crumbTitle;
+    }
+
+    public render() {
+        if (this.props.locationData.length === 0) {
+            return t("Set Page Location");
+        }
+        return this.renderHTML();
     }
 
     private renderHTML() {
