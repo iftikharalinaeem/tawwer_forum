@@ -14,18 +14,15 @@ import { InlineTypes } from "@library/components/Sentence";
 import { IArticle } from "@knowledge/@types/api";
 import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
 import { makeEditUrl } from "@knowledge/modules/editor/route";
-import { RouteComponentProps, withRouter } from "react-router-dom";
-import { LocationDescriptor } from "history";
-import classNames from "classnames";
 
-export interface IProps extends RouteComponentProps<{}> {
+export interface IProps {
     article: IArticle;
 }
 
 /**
  * Generates drop down menu for Article page
  */
-export class ArticleMenu extends React.PureComponent<IProps> {
+export default class ArticleMenu extends React.PureComponent<IProps> {
     public render() {
         const { article } = this.props;
         const domID = "articleMenuDropDown-" + article.articleID;
@@ -94,5 +91,3 @@ export class ArticleMenu extends React.PureComponent<IProps> {
         );
     }
 }
-
-export default withRouter(ArticleMenu);
