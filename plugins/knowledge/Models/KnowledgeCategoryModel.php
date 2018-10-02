@@ -19,6 +19,8 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
     /**
      * KnowledgeCategoryModel constructor.
+     *
+     * @param Gdn_Session $session
      */
     public function __construct(Gdn_Session $session) {
         parent::__construct("knowledgeCategory");

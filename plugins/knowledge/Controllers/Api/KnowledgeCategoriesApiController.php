@@ -38,7 +38,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * Delete a knowledge category.
      *
      * @param int $id
-     * @throws ValidationException
+     * @throws ValidationException If output validation fails while getting the knowledge category.
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
      * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
