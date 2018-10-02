@@ -31,20 +31,6 @@
         max-width: 100%;
     }
 
-    &.button-icon {
-        align-items: center;
-        justify-content: center;
-        height: $formElement-height;
-        width: $formElement-height;
-        min-width: $formElement-height;
-        padding: 0;
-        border: 0;
-
-        &.isOpen {
-            color: $global-color_primary;
-        }
-    }
-
     &.buttonNoBorder {
         border: 0;
         min-width: $formElement-height;
@@ -53,16 +39,38 @@
             right: 0;
         }
     }
+
+    &.isSquare {
+        min-width: $formElement-height;
+        padding: {
+            left: $utility-baseUnit;
+            right: $utility-baseUnit;
+        }
+    }
 }
+
+.buttonIcon {
+    align-items: center;
+    justify-content: center;
+    height: $formElement-height;
+    width: $formElement-height;
+    min-width: $formElement-height;
+    padding: 0;
+
+    &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &.isCompact {
+        height: $icon-default_size;
+        width: $icon-default_size;
+        min-width: $icon-default_size;
+    }
+}
+
 
 .button-callToAction {
     @include generateButtonClass($buttonPrimary);
-}
-
-
-.button-icon {
-    display: flex;
-    min-width: $formElement-height;
 }
 
 
@@ -76,4 +84,13 @@
     &:focus {
         color: $link_default_focus-color;
     }
+}
+
+
+.buttonPrimary {
+    @include generateButtonClass($buttonPrimary);
+}
+
+.button-pushLeft {
+    margin-right: auto;
 }

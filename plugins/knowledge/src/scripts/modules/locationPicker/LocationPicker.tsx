@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
@@ -41,26 +41,27 @@ export class LocationPicker extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <Frame>
-                    <FrameHeader onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
+                    <FrameHeader className="isShadowed" onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
                         {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                     </FrameHeader>
-                    <FrameBody>
+                    <FrameBody className="isSelfPadded">
                         <FramePanel>
                             <LocationContents initialCategoryID={1} />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
+                    <FrameFooter className="isShadowed">
                         <Button
                             disabled={!!this.state.selectedCategory}
-                            className="locationPicker-validate"
+                            className="button-pushLeft"
                             onClick={this.tempClick}
                         >
                             {t("Choose")}
                         </Button>
                         <Button
                             title={t("New Category")}
-                            className="locationPicker-newFolder"
+                            className="locationPicker-newFolder isSquare"
                             onClick={this.showNewCategoryModal}
+                            baseClass={ButtonBaseClass.STANDARD}
                         >
                             {newFolder()}
                         </Button>

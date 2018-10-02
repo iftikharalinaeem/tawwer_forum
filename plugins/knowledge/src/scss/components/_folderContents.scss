@@ -4,22 +4,94 @@
  * @license GPL-2.0-only
  */
 
+$folderContents-item_minHeight: 42px;
+$folderContents-item_spacing: 12px;
+$folderContents_borderColor: mix($global-color_fg, $global-color_bg, 15%);
+$folderContents_minHeight: 396px;
 
 .folderContents {
-  display: block;
-  position: relative;
+    display: block;
+    position: relative;
+    min-height: $folderContents_minHeight;
 }
 
 .folderContents-items {
-  display: block;
-  position: relative;
+    display: block;
+    position: relative;
+    border-top: {
+        style: solid;
+        width: $formElement-borderWidth;
+        color: $folderContents_borderColor;
+    }
 }
 
 .folderContents-item {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: nowrap;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+    border-bottom: {
+        style: solid;
+        width: $formElement-borderWidth;
+        color: $folderContents_borderColor;
+    }
+}
+
+.folderContents-folder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+    cursor: pointer;
+    min-height: $folderContents-item_minHeight;
+    padding: {
+        left: $folderContents-item_spacing;
+        right: $folderContents-item_spacing;
+    }
+
+    &:hover {
+        background-color: $state-hover_color;
+    }
+}
+
+.folderContents-label {
+    flex-grow: 1;
+}
+
+.folderContents-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 1;
+    margin-right: $folderContents-item_spacing;
+}
+
+.folderContents-folderIcon {
+    //color: $global-color_primary;
+}
+
+.folderContents-checkIcon {
+    color: $global-color_primary;
 }
 
 
+.icon-selectedCategory {
+    width: 18px;
+    height: 18px;
+}
+
+.icon-categoryIcon {
+    width: 18px;
+    height: 12px;
+}
+
+.folderContents-subFolder {
+    height: $folderContents-item_minHeight;
+
+    &:focus,
+    &:hover {
+        background-color: $global-color_primary;
+        color: $global-color_bg;
+    }
+}
