@@ -36,49 +36,53 @@ export class ArticleMenu extends React.PureComponent<IProps> {
         const publishedMeta = [
             {
                 type: InlineTypes.TEXT,
-                contents: "Published ",
+                children: "Published ",
             },
             {
                 type: InlineTypes.DATETIME,
                 timeStamp: "2017-05-20 10:00",
-                contents: "20th May, 2018 10:00 AM",
+                children: "20th May, 2018 10:00 AM",
             },
             {
                 type: InlineTypes.TEXT,
-                contents: t(" by "),
+                children: t(" by "),
             },
             {
                 type: InlineTypes.LINK,
                 to: "#user/Todd_Burry",
-                contents: "Todd Burry",
+                children: "Todd Burry",
             },
         ];
 
         const updatedMeta = [
             {
                 type: InlineTypes.TEXT,
-                contents: "Updated ",
+                children: "Updated ",
             },
             {
                 type: InlineTypes.DATETIME,
                 timeStamp: "2017-05-20 10:00",
-                contents: "20th May, 2018 10:00 AM",
+                children: "20th May, 2018 10:00 AM",
             },
             {
                 type: InlineTypes.TEXT,
-                contents: t(" by "),
+                children: t(" by "),
             },
             {
                 type: InlineTypes.LINK,
                 to: "#user/Todd_Burry",
-                contents: "Todd Burry",
+                children: "Todd Burry",
             },
         ];
 
         const editUrl = makeEditUrl(article.articleID);
 
         return (
-            <DropDown id={domID} name={t("Article Options")} className="articlePage-options">
+            <DropDown
+                id={domID}
+                name={t("Article Options")}
+                className={classNames("articlePage-options", this.props.className)}
+            >
                 <DropDownItemMetas contents={publishedMeta} />
                 <DropDownItemMetas contents={updatedMeta} />
                 <DropDownItemSeparator />

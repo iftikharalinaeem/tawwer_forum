@@ -9,12 +9,12 @@ import { bindActionCreators } from "redux";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
-import { IDeviceProps } from "@knowledge/components/DeviceChecker";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
 import { actions, thunks, model } from "@knowledge/modules/article/state";
-import { ArticleLayout } from "@knowledge/modules/article/components";
+import { ArticleLayout, ArticleMenu } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
 
 interface IProps extends IDeviceProps {

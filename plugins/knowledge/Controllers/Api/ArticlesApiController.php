@@ -92,7 +92,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 \Garden\Schema\Schema::parse([
                     "knowledgeCategoryID",
                     "sort?",
-                ])->add($this->articleSchema()),
+                ])->add($this->fullSchema()),
                 "ArticlePost"
             );
         }
@@ -107,7 +107,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return \Garden\Schema\Schema
      */
     public function articleSchema(string $type = ""): \Garden\Schema\Schema {
-        return $this->schema($this->fullSchema(), $type);
+        if ($this->articleSchema === null) {
+            $this->articleSchema = $this->schema($this->fullSchema(), "Article");
+        }
+        return $this->schema($this->articleSchema, $type);
     }
 
     /**
@@ -116,8 +119,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return \Garden\Schema\Schema
      */
     private function fullSchema(): \Garden\Schema\Schema {
-        if ($this->articleSchema === null) {
-            $this->articleSchema = $this->schema([
+        return \Garden\Schema\Schema::parse([
                 "articleID:i" => "Unique article ID.",
                 "knowledgeCategoryID:i" => "Category the article belongs in.",
                 "articleRevisionID:i" => [
@@ -151,9 +153,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "categoryAncestorIDs:a?" => "integer",
-            ], "Article");
-        }
-        return $this->articleSchema;
+            ]);
     }
 
     /**
@@ -177,7 +177,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $in = $this->schema([
             "expand" => ApiUtils::getExpandDefinition(["all", "ancestors", "articleRevision"]),
         ], "in")->setDescription("Get an article.");
-        $out = $this->schema($this->articleSchema(), "out");
+        $out = $this->articleSchema("out");
 
         $query = $in->validate($query);
 
@@ -204,12 +204,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function get_edit(int $id): array {
         $this->permission();
 
-        $this->idParamSchema();
+        $this->idParamSchema()->setDescription("Get an article for editing.");
         $out = $this->schema(\Garden\Schema\Schema::parse([
             "articleID",
             "knowledgeCategoryID",
             "sort",
-        ])->add($this->fullSchema()), "out")->setDescription("Get an article for editing.");
+        ])->add($this->fullSchema()), "out");
 
         $article = $this->articleByID($id);
         $result = $out->validate($article);
@@ -294,7 +294,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function patch(int $id, array $body = []): array {
         $this->permission();
 
-        $in = $this->articlePostSchema("in");
+        $in = $this->articlePostSchema("in")->setDescription("Update an existing article.");
         $out = $this->articleSchema("out");
 
         $article = $this->articleByID($id);
@@ -319,7 +319,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function post(array $body): array {
         $this->permission(["knowledge.articles.add", "knowledge.articles.manage"]);
 
-        $in = $this->articlePostSchema("in");
+        $in = $this->articlePostSchema("in")->setDescription("Create a new article.");
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body);

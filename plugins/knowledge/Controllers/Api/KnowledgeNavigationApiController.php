@@ -41,112 +41,133 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        $data = [
-            [
-                "name" => "Predator Urine",
-                "displayType" => null,
-                "isSection" => false,
-                "url" => url("/knowledge/category/predator-urine-2", true),
-                "parentID" => 1,
-                "recordID" => 2,
-                "recordType" => "knowledgeCategory",
-                "children" => [
-                    [
-                        "name" => "Coyote Urine",
-                        "displayType" => null,
-                        "isSection" => false,
-                        "url" => url("/knowledge/category/coyote-urine-3", true),
-                        "parentID" => 2,
-                        "recordID" => 3,
-                        "recordType" => "knowledgeCategory",
-                        "children" => [],
-                    ],
-                    [
-                        "name" => "Fox Urine",
-                        "displayType" => null,
-                        "isSection" => false,
-                        "url" => url("/knowledge/category/fox-urine-4", true),
-                        "parentID" => 2,
-                        "recordID" => 4,
-                        "recordType" => "knowledgeCategory",
-                        "children" => [],
-                    ],
-                    [
-                        "name" => "Bobcat Urine",
-                        "displayType" => null,
-                        "isSection" => false,
-                        "url" => url("/knowledge/category/bobcat-urine-5", true),
-                        "parentID" => 2,
-                        "recordID" => 5,
-                        "recordType" => "knowledgeCategory",
-                        "children" => [],
-                    ],
+        $data2 = [
+            "name" => "Predator Urine",
+            "displayType" => null,
+            "isSection" => false,
+            "url" => url("/knowledge/category/predator-urine-2", true),
+            "parentID" => 1,
+            "recordID" => 2,
+            "recordType" => "knowledgeCategory",
+            "children" => [
+                [
+                    "name" => "Coyote Urine",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/coyote-urine-3", true),
+                    "parentID" => 2,
+                    "recordID" => 3,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
                 ],
-            ],
-            [
-                "name" => "P-Gel",
-                "displayType" => null,
-                "isSection" => false,
-                "url" => url("/knowledge/category/p-gel-6", true),
-                "parentID" => 1,
-                "recordID" => 6,
-                "recordType" => "knowledgeCategory",
-                "children" => [],
-            ],
-            [
-                "name" => "P-Cover Granules",
-                "displayType" => "guide",
-                "isSection" => true,
-                "url" => url("/knowledge/category/p-cover-granules-7", true),
-                "parentID" => 1,
-                "recordID" => 7,
-                "recordType" => "knowledgeCategory",
-                "children" => [],
-            ],
-            [
-                "name" => "Prey Animals",
-                "displayType" => null,
-                "isSection" => false,
-                "url" => url("/knowledge/category/prey-animals-8", true),
-                "parentID" => 1,
-                "recordID" => 8,
-                "recordType" => "knowledgeCategory",
-                "children" => [
-                    [
-                        "name" => "Armadillos ",
-                        "displayType" => null,
-                        "isSection" => false,
-                        "url" => url("/knowledge/category/armadillos-9", true),
-                        "parentID" => 8,
-                        "recordID" => 9,
-                        "recordType" => "knowledgeCategory",
-                        "children" => [],
-                    ],
-                    [
-                        "name" => "Chipmunks",
-                        "displayType" => null,
-                        "isSection" => false,
-                        "url" => url("/knowledge/category/chipmunks-10", true),
-                        "parentID" => 8,
-                        "recordID" => 10,
-                        "recordType" => "knowledgeCategory",
-                        "children" => [],
-                    ],
+                [
+                    "name" => "Fox Urine",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/fox-urine-4", true),
+                    "parentID" => 2,
+                    "recordID" => 4,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
                 ],
-            ],
-            [
-                "name" => "Dispensers",
-                "displayType" => "search",
-                "isSection" => true,
-                "url" => url("/knowledge/category/dispensers-11", true),
-                "parentID" => 1,
-                "recordID" => 11,
-                "recordType" => "knowledgeCategory",
-                "children" => [],
+                [
+                    "name" => "Bobcat Urine",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/bobcat-urine-5", true),
+                    "parentID" => 2,
+                    "recordID" => 5,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
             ],
         ];
 
-        $result = $out->validate($data);
+        $data8 = [
+            "name" => "Prey Animals",
+            "displayType" => null,
+            "isSection" => false,
+            "url" => url("/knowledge/category/prey-animals-8", true),
+            "parentID" => 1,
+            "recordID" => 8,
+            "recordType" => "knowledgeCategory",
+            "children" => [
+                [
+                    "name" => "Armadillos ",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/armadillos-9", true),
+                    "parentID" => 8,
+                    "recordID" => 9,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
+                [
+                    "name" => "Chipmunks",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/chipmunks-10", true),
+                    "parentID" => 8,
+                    "recordID" => 10,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
+            ],
+        ];
+
+        $data1 = [
+            "name" => "Top Level category",
+            "displayType" => null,
+            "isSection" => false,
+            "url" => url("/knowledge/category/chipmunks-1", true),
+            "parentID" => -1,
+            "recordID" => 1,
+            "recordType" => "knowledgeCategory",
+            "children" => [
+                $data2,
+                [
+                    "name" => "P-Gel",
+                    "displayType" => null,
+                    "isSection" => false,
+                    "url" => url("/knowledge/category/p-gel-6", true),
+                    "parentID" => 1,
+                    "recordID" => 6,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
+                [
+                    "name" => "P-Cover Granules",
+                    "displayType" => "guide",
+                    "isSection" => true,
+                    "url" => url("/knowledge/category/p-cover-granules-7", true),
+                    "parentID" => 1,
+                    "recordID" => 7,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
+                $data8,
+                [
+                    "name" => "Dispensers",
+                    "displayType" => "search",
+                    "isSection" => true,
+                    "url" => url("/knowledge/category/dispensers-11", true),
+                    "parentID" => 1,
+                    "recordID" => 11,
+                    "recordType" => "knowledgeCategory",
+                    "children" => [],
+                ],
+            ],
+        ];
+
+        if ($query['knowledgeCategoryID'] === 2) {
+            $dataset = $data2;
+        } elseif ($query['knowledgeCategoryID'] === 8) {
+            $dataset = $data8;
+        } else {
+            $dataset = $data1;
+        }
+
+        $result = $out->validate($dataset['children']);
         return $result;
     }
 }

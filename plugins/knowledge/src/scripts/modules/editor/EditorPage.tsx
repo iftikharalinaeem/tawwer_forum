@@ -1,7 +1,7 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import React from "react";
@@ -9,12 +9,17 @@ import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
+<<<<<<< HEAD
 import { Modal } from "@library/components/modal";
+=======
+import Modal, { ModalSizes } from "@library/components/Modal";
+>>>>>>> master
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model } from "@knowledge/modules/editor/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
+import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -26,26 +31,34 @@ interface IProps extends IOwnProps {
     clearPageState: () => void;
     initPageFromLocation: typeof thunks.initPageFromLocation;
     submitNewRevision: typeof thunks.submitNewRevision;
+    data: any; // temp
+}
+
+interface IState {
+    showFolderPicker: boolean;
 }
 
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.Component<IProps> {
+export class EditorPage extends React.Component<IProps, IState> {
+    public state = {
+        showFolderPicker: false,
+    };
+
     public render() {
         const pageContent = (
-            <EditorLayout backUrl={this.backLink}>
-                <EditorForm submitHandler={this.formSubmit} />
-            </EditorLayout>
+            <React.Fragment>
+                <LocationInput children={this.props.data} />
+                <EditorLayout backUrl={this.backLink}>
+                    <EditorForm submitHandler={this.formSubmit} />
+                </EditorLayout>
+            </React.Fragment>
         );
 
         if (this.isModal) {
             return (
-                <Modal
-                    exitHandler={this.navigateToBacklink}
-                    appContainer={document.getElementById("app")!}
-                    container={document.getElementById("modals")!}
-                >
+                <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
                     {pageContent}
                 </Modal>
             );
@@ -66,6 +79,18 @@ export class EditorPage extends React.Component<IProps> {
      */
     public componentWillUnmount() {
         this.props.clearPageState();
+    }
+
+    public showLocationPicker() {
+        this.setState({
+            showFolderPicker: true,
+        });
+    }
+
+    public hideLocationPicker() {
+        this.setState({
+            showFolderPicker: false,
+        });
     }
 
     /**

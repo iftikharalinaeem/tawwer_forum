@@ -1,0 +1,62 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$modal-bgColor: $global-color_white !default;
+$modal-large_width: 720px;
+$modal-medium_width: 516px;
+$modal-small_width: 375px;
+$modal-border_radius: $global-borderRadius;
+
+
+.frame {
+    position: relative;
+    max-height: 100%;
+    background-color: $modal-bgColor;
+    box-shadow: $overlay-dropShadow;
+    overflow: hidden;
+    border: {
+        style: solid;
+        width: 1px;
+        color: $overlay-border_color;
+        radius: $modal-border_radius;
+    }
+}
+
+.frameHeader {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.frameHeader-backButton {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    flex-shrink: 1;
+}
+
+.frameHeader-heading {
+    flex-grow: 1;
+}
+
+.frameBody {
+    position: relative;
+    max-height: 100%;
+}
+
+.framePanel {
+    position: relative;
+    height: 100%;
+    background-color: $modal-bgColor;
+    overflow: auto;
+}
+
+.frameFooter {
+    display: flex;
+    flex-wrap: wrap;
+}

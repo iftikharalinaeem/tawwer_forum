@@ -1,7 +1,7 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license Proprietary
  */
 
 import React from "react";
@@ -9,9 +9,9 @@ import { t } from "@library/application";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageHeading from "@knowledge/components/PageHeading";
+import PageHeading from "@library/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { Devices } from "@knowledge/components/DeviceChecker";
+import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps {
     device: Devices;

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageHeading from "@knowledge/components/PageHeading";
+import PageHeading from "@library/components/PageHeading";
 import { IArticle } from "@knowledge/@types/api";
 
 interface IProps {
