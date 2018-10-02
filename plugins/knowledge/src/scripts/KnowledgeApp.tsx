@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import DeviceContext from "@knowledge/contexts/DeviceContext";
-import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
+import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 
 /**

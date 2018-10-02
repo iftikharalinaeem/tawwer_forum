@@ -7,7 +7,7 @@
 import * as React from "react";
 import { IArticle } from "@knowledge/@types/api";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import UserContent from "@knowledge/components/UserContent";
+import UserContent from "@library/components/UserContent";
 import { t } from "@library/application";
 
 interface IProps {

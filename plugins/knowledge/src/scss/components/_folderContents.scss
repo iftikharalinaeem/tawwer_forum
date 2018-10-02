@@ -1,0 +1,25 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+.folderContents {
+  display: block;
+  position: relative;
+}
+
+.folderContents-items {
+  display: block;
+  position: relative;
+}
+
+.folderContents-item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+
