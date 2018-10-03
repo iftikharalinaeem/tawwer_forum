@@ -72,7 +72,9 @@ export function initPageFromLocation(history: History) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
             const article: AxiosResponse<IGetArticleResponseBody> = await dispatch(getEditArticle(articleID));
-            dispatch(getRevision(article.data.articleRevisionID));
+            if (article.data.articleRevisionID !== null) {
+                dispatch(getRevision(article.data.articleRevisionID));
+            }
         }
     };
 }

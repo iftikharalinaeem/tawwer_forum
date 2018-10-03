@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import uniqueId from "lodash/uniqueId";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
@@ -15,7 +14,7 @@ import Button from "@library/components/forms/Button";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
-    revision: ILoadable<IArticleRevision>;
+    revision: ILoadable<IArticleRevision | undefined>;
 }
 
 interface IState {
@@ -37,9 +36,6 @@ export default class EditorForm extends React.Component<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const editorID = uniqueId();
-        const editorDescriptionId = "editorDescription-" + editorID;
-
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
@@ -50,24 +46,27 @@ export default class EditorForm extends React.Component<IProps, IState> {
                             placeholder={t("Title")}
                             value={this.state.name}
                             onChange={this.titleChangeHandler}
+                            disabled={this.isLoading}
                         />
                     </div>
-                    <div className="richEditor inheritHeight">
-                        <Editor
-                            ref={this.editorRef}
-                            editorID={editorID}
-                            editorDescriptionID={editorDescriptionId}
-                            isPrimaryEditor={true}
-                            onChange={this.editorChangeHandler}
-                            legacyMode={false}
-                        />
-                    </div>
+                    <Editor
+                        allowUpload={true}
+                        ref={this.editorRef}
+                        isPrimaryEditor={true}
+                        onChange={this.editorChangeHandler}
+                        className="inheritHeight"
+                        isLoading={this.isLoading}
+                    />
                     <Button disabled={!this.canSubmit} type="submit">
                         {t("Submit")}
                     </Button>
                 </form>
             </div>
         );
+    }
+
+    private get isLoading(): boolean {
+        return this.props.revision.status === LoadStatus.LOADING;
     }
 
     /**
@@ -80,7 +79,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
     public componentDidUpdate(oldProps: IProps) {
         const oldRevision = oldProps.revision;
         const revision = this.props.revision;
-        if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS) {
+        if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS && revision.data) {
             this.initFormFromRevision(revision.data);
         }
     }
