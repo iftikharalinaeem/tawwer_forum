@@ -86,6 +86,9 @@ export class LocationPicker extends React.Component<IProps, IState> {
         this.props.resetNavigation();
     }
 
+    /**
+     * If the current navigated category has a valid parent we can navigate back to it.
+     */
     private get canNavigateBack(): boolean {
         return this.props.navigatedCategory.parentID !== -1;
     }
