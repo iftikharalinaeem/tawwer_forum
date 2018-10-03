@@ -25,10 +25,14 @@ $meta_spacing                 : $global-gutter_quarterSize;
 }
 
 .meta {
-    display: block;
+    display: flex;
     margin: 0 $utility-baseUnit;
     font-size: $metaText_fontSize;
     color: $metas_color;
+
+    .meta {
+        margin: 0;
+    }
 }
 
 a.meta {
