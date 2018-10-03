@@ -57,20 +57,16 @@ export class LocationPicker extends React.Component<IProps, IState> {
                     </FrameBody>
                     <FrameFooter className="isShadowed">
                         <Button
-                            disabled={this.props.items.status !== LoadStatus.SUCCESS}
-                            className="button-pushLeft"
-                            onClick={this.handleChoose}
-                        >
-                            {t("Choose")}
-                        </Button>
-                        <Button
                             title={t("New Category")}
                             disabled={this.props.items.status !== LoadStatus.SUCCESS}
-                            className="locationPicker-newFolder isSquare"
+                            className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
                         >
                             {newFolder()}
+                        </Button>
+                        <Button disabled={this.props.items.status !== LoadStatus.SUCCESS} onClick={this.handleChoose}>
+                            {t("Choose")}
                         </Button>
                     </FrameFooter>
                 </Frame>

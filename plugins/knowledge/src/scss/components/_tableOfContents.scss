@@ -1,26 +1,11 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
-$tableOfContents_fontSize        : $global-medium_fontSize;
-$tableOfContents_color           : $global-color_fg;
-$tableOfContents_offset          : $utility-baseUnit * 2;
-
-.tableOfContents {
-    position: relative;
-    display: block;
-}
+$tableOfContents_color           : $metaText_color;
 
 .tableOfContents-link {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    font-size: $tableOfContents_fontSize;
     color: $tableOfContents_color;
-
-    + .tableOfContents-link {
-        margin-top: $tableOfContents_offset;
-    }
 }
