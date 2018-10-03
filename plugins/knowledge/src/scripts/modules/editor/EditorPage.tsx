@@ -139,7 +139,7 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
-    let articleCategory: any = undefined;
+    let articleCategory;
     const { editorPage } = state.knowledge;
     if (editorPage.article.status === LoadStatus.SUCCESS) {
         articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
