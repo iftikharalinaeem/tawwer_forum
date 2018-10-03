@@ -4,11 +4,6 @@
  * @license Proprietary
  */
 
-// Route constants
-export const EDIT_ROUTE = "/kb/articles/:id/editor";
-export const ADD_ROUTE = "/kb/articles/add";
-export const ADD_EDIT_ROUTE = "/kb/articles/(\\d+/editor|add)";
-
 // API actions
 export const POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
 export const POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";

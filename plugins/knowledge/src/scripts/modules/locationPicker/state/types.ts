@@ -4,11 +4,12 @@
  * @license Proprietary
  */
 
-import { LoadStatus } from "@library/@types/api";
+import { ILoadable } from "@library/@types/api";
 import { IKbNavigationItem } from "@knowledge/@types/api";
 
 export interface ILocationPickerState {
-    status: LoadStatus;
-    currentCategoryID: number; // A list of category IDs;
-    currentFolderItems: IKbNavigationItem[];
+    selectedCategoryID: number;
+    navigatedCategoryID: number;
+    chosenCategoryID: number;
+    items: ILoadable<IKbNavigationItem[]>;
 }

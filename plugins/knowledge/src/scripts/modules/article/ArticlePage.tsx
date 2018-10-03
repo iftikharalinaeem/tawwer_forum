@@ -47,11 +47,9 @@ export class ArticlePage extends React.Component<IProps> {
 
         const { article } = articlePageState.data;
 
-        const menu = <ArticleMenu id={"articlePage-" + id} />; // hard coded for now
-
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} menu={menu} />
+                <ArticleLayout article={article} />
             </PageLoader>
         );
     }

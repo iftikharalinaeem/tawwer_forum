@@ -9,6 +9,6 @@ import { IArticle, IArticleRevision } from "@knowledge/@types/api";
 
 export interface IState {
     article: ILoadable<IArticle>;
-    revision: ILoadable<IArticleRevision>;
+    revision: ILoadable<IArticleRevision | undefined>;
     submit: ILoadable<{}>;
 }

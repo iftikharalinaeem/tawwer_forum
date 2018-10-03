@@ -9,7 +9,6 @@ import { IArticle } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
-import { t } from "@library/application";
 import {
     ArticleBreadcrumbs,
     ArticleActions,
@@ -18,13 +17,13 @@ import {
     ArticleContent,
     ArticleTOC,
     RelatedArticles,
+    ArticleMenu,
 } from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 
 interface IProps {
     article: IArticle;
     device: Devices;
-    menu: JSX.Element;
 }
 
 interface IState {}
@@ -45,7 +44,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleNavigation />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle article={article} menu={this.props.menu} />
+                        <ArticleTitle article={article} menu={<ArticleMenu article={article} />} />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <ArticleContent article={article} />

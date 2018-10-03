@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Modal, { ModalSizes } from "@library/components/Modal";
+import { Modal, ModalSizes } from "@library/components/modal";
 import Button from "@library/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
@@ -36,7 +36,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal size={ModalSizes.SMALL}>
+            <Modal size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
                 <Frame>
                     <FrameHeader closeFrame={this.props.exitHandler}>{t("New Folder")}</FrameHeader>
                     <FrameBody>
