@@ -11,14 +11,16 @@ import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
     onCloseClick: () => void;
+    onChoose: (category: IKbCategoryFragment) => void;
 }
 
 interface IState {
-    selectedCategory?: any;
     showNewCategoryModal: boolean;
 }
 
@@ -26,15 +28,8 @@ interface IState {
  * Component for choosing a location for a new article.
  */
 export class LocationPicker extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            showNewCategoryModal: false,
-        };
-    }
-
-    public tempClick = () => {
-        alert("do click");
+    public state = {
+        showNewCategoryModal: false,
     };
 
     public render() {
@@ -48,7 +43,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
                         closeFrame={this.props.onCloseClick}
                     >
-                        {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
+                        {this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Category")}
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
@@ -62,11 +57,16 @@ export class LocationPicker extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed">
-                        <Button disabled={!this.canNavigateBack} className="button-pushLeft" onClick={this.tempClick}>
+                        <Button
+                            disabled={this.props.items.status !== LoadStatus.SUCCESS}
+                            className="button-pushLeft"
+                            onClick={this.handleChoose}
+                        >
                             {t("Choose")}
                         </Button>
                         <Button
                             title={t("New Category")}
+                            disabled={this.props.items.status !== LoadStatus.SUCCESS}
                             className="locationPicker-newFolder isSquare"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
@@ -109,6 +109,10 @@ export class LocationPicker extends React.Component<IProps, IState> {
         this.setState({
             showNewCategoryModal: false,
         });
+    };
+
+    private handleChoose = () => {
+        this.props.onChoose(this.props.selectedCategory);
     };
 }
 

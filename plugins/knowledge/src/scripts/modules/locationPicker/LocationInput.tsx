@@ -20,6 +20,7 @@ interface IProps extends ILocationPickerProps {
 
 interface IState {
     showLocationPicker: boolean;
+    selectedCategoryID: number;
 }
 
 /**
