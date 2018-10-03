@@ -32,15 +32,25 @@ export default function editorPageReducer(
 ): model.IState {
     return produce(state, (draft: Draft<model.IState>) => {
         switch (action.type) {
-            // POST_ARTICLE & GET_ARTICLE are handled the same way right now.
             case constants.POST_ARTICLE_REQUEST:
-            case constants.GET_ARTICLE_REQUEST:
                 draft.article.status = LoadStatus.LOADING;
                 break;
-            case constants.POST_ARTICLE_RESPONSE:
+            case constants.GET_ARTICLE_REQUEST:
+                draft.article.status = LoadStatus.LOADING;
+                // When fetching an existing article, we will also need to look for
+                // An existing revision.
+                draft.revision.status = LoadStatus.LOADING;
+                break;
             case constants.GET_ARTICLE_RESPONSE:
+            case constants.POST_ARTICLE_RESPONSE:
                 draft.article.status = LoadStatus.SUCCESS;
                 draft.article.data = action.payload.data;
+                // When receving an article, not having a revision ID means there is nothing new to load.
+                // As a result we need to clear the optomistic loading indicator we put up earlier.
+                // as the user will be making a totally new revision.
+                if (action.payload.data.articleRevisionID === null) {
+                    draft.revision.status = LoadStatus.SUCCESS;
+                }
                 break;
             case constants.GET_ARTICLE_ERROR:
             case constants.POST_ARTICLE_ERROR:

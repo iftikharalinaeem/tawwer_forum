@@ -9,12 +9,17 @@ import { getRequiredID } from "@library/componentIDs";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
+import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import MediumLoader from "@library/components/MediumLoader";
 
-interface IOwnProps {
+interface IProps {
     initialCategoryID: number;
+    onCategoryNavigate: (categoryID: number) => void;
+    onItemSelect: (categoryID: number) => void;
+    selectedCategory: IKbCategoryFragment;
+    items: ILoadable<IKbNavigationItem[]>;
 }
-
-interface IProps extends IOwnProps, ILocationPickerProps {}
 
 interface IState {
     id: string;
@@ -24,7 +29,7 @@ interface IState {
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-export class LocationContents extends React.Component<IProps, IState> {
+export default class LocationContents extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -33,30 +38,36 @@ export class LocationContents extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { locationBreadcrumb, currentFolderItems } = this.props;
-        const currentCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
-        const contents = currentFolderItems.map((item, index) => {
-            const isSelected = currentCategory.knowledgeCategoryID === item.recordID;
-            const navigateCallback = () => this.props.navigateToCategory(item.recordID);
-            const selectCallback = () => this.props.setCategory(item.recordID);
+        const { selectedCategory, items } = this.props;
+
+        if (items.status === LoadStatus.SUCCESS) {
+            const contents = items.data.map((item, index) => {
+                const isSelected = selectedCategory.knowledgeCategoryID === item.recordID;
+                const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
+                const selectCallback = () => this.props.onItemSelect(item.recordID);
+                return (
+                    <NavigationItemCategory
+                        key={index}
+                        isInitialSelection={false}
+                        isSelected={isSelected}
+                        name={this.radioName}
+                        value={item}
+                        onNavigate={navigateCallback}
+                        onSelect={selectCallback}
+                    />
+                );
+            });
+            return <NavigationItemList categoryName={selectedCategory.name}>{contents}</NavigationItemList>;
+        } else {
             return (
-                <NavigationItemCategory
-                    key={index}
-                    isInitialSelection={false}
-                    isSelected={isSelected}
-                    name={this.radioName}
-                    value={item}
-                    onNavigate={navigateCallback}
-                    onSelect={selectCallback}
-                />
+                <div className="folderContents">
+                    <MediumLoader />
+                </div>
             );
-        });
-        return <NavigationItemList categoryName={currentCategory.name}>{contents}</NavigationItemList>;
+        }
     }
 
     private get radioName(): string {
         return "folders-" + this.state.id;
     }
 }
-
-export default withLocationPicker<IProps>(LocationContents);

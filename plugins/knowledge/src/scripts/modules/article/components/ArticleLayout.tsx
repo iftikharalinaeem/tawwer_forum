@@ -9,7 +9,6 @@ import { IArticle } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
-import { t } from "@library/application";
 import {
     ArticleBreadcrumbs,
     ArticleActions,
@@ -18,16 +17,16 @@ import {
     ArticleContent,
     ArticleTOC,
     RelatedArticles,
+    ArticleMenu,
 } from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
 import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
-import { InlineTypes, ISentence } from "@library/components/Sentence";
+import { InlineTypes } from "@library/components/Sentence";
 
 interface IProps {
     article: IArticle;
     device: Devices;
-    menu: JSX.Element;
 }
 
 interface IState {}
@@ -118,7 +117,11 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleNavigation />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle article={article} menu={this.props.menu} meta={metaData} />
+                        <ArticleTitle
+                            article={article}
+                            menu={<ArticleMenu article={article} />}
+                            meta={metaData as any}
+                        />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <ArticleContent article={article} />

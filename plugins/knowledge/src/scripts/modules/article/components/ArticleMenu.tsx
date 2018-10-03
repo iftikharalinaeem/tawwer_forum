@@ -6,41 +6,28 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import classNames from "classnames";
-import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import DropDownItemMetas from "@library/components/dropdown/items/DropDownItemMetas";
-import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
-import { getRequiredID } from "@library/componentIDs";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+import { IArticle } from "@knowledge/@types/api";
+import {
+    DropDownItemLink,
+    DropDownItemButton,
+    DropDownItemMetas,
+    DropDownItemSeparator,
+} from "@library/components/dropdown";
+import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export interface IProps {
-    id: string;
-    name?: string;
-    className?: string;
-}
-
-export interface IState {
-    id: string;
+    article: IArticle;
 }
 
 /**
  * Generates drop down menu for Article page
  */
-export default class ArticleMenu extends React.PureComponent<IProps, IState> {
-    public static defaultProps = {
-        name: t("Article Options"),
-    };
-
-    public constructor(props) {
-        super(props);
-        this.state = {
-            id: getRequiredID(props, "articleMenuDropDown"),
-        };
-    }
-
+export default class ArticleMenu extends React.PureComponent<IProps> {
     public render() {
+        const { article } = this.props;
+        const domID = "articleMenuDropDown-" + article.articleID;
         // Hard coded data/functions
         const buttonClick = () => {
             alert("Click works");
@@ -88,17 +75,16 @@ export default class ArticleMenu extends React.PureComponent<IProps, IState> {
             },
         ];
 
+        const editUrl = makeEditUrl(article.articleID);
+
         return (
-            <DropDown
-                id={this.state.id}
-                name={this.props.name!}
-                className={classNames("articlePage-options", this.props.className)}
-            >
+            <DropDown id={domID} name={t("Article Options")} className={"articlePage-options"}>
                 <DropDownItemMetas>{publishedMeta}</DropDownItemMetas>
                 <DropDownItemMetas>{updatedMeta}</DropDownItemMetas>
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
+                <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
                 <DropDownItemSeparator />

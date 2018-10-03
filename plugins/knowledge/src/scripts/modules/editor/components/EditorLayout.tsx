@@ -15,7 +15,7 @@ import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps {
     device: Devices;
-    backUrl: string;
+    backUrl: string | null;
     children: React.ReactNode;
 }
 

@@ -11,14 +11,15 @@ import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
     onCloseClick: () => void;
+    onChoose: () => void;
 }
 
 interface IState {
-    selectedCategory?: any;
     showNewCategoryModal: boolean;
 }
 
@@ -26,39 +27,45 @@ interface IState {
  * Component for choosing a location for a new article.
  */
 export class LocationPicker extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            showNewCategoryModal: false,
-        };
-    }
-
-    public tempClick = () => {
-        alert("do click");
+    public state = {
+        showNewCategoryModal: false,
     };
 
     public render() {
+        const { items } = this.props;
+
         return (
             <React.Fragment>
                 <Frame>
-                    <FrameHeader className="isShadowed" onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
-                        {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
+                    <FrameHeader
+                        className="isShadowed"
+                        onBackClick={this.canNavigateBack ? this.goBack : undefined}
+                        closeFrame={this.props.onCloseClick}
+                    >
+                        {this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Category")}
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <LocationContents initialCategoryID={1} />
+                            <LocationContents
+                                onCategoryNavigate={this.props.navigateToCategory}
+                                onItemSelect={this.props.selectCategory}
+                                selectedCategory={this.props.selectedCategory}
+                                initialCategoryID={1}
+                                items={items}
+                            />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed">
                         <Button
                             title={t("New Category")}
+                            disabled={this.props.items.status !== LoadStatus.SUCCESS}
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
                         >
                             {newFolder()}
                         </Button>
-                        <Button disabled={!!this.state.selectedCategory} className="" onClick={this.tempClick}>
+                        <Button disabled={this.props.items.status !== LoadStatus.SUCCESS} onClick={this.handleChoose}>
                             {t("Choose")}
                         </Button>
                     </FrameFooter>
@@ -69,16 +76,26 @@ export class LocationPicker extends React.Component<IProps, IState> {
     }
 
     /**
+     * Cleanup on unmount.
+     */
+    public componentWillUnmount() {
+        this.props.resetNavigation();
+    }
+
+    /**
+     * If the current navigated category has a valid parent we can navigate back to it.
+     */
+    private get canNavigateBack(): boolean {
+        return this.props.navigatedCategory.parentID !== -1;
+    }
+
+    /**
      * Navigate one level up in the category hierarchy.
      */
     private goBack = () => {
-        const { navigateToCategory, locationBreadcrumb } = this.props;
-        if (locationBreadcrumb.length < 2) {
-            return;
+        if (this.canNavigateBack) {
+            this.props.navigateToCategory(this.props.navigatedCategory.parentID);
         }
-
-        const lastCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
-        navigateToCategory(lastCategory.parentID);
     };
 
     /**
@@ -97,6 +114,11 @@ export class LocationPicker extends React.Component<IProps, IState> {
         this.setState({
             showNewCategoryModal: false,
         });
+    };
+
+    private handleChoose = () => {
+        this.props.chooseCategory(this.props.selectedCategory.knowledgeCategoryID);
+        this.props.onChoose();
     };
 }
 

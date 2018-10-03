@@ -5,7 +5,7 @@
  */
 
 import * as constants from "./constants";
-import { IKbNavigationRequest, IKbNavigationResponse } from "@knowledge/@types/api";
+import { IKbNavigationRequest, IKbNavigationResponse, IKbCategoryFragment } from "@knowledge/@types/api";
 import { generateApiActionCreators, createAction, ActionsUnion } from "@library/state/utility";
 
 export const getKbNavigationActions = generateApiActionCreators(
@@ -21,11 +21,26 @@ export function resetNavigation() {
     return createAction(constants.RESET_NAVIGATION);
 }
 
-export function setCategory(categoryID: number) {
-    return createAction(constants.NAVIGATE_TO_CATEGORY, { categoryID });
+export function initForCategory(category: IKbCategoryFragment) {
+    return createAction(constants.INIT, { category });
+}
+
+export function setNavigatedCategory(categoryID: number) {
+    return createAction(constants.SET_NAVIGATED_CATEGORY, { categoryID });
+}
+
+export function selectCategory(categoryID: number) {
+    return createAction(constants.SELECT_CATEGORY, { categoryID });
+}
+
+export function chooseCategory(categoryID: number) {
+    return createAction(constants.CHOOSE_CATEGORY, { categoryID });
 }
 
 export type ActionTypes =
     | ActionsUnion<typeof getKbNavigationActions>
     | ReturnType<typeof resetNavigation>
-    | ReturnType<typeof setCategory>;
+    | ReturnType<typeof initForCategory>
+    | ReturnType<typeof setNavigatedCategory>
+    | ReturnType<typeof chooseCategory>
+    | ReturnType<typeof selectCategory>;

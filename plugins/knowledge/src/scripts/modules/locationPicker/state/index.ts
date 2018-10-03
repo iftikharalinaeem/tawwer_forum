@@ -12,9 +12,8 @@
 import * as actions from "./actions";
 import * as constants from "./constants";
 import reducer from "./reducer";
-import * as model from "./model";
 import * as thunks from "./thunks";
 
 export * from "./context";
 export * from "./types";
-export { actions, thunks, constants, reducer, model };
+export { actions, thunks, constants, reducer };
