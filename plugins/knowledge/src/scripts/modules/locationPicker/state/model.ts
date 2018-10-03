@@ -15,5 +15,5 @@ import { IStoreState } from "@knowledge/state/model";
  */
 export function selectCurrentLocationBreadcrumb(state: IStoreState): IKbCategoryFragment[] {
     const { locationPicker } = state.knowledge;
-    return categoryModel.selectKbCategoryBreadcrumb(state, locationPicker.currentCategoryID);
+    return categoryModel.selectKbCategoryBreadcrumb(state, locationPicker.selectedCategoryID);
 }

@@ -21,11 +21,16 @@ export function resetNavigation() {
     return createAction(constants.RESET_NAVIGATION);
 }
 
-export function setCategory(categoryID: number) {
-    return createAction(constants.NAVIGATE_TO_CATEGORY, { categoryID });
+export function setNavigatedCategory(categoryID: number) {
+    return createAction(constants.SET_NAVIGATED_CATEGORY, { categoryID });
+}
+
+export function selectCategory(categoryID: number) {
+    return createAction(constants.SELECT_CATEGORY, { categoryID });
 }
 
 export type ActionTypes =
     | ActionsUnion<typeof getKbNavigationActions>
     | ReturnType<typeof resetNavigation>
-    | ReturnType<typeof setCategory>;
+    | ReturnType<typeof setNavigatedCategory>
+    | ReturnType<typeof selectCategory>;

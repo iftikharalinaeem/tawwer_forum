@@ -38,23 +38,31 @@ export class LocationPicker extends React.Component<IProps, IState> {
     };
 
     public render() {
+        const { items } = this.props;
+
         return (
             <React.Fragment>
                 <Frame>
-                    <FrameHeader className="isShadowed" onBackClick={this.goBack} closeFrame={this.props.onCloseClick}>
+                    <FrameHeader
+                        className="isShadowed"
+                        onBackClick={this.canNavigateBack ? this.goBack : undefined}
+                        closeFrame={this.props.onCloseClick}
+                    >
                         {this.state.selectedCategory ? this.state.selectedCategory.name : t("Category")}
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <LocationContents initialCategoryID={1} />
+                            <LocationContents
+                                onCategoryNavigate={this.props.navigateToCategory}
+                                onItemSelect={this.props.selectCategory}
+                                selectedCategory={this.props.selectedCategory}
+                                initialCategoryID={1}
+                                items={items}
+                            />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed">
-                        <Button
-                            disabled={!!this.state.selectedCategory}
-                            className="button-pushLeft"
-                            onClick={this.tempClick}
-                        >
+                        <Button disabled={!this.canNavigateBack} className="button-pushLeft" onClick={this.tempClick}>
                             {t("Choose")}
                         </Button>
                         <Button
@@ -72,17 +80,17 @@ export class LocationPicker extends React.Component<IProps, IState> {
         );
     }
 
+    private get canNavigateBack(): boolean {
+        return this.props.navigatedCategory.parentID !== -1;
+    }
+
     /**
      * Navigate one level up in the category hierarchy.
      */
     private goBack = () => {
-        const { navigateToCategory, locationBreadcrumb } = this.props;
-        if (locationBreadcrumb.length < 2) {
-            return;
+        if (this.canNavigateBack) {
+            this.props.navigateToCategory(this.props.navigatedCategory.parentID);
         }
-
-        const lastCategory = locationBreadcrumb[locationBreadcrumb.length - 1];
-        navigateToCategory(lastCategory.parentID);
     };
 
     /**

@@ -9,5 +9,6 @@ export const GET_KB_NAVIGATION_REQUEST = "@@locationPicker/GET_KB_NAVIGATION_REQ
 export const GET_KB_NAVIGATION_RESPONSE = "@@locationPicker/GET_KB_NAVIGATION_RESPONSE";
 export const GET_KB_NAVIGATION_ERROR = "@@locationPicker/GET_KB_NAVIGATION_ERROR";
 
-export const NAVIGATE_TO_CATEGORY = "@@locationPicker/NAVIGATE_TO_CATEGORY";
+export const SET_NAVIGATED_CATEGORY = "@@locationPicker/SET_NAVIGATED_CATEGORY";
+export const SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
 export const RESET_NAVIGATION = "@@locationPicker/RESET_NAVIGATION";
