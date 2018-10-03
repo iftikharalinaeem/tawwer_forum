@@ -9,6 +9,8 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
@@ -308,7 +310,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->permission("garden.setttings.manage");
 
         $this->idParamSchema();
-        $in = $this->schema($this->knowledgeCategoryPostSchema())->setDescription("Update an existing knowledge category.");
+        $in = $this->schema($this->knowledgeCategoryPostSchema())
+            ->setDescription("Update an existing knowledge category.")
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
@@ -339,7 +343,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     public function post(array $body = []): array {
         $this->permission("garden.setttings.manage");
 
-        $in = $this->schema($this->knowledgeCategoryPostSchema())->setDescription("Create a new knowledge category.");
+        $in = $this->schema($this->knowledgeCategoryPostSchema())
+            ->setDescription("Create a new knowledge category.")
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
