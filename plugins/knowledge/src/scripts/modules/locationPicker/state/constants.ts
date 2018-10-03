@@ -13,3 +13,4 @@ export const SET_NAVIGATED_CATEGORY = "@@locationPicker/SET_NAVIGATED_CATEGORY";
 export const SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
 export const CHOOSE_CATEGORY = "@@locationPicker/CHOOSE_CATEGORY";
 export const RESET_NAVIGATION = "@@locationPicker/RESET_NAVIGATION";
+export const INIT = "@@locationPicker/INIT";

@@ -36,7 +36,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal size={ModalSizes.SMALL}>
+            <Modal size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
                 <Frame>
                     <FrameHeader closeFrame={this.props.exitHandler}>{t("New Folder")}</FrameHeader>
                     <FrameBody>
