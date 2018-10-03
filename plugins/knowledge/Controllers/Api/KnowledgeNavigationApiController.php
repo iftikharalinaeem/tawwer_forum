@@ -30,6 +30,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
+    /**
+     * Get a schema with limited fields for representing a knowledge category row.
+     *
+     * @return Schema
+     */
     public function categoryNavigationFragment(): Schema {
         if ($this->categoryNavigationFragment === null) {
             $this->categoryNavigationFragment = $this->schema([
