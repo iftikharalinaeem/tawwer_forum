@@ -287,10 +287,10 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      *
      * @param array $row
      * @return array
+     * @throws \Exception If $row is not a valid knowledge category.
      */
     public function normalizeOutput(array $row): array {
-        $slug = \Gdn_Format::url($row["name"] ? $row["knowledgeCategoryID"]."-".$row["name"] : $row["knowledgeCategoryID"]);
-        $row["url"] = \Gdn::request()->url("/kb/categories/".$slug, true);
+        $row["url"] = $this->knowledgeCategoryModel->url($row);
         return $row;
     }
 

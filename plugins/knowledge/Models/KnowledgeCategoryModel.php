@@ -73,6 +73,44 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get child categories in a section, starting at a specific category.
+     *
+     * @param int $knowledgeCategoryID
+     * @param bool $recursive
+     * @return array
+     */
+    public function sectionChildren(int $knowledgeCategoryID, bool $recursive = true): array {
+        $result = $this->get(["parentID" => $knowledgeCategoryID]);
+        foreach ($result as &$row) {
+            if ($recursive === false || $row["isSection"]) {
+                $row["children"] = [];
+                continue;
+            }
+            $row["children"] = $this->sectionChildren($row["knowledgeCategoryID"]);
+        }
+        return $result;
+    }
+
+    /**
+     * Get the full knowledge category tree containing the target category.
+     *
+     * @param int $knowledgeCategoryID
+     * @return array
+     * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
+     */
+    public function sectionTree(int $knowledgeCategoryID): array {
+        // Search upward to get the container section.
+        do {
+            $result = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+            $knowledgeCategoryID = $result["parentID"];
+        } while (!$result["isSection"]);
+
+        // Fetch all child categories in this section.
+        $result["children"] = $this->sectionChildren($result["knowledgeCategoryID"]);
+        return $result;
+    }
+
+    /**
      * Update existing knowledge categories.
      *
      * @param array $set Field values to set.
@@ -114,5 +152,25 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             }
         }
         return true;
+    }
+
+    /**
+     * Generate a URL to the provided knowledge category.
+     *
+     * @param array $knowledgeCategory
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function url(array $knowledgeCategory): string {
+        $name = $knowledgeCategory["name"] ?? null;
+        $knowledgeCategoryID = $knowledgeCategory["knowledgeCategoryID"] ?? null;
+
+        if (!$name || !$knowledgeCategoryID) {
+            throw new \Exception("Invalid knowledge category row.");
+        }
+
+        $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
+        $result = \Gdn::request()->url("/kb/categories/".$slug, true);
+        return $result;
     }
 }
