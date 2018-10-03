@@ -56,7 +56,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $row["displayType"] = $row["displayType"] ?? null;
 
         $row["name"] = md5($row["name"]);
-        $row["parentID"]++;
         $row["isSection"] = !$row["isSection"];
         $row["sort"]++;
 
