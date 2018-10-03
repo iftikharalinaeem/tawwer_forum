@@ -13,6 +13,7 @@ import DropDownItemSeparator from "@library/components/dropdown/items/DropDownIt
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
 import { getRequiredID } from "@library/componentIDs";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface IProps {
     id: string;

@@ -1,0 +1,16 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$relatedArticles-link_color           : $link_default-color;
+
+.relatedArticles-link {
+    color: $relatedArticles-link_color;
+
+    &:hover,
+    &:focus {
+        text-decoration: underline;
+    }
+}

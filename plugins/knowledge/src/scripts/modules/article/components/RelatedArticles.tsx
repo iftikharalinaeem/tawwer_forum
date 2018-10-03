@@ -8,16 +8,40 @@ import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
+import { Link } from "react-router-dom";
 
-interface IProps {}
+export interface IInternalLink {
+    name: string;
+    to: string;
+}
+
+interface IProps {
+    children: IInternalLink[];
+}
 
 export default class RelatedArticles extends React.Component<IProps> {
     public render() {
-        return (
-            <PanelWidget>
-                <Heading title={t("Right Bottom")} />
-                <p>{`${"(Related Articles)"}`}</p>
-            </PanelWidget>
-        );
+        if (!!this.props.children && this.props.children.length > 0) {
+            const contents = this.props.children.map((item, i) => {
+                return (
+                    <li className="linkList-item relatedArticles-item" key={"related-" + i}>
+                        <Link to={item.to} className="linkList-link relatedArticles-link" title={item.name}>
+                            {item.name}
+                        </Link>
+                    </li>
+                );
+            });
+
+            return (
+                <PanelWidget>
+                    <nav className="linkList relatedArticles">
+                        <Heading title={t("Related Articles")} className="linkList-title relatedArticles-title" />
+                        <ul className="linkList-items relatedArticles-items">{contents}</ul>
+                    </nav>
+                </PanelWidget>
+            );
+        } else {
+            return null;
+        }
     }
 }

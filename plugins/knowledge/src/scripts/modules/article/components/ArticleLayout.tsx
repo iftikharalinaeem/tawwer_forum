@@ -20,6 +20,8 @@ import {
     RelatedArticles,
 } from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
+import { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 
 interface IProps {
     article: IArticle;
@@ -32,6 +34,45 @@ interface IState {}
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
         const { article } = this.props;
+
+        const articleTOC: IPageHeading[] = [
+            {
+                name: "Overview",
+                anchor: "#overview",
+            },
+            {
+                name: "Changing Themes",
+                anchor: "#changing-themes",
+            },
+            {
+                name: "Configuration Guide",
+                anchor: "#configuration-guide",
+            },
+            {
+                name: "Theming Guide for Designers",
+                anchor: "#theming-guide-for-designers",
+            },
+        ];
+
+        const articleRelatedArticles: IInternalLink[] = [
+            {
+                name: "Overview",
+                to: "#overview",
+            },
+            {
+                name: "Changing Themes",
+                to: "#changing-themes",
+            },
+            {
+                name: "Configuration Guide",
+                to: "#configuration-guide",
+            },
+            {
+                name: "Theming Guide for Designers",
+                to: "#theming-guide-for-designers",
+            },
+        ];
+
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
@@ -51,10 +92,10 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleContent article={article} />
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <ArticleTOC />
+                        <ArticleTOC children={articleTOC} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
-                        <RelatedArticles />
+                        <RelatedArticles children={articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>
             </Container>
