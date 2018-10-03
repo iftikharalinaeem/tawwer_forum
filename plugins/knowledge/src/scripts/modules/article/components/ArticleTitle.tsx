@@ -8,10 +8,12 @@ import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
 import { IArticle } from "@knowledge/@types/api";
+import Sentence, { ISentence } from "@library/components/Sentence";
 
 interface IProps {
     article: IArticle;
     menu?: JSX.Element;
+    meta: ISentence;
 }
 
 export default class ArticleTitle extends React.Component<IProps> {
@@ -20,6 +22,7 @@ export default class ArticleTitle extends React.Component<IProps> {
         return (
             <PanelWidget>
                 <PageHeading title={article.articleRevision.name} menu={this.props.menu} />
+                {this.props.meta && <Sentence children={this.props.meta} />}
             </PanelWidget>
         );
     }

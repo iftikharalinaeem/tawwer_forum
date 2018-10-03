@@ -19,7 +19,7 @@ interface IProps {
     children: IInternalLink[];
 }
 
-export default class RelatedArticles extends React.Component<IProps> {
+export default class ArticleRelatedArticles extends React.Component<IProps> {
     public render() {
         if (!!this.props.children && this.props.children.length > 0) {
             const contents = this.props.children.map((item, i) => {

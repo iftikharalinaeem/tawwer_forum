@@ -21,7 +21,8 @@ import {
 } from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
+import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
+import { InlineTypes, ISentence } from "@library/components/Sentence";
 
 interface IProps {
     article: IArticle;
@@ -73,6 +74,15 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             },
         ];
 
+        const metaData: ISentence = {
+            children: [
+                {
+                    children: "By Todd Burry",
+                    type: InlineTypes.TEXT,
+                },
+            ],
+        };
+
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
@@ -86,7 +96,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleNavigation />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle article={article} menu={this.props.menu} />
+                        <ArticleTitle article={article} menu={this.props.menu} meta={metaData} />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <ArticleContent article={article} />
