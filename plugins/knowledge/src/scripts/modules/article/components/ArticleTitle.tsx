@@ -22,7 +22,11 @@ export default class ArticleTitle extends React.Component<IProps> {
         return (
             <PanelWidget>
                 <PageHeading title={article.articleRevision.name} menu={this.props.menu} />
-                {this.props.meta && <Sentence children={this.props.meta} />}
+                {this.props.meta && (
+                    <div className="pageMetas metas">
+                        <Sentence {...this.props.meta} recursiveChildClass="meta pageMetas-meta" />
+                    </div>
+                )}
             </PanelWidget>
         );
     }

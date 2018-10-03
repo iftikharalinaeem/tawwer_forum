@@ -11,6 +11,7 @@ $pageHeading-dropdown_width                    : 150px !default;
     display: flex;
     width: 100%;
     align-items: center;
+
     + .pageMetas {
         margin-top: $utility-baseUnit * 2;
     }

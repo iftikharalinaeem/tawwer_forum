@@ -74,10 +74,32 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             },
         ];
 
-        const metaData: ISentence = {
+        const metaData = {
             children: [
                 {
                     children: "By Todd Burry",
+                    type: InlineTypes.TEXT,
+                },
+                {
+                    children: [
+                        {
+                            children: "Last Updated:" + String.fromCharCode(160),
+                            type: InlineTypes.TEXT,
+                        },
+                        {
+                            timeStamp: "2018-03-03",
+                            type: InlineTypes.DATETIME,
+                            children: [
+                                {
+                                    children: "3 March 2018",
+                                    type: InlineTypes.TEXT,
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    children: "ID #1029384756",
                     type: InlineTypes.TEXT,
                 },
             ],
