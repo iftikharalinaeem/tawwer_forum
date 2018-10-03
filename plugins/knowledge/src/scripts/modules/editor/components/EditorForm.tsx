@@ -92,7 +92,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         const minBodyLength = 1;
 
         const title = this.state.name;
-        const body = this.editorRef.current.getEditorText();
+        const body = this.editorRef.current.getEditorText().trim();
 
         return title.length >= minTitleLength && body.length >= minBodyLength;
     }
