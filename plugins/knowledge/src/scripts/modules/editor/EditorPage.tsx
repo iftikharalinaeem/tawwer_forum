@@ -5,17 +5,17 @@
  */
 
 import React from "react";
-import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
 import { Modal, ModalSizes } from "@library/components/modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model } from "@knowledge/modules/editor/state";
+import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
-import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
+import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -27,6 +27,7 @@ interface IProps extends IOwnProps {
     clearPageState: () => void;
     initPageFromLocation: typeof thunks.initPageFromLocation;
     submitNewRevision: typeof thunks.submitNewRevision;
+    articleCategory: IKbCategoryFragment;
 }
 
 interface IState {
@@ -44,9 +45,12 @@ export class EditorPage extends React.Component<IProps, IState> {
     public render() {
         const pageContent = (
             <React.Fragment>
-                <LocationInput />
                 <EditorLayout backUrl={this.backLink}>
-                    <EditorForm submitHandler={this.formSubmit} revision={this.props.pageState.revision} />
+                    <EditorForm
+                        submitHandler={this.formSubmit}
+                        revision={this.props.pageState.revision}
+                        articleCategory={this.props.articleCategory}
+                    />
                 </EditorLayout>
             </React.Fragment>
         );
@@ -135,8 +139,15 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
+    let articleCategory: any = undefined;
+    const { editorPage } = state.knowledge;
+    if (editorPage.article.status === LoadStatus.SUCCESS) {
+        articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
+    }
+
     return {
-        pageState: state.knowledge.editorPage,
+        pageState: editorPage,
+        articleCategory,
     };
 }
 

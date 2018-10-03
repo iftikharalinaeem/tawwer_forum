@@ -6,6 +6,7 @@
 
 import { produce, Draft } from "immer";
 import { LoadStatus } from "@library/@types/api";
+import { model } from "@knowledge/modules/categories/state";
 import * as actions from "./actions";
 import * as constants from "./constants";
 import { ILocationPickerState } from "./types";
@@ -13,6 +14,7 @@ import { ILocationPickerState } from "./types";
 export const initialState: ILocationPickerState = {
     selectedCategoryID: 1,
     navigatedCategoryID: 1,
+    chosenCategoryID: 1,
     items: {
         status: LoadStatus.PENDING,
     },
@@ -44,6 +46,17 @@ export default function editorPageReducer(
                 break;
             case constants.SELECT_CATEGORY:
                 draft.selectedCategoryID = action.payload.categoryID;
+                break;
+            case constants.CHOOSE_CATEGORY:
+                draft.chosenCategoryID = action.payload.categoryID;
+                break;
+            case constants.INIT:
+                draft.navigatedCategoryID = action.payload.category.parentID;
+                draft.selectedCategoryID = action.payload.category.knowledgeCategoryID;
+                draft.chosenCategoryID = action.payload.category.knowledgeCategoryID;
+            case constants.RESET_NAVIGATION:
+                draft.navigatedCategoryID = initialState.chosenCategoryID;
+                draft.selectedCategoryID = draft.chosenCategoryID;
                 break;
         }
     });

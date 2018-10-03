@@ -13,14 +13,15 @@ import { t } from "@library/application";
 import { Modal, ModalSizes } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
+    initialCategory?: IKbCategoryFragment;
 }
 
 interface IState {
     showLocationPicker: boolean;
-    selectedCategoryID: number;
 }
 
 /**
@@ -57,23 +58,26 @@ export class LocationInput extends React.Component<IProps, IState> {
                 </div>
                 {this.state.showLocationPicker && (
                     <Modal
-                        exitHandler={this.hideLocationChooser}
+                        exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
                         className={classNames(this.props.className)}
                         description={t("Choose a location for this page.")}
                     >
-                        <LocationPicker onCloseClick={this.hideLocationChooser} />
+                        <LocationPicker onChoose={this.hideLocationPicker} onCloseClick={this.hideLocationPicker} />
                     </Modal>
                 )}
             </React.Fragment>
         );
     }
 
-    /**
-     * Cleanup on unmount.
-     */
-    public componentWillUnmount() {
-        this.props.resetNavigation();
+    public get value(): number {
+        return this.props.chosenCategoryID;
+    }
+
+    public componentDidUpdate(oldProps: IProps) {
+        if (oldProps.initialCategory !== this.props.initialCategory && this.props.initialCategory) {
+            this.props.initForCategory(this.props.initialCategory);
+        }
     }
 
     /**
@@ -89,11 +93,11 @@ export class LocationInput extends React.Component<IProps, IState> {
     /**
      * Hiders the location picker modal.
      */
-    private hideLocationChooser = () => {
+    private hideLocationPicker = () => {
         this.setState({
             showLocationPicker: false,
         });
     };
 }
 
-export default withLocationPicker(LocationInput);
+export default withLocationPicker<IProps>(LocationInput);

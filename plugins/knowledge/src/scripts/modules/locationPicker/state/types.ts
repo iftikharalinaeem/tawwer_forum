@@ -10,5 +10,6 @@ import { IKbNavigationItem } from "@knowledge/@types/api";
 export interface ILocationPickerState {
     selectedCategoryID: number;
     navigatedCategoryID: number;
+    chosenCategoryID: number;
     items: ILoadable<IKbNavigationItem[]>;
 }

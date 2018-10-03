@@ -11,4 +11,5 @@ export const GET_KB_NAVIGATION_ERROR = "@@locationPicker/GET_KB_NAVIGATION_ERROR
 
 export const SET_NAVIGATED_CATEGORY = "@@locationPicker/SET_NAVIGATED_CATEGORY";
 export const SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
+export const CHOOSE_CATEGORY = "@@locationPicker/CHOOSE_CATEGORY";
 export const RESET_NAVIGATION = "@@locationPicker/RESET_NAVIGATION";

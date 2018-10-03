@@ -11,13 +11,12 @@ import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
     onCloseClick: () => void;
-    onChoose: (category: IKbCategoryFragment) => void;
+    onChoose: () => void;
 }
 
 interface IState {
@@ -80,6 +79,13 @@ export class LocationPicker extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Cleanup on unmount.
+     */
+    public componentWillUnmount() {
+        this.props.resetNavigation();
+    }
+
     private get canNavigateBack(): boolean {
         return this.props.navigatedCategory.parentID !== -1;
     }
@@ -112,7 +118,8 @@ export class LocationPicker extends React.Component<IProps, IState> {
     };
 
     private handleChoose = () => {
-        this.props.onChoose(this.props.selectedCategory);
+        this.props.chooseCategory(this.props.selectedCategory.knowledgeCategoryID);
+        this.props.onChoose();
     };
 }
 

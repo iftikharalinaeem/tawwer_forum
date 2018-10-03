@@ -8,13 +8,15 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IArticleRevision } from "@knowledge/@types/api";
+import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import Button from "@library/components/forms/Button";
+import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
+    articleCategory: IKbCategoryFragment;
 }
 
 interface IState {
@@ -39,6 +41,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
+                    <LocationInput initialCategory={this.props.articleCategory} />
                     <div className="inputBlock">
                         <input
                             className="inputBlock-inputText inputText"
