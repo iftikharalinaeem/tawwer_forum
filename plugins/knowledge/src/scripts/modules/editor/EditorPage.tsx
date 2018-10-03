@@ -5,17 +5,17 @@
  */
 
 import React from "react";
-import { withRouter, RouteComponentProps, Redirect } from "react-router-dom";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import Modal, { ModalSizes } from "@library/components/Modal";
+import { Modal, ModalSizes } from "@library/components/modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
-import { thunks, actions, model, constants } from "@knowledge/modules/editor/state";
+import { thunks, actions, model } from "@knowledge/modules/editor/state";
+import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { IPostArticleRevisionRequestBody, Format } from "@knowledge/@types/api";
-import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
+import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -27,7 +27,7 @@ interface IProps extends IOwnProps {
     clearPageState: () => void;
     initPageFromLocation: typeof thunks.initPageFromLocation;
     submitNewRevision: typeof thunks.submitNewRevision;
-    data: any; // temp
+    articleCategory: IKbCategoryFragment;
 }
 
 interface IState {
@@ -45,9 +45,12 @@ export class EditorPage extends React.Component<IProps, IState> {
     public render() {
         const pageContent = (
             <React.Fragment>
-                <LocationInput children={this.props.data} />
                 <EditorLayout backUrl={this.backLink}>
-                    <EditorForm submitHandler={this.formSubmit} />
+                    <EditorForm
+                        submitHandler={this.formSubmit}
+                        revision={this.props.pageState.revision}
+                        articleCategory={this.props.articleCategory}
+                    />
                 </EditorLayout>
             </React.Fragment>
         );
@@ -115,7 +118,7 @@ export class EditorPage extends React.Component<IProps, IState> {
         return !!(location && location.state && location.state.modal);
     }
 
-    private get backLink(): string {
+    private get backLink(): string | null {
         const { state } = this.props.location;
         return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
     }
@@ -124,7 +127,11 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        this.props.history.push(this.backLink);
+        if (this.backLink) {
+            this.props.history.goBack();
+        } else {
+            this.props.history.push("/kb");
+        }
     };
 }
 
@@ -132,8 +139,15 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
+    let articleCategory;
+    const { editorPage } = state.knowledge;
+    if (editorPage.article.status === LoadStatus.SUCCESS) {
+        articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
+    }
+
     return {
-        pageState: state.knowledge.editorPage,
+        pageState: editorPage,
+        articleCategory,
     };
 }
 

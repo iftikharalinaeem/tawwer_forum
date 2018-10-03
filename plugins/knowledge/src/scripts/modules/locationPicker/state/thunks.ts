@@ -5,7 +5,7 @@
  */
 
 import { IKbNavigationRequest } from "@knowledge/@types/api";
-import { getKbNavigationActions, setCategory } from "./actions";
+import { getKbNavigationActions, setNavigatedCategory } from "./actions";
 import { apiThunk } from "@library/state/utility";
 
 /**
@@ -31,7 +31,7 @@ export function getKbNavigation(options: IKbNavigationRequest) {
  */
 export function navigateToCategory(categoryID: number) {
     return async dispatch => {
-        dispatch(setCategory(categoryID));
+        dispatch(setNavigatedCategory(categoryID));
         dispatch(getKbNavigation({ knowledgeCategoryID: categoryID }));
     };
 }

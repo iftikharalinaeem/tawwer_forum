@@ -6,14 +6,18 @@
 
 import { produce, Draft } from "immer";
 import { LoadStatus } from "@library/@types/api";
+import { model } from "@knowledge/modules/categories/state";
 import * as actions from "./actions";
 import * as constants from "./constants";
 import { ILocationPickerState } from "./types";
 
 export const initialState: ILocationPickerState = {
-    status: LoadStatus.PENDING,
-    currentCategoryID: 1,
-    currentFolderItems: [],
+    selectedCategoryID: 1,
+    navigatedCategoryID: 1,
+    chosenCategoryID: 1,
+    items: {
+        status: LoadStatus.PENDING,
+    },
 };
 
 /**
@@ -29,16 +33,30 @@ export default function editorPageReducer(
     return produce(state, (draft: Draft<ILocationPickerState>) => {
         switch (action.type) {
             case constants.GET_KB_NAVIGATION_REQUEST:
-                draft.status = LoadStatus.LOADING;
+                draft.items.status = LoadStatus.LOADING;
                 break;
             case constants.GET_KB_NAVIGATION_RESPONSE:
-                draft.status = LoadStatus.SUCCESS;
-                draft.currentFolderItems = action.payload.data;
+                draft.items.status = LoadStatus.SUCCESS;
+                draft.items.data = action.payload.data;
                 break;
             case constants.GET_KB_NAVIGATION_ERROR:
                 break;
-            case constants.NAVIGATE_TO_CATEGORY:
-                draft.currentCategoryID = action.payload.categoryID;
+            case constants.SET_NAVIGATED_CATEGORY:
+                draft.navigatedCategoryID = action.payload.categoryID;
+                break;
+            case constants.SELECT_CATEGORY:
+                draft.selectedCategoryID = action.payload.categoryID;
+                break;
+            case constants.CHOOSE_CATEGORY:
+                draft.chosenCategoryID = action.payload.categoryID;
+                break;
+            case constants.INIT:
+                draft.navigatedCategoryID = action.payload.category.parentID;
+                draft.selectedCategoryID = action.payload.category.knowledgeCategoryID;
+                draft.chosenCategoryID = action.payload.category.knowledgeCategoryID;
+            case constants.RESET_NAVIGATION:
+                draft.navigatedCategoryID = initialState.chosenCategoryID;
+                draft.selectedCategoryID = draft.chosenCategoryID;
                 break;
         }
     });

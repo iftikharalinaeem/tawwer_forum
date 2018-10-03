@@ -4,7 +4,8 @@
  * @license Proprietary
  */
 
-import { actions, constants } from "@knowledge/modules/editor/state";
+import { actions } from "@knowledge/modules/editor/state";
+import * as route from "@knowledge/modules/editor/route";
 import { thunks as articleThunks } from "@knowledge/modules/article/state";
 import { History } from "history";
 import {
@@ -51,8 +52,8 @@ export function initPageFromLocation(history: History) {
     return async dispatch => {
         const { location } = history;
         // Use the same path regex as our router.
-        const addRegex = pathToRegexp(constants.ADD_ROUTE);
-        const editRegex = pathToRegexp(constants.EDIT_ROUTE);
+        const addRegex = pathToRegexp(route.ADD_ROUTE);
+        const editRegex = pathToRegexp(route.EDIT_ROUTE);
 
         // Check url
         if (addRegex.test(location.pathname)) {
@@ -60,7 +61,7 @@ export function initPageFromLocation(history: History) {
             const article: AxiosResponse<IPostArticleResponseBody> = await dispatch(
                 postArticle({ knowledgeCategoryID: 0 }),
             );
-            const replacementUrl = `/kb/articles/${article.data.articleID}/editor`;
+            const replacementUrl = route.makeEditUrl(article.data.articleID);
             const newLocation = {
                 ...location,
                 pathname: replacementUrl,
@@ -71,7 +72,9 @@ export function initPageFromLocation(history: History) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
             const article: AxiosResponse<IGetArticleResponseBody> = await dispatch(getEditArticle(articleID));
-            dispatch(getRevision(article.data.articleRevisionID));
+            if (article.data.articleRevisionID !== null) {
+                dispatch(getRevision(article.data.articleRevisionID));
+            }
         }
     };
 }
