@@ -59,8 +59,10 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         //$this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
 
         // Put together pre-loaded redux actions.
+        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
         $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
+            $categoriesGetRedux->getReduxAction(),
             $articlesGetRedux->getReduxAction(),
         ];
         $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
@@ -100,6 +102,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();
+        $data['page'][self::CATEGORY_API_RESPONSE] = $this->data[self::CATEGORY_API_RESPONSE];
         $data['page'] = $this->data[self::API_PAGE_KEY] ?? [];
         $data['page']['classes'][] = 'isLoading';
         $data['page']['userSignedIn'] = $this->session->isValid();
@@ -135,7 +138,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         if ($url === null) {
             switch ($this->action) {
                 case self::ACTION_VIEW_ARTICLES:
-                    if ($apiUrl = $this->data[self::API_PAGE_KEY]['url'] ?? false) {
+                    if ($apiUrl = $this->data[self::CATEGORY_API_RESPONSE]['url'] ?? false) {
                         $url = $apiUrl;
                     } else {
                         $url = \Gdn::request()->url('/kb/categories/'.$this->articleId.'-', true);
