@@ -1,79 +1,31 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
-import { IArticle } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
-import {
-    ArticleActions,
-    ArticleNavigation,
-    ArticleContent,
-    ArticleTOC,
-    RelatedArticles,
-    ArticleMenu,
-} from "@knowledge/modules/article/components";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
 import { InlineTypes } from "@library/components/Sentence";
+import { IKbCategoriesState } from "@knowledge/modules/categories/state";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
+import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
 
 interface IProps {
-    article: IArticle;
+    categories: any[];
     device: Devices;
 }
 
 interface IState {}
 
-export class ArticleLayout extends React.Component<IProps, IState> {
+export class CategoriesLayout extends React.Component<IProps, IState> {
     public render() {
-        const { article } = this.props;
-
-        const articleTOC: IPageHeading[] = [
-            {
-                name: "Overview",
-                anchor: "#overview",
-            },
-            {
-                name: "Changing Themes",
-                anchor: "#changing-themes",
-            },
-            {
-                name: "Configuration Guide",
-                anchor: "#configuration-guide",
-            },
-            {
-                name: "Theming Guide for Designers",
-                anchor: "#theming-guide-for-designers",
-            },
-        ];
-
-        const articleRelatedArticles: IInternalLink[] = [
-            {
-                name: "Overview",
-                to: "#overview",
-            },
-            {
-                name: "Changing Themes",
-                to: "#changing-themes",
-            },
-            {
-                name: "Configuration Guide",
-                to: "#configuration-guide",
-            },
-            {
-                name: "Theming Guide for Designers",
-                to: "#theming-guide-for-designers",
-            },
-        ];
-
         const metaData = {
             children: [
                 {
@@ -113,28 +65,10 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
-                    <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
-                    </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <PageTitle
-                            title={article.articleRevision.name}
-                            menu={<ArticleMenu article={article} />}
-                            meta={metaData as any}
-                        />
+                        <PageTitle title={t("[Category Name]")} menu={<CategoryMenu />} meta={metaData as any} />
                     </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <ArticleContent article={article} />
-                    </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <ArticleTOC children={articleTOC} />
-                    </PanelLayout.RightTop>
-                    <PanelLayout.RightBottom>
-                        <RelatedArticles children={articleRelatedArticles} />
-                    </PanelLayout.RightBottom>
+                    <PanelLayout.MiddleBottom>{t("toto")}</PanelLayout.MiddleBottom>
                 </PanelLayout>
             </Container>
         );
@@ -170,4 +104,4 @@ export class ArticleLayout extends React.Component<IProps, IState> {
     }
 }
 
-export default withDevice<IProps>(ArticleLayout);
+export default withDevice<IProps>(CategoriesLayout);

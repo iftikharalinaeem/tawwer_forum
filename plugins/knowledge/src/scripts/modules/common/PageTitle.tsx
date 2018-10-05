@@ -1,7 +1,7 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
@@ -11,17 +11,16 @@ import { IArticle } from "@knowledge/@types/api";
 import Sentence, { ISentence } from "@library/components/Sentence";
 
 interface IProps {
-    article: IArticle;
+    title: string;
     menu?: JSX.Element;
-    meta: ISentence;
+    meta?: ISentence;
 }
 
-export default class ArticleTitle extends React.Component<IProps> {
+export default class PageTitle extends React.Component<IProps> {
     public render() {
-        const { article } = this.props;
         return (
             <PanelWidget>
-                <PageHeading title={article.articleRevision.name} menu={this.props.menu} />
+                <PageHeading title={this.props.title} menu={this.props.menu} />
                 {this.props.meta && (
                     <div className="pageMetas metas">
                         <Sentence {...this.props.meta} recursiveChildClass="meta pageMetas-meta" />
