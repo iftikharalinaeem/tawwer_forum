@@ -59,13 +59,13 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         //$this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
 
         // Put together pre-loaded redux actions.
-        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
-        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
-        $reduxActions = [
-            $categoriesGetRedux->getReduxAction(),
-            $articlesGetRedux->getReduxAction(),
-        ];
-        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+//        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
+//        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
+//        $reduxActions = [
+//            $categoriesGetRedux->getReduxAction(),
+//            $articlesGetRedux->getReduxAction(),
+//        ];
+//        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -121,8 +121,8 @@ class CategoriesPageController extends KnowledgeTwigPageController {
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
         if ($this->action === self::ACTION_VIEW_ARTICLES) {
             $this->meta
-                ->setSeo('title', $this->getApiPageData('seoName'))
-                ->setSeo('description', $this->getApiPageData('seoDescription'));
+                ->setSeo('title', $this->getCategoryApiPageData('seoName'))
+                ->setSeo('description', $this->getCategoryApiPageData('seoDescription'));
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
