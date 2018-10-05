@@ -83,6 +83,7 @@ class ArticleModel extends \Vanilla\Models\Model {
         $result = $this->sql()
             ->select("a.*")
             ->join("articleRevision ar", "ar.status = \"published\" and a.articleID = ar.articleID")
+            ->where(["a.knowledgeCategoryID" => $knowledgeCategoryID])
             ->get($this->getTable() . " a", $orderFields, $orderDirection, $limit, $page)
             ->resultArray();
         return $result;
