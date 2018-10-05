@@ -22,3 +22,13 @@
   user-select: none;
   pointer-events: none;
 }
+
+.smartAlign-outer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smartAlign-inner {
+  text-align: left;
+}
