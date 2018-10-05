@@ -16,6 +16,9 @@ use Exception;
  */
 class ArticleModel extends \Vanilla\Models\Model {
 
+    /** Default limit on the number of results returned. */
+    const LIMIT_DEFAULT = 30;
+
     /** @var Gdn_Session */
     private $session;
 
@@ -25,8 +28,25 @@ class ArticleModel extends \Vanilla\Models\Model {
      * @param Gdn_Session $session
      */
     public function __construct(Gdn_Session $session) {
-        parent::__construct('article');
+        parent::__construct("article");
         $this->session = $session;
+    }
+
+    /**
+     * Get resource rows from a database table.
+     *
+     * @param array $where Conditions for the select query.
+     * @param array $options Options for the select query.
+     *    - orderFields (string, array): Fields to sort the result by.
+     *    - orderDirection (string): Sort direction for the order fields.
+     *    - limit (int): Limit on the total results returned.
+     *    - offset (int): Row offset before capturing the result.
+     * @return array Rows matching the conditions and within the parameters specified in the options.
+     * @throws ValidationException If a row fails to validate against the schema.
+     */
+    public function get(array $where = [], array $options = []): array {
+        $options["limit"] = $options["limit"] ?? self::LIMIT_DEFAULT;
+        return parent::get($where, $options);
     }
 
     /**
@@ -47,7 +67,33 @@ class ArticleModel extends \Vanilla\Models\Model {
     }
 
     /**
-     * @inheritdoc
+     * Get articles with a published revision in a particular category.
+     *
+     * @param int $knowledgeCategoryID
+     * @param array $options
+     * @return array
+     */
+    public function getPublishedByCategory(int $knowledgeCategoryID, array $options = []): array {
+        $orderFields = $options["orderFields"] ?? "";
+        $orderDirection = $options["orderDirection"] ?? "asc";
+        $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
+        $offset = $options["offset"] ?? 0;
+        $page = $offset / $limit;
+
+        $result = $this->sql()
+            ->select("a.*")
+            ->join("articleRevision ar", "ar.status = \"published\" and a.articleID = ar.articleID")
+            ->get($this->getTable() . " a", $orderFields, $orderDirection, $limit, $page)
+            ->resultArray();
+        return $result;
+    }
+
+    /**
+     * Add an article.
+     *
+     * @param array $set Field values to set.
+     * @return mixed ID of the inserted row.
+     * @throws Exception If an error is encountered while performing the query.
      */
     public function insert(array $set) {
         $set["insertUserID"] = $set["updateUserID"] = $this->session->UserID;
@@ -58,7 +104,12 @@ class ArticleModel extends \Vanilla\Models\Model {
     }
 
     /**
-     * @inheritdoc
+     * Update existing articles.
+     *
+     * @param array $set Field values to set.
+     * @param array $where Conditions to restrict the update.
+     * @throws Exception If an error is encountered while performing the query.
+     * @return bool True.
      */
     public function update(array $set, array $where): bool {
         $set["updateUserID"] = $this->session->UserID;

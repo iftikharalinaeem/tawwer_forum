@@ -24,6 +24,9 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /** @var \Garden\Schema\Schema */
+    private $articleFragmentSchema;
+
+    /** @var \Garden\Schema\Schema */
     private $articlePostSchema;
 
     /** @var \Garden\Schema\Schema */
@@ -98,6 +101,31 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         return $this->schema($this->articlePostSchema, $type);
+    }
+
+    /**
+     * Get an article schema with minimal fields.
+     *
+     * @param string $type The type of schema.
+     * @return \Garden\Schema\Schema Returns a schema object.
+     */
+    public function articleFragmentSchema(string $type = ""): \Garden\Schema\Schema {
+        if ($this->articleFragmentSchema === null) {
+            $this->articleFragmentSchema = $this->schema(
+                \Garden\Schema\Schema::parse([
+                    "articleID",
+                    "knowledgeCategoryID",
+                    "sort",
+                ])->add($this->fullSchema()),
+                "ArticleFragment"
+            );
+            $this->articleFragmentSchema->setField(
+                "properties.articleRevision",
+                \Garden\Schema\Schema::parse(["name"])->add($this->articleRevisionsApiController->articleRevisionSchema())
+            );
+        }
+
+        return $this->schema($this->articleFragmentSchema, $type);
     }
 
     /**
@@ -186,7 +214,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $article,
             ["insertUserID", "updateUserID"]
         );
-        $article = $this->normalizeOutput($article, $query["expand"] ?: []);
+        $revision = $this->articleRevisionModel->get([
+            "articleID" => $id,
+            "status" => "published"
+        ]);
+        $revision = array_column($revision, null, "articleID");
+        $article = $this->normalizeOutput($article, $query["expand"] ?: [], $revision);
         $result = $out->validate($article);
         return $result;
     }
@@ -233,26 +266,74 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * List published articles in a given knowledge category.
+     *
+     * @param array $query
+     * @return mixed
+     * @throws ValidationException If input validation fails.
+     * @throws ValidationException If output validation fails.
+     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function index(array $query = []) {
+        $this->permission("knowledge.kb.view");
+
+        $in = $this->schema([
+            "knowledgeCategoryID" => [
+                "type" => "integer",
+                "minimum" => 1,
+            ],
+            "limit" => [
+                "default" => ArticleModel::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("List published articles in a given knowledge category.");
+        $out = $this->schema([":a" => $this->articleSchema()], "out");
+
+        $query = $in->validate($query);
+
+        $rows = $this->articleModel->getPublishedByCategory(
+            $query["knowledgeCategoryID"],
+            ["limit" => $query["limit"]]
+        );
+        $articleIDs = array_column($rows, "articleID");
+        if ($articleIDs) {
+            $revisions = $this->articleRevisionModel->get([
+                "articleID" => $articleIDs,
+                "status" => "published",
+            ]);
+            $revisions = array_column($revisions, null, "articleID");
+        } else {
+            $revisions = [];
+        }
+        foreach ($rows as &$row) {
+            $row = $this->normalizeOutput($row, ["articleRevision"], $revisions);
+        }
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
      * Massage article row data for useful API output.
      *
      * @param array $row
      * @param array $expand
+     * @param array $revisions Relevant published revisions. Indexed by article ID.
      * @return array
      * @throws ServerException If no article ID was found in the row.
      * @throws ValidationException If a fetched article fails to validate against the article schema.
      * @throws ValidationException If a fetched article revision fails to validate against the article revision schema.
      */
-    public function normalizeOutput(array $row, array $expand = []): array {
+    public function normalizeOutput(array $row, array $expand = [], array $revisions = []): array {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
 
-        $publishedRevision = $this->articleRevisionModel->get([
-            "articleID" => $row["articleID"],
-            "status" => "published"
-        ]);
-        $articleRevision = reset($publishedRevision) ?: null;
+        $articleRevision = $revisions[$articleID] ?? null;
         if ($articleRevision) {
             $this->userModel->expandUsers(
                 $articleRevision,
@@ -302,7 +383,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
         $row = $this->articleByID($id);
-        $row = $this->normalizeOutput($row);
+        $revision = $this->articleRevisionModel->get([
+            "articleID" => $id,
+            "status" => "published"
+        ]);
+        $revision = array_column($revision, null, "articleID");
+        $row = $this->normalizeOutput($row, [], $revision);
         $result = $out->validate($row);
         return $result;
     }
@@ -325,7 +411,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
         $articleID = $this->articleModel->insert($body);
         $row = $this->articleByID($articleID);
-        $row = $this->normalizeOutput($row);
+        $revision = $this->articleRevisionModel->get([
+            "articleID" => $articleID,
+            "status" => "published"
+        ]);
+        $revision = array_column($revision, null, "articleID");
+        $row = $this->normalizeOutput($row, [], $revision);
         $result = $out->validate($row);
         return $result;
     }
