@@ -14,7 +14,7 @@ import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
-import { ModalSizes } from "@library/components/modal/ModalSizes";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
