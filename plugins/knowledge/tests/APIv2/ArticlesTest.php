@@ -76,10 +76,56 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles.
      */
     public function testIndex() {
-        if (!method_exists(ArticlesApiController::class, "index")) {
-            $this->markTestSkipped("Getting a list of articles is not implemented.");
-        } else {
-            $this->fail("Missing test for retrieving a list of articles.");
+        // Setup the test categories.
+        $primaryCategory = $this->api()->post("knowledge-categories", [
+            "name" => __FUNCTION__ . " Primary",
+            "parentID" => -1,
+            "isSection" => false,
+        ])->getBody();
+        $secondaryCategory = $this->api()->post("knowledge-categories", [
+            "name" => __FUNCTION__ . " Secondary",
+            "parentID" => -1,
+            "isSection" => false,
+        ])->getBody();
+
+        // Setup the test articles.
+        for ($i = 1; $i <= 5; $i++) {
+            $primaryArticle = $this->api()->post($this->baseUrl, [
+                "knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]
+            ])->getBody();
+            $this->api()->post("article-revisions", [
+                "articleID" => $primaryArticle["articleID"],
+                "name" => "Primary Category Article",
+                "body" => "Hello world.",
+                "format" => "markdown",
+            ])->getBody();
+
+            $secondaryArticle = $this->api()->post($this->baseUrl, [
+                "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"]
+            ])->getBody();
+            $this->api()->post("article-revisions", [
+                "articleID" => $secondaryArticle["articleID"],
+                "name" => "Secondary Category Article",
+                "body" => "Hello world.",
+                "format" => "markdown",
+            ])->getBody();
         }
+
+        // Get the articles for the primary category.
+        $articles = $this->api()->get(
+            $this->baseUrl,
+            ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
+        )->getBody();
+
+        // Verify the result.
+        $this->assertNotEmpty($articles);
+        $success = true;
+        foreach ($articles as $article) {
+            if ($article["knowledgeCategoryID"] !== $primaryCategory["knowledgeCategoryID"]) {
+                $success = false;
+                break;
+            }
+        }
+        $this->assertTrue($success, "Unable to limit index to articles in a specific category.");
     }
 }
