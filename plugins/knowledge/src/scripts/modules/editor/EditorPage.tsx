@@ -9,13 +9,14 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import { Modal, ModalSizes } from "@library/components/modal";
+import { Modal } from "@library/components/modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { thunks, actions, model } from "@knowledge/modules/editor/state";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
+import { ModalSizes } from "@library/components/modal/ModalSizes";
 
 interface IOwnProps
     extends RouteComponentProps<{
