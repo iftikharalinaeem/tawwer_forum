@@ -29,7 +29,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     public function __construct(Gdn_Session $session) {
         parent::__construct("knowledgeCategory");
         $this->session = $session;
-    }
+
+        $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
+            ->setUpdateFields(["dateUpdated"]);
+        $this->addPipelineProcessor($dateProcessor);
+
+        $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
+            ->setUpdateFields(["updateUserID"]);
+        $this->addPipelineProcessor($userProcessor);    }
 
     /**
      * Configure a Garden Schema instance for write operations by the model.
@@ -55,21 +64,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             $where,
             $limit
         );
-    }
-
-    /**
-     * Add a knowledge category.
-     *
-     * @param array $set Field values to set.
-     * @return mixed ID of the inserted row.
-     * @throws \Exception If an error is encountered while performing the query.
-     */
-    public function insert(array $set) {
-        $set["insertUserID"] = $set["updateUserID"] = $this->session->UserID;
-        $set["dateInserted"] = $set["dateUpdated"] = new DateTimeImmutable("now");
-
-        $result = parent::insert($set);
-        return $result;
     }
 
     /**
@@ -124,9 +118,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 throw new \Garden\Web\Exception\ClientException("Cannot set the parent of a knowledge category to itself.");
             }
         }
-
-        $set["updateUserID"] = $this->session->UserID;
-        $set["dateUpdated"] = new DateTimeImmutable("now");
 
         return parent::update($set, $where);
     }
