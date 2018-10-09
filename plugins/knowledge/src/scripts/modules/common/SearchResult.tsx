@@ -8,10 +8,11 @@ import * as React from "react";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import { ISentence } from "@library/components/Sentence";
+import Sentence, { ISentence } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
 import { Link } from "react-router-dom";
 import Attachments, { IAttachmentsIcons, IAttachmentsDetailed, AttachmentDisplay } from "./Attachments";
+import Paragraph from "@library/components/Paragraph";
 
 export interface IResult {
     name: string;
@@ -39,19 +40,20 @@ export default class SearchResult extends React.Component<IResult> {
         let attachmentOutput;
         if (hasAttachments && attachments) {
             if (attachments.display === AttachmentDisplay.ICON) {
-                attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.ICON} />;
+                attachmentOutput = <Attachments children={attachments.children} display={attachments.display} />;
             } else {
                 attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.DETAILED} />;
             }
         }
 
         return (
-            <li className={classNames("searchResult", this.props.className)}>
+            <li className={classNames("searchResults-item", this.props.className)}>
                 <article className="searchResult-contents">
-                    <Link to={this.props.url} className="searchResult-link">
+                    <Link to={this.props.url} className="searchResult">
                         <div className="searchResult-main">
-                            {this.props.name}
-                            {this.props.excerpt}
+                            <div className="searchResult-title">{this.props.name}</div>
+                            {this.props.meta && <Sentence children={this.props.meta as any} />}
+                            {this.props.excerpt && <Paragraph>{this.props.excerpt}</Paragraph>}
                         </div>
                         <div className="searchResult-media">
                             {!hasAttachments && image}

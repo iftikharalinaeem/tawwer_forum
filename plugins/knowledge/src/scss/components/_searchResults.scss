@@ -41,6 +41,16 @@ $searchResult_breakPoint                      : 800px;
 
 }
 
+.searchResults-item {
+    position: relative;
+    display: block;
+}
+
+.searchResult-contents {
+    position: relative;
+    display: block;
+}
+
 .searchResult {
     display: flex;
     align-items: center;
@@ -118,10 +128,7 @@ $searchResult_breakPoint                      : 800px;
     display: block;
     color: $searchResult-title_color;
     flex-grow: 1;
-    margin: {
-        top: -$global-lineHeight_offset;
-        bottom: 0;
-    }
+    margin: 0;
     padding: {
         right: $utility-baseUnit * 2;
     }

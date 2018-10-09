@@ -96,13 +96,76 @@ export class CategoriesLayout extends React.Component<IProps> {
                         display: AttachmentDisplay.ICON,
                         children: [
                             {
-                                name: "Some Word Document",
+                                name: "Some Word Document 1",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 2",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 3",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 4",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 5",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 6",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 7",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 8",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 9",
                                 type: AttachmentType.WORD,
                             },
                         ],
                     },
                 ],
                 image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
+            },
+            {
+                name:
+                    "Getting Help with your communityGetting Help with your communityGetting Help with your communityGetting Help with your communityGetting Help with your communityGetting Help with your communityGetting Help with your communityGetting Help with your community",
+                meta: metaData,
+                url: "#",
+                excerpt:
+                    "Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.",
+                attachments: [
+                    {
+                        display: AttachmentDisplay.ICON,
+                        children: [
+                            {
+                                name: "Some Word Document 1",
+                                type: AttachmentType.WORD,
+                            },
+                            {
+                                name: "Some Word Document 2",
+                                type: AttachmentType.PDF,
+                            },
+                            {
+                                name: "Some Word Document 3",
+                                type: AttachmentType.FILE,
+                            },
+                            {
+                                name: "Some Word Document 4",
+                                type: AttachmentType.EXCEL,
+                            },
+                        ],
+                    },
+                ],
             },
         ];
 

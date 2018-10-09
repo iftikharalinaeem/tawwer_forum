@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Sentence, { ISentence } from "@library/components/Sentence";
+import Sentence, { ISentence, InlineTypes } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
 import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
 import Paragraph from "@library/components/Paragraph";
@@ -44,6 +44,7 @@ export interface IDetailedAttachment extends IAttachmentCommon {
 export interface IAttachmentsIcons {
     display: AttachmentDisplay.ICON;
     children: IIconAttachment[];
+    maxCount?: number;
 }
 
 // Array of detailed attachments
@@ -57,15 +58,20 @@ interface IState {
 }
 
 export default class SearchResult extends React.Component<IAttachmentsIcons | IAttachmentsDetailed, IState> {
-    // public static defaultProps = {
-    //     selectedIndex: 0,
-    // };
+    private maxCount;
 
     constructor(props) {
         super(props);
         this.state = {
             id: getRequiredID(props, "attachments-"),
         };
+
+        if (props.type === AttachmentDisplay.ICON) {
+            this.maxCount = 3;
+            if (props.maxCount && props.maxCount > 0 && props.maxCount <= props.children.length) {
+                this.maxCount = props.maxCount;
+            }
+        }
     }
 
     public get titleID() {
@@ -91,24 +97,56 @@ export default class SearchResult extends React.Component<IAttachmentsIcons | IA
             const attachments = loopableArray(this.props.children)
                 ? this.props.display === AttachmentDisplay.ICON &&
                   this.props.children.map((attachment, i) => {
-                      return (
-                          <li className="attachmentsIcons-item attachmentsIcons-items" key={`attachment-${i}`}>
-                              <div
-                                  className={classNames(
-                                      "attachmentsIcons-file",
-                                      `attachmentsIcons-${attachment.type.toLocaleLowerCase()}`,
-                                  )}
-                                  title={t(attachment.type)}
-                              >
-                                  <span className="sr-only">
-                                      <Paragraph>{`${attachment.name} (${t("Type: ")}} ${t(
-                                          attachment.type,
-                                      )}})`}</Paragraph>
-                                  </span>
-                                  {this.getAttachmentIcon(attachment.type)}
-                              </div>
-                          </li>
-                      );
+                      const key = `attachment-${i}`;
+                      const index = i + 1;
+                      if (index < this.maxCount) {
+                          return (
+                              <li className="attachmentsIcons-item" key={key}>
+                                  <div
+                                      className={classNames(
+                                          "attachmentsIcons-file",
+                                          `attachmentsIcons-${attachment.type.toLocaleLowerCase()}`,
+                                      )}
+                                      title={t(attachment.type)}
+                                  >
+                                      <span className="sr-only">
+                                          <Paragraph>{`${attachment.name} (${t("Type: ")}} ${t(
+                                              attachment.type,
+                                          )}})`}</Paragraph>
+                                      </span>
+                                      {this.getAttachmentIcon(attachment.type)}
+                                  </div>
+                              </li>
+                          );
+                      } else if (i === index) {
+                          const moreMessage = {
+                              children: [
+                                  {
+                                      children: "+ ",
+                                      type: InlineTypes.TEXT,
+                                  },
+                                  {
+                                      children: this.props.children.length - index,
+                                      type: InlineTypes.TEXT,
+                                      className: "attachmentsIcons-moreCount",
+                                  },
+                                  {
+                                      children: " more",
+                                      type: InlineTypes.TEXT,
+                                  },
+                              ],
+                          };
+
+                          return (
+                              <li className="attachmentsIcons-item" key={key}>
+                                  <div className={classNames("attachmentsIcons-more")} title={t(attachment.type)}>
+                                      {<Sentence children={moreMessage.children as any} />}
+                                  </div>
+                              </li>
+                          );
+                      } else {
+                          return null;
+                      }
                   })
                 : null;
 

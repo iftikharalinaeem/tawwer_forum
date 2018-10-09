@@ -48,7 +48,7 @@ export default class SearchResults extends React.Component<IProps, IState> {
 
         if (hasResults) {
             content = this.props.children.map((result, i) => {
-                return <SearchResult {...result} display={this.props.attachmentDisplay} />;
+                return <SearchResult {...result} display={this.props.attachmentDisplay} key={`searchResults-${i}`} />;
             });
         } else if (!this.props.searchTerm || this.props.searchTerm === "") {
             content = <Paragraph className="searchResults-noResults">{t("No results")}</Paragraph>;
