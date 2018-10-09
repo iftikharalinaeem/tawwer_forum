@@ -29,6 +29,12 @@
             <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
+        <noscript>
+            <style>
+                .fullPageLoader { display: none }
+            </style>
+        </noscript>
+
     </head>
     <body class="{{ page.classes|join(' ') }}">
         <div class="page">
@@ -36,13 +42,12 @@
                 {{ include('partials/header.twig') }}
             </div>
             <div id="app" class="page-minHeight">
-                <div class="fullPageLoader">
-                    {% if template %}
-                        <noscript>
-                            {{ include(template) }}
-                        </noscript>
-                    {% endif %}
-                </div>
+                {% if template %}
+                    <noscript>
+                        {{ include(template) }}
+                    </noscript>
+                {% endif %}
+                <div class="fullPageLoader"></div>
             </div>
             <div id="footerContainer">
                 {{ include('partials/footer.twig') }}

@@ -144,6 +144,8 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();
         $data['page'] = $this->data[self::API_PAGE_KEY] ?? [];
+        $data['page']['name'] = $this->data[self::API_PAGE_KEY]['articleRevision']['name'];
+        $data['page']['bodyRendered'] = $this->data[self::API_PAGE_KEY]['articleRevision']['bodyRendered'];
         $data['page']['classes'][] = 'isLoading';
         $data['page']['userSignedIn'] = $this->session->isValid();
         $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';

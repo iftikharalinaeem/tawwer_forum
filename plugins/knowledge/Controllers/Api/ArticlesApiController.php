@@ -350,11 +350,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $row["url"] = \Gdn::request()->url("/kb/articles/".($slug ?: $row["articleID"]), true);
+        $row["seoName"] = $articleRevision['seoName'] ?? $articleRevision['name'];
+        $row["slug"] = $slug;
 
         // Placeholder data.
-        $row["seoName"] = "Example SEO Name";
         $row["seoDescription"] = "Example SEO description.";
-        $row["slug"] = $slug;
         if ($this->isExpandField("ancestors", $expand)) {
             $row["categoryAncestorIDs"] = [1, 2, 3];
         }
