@@ -8,18 +8,20 @@ import * as React from "react";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import SearchResult from "./SearchResult";
+import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Sentence, { InlineTypes } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
+import { AttachmentDisplay } from "@knowledge/modules/common/Attachments";
 
 interface IProps {
     className?: string;
-    children: any[];
     searchTerm?: string;
+    children: IResult[];
+    attachmentDisplay: AttachmentDisplay;
 }
 interface IState {
-    children: any[];
+    children: IResult[];
 }
 
 export default class SearchResults extends React.Component<IProps, IState> {
@@ -45,8 +47,8 @@ export default class SearchResults extends React.Component<IProps, IState> {
         };
 
         if (hasResults) {
-            this.props.children.map((result, i) => {
-                return <SearchResult {...result} />;
+            content = this.props.children.map((result, i) => {
+                return <SearchResult {...result} display={this.props.attachmentDisplay} />;
             });
         } else if (!this.props.searchTerm || this.props.searchTerm === "") {
             content = <Paragraph className="searchResults-noResults">{t("No results")}</Paragraph>;

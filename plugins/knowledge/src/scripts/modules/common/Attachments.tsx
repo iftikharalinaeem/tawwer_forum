@@ -27,7 +27,6 @@ export enum AttachmentDisplay {
 
 // Common to both attachment types
 interface IAttachmentCommon {
-    id: string;
     name: string;
     type: AttachmentType;
 }
@@ -42,13 +41,13 @@ export interface IDetailedAttachment extends IAttachmentCommon {
 }
 
 // Array of icon attachments
-export interface IattachmentsIcons {
+export interface IAttachmentsIcons {
     display: AttachmentDisplay.ICON;
     children: IIconAttachment[];
 }
 
 // Array of detailed attachments
-export interface IattachmentsDetailed {
+export interface IAttachmentsDetailed {
     display: AttachmentDisplay.DETAILED;
     children: IDetailedAttachment[];
 }
@@ -57,7 +56,7 @@ interface IState {
     id: string;
 }
 
-export default class SearchResult extends React.Component<IattachmentsIcons | IattachmentsDetailed, IState> {
+export default class SearchResult extends React.Component<IAttachmentsIcons | IAttachmentsDetailed, IState> {
     // public static defaultProps = {
     //     selectedIndex: 0,
     // };
@@ -93,7 +92,7 @@ export default class SearchResult extends React.Component<IattachmentsIcons | Ia
                 ? this.props.display === AttachmentDisplay.ICON &&
                   this.props.children.map((attachment, i) => {
                       return (
-                          <li className="attachmentsIcons-item attachmentsIcons-items">
+                          <li className="attachmentsIcons-item attachmentsIcons-items" key={`attachment-${i}`}>
                               <div
                                   className={classNames(
                                       "attachmentsIcons-file",

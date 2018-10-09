@@ -10,7 +10,8 @@ import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import { ISentence } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
-import Attachments, { IDetailedAttachment, IIconAttachment, AttachmentDisplay } from "./AttachmentIcons";
+import { Link } from "react-router-dom";
+import Attachments, { IAttachmentsIcons, IAttachmentsDetailed, AttachmentDisplay } from "./Attachments";
 
 export interface IResult {
     name: string;
@@ -19,44 +20,44 @@ export interface IResult {
     url: string;
     excerpt: string;
     image?: string;
-    children: IIconAttachment[] | IDetailedAttachment[];
+    attachments?: IAttachmentsDetailed | IAttachmentsIcons;
     display: AttachmentDisplay;
 }
 
-interface IProps {
-    className?: string;
-    children: IResult[];
-}
-
-interface IState {}
-
-export default class SearchResult extends React.Component<IResult, IState> {
-    // public static defaultProps = {
-    //     selectedIndex: 0,
-    // };
-
-    // public constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         id: getRequiredID(props, "selectBox-"),
-    //         selectedIndex: this.props.selectedIndex,
-    //     };
-    // }
+export default class SearchResult extends React.Component<IResult> {
+    public static defaultProps = {
+        attachmentDisplay: AttachmentDisplay.ICON,
+    };
 
     public render() {
-        const hasAttachments = loopableArray(this.props.children);
+        const hasAttachments = this.props.attachments && loopableArray(this.props.attachments.children);
         const image = this.props.image ? (
             <img src={this.props.image} alt={t("Thumbnail for: " + this.props.name)} aria-hidden={true} />
         ) : null;
 
+        const attachments = this.props.attachments;
+        let attachmentOutput;
+        if (hasAttachments && attachments) {
+            if (attachments.display === AttachmentDisplay.ICON) {
+                attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.ICON} />;
+            } else {
+                attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.DETAILED} />;
+            }
+        }
+
         return (
             <li className={classNames("searchResult", this.props.className)}>
                 <article className="searchResult-contents">
-                    <div className="searchResult-main" />
-                    <div className="searchResult-media">
-                        {!hasAttachments && image}
-                        <Attachments children={this.props.children} display={this.props.display} />
-                    </div>
+                    <Link to={this.props.url} className="searchResult-link">
+                        <div className="searchResult-main">
+                            {this.props.name}
+                            {this.props.excerpt}
+                        </div>
+                        <div className="searchResult-media">
+                            {!hasAttachments && image}
+                            {attachmentOutput}
+                        </div>
+                    </Link>
                 </article>
             </li>
         );
