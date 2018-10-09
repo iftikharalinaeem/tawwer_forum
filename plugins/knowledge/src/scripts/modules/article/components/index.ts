@@ -5,7 +5,6 @@
  */
 
 export { default as ArticleActions } from "./ArticleActions";
-export { default as ArticleContent } from "./ArticleContent";
 export { default as ArticleLayout } from "./ArticleLayout";
 export { default as ArticleNavigation } from "./ArticleActions";
 export { default as ArticleTOC } from "./ArticleTOC";

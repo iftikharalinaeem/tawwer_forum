@@ -24,7 +24,7 @@ export interface IProps {}
  */
 export default class ArticleMenu extends React.PureComponent<IProps> {
     public render() {
-        const domID = "categoryMenuDropDown";
+        const domID = "categoryMenuDropDown"; // Todo: dynamic
         // Hard coded data/functions
         const buttonClick = () => {
             alert("Click works");

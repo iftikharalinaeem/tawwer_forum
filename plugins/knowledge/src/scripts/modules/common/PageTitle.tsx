@@ -14,13 +14,14 @@ interface IProps {
     title: string;
     menu?: JSX.Element;
     meta?: ISentence;
+    backUrl?: string | null;
 }
 
 export default class PageTitle extends React.Component<IProps> {
     public render() {
         return (
             <PanelWidget>
-                <PageHeading title={this.props.title} menu={this.props.menu} />
+                <PageHeading backUrl={this.props.backUrl} title={this.props.title} menu={this.props.menu} />
                 {this.props.meta && (
                     <div className="pageMetas metas">
                         <Sentence {...this.props.meta} recursiveChildClass="meta pageMetas-meta" />

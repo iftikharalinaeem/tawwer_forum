@@ -20,7 +20,7 @@ interface IProps extends IDeviceProps {}
 export class CategoriesPage extends React.Component<IProps> {
     public render() {
         const categories = Object.values(dummyData.categoriesByID);
-        return <CategoriesLayout categories={categories} />;
+        return <CategoriesLayout children={categories} />;
     }
 }
 

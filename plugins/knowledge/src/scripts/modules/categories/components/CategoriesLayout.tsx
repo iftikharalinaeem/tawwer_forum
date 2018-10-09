@@ -16,9 +16,11 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
+import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import SearchResults from "@knowledge/modules/common/SearchResults";
 
 interface IProps {
-    categories: any[];
+    children: IKbCategoryFragment[];
     device: Devices;
 }
 
@@ -66,9 +68,16 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.MiddleTop>
-                        <PageTitle title={t("[Category Name]")} menu={<CategoryMenu />} meta={metaData as any} />
+                        <PageTitle
+                            backUrl="#Back"
+                            title={t("[Category Name]")}
+                            menu={<CategoryMenu />}
+                            meta={metaData as any}
+                        />
                     </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>{t("toto")}</PanelLayout.MiddleBottom>
+                    <PanelLayout.MiddleBottom>
+                        <SearchResults />
+                    </PanelLayout.MiddleBottom>
                 </PanelLayout>
             </Container>
         );

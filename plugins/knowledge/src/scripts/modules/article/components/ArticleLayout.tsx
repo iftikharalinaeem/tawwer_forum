@@ -12,7 +12,6 @@ import { Devices } from "@library/components/DeviceChecker";
 import {
     ArticleActions,
     ArticleNavigation,
-    ArticleContent,
     ArticleTOC,
     RelatedArticles,
     ArticleMenu,
@@ -24,6 +23,7 @@ import { InlineTypes } from "@library/components/Sentence";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
+import UserContent from "@library/components/UserContent";
 
 interface IProps {
     article: IArticle;
@@ -127,7 +127,9 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <ArticleContent article={article} />
+                        <PanelWidget>
+                            <UserContent content={article.articleRevision.bodyRendered} />
+                        </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
                         <ArticleTOC children={articleTOC} />
