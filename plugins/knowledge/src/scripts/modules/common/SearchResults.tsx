@@ -10,7 +10,8 @@ import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import SearchResult from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
-import Sentence, {InlineTypes} from "@library/components/Sentence";
+import Sentence, { InlineTypes } from "@library/components/Sentence";
+import { loopableArray } from "@library/utility";
 
 interface IProps {
     className?: string;
@@ -23,7 +24,7 @@ interface IState {
 
 export default class SearchResults extends React.Component<IProps, IState> {
     public render() {
-        const hasResults = this.props.children.length > 0;
+        const hasResults = loopableArray(this.props.children);
         let content;
 
         const noResultsMessage = {
@@ -44,28 +45,21 @@ export default class SearchResults extends React.Component<IProps, IState> {
         };
 
         if (hasResults) {
-            content = this.props.children.forEach((result, i) => {
+            this.props.children.map((result, i) => {
                 return <SearchResult {...result} />;
             });
         } else if (!this.props.searchTerm || this.props.searchTerm === "") {
-            content = <Paragraph className="searchResults-noResults">{t('No results')}</Paragraph>;
+            content = <Paragraph className="searchResults-noResults">{t("No results")}</Paragraph>;
         } else {
-            content = <Paragraph className="searchResults-noResults isEmpty">
-                <Sentence children={noResultsMessage as any}/>
-            </Paragraph>;
+            content = (
+                <Paragraph className="searchResults-noResults isEmpty">
+                    <Sentence children={noResultsMessage as any} />
+                </Paragraph>
+            );
         }
 
         const Tag = hasResults ? `ul` : `div`;
 
-        return (
-            <div className={classNames("searchResults", this.props.className)}>
-                {hasResults && (
-                    <Tag className="searchResults-results">
-                        {content}
-                    </Tag>
-                )}
-                {!hasResults && <p className="searchResults-noResults">{t("No results")}</p>}
-            </div>
-        );
+        return <Tag className={classNames("searchResults", this.props.className)}>{content}</Tag>;
     }
 }

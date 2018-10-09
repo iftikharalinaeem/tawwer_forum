@@ -9,6 +9,7 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import { Link } from "react-router-dom";
+import { loopableArray } from "@library/utility";
 
 export interface IInternalLink {
     name: string;
@@ -21,7 +22,7 @@ interface IProps {
 
 export default class ArticleRelatedArticles extends React.Component<IProps> {
     public render() {
-        if (!!this.props.children && this.props.children.length > 0) {
+        if (loopableArray(this.props.children)) {
             const contents = this.props.children.map((item, i) => {
                 return (
                     <li className="linkList-item relatedArticles-item" key={"related-" + i}>

@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { CategoriesLayout } from "@knowledge/modules/categories/components/CategoriesLayout";
+import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { dummyData } from "@knowledge/modules/categories/state/dummyData";
 
 interface IProps extends IDeviceProps {}
@@ -20,7 +20,7 @@ interface IProps extends IDeviceProps {}
 export class CategoriesPage extends React.Component<IProps> {
     public render() {
         const categories = Object.values(dummyData.categoriesByID);
-        return <CategoriesLayout children={categories} />;
+        return <CategoriesLayout children={...categories as any} />;
     }
 }
 

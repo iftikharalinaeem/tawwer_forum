@@ -24,9 +24,7 @@ interface IProps {
     device: Devices;
 }
 
-interface IState {}
-
-export class CategoriesLayout extends React.Component<IProps, IState> {
+export class CategoriesLayout extends React.Component<IProps> {
     public render() {
         const metaData = {
             children: [
@@ -59,6 +57,32 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             ],
         };
 
+        const searchResults = [
+            {
+                name: "Getting Help with your community",
+                meta: metaData.children,
+                url: "#",
+                excerpt:
+                    "Standard with your order of the Plantronics CT12 wireless headset phone is a two in one headset that is convertible so you can use it over the head for stability or over the ear for convenience. It has a microphone that is especially designed to cancel out background noises as well as top notch clarity of sound.",
+                image: "https://us.v-cdn.net/5022541/uploads/942/WKEOVS2LF32Y.png",
+            },
+            {
+                name: "Getting Help with your community",
+                meta: metaData.children,
+                url: "#",
+                excerpt: "Standard with your order.",
+                image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
+            },
+            {
+                name: "Getting Help with your community",
+                meta: metaData.children,
+                url: "#",
+                excerpt: "Standard with your order.",
+                attachments: [{}],
+                image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
+            },
+        ];
+
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
@@ -76,7 +100,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <SearchResults />
+                        <SearchResults children={searchResults} />
                     </PanelLayout.MiddleBottom>
                 </PanelLayout>
             </Container>
