@@ -41,14 +41,20 @@ export default class EditorPageActions extends ReduxActions {
     // Frontend only actions
     public static readonly RESET = "@@articleEditor/RESET";
 
+    /**
+     * Union of all possible action types in this class.
+     */
     public static ACTION_TYPES:
-        | ActionsUnion<typeof EditorPageActions.postRevisionActions>
-        | ActionsUnion<typeof EditorPageActions.postArticleActions>
-        | ActionsUnion<typeof EditorPageActions.getRevisionActions>
-        | ActionsUnion<typeof EditorPageActions.getArticleActions>
+        | ActionsUnion<typeof EditorPageActions.postRevisionACs>
+        | ActionsUnion<typeof EditorPageActions.postArticleACs>
+        | ActionsUnion<typeof EditorPageActions.getRevisionACs>
+        | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
-    private static getArticleActions = ReduxActions.generateApiActionCreators(
+    /**
+     * Action creators for GET /articles/:id
+     */
+    private static getArticleACs = ReduxActions.generateApiActionCreators(
         EditorPageActions.GET_ARTICLE_REQUEST,
         EditorPageActions.GET_ARTICLE_RESPONSE,
         EditorPageActions.GET_ARTICLE_ERROR,
@@ -57,7 +63,10 @@ export default class EditorPageActions extends ReduxActions {
         {} as any,
     );
 
-    private static postArticleActions = ReduxActions.generateApiActionCreators(
+    /**
+     * Action creators for POST /articles
+     */
+    private static postArticleACs = ReduxActions.generateApiActionCreators(
         EditorPageActions.POST_ARTICLE_REQUEST,
         EditorPageActions.POST_ARTICLE_RESPONSE,
         EditorPageActions.POST_ARTICLE_ERROR,
@@ -66,7 +75,10 @@ export default class EditorPageActions extends ReduxActions {
         {} as IPostArticleRequestBody,
     );
 
-    private static getRevisionActions = ReduxActions.generateApiActionCreators(
+    /**
+     * Action creators for GET /article-revisions/:id
+     */
+    private static getRevisionACs = ReduxActions.generateApiActionCreators(
         EditorPageActions.GET_REVISION_REQUEST,
         EditorPageActions.GET_REVISION_RESPONSE,
         EditorPageActions.GET_REVISION_ERROR,
@@ -75,7 +87,10 @@ export default class EditorPageActions extends ReduxActions {
         {} as IGetArticleRevisionRequestBody,
     );
 
-    private static postRevisionActions = ReduxActions.generateApiActionCreators(
+    /**
+     * Action creators for POST /article-revisions
+     */
+    private static postRevisionACs = ReduxActions.generateApiActionCreators(
         EditorPageActions.POST_REVISION_REQUEST,
         EditorPageActions.POST_REVISION_RESPONSE,
         EditorPageActions.POST_REVISION_ERROR,
@@ -84,12 +99,19 @@ export default class EditorPageActions extends ReduxActions {
         {} as IPostArticleRevisionRequestBody,
     );
 
+    /**
+     * Create a reset action
+     */
     private static createResetAction() {
         return EditorPageActions.createAction(EditorPageActions.RESET);
     }
 
+    /**
+     * Reset the page state.
+     */
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
 
+    /** Article page actions instance. */
     private articlePageActions: ArticlePageActions = new ArticlePageActions(this.dispatch, this.api);
 
     /**
@@ -111,7 +133,7 @@ export default class EditorPageActions extends ReduxActions {
         // Check url
         if (addRegex.test(location.pathname)) {
             // We don't have an article so go create one.
-            const article: AxiosResponse<IPostArticleResponseBody> | undefined = await this.postArticle({
+            const article: AxiosResponse<IPostArticleResponseBody> | undefined = await this.createArticle({
                 knowledgeCategoryID: 0,
             });
 
@@ -127,9 +149,11 @@ export default class EditorPageActions extends ReduxActions {
         } else if (editRegex.test(location.pathname)) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
-            const article: AxiosResponse<IGetArticleResponseBody> | undefined = await this.getEditArticle(articleID);
+            const article: AxiosResponse<IGetArticleResponseBody> | undefined = await this.getEditableArticleByID(
+                articleID,
+            );
             if (article && article.data.articleRevisionID !== null) {
-                await this.getRevision(article.data.articleRevisionID);
+                await this.getRevisionByID(article.data.articleRevisionID);
             }
         }
     }
@@ -162,41 +186,53 @@ export default class EditorPageActions extends ReduxActions {
         history.push(link.pathname);
     }
 
-    // Usable action for getting an article
+    /**
+     * Post a revision to the API.
+     *
+     * @param data The revision data.
+     */
     public postRevision(data: IPostArticleRevisionRequestBody) {
         return this.dispatchApi<IPostArticleRevisionResponseBody>(
             "post",
-            `/article-revisions`,
-            EditorPageActions.postRevisionActions,
+            "/article-revisions",
+            EditorPageActions.postRevisionACs,
             data,
         );
     }
 
-    // Usable action for getting an article
-    private postArticle(data: IPostArticleRequestBody) {
-        return this.dispatchApi<IPostArticleResponseBody>(
-            "post",
-            `/articles`,
-            EditorPageActions.postArticleActions,
-            data,
-        );
+    /**
+     * Create a new article.
+     *
+     * @param data The article data.
+     */
+    private createArticle(data: IPostArticleRequestBody) {
+        return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
     }
 
-    // Usable action for getting an article
-    private getRevision(id: number | string) {
+    /**
+     * Get an existing revision by its ID.
+     *
+     * @param revisionID
+     */
+    private getRevisionByID(revisionID: number) {
         return this.dispatchApi<IGetArticleRevisionResponseBody>(
             "get",
-            `/article-revisions/${id}`,
-            EditorPageActions.getRevisionActions,
+            `/article-revisions/${revisionID}`,
+            EditorPageActions.getRevisionACs,
             {},
         );
     }
 
-    private getEditArticle(id: string) {
+    /**
+     * Get an article for editing by its id.
+     *
+     * @param articleID
+     */
+    private getEditableArticleByID(articleID: string) {
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
-            `/articles/${id}`,
-            EditorPageActions.getArticleActions,
+            `/articles/${articleID}`,
+            EditorPageActions.getArticleACs,
             {},
         );
     }

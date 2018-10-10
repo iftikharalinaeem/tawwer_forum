@@ -6,7 +6,6 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
 import { Modal } from "@library/components/modal";

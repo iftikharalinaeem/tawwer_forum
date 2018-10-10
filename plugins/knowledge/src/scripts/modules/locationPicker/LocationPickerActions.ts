@@ -21,6 +21,9 @@ export default class LocationPickerActions extends ReduxActions {
     public static readonly RESET = "@@locationPicker/RESET";
     public static readonly INIT = "@@locationPicker/INIT";
 
+    /**
+     * Union of all possible action types in this class.
+     */
     public static ACTION_TYPES:
         | ActionsUnion<typeof LocationPickerActions.getNavigationActionCreators>
         | ReturnType<typeof LocationPickerActions.createResetAction>

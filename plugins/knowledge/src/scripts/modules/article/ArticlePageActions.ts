@@ -16,7 +16,9 @@ export default class ArticlePageActions extends ReduxActions {
     public static readonly GET_ARTICLE_ERROR = "@@articlePage/GET_ARTICLE_ERROR";
     public static readonly RESET = "@@articlePage/RESET";
 
-    /** Variable representing all of the possible action types from this class. */
+    /**
+     * Union of all possible action types in this class.
+     */
     public static readonly ACTION_TYPES:
         | ActionsUnion<typeof ArticlePageActions.getArticleActionCreators>
         | ReturnType<typeof ArticlePageActions.createResetAction>;
