@@ -1,0 +1,30 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.attachmentsIcons {
+    display: block;
+    position: relative;
+}
+
+.attachmentsIcons-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+    width: calc(100% + #{$meta_spacing * 2});
+
+    margin: {
+        top: -#{$meta_spacing};
+        left: -#{$meta_spacing};
+        right: $meta_spacing;
+    }
+
+    overflow: hidden;
+}
+
+.attachmentsIcons-item {
+    margin: $utility-baseUnit / 2;
+}

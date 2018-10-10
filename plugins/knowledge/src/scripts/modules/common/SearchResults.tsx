@@ -12,13 +12,11 @@ import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Sentence, { InlineTypes } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
-import { AttachmentDisplay } from "@knowledge/modules/common/Attachments";
 
 interface IProps {
     className?: string;
     searchTerm?: string;
     children: IResult[];
-    attachmentDisplay: AttachmentDisplay;
 }
 interface IState {
     children: IResult[];
@@ -48,7 +46,7 @@ export default class SearchResults extends React.Component<IProps, IState> {
 
         if (hasResults) {
             content = this.props.children.map((result, i) => {
-                return <SearchResult {...result} display={this.props.attachmentDisplay} key={`searchResults-${i}`} />;
+                return <SearchResult {...result} key={`searchResults-${i}`} />;
             });
         } else if (!this.props.searchTerm || this.props.searchTerm === "") {
             content = <Paragraph className="searchResults-noResults">{t("No results")}</Paragraph>;

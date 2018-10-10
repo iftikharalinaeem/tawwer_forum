@@ -11,8 +11,8 @@ import { t } from "@library/application";
 import Sentence, { ISentence } from "@library/components/Sentence";
 import { loopableArray } from "@library/utility";
 import { Link } from "react-router-dom";
-import Attachments, { IAttachmentsIcons, IAttachmentsDetailed, AttachmentDisplay } from "./Attachments";
 import Paragraph from "@library/components/Paragraph";
+import AttachmentIcons, { IIconAttachment } from "@knowledge/modules/common/AttachmentIcons";
 
 export interface IResult {
     name: string;
@@ -21,19 +21,17 @@ export interface IResult {
     url: string;
     excerpt: string;
     image?: string;
-    attachments?: IAttachmentsDetailed | IAttachmentsIcons;
-    display: AttachmentDisplay;
     headingLevel?: 2 | 3;
+    attachments: IIconAttachment[];
 }
 
 export default class SearchResult extends React.Component<IResult> {
     public static defaultProps = {
-        attachmentDisplay: AttachmentDisplay.ICON,
         headingLevel: 3,
     };
 
     public render() {
-        const hasAttachments = this.props.attachments && loopableArray(this.props.attachments.children);
+        const hasAttachments = this.props.attachments && loopableArray(this.props.attachments);
         const image = this.props.image ? (
             <img
                 src={this.props.image}
@@ -43,14 +41,9 @@ export default class SearchResult extends React.Component<IResult> {
             />
         ) : null;
 
-        const attachments = this.props.attachments;
         let attachmentOutput;
-        if (hasAttachments && attachments) {
-            if (attachments.display === AttachmentDisplay.ICON) {
-                attachmentOutput = <Attachments children={attachments.children} display={attachments.display} />;
-            } else {
-                attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.DETAILED} />;
-            }
+        if (hasAttachments && this.props.attachments) {
+            attachmentOutput = <AttachmentIcons children={this.props.attachments} />;
         }
         const HeadingTag = `h${this.props.headingLevel}`;
 

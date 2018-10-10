@@ -19,7 +19,7 @@ import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu"
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { AttachmentDisplay, AttachmentType } from "@knowledge/modules/common/Attachments";
+import { AttachmentType } from "@knowledge/modules/common/AttachmentIcons";
 
 interface IProps {
     children: IKbCategoryFragment[];
@@ -69,13 +69,40 @@ export class CategoriesLayout extends React.Component<IProps> {
                 image: "https://us.v-cdn.net/5022541/uploads/942/WKEOVS2LF32Y.png",
                 attachments: [
                     {
-                        display: AttachmentDisplay.ICON,
-                        children: [
-                            {
-                                name: "Some Word Document",
-                                type: AttachmentType.WORD,
-                            },
-                        ],
+                        name: "Some Word Document",
+                        type: AttachmentType.WORD,
+                    },
+                    {
+                        name: "Some Word Document 2",
+                        type: AttachmentType.FILE,
+                    },
+                    {
+                        name: "Some Word Document 3",
+                        type: AttachmentType.PDF,
+                    },
+                    {
+                        name: "Some Word Document 4",
+                        type: AttachmentType.EXCEL,
+                    },
+                    {
+                        name: "Some Word Document 5",
+                        type: AttachmentType.WORD,
+                    },
+                    {
+                        name: "Some Word Document 6",
+                        type: AttachmentType.EXCEL,
+                    },
+                    {
+                        name: "Some Word Document 7",
+                        type: AttachmentType.WORD,
+                    },
+                    {
+                        name: "Some Word Document 8",
+                        type: AttachmentType.WORD,
+                    },
+                    {
+                        name: "Some Word Document 9",
+                        type: AttachmentType.WORD,
                     },
                 ],
             },
@@ -93,45 +120,8 @@ export class CategoriesLayout extends React.Component<IProps> {
                 excerpt: "Standard with your order.",
                 attachments: [
                     {
-                        display: AttachmentDisplay.ICON,
-                        children: [
-                            {
-                                name: "Some Word Document 1",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 2",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 3",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 4",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 5",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 6",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 7",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 8",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 9",
-                                type: AttachmentType.WORD,
-                            },
-                        ],
+                        name: "Some Word Document 1",
+                        type: AttachmentType.EXCEL,
                     },
                 ],
                 image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
@@ -145,25 +135,20 @@ export class CategoriesLayout extends React.Component<IProps> {
                     "Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.Standard with your order.",
                 attachments: [
                     {
-                        display: AttachmentDisplay.ICON,
-                        children: [
-                            {
-                                name: "Some Word Document 1",
-                                type: AttachmentType.WORD,
-                            },
-                            {
-                                name: "Some Word Document 2",
-                                type: AttachmentType.PDF,
-                            },
-                            {
-                                name: "Some Word Document 3",
-                                type: AttachmentType.FILE,
-                            },
-                            {
-                                name: "Some Word Document 4",
-                                type: AttachmentType.EXCEL,
-                            },
-                        ],
+                        name: "Some Word Document 1",
+                        type: AttachmentType.WORD,
+                    },
+                    {
+                        name: "Some Word Document 2",
+                        type: AttachmentType.PDF,
+                    },
+                    {
+                        name: "Some Word Document 3",
+                        type: AttachmentType.FILE,
+                    },
+                    {
+                        name: "Some Word Document 4",
+                        type: AttachmentType.EXCEL,
                     },
                 ],
             },
@@ -186,7 +171,7 @@ export class CategoriesLayout extends React.Component<IProps> {
                         />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <SearchResults children={searchResults as any} attachmentDisplay={AttachmentDisplay.ICON} />
+                        <SearchResults children={searchResults as any} />
                     </PanelLayout.MiddleBottom>
                 </PanelLayout>
             </Container>
