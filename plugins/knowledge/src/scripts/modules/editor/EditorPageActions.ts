@@ -16,7 +16,6 @@ import {
 } from "@knowledge/@types/api";
 import { History } from "history";
 import pathToRegexp from "path-to-regexp";
-import { AxiosResponse, AxiosInstance } from "axios";
 import * as route from "./route";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 
@@ -133,7 +132,7 @@ export default class EditorPageActions extends ReduxActions {
         // Check url
         if (addRegex.test(location.pathname)) {
             // We don't have an article so go create one.
-            const article: AxiosResponse<IPostArticleResponseBody> | undefined = await this.createArticle({
+            const article = await this.createArticle({
                 knowledgeCategoryID: 0,
             });
 
@@ -149,9 +148,7 @@ export default class EditorPageActions extends ReduxActions {
         } else if (editRegex.test(location.pathname)) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
-            const article: AxiosResponse<IGetArticleResponseBody> | undefined = await this.getEditableArticleByID(
-                articleID,
-            );
+            const article = await this.getEditableArticleByID(articleID);
             if (article && article.data.articleRevisionID !== null) {
                 await this.getRevisionByID(article.data.articleRevisionID);
             }

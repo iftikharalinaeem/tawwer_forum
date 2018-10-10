@@ -45,7 +45,7 @@ export default class LocationPickerActions extends ReduxActions {
     );
 
     private static createResetAction() {
-        return this.createAction(this.RESET);
+        return LocationPickerActions.createAction(LocationPickerActions.RESET);
     }
 
     /**
@@ -54,7 +54,7 @@ export default class LocationPickerActions extends ReduxActions {
      * @param category A category fragment.
      */
     private static createInitAction(category: IKbCategoryFragment) {
-        return this.createAction(this.INIT, { category });
+        return LocationPickerActions.createAction(LocationPickerActions.INIT, { category });
     }
 
     /**
@@ -63,7 +63,7 @@ export default class LocationPickerActions extends ReduxActions {
      * @param categoryID
      */
     private static createNavigateAction(categoryID: number) {
-        return this.createAction(this.NAVIGATE_TO_CATEGORY, { categoryID });
+        return LocationPickerActions.createAction(LocationPickerActions.NAVIGATE_TO_CATEGORY, { categoryID });
     }
 
     /**
@@ -72,7 +72,7 @@ export default class LocationPickerActions extends ReduxActions {
      * @param categoryID
      */
     private static createSelectAction(categoryID: number) {
-        return this.createAction(this.SELECT_CATEGORY, { categoryID });
+        return LocationPickerActions.createAction(LocationPickerActions.SELECT_CATEGORY, { categoryID });
     }
 
     /**
@@ -81,7 +81,7 @@ export default class LocationPickerActions extends ReduxActions {
      * @param categoryID
      */
     private static createChooseAction(categoryID: number) {
-        return this.createAction(this.CHOOSE_CATEGORY, { categoryID });
+        return LocationPickerActions.createAction(LocationPickerActions.CHOOSE_CATEGORY, { categoryID });
     }
 
     // Bind dispatch the simpler action creators instead of rewriting their function signatures.
@@ -95,14 +95,14 @@ export default class LocationPickerActions extends ReduxActions {
      *
      * @param options
      */
-    public getKbNavigation(options: IKbNavigationRequest) {
+    public getKbNavigation = (options: IKbNavigationRequest) => {
         return this.dispatchApi(
             "get",
             `/knowledge-navigation?knowledgeCategoryID=${options.knowledgeCategoryID}`,
             LocationPickerActions.getNavigationActionCreators,
             options,
         );
-    }
+    };
 
     /**
      * Navigate to a particular category.
@@ -111,8 +111,8 @@ export default class LocationPickerActions extends ReduxActions {
      *
      * @param categoryID
      */
-    public navigateToCategory(categoryID: number) {
+    public navigateToCategory = (categoryID: number) => {
         this.dispatch(LocationPickerActions.createNavigateAction(categoryID));
         this.dispatch(this.getKbNavigation({ knowledgeCategoryID: categoryID }));
-    }
+    };
 }
