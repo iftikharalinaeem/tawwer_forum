@@ -37,7 +37,7 @@ export class CategoriesLayout extends React.Component<IProps> {
                 {
                     children: [
                         {
-                            children: "Last Updated:" + String.fromCharCode(160),
+                            children: "Last Updated: ",
                             type: InlineTypes.TEXT,
                         },
                         {

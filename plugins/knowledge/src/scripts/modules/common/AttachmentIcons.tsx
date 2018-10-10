@@ -71,10 +71,12 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
     }
 
     public render() {
+        const childrenCount = !!this.props.children ? this.props.children.length : 0;
         const attachments = loopableArray(this.props.children)
             ? this.props.children.map((attachment, i) => {
                   const key = `attachment-${i}`;
                   const index = i + 1;
+                  const extraCount = childrenCount - index;
                   if (i < this.maxCount) {
                       return (
                           <li className="attachmentsIcons-item" key={key}>
@@ -91,7 +93,7 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
                               </div>
                           </li>
                       );
-                  } else if (i === index) {
+                  } else if (i === this.maxCount && extraCount > 0) {
                       const moreMessage = {
                           children: [
                               {
@@ -99,7 +101,7 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
                                   type: InlineTypes.TEXT,
                               },
                               {
-                                  children: this.props.children.length - index,
+                                  children: `${extraCount}`,
                                   type: InlineTypes.TEXT,
                                   className: "attachmentsIcons-moreCount",
                               },
@@ -112,12 +114,9 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
 
                       return (
                           <li className="attachmentsIcons-item" key={key}>
-                              <div
-                                  className={classNames("attachmentsIcons-more")}
-                                  title={t(attachment.type.toLocaleLowerCase())}
-                              >
-                                  {<Sentence children={moreMessage.children as any} />}
-                              </div>
+                              <span className={"attachmentsIcons-more"} title={t(attachment.type.toLocaleLowerCase())}>
+                                  {<Sentence className="metaStyle" children={...moreMessage as any} />}
+                              </span>
                           </li>
                       );
                   } else {
