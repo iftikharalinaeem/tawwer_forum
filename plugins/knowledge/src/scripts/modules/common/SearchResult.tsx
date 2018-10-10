@@ -64,9 +64,9 @@ export default class SearchResult extends React.Component<IResult> {
 
         return (
             <li className={classNames("searchResults-item", this.props.className)}>
-                <article className="searchResult-contents">
+                <article className="searchResults-result">
                     <Link to={this.props.url} className="searchResult">
-                        <div className="searchResult-main">
+                        <div className={classNames("searchResult-main", { hasMedia: !!media })}>
                             <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
                             {this.props.meta && (
                                 <div className="searchResult-metas">
