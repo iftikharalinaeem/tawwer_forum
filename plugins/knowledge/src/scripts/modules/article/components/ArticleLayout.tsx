@@ -23,6 +23,8 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
 import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
 import { InlineTypes } from "@library/components/Sentence";
+import { dummyNavData } from "../../categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
 
 interface IProps {
     article: IArticle;
@@ -110,11 +112,10 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     <PanelLayout.Breadcrumbs>
                         <ArticleBreadcrumbs />
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
+                        <PanelWidget>
+                            <SiteNav {...dummyNavData} />
+                        </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <ArticleTitle
