@@ -4,11 +4,8 @@
  * @license GPL-2.0-only
  */
 
-.word {
-  color: inherit;
-}
-
 a.word {
+  color: inherit;
   &:focus,
   &:hover {
     text-decoration: underline;

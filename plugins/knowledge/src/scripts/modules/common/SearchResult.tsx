@@ -23,17 +23,24 @@ export interface IResult {
     image?: string;
     attachments?: IAttachmentsDetailed | IAttachmentsIcons;
     display: AttachmentDisplay;
+    headingLevel?: 2 | 3;
 }
 
 export default class SearchResult extends React.Component<IResult> {
     public static defaultProps = {
         attachmentDisplay: AttachmentDisplay.ICON,
+        headingLevel: 3,
     };
 
     public render() {
         const hasAttachments = this.props.attachments && loopableArray(this.props.attachments.children);
         const image = this.props.image ? (
-            <img src={this.props.image} alt={t("Thumbnail for: " + this.props.name)} aria-hidden={true} />
+            <img
+                src={this.props.image}
+                className="searchResult-image"
+                alt={t("Thumbnail for: " + this.props.name)}
+                aria-hidden={true}
+            />
         ) : null;
 
         const attachments = this.props.attachments;
@@ -45,20 +52,36 @@ export default class SearchResult extends React.Component<IResult> {
                 attachmentOutput = <Attachments children={attachments.children} display={AttachmentDisplay.DETAILED} />;
             }
         }
+        const HeadingTag = `h${this.props.headingLevel}`;
+
+        const media =
+            hasAttachments || !!image ? (
+                <div className="searchResult-media">
+                    {!hasAttachments && image}
+                    {attachmentOutput}
+                </div>
+            ) : null;
 
         return (
             <li className={classNames("searchResults-item", this.props.className)}>
                 <article className="searchResult-contents">
                     <Link to={this.props.url} className="searchResult">
                         <div className="searchResult-main">
-                            <div className="searchResult-title">{this.props.name}</div>
-                            {this.props.meta && <Sentence children={this.props.meta as any} />}
-                            {this.props.excerpt && <Paragraph>{this.props.excerpt}</Paragraph>}
+                            <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
+                            {this.props.meta && (
+                                <div className="searchResult-metas">
+                                    <Sentence
+                                        directChildClass="metas"
+                                        descendantChildClasses="meta"
+                                        children={this.props.meta as any}
+                                    />
+                                </div>
+                            )}
+                            {!!this.props.excerpt && (
+                                <Paragraph className="searchResult-excerpt">{this.props.excerpt}</Paragraph>
+                            )}
                         </div>
-                        <div className="searchResult-media">
-                            {!hasAttachments && image}
-                            {attachmentOutput}
-                        </div>
+                        {media}
                     </Link>
                 </article>
             </li>

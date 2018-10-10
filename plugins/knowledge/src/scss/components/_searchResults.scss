@@ -16,10 +16,10 @@ $searchResult-image_borderWidth               : 1px;
 $searchResult-separator_color                 : $global-separator_color;
 $searchResult-separator_width                 : $global-separator_width;
 
-$searchResult-maxImageWidth                   : 153px;
-
 $searchResult_verticalPadding                 : $utility-baseUnit * 3;
 $searchResult_horizontalPadding               : $utility-baseUnit;
+
+$searchResult-media_width                     : 115px;
 
 $searchResult_breakPoint                      : 800px;
 
@@ -80,53 +80,17 @@ $searchResult_breakPoint                      : 800px;
     }
 }
 
-.searchResult-titleWrap {
-    display: flex;
-    align-items: center;
-}
-
-.searchResult-title {
-    display: block;
-    overflow: hidden;
-    font-size: $global-title_fontSize;
-    font-weight: $global-bold_fontWeight;
-    flex-grow: 1;
-    margin: 0;
-}
-
-
-.searchResult-head {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    margin: {
-        bottom: $utility-baseUnit * 1.5;
-    }
-
-    @include mediaQuery-searchResults_smallScreen {
-        flex-wrap: wrap;
-        justify-content: flex-start;
-    }
-}
-
-.searchResult-titleIcon {
-    margin-left: auto;
-}
-
-.searchResult-attachments {
-    display: flex;
-    flex-wrap: nowrap;
-
-    @include mediaQuery-searchResults_smallScreen {
-        flex-wrap: wrap;
-        width: 100%;
-        margin-top: $utility-baseUnit;
-    }
-}
+//.searchResult-titleWrap {
+//    display: flex;
+//    align-items: center;
+//}
 
 .searchResult-title {
     display: block;
     color: $searchResult-title_color;
+    font-size: $global-title_fontSize;
+    font-weight: $global-bold_fontWeight;
+    overflow: hidden;
     flex-grow: 1;
     margin: 0;
     padding: {
@@ -147,77 +111,142 @@ $searchResult_breakPoint                      : 800px;
 }
 
 
-.searchResult-excerpt {
-    margin: {
-        top: $utility-baseUnit;
-        bottom: $utility-baseUnit;
+//.searchResult-head {
+//    display: flex;
+//    flex-wrap: nowrap;
+//    align-items: center;
+//    margin: {
+//        bottom: $utility-baseUnit * 1.5;
+//    }
+//
+//    @include mediaQuery-searchResults_smallScreen {
+//        flex-wrap: wrap;
+//        justify-content: flex-start;
+//    }
+//}
+
+//.searchResult-titleIcon {
+//    margin-left: auto;
+//}
+
+.searchResult-attachments {
+    display: flex;
+    flex-wrap: nowrap;
+
+    @include mediaQuery-searchResults_smallScreen {
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: $utility-baseUnit;
     }
-    color: $searchResult-excerpt_color;
 }
 
+.searchResult-image {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    border-left: $searchResult-image_borderColor 1px $searchResult-image_borderWidth;
+    margin: {
+        top: auto;
+        bottom: auto;
+    }
+    width: $embedLink-linkImage_width;
+
+    @supports (object-fit: cover) {
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+}
+
+.searchResult-media {
+    position: relative;
+    width: $searchResult-media_width;
+}
 
 .searchResult-main {
-    display: flex;
+    display: block;
+    flex-grow: 1;
+
+    + .searchResult-media {
+        padding-right: $searchResult_horizontalPadding;
+    }
 
     @include mediaQuery-searchResults_smallScreen {
         flex-wrap: wrap;
     }
 }
 
-.searchResult-text {
-    flex-grow: 1;
-}
 
-.searchResult-mediaPreview { // Flexed element
-    display: block;
-    flex-basis: $searchResult-maxImageWidth;
-    width: $searchResult-maxImageWidth;
-    order: 2;
-
-    ~ .searchResult-text {
-        width: calc(100% - #{$searchResult-maxImageWidth});
-        order: 1;
-        padding-right: $utility-baseUnit * 4;
-
-        @include mediaQuery-searchResults_smallScreen {
-            padding-right: 0;
-            width: 100%;
-        }
-    }
-
-    @include mediaQuery-searchResults_smallScreen {
-        margin-top: $utility-baseUnit * 2;
+.searchResult-metas {
+    margin: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
     }
 }
 
-.searchResult-mediaPreviewFrame { // Image container
-    position: relative;
-    display: block;
-    max-width: 100%;
-    padding-top: $utility-percentage_nineSixteenths; // 16/9 aspect ratio
-    overflow: hidden;
+.searchResult-excerpt {
+    margin: {
+        top: $utility-baseUnit;
+    }
+    color: $searchResult-excerpt_color;
 }
 
-.searchResult-mediaPreviewImage {
-    position: absolute;
-    top: 0;
-    left: auto;
-    right: 0;
-    margin: auto;
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    border: {
-        style: solid;
-        width: $searchResult-image_borderWidth;
-        color: $searchResult-image_borderColor;
-    }
-
-    @include mediaQuery-searchResults_smallScreen {
-        left: 0;
-        right: auto;
-    }
-}
-
-
-
+//.searchResult-text {
+//    flex-grow: 1;
+//}
+//
+//.searchResult-mediaPreview { // Flexed element
+//    display: block;
+//    flex-basis: $searchResult-maxImageWidth;
+//    width: $searchResult-maxImageWidth;
+//    order: 2;
+//
+//    ~ .searchResult-text {
+//        width: calc(100% - #{$searchResult-maxImageWidth});
+//        order: 1;
+//        padding-right: $utility-baseUnit * 4;
+//
+//        @include mediaQuery-searchResults_smallScreen {
+//            padding-right: 0;
+//            width: 100%;
+//        }
+//    }
+//
+//    @include mediaQuery-searchResults_smallScreen {
+//        margin-top: $utility-baseUnit * 2;
+//    }
+//}
+//
+//.searchResult-mediaPreviewFrame { // Image container
+//    position: relative;
+//    display: block;
+//    max-width: 100%;
+//    padding-top: $utility-percentage_nineSixteenths; // 16/9 aspect ratio
+//    overflow: hidden;
+//}
+//
+//.searchResult-mediaPreviewImage {
+//    position: absolute;
+//    top: 0;
+//    left: auto;
+//    right: 0;
+//    margin: auto;
+//    display: block;
+//    max-width: 100%;
+//    max-height: 100%;
+//    border: {
+//        style: solid;
+//        width: $searchResult-image_borderWidth;
+//        color: $searchResult-image_borderColor;
+//    }
+//
+//    @include mediaQuery-searchResults_smallScreen {
+//        left: 0;
+//        right: auto;
+//    }
+//}
+//
+//
+//
