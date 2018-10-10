@@ -9,7 +9,6 @@ import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import Sentence, { ISentence, InlineTypes } from "@library/components/Sentence";
-import { loopableArray } from "@library/utility";
 import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
 import Paragraph from "@library/components/Paragraph";
 
@@ -72,58 +71,65 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
 
     public render() {
         const childrenCount = !!this.props.children ? this.props.children.length : 0;
-        const attachments = loopableArray(this.props.children)
-            ? this.props.children.map((attachment, i) => {
-                  const key = `attachment-${i}`;
-                  const index = i + 1;
-                  const extraCount = childrenCount - index;
-                  if (i < this.maxCount) {
-                      return (
-                          <li className="attachmentsIcons-item" key={key}>
-                              <div
-                                  className={classNames("attachmentsIcons-file", `attachmentsIcons-${attachment.type}`)}
-                                  title={t(attachment.type)}
-                              >
-                                  <span className="sr-only">
-                                      <Paragraph>{`${attachment.name} (${t("Type: ")}} ${t(
-                                          attachment.type,
-                                      )}})`}</Paragraph>
-                                  </span>
-                                  {this.getAttachmentIcon(attachment.type)}
-                              </div>
-                          </li>
-                      );
-                  } else if (i === this.maxCount && extraCount > 0) {
-                      const moreMessage = {
-                          children: [
-                              {
-                                  children: "+ ",
-                                  type: InlineTypes.TEXT,
-                              },
-                              {
-                                  children: `${extraCount}`,
-                                  type: InlineTypes.TEXT,
-                                  className: "attachmentsIcons-moreCount",
-                              },
-                              {
-                                  children: " more",
-                                  type: InlineTypes.TEXT,
-                              },
-                          ],
-                      };
+        const attachments =
+            this.props.children && this.props.children.length > 0
+                ? this.props.children.map((attachment, i) => {
+                      const key = `attachment-${i}`;
+                      const index = i + 1;
+                      const extraCount = childrenCount - index;
+                      if (i < this.maxCount) {
+                          return (
+                              <li className="attachmentsIcons-item" key={key}>
+                                  <div
+                                      className={classNames(
+                                          "attachmentsIcons-file",
+                                          `attachmentsIcons-${attachment.type}`,
+                                      )}
+                                      title={t(attachment.type)}
+                                  >
+                                      <span className="sr-only">
+                                          <Paragraph>{`${attachment.name} (${t("Type: ")}} ${t(
+                                              attachment.type,
+                                          )}})`}</Paragraph>
+                                      </span>
+                                      {this.getAttachmentIcon(attachment.type)}
+                                  </div>
+                              </li>
+                          );
+                      } else if (i === this.maxCount && extraCount > 0) {
+                          const moreMessage = {
+                              children: [
+                                  {
+                                      children: "+ ",
+                                      type: InlineTypes.TEXT,
+                                  },
+                                  {
+                                      children: `${extraCount}`,
+                                      type: InlineTypes.TEXT,
+                                      className: "attachmentsIcons-moreCount",
+                                  },
+                                  {
+                                      children: " more",
+                                      type: InlineTypes.TEXT,
+                                  },
+                              ],
+                          };
 
-                      return (
-                          <li className="attachmentsIcons-item" key={key}>
-                              <span className={"attachmentsIcons-more"} title={t(attachment.type.toLocaleLowerCase())}>
-                                  {<Sentence className="metaStyle" children={...moreMessage as any} />}
-                              </span>
-                          </li>
-                      );
-                  } else {
-                      return null;
-                  }
-              })
-            : null;
+                          return (
+                              <li className="attachmentsIcons-item" key={key}>
+                                  <span
+                                      className={"attachmentsIcons-more"}
+                                      title={t(attachment.type.toLocaleLowerCase())}
+                                  >
+                                      {<Sentence className="metaStyle" children={...moreMessage as any} />}
+                                  </span>
+                              </li>
+                          );
+                      } else {
+                          return null;
+                      }
+                  })
+                : null;
 
         if (attachments) {
             return (

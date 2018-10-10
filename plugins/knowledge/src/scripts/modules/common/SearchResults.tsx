@@ -11,7 +11,6 @@ import { t } from "@library/application";
 import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Sentence, { InlineTypes } from "@library/components/Sentence";
-import { loopableArray } from "@library/utility";
 
 interface IProps {
     className?: string;
@@ -24,7 +23,7 @@ interface IState {
 
 export default class SearchResults extends React.Component<IProps, IState> {
     public render() {
-        const hasResults = loopableArray(this.props.children);
+        const hasResults = this.props.children && this.props.children.length > 0;
         let content;
 
         const noResultsMessage = {

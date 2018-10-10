@@ -9,7 +9,6 @@ import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import Sentence, { ISentence } from "@library/components/Sentence";
-import { loopableArray } from "@library/utility";
 import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import AttachmentIcons, { IIconAttachment } from "@knowledge/modules/common/AttachmentIcons";
@@ -31,7 +30,7 @@ export default class SearchResult extends React.Component<IResult> {
     };
 
     public render() {
-        const hasAttachments = this.props.attachments && loopableArray(this.props.attachments);
+        const hasAttachments = this.props.attachments && this.props.attachments.length > 0;
         const image = this.props.image ? (
             <img
                 src={this.props.image}
