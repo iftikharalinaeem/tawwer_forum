@@ -11,7 +11,7 @@ import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
-import { model as categoryModel } from "@knowledge/modules/categories/state";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";

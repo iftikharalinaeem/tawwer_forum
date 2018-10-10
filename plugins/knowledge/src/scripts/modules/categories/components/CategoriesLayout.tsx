@@ -11,7 +11,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
 import { InlineTypes } from "@library/components/Sentence";
-import { IKbCategoriesState } from "@knowledge/modules/categories/state";
+import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
