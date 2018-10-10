@@ -10,7 +10,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
-import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
+import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/LocationPickerContext";
 import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends ILocationPickerProps {
@@ -32,7 +32,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { items } = this.props;
+        const { items, actions } = this.props;
 
         return (
             <React.Fragment>
@@ -47,8 +47,8 @@ export class LocationPicker extends React.Component<IProps, IState> {
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
                             <LocationContents
-                                onCategoryNavigate={this.props.navigateToCategory}
-                                onItemSelect={this.props.selectCategory}
+                                onCategoryNavigate={actions.navigateToCategory}
+                                onItemSelect={actions.selectCategory}
                                 selectedCategory={this.props.selectedCategory}
                                 initialCategoryID={1}
                                 items={items}
@@ -79,7 +79,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
      * Cleanup on unmount.
      */
     public componentWillUnmount() {
-        this.props.resetNavigation();
+        this.props.actions.reset();
     }
 
     /**
@@ -94,7 +94,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
      */
     private goBack = () => {
         if (this.canNavigateBack) {
-            this.props.navigateToCategory(this.props.navigatedCategory.parentID);
+            this.props.actions.navigateToCategory(this.props.navigatedCategory.parentID);
         }
     };
 
@@ -117,7 +117,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
     };
 
     private handleChoose = () => {
-        this.props.chooseCategory(this.props.selectedCategory.knowledgeCategoryID);
+        this.props.actions.chooseCategory(this.props.selectedCategory.knowledgeCategoryID);
         this.props.onChoose();
     };
 }

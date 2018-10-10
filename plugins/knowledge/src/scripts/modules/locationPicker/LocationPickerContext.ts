@@ -4,13 +4,13 @@
  * @license Proprietary
  */
 
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
-import { thunks, actions, ILocationPickerState } from "@knowledge/modules/locationPicker/state";
+import { connect } from "react-redux";
+import apiv2 from "@library/apiv2";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
-import { bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 
 interface IStateProps extends ILocationPickerState {
     locationBreadcrumb: IKbCategoryFragment[];
@@ -20,12 +20,7 @@ interface IStateProps extends ILocationPickerState {
 }
 
 interface IDispatchProps {
-    getKbNavigation: typeof thunks.getKbNavigation;
-    resetNavigation: typeof actions.resetNavigation;
-    initForCategory: typeof actions.initForCategory;
-    navigateToCategory: typeof thunks.navigateToCategory;
-    selectCategory: typeof actions.selectCategory;
-    chooseCategory: typeof actions.chooseCategory;
+    actions: LocationPickerActions;
 }
 
 export interface ILocationPickerProps extends IStateProps, IDispatchProps {}
@@ -48,12 +43,9 @@ function mapStateToProps(state: IStoreState): IStateProps {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch): IDispatchProps {
-    const { getKbNavigation, navigateToCategory } = thunks;
-    const { resetNavigation, selectCategory, chooseCategory, initForCategory } = actions;
-    return bindActionCreators(
-        { getKbNavigation, resetNavigation, selectCategory, navigateToCategory, chooseCategory, initForCategory },
-        dispatch,
-    );
+    return {
+        actions: new LocationPickerActions(dispatch, apiv2),
+    };
 }
 
 export const withLocationPicker = connect(

@@ -7,23 +7,25 @@
 import { expect } from "chai";
 import * as sinon from "sinon";
 import { createMemoryHistory } from "history";
-import { thunks, constants } from "@knowledge/modules/editor/state";
-import { constants as articleConstants } from "@knowledge/modules/article/state";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import apiv2 from "@library/apiv2";
 import MockAdapter from "axios-mock-adapter";
 import configureStore, { MockStore } from "redux-mock-store";
 import thunk from "redux-thunk";
 import { Format } from "@knowledge/@types/api";
 import { assertStoreHasActions } from "@library/__tests__/customAssertions";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 
-describe("Editor thunks", () => {
+describe("EditorPageActions", () => {
     let mockStore: MockStore;
     let mockApi: MockAdapter;
+    let editorPageActions: EditorPageActions;
 
     before(() => {
         const middlewares = [thunk];
         mockStore = configureStore(middlewares)({});
         mockApi = new MockAdapter(apiv2);
+        editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
     });
 
     afterEach(() => {
@@ -35,10 +37,9 @@ describe("Editor thunks", () => {
         it("Does nothing if we are not in the correct location", async () => {
             const history = createMemoryHistory();
             history.push("/test-bad-location");
-            const dispatchableAction = thunks.initPageFromLocation(history);
-            const dispatch = sinon.spy();
-            void (await dispatchableAction(dispatch));
-            expect(dispatch.notCalled).eq(true);
+            const spy = sinon.spy(mockStore, "dispatch");
+            void (await editorPageActions.initPageFromLocation(history));
+            expect(spy.notCalled).eq(true);
             expect(history.location.pathname).eq("/test-bad-location");
         });
 
@@ -48,16 +49,15 @@ describe("Editor thunks", () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/add");
 
-            const dispatchableAction = thunks.initPageFromLocation(history);
-            void (await dispatchableAction(mockStore.dispatch));
+            void (await editorPageActions.initPageFromLocation(history));
 
             expect(history.location.pathname).eq("/kb/articles/1/editor");
             assertStoreHasActions(mockStore, [
                 {
-                    type: constants.POST_ARTICLE_REQUEST,
+                    type: EditorPageActions.POST_ARTICLE_REQUEST,
                 },
                 {
-                    type: constants.POST_ARTICLE_RESPONSE,
+                    type: EditorPageActions.POST_ARTICLE_RESPONSE,
                     payload: {
                         data: dummyArticle,
                     },
@@ -70,15 +70,14 @@ describe("Editor thunks", () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/1/editor");
 
-            const dispatchableAction = thunks.initPageFromLocation(history);
-            void (await dispatchableAction(mockStore.dispatch));
+            void (await editorPageActions.initPageFromLocation(history));
 
             assertStoreHasActions(mockStore, [
                 {
-                    type: constants.GET_ARTICLE_REQUEST,
+                    type: EditorPageActions.GET_ARTICLE_REQUEST,
                 },
                 {
-                    type: constants.GET_ARTICLE_RESPONSE,
+                    type: EditorPageActions.GET_ARTICLE_RESPONSE,
                     payload: {
                         data: dummyArticle,
                     },
@@ -98,27 +97,26 @@ describe("Editor thunks", () => {
                 .replyOnce(200, dummyArticle);
             const history = createMemoryHistory();
 
-            const dispatchableAction = thunks.submitNewRevision(
+            void (await editorPageActions.submitNewRevision(
                 { name: "test", body: "asd", articleID: 1, format: Format.RICH },
                 history,
-            );
-            void (await dispatchableAction(mockStore.dispatch));
+            ));
 
             assertStoreHasActions(mockStore, [
                 {
-                    type: constants.POST_REVISION_REQUEST,
+                    type: EditorPageActions.POST_REVISION_REQUEST,
                 },
                 {
-                    type: constants.POST_REVISION_RESPONSE,
+                    type: EditorPageActions.POST_REVISION_RESPONSE,
                     payload: {
                         data: dummyRevision,
                     },
                 },
                 {
-                    type: articleConstants.GET_ARTICLE_REQUEST,
+                    type: ArticlePageActions.GET_ARTICLE_REQUEST,
                 },
                 {
-                    type: articleConstants.GET_ARTICLE_RESPONSE,
+                    type: ArticlePageActions.GET_ARTICLE_RESPONSE,
                     payload: {
                         data: dummyArticle,
                     },

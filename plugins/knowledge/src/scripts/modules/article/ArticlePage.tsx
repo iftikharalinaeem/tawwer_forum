@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { bindActionCreators } from "redux";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
@@ -13,17 +12,18 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
-import { actions, thunks, model } from "@knowledge/modules/article/state";
-import { ArticleLayout, ArticleMenu } from "@knowledge/modules/article/components";
+import { ArticleLayout } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
+import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import apiv2 from "@library/apiv2";
 
 interface IProps extends IDeviceProps {
     match: match<{
         id: number;
     }>;
-    articlePageState: model.IState;
-    getArticle: typeof thunks.getArticle;
-    clearPageState: typeof actions.clearPageState;
+    articlePageState: IArticlePageState;
+    articlePageActions: ArticlePageActions;
 }
 
 /**
@@ -58,7 +58,7 @@ export class ArticlePage extends React.Component<IProps> {
      * If the component mounts without any data we need to fetch request it.
      */
     public componentDidMount() {
-        const { articlePageState, getArticle } = this.props;
+        const { articlePageState, articlePageActions } = this.props;
         const { id } = this.props.match.params;
         if (articlePageState.status !== LoadStatus.PENDING) {
             return;
@@ -68,14 +68,14 @@ export class ArticlePage extends React.Component<IProps> {
             return;
         }
 
-        getArticle(id);
+        articlePageActions.getArticleByID(id);
     }
 
     /**
      * When the component unmounts we need to be sure to clear out the data we requested in componentDidMount.
      */
     public componentWillUnmount() {
-        this.props.clearPageState();
+        this.props.articlePageActions.reset();
     }
 }
 
@@ -92,9 +92,9 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    const { getArticle } = thunks;
-    const { clearPageState } = actions;
-    return bindActionCreators({ getArticle, clearPageState }, dispatch);
+    return {
+        articlePageActions: new ArticlePageActions(dispatch, apiv2),
+    };
 }
 
 const withRedux = connect(
