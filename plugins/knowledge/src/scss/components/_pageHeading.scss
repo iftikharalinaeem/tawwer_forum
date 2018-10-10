@@ -62,13 +62,14 @@ $pageHeading-dropdown_width                    : 150px !default;
 
 
 .pageHeading-backLink {
-    @include absolute-topLeft;
+    @include absolute-topLeft(($global-title_fontSize * $global-heading_lineHeightRatio) * $global-condensed_lineHeight / 2);
     overflow: visible;
     width: $icon-default_size;
-    height: #{$global-title_fontSize * $global-base_lineHeight};
+    height: $icon-default_size;
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: translateY(-50%);
 
     margin: {
         top: 0;
