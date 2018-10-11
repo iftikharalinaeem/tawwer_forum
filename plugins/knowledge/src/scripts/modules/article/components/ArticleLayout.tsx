@@ -24,6 +24,8 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
+import SiteNav from "@library/components/siteNav/SiteNav";
+import { dummyNavData } from "../../categories/state/dummyNavData";
 
 interface IProps {
     article: IArticle;
@@ -120,7 +122,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleActions />
                     </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
+                        <SiteNav {...dummyNavData} />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PageTitle
