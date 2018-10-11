@@ -82,7 +82,7 @@ class ArticlesTest extends AbstractResourceTest {
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}/delete"
         );
-        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(204, $r->getStatusCode());
         $this->assertEquals('', $r->getBody());
 
         $r = $this->api()->get(
@@ -101,7 +101,7 @@ class ArticlesTest extends AbstractResourceTest {
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}/undelete"
         );
-        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(204, $r->getStatusCode());
         $this->assertEquals('', $r->getBody());
 
         $r = $this->api()->get(

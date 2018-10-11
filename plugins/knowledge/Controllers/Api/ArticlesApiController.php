@@ -399,11 +399,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param int $id ArticleID
      *
+     * @return \Garden\Web\Data
+     *
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch_undelete(int $id) {
+    public function patch_undelete(int $id): \Garden\Web\Data {
         $this->permission();
         $in = $this->schema(["id:i" => "The article ID."], 'in')
             ->setDescription('Undelete an existing article.');
@@ -413,6 +415,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($article['status'] !== ArticleModel::STATUS_UNDELETED) {
             $this->articleModel->update(['status'=>ArticleModel::STATUS_UNDELETED], ["articleID" => $id]);
         }
+        return new \Garden\Web\Data([], 204);
     }
 
     /**
@@ -420,11 +423,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param int $id ArticleID
      *
+     * @return \Garden\Web\Data
+     *
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch_delete(int $id) {
+    public function patch_delete(int $id): \Garden\Web\Data {
         $this->permission();
 
         $in = $this->schema(["id:i" => "The article ID."], 'in')
@@ -436,6 +441,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($article['status'] !== ArticleModel::STATUS_DELETED) {
             $this->articleModel->update(['status'=>ArticleModel::STATUS_DELETED], ["articleID" => $id]);
         }
+        return new \Garden\Web\Data([], 204);
     }
 
     /**
