@@ -118,9 +118,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
                         <SiteNav {...dummyNavData} />
                     </PanelLayout.LeftBottom>
