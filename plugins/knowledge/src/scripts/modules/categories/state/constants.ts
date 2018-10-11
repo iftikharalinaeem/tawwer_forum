@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+export const CATEGORIES_ROUTE = "/kb/categories/";
+
 export const GET_REQUEST = "@@kbCategories/GET_REQUEST";
 export const GET_RESPONSE = "@@kbCategories/GET_RESPONSE";
 export const GET_ERROR = "@@kbCategories/GET_REQUEST";

@@ -19,6 +19,9 @@ interface IProps {
     minimumChildrenCount?: number;
 }
 
+/**
+ * Implements the table of contents component
+ */
 export default class ArticleTOC extends React.Component<IProps> {
     public static defaultProps = {
         minimumChildrenCount: 2,
