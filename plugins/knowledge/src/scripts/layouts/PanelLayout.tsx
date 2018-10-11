@@ -85,7 +85,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 
         // Calculate some rendering variables.
         const isMobile = device === Devices.MOBILE;
-        const isDesktop = device === Devices.DESKTOP;
+        const isDesktop = device === Devices.DESKTOP || Devices.NO_BLEED; // This compoment doesn't care about the no bleed, it's the same as desktop
         const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || children.leftBottom);
         const shouldRenderRightPanel: boolean = isDesktop && !!(children.rightTop || children.rightBottom);
         const renderMobilePanel: boolean = isMobile && !!children.leftBottom;

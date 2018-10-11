@@ -60,7 +60,6 @@ $pageHeading-dropdown_width                    : 150px !default;
     //}
 }
 
-
 .pageHeading-backLink {
     @include absolute-topLeft(($global-title_fontSize * $global-heading_lineHeightRatio) * $global-condensed_lineHeight / 2);
     overflow: visible;
@@ -74,10 +73,6 @@ $pageHeading-dropdown_width                    : 150px !default;
     margin: {
         top: 0;
         left: -#{$icon-default_size + $utility-baseUnit * 2};
-    }
-
-    @include mediaQuery-panelLayout_noBleed {
-        display: none;
     }
 }
 

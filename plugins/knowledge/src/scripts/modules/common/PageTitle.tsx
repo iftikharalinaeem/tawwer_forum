@@ -9,8 +9,10 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
 import { IArticle } from "@knowledge/@types/api";
 import Sentence, { ISentence } from "@library/components/Sentence";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 
-interface IProps {
+interface IProps extends IDeviceProps {
     title: string;
     menu?: JSX.Element;
     meta?: ISentence;
@@ -20,11 +22,14 @@ interface IProps {
 /**
  * Generates main title for page as well as possibly a back link and some meta information about the page
  */
-export default class PageTitle extends React.Component<IProps> {
+export class PageTitle extends React.Component<IProps> {
     public render() {
+        const { device } = this.props;
+        const isDesktop = device === Devices.DESKTOP;
+        const backUrl = isDesktop ? this.props.backUrl : null;
         return (
             <PanelWidget>
-                <PageHeading backUrl={this.props.backUrl} title={this.props.title} menu={this.props.menu} />
+                <PageHeading backUrl={backUrl} title={this.props.title} menu={this.props.menu} />
                 {this.props.meta && (
                     <div className="pageMetas metas">
                         <Sentence {...this.props.meta} recursiveChildClass="meta pageMetas-meta" />
@@ -34,3 +39,5 @@ export default class PageTitle extends React.Component<IProps> {
         );
     }
 }
+
+export default withDevice(PageTitle);
