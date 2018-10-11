@@ -112,7 +112,7 @@ export default class LocationPickerActions extends ReduxActions {
      * @param categoryID
      */
     public navigateToCategory = (categoryID: number) => {
-        this.navigateToCategory(categoryID);
-        this.getKbNavigation({ knowledgeCategoryID: categoryID });
+        this.dispatch(LocationPickerActions.createNavigateAction(categoryID));
+        return this.getKbNavigation({ knowledgeCategoryID: categoryID });
     };
 }
