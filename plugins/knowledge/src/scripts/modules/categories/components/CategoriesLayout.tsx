@@ -21,7 +21,6 @@ import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { AttachmentType } from "@knowledge/modules/common/AttachmentIcons";
 import { dummyMetaData } from "../state/dummyMetaData";
-import PageLoader from "@library/components/PageLoader";
 import { LoadStatus } from "@library/@types/api";
 
 interface IProps {

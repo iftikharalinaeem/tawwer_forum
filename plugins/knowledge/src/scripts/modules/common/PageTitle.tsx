@@ -40,4 +40,4 @@ export class PageTitle extends React.Component<IProps> {
     }
 }
 
-export default withDevice(PageTitle);
+export default withDevice<IProps>(PageTitle);
