@@ -11,6 +11,9 @@ import Heading from "@library/components/Heading";
 
 interface IProps {}
 
+/**
+ * Implements the site nav, to go in a layout template
+ */
 export default class ArticleNavigation extends React.Component<IProps> {
     public render() {
         return (

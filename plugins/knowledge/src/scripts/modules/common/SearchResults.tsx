@@ -21,6 +21,9 @@ interface IState {
     children: IResult[];
 }
 
+/**
+ * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
+ */
 export default class SearchResults extends React.Component<IProps, IState> {
     public render() {
         const hasResults = this.props.children && this.props.children.length > 0;

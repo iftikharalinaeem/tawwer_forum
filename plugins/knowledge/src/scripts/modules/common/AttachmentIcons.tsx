@@ -38,6 +38,9 @@ interface IState {
     id: string;
 }
 
+/**
+ * Generates a list of attachment icons
+ */
 export default class AttachmentIcons extends React.Component<IAttachmentsIcons, IState> {
     private maxCount;
 

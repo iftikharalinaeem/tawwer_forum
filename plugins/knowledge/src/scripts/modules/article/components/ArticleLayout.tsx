@@ -32,6 +32,9 @@ interface IProps {
 
 interface IState {}
 
+/**
+ * Implements the article's layout
+ */
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
         const { article } = this.props;

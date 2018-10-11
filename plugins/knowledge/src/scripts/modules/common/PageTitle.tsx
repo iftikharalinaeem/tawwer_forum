@@ -17,6 +17,9 @@ interface IProps {
     backUrl?: string | null;
 }
 
+/**
+ * Generates main title for page as well as possibly a back link and some meta information about the page
+ */
 export default class PageTitle extends React.Component<IProps> {
     public render() {
         return (

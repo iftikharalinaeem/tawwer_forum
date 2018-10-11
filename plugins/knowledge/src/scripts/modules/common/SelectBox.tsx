@@ -32,6 +32,10 @@ interface IState {
     selectedIndex: number;
 }
 
+
+/**
+ * Generates Select Box component (similar to a select)
+ */
 export default class Sort extends React.Component<IProps, IState> {
     public static defaultProps = {
         selectedIndex: 0,

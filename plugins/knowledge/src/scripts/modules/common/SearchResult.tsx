@@ -24,6 +24,9 @@ export interface IResult {
     attachments: IIconAttachment[];
 }
 
+/**
+ * Generates search result list. Note that this template is used in other contexts, such as the flat category list
+ */
 export default class SearchResult extends React.Component<IResult> {
     public static defaultProps = {
         headingLevel: 3,
