@@ -62,7 +62,7 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
-            ->column("status", ["enum",['deleted', 'undeleted']])
+            ->column("status", ["enum",['published','deleted', 'undeleted']], ['Null'=>true, 'Default'=>'published'])
             ->set();
 
         $this->database->structure()

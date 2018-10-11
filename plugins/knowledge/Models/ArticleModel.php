@@ -15,6 +15,7 @@ use Exception;
  * A model for managing articles.
  */
 class ArticleModel extends \Vanilla\Models\Model {
+    const STATUS_PUBLISHED = 'published'; //default state
     const STATUS_DELETED = 'deleted';
     const STATUS_UNDELETED = 'undeleted';
 
