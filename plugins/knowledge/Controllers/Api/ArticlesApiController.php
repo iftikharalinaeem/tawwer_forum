@@ -153,6 +153,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "categoryAncestorIDs:a?" => "integer",
+                "status:s" => "Article status: draft, published, deleted, undeleted, etc..."
             ]);
     }
 
@@ -305,6 +306,50 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Undelete an existing article.
+     *
+     * @param int $id ArticleID
+     *
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function patch_undelete(int $id) {
+        $this->permission();
+        $in = $this->schema(["id:i" => "The article ID."], 'in')
+            ->setDescription('Undelete an existing article.');
+        $out = $this->schema([], 'out');
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
+        if ($article['status'] !== ArticleModel::STATUS_UNDELETED) {
+            $this->articleModel->update(['status'=>ArticleModel::STATUS_UNDELETED], ["articleID" => $id]);
+        }
+    }
+
+    /**
+     * Delete an existing article.
+     *
+     * @param int $id ArticleID
+     *
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function patch_delete(int $id) {
+        $this->permission();
+
+        $in = $this->schema(["id:i" => "The article ID."], 'in')
+            ->setDescription('Delete an existing article.');
+        $out = $this->schema([], 'out');
+
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
+        if ($article['status'] !== ArticleModel::STATUS_DELETED) {
+            $this->articleModel->update(['status'=>ArticleModel::STATUS_DELETED], ["articleID" => $id]);
+        }
     }
 
     /**

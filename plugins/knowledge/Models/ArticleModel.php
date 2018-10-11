@@ -15,6 +15,8 @@ use Exception;
  * A model for managing articles.
  */
 class ArticleModel extends \Vanilla\Models\Model {
+    const STATUS_DELETED = 'deleted';
+    const STATUS_UNDELETED = 'undeleted';
 
     /** @var Gdn_Session */
     private $session;
