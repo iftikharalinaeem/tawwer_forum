@@ -7,6 +7,7 @@
 $panelLayout_topMargin                                                : $utility-baseUnit * 4;
 $panelLayout_bottomMargin                                             : $utility-baseUnit * 4;
 
+$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth +  2 * $icon-default_size + $utility-baseUnit !default;
 $panelLayout-twoColumn_breakpoint                                     : $global-main_paddedWidth !default;
 $panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
 
@@ -14,6 +15,13 @@ $panelLayout-panel_topPadding                                         : $global-
 $panelLayout-panel_rightPadding                                       : $global-widgetInner_padding !default;
 $panelLayout-panel_bottomPadding                                      : $global-widgetInner_padding !default;
 $panelLayout-panel_leftPadding                                        : $global-widgetInner_padding !default;
+
+@mixin mediaQuery-panelLayout_noBleed {
+    @media (max-width: #{$panelLayout-noBleed_breakpoint}) {
+        @content;
+    }
+}
+
 
 @mixin mediaQuery-panelLayout_twoColumn {
     @media (max-width: #{$panelLayout-twoColumn_breakpoint}) {

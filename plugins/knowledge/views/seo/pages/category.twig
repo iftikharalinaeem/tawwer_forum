@@ -1,0 +1,8 @@
+
+<main>
+
+    <articles>
+        {% include 'seo/components/title.twig' with {'title': page.name} %}
+        {{ page.bodyRendered|raw }}
+    </articles>
+</main>

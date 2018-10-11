@@ -4,10 +4,6 @@
  * @license Proprietary
  */
 
-$fullWidthLayout-backLink_breakpoint  : $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
-
-@mixin mediaQuery-backLink_breakPoint {
-    @media (max-width: #{$fullWidthLayout-backLink_breakpoint}) {
-        @content;
-    }
+.backLink-link {
+    color: inherit;
 }

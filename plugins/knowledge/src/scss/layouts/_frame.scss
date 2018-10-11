@@ -1,7 +1,7 @@
-/*!
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 $frame-bgColor: $global-color_bg !default;
@@ -60,7 +60,7 @@ $frame-panel_minHeight: 500px;
         justify-content: center;
         align-items: center;
         flex-shrink: 1;
-        height: #{$frame-header_minHeight - 2 * $frame-header_spacing};
+        height: #{($global-large_fontSize * $global-condensed_lineHeight) - (2 * $frame-header_spacing)};
         width: $icon_small_size;
         margin: {
             right: $utility-baseUnit;
@@ -73,6 +73,14 @@ $frame-panel_minHeight: 500px;
     flex-grow: 1;
     font-size: $frame-header_fontSize;
     text-overflow: ellipsis;
+}
+
+.frameHeader-closePosition {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 1;
+    height: $formElement-height;
 }
 
 .frameBody {
@@ -89,6 +97,10 @@ $frame-panel_minHeight: 500px;
             right: 0;
         }
     }
+}
+
+.frameBody-contents {
+    margin-bottom: $frame-header_spacing / 2;
 }
 
 .framePanel {

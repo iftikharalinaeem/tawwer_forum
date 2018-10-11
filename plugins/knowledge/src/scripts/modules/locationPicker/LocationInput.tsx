@@ -10,10 +10,11 @@ import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/component
 import Button from "@library/components/forms/Button";
 import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
 import { t } from "@library/application";
-import { Modal, ModalSizes } from "@library/components/modal";
+import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IProps extends ILocationPickerProps {
     className?: string;

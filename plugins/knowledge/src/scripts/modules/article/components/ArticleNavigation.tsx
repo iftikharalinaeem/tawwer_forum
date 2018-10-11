@@ -1,5 +1,5 @@
 /**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -11,6 +11,9 @@ import Heading from "@library/components/Heading";
 
 interface IProps {}
 
+/**
+ * Implements the site nav, to go in a layout template
+ */
 export default class ArticleNavigation extends React.Component<IProps> {
     public render() {
         return (

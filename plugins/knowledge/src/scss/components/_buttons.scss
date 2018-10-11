@@ -60,12 +60,6 @@
     &.isOpen {
         color: $global-color_primary;
     }
-
-    &.isCompact {
-        height: $icon-default_size;
-        width: $icon-default_size;
-        min-width: $icon-default_size;
-    }
 }
 
 

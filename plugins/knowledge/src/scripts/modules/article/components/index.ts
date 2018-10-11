@@ -5,11 +5,8 @@
  */
 
 export { default as ArticleActions } from "./ArticleActions";
-export { default as ArticleBreadcrumbs } from "./ArticleBreadcrumbs";
-export { default as ArticleContent } from "./ArticleContent";
 export { default as ArticleLayout } from "./ArticleLayout";
 export { default as ArticleNavigation } from "./ArticleActions";
-export { default as ArticleTitle } from "./ArticleTitle";
 export { default as ArticleTOC } from "./ArticleTOC";
 export { default as RelatedArticles } from "./ArticleRelatedArticles";
 export { default as ArticleMenu } from "./ArticleMenu";
