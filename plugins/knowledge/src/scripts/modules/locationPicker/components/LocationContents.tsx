@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";

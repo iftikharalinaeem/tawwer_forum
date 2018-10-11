@@ -9,7 +9,13 @@
     height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 3px;
+    width: 4px;
+}
+
+@include mediaQuery-panelLayout_noBleed {
+    .deviceChecker {
+        width: 3px;
+    }
 }
 
 @include mediaQuery-panelLayout_twoColumn {

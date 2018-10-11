@@ -1,5 +1,5 @@
 /**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -19,9 +19,12 @@ interface IProps {
     children: IInternalLink[];
 }
 
+/**
+ * Implements the related articles component
+ */
 export default class ArticleRelatedArticles extends React.Component<IProps> {
     public render() {
-        if (!!this.props.children && this.props.children.length > 0) {
+        if (this.props.children && this.props.children.length > 0) {
             const contents = this.props.children.map((item, i) => {
                 return (
                     <li className="linkList-item relatedArticles-item" key={"related-" + i}>

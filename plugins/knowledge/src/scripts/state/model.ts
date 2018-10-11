@@ -5,15 +5,15 @@
  * @license Proprietary
  */
 
-import { model as editorModel } from "@knowledge/modules/editor/state";
-import { model as articleModel } from "@knowledge/modules/article/state";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import { IKbCategoriesState } from "@knowledge/modules/categories/state";
-import { ILocationPickerState } from "@knowledge/modules/locationPicker/state";
+import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
+import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 
 export interface IStoreState {
     knowledge: {
-        articlePage: articleModel.IState;
-        editorPage: editorModel.IState;
+        articlePage: IArticlePageState;
+        editorPage: IEditorPageState;
         categories: IKbCategoriesState;
         locationPicker: ILocationPickerState;
     };
