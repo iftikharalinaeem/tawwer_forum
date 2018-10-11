@@ -4,4 +4,5 @@
  * @license Proprietary
  */
 
-import * as CategoryResult from "./CategoryResult";
+import * as CategoriesLayout from "./CategoriesLayout";
+import * as CategoryMenu from "./CategoryMenu";

@@ -19,6 +19,9 @@ interface IProps {
     children: IInternalLink[];
 }
 
+/**
+ * Implements the related articles component
+ */
 export default class ArticleRelatedArticles extends React.Component<IProps> {
     public render() {
         if (this.props.children && this.props.children.length > 0) {

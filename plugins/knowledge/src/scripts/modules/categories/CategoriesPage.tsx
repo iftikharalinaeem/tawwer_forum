@@ -17,11 +17,10 @@ interface IProps extends IDeviceProps {}
 /**
  * Page component for a flat category list.
  */
-export class CategoriesPage extends React.Component<IProps> {
+export default class CategoriesPage extends React.Component<IProps> {
     public render() {
         const categories = Object.values(dummyData.categoriesByID);
         return <CategoriesLayout children={...categories as any} />;
     }
 }
 
-export default withDevice(CategoriesPage);
