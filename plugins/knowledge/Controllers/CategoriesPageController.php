@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
@@ -15,7 +15,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
-/**
+/*
  * Knowledge base Categories controller for article view.
  */
 class CategoriesPageController extends KnowledgeTwigPageController {

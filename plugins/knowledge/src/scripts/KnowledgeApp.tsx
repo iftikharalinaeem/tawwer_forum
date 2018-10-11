@@ -1,4 +1,4 @@
-/**
+/*
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
@@ -12,7 +12,7 @@ import DeviceContext from "@knowledge/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 
-/**
+/*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
