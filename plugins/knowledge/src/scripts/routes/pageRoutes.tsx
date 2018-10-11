@@ -8,11 +8,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-<<<<<<< HEAD
-=======
-import { constants as articleConstants } from "@knowledge/modules/article/state";
 import { constants as categoriesConstants } from "@knowledge/modules/categories/state";
->>>>>>> master
 import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
 import CategoriesPage from "@knowledge/modules/categories/CategoriesPage";
 
@@ -48,16 +44,12 @@ const HomePage = Loadable({
 export function getPageRoutes() {
     return [
         <Route exact path="/kb" component={HomePage} key={"/kb"} />,
-<<<<<<< HEAD
         <Route path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
-=======
         <Route
             path={categoriesConstants.CATEGORIES_ROUTE}
             component={CategoriesPage}
             key={categoriesConstants.CATEGORIES_ROUTE}
         />,
-        <Route path={articleConstants.ARTICLE_ROUTE} component={ArticlePage} key={articleConstants.ARTICLE_ROUTE} />,
->>>>>>> master
         <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
     ];
 }

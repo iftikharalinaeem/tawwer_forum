@@ -8,24 +8,16 @@ import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-<<<<<<< HEAD
-import { Modal } from "@library/components/modal";
 import apiv2 from "@library/apiv2";
-=======
 import Modal from "@library/components/modal/Modal";
->>>>>>> master
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
-<<<<<<< HEAD
-import { ModalSizes } from "@library/components/modal/ModalSizes";
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-=======
 import ModalSizes from "@library/components/modal/ModalSizes";
->>>>>>> master
 
 interface IOwnProps
     extends RouteComponentProps<{

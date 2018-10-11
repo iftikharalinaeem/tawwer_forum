@@ -68,7 +68,7 @@ export class ArticlePage extends React.Component<IProps> {
             return;
         }
 
-        articlePageActions.getArticleByID(id);
+        void articlePageActions.getArticleByID(id);
     }
 
     /**

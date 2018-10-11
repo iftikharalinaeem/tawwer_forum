@@ -85,7 +85,7 @@ export class LocationInput extends React.Component<IProps, IState> {
      * Show the location picker modal.
      */
     private showLocationPicker = () => {
-        this.props.actions.getKbNavigation({ knowledgeCategoryID: 1 });
+        void this.props.actions.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
             showLocationPicker: true,
         });
