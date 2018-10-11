@@ -19,6 +19,14 @@ export const dummyNavData: any = {
             children: [
                 {
                     knowledgeCategoryID: 10,
+                    name: "Test Article - All Formatting & Embeds",
+                    parentID: 9,
+                    isSection: false,
+                    displayType: KbCategoryDisplayType.GUIDE,
+                    url: "/kb/articles/test-articles--all-formatting--embeds-3",
+                },
+                {
+                    knowledgeCategoryID: 10,
                     name: "Armadillos",
                     parentID: 9,
                     isSection: false,
