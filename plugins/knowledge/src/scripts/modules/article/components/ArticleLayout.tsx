@@ -10,11 +10,8 @@ import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
 import {
-    ArticleBreadcrumbs,
     ArticleActions,
     ArticleNavigation,
-    ArticleTitle,
-    ArticleContent,
     ArticleTOC,
     RelatedArticles,
     ArticleMenu,
@@ -23,8 +20,10 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
 import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
 import { InlineTypes } from "@library/components/Sentence";
-import { dummyNavData } from "../../categories/state/dummyNavData";
-import SiteNav from "@library/components/siteNav/SiteNav";
+import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
+import { t } from "@library/application";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import UserContent from "@library/components/UserContent";
 
 interface IProps {
     article: IArticle;
@@ -33,6 +32,9 @@ interface IProps {
 
 interface IState {}
 
+/**
+ * Implements the article's layout
+ */
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
         const { article } = this.props;
@@ -110,22 +112,27 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             <Container>
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.Breadcrumbs>
-                        <ArticleBreadcrumbs />
-                    </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftBottom>
                         <PanelWidget>
-                            <SiteNav {...dummyNavData} />
+                            <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
                         </PanelWidget>
+                    </PanelLayout.Breadcrumbs>
+                    <PanelLayout.LeftTop>
+                        <ArticleActions />
+                    </PanelLayout.LeftTop>
+                    <PanelLayout.LeftBottom>
+                        <ArticleNavigation />
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle
-                            article={article}
+                        <PageTitle
+                            title={article.articleRevision.name}
                             menu={<ArticleMenu article={article} />}
                             meta={metaData as any}
                         />
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <ArticleContent article={article} />
+                        <PanelWidget>
+                            <UserContent content={article.articleRevision.bodyRendered} />
+                        </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
                         <ArticleTOC children={articleTOC} />
@@ -136,6 +143,35 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                 </PanelLayout>
             </Container>
         );
+    }
+
+    private get dummyBreadcrumbData(): ICrumb[] {
+        return [
+            {
+                name: "Home",
+                url: "/kb",
+            },
+            {
+                name: "two",
+                url: "#",
+            },
+            {
+                name: "three",
+                url: "#",
+            },
+            {
+                name: "four",
+                url: "#",
+            },
+            {
+                name: "five",
+                url: "#",
+            },
+            {
+                name: "six",
+                url: "#",
+            },
+        ];
     }
 }
 
