@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
 import Button from "@library/components/forms/Button";
-import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/state/context";
+import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/LocationPickerContext";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
@@ -77,7 +77,7 @@ export class LocationInput extends React.Component<IProps, IState> {
 
     public componentDidUpdate(oldProps: IProps) {
         if (oldProps.initialCategory !== this.props.initialCategory && this.props.initialCategory) {
-            this.props.initForCategory(this.props.initialCategory);
+            this.props.actions.init(this.props.initialCategory);
         }
     }
 
@@ -85,7 +85,7 @@ export class LocationInput extends React.Component<IProps, IState> {
      * Show the location picker modal.
      */
     private showLocationPicker = () => {
-        this.props.getKbNavigation({ knowledgeCategoryID: 1 });
+        void this.props.actions.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
             showLocationPicker: true,
         });

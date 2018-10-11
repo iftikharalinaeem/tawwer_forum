@@ -6,16 +6,17 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
+import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
 import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
-import { thunks, actions, model } from "@knowledge/modules/editor/state";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IOwnProps
@@ -24,10 +25,8 @@ interface IOwnProps
         }> {}
 
 interface IProps extends IOwnProps {
-    pageState: model.IState;
-    clearPageState: () => void;
-    initPageFromLocation: typeof thunks.initPageFromLocation;
-    submitNewRevision: typeof thunks.submitNewRevision;
+    pageState: IEditorPageState;
+    actions: EditorPageActions;
     articleCategory: IKbCategoryFragment;
 }
 
@@ -71,14 +70,14 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Initial setup for the page.
      */
     public componentDidMount() {
-        this.props.initPageFromLocation(this.props.history);
+        void this.props.actions.initPageFromLocation(this.props.history);
     }
 
     /**
      * Cleanup the page contents.
      */
     public componentWillUnmount() {
-        this.props.clearPageState();
+        this.props.actions.reset();
     }
 
     public showLocationPicker() {
@@ -97,7 +96,7 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history } = this.props;
+        const { pageState, history, actions } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
@@ -107,7 +106,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            this.props.submitNewRevision(data, history);
+            void actions.submitNewRevision(data, history);
         }
     };
 
@@ -156,9 +155,9 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    const { initPageFromLocation, submitNewRevision } = thunks;
-    const { clearPageState } = actions;
-    return bindActionCreators({ initPageFromLocation, submitNewRevision, clearPageState }, dispatch);
+    return {
+        actions: new EditorPageActions(dispatch, apiv2),
+    };
 }
 
 const withRedux = connect(
