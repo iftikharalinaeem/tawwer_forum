@@ -16,7 +16,7 @@ import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
-import { ModalSizes } from "@library/components/modal/ModalSizes";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IOwnProps
     extends RouteComponentProps<{

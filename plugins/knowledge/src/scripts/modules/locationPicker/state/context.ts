@@ -4,8 +4,7 @@
  * @license Proprietary
  */
 
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { thunks, actions, ILocationPickerState } from "@knowledge/modules/locationPicker/state";
 import { model as categoryModel } from "@knowledge/modules/categories/state";
 import { IStoreState } from "@knowledge/state/model";
