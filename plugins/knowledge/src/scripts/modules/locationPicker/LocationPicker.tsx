@@ -94,7 +94,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
      */
     private goBack = () => {
         if (this.canNavigateBack) {
-            this.props.actions.navigateToCategory(this.props.navigatedCategory.parentID);
+            void this.props.actions.navigateToCategory(this.props.navigatedCategory.parentID);
         }
     };
 
