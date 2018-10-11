@@ -75,6 +75,10 @@ $pageHeading-dropdown_width                    : 150px !default;
         top: 0;
         left: -#{$icon-default_size + $utility-baseUnit * 2};
     }
+
+    @include mediaQuery-panelLayout_noBleed {
+        display: none;
+    }
 }
 
 .pageHeading-link {

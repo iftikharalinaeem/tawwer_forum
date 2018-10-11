@@ -34,7 +34,9 @@ export default class SearchResult extends React.Component<IResult> {
 
     public render() {
         const hasAttachments = this.props.attachments && this.props.attachments.length > 0;
-        const image = this.props.image ? (
+        const showImage = this.props.image && !hasAttachments;
+        const hasMedia = hasAttachments || showImage;
+        const image = showImage ? (
             <img
                 src={this.props.image}
                 className="searchResult-image"
@@ -49,13 +51,12 @@ export default class SearchResult extends React.Component<IResult> {
         }
         const HeadingTag = `h${this.props.headingLevel}`;
 
-        const media =
-            hasAttachments || !!image ? (
-                <div className="searchResult-media">
-                    {!hasAttachments && image}
-                    {attachmentOutput}
-                </div>
-            ) : null;
+        const media = hasMedia ? (
+            <div className={classNames("searchResult-media", { hasImage: showImage })}>
+                {showImage && image}
+                {attachmentOutput}
+            </div>
+        ) : null;
 
         return (
             <li className={classNames("searchResults-item", this.props.className)}>

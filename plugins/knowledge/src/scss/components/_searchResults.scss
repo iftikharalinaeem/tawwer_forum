@@ -96,7 +96,10 @@ $searchResult_breakPoint                      : 800px;
 
     @include mediaQuery-searchResults_smallScreen {
         width: 100%;
-        height: $searchResult-media_width;
+
+        &.hasImage {
+            height: $searchResult-media_width;
+        }
     }
 }
 

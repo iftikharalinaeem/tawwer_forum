@@ -11,6 +11,8 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { dummyData } from "@knowledge/modules/categories/state/dummyData";
+import { LoadStatus } from "@library/@types/api";
+import PageLoader from "@library/components/PageLoader";
 
 interface IProps extends IDeviceProps {}
 
@@ -20,7 +22,10 @@ interface IProps extends IDeviceProps {}
 export default class CategoriesPage extends React.Component<IProps> {
     public render() {
         const categories = Object.values(dummyData.categoriesByID);
-        return <CategoriesLayout children={...categories as any} />;
+        return (
+            <PageLoader data={{}} status={LoadStatus.SUCCESS}>
+                <CategoriesLayout children={...categories as any} />
+            </PageLoader>
+        );
     }
 }
-
