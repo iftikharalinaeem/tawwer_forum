@@ -9,7 +9,7 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
@@ -63,13 +63,8 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         $this->setPageTitle($category['name']);
 
         // Put together pre-loaded redux actions.
-        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
-        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLES_RESPONSE, $this->data[self::API_PAGE_KEY]);
-        $reduxActions = [
-            $categoriesGetRedux,
-            $articlesGetRedux,
-        ];
-        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLES_RESPONSE, $this->data[self::API_PAGE_KEY]));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();

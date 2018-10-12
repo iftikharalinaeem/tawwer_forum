@@ -34,9 +34,9 @@ export default class EditorForm extends React.Component<IProps, IState> {
     public constructor(props: IProps) {
         super(props);
 
-        if (this.props.revision.status === LoadStatus.SUCCESS) {
+        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
             this.state = {
-                name: this.props.revision.data!.name,
+                name: this.props.revision.data.name,
                 body: [],
             };
         } else {
@@ -48,8 +48,8 @@ export default class EditorForm extends React.Component<IProps, IState> {
     }
 
     public componentDidMount() {
-        if (this.props.revision.status === LoadStatus.SUCCESS) {
-            this.editorRef.current!.setEditorContent(JSON.parse(this.props.revision.data!.body));
+        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
+            this.editorRef.current!.setEditorContent(JSON.parse(this.props.revision.data.body));
         }
     }
 
@@ -58,6 +58,8 @@ export default class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
+        console.log("isLoiading", isLoadingOrPending);
+        console.log(isLoadingOrPending ? "Loading" : this.state.name || t("Untitled"));
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>

@@ -13,6 +13,8 @@ import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
 
 /*
  * Top level application component for knowledge.
@@ -23,13 +25,14 @@ export default class KnowledgeApp extends React.Component {
 
     private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
+    private store = getStore<IStoreState>();
+
     /**
      * Device checker detects device and calls a force update if needed to update the current device.
      */
     public render() {
-        const store = getStore();
         return (
-            <Provider store={store}>
+            <Provider store={this.store}>
                 <React.Fragment>
                     <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
                     <DeviceContext.Provider
@@ -49,7 +52,9 @@ export default class KnowledgeApp extends React.Component {
      */
     public componentDidMount() {
         this.doUpdate();
-        void this.categoryActions.getAllCategories();
+        if (this.store.getState().knowledge.categories.status !== LoadStatus.SUCCESS) {
+            void this.categoryActions.getAllCategories();
+        }
     }
 
     /**

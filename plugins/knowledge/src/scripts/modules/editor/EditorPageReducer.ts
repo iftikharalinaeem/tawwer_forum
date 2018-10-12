@@ -8,7 +8,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, IArticleRevision } from "@knowledge/@types/api";
+import { IArticle, IArticleRevision, Format } from "@knowledge/@types/api";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
@@ -52,7 +52,7 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
                     // As a result we need to clear the optomistic loading indicator we put up earlier.
                     // as the user will be making a totally new revision.
                     if (action.payload.data.articleRevisionID === null) {
-                        draft.revision.status = LoadStatus.PENDING;
+                        draft.revision.status = LoadStatus.SUCCESS;
                     }
                     break;
                 case EditorPageActions.GET_ARTICLE_ERROR:

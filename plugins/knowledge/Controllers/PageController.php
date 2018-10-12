@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
+use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
 
 /**
@@ -28,6 +29,8 @@ abstract class PageController extends \Garden\Controller {
 
     protected $styles = [];
 
+    protected $reduxActions = [];
+
     protected $inlineStyles = [];
 
     protected $meta;
@@ -43,6 +46,15 @@ abstract class PageController extends \Garden\Controller {
     public function __construct() {
         $this->meta = new PageMetaModel();
         $this->pageMetaInit();
+    }
+
+    /**
+     * Add a redux action to the page.
+     *
+     * @param ReduxAction $action The action to add.
+     */
+    public function addReduxAction(ReduxAction $action) {
+        $this->reduxActions[] = $action;
     }
 
     /**
@@ -93,7 +105,7 @@ abstract class PageController extends \Garden\Controller {
      * @return array
      */
     public function getInlineScripts() {
-        return $this->inlineScripts;
+        return array_merge($this->inlineScripts, [self::createInlineScriptContent('__ACTIONS__', $this->reduxActions)]);
     }
 
     /**

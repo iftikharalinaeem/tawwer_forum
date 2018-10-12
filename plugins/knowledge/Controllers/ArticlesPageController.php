@@ -10,7 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
@@ -31,6 +31,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
     /**
      * ArticlesPageController constructor.
+     *
      * @param Container $container
      */
     public function __construct(Container $container) {
@@ -54,7 +55,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @param string $path URI slug page action string.
      * @return string Returns HTML page content
      */
-    public function index(string $path) : string {
+    public function index(string $path): string {
         $this->action = self::ACTION_VIEW;
         $this->articleId = $id = $this->detectArticleId($path);
 
@@ -64,10 +65,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $this->setPageTitle($article['articleRevision']['name']);
 
         // Put together pre-loaded redux actions.
-        $reduxActions = [
-            new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $article),
-        ];
-        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, $article));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -83,7 +81,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @param int $id URI article id.
      * @return string Returns HTML page content
      */
-    public function get_editor(int $id) : string {
+    public function get_editor(int $id): string {
         $this->action = self::ACTION_EDIT;
         $this->articleId = $id;
         if (!$this->session->isValid()) {
@@ -93,11 +91,11 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         // API data
         $reduxActions = [];
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
-        $reduxActions[] = new ReduxAction(ArticlesApiActions::GET_EDITOR_ARTICLE_RESPONSE, $article);
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_EDITOR_ARTICLE_RESPONSE, $article));
 
         if (isset($article['articleRevisionID'])) {
             $revision = $this->revisionsApi->get($article['articleRevisionID']);
-            $reduxActions[] = new ReduxAction(ArticlesApiActions::GET_REVISION_RESPONSE, $revision);
+            $this->addReduxAction(new ReduxAction(ActionConstants::GET_REVISION_RESPONSE, $revision));
         }
 
         // Set the title
@@ -106,9 +104,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         } else {
             $this->setPageTitle(\Gdn::translate('Untitled'));
         }
-
-        // Put together pre-loaded redux actions.
-        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -119,9 +114,10 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
     /**
      * Render out the /kb/articles/add path page.
+     *
      * @return string Returns HTML page content.
      */
-    public function get_add() : string {
+    public function get_add(): string {
         $this->action = self::ACTION_ADD;
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/add');
@@ -144,7 +140,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @return int Returns article id as int.
      * @throws ClientException If the URL can't be parsed properly.
      */
-    protected function detectArticleId(string $path) : int {
+    protected function detectArticleId(string $path): int {
         $matches = [];
         if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
@@ -154,12 +150,13 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
         return $id;
     }
+
     /**
      * Gather the data array to render a page with.
      *
      * @return array
      */
-    private function getViewData() : array {
+    private function getViewData(): array {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();
@@ -169,8 +166,10 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $data['page']['classes'][] = 'isLoading';
         $data['page']['userSignedIn'] = $this->session->isValid();
         $data['page']['classes'][] = $data['page']['userSignedIn'] ? 'isSignedIn' : 'isSignedOut';
+
         return $data;
     }
+
     /**
      * Initialize page SEO meta data.
      *
@@ -187,14 +186,16 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()))
+        ;
+
         return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function getCanonicalLink() : string {
+    public function getCanonicalLink(): string {
         $url = $this->canonicalUrl;
         if ($url === null) {
             switch ($this->action) {
@@ -216,6 +217,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             }
             $this->canonicalUrl = $url;
         }
+
         return $url;
     }
 
@@ -229,6 +231,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     public function getApiPageData(string $key) {
         return $this->data[self::API_PAGE_KEY][$key] ?? '';
     }
+
     /**
      * Get Breadcrumbs data array
      * This is temporary implementation need to be refactored

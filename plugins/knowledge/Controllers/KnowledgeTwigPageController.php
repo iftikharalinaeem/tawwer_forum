@@ -8,7 +8,10 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
+use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
 
 /**
@@ -50,8 +53,9 @@ abstract class KnowledgeTwigPageController extends PageController {
         $locale = $container->get(\Gdn_Locale::class);
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        $this->scripts[] = $assetModel->getJSLocalePath($locale->current());
         $this->addGdnScript();
+        $this->scripts[] = $assetModel->getJSLocalePath($locale->current());
+        $this->addGlobalReduxActions();
 
         // Stylesheets
         if (\Gdn::config('HotReload.Enabled', false) === false) {
@@ -60,6 +64,13 @@ abstract class KnowledgeTwigPageController extends PageController {
                 '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/rich-editor.min.css',
             ];
         }
+    }
+
+    private function addGlobalReduxActions() {
+        /** @var KnowledgeCategoriesApiController $categoriesApi */
+        $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
+        $categories = $categoriesApi->index();
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, $categories));
     }
 
     /**
