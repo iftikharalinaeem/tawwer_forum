@@ -58,8 +58,6 @@ export default class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
-        console.log("isLoiading", isLoadingOrPending);
-        console.log(isLoadingOrPending ? "Loading" : this.state.name || t("Untitled"));
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
