@@ -415,7 +415,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($article['status'] !== ArticleModel::STATUS_UNDELETED) {
             $this->articleModel->update(['status'=>ArticleModel::STATUS_UNDELETED], ["articleID" => $id]);
         }
-        return new \Garden\Web\Data([], 204);
+        return new \Garden\Web\Data('', 204);
     }
 
     /**
@@ -441,7 +441,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($article['status'] !== ArticleModel::STATUS_DELETED) {
             $this->articleModel->update(['status'=>ArticleModel::STATUS_DELETED], ["articleID" => $id]);
         }
-        return new \Garden\Web\Data([], 204);
+        return new \Garden\Web\Data('', 204);
     }
 
     /**
