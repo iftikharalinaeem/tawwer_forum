@@ -19,6 +19,7 @@ class ReduxAction implements \JsonSerializable {
      * @var array $payload Redux action payload
      */
     protected $payload;
+
     /**
      * Create an redux action
      *
@@ -30,7 +31,10 @@ class ReduxAction implements \JsonSerializable {
         $this->payload = $data;
     }
 
-    public function jsonSerialize() {
+    /**
+     * Get the array for JSON serialization.
+     */
+    public function jsonSerialize(): array {
         return $this->value();
     }
 
@@ -40,7 +44,7 @@ class ReduxAction implements \JsonSerializable {
      *
      * @return array
      */
-    public function value() : array {
+    public function value(): array {
         return [
             "type" => $this->type,
             "payload" => [

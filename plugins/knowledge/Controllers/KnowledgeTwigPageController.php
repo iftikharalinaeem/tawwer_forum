@@ -64,8 +64,6 @@ abstract class KnowledgeTwigPageController extends PageController {
 
     /**
      * Add the an inline script for global context to the frontend.
-     *
-     * @param SiteMeta $siteMeta
      */
     private function addGdnScript() {
         $gdnData = [
