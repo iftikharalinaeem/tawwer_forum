@@ -66,6 +66,9 @@ abstract class KnowledgeTwigPageController extends PageController {
         }
     }
 
+    /**
+     * Preload redux actions that are present on every page.
+     */
     private function addGlobalReduxActions() {
         /** @var KnowledgeCategoriesApiController $categoriesApi */
         $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
