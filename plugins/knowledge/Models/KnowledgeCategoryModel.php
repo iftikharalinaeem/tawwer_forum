@@ -38,7 +38,8 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
-        $this->addPipelineProcessor($userProcessor);    }
+        $this->addPipelineProcessor($userProcessor);
+    }
 
     /**
      * Configure a Garden Schema instance for write operations by the model.
