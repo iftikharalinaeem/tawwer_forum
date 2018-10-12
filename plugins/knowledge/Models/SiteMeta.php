@@ -52,13 +52,13 @@ class SiteMeta implements \JsonSerializable {
      * Return array for json serialization.
      */
     public function jsonSerialize(): array {
-        return $this->getMeta();
+        return $this->value();
     }
 
     /**
      * @return array
      */
-    private function getMeta(): array {
+    private function value(): array {
         return [
             'context' => [
                 'host' => $this->assetPath,
