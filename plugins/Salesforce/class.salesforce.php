@@ -665,9 +665,9 @@ class Salesforce {
             return false;
         }
 
-        $response = $this->request('sobjects/{$type}/describe');
+        $response = $this->request('sobjects/'.$type.'/describe');
         if ($response['HttpCode'] != 200) {
-            throw new Gdn_UserException('Error getting {$type} status Options');
+            throw new Gdn_UserException('Error getting '.$type.' status Options');
         }
         foreach ($response['Response']['fields'] as $fieldNum => $field) {
             if ($field['name'] == $searchField) {
