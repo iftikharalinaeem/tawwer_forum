@@ -181,7 +181,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "categoryAncestorIDs:a?" => "integer",
-                "status:s" => "Article status: draft, published, deleted, undeleted, etc..."
+                "status:s" => [
+                    'description' => "Article status: draft, published, deleted, undeleted, etc...",
+                    'enum' => [ArticleModel::STATUS_PUBLISHED, ArticleModel::STATUS_DELETED, ArticleModel::STATUS_UNDELETED]
+                ]
             ]);
     }
 
