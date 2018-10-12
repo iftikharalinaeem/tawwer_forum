@@ -32,7 +32,6 @@ interface IState {
     selectedIndex: number;
 }
 
-
 /**
  * Generates Select Box component (similar to a select)
  */
@@ -49,11 +48,16 @@ export default class Sort extends React.Component<IProps, IState> {
         };
     }
 
-
     public render() {
         const selectItems = this.props.children.map((child, i) => {
             return (
-                <DropDownItemButton key={this.props.id + "-item" + i} className="selectBox-option" name={t("Customize SEO")} onClick={this.onClick} disabled={i === this.state.selectedIndex}>
+                <DropDownItemButton
+                    key={this.props.id + "-item" + i}
+                    className="selectBox-option"
+                    name={t("Customize SEO")}
+                    onClick={this.onClick}
+                    disabled={i === this.state.selectedIndex}
+                >
                     {child.name}
                 </DropDownItemButton>
             );
@@ -61,9 +65,7 @@ export default class Sort extends React.Component<IProps, IState> {
 
         return (
             <div className={classNames("selectBox", this.props.className)}>
-                <span className="selectBox-label">
-                    {this.props.label}
-                </span>
+                <span className="selectBox-label">{this.props.label}</span>
                 <div className="selectBox-content">
                     <DropDown id={this.state.id} name={this.props.label}>
                         {selectItems}
@@ -77,5 +79,5 @@ export default class Sort extends React.Component<IProps, IState> {
         this.setState({
             selectedIndex: index,
         });
-    }
+    };
 }

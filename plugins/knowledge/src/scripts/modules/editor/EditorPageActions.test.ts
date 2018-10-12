@@ -34,7 +34,7 @@ describe("EditorPageActions", () => {
     });
 
     describe("initPageFromLocation", () => {
-        it("Does nothing if we are not in the correct location", async () => {
+        it.only("Does nothing if we are not in the correct location", async () => {
             const history = createMemoryHistory();
             history.push("/test-bad-location");
             const spy = sinon.spy(mockStore, "dispatch");

@@ -37,8 +37,14 @@ abstract class KnowledgeTwigPageController extends PageController {
         $this->session = $this->container->get(\Gdn_Session::class);
         $assetModel = $this->container->get(\AssetModel::class);
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+
+        // Scripts
+        $locale = $container->get(\Gdn_Locale::class);
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
+        $this->scripts[] = $assetModel->getJSLocalePath($locale->current());
+
+        // Stylesheets
         if (\Gdn::config('HotReload.Enabled', false) === false) {
             $this->styles = [
                 '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css',

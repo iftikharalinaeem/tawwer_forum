@@ -17,6 +17,7 @@ import PageLoader from "@library/components/PageLoader";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
+import DocumentTitle from "@library/components/DocumentTitle";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -41,15 +42,13 @@ export class ArticlePage extends React.Component<IProps> {
             return <NotFoundPage type="Page" />;
         }
 
-        if (articlePageState.status !== LoadStatus.SUCCESS) {
-            return null;
-        }
-
-        const { article } = articlePageState.data;
-
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} />
+                {articlePageState.status === LoadStatus.SUCCESS && (
+                    <DocumentTitle title={articlePageState.data.article.seoName}>
+                        <ArticleLayout article={articlePageState.data.article} />
+                    </DocumentTitle>
+                )}
             </PageLoader>
         );
     }

@@ -8,11 +8,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
+import DocumentTitle from "@library/components/DocumentTitle";
 
 export default class HomePage extends React.Component {
     public render() {
         return (
             <div>
+                <DocumentTitle title="Home" />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
                     <Link to="/kb/articles/test-articles--text-post-1">{t("Test Article - Text Post")}</Link>

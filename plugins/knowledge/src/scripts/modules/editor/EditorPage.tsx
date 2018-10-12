@@ -18,6 +18,8 @@ import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@k
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import DocumentTitle from "@library/components/DocumentTitle";
+import { t } from "@library/application";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -43,8 +45,12 @@ export class EditorPage extends React.Component<IProps, IState> {
     };
 
     public render() {
+        const { pageState } = this.props;
+        const title =
+            pageState.article.status === LoadStatus.SUCCESS ? t("EditArticle.PageTitle") : t("AddArticle.PageTitle");
+
         const pageContent = (
-            <React.Fragment>
+            <DocumentTitle title={title}>
                 <EditorLayout backUrl={this.backLink}>
                     <EditorForm
                         submitHandler={this.formSubmit}
@@ -52,7 +58,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                         articleCategory={this.props.articleCategory}
                     />
                 </EditorLayout>
-            </React.Fragment>
+            </DocumentTitle>
         );
 
         if (this.isModal) {
