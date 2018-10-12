@@ -502,25 +502,27 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $sender->informMessage('Salesforce Lead Created.');
             }
         }
-        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+
         try {
-            $data = [
-                'DiscussionID' => $content->DiscussionID,
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'Name' => $user->Name,
-                'Email' => $user->Email,
-                'Title' => $user->Title,
-                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
-                'Options' => $salesforce->getLeadStatusOptions(),
-                'Type' => $type,
-                'CommentID' => val('CommentID', $content),
-                'InsertUserID' => val('InsertUserID', $content),
-            ];
+            $salesforce->getLeadStatusOptions();
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
-
+        
+        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+        $data = [
+            'DiscussionID' => $content->DiscussionID,
+            'FirstName' => $firstName,
+            'LastName' => $lastName,
+            'Name' => $user->Name,
+            'Email' => $user->Email,
+            'Title' => $user->Title,
+            'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+            'Options' => $salesforce->getLeadStatusOptions(),
+            'Type' => $type,
+            'CommentID' => val('CommentID', $content),
+            'InsertUserID' => val('InsertUserID', $content),
+        ];
         $this->EventArguments['Data'] = &$data;
         $this->fireEvent('LeadFormData');
 
@@ -645,26 +647,28 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $sender->Form->setValidationResults($attachmentModel->validationResults());
         }
-        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
 
         try {
-            $data = [
-                'DiscussionID' => $content->DiscussionID,
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'Email' => $user->Email,
-                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
-                'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
-                'Options' => $salesforce->getCaseStatusOptions(),
-                'Priorities' => $salesforce->getCasePriorityOptions(),
-                'Body' => Gdn_Format::textEx($content->Body),
-                'Type' => $type,
-                'CommentID' => val('CommentID', $content),
-                'InsertUserID' => val('InsertUserID', $content),
-            ];
+            $salesforce->getCasePriorityOptions();
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
+
+        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+        $data = [
+            'DiscussionID' => $content->DiscussionID,
+            'FirstName' => $firstName,
+            'LastName' => $lastName,
+            'Email' => $user->Email,
+            'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+            'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
+            'Options' => $salesforce->getCaseStatusOptions(),
+            'Priorities' => $salesforce->getCasePriorityOptions(),
+            'Body' => Gdn_Format::textEx($content->Body),
+            'Type' => $type,
+            'CommentID' => val('CommentID', $content),
+            'InsertUserID' => val('InsertUserID', $content),
+        ];
 
         $sender->EventArguments['Data'] = &$data;
         $sender->fireEvent('CaseFormData');
