@@ -16,6 +16,10 @@ use Exception;
  */
 class ArticleModel extends \Vanilla\Models\PipelineModel {
 
+    const STATUS_PUBLISHED = 'published'; //default state
+    const STATUS_DELETED = 'deleted';
+    const STATUS_UNDELETED = 'undeleted';
+
     /** Default limit on the number of results returned. */
     const LIMIT_DEFAULT = 30;
 

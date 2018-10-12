@@ -8,7 +8,7 @@ import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/Sentence";
-import { IArticle } from "@knowledge/@types/api";
+
 import {
     DropDownItemLink,
     DropDownItemButton,
@@ -17,17 +17,14 @@ import {
 } from "@library/components/dropdown";
 import { makeEditUrl } from "@knowledge/modules/editor/route";
 
-export interface IProps {
-    article: IArticle;
-}
+export interface IProps {}
 
 /**
  * Generates drop down menu for Article page
  */
 export default class ArticleMenu extends React.PureComponent<IProps> {
     public render() {
-        const { article } = this.props;
-        const domID = "articleMenuDropDown-" + article.articleID;
+        const domID = "categoryMenuDropDown"; // Todo: dynamic
         // Hard coded data/functions
         const buttonClick = () => {
             alert("Click works");
@@ -75,16 +72,13 @@ export default class ArticleMenu extends React.PureComponent<IProps> {
             },
         ];
 
-        const editUrl = makeEditUrl(article.articleID);
-
         return (
-            <DropDown id={domID} name={t("Article Options")} className={"articlePage-options"}>
+            <DropDown id={domID} name={t("Category Options")} className={"categoryPage-options"}>
                 <DropDownItemMetas>{publishedMeta}</DropDownItemMetas>
                 <DropDownItemMetas>{updatedMeta}</DropDownItemMetas>
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
-                <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
                 <DropDownItemSeparator />

@@ -1,0 +1,36 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$attachmentIcon_spacing: $utility-baseUnit / 2;
+
+.attachmentsIcons {
+    display: block;
+    position: relative;
+}
+
+.attachmentsIcons-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+    width: calc(100% + #{$attachmentIcon_spacing * 2});
+
+    margin: {
+        top: -#{$attachmentIcon_spacing};
+        left: -#{$attachmentIcon_spacing};
+        right: $meta_spacing;
+    }
+
+    overflow: hidden;
+}
+
+.attachmentsIcons-item {
+    margin: $attachmentIcon_spacing;
+}
+
+.attachmentsIcons-more {
+
+}

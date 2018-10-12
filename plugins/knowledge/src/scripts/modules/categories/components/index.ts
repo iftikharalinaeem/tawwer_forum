@@ -4,6 +4,5 @@
  * @license Proprietary
  */
 
-.pageLocation {
-  user-select: none;
-}
+import * as CategoriesLayout from "./CategoriesLayout";
+import * as CategoryMenu from "./CategoryMenu";

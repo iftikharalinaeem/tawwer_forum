@@ -15,7 +15,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
-/**
+/*
  * Knowledge base Categories controller for article view.
  */
 class CategoriesPageController extends KnowledgeTwigPageController {
@@ -56,16 +56,16 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         $this->action = self::ACTION_VIEW_ARTICLES;
         $this->categoryId = $id = $this->detectCategoryId($path);
         $this->data[self::CATEGORY_API_RESPONSE] = $this->categoriesApi->get($id);
-        //$this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
 
         // Put together pre-loaded redux actions.
-//        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
-//        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
-//        $reduxActions = [
-//            $categoriesGetRedux->getReduxAction(),
-//            $articlesGetRedux->getReduxAction(),
-//        ];
-//        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
+        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLES_RESPONSE, $this->data[self::API_PAGE_KEY]);
+        $reduxActions = [
+            $categoriesGetRedux->getReduxAction(),
+            $articlesGetRedux->getReduxAction(),
+        ];
+        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -141,7 +141,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
                     if ($apiUrl = $this->data[self::CATEGORY_API_RESPONSE]['url'] ?? false) {
                         $url = $apiUrl;
                     } else {
-                        $url = \Gdn::request()->url('/kb/categories/'.$this->articleId.'-', true);
+                        $url = \Gdn::request()->url('/kb/categories/'.$this->categoryId.'-', true);
                     }
                     break;
                 default:
