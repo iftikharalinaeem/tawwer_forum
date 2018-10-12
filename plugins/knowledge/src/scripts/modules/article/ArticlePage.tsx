@@ -18,6 +18,8 @@ import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -25,6 +27,7 @@ interface IProps extends IDeviceProps {
     }>;
     articlePageState: IArticlePageState;
     articlePageActions: ArticlePageActions;
+    breadcrumbData: ICrumb[] | null;
 }
 
 /**
@@ -35,7 +38,7 @@ export class ArticlePage extends React.Component<IProps> {
      * Render not found or the article.
      */
     public render() {
-        const { articlePageState } = this.props;
+        const { articlePageState, breadcrumbData } = this.props;
         const { id } = this.props.match.params;
 
         if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
@@ -46,7 +49,7 @@ export class ArticlePage extends React.Component<IProps> {
             <PageLoader {...articlePageState}>
                 {articlePageState.status === LoadStatus.SUCCESS && (
                     <DocumentTitle title={articlePageState.data.article.seoName}>
-                        <ArticleLayout article={articlePageState.data.article} />
+                        <ArticleLayout article={articlePageState.data.article} breadcrumbData={breadcrumbData!} />
                     </DocumentTitle>
                 )}
             </PageLoader>
@@ -82,8 +85,24 @@ export class ArticlePage extends React.Component<IProps> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
+    let breadcrumbData: ICrumb[] | null = null;
+
+    if (state.knowledge.articlePage.status === LoadStatus.SUCCESS) {
+        const categories = categoryModel.selectKbCategoryBreadcrumb(
+            state,
+            state.knowledge.articlePage.data.article.knowledgeCategoryID,
+        );
+        breadcrumbData = categories.map(category => {
+            return {
+                name: category.name,
+                url: category.url,
+            };
+        });
+    }
+
     return {
         articlePageState: state.knowledge.articlePage,
+        breadcrumbData,
     };
 }
 

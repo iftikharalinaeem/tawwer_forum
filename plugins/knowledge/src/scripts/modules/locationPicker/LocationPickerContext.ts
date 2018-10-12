@@ -7,7 +7,7 @@
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
-import { model as categoryModel } from "@knowledge/modules/categories/state";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";

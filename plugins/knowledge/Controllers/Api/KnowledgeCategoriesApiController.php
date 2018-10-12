@@ -290,7 +290,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Exception If $row is not a valid knowledge category.
      */
     public function normalizeOutput(array $row): array {
-        $row["url"] = $this->knowledgeCategoryModel->url($row);
+        $row["url"] = $this->knowledgeCategoryModel->url($row, false);
         return $row;
     }
 

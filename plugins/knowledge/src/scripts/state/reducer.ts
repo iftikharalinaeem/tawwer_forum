@@ -5,7 +5,7 @@
  */
 
 import { combineReducers } from "redux";
-import { reducer as categoriesReducer } from "@knowledge/modules/categories/state";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import LocationPickerReducer from "@knowledge/modules/locationPicker/LocationPickerReducer";
 import ArticlePageReducer from "@knowledge/modules/article/ArticlePageReducer";
 import EditorPageReducer from "@knowledge/modules/editor/EditorPageReducer";
@@ -13,7 +13,7 @@ import EditorPageReducer from "@knowledge/modules/editor/EditorPageReducer";
 const knowledgeReducer = combineReducers({
     articlePage: new ArticlePageReducer().reducer,
     editorPage: new EditorPageReducer().reducer,
-    categories: categoriesReducer,
+    categories: new CategoryModel().reducer,
     locationPicker: new LocationPickerReducer().reducer,
 });
 

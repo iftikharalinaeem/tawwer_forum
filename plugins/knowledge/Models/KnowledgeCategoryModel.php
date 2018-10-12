@@ -29,6 +29,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     public function __construct(Gdn_Session $session) {
         parent::__construct("knowledgeCategory");
         $this->session = $session;
+
+        $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
+            ->setUpdateFields(["dateUpdated"]);
+        $this->addPipelineProcessor($dateProcessor);
+
+        $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
+            ->setUpdateFields(["updateUserID"]);
+        $this->addPipelineProcessor($userProcessor);
     }
 
     /**
@@ -55,21 +65,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             $where,
             $limit
         );
-    }
-
-    /**
-     * Add a knowledge category.
-     *
-     * @param array $set Field values to set.
-     * @return mixed ID of the inserted row.
-     * @throws \Exception If an error is encountered while performing the query.
-     */
-    public function insert(array $set) {
-        $set["insertUserID"] = $set["updateUserID"] = $this->session->UserID;
-        $set["dateInserted"] = $set["dateUpdated"] = new DateTimeImmutable("now");
-
-        $result = parent::insert($set);
-        return $result;
     }
 
     /**
@@ -125,9 +120,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             }
         }
 
-        $set["updateUserID"] = $this->session->UserID;
-        $set["dateUpdated"] = new DateTimeImmutable("now");
-
         return parent::update($set, $where);
     }
 
@@ -158,10 +150,11 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * Generate a URL to the provided knowledge category.
      *
      * @param array $knowledgeCategory
+     * @param bool $withDomain
      * @return string
      * @throws \Exception If the row does not contain a valid ID or name.
      */
-    public function url(array $knowledgeCategory): string {
+    public function url(array $knowledgeCategory, bool $withDomain = true): string {
         $name = $knowledgeCategory["name"] ?? null;
         $knowledgeCategoryID = $knowledgeCategory["knowledgeCategoryID"] ?? null;
 
@@ -170,7 +163,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
-        $result = \Gdn::request()->url("/kb/categories/".$slug, true);
+        $result = \Gdn::request()->url("/kb/categories/".$slug, $withDomain);
         return $result;
     }
 }
