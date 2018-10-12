@@ -52,7 +52,7 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
                     // As a result we need to clear the optomistic loading indicator we put up earlier.
                     // as the user will be making a totally new revision.
                     if (action.payload.data.articleRevisionID === null) {
-                        draft.revision.status = LoadStatus.SUCCESS;
+                        draft.revision.status = LoadStatus.PENDING;
                     }
                     break;
                 case EditorPageActions.GET_ARTICLE_ERROR:
@@ -83,6 +83,8 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
                 case EditorPageActions.POST_REVISION_RESPONSE:
                     draft.submit.status = LoadStatus.SUCCESS;
                     break;
+                case EditorPageActions.RESET:
+                    return this.initialState;
             }
         });
     };

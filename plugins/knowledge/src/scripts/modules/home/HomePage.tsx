@@ -14,7 +14,7 @@ export default class HomePage extends React.Component {
     public render() {
         return (
             <div>
-                <DocumentTitle title="Home" />
+                <DocumentTitle title={t("Home")} />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
                     <Link to="/kb/articles/test-articles--text-post-1">{t("Test Article - Text Post")}</Link>

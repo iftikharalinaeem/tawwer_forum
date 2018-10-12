@@ -46,19 +46,16 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     public render() {
         const { pageState } = this.props;
-        const title =
-            pageState.article.status === LoadStatus.SUCCESS ? t("EditArticle.PageTitle") : t("AddArticle.PageTitle");
 
         const pageContent = (
-            <DocumentTitle title={title}>
-                <EditorLayout backUrl={this.backLink}>
-                    <EditorForm
-                        submitHandler={this.formSubmit}
-                        revision={this.props.pageState.revision}
-                        articleCategory={this.props.articleCategory}
-                    />
-                </EditorLayout>
-            </DocumentTitle>
+            <EditorLayout backUrl={this.backLink}>
+                <EditorForm
+                    key={this.props.pageState.revision.status}
+                    submitHandler={this.formSubmit}
+                    revision={this.props.pageState.revision}
+                    articleCategory={this.props.articleCategory}
+                />
+            </EditorLayout>
         );
 
         if (this.isModal) {
@@ -76,7 +73,9 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Initial setup for the page.
      */
     public componentDidMount() {
-        void this.props.actions.initPageFromLocation(this.props.history);
+        if (this.props.pageState.article.status !== LoadStatus.SUCCESS) {
+            void this.props.actions.initPageFromLocation(this.props.history);
+        }
     }
 
     /**

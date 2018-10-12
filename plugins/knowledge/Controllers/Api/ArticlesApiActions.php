@@ -12,6 +12,8 @@ namespace Vanilla\Knowledge\Controllers\Api;
  */
 abstract class ArticlesApiActions {
     const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
+    const GET_EDITOR_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
+    const GET_REVISION_RESPONSE = "@@articleEditor/GET_REVISION_RESPONSE";
     const GET_CATEGORY_RESPONSE = "@@kbCategories/GET_RESPONSE";
     const GET_ARTICLES_RESPONSE = "@@article/GET_ARTICLES_RESPONSE";
 }

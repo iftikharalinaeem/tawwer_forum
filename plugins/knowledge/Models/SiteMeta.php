@@ -67,7 +67,7 @@ class SiteMeta implements \JsonSerializable {
                 'debug' => $this->debugModeEnabled,
             ],
             'ui' => [
-                'title' => $this->siteTitle,
+                'siteName' => $this->siteTitle,
             ],
         ];
     }

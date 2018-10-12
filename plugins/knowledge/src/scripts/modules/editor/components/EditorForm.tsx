@@ -12,6 +12,7 @@ import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import Button from "@library/components/forms/Button";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
+import DocumentTitle from "@library/components/DocumentTitle";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
@@ -28,29 +29,50 @@ interface IState {
  * Form for the editor page.
  */
 export default class EditorForm extends React.Component<IProps, IState> {
-    public state = {
-        name: "",
-        body: [],
-    };
     private editorRef: React.RefObject<Editor> = React.createRef();
+
+    public constructor(props: IProps) {
+        super(props);
+
+        if (this.props.revision.status === LoadStatus.SUCCESS) {
+            this.state = {
+                name: this.props.revision.data!.name,
+                body: [],
+            };
+        } else {
+            this.state = {
+                name: "",
+                body: [],
+            };
+        }
+    }
+
+    public componentDidMount() {
+        if (this.props.revision.status === LoadStatus.SUCCESS) {
+            this.editorRef.current!.setEditorContent(JSON.parse(this.props.revision.data!.body));
+        }
+    }
 
     /**
      * @inheritdoc
      */
     public render() {
+        const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
                     <LocationInput initialCategory={this.props.articleCategory} />
                     <div className="inputBlock">
-                        <input
-                            className="inputBlock-inputText inputText"
-                            type="text"
-                            placeholder={t("Title")}
-                            value={this.state.name}
-                            onChange={this.titleChangeHandler}
-                            disabled={this.isLoading}
-                        />
+                        <DocumentTitle title={isLoadingOrPending ? "Loading" : this.state.name || t("Untitled")}>
+                            <input
+                                className="inputBlock-inputText inputText"
+                                type="text"
+                                placeholder={t("Title")}
+                                value={this.state.name}
+                                onChange={this.titleChangeHandler}
+                                disabled={this.isLoading}
+                            />
+                        </DocumentTitle>
                     </div>
                     <Editor
                         allowUpload={true}
@@ -72,21 +94,6 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return this.props.revision.status === LoadStatus.LOADING;
     }
 
-    /**
-     * Handle prop changes on the form.
-     *
-     * - If the revision changes from non successful to successful, initialize the form with values from that revision.
-     *
-     * @inheritdoc
-     */
-    public componentDidUpdate(oldProps: IProps) {
-        const oldRevision = oldProps.revision;
-        const revision = this.props.revision;
-        if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS && revision.data) {
-            this.initFormFromRevision(revision.data);
-        }
-    }
-
     private get canSubmit(): boolean {
         if (!this.editorRef.current) {
             return false;
@@ -98,16 +105,6 @@ export default class EditorForm extends React.Component<IProps, IState> {
         const body = this.editorRef.current.getEditorText().trim();
 
         return title.length >= minTitleLength && body.length >= minBodyLength;
-    }
-
-    /**
-     * Use a revision to initialize form values.
-     *
-     * @param revision - The revision to pull data from.
-     */
-    private initFormFromRevision(revision: IArticleRevision) {
-        this.editorRef.current!.setEditorContent(JSON.parse(revision.body));
-        this.setState({ name: revision.name });
     }
 
     /**

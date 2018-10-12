@@ -10,7 +10,7 @@ namespace Vanilla\Knowledge\Models;
 /**
  * Class ReduxAction.
  */
-class ReduxAction {
+class ReduxAction implements \JsonSerializable {
     /**
      * @var string $type Redux action type
      */
@@ -30,12 +30,17 @@ class ReduxAction {
         $this->payload = $data;
     }
 
+    public function jsonSerialize() {
+        return $this->value();
+    }
+
+
     /**
      * Return an array of redux action to be sent.
      *
      * @return array
      */
-    public function getReduxAction() : array {
+    public function value() : array {
         return [
             "type" => $this->type,
             "payload" => [

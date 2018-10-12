@@ -22,7 +22,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
     const ACTION_VIEW_ARTICLES = 'view';
     const CATEGORY_API_RESPONSE = 'category';
 
-    /** @var CategoriesApiController */
+    /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
     /** @var ArticlesApiController */
     protected $articlesApi;
@@ -55,15 +55,19 @@ class CategoriesPageController extends KnowledgeTwigPageController {
     public function index(string $path) : string {
         $this->action = self::ACTION_VIEW_ARTICLES;
         $this->categoryId = $id = $this->detectCategoryId($path);
-        $this->data[self::CATEGORY_API_RESPONSE] = $this->categoriesApi->get($id);
+        $category = $this->categoriesApi->get($id);
+        $this->data[self::CATEGORY_API_RESPONSE] = $category;
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
+
+        // Title
+        $this->setPageTitle($category['name']);
 
         // Put together pre-loaded redux actions.
         $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
         $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLES_RESPONSE, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
-            $categoriesGetRedux->getReduxAction(),
-            $articlesGetRedux->getReduxAction(),
+            $categoriesGetRedux,
+            $articlesGetRedux,
         ];
         $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 

@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
@@ -25,6 +26,9 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     /** @var ArticlesApiController */
     protected $articlesApi;
 
+    /** @var ArticleRevisionsApiController */
+    protected $revisionsApi;
+
     /**
      * ArticlesPageController constructor.
      * @param Container $container
@@ -32,6 +36,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     public function __construct(Container $container) {
         parent::__construct($container);
         $this->articlesApi = $this->container->get(ArticlesApiController::class);
+        $this->revisionsApi = $this->container->get(ArticleRevisionsApiController::class);
     }
 
     /**
@@ -56,12 +61,11 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
         $this->data[self::API_PAGE_KEY] = $article;
 
-        $this->setPageTitle($this->data[self::API_PAGE_KEY]['articleRevision']['name']);
+        $this->setPageTitle($article['articleRevision']['name']);
 
         // Put together pre-loaded redux actions.
-        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
         $reduxActions = [
-            $articlesGetRedux->getReduxAction(),
+            new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $article),
         ];
         $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
@@ -86,8 +90,15 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
 
+        // API data
+        $reduxActions = [];
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->data[self::API_PAGE_KEY] = $article;
+        $reduxActions[] = new ReduxAction(ArticlesApiActions::GET_EDITOR_ARTICLE_RESPONSE, $article);
+
+        if (isset($article['articleRevisionID'])) {
+            $revision = $this->revisionsApi->get($article['articleRevisionID']);
+            $reduxActions[] = new ReduxAction(ArticlesApiActions::GET_REVISION_RESPONSE, $revision);
+        }
 
         // Set the title
         if (isset($article['articleRevision'])) {
@@ -97,10 +108,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         }
 
         // Put together pre-loaded redux actions.
-        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
-        $reduxActions = [
-            $articlesGetRedux->getReduxAction(),
-        ];
         $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
 
         // We'll need to be able to set all of this dynamically in the future.
