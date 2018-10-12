@@ -31,7 +31,8 @@ class KbPageController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->data['title'] = 'Knowledge Base Title';
+        $this->setPageTitle(\Gdn::translate('Home'));
+
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
         $data['page']['classes'][] = 'isLoading';

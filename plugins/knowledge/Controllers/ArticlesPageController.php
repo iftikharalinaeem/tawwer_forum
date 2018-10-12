@@ -53,7 +53,10 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $this->action = self::ACTION_VIEW;
         $this->articleId = $id = $this->detectArticleId($path);
 
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+        $article = $this->articlesApi->get($id, ["expand" => "all"]);
+        $this->data[self::API_PAGE_KEY] = $article;
+
+        $this->setPageTitle($this->data[self::API_PAGE_KEY]['articleRevision']['name']);
 
         // Put together pre-loaded redux actions.
         $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
@@ -82,7 +85,16 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->get($id, ["expand" => "all"]);
+
+        $article = $this->articlesApi->get($id, ["expand" => "all"]);
+        $this->data[self::API_PAGE_KEY] = $article;
+
+        // Set the title
+        if (isset($article['articleRevision'])) {
+            $this->setPageTitle($article['articleRevision']['name']);
+        } else {
+            $this->setPageTitle(\Gdn::translate('Untitled'));
+        }
 
         // Put together pre-loaded redux actions.
         $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
@@ -108,6 +120,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             self::signInFirst('kb/articles/add');
         }
         $this->data[self::API_PAGE_KEY] = [];
+        $this->setPageTitle(\Gdn::translate('Untitled'));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -163,7 +176,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
         if ($this->action === self::ACTION_VIEW) {
             $this->meta
-                ->setSeo('title', $this->getApiPageData('seoName'))
                 ->setSeo('description', $this->getApiPageData('seoDescription'));
         }
         $this->meta

@@ -9,14 +9,14 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
-use Vanilla\Knowledge\Models\SiteContextModel;
+use Vanilla\Knowledge\Models\SiteMeta;
 
 /**
  * Knowledge Base base controller class.
  *
  * This controller expects most content to come from api
  */
-abstract class PageController extends \Garden\Controller implements InjectableInterface {
+abstract class PageController extends \Garden\Controller {
     /** @var \Gdn_Session */
     protected $session;
 
@@ -43,22 +43,6 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     public function __construct() {
         $this->meta = new PageMetaModel();
         $this->pageMetaInit();
-    }
-
-    /**
-     * Get dependencies injected by the container.
-     *
-     * @param SiteContextModel $siteContext Needed to pass data to the frontend.
-     */
-    public function setDependencies(SiteContextModel $siteContext) {
-        // Assemble our site context for the frontend.
-        $gdnData = [
-            'meta' => [
-                'context' => $siteContext->getContext(),
-            ],
-        ];
-
-        $this->addInlineScript($this->createInlineScriptContent("gdn", $gdnData));
     }
 
     /**
