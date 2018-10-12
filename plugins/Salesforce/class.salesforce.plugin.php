@@ -472,7 +472,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Description' => $formValues['Description']
                 ];
                 // Add Vanilla custom field only if it exists.
-                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__FormUrl__c', 'Lead');
+                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__ForumUrl__c', 'Lead');
                 if ($vanillaUrl) {
                     $leadData['Vanilla__ForumUrl__c'] = $formValues['ForumUrl'] ?? '';
                 }
@@ -619,14 +619,13 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Origin' => $formValues['Origin'],
                     'Priority' => $formValues['Priority'],
                     'Subject' => $sender->DiscussionModel->getID($content->DiscussionID)->Name,
-                    'Description' => $formValues['Body'],
-                    'Vanilla__ForumUrl__c' => $formValues['SourceUri']
+                    'Description' => $formValues['Body']
                 ];
 
                 // Add Vanilla custom field only if it exists.
-                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__FormUrl__c', 'Case');
+                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__ForumUrl__c', 'Case');
                 if ($vanillaUrl) {
-                    $leadData['Vanilla__ForumUrl__c'] = $formValues['ForumUrl'] ?? '';
+                    $caseData['Vanilla__ForumUrl__c'] = $formValues['SourceUri'] ?? '';
                 }
                 $sender->EventArguments['CaseData'] = &$caseData;
                 $sender->fireEvent('SendingCaseData');
