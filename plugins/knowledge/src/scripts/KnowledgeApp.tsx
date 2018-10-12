@@ -11,6 +11,8 @@ import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import DeviceContext from "@knowledge/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import apiv2 from "@library/apiv2";
 
 /*
  * Top level application component for knowledge.
@@ -18,6 +20,8 @@ import { Route, BrowserRouter } from "react-router-dom";
  */
 export default class KnowledgeApp extends React.Component {
     public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
+
+    private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
     /**
      * Device checker detects device and calls a force update if needed to update the current device.
@@ -45,6 +49,7 @@ export default class KnowledgeApp extends React.Component {
      */
     public componentDidMount() {
         this.doUpdate();
+        void this.categoryActions.getAllCategories();
     }
 
     /**

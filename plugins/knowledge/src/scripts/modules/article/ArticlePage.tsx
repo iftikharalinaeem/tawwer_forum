@@ -17,6 +17,8 @@ import PageLoader from "@library/components/PageLoader";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -24,6 +26,7 @@ interface IProps extends IDeviceProps {
     }>;
     articlePageState: IArticlePageState;
     articlePageActions: ArticlePageActions;
+    breadcrumbData: ICrumb[] | null;
 }
 
 /**
@@ -34,14 +37,14 @@ export class ArticlePage extends React.Component<IProps> {
      * Render not found or the article.
      */
     public render() {
-        const { articlePageState } = this.props;
+        const { articlePageState, breadcrumbData } = this.props;
         const { id } = this.props.match.params;
 
         if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
             return <NotFoundPage type="Page" />;
         }
 
-        if (articlePageState.status !== LoadStatus.SUCCESS) {
+        if (articlePageState.status !== LoadStatus.SUCCESS || breadcrumbData === null) {
             return null;
         }
 
@@ -49,7 +52,7 @@ export class ArticlePage extends React.Component<IProps> {
 
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} />
+                <ArticleLayout article={article} breadcrumbData={breadcrumbData} />
             </PageLoader>
         );
     }
@@ -83,8 +86,24 @@ export class ArticlePage extends React.Component<IProps> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
+    let breadcrumbData: ICrumb[] | null = null;
+
+    if (state.knowledge.articlePage.status === LoadStatus.SUCCESS) {
+        const categories = categoryModel.selectKbCategoryBreadcrumb(
+            state,
+            state.knowledge.articlePage.data.article.knowledgeCategoryID,
+        );
+        breadcrumbData = categories.map(category => {
+            return {
+                name: category.name,
+                url: category.url,
+            };
+        });
+    }
+
     return {
         articlePageState: state.knowledge.articlePage,
+        breadcrumbData,
     };
 }
 

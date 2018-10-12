@@ -6,7 +6,7 @@
  */
 
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
-import { IKbCategoriesState } from "@knowledge/modules/categories/state";
+import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 

@@ -8,11 +8,13 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-import { constants as categoriesConstants } from "@knowledge/modules/categories/state";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
 import CategoriesPage from "@knowledge/modules/categories/CategoriesPage";
 
 export const ARTICLE_ROUTE = "/kb/articles/(.*)-:id(\\d+)";
+
+export const CATEGORIES_ROUTE = "/kb/categories/";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
@@ -45,11 +47,7 @@ export function getPageRoutes() {
     return [
         <Route exact path="/kb" component={HomePage} key={"/kb"} />,
         <Route path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
-        <Route
-            path={categoriesConstants.CATEGORIES_ROUTE}
-            component={CategoriesPage}
-            key={categoriesConstants.CATEGORIES_ROUTE}
-        />,
+        <Route path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
         <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
     ];
 }
