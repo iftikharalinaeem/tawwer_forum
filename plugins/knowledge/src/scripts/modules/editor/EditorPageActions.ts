@@ -133,7 +133,7 @@ export default class EditorPageActions extends ReduxActions {
         if (addRegex.test(location.pathname)) {
             // We don't have an article so go create one.
             const article = await this.createArticle({
-                knowledgeCategoryID: 0,
+                knowledgeCategoryID: 1,
             });
 
             if (article) {

@@ -18,6 +18,8 @@ import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@k
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import DocumentTitle from "@library/components/DocumentTitle";
+import { t } from "@library/application";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -43,16 +45,17 @@ export class EditorPage extends React.Component<IProps, IState> {
     };
 
     public render() {
+        const { pageState } = this.props;
+
         const pageContent = (
-            <React.Fragment>
-                <EditorLayout backUrl={this.backLink}>
-                    <EditorForm
-                        submitHandler={this.formSubmit}
-                        revision={this.props.pageState.revision}
-                        articleCategory={this.props.articleCategory}
-                    />
-                </EditorLayout>
-            </React.Fragment>
+            <EditorLayout backUrl={this.backLink}>
+                <EditorForm
+                    key={this.props.pageState.revision.status}
+                    submitHandler={this.formSubmit}
+                    revision={this.props.pageState.revision}
+                    articleCategory={this.props.articleCategory}
+                />
+            </EditorLayout>
         );
 
         if (this.isModal) {
@@ -70,7 +73,9 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Initial setup for the page.
      */
     public componentDidMount() {
-        void this.props.actions.initPageFromLocation(this.props.history);
+        if (this.props.pageState.article.status !== LoadStatus.SUCCESS) {
+            void this.props.actions.initPageFromLocation(this.props.history);
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, IArticleRevision } from "@knowledge/@types/api";
+import { IArticle, IArticleRevision, Format } from "@knowledge/@types/api";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
@@ -83,6 +83,8 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
                 case EditorPageActions.POST_REVISION_RESPONSE:
                     draft.submit.status = LoadStatus.SUCCESS;
                     break;
+                case EditorPageActions.RESET:
+                    return this.initialState;
             }
         });
     };

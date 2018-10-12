@@ -17,6 +17,7 @@ import PageLoader from "@library/components/PageLoader";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
+import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 
@@ -44,15 +45,17 @@ export class ArticlePage extends React.Component<IProps> {
             return <NotFoundPage type="Page" />;
         }
 
-        if (articlePageState.status !== LoadStatus.SUCCESS || breadcrumbData === null) {
-            return null;
-        }
-
-        const { article } = articlePageState.data;
-
         return (
             <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} breadcrumbData={breadcrumbData} />
+                {articlePageState.status === LoadStatus.SUCCESS && (
+                    <DocumentTitle
+                        title={
+                            articlePageState.data.article.seoName || articlePageState.data.article.articleRevision.name
+                        }
+                    >
+                        <ArticleLayout article={articlePageState.data.article} breadcrumbData={breadcrumbData!} />
+                    </DocumentTitle>
+                )}
             </PageLoader>
         );
     }
