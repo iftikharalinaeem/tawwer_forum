@@ -658,6 +658,13 @@ class Salesforce {
         return false;
     }
 
+    /**
+     * Checks if custom field is an salesforce object.
+     *
+     * @param string $searchField fields that we need to search for.
+     * @param string $type salesforce object type.
+     * @return bool
+     */
     public function salesforceFieldExists(string $searchField = '', string $type = '') {
         $salesforceObjectTypes = ['Case', 'Lead'];
 
