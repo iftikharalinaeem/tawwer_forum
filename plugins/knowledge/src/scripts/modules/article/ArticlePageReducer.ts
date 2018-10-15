@@ -9,16 +9,18 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 
-export type IArticlePageState = ILoadable<{
-    article: IArticle;
-}>;
+export interface IArticlePageState {
+    article: ILoadable<IArticle>;
+}
 
 /**
  * Reducer for the article page.
  */
 export default class ArticlePageReducer extends ReduxReducer<IArticlePageState> {
     public initialState: IArticlePageState = {
-        status: LoadStatus.PENDING,
+        article: {
+            status: LoadStatus.PENDING,
+        },
     };
 
     public reducer = (
@@ -28,19 +30,23 @@ export default class ArticlePageReducer extends ReduxReducer<IArticlePageState> 
         switch (action.type) {
             case ArticlePageActions.GET_ARTICLE_REQUEST:
                 return {
-                    status: LoadStatus.LOADING,
+                    article: {
+                        status: LoadStatus.LOADING,
+                    },
                 };
             case ArticlePageActions.GET_ARTICLE_RESPONSE:
                 return {
-                    status: LoadStatus.SUCCESS,
-                    data: {
-                        article: action.payload.data,
+                    article: {
+                        status: LoadStatus.SUCCESS,
+                        data: action.payload.data,
                     },
                 };
             case ArticlePageActions.GET_ARTICLE_ERROR:
                 return {
-                    status: LoadStatus.ERROR,
-                    error: action.payload,
+                    article: {
+                        status: LoadStatus.ERROR,
+                        error: action.payload,
+                    },
                 };
             case ArticlePageActions.RESET:
                 return this.initialState;
