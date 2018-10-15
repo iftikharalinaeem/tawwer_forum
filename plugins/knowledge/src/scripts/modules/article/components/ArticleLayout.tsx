@@ -24,6 +24,8 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
+import ArticleOtherLanguages from "@knowledge/modules/article/components/ArticleOtherLanguages";
+import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 
 interface IProps {
     article: IArticle;
@@ -139,6 +141,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleTOC children={articleTOC} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
+                        <ArticleOtherLanguages data={dummyOtherLanguagesData} />
                         <RelatedArticles children={articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>

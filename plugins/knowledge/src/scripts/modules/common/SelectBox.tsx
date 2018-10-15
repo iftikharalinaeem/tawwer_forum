@@ -20,11 +20,18 @@ export interface ISelectboxItem {
 }
 
 interface IProps {
-    label: string;
     className?: string;
     id?: string;
     children: ISelectboxItem[];
     selectedIndex: number;
+}
+
+export interface ISelfLabelledProps extends IProps {
+    label: string;
+}
+
+export interface IExternalLabelledProps extends IProps {
+    describedBy: string;
 }
 
 interface IState {
@@ -35,7 +42,7 @@ interface IState {
 /**
  * Generates Select Box component (similar to a select)
  */
-export default class Sort extends React.Component<IProps, IState> {
+export default class Sort extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
     public static defaultProps = {
         selectedIndex: 0,
     };
@@ -49,23 +56,26 @@ export default class Sort extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const selectItems = this.props.children.map((child, i) => {
-            return (
-                <DropDownItemButton
-                    key={this.props.id + "-item" + i}
-                    className="selectBox-option"
-                    name={t("Customize SEO")}
-                    onClick={this.onClick}
-                    disabled={i === this.state.selectedIndex}
-                >
-                    {child.name}
-                </DropDownItemButton>
-            );
-        });
+        const selectItems =
+            this.props.children && this.props.children.length > 0
+                ? this.props.children.map((child, i) => {
+                      return (
+                          <DropDownItemButton
+                              key={this.props.id + "-item" + i}
+                              className="selectBox-option"
+                              name={t("Customize SEO")}
+                              onClick={this.onClick}
+                              disabled={i === this.state.selectedIndex}
+                          >
+                              {child.name}
+                          </DropDownItemButton>
+                      );
+                  })
+                : null;
 
         return (
             <div className={classNames("selectBox", this.props.className)}>
-                <span className="selectBox-label">{this.props.label}</span>
+                {this.props.label && <span className="selectBox-label">{this.props.label}</span>}
                 <div className="selectBox-content">
                     <DropDown id={this.state.id} name={this.props.label}>
                         {selectItems}
