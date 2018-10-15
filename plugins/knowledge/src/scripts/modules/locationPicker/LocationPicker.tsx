@@ -43,7 +43,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
                         closeFrame={this.props.onCloseClick}
                     >
-                        {this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Category")}
+                        {this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Knowledge Bases")}
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
@@ -51,7 +51,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                                 onCategoryNavigate={actions.navigateToCategory}
                                 onItemSelect={actions.selectCategory}
                                 selectedCategory={this.props.selectedCategory}
-                                items={this.props.navigatedCategoryContents}
+                                items={this.props.pageContents}
                                 initialCategoryID={this.props.initialCategoryID}
                             />
                         </FramePanel>
@@ -77,7 +77,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
      * If the current navigated category has a valid parent we can navigate back to it.
      */
     private get canNavigateBack(): boolean {
-        return this.props.navigatedCategory.parentID !== -1;
+        return this.props.navigatedCategory !== null;
     }
 
     /**
@@ -85,7 +85,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
      */
     private goBack = () => {
         if (this.canNavigateBack) {
-            void this.props.actions.navigateToCategory(this.props.navigatedCategory.parentID);
+            void this.props.actions.navigateToCategory(this.props.navigatedCategory!.parentID);
         }
     };
 
@@ -107,8 +107,14 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         });
     };
 
+    private get canChoose(): boolean {
+        return this.props.selectedCategory !== null;
+    }
+
     private handleChoose = () => {
-        this.props.actions.chooseCategory(this.props.selectedCategory.knowledgeCategoryID);
-        this.props.onChoose();
+        if (this.canChoose) {
+            this.props.actions.chooseCategory(this.props.selectedCategory!.knowledgeCategoryID);
+            this.props.onChoose();
+        }
     };
 }

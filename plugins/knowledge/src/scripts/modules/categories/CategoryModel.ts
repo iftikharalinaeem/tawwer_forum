@@ -8,8 +8,8 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import {
     IKbCategoryFragment,
     IKbCategoryMultiTypeFragment,
-    IKbNavigationItem,
     IKbNavigationCategory,
+    KbCategoryDisplayType,
 } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
@@ -21,6 +21,16 @@ export type IKbCategoriesState = ILoadable<{
 }>;
 
 export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
+    public static readonly ROOT_CATEGORY: IKbNavigationCategory = {
+        name: "Root Category",
+        recordID: -1,
+        recordType: "knowledgeCategory",
+        parentID: -1,
+        displayType: KbCategoryDisplayType.ROOT,
+        isSection: true,
+        url: "#",
+    };
+
     /**
      * Get a category out of the state as a category fragment.
      *
@@ -68,7 +78,8 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     }
 
     public static selectMixedRecordTree(state: IStoreState, categoryID: number, maxDepth = 2): IKbNavigationCategory {
-        const category: IKbNavigationCategory = this.selectMixedRecord(state, categoryID);
+        const category: IKbNavigationCategory =
+            categoryID === -1 ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID);
 
         if (maxDepth > 1) {
             category.children = this.selectChildrenIDsFromParent(state, categoryID).map(id =>

@@ -12,25 +12,17 @@ import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 interface ILocationPickerState {
-    selectedCategoryID: number;
-    navigatedCategoryID: number;
-    chosenCategoryID: number;
+    navigatedCategoryID: number; // What page the user is on in the picker.
+    selectedCategoryID: number; // What category is selected (still not chosen).
+    chosenCategoryID: number; // What category is chosen (input closes after a selection)
 }
 
 export interface ILPConnectedData extends ILocationPickerState {
-    locationBreadcrumb: IKbCategoryFragment[];
-    navigatedCategory: IKbCategoryFragment;
-    navigatedCategoryContents: IKbNavigationItem[];
-    selectedCategory: IKbCategoryFragment;
-    choosenCategory: IKbCategoryFragment;
-}
-
-export interface ILPConnectedData extends ILocationPickerState {
-    locationBreadcrumb: IKbCategoryFragment[];
-    navigatedCategory: IKbCategoryFragment;
-    navigatedCategoryContents: IKbNavigationItem[];
-    selectedCategory: IKbCategoryFragment;
-    choosenCategory: IKbCategoryFragment;
+    pageContents: IKbNavigationItem[];
+    locationBreadcrumb: IKbCategoryFragment[] | null;
+    navigatedCategory: IKbCategoryFragment | null; // What page the user is on in the picker.
+    selectedCategory: IKbCategoryFragment | null; // What category is selected (still not chosen).
+    choosenCategory: IKbCategoryFragment | null; // What category is chosen (input closes after a selection)
 }
 
 /**
@@ -42,20 +34,26 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
      */
     public static mapStateToProps(state: IStoreState): ILPConnectedData {
         const { navigatedCategoryID, selectedCategoryID, chosenCategoryID } = state.knowledge.locationPicker;
+
+        // Category ID's less than 0 (eg. -1) represents the true root of the forum.
         return {
-            locationBreadcrumb: CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID),
-            navigatedCategory: CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID),
-            navigatedCategoryContents: CategoryModel.selectMixedRecordTree(state, navigatedCategoryID).children!,
-            selectedCategory: CategoryModel.selectKbCategoryFragment(state, selectedCategoryID),
-            choosenCategory: CategoryModel.selectKbCategoryFragment(state, chosenCategoryID),
+            pageContents: CategoryModel.selectMixedRecordTree(state, navigatedCategoryID).children!,
+            locationBreadcrumb:
+                chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
+            navigatedCategory:
+                navigatedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID) : null,
+            selectedCategory:
+                selectedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, selectedCategoryID) : null,
+            choosenCategory:
+                chosenCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, chosenCategoryID) : null,
             ...state.knowledge.locationPicker,
         };
     }
 
     public initialState: ILocationPickerState = {
-        selectedCategoryID: 1,
-        navigatedCategoryID: 1,
-        chosenCategoryID: 1,
+        selectedCategoryID: -1,
+        navigatedCategoryID: -1,
+        chosenCategoryID: -1,
     };
 
     public reducer = (

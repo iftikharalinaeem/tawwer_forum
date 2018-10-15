@@ -61,7 +61,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
-                    <LocationInput initialCategoryID={1} />
+                    <LocationInput initialCategoryID={-1} />
                     <div className="inputBlock">
                         <DocumentTitle title={isLoadingOrPending ? "Loading" : this.state.name || t("Untitled")}>
                             <input

@@ -9,12 +9,13 @@ import { getRequiredID } from "@library/componentIDs";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { t } from "@library/application";
 
 interface IProps {
     initialCategoryID: number | null;
     onCategoryNavigate: (categoryID: number) => void;
     onItemSelect: (categoryID: number) => void;
-    selectedCategory: IKbCategoryFragment;
+    selectedCategory: IKbCategoryFragment | null;
     items: IKbNavigationItem[];
 }
 
@@ -36,9 +37,10 @@ export default class LocationContents extends React.Component<IProps, IState> {
 
     public render() {
         const { selectedCategory, items } = this.props;
+        const title = selectedCategory ? selectedCategory.name : t("Knowledge Bases");
 
         const contents = items.map((item, index) => {
-            const isSelected = selectedCategory.knowledgeCategoryID === item.recordID;
+            const isSelected = !!selectedCategory && selectedCategory.knowledgeCategoryID === item.recordID;
             const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
             const selectCallback = () => this.props.onItemSelect(item.recordID);
             return (
@@ -53,7 +55,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
                 />
             );
         });
-        return <NavigationItemList categoryName={selectedCategory.name}>{contents}</NavigationItemList>;
+        return <NavigationItemList categoryName={title}>{contents}</NavigationItemList>;
     }
 
     private get radioName(): string {

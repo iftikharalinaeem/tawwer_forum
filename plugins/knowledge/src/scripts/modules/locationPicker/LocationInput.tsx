@@ -31,6 +31,8 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
+    private static readonly SELECT_MESSAGE = t("Choose a Category");
+
     public state: IState = {
         showLocationPicker: false,
     };
@@ -38,6 +40,15 @@ export class LocationInput extends React.Component<IProps, IState> {
     public render() {
         const { className, ...passThrough } = this.props;
         const { locationBreadcrumb } = this.props;
+        const buttonTitle = locationBreadcrumb
+            ? LocationBreadcrumbs.renderString(locationBreadcrumb)
+            : LocationInput.SELECT_MESSAGE;
+
+        const buttonContents = locationBreadcrumb ? (
+            <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
+        ) : (
+            LocationInput.SELECT_MESSAGE
+        );
 
         return (
             <React.Fragment>
@@ -46,14 +57,14 @@ export class LocationInput extends React.Component<IProps, IState> {
                         {t("To: ")}
                     </span>
                     <Button
-                        title={LocationBreadcrumbs.renderString(locationBreadcrumb)}
+                        title={buttonTitle}
                         type="button"
                         aria-label={t("Page Location:")}
                         className="pageLocation"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
                     >
-                        <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
+                        {buttonContents}
                     </Button>
                 </div>
                 {this.state.showLocationPicker && (
