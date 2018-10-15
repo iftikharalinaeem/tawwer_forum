@@ -8,13 +8,11 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
-import CategoriesPage from "@knowledge/modules/categories/CategoriesPage";
 
-export const ARTICLE_ROUTE = "/kb/articles/(.*)-:id(\\d+)";
+export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 
-export const CATEGORIES_ROUTE = "/kb/categories/";
+export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
@@ -34,6 +32,12 @@ const HomePage = Loadable({
     loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
 });
 
+/** A loadable version of the article page. */
+const CategoriesPage = Loadable({
+    loading: FullPageLoader,
+    loader: () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
+});
+
 /**
  * Get the data for routes that can render in a modal.
  *
@@ -45,7 +49,7 @@ const HomePage = Loadable({
  */
 export function getPageRoutes() {
     return [
-        <Route exact path="/kb" component={HomePage} key={"/kb"} />,
+        <Route exact path="/kb" component={HomePage} key={1} />,
         <Route path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
         <Route path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
         <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
