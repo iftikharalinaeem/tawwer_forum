@@ -9,8 +9,7 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
 import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
-
-import SelectBox, { ISelectBoxItem } from "@knowledge/modules/common/SelectBox";
+import SelectBox, { ISelectBoxItem } from "@library/components/SelectBox";
 
 interface IState {
     id: string;
@@ -27,6 +26,9 @@ interface IProps {
     children: ILanguageProps[];
 }
 
+/**
+ * Implements "other languages" DropDown for articles.
+ */
 export default class ArticleOtherLanguages extends React.Component<IProps, IState> {
     private get titleID() {
         return this.state.id + "-title";
