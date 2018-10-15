@@ -86,8 +86,8 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         // Calculate some rendering variables.
         const isMobile = device === Devices.MOBILE;
         const isDesktop = device === Devices.DESKTOP || Devices.NO_BLEED; // This compoment doesn't care about the no bleed, it's the same as desktop
-        const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || children.leftBottom);
-        const shouldRenderRightPanel: boolean = isDesktop && !!(children.rightTop || children.rightBottom);
+        const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || !!children.leftBottom);
+        const shouldRenderRightPanel: boolean = isDesktop && !!(children.rightTop || !!children.rightBottom);
         const renderMobilePanel: boolean = isMobile && !!children.leftBottom;
 
         // Determine the classes we want to display.
@@ -135,8 +135,12 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     >
                         {shouldRenderLeftPanel && (
                             <Panel className="panelLayout-left" tag="aside">
-                                <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
-                                <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                                {children.leftTop && (
+                                    <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                )}
+                                {children.leftBottom && (
+                                    <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                                )}
                             </Panel>
                         )}
 
@@ -175,12 +179,16 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                             </div>
                             {shouldRenderRightPanel && (
                                 <Panel className="panelLayout-right">
-                                    <PanelArea className="panelArea-rightTop" tag="aside">
-                                        {children.rightTop}
-                                    </PanelArea>
-                                    <PanelArea className="panelArea-rightBottom" tag="aside">
-                                        {children.rightBottom}
-                                    </PanelArea>
+                                    {children.rightTop && (
+                                        <PanelArea className="panelArea-rightTop" tag="aside">
+                                            {children.rightTop}
+                                        </PanelArea>
+                                    )}
+                                    {children.rightBottom && (
+                                        <PanelArea className="panelArea-rightBottom" tag="aside">
+                                            {children.rightBottom}
+                                        </PanelArea>
+                                    )}
                                 </Panel>
                             )}
                         </ContentTag>

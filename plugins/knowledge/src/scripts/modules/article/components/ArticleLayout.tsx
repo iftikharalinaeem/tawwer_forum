@@ -25,6 +25,9 @@ import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 
+import { dummyNavData } from "../../categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
+
 interface IProps {
     article: IArticle;
     device: Devices;
@@ -117,11 +120,8 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
+                        <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PageTitle
