@@ -35,7 +35,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
         const category = state.knowledge.categories.data.categoriesByID[categoryID];
 
         if (category === undefined) {
-            throw new Error("Category not found.");
+            throw new Error(`Category ${categoryID} not found.`);
         }
 
         return category;
