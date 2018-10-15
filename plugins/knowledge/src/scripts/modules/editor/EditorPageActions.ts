@@ -13,11 +13,15 @@ import {
     IPostArticleRevisionResponseBody,
     IPostArticleRevisionRequestBody,
     IGetArticleResponseBody,
+    IArticle,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import pathToRegexp from "path-to-regexp";
 import * as route from "./route";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import LocationPickerActions from "../locationPicker/LocationPickerActions";
+import { IStoreState } from "@knowledge/state/model";
+import CategoryModel from "../categories/CategoryModel";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -113,6 +117,8 @@ export default class EditorPageActions extends ReduxActions {
     /** Article page actions instance. */
     private articlePageActions: ArticlePageActions = new ArticlePageActions(this.dispatch, this.api);
 
+    private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
+
     /**
      * Initialize the editor page data based on our path.
      *
@@ -148,10 +154,26 @@ export default class EditorPageActions extends ReduxActions {
         } else if (editRegex.test(location.pathname)) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
-            const article = await this.getEditableArticleByID(articleID);
-            if (article && article.data.articleRevisionID !== null) {
-                await this.getRevisionByID(article.data.articleRevisionID);
+            const article = await this.getEditableArticleByID(articleID).then(
+                response => (response ? response.data : undefined),
+            );
+            void this.fetchRevisionFromArticle(article);
+
+            if (article) {
+                this.dispatch((a, getState: () => IStoreState) => {
+                    const category = CategoryModel.selectKbCategoryFragment(getState(), article!.articleID);
+                    this.locationPickerActions.init(category);
+                });
             }
+        }
+    }
+
+    /**
+     * Fetch the current revision from an article resource through the API.
+     */
+    private async fetchRevisionFromArticle(article: IArticle | undefined) {
+        if (article && article.articleRevisionID !== null) {
+            await this.getRevisionByID(article.articleRevisionID);
         }
     }
 

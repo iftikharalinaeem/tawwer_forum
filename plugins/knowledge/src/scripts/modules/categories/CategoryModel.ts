@@ -5,7 +5,12 @@
 
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import { IKbCategoryFragment, IKbCategoryMultiTypeFragment } from "@knowledge/@types/api";
+import {
+    IKbCategoryFragment,
+    IKbCategoryMultiTypeFragment,
+    IKbNavigationItem,
+    IKbNavigationCategory,
+} from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
 
@@ -42,13 +47,35 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectKbCategoryMixedRecord(state: IStoreState, categoryID: number): IKbCategoryMultiTypeFragment {
+    public static selectMixedRecord(state: IStoreState, categoryID: number): IKbCategoryMultiTypeFragment {
         const { knowledgeCategoryID, ...rest } = this.selectKbCategoryFragment(state, categoryID);
         return {
             ...rest,
             recordType: "knowledgeCategory",
             recordID: knowledgeCategoryID,
         };
+    }
+
+    /**
+     *
+     * @param state
+     * @param parentID
+     */
+    public static selectChildrenIDsFromParent(state: IStoreState, parentID: number): number[] {
+        return Object.values(state.knowledge.categories.data!.categoriesByID)
+            .filter(category => category.parentID === parentID)
+            .map(category => category.knowledgeCategoryID);
+    }
+
+    public static selectMixedRecordTree(state: IStoreState, categoryID: number, maxDepth = 2): IKbNavigationCategory {
+        const category: IKbNavigationCategory = this.selectMixedRecord(state, categoryID);
+
+        if (maxDepth > 1) {
+            category.children = this.selectChildrenIDsFromParent(state, categoryID).map(id =>
+                this.selectMixedRecordTree(state, id, maxDepth - 1),
+            );
+        }
+        return category;
     }
 
     /**

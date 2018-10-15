@@ -13,12 +13,10 @@ import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IProps extends ILocationPickerProps {
     className?: string;
-    initialCategory?: IKbCategoryFragment;
 }
 
 interface IState {
@@ -73,12 +71,6 @@ export class LocationInput extends React.Component<IProps, IState> {
 
     public get value(): number {
         return this.props.chosenCategoryID;
-    }
-
-    public componentDidUpdate(oldProps: IProps) {
-        if (oldProps.initialCategory !== this.props.initialCategory && this.props.initialCategory) {
-            this.props.actions.init(this.props.initialCategory);
-        }
     }
 
     /**

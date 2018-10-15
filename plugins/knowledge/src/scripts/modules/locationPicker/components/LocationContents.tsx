@@ -9,15 +9,13 @@ import { getRequiredID } from "@library/componentIDs";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
-import { ILoadable, LoadStatus } from "@library/@types/api";
-import MediumLoader from "@library/components/MediumLoader";
 
 interface IProps {
-    initialCategoryID: number;
+    initialCategoryID: number | null;
     onCategoryNavigate: (categoryID: number) => void;
     onItemSelect: (categoryID: number) => void;
     selectedCategory: IKbCategoryFragment;
-    items: ILoadable<IKbNavigationItem[]>;
+    items: IKbNavigationItem[];
 }
 
 interface IState {
@@ -39,31 +37,23 @@ export default class LocationContents extends React.Component<IProps, IState> {
     public render() {
         const { selectedCategory, items } = this.props;
 
-        if (items.status === LoadStatus.SUCCESS) {
-            const contents = items.data.map((item, index) => {
-                const isSelected = selectedCategory.knowledgeCategoryID === item.recordID;
-                const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
-                const selectCallback = () => this.props.onItemSelect(item.recordID);
-                return (
-                    <NavigationItemCategory
-                        key={index}
-                        isInitialSelection={false}
-                        isSelected={isSelected}
-                        name={this.radioName}
-                        value={item}
-                        onNavigate={navigateCallback}
-                        onSelect={selectCallback}
-                    />
-                );
-            });
-            return <NavigationItemList categoryName={selectedCategory.name}>{contents}</NavigationItemList>;
-        } else {
+        const contents = items.map((item, index) => {
+            const isSelected = selectedCategory.knowledgeCategoryID === item.recordID;
+            const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
+            const selectCallback = () => this.props.onItemSelect(item.recordID);
             return (
-                <div className="folderContents">
-                    <MediumLoader />
-                </div>
+                <NavigationItemCategory
+                    key={index}
+                    isInitialSelection={item.recordID === this.props.initialCategoryID}
+                    isSelected={isSelected}
+                    name={this.radioName}
+                    value={item}
+                    onNavigate={navigateCallback}
+                    onSelect={selectCallback}
+                />
             );
-        }
+        });
+        return <NavigationItemList categoryName={selectedCategory.name}>{contents}</NavigationItemList>;
     }
 
     private get radioName(): string {

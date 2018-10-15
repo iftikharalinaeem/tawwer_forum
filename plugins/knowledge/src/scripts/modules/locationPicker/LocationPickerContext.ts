@@ -6,15 +6,16 @@
 
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
+import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
-import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
+import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 
 interface IStateProps extends ILocationPickerState {
     locationBreadcrumb: IKbCategoryFragment[];
     navigatedCategory: IKbCategoryFragment;
+    navigatedCategoryContents: IKbNavigationItem[];
     selectedCategory: IKbCategoryFragment;
     choosenCategory: IKbCategoryFragment;
 }
@@ -31,10 +32,11 @@ export interface ILocationPickerProps extends IStateProps, IDispatchProps {}
 function mapStateToProps(state: IStoreState): IStateProps {
     const { navigatedCategoryID, selectedCategoryID, chosenCategoryID } = state.knowledge.locationPicker;
     return {
-        locationBreadcrumb: categoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID),
-        navigatedCategory: categoryModel.selectKbCategoryFragment(state, navigatedCategoryID),
-        selectedCategory: categoryModel.selectKbCategoryFragment(state, selectedCategoryID),
-        choosenCategory: categoryModel.selectKbCategoryFragment(state, chosenCategoryID),
+        locationBreadcrumb: CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID),
+        navigatedCategory: CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID),
+        navigatedCategoryContents: CategoryModel.selectMixedRecordTree(state, navigatedCategoryID).children!,
+        selectedCategory: CategoryModel.selectKbCategoryFragment(state, selectedCategoryID),
+        choosenCategory: CategoryModel.selectKbCategoryFragment(state, chosenCategoryID),
         ...state.knowledge.locationPicker,
     };
 }

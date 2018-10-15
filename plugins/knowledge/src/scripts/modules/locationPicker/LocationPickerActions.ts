@@ -18,7 +18,6 @@ export default class LocationPickerActions extends ReduxActions {
     public static readonly NAVIGATE_TO_CATEGORY = "@@locationPicker/NAVIGATE_TO_CATEGORY";
     public static readonly SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
     public static readonly CHOOSE_CATEGORY = "@@locationPicker/CHOOSE_CATEGORY";
-    public static readonly RESET = "@@locationPicker/RESET";
     public static readonly INIT = "@@locationPicker/INIT";
 
     /**
@@ -26,7 +25,6 @@ export default class LocationPickerActions extends ReduxActions {
      */
     public static ACTION_TYPES:
         | ActionsUnion<typeof LocationPickerActions.getNavigationActionCreators>
-        | ReturnType<typeof LocationPickerActions.createResetAction>
         | ReturnType<typeof LocationPickerActions.createInitAction>
         | ReturnType<typeof LocationPickerActions.createNavigateAction>
         | ReturnType<typeof LocationPickerActions.createChooseAction>
@@ -44,17 +42,13 @@ export default class LocationPickerActions extends ReduxActions {
         {} as IKbNavigationRequest,
     );
 
-    private static createResetAction() {
-        return LocationPickerActions.createAction(LocationPickerActions.RESET);
-    }
-
     /**
      * Initialize the state from a category.
      *
-     * @param category A category fragment.
+     * @param initialCategory A category fragment.
      */
-    private static createInitAction(category: IKbCategoryFragment) {
-        return LocationPickerActions.createAction(LocationPickerActions.INIT, { category });
+    private static createInitAction(initialCategory: IKbCategoryFragment) {
+        return LocationPickerActions.createAction(LocationPickerActions.INIT, { initialCategory });
     }
 
     /**
@@ -87,7 +81,6 @@ export default class LocationPickerActions extends ReduxActions {
     // Bind dispatch the simpler action creators instead of rewriting their function signatures.
     public selectCategory = this.bindDispatch(LocationPickerActions.createSelectAction);
     public chooseCategory = this.bindDispatch(LocationPickerActions.createChooseAction);
-    public reset = this.bindDispatch(LocationPickerActions.createResetAction);
     public init = this.bindDispatch(LocationPickerActions.createInitAction);
 
     /**

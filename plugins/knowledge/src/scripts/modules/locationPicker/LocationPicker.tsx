@@ -32,7 +32,7 @@ export class LocationPicker extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { items, actions } = this.props;
+        const { actions } = this.props;
 
         return (
             <React.Fragment>
@@ -50,36 +50,26 @@ export class LocationPicker extends React.Component<IProps, IState> {
                                 onCategoryNavigate={actions.navigateToCategory}
                                 onItemSelect={actions.selectCategory}
                                 selectedCategory={this.props.selectedCategory}
-                                initialCategoryID={1}
-                                items={items}
+                                items={this.props.navigatedCategoryContents}
+                                initialCategoryID={this.props.initialCategoryID}
                             />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed">
                         <Button
                             title={t("New Category")}
-                            disabled={this.props.items.status !== LoadStatus.SUCCESS}
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
                         >
                             {newFolder()}
                         </Button>
-                        <Button disabled={this.props.items.status !== LoadStatus.SUCCESS} onClick={this.handleChoose}>
-                            {t("Choose")}
-                        </Button>
+                        <Button onClick={this.handleChoose}>{t("Choose")}</Button>
                     </FrameFooter>
                 </Frame>
                 {this.state.showNewCategoryModal && <NewCategoryForm exitHandler={this.hideNewFolderModal} />}
             </React.Fragment>
         );
-    }
-
-    /**
-     * Cleanup on unmount.
-     */
-    public componentWillUnmount() {
-        this.props.actions.reset();
     }
 
     /**
