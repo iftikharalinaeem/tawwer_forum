@@ -5,16 +5,16 @@
  */
 
 import { combineReducers } from "redux";
-import { reducer as articleReducer } from "@knowledge/modules/article/state";
-import { reducer as editorReducer } from "@knowledge/modules/editor/state";
-import { reducer as categoriesReducer } from "@knowledge/modules/categories/state";
-import { reducer as locationPickerReducer } from "@knowledge/modules/locationPicker/state";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import LocationPickerReducer from "@knowledge/modules/locationPicker/LocationPickerReducer";
+import ArticlePageReducer from "@knowledge/modules/article/ArticlePageReducer";
+import EditorPageReducer from "@knowledge/modules/editor/EditorPageReducer";
 
 const knowledgeReducer = combineReducers({
-    articlePage: articleReducer,
-    editorPage: editorReducer,
-    categories: categoriesReducer,
-    locationPicker: locationPickerReducer,
+    articlePage: new ArticlePageReducer().reducer,
+    editorPage: new EditorPageReducer().reducer,
+    categories: new CategoryModel().reducer,
+    locationPicker: new LocationPickerReducer().reducer,
 });
 
 export default knowledgeReducer;

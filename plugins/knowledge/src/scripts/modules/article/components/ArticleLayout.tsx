@@ -31,6 +31,7 @@ import SiteNav from "@library/components/siteNav/SiteNav";
 interface IProps {
     article: IArticle;
     device: Devices;
+    breadcrumbData: ICrumb[];
 }
 
 interface IState {}
@@ -116,7 +117,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.Breadcrumbs>
                         <PanelWidget>
-                            <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
+                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
@@ -143,35 +144,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                 </PanelLayout>
             </Container>
         );
-    }
-
-    private get dummyBreadcrumbData(): ICrumb[] {
-        return [
-            {
-                name: "Home",
-                url: "/kb",
-            },
-            {
-                name: "two",
-                url: "#",
-            },
-            {
-                name: "three",
-                url: "#",
-            },
-            {
-                name: "four",
-                url: "#",
-            },
-            {
-                name: "five",
-                url: "#",
-            },
-            {
-                name: "six",
-                url: "#",
-            },
-        ];
     }
 }
 

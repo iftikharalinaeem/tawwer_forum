@@ -21,7 +21,11 @@ interface IProps extends IDeviceProps {}
  */
 export default class CategoriesPage extends React.Component<IProps> {
     public render() {
-        const categories = Object.values(dummyData.categoriesByID);
+        if (dummyData.status !== LoadStatus.SUCCESS) {
+            throw Error("Categories not loaded.");
+        }
+
+        const categories = Object.values(dummyData.data.categoriesByID);
         return (
             <PageLoader data={{}} status={LoadStatus.SUCCESS}>
                 <CategoriesLayout children={...categories as any} />

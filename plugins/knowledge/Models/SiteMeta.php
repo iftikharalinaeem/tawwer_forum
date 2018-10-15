@@ -10,7 +10,7 @@ namespace Vanilla\Knowledge\Models;
 /**
  * A class for gathering particular data about the site.
  */
-class SiteContextModel {
+class SiteMeta implements \JsonSerializable {
 
     /** @var string */
     private $host;
@@ -24,8 +24,11 @@ class SiteContextModel {
     /** @var bool */
     private $debugModeEnabled;
 
+    /** @var string */
+    private $siteTitle;
+
     /**
-     * SiteContextModel constructor.
+     * SiteMeta constructor.
      *
      * @param \Gdn_Request $request The request to gather data from.
      * @param \Gdn_Configuration $config The configuration object.
@@ -38,18 +41,42 @@ class SiteContextModel {
         $this->basePath = rtrim('/'.trim($request->webRoot(), '/'), '/');
         $this->assetPath = rtrim('/'.trim($request->assetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
+
+        // Get some ui metadata
+        // This title may become knowledge base specific or may come down in a different way in the future.
+        // For now it needs to come from some where, so I'm putting it here.
+        $this->siteTitle = $config->get('Garden.Title', "");
+    }
+
+    /**
+     * Return array for json serialization.
+     */
+    public function jsonSerialize(): array {
+        return $this->value();
     }
 
     /**
      * @return array
      */
-    public function getContext(): array {
+    private function value(): array {
         return [
-            'host' => $this->assetPath,
-            'basePath' => $this->basePath,
-            'assetPath' => $this->assetPath,
-            'debug' => $this->debugModeEnabled,
+            'context' => [
+                'host' => $this->assetPath,
+                'basePath' => $this->basePath,
+                'assetPath' => $this->assetPath,
+                'debug' => $this->debugModeEnabled,
+            ],
+            'ui' => [
+                'siteName' => $this->siteTitle,
+            ],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getSiteTitle(): string {
+        return $this->siteTitle;
     }
 
     /**

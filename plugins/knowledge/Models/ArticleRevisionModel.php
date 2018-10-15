@@ -12,7 +12,7 @@ use Gdn_Session;
 /**
  * A model for managing article revisions.
  */
-class ArticleRevisionModel extends \Vanilla\Models\Model {
+class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
 
     private $session;
 
@@ -24,16 +24,15 @@ class ArticleRevisionModel extends \Vanilla\Models\Model {
     public function __construct(Gdn_Session $session) {
         parent::__construct('articleRevision');
         $this->session = $session;
-    }
 
-    /**
-     * @inheritdoc
-     */
-    public function insert(array $set) {
-        $set["insertUserID"] = $this->session->UserID;
-        $set["dateInserted"] = new DateTimeImmutable("now");
+        $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
+        $dateProcessor->setInsertFields(["dateInserted"])
+            ->setUpdateFields([]);
+        $this->addPipelineProcessor($dateProcessor);
 
-        $result = parent::insert($set);
-        return $result;
+        $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor->setInsertFields(["insertUserID"])
+            ->setUpdateFields([]);
+        $this->addPipelineProcessor($userProcessor);
     }
 }
