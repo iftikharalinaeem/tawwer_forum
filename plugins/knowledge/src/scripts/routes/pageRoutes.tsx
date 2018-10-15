@@ -49,7 +49,7 @@ const CategoriesPage = Loadable({
  */
 export function getPageRoutes() {
     return [
-        <Route exact path="/kb" component={HomePage} key={1} />,
+        <Route exact path="/kb" component={HomePage} key={"/kb"} />,
         <Route path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
         <Route path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
         <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
