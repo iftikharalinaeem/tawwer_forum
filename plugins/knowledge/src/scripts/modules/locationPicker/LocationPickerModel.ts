@@ -11,10 +11,18 @@ import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
-export interface ILocationPickerState {
+interface ILocationPickerState {
     selectedCategoryID: number;
     navigatedCategoryID: number;
     chosenCategoryID: number;
+}
+
+export interface ILPConnectedData extends ILocationPickerState {
+    locationBreadcrumb: IKbCategoryFragment[];
+    navigatedCategory: IKbCategoryFragment;
+    navigatedCategoryContents: IKbNavigationItem[];
+    selectedCategory: IKbCategoryFragment;
+    choosenCategory: IKbCategoryFragment;
 }
 
 export interface ILPConnectedData extends ILocationPickerState {

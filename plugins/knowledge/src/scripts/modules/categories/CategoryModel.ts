@@ -28,7 +28,6 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param categoryID - The ID of the category to lookup.
      */
     public static selectKbCategoryFragment(state: IStoreState, categoryID: number): IKbCategoryFragment {
-        console.log(state);
         if (state.knowledge.categories.status !== LoadStatus.SUCCESS) {
             throw new Error("Categories not loaded.");
         }
@@ -36,7 +35,6 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
         const category = state.knowledge.categories.data.categoriesByID[categoryID];
 
         if (category === undefined) {
-            console.error("No!!!");
             throw new Error(`Category ${categoryID} not found.`);
         }
 
