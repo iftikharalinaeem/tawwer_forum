@@ -112,12 +112,14 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             ],
         };
 
+        const crumbs = [{ name: t("Home"), url: "/kb" }, ...this.props.breadcrumbData];
+
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.Breadcrumbs>
                         <PanelWidget>
-                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                            <Breadcrumbs>{crumbs}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
