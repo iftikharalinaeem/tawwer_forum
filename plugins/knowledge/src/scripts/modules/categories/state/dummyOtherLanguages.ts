@@ -18,6 +18,7 @@ export const dummyOtherLanguagesData: any = {
         {
             name: "Klingon",
             key: "kl",
+            outdated: true,
         },
         {
             name: "Bajoran",
@@ -26,6 +27,7 @@ export const dummyOtherLanguagesData: any = {
         {
             name: "Andorian",
             key: "an",
+            outdated: true,
         },
     ],
 };

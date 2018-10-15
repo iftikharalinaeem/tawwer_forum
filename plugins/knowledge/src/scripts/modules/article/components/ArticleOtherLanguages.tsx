@@ -10,13 +10,23 @@ import Heading from "@library/components/Heading";
 import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
 
-import SelectBox, { ISelectboxItem, IExternalLabelledProps } from "@knowledge/modules/common/SelectBox";
+import SelectBox, { ISelectBoxItem } from "@knowledge/modules/common/SelectBox";
 
-export interface IState {
+interface IState {
     id: string;
 }
 
-export default class ArticleOtherLanguages extends React.Component<IExternalLabelledProps, IState> {
+interface ILanguageProps extends ISelectBoxItem {
+    key: string;
+    outdated?: boolean;
+}
+
+interface IProps {
+    selectedKey: any;
+    children: ILanguageProps[];
+}
+
+export default class ArticleOtherLanguages extends React.Component<IProps, IState> {
     private get titleID() {
         return this.state.id + "-title";
     }
@@ -29,13 +39,26 @@ export default class ArticleOtherLanguages extends React.Component<IExternalLabe
     }
 
     public render() {
-        if (this.props.children && this.props.children.length > 1) {
+        const showPicker = this.props.children && this.props.children.length > 1;
+        if (showPicker) {
+            let foundIndex = false;
+            const processedChildren = this.props.children.map(language => {
+                const selected = language.key === this.props.selectedKey;
+                language.selected = selected;
+                if (selected) {
+                    foundIndex = selected;
+                }
+                return language;
+            });
+            if (!foundIndex) {
+                processedChildren[0].selected = true;
+            }
             return (
                 <PanelWidget>
                     <div className="otherLanguages">
                         <Heading id={this.titleID} title={t("Other Languages")} />
-                        <SelectBox describedBy={this.titleID} selectedIndex={0} className="otherLanguages-select">
-                            {this.props.children}
+                        <SelectBox describedBy={this.titleID} className="otherLanguages-select">
+                            {processedChildren}
                         </SelectBox>
                     </div>
                 </PanelWidget>

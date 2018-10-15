@@ -91,15 +91,6 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         const shouldRenderRightPanel: boolean = !isMobile && !!(children.rightTop || children.rightBottom);
         const renderMobilePanel: boolean = isMobile && !!children.leftBottom;
 
-        window.console.log("data: ", {
-            isMobile,
-            isTablet,
-            isFullWidth,
-            shouldRenderLeftPanel,
-            shouldRenderRightPanel,
-            renderMobilePanel,
-        });
-
         // Determine the classes we want to display.
         const panelClasses = classNames(
             "panelLayout",

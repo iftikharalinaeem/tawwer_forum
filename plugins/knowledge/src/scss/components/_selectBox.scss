@@ -1,0 +1,26 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+
+padding: {
+  top: $dropDown-item_verticalPadding;
+  right: $dropDown-item_horizontalPadding;
+  bottom: $dropDown-item_verticalPadding;
+  left: $dropDown-item_horizontalPadding;
+}
+
+.selectBox {}
+.selectBox-content {}
+.selectBox-dropDown {}
+
+.selectBox-option {
+    display: block;
+    width: 100%;
+}
+
+.selectBox-buttonItem {
+
+}

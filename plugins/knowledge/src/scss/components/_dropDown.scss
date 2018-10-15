@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-$dropDown_width                                : 200px;
-$dropDown_borderRadius                         : 1px;
-$dropdown_bg                                   : $global-color_bg;
-
-$dropDown-metas_verticalPadding                : 6px;
-$dropDown-metas_horizontalPadding              : 18px;
-
-$dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 36px;
-
-$dropDown-item_minHeight                       : 45px;
-
 .dropDown {
     position: relative;
     z-index: 1;
@@ -24,7 +12,7 @@ $dropDown-item_minHeight                       : 45px;
 .dropDown-contents {
     position: absolute;
     width: $dropDown_width;
-    background-color: $dropdown_bg;
+    background-color: $dropDown_bg;
     box-shadow: $overlay-dropShadow;
     border: {
         radius: $global_borderRadius;

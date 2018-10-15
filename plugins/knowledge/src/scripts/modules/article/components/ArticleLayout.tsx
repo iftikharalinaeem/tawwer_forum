@@ -141,7 +141,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleTOC children={articleTOC} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
-                        <ArticleOtherLanguages data={dummyOtherLanguagesData} />
+                        <ArticleOtherLanguages {...dummyOtherLanguagesData} />
                         <RelatedArticles children={articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>
