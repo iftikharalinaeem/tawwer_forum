@@ -121,7 +121,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
-                        <SiteNav {...dummyNavData} />
+                        <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PageTitle
