@@ -8,11 +8,11 @@ import { combineReducers } from "redux";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import ArticlePageReducer from "@knowledge/modules/article/ArticlePageReducer";
-import EditorPageReducer from "@knowledge/modules/editor/EditorPageReducer";
+import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 
 const knowledgeReducer = combineReducers({
     articlePage: new ArticlePageReducer().reducer,
-    editorPage: new EditorPageReducer().reducer,
+    editorPage: new EditorPageModel().reducer,
     categories: new CategoryModel().reducer,
     locationPicker: new LocationPickerModel().reducer,
 });

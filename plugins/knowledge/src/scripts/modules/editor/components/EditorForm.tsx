@@ -17,7 +17,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
-    articleCategory: IKbCategoryFragment;
+    currentCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -58,10 +58,11 @@ export default class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
+        const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
-                    <LocationInput initialCategoryID={-1} />
+                    <LocationInput initialCategoryID={categoryID} key={categoryID === null ? undefined : categoryID} />
                     <div className="inputBlock">
                         <DocumentTitle title={isLoadingOrPending ? "Loading" : this.state.name || t("Untitled")}>
                             <input

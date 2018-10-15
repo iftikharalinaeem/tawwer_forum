@@ -14,8 +14,13 @@ import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
+import {
+    IPostArticleRevisionRequestBody,
+    Format,
+    IKbCategoryFragment,
+    IPatchArticleRequestBody,
+} from "@knowledge/@types/api";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
@@ -27,7 +32,7 @@ interface IOwnProps
 interface IProps extends IOwnProps {
     pageState: IEditorPageState;
     actions: EditorPageActions;
-    articleCategory: IKbCategoryFragment;
+    locationCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -49,7 +54,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                     key={this.props.pageState.revision.status}
                     submitHandler={this.formSubmit}
                     revision={this.props.pageState.revision}
-                    articleCategory={this.props.articleCategory}
+                    currentCategory={this.props.locationCategory}
                 />
             </EditorLayout>
         );
@@ -97,17 +102,25 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history, actions } = this.props;
+        const { pageState, history, actions, locationCategory } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
-            const data: IPostArticleRevisionRequestBody = {
+            const articleRequest: IPatchArticleRequestBody = {
+                articleID: article.data.articleID,
+            };
+
+            if (locationCategory !== null) {
+                articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
+            }
+
+            const revisionRequest: IPostArticleRevisionRequestBody = {
                 articleID: article.data.articleID,
                 name: title,
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            void actions.submitNewRevision(data, history);
+            void actions.updateArticle(articleRequest, revisionRequest, history);
         }
     };
 
@@ -140,15 +153,15 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
-    let articleCategory;
-    const { editorPage } = state.knowledge;
+    let locationCategory: IKbCategoryFragment | null = null;
+    const { editorPage, locationPicker } = state.knowledge;
     if (editorPage.article.status === LoadStatus.SUCCESS) {
-        articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
+        locationCategory = categoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
     }
 
     return {
         pageState: editorPage,
-        articleCategory,
+        locationCategory,
     };
 }
 

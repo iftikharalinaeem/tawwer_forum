@@ -19,7 +19,7 @@ import { connect } from "react-redux";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
-    initialCategoryID: number;
+    initialCategoryID: number | null;
 }
 
 interface IState {
@@ -93,7 +93,6 @@ export class LocationInput extends React.Component<IProps, IState> {
      * Show the location picker modal.
      */
     private showLocationPicker = () => {
-        void this.props.actions.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
             showLocationPicker: true,
         });

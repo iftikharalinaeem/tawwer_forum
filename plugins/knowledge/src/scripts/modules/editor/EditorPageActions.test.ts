@@ -86,7 +86,7 @@ describe("EditorPageActions", () => {
         });
     });
 
-    describe("submitNewRevision()", () => {
+    describe("updateArticle()", () => {
         it("submits a revision and redirects to the page from the response", async () => {
             const dummyRevision = { articleID: 1 };
             const dummyArticle = { url: "/test-redirect-url" };
@@ -97,7 +97,8 @@ describe("EditorPageActions", () => {
                 .replyOnce(200, dummyArticle);
             const history = createMemoryHistory();
 
-            void (await editorPageActions.submitNewRevision(
+            void (await editorPageActions.updateArticle(
+                { articleID: 1 },
                 { name: "test", body: "asd", articleID: 1, format: Format.RICH },
                 history,
             ));

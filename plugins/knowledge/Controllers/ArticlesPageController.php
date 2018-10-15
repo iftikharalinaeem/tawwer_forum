@@ -88,15 +88,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             self::signInFirst('kb/articles/'.$id.'/editor');
         }
 
-        // API data
-        $reduxActions = [];
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_EDITOR_ARTICLE_RESPONSE, $article));
-
-        if (isset($article['articleRevisionID'])) {
-            $revision = $this->revisionsApi->get($article['articleRevisionID']);
-            $this->addReduxAction(new ReduxAction(ActionConstants::GET_REVISION_RESPONSE, $revision));
-        }
 
         // Set the title
         if (isset($article['articleRevision'])) {

@@ -14,6 +14,8 @@ import {
     IPostArticleRevisionRequestBody,
     IGetArticleResponseBody,
     IArticle,
+    IPatchArticleRequestBody,
+    IPatchArticleResponseBody,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import pathToRegexp from "path-to-regexp";
@@ -28,6 +30,11 @@ export default class EditorPageActions extends ReduxActions {
     public static readonly POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
     public static readonly POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
     public static readonly POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
+
+    // API actions
+    public static readonly PATCH_ARTICLE_REQUEST = "@@articleEditor/PATCH_ARTICLE_REQUEST";
+    public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
+    public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
     public static readonly POST_REVISION_REQUEST = "@@articleEditor/POST_REVISION_REQUEST";
     public static readonly POST_REVISION_RESPONSE = "@@articleEditor/POST_REVISION_RESPONSE";
@@ -52,6 +59,7 @@ export default class EditorPageActions extends ReduxActions {
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
+        | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
     /**
@@ -73,6 +81,18 @@ export default class EditorPageActions extends ReduxActions {
         EditorPageActions.POST_ARTICLE_REQUEST,
         EditorPageActions.POST_ARTICLE_RESPONSE,
         EditorPageActions.POST_ARTICLE_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {} as IPostArticleResponseBody,
+        {} as IPostArticleRequestBody,
+    );
+
+    /**
+     * Action creators for POST /articles
+     */
+    private static patchArticleACs = ReduxActions.generateApiActionCreators(
+        EditorPageActions.PATCH_ARTICLE_REQUEST,
+        EditorPageActions.PATCH_ARTICLE_RESPONSE,
+        EditorPageActions.PATCH_ARTICLE_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPostArticleResponseBody,
         {} as IPostArticleRequestBody,
@@ -161,8 +181,8 @@ export default class EditorPageActions extends ReduxActions {
 
             if (article) {
                 this.dispatch((a, getState: () => IStoreState) => {
-                    const category = CategoryModel.selectKbCategoryFragment(getState(), article!.articleID);
-                    this.locationPickerActions.init(category);
+                    const category = CategoryModel.selectKbCategoryFragment(getState(), article!.knowledgeCategoryID);
+                    this.locationPickerActions.init(category!);
                 });
             }
         }
@@ -173,14 +193,21 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param body - The body of the submit request.
      */
-    public async submitNewRevision(body: IPostArticleRevisionRequestBody, history: History) {
-        const result = await this.postRevision(body);
+    public async updateArticle(
+        article: IPatchArticleRequestBody,
+        revision: IPostArticleRevisionRequestBody,
+        history: History,
+    ) {
+        const [articleResult, revisionResult] = await Promise.all([
+            this.patchArticle(article),
+            this.postRevision(revision),
+        ]);
         // Our API request has failed
-        if (!result) {
+        if (!articleResult || !revisionResult) {
             return;
         }
 
-        const { articleID } = result.data;
+        const { articleID } = articleResult.data;
         const newArticle = await this.articlePageActions.getArticleByID(articleID);
         // Our API request failed.
         if (!newArticle) {
@@ -201,7 +228,7 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param data The revision data.
      */
-    public postRevision(data: IPostArticleRevisionRequestBody) {
+    private postRevision(data: IPostArticleRevisionRequestBody) {
         return this.dispatchApi<IPostArticleRevisionResponseBody>(
             "post",
             "/article-revisions",
@@ -226,6 +253,19 @@ export default class EditorPageActions extends ReduxActions {
      */
     private createArticle(data: IPostArticleRequestBody) {
         return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
+    }
+
+    /**
+     * Update an article
+     */
+    private patchArticle(data: IPatchArticleRequestBody) {
+        const { articleID, ...rest } = data;
+        return this.dispatchApi<IPatchArticleResponseBody>(
+            "patch",
+            `/articles/${articleID}`,
+            EditorPageActions.patchArticleACs,
+            rest,
+        );
     }
 
     /**

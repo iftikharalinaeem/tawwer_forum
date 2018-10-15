@@ -37,9 +37,13 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectKbCategoryFragment(state: IStoreState, categoryID: number): IKbCategoryFragment {
+    public static selectKbCategoryFragment(state: IStoreState, categoryID: number): IKbCategoryFragment | null {
         if (state.knowledge.categories.status !== LoadStatus.SUCCESS) {
             throw new Error("Categories not loaded.");
+        }
+
+        if (categoryID === CategoryModel.ROOT_CATEGORY.recordID) {
+            return null;
         }
 
         const category = state.knowledge.categories.data.categoriesByID[categoryID];
@@ -57,8 +61,13 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectMixedRecord(state: IStoreState, categoryID: number): IKbCategoryMultiTypeFragment {
-        const { knowledgeCategoryID, ...rest } = this.selectKbCategoryFragment(state, categoryID);
+    public static selectMixedRecord(state: IStoreState, categoryID: number): IKbCategoryMultiTypeFragment | null {
+        const record = this.selectKbCategoryFragment(state, categoryID);
+        if (record === null) {
+            return null;
+        }
+
+        const { knowledgeCategoryID, ...rest } = record;
         return {
             ...rest,
             recordType: "knowledgeCategory",
@@ -79,7 +88,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
 
     public static selectMixedRecordTree(state: IStoreState, categoryID: number, maxDepth = 2): IKbNavigationCategory {
         const category: IKbNavigationCategory =
-            categoryID === -1 ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID);
+            categoryID === -1 ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
 
         if (maxDepth > 1) {
             category.children = this.selectChildrenIDsFromParent(state, categoryID).map(id =>

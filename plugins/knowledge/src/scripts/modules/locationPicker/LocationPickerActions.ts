@@ -7,6 +7,8 @@
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 import { IKbCategoryFragment, IKbNavigationResponse, IKbNavigationRequest } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
+import { IStoreState } from "@knowledge/state/model";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface ILPActionsProps {
     actions: LocationPickerActions;
@@ -17,9 +19,6 @@ export interface ILPActionsProps {
  */
 export default class LocationPickerActions extends ReduxActions {
     // Action constants.
-    public static readonly GET_KB_NAVIGATION_REQUEST = "@@locationPicker/GET_KB_NAVIGATION_REQUEST";
-    public static readonly GET_KB_NAVIGATION_RESPONSE = "@@locationPicker/GET_KB_NAVIGATION_RESPONSE";
-    public static readonly GET_KB_NAVIGATION_ERROR = "@@locationPicker/GET_KB_NAVIGATION_ERROR";
     public static readonly NAVIGATE_TO_CATEGORY = "@@locationPicker/NAVIGATE_TO_CATEGORY";
     public static readonly SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
     public static readonly CHOOSE_CATEGORY = "@@locationPicker/CHOOSE_CATEGORY";
@@ -29,7 +28,6 @@ export default class LocationPickerActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static ACTION_TYPES:
-        | ActionsUnion<typeof LocationPickerActions.getNavigationActionCreators>
         | ReturnType<typeof LocationPickerActions.createInitAction>
         | ReturnType<typeof LocationPickerActions.createNavigateAction>
         | ReturnType<typeof LocationPickerActions.createChooseAction>
@@ -40,18 +38,6 @@ export default class LocationPickerActions extends ReduxActions {
             actions: new LocationPickerActions(dispatch, apiv2),
         };
     }
-
-    /**
-     * Action creators for the /kb/navigation get request.
-     */
-    private static getNavigationActionCreators = ReduxActions.generateApiActionCreators(
-        LocationPickerActions.GET_KB_NAVIGATION_REQUEST,
-        LocationPickerActions.GET_KB_NAVIGATION_RESPONSE,
-        LocationPickerActions.GET_KB_NAVIGATION_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IKbNavigationResponse,
-        {} as IKbNavigationRequest,
-    );
 
     /**
      * Initialize the state from a category.
@@ -95,20 +81,6 @@ export default class LocationPickerActions extends ReduxActions {
     public init = this.bindDispatch(LocationPickerActions.createInitAction);
 
     /**
-     * Get location data from the server.
-     *
-     * @param options
-     */
-    public getKbNavigation = (options: IKbNavigationRequest) => {
-        return this.dispatchApi(
-            "get",
-            `/knowledge-navigation?knowledgeCategoryID=${options.knowledgeCategoryID}`,
-            LocationPickerActions.getNavigationActionCreators,
-            options,
-        );
-    };
-
-    /**
      * Navigate to a particular category.
      *
      * Immediately navigates in one level, then requests the data for the next level deeper.
@@ -117,6 +89,5 @@ export default class LocationPickerActions extends ReduxActions {
      */
     public navigateToCategory = (categoryID: number) => {
         this.dispatch(LocationPickerActions.createNavigateAction(categoryID));
-        return this.getKbNavigation({ knowledgeCategoryID: categoryID });
     };
 }

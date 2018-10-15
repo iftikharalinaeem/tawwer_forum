@@ -11,7 +11,7 @@ import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
-interface ILocationPickerState {
+export interface ILocationPickerState {
     navigatedCategoryID: number; // What page the user is on in the picker.
     selectedCategoryID: number; // What category is selected (still not chosen).
     chosenCategoryID: number; // What category is chosen (input closes after a selection)

@@ -12,11 +12,11 @@ import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { t } from "@library/application";
 
 interface IProps {
-    initialCategoryID: number | null;
     onCategoryNavigate: (categoryID: number) => void;
     onItemSelect: (categoryID: number) => void;
     selectedCategory: IKbCategoryFragment | null;
     navigatedCategory: IKbCategoryFragment | null;
+    chosenCategory: IKbCategoryFragment | null;
     items: IKbNavigationItem[];
 }
 
@@ -37,7 +37,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { selectedCategory, items, navigatedCategory } = this.props;
+        const { selectedCategory, items, navigatedCategory, chosenCategory } = this.props;
         const title = navigatedCategory ? navigatedCategory.name : t("Knowledge Bases");
 
         const contents = items.map((item, index) => {
@@ -47,7 +47,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
             return (
                 <NavigationItemCategory
                     key={index}
-                    isInitialSelection={item.recordID === this.props.initialCategoryID}
+                    isInitialSelection={!!chosenCategory && item.recordID === chosenCategory.knowledgeCategoryID}
                     isSelected={isSelected}
                     name={this.radioName}
                     value={item}

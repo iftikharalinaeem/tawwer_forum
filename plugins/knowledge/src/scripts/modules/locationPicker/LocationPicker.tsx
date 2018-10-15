@@ -14,7 +14,6 @@ import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPicke
 import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
-    initialCategoryID: number | null;
     className?: string;
     onCloseClick: () => void;
     onChoose: () => void;
@@ -52,8 +51,8 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                                 onItemSelect={actions.selectCategory}
                                 selectedCategory={this.props.selectedCategory}
                                 navigatedCategory={this.props.navigatedCategory}
+                                chosenCategory={this.props.choosenCategory}
                                 items={this.props.pageContents}
-                                initialCategoryID={this.props.initialCategoryID}
                             />
                         </FramePanel>
                     </FrameBody>

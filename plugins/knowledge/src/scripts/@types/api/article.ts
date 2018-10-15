@@ -40,7 +40,13 @@ export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, I
 // Request/Response interfaces
 export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
 
+export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
+    articleID: number;
+}
+
 export interface IPostArticleResponseBody extends IArticle {}
+
+export interface IPatchArticleResponseBody extends IArticle {}
 
 export interface IGetArticleResponseBody extends IArticle {}
 
