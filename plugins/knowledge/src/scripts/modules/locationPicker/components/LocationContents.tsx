@@ -16,6 +16,7 @@ interface IProps {
     onCategoryNavigate: (categoryID: number) => void;
     onItemSelect: (categoryID: number) => void;
     selectedCategory: IKbCategoryFragment | null;
+    navigatedCategory: IKbCategoryFragment | null;
     items: IKbNavigationItem[];
 }
 
@@ -36,8 +37,8 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { selectedCategory, items } = this.props;
-        const title = selectedCategory ? selectedCategory.name : t("Knowledge Bases");
+        const { selectedCategory, items, navigatedCategory } = this.props;
+        const title = navigatedCategory ? navigatedCategory.name : t("Knowledge Bases");
 
         const contents = items.map((item, index) => {
             const isSelected = !!selectedCategory && selectedCategory.knowledgeCategoryID === item.recordID;
@@ -55,7 +56,14 @@ export default class LocationContents extends React.Component<IProps, IState> {
                 />
             );
         });
-        return <NavigationItemList categoryName={title}>{contents}</NavigationItemList>;
+        return (
+            <NavigationItemList
+                categoryName={title}
+                key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
+            >
+                {contents}
+            </NavigationItemList>
+        );
     }
 
     private get radioName(): string {

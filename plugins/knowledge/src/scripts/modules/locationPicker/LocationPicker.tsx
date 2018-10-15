@@ -51,6 +51,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                                 onCategoryNavigate={actions.navigateToCategory}
                                 onItemSelect={actions.selectCategory}
                                 selectedCategory={this.props.selectedCategory}
+                                navigatedCategory={this.props.navigatedCategory}
                                 items={this.props.pageContents}
                                 initialCategoryID={this.props.initialCategoryID}
                             />
@@ -65,7 +66,9 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         >
                             {newFolder()}
                         </Button>
-                        <Button onClick={this.handleChoose}>{t("Choose")}</Button>
+                        <Button onClick={this.handleChoose} disabled={!this.canChoose}>
+                            {t("Choose")}
+                        </Button>
                     </FrameFooter>
                 </Frame>
                 {this.state.showNewCategoryModal && <NewCategoryForm exitHandler={this.hideNewFolderModal} />}
