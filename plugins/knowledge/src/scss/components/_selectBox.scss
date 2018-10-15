@@ -4,23 +4,71 @@
  * @license Proprietary
  */
 
+$selectBox-check_width: 18px;
 
-padding: {
-  top: $dropDown-item_verticalPadding;
-  right: $dropDown-item_horizontalPadding;
-  bottom: $dropDown-item_verticalPadding;
-  left: $dropDown-item_horizontalPadding;
-}
-
-.selectBox {}
-.selectBox-content {}
-.selectBox-dropDown {}
-
-.selectBox-option {
-    display: block;
-    width: 100%;
+.selectBox-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    max-width: 100%;
 }
 
 .selectBox-buttonItem {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    max-width: 100%;
+    line-height: $global-condensed_lineHeight;
+    padding: {
+        left: $selectBox-check_width * .75;
+    }
 
+    &[disabled] {
+        opacity: 1;
+    }
+}
+
+.selectBox-buttonIcon {
+    margin: {
+        left: $utility-baseUnit;
+        right: auto;
+    }
+}
+
+.selectBox-outdated {
+    margin-left: auto;
+    line-height: inherit;
+    white-space: nowrap;
+}
+
+.selectBox-dropDownContents {
+    width: 100%;
+    padding: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+    }
+}
+
+.selectBox-checkContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $global-color_primary;
+    width: $selectBox-check_width;
+    height: $selectBox-check_width;
+    flex-basis: $selectBox-check_width;
+    margin-right: $selectBox-check_width / 2;
+}
+
+.selectBox-spacer {
+    display: block;
+    width: $selectBox-check_width;
+    height: $selectBox-check_width;
+}
+
+.selectBox-itemLabel {
+    width: 100%;
 }

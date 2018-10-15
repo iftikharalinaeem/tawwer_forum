@@ -18,6 +18,7 @@
 @import "~library-scss/userContent/_accessibility";
 
 @import "~library-scss/components/_loader";
+@import "~library-scss/components/_siteNav";
 
 @import "~library-scss/embeds/_embeds";
 
@@ -61,7 +62,7 @@
 @import "components/navMenu";
 @import "components/tableOfContents";
 @import "components/relatedArticles";
-@import "components/linkLists";
+@import "components/related";
 @import "components/userContent";
 @import "components/searchResults";
 //@import "components/sortAndFilter";

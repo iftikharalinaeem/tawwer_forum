@@ -64,8 +64,10 @@
 
 .buttonAsText {
     color: $global-color_primary;
-    line-height: inherit;
+    line-height: $global-condensed_lineHeight;
     padding: 0;
+    text-align: left;
+    overflow: hidden;
 
     &:hover,
     &:focus {

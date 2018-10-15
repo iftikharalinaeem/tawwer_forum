@@ -10,7 +10,7 @@ import DropDown from "@library/components/dropdown/DropDown";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import { checkCompact, rightChevron } from "@library/components/Icons";
+import { checkCompact, downTriangle } from "@library/components/Icons";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface ISelectBoxItem {
@@ -25,6 +25,8 @@ interface IProps {
     className?: string;
     id?: string;
     children: ISelectBoxItem[];
+    stickTop?: boolean; // Adjusts the flyout position vertically
+    stickRight?: boolean; // Adjusts the flyout position horizontally
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -44,7 +46,7 @@ interface IState {
 /**
  * Generates Select Box component (similar to a select)
  */
-export default class Sort extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
+export default class SelectBox extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
     public static defaultProps = {
         selectedIndex: 0,
     };
@@ -67,26 +69,34 @@ export default class Sort extends React.Component<ISelfLabelledProps | IExternal
     };
 
     public render() {
+        const space = `&nbsp;`;
+
         const selectItems =
             this.props.children && this.props.children.length > 0
                 ? this.props.children.map((child, i) => {
+                      const selected = this.state.selectedIndex === i;
                       return (
                           <DropDownItemButton
                               key={this.props.id + "-item" + i}
-                              className={classNames("selectBox-option", { isSelected: child.selected })}
+                              className={classNames({ isSelected: child.selected })}
                               name={child.name}
                               onClick={this.handleClick.bind(this, child, i)}
                               disabled={i === this.state.selectedIndex}
                               clickData={child}
                               index={i}
-                              current={child.selected}
-                              buttonClassName="selectBox-buttonItem"
+                              current={selected}
+                              buttonClassName="dropDownItem-button selectBox-buttonItem"
                           >
                               <span className="selectBox-checkContainer sc-only">
-                                  {child.selected && checkCompact()}
+                                  {selected && checkCompact("selectBox-selectedIcon")}
+                                  {!selected && (
+                                      <span className="selectBox-spacer" dangerouslySetInnerHTML={{ __html: space }} />
+                                  )}
                               </span>
-                              {child.name}
-                              {child.outdated && t("(Outdated)")}
+                              <span className="selectBox-itemLabel">{child.name}</span>
+                              {child.outdated && (
+                                  <span className="selectBox-outdated metaStyle">{t("(Outdated)")}</span>
+                              )}
                           </DropDownItemButton>
                       );
                   })
@@ -95,7 +105,7 @@ export default class Sort extends React.Component<ISelfLabelledProps | IExternal
             this.state.selectedItem && this.state.selectedItem.name ? (
                 <React.Fragment>
                     {this.state.selectedItem.name}
-                    {rightChevron()}
+                    {downTriangle("selectBox-buttonIcon")}
                 </React.Fragment>
             ) : null;
         return (
@@ -110,8 +120,10 @@ export default class Sort extends React.Component<ISelfLabelledProps | IExternal
                         className="selectBox-dropDown"
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
-                        buttonClassName="selectBox-buttonItem"
+                        buttonClassName="selectBox-toggle"
                         buttonBaseClass={ButtonBaseClass.TEXT}
+                        stickTop={this.props.stickTop}
+                        stickRight={this.props.stickRight}
                     >
                         {selectItems}
                     </DropDown>

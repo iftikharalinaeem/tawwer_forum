@@ -22,6 +22,7 @@ interface ILanguageProps extends ISelectBoxItem {
 }
 
 interface IProps {
+    id?: string;
     selectedKey: any;
     children: ILanguageProps[];
 }
@@ -55,9 +56,9 @@ export default class ArticleOtherLanguages extends React.Component<IProps, IStat
             }
             return (
                 <PanelWidget>
-                    <div className="otherLanguages">
-                        <Heading id={this.titleID} title={t("Other Languages")} />
-                        <SelectBox describedBy={this.titleID} className="otherLanguages-select">
+                    <div className="otherLanguages related">
+                        <Heading id={this.titleID} title={t("Other Languages")} className="related-title" />
+                        <SelectBox describedBy={this.titleID} className="otherLanguages-select" stickRight={true}>
                             {processedChildren}
                         </SelectBox>
                     </div>

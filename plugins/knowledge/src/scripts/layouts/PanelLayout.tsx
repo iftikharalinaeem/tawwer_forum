@@ -136,8 +136,12 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     >
                         {shouldRenderLeftPanel && (
                             <Panel className="panelLayout-left" tag="aside">
-                                <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
-                                <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                                {children.leftTop && (
+                                    <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                )}
+                                {children.leftBottom && (
+                                    <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                                )}
                             </Panel>
                         )}
 

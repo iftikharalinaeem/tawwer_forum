@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, ILoadable } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
 import { ArticleLayout } from "@knowledge/modules/article/components";
 import PageLoader from "@library/components/PageLoader";
@@ -20,12 +20,13 @@ import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
+import { IArticle } from "@knowledge/@types/api";
 
 interface IProps extends IDeviceProps {
     match: match<{
         id: number;
     }>;
-    articlePageState: IArticlePageState;
+    article: ILoadable<IArticle>;
     articlePageActions: ArticlePageActions;
     breadcrumbData: ICrumb[] | null;
 }
@@ -38,22 +39,18 @@ export class ArticlePage extends React.Component<IProps> {
      * Render not found or the article.
      */
     public render() {
-        const { articlePageState, breadcrumbData } = this.props;
+        const { article, breadcrumbData } = this.props;
         const { id } = this.props.match.params;
 
-        if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
+        if (id === null || (article.status === LoadStatus.ERROR && article.error.status === 404)) {
             return <NotFoundPage type="Page" />;
         }
 
         return (
-            <PageLoader {...articlePageState}>
-                {articlePageState.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle
-                        title={
-                            articlePageState.data.article.seoName || articlePageState.data.article.articleRevision.name
-                        }
-                    >
-                        <ArticleLayout article={articlePageState.data.article} breadcrumbData={breadcrumbData!} />
+            <PageLoader {...article}>
+                {article.status === LoadStatus.SUCCESS && (
+                    <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
+                        <ArticleLayout article={article.data} breadcrumbData={breadcrumbData!} />
                     </DocumentTitle>
                 )}
             </PageLoader>
@@ -61,20 +58,22 @@ export class ArticlePage extends React.Component<IProps> {
     }
 
     /**
-     * If the component mounts without any data we need to fetch request it.
+     * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        const { articlePageState, articlePageActions } = this.props;
-        const { id } = this.props.match.params;
-        if (articlePageState.status !== LoadStatus.PENDING) {
-            return;
+        const { article } = this.props;
+        if (article.status !== LoadStatus.SUCCESS) {
+            this.initializeFromUrl();
         }
+    }
 
-        if (id === null) {
-            return;
+    /**
+     * If the pages url changes we need to fetch the article data again.
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.props.match.url !== prevProps.match.url) {
+            this.initializeFromUrl();
         }
-
-        void articlePageActions.getArticleByID(id);
     }
 
     /**
@@ -82,6 +81,20 @@ export class ArticlePage extends React.Component<IProps> {
      */
     public componentWillUnmount() {
         this.props.articlePageActions.reset();
+    }
+
+    /**
+     * Initialize the page's data from it's url.
+     */
+    private initializeFromUrl() {
+        const { articlePageActions } = this.props;
+        const { id } = this.props.match.params;
+
+        if (id === null) {
+            return;
+        }
+
+        void articlePageActions.getArticleByID(id);
     }
 }
 
@@ -91,10 +104,10 @@ export class ArticlePage extends React.Component<IProps> {
 function mapStateToProps(state: IStoreState) {
     let breadcrumbData: ICrumb[] | null = null;
 
-    if (state.knowledge.articlePage.status === LoadStatus.SUCCESS) {
+    if (state.knowledge.articlePage.article.status === LoadStatus.SUCCESS) {
         const categories = categoryModel.selectKbCategoryBreadcrumb(
             state,
-            state.knowledge.articlePage.data.article.knowledgeCategoryID,
+            state.knowledge.articlePage.article.data.knowledgeCategoryID,
         );
         breadcrumbData = categories.map(category => {
             return {
@@ -105,7 +118,7 @@ function mapStateToProps(state: IStoreState) {
     }
 
     return {
-        articlePageState: state.knowledge.articlePage,
+        article: state.knowledge.articlePage.article,
         breadcrumbData,
     };
 }

@@ -27,6 +27,9 @@ import UserContent from "@library/components/UserContent";
 import ArticleOtherLanguages from "@knowledge/modules/article/components/ArticleOtherLanguages";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 
+import { dummyNavData } from "../../categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
+
 interface IProps {
     article: IArticle;
     device: Devices;
@@ -119,16 +122,13 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
+                        <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PageTitle
                             title={article.articleRevision.name}
-                            menu={<ArticleMenu article={article} />}
+                            menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={metaData as any}
                         />
                     </PanelLayout.MiddleTop>

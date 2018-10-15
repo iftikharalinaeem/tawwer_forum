@@ -27,8 +27,8 @@ export default class ArticleRelatedArticles extends React.Component<IProps> {
         if (this.props.children && this.props.children.length > 0) {
             const contents = this.props.children.map((item, i) => {
                 return (
-                    <li className="linkList-item relatedArticles-item" key={"related-" + i}>
-                        <Link to={item.to} className="linkList-link relatedArticles-link" title={item.name}>
+                    <li className="related-item relatedArticles-item" key={"related-" + i}>
+                        <Link to={item.to} className="related-link relatedArticles-link" title={item.name}>
                             {item.name}
                         </Link>
                     </li>
@@ -37,9 +37,9 @@ export default class ArticleRelatedArticles extends React.Component<IProps> {
 
             return (
                 <PanelWidget>
-                    <nav className="linkList relatedArticles">
-                        <Heading title={t("Related Articles")} className="linkList-title relatedArticles-title" />
-                        <ul className="linkList-items relatedArticles-items">{contents}</ul>
+                    <nav className="related relatedArticles">
+                        <Heading title={t("Related Articles")} className="related-title relatedArticles-title" />
+                        <ul className="related-items relatedArticles-items">{contents}</ul>
                     </nav>
                 </PanelWidget>
             );
