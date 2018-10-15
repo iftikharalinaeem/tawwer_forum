@@ -169,15 +169,6 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     /**
-     * Fetch the current revision from an article resource through the API.
-     */
-    private async fetchRevisionFromArticle(article: IArticle | undefined) {
-        if (article && article.articleRevisionID !== null) {
-            await this.getRevisionByID(article.articleRevisionID);
-        }
-    }
-
-    /**
      * Submit the editor's form data to the API.
      *
      * @param body - The body of the submit request.
@@ -217,6 +208,15 @@ export default class EditorPageActions extends ReduxActions {
             EditorPageActions.postRevisionACs,
             data,
         );
+    }
+
+    /**
+     * Fetch the current revision from an article resource through the API.
+     */
+    private async fetchRevisionFromArticle(article: IArticle | undefined) {
+        if (article && article.articleRevisionID !== null) {
+            await this.getRevisionByID(article.articleRevisionID);
+        }
     }
 
     /**

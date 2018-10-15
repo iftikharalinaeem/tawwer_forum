@@ -10,10 +10,11 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/Icons";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
-import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/LocationPickerContext";
-import { LoadStatus } from "@library/@types/api";
+import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 
-interface IProps extends ILocationPickerProps {
+interface IProps extends ILPActionsProps, ILPConnectedData {
+    initialCategoryID: number | null;
     className?: string;
     onCloseClick: () => void;
     onChoose: () => void;
@@ -26,7 +27,7 @@ interface IState {
 /**
  * Component for choosing a location for a new article.
  */
-export class LocationPicker extends React.Component<IProps, IState> {
+export default class LocationPicker extends React.Component<IProps, IState> {
     public state = {
         showNewCategoryModal: false,
     };
@@ -111,5 +112,3 @@ export class LocationPicker extends React.Component<IProps, IState> {
         this.props.onChoose();
     };
 }
-
-export default withLocationPicker(LocationPicker);

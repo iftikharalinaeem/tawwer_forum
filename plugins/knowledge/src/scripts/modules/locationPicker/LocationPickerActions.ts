@@ -6,6 +6,11 @@
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 import { IKbCategoryFragment, IKbNavigationResponse, IKbNavigationRequest } from "@knowledge/@types/api";
+import apiv2 from "@library/apiv2";
+
+export interface ILPActionsProps {
+    actions: LocationPickerActions;
+}
 
 /**
  * Actions for the article page.
@@ -29,6 +34,12 @@ export default class LocationPickerActions extends ReduxActions {
         | ReturnType<typeof LocationPickerActions.createNavigateAction>
         | ReturnType<typeof LocationPickerActions.createChooseAction>
         | ReturnType<typeof LocationPickerActions.createSelectAction>;
+
+    public static mapDispatchToProps(dispatch: any): ILPActionsProps {
+        return {
+            actions: new LocationPickerActions(dispatch, apiv2),
+        };
+    }
 
     /**
      * Action creators for the /kb/navigation get request.

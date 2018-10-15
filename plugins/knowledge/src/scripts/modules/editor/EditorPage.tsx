@@ -18,8 +18,6 @@ import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@k
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { t } from "@library/application";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -45,8 +43,6 @@ export class EditorPage extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { pageState } = this.props;
-
         const pageContent = (
             <EditorLayout backUrl={this.backLink}>
                 <EditorForm

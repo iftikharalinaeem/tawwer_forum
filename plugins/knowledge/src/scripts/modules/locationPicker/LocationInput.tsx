@@ -8,15 +8,18 @@ import * as React from "react";
 import classNames from "classnames";
 import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
 import Button from "@library/components/forms/Button";
-import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/LocationPickerContext";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { connect } from "react-redux";
 
-interface IProps extends ILocationPickerProps {
+interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
+    initialCategoryID: number;
 }
 
 interface IState {
@@ -28,14 +31,12 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            showLocationPicker: false,
-        };
-    }
+    public state: IState = {
+        showLocationPicker: false,
+    };
 
     public render() {
+        const { className, ...passThrough } = this.props;
         const { locationBreadcrumb } = this.props;
 
         return (
@@ -62,7 +63,11 @@ export class LocationInput extends React.Component<IProps, IState> {
                         className={classNames(this.props.className)}
                         description={t("Choose a location for this page.")}
                     >
-                        <LocationPicker onChoose={this.hideLocationPicker} onCloseClick={this.hideLocationPicker} />
+                        <LocationPicker
+                            onChoose={this.hideLocationPicker}
+                            onCloseClick={this.hideLocationPicker}
+                            {...passThrough}
+                        />
                     </Modal>
                 )}
             </React.Fragment>
@@ -93,4 +98,9 @@ export class LocationInput extends React.Component<IProps, IState> {
     };
 }
 
-export default withLocationPicker<IProps>(LocationInput);
+const withRedux = connect(
+    LocationPickerModel.mapStateToProps,
+    LocationPickerActions.mapDispatchToProps,
+);
+
+export default withRedux(LocationInput);
