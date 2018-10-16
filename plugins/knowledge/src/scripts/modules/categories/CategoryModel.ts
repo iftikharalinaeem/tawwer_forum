@@ -96,7 +96,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      */
     public static selectMixedRecordTree(
         state: IStoreState,
-        categoryID: number | null,
+        categoryID: number,
         maxDepth: number = 2,
     ): IKbNavigationCategory {
         const category: IKbNavigationCategory =

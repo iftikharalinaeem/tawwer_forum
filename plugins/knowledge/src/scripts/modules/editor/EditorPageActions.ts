@@ -194,21 +194,21 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param history - The history object.
      */
-    public async initPageFromLocation(history: History) {
-        const { location } = history;
-        // Use the same path regex as our router.
-        const addRegex = pathToRegexp(route.ADD_ROUTE);
-        const editRegex = pathToRegexp(route.EDIT_ROUTE);
+    // public async initPageFromLocation(history: History) {
+    //     const { location } = history;
+    //     // Use the same path regex as our router.
+    //     const addRegex = pathToRegexp(route.ADD_ROUTE);
+    //     const editRegex = pathToRegexp(route.EDIT_ROUTE);
 
-        // Check url
-        if (addRegex.test(location.pathname)) {
-            await this.createArticleForEdit(history);
-        } else if (editRegex.test(location.pathname)) {
-            // We don't have an article, but we have ID for one. Go get it.
-            const articleID = editRegex.exec(location.pathname)![1];
-            await this.fetchArticleForEdit(Number.parseInt(articleID, 10));
-        }
-    }
+    //     // Check url
+    //     if (addRegex.test(location.pathname)) {
+    //         await this.createArticleForEdit(history);
+    //     } else if (editRegex.test(location.pathname)) {
+    //         // We don't have an article, but we have ID for one. Go get it.
+    //         const articleID = editRegex.exec(location.pathname)![1];
+    //         await this.fetchArticleForEdit(Number.parseInt(articleID, 10));
+    //     }
+    // }
 
     /**
      * Submit the editor's form data to the API.

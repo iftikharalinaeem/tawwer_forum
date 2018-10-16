@@ -40,14 +40,14 @@ describe("EditorPageActions", () => {
         mockApi.reset();
     });
 
-    describe("initPageFromLocation", () => {
+    describe("createArticleForEdit()", () => {
         it("creates and article and redirects to it", async () => {
             const dummyArticle = { articleID: 1 };
             mockApi.onPost("/api/v2/articles").replyOnce(200, dummyArticle);
             const history = createMemoryHistory();
             history.push("/kb/articles/add");
 
-            void (await editorPageActions.initPageFromLocation(history));
+            void (await editorPageActions.createArticleForEdit(history));
 
             expect(history.location.pathname).eq("/kb/articles/1/editor");
             assertStoreHasActions(mockStore, [
@@ -62,6 +62,8 @@ describe("EditorPageActions", () => {
                 },
             ]);
         });
+    });
+    describe("fetchArticleForEdit()", () => {
         it("gets the existing article and sets initializes the location picker from it", async () => {
             const dummyArticle = { articleID: 1, knowledgeCategoryID: 5 };
             mockApi.onGet("/api/v2/articles/1").replyOnce(200, dummyArticle);
