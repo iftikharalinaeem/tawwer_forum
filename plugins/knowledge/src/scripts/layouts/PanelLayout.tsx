@@ -107,7 +107,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 
         return (
             <div className={panelClasses}>
-                {breadcrumbCount > 0 && (
+                {children.breadcrumbs && (
                     <div className="panelLayout-breadcrumbs">
                         <div className="panelLayout-container">
                             <Panel className="panel-breadcrumbs">

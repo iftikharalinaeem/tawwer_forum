@@ -22,6 +22,7 @@ $breadcrumbs-activeLink_opacity: 1;
 
 .breadcrumbs-separator {
     user-select: none;
+    margin: 0 $utility-baseUnit;
 }
 
 .breadcrumbs-separatorIcon {
@@ -45,8 +46,18 @@ $breadcrumbs-activeLink_opacity: 1;
 .breadcrumb-link {
     @include singleLineEllipsis;
     display: inline-flex;
-    line-height: inherit;
+    line-height: $global-condensed_lineHeight;
     color: inherit;
+
+    &.isCurrent {
+        opacity: .5;
+
+        @include allLinkStates {
+            cursor: pointer;
+            pointer-events: none;
+            color: inherit;
+        }
+    }
 }
 
 a.breadcrumb-link { // The location chooser component uses spans and we don't want to underline them

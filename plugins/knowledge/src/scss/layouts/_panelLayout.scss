@@ -4,8 +4,8 @@
  * @license Proprietary
  */
 
-$panelLayout_topMargin                                                : $utility-baseUnit * 4;
-$panelLayout_bottomMargin                                             : $utility-baseUnit * 4;
+$panelLayout_topMargin                                                : 0;
+$panelLayout_bottomMargin                                             : 48px;
 
 $panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth +  2 * $icon-default_size + $utility-baseUnit !default;
 $panelLayout-twoColumn_breakpoint                                     : $global-main_paddedWidth !default;
@@ -115,8 +115,10 @@ $panelLayout-border_color                                             : rgba($gl
 
 .panelLayout-breadcrumbs {
     padding: {
-        right: $global-gutter_quarterSize;
-        left: $global-gutter_quarterSize;
+        top: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+        bottom: $global-gutter_halfSize;
+        left: $global-gutter_halfSize;
     }
 
     &.hasAdjacentPanel {
