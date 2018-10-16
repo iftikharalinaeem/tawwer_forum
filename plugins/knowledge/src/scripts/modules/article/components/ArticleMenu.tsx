@@ -19,6 +19,7 @@ import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export interface IProps {
     article: IArticle;
+    buttonClassName?: string;
 }
 
 /**
@@ -78,7 +79,7 @@ export default class ArticleMenu extends React.PureComponent<IProps> {
         const editUrl = makeEditUrl(article.articleID);
 
         return (
-            <DropDown id={domID} name={t("Article Options")} className={"articlePage-options"}>
+            <DropDown id={domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
                 <DropDownItemMetas>{publishedMeta}</DropDownItemMetas>
                 <DropDownItemMetas>{updatedMeta}</DropDownItemMetas>
                 <DropDownItemSeparator />

@@ -17,17 +17,19 @@ export default class HomePage extends React.Component {
                 <DocumentTitle title={t("Home")} />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
-                    <Link to="/kb/articles/test-articles--text-post-1">{t("Test Article - Text Post")}</Link>
+                    <Link to="/kb/articles/1-article-one">{t("Article One")}</Link>
                 </p>
                 <p>
-                    <Link to="/kb/articles/test-articles--another-test-post-2">
-                        {t("Test Article - Another Text Post")}
-                    </Link>
+                    <Link to="/kb/articles/2-article-two">{t("Article Two")}</Link>
                 </p>
                 <p>
-                    <Link to="/kb/articles/test-articles--all-formatting--embeds-3">
-                        {t("Test Article - All Formatting & Embeds")}
-                    </Link>
+                    <Link to="/kb/articles/3-article-two">{t("Article Three")}</Link>
+                </p>
+                <p>
+                    <Link to="/kb/categories/1-category-one">{t("Category One")}</Link>
+                </p>
+                <p>
+                    <Link to="/kb/categories/2-category-two">{t("Category Two")}</Link>
                 </p>
                 <p>
                     <Link to="/kb/articles/add">{t("Add article")}</Link>

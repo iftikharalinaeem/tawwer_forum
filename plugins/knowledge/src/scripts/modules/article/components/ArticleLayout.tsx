@@ -24,6 +24,8 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
+import ArticleOtherLanguages from "@knowledge/modules/article/components/ArticleOtherLanguages";
+import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
@@ -128,7 +130,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     <PanelLayout.MiddleTop>
                         <PageTitle
                             title={article.articleRevision.name}
-                            menu={<ArticleMenu article={article} />}
+                            menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={metaData as any}
                         />
                     </PanelLayout.MiddleTop>
@@ -141,6 +143,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <ArticleTOC children={articleTOC} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
+                        <ArticleOtherLanguages {...dummyOtherLanguagesData} />
                         <RelatedArticles children={articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>
