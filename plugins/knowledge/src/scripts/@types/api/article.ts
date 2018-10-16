@@ -11,11 +11,18 @@ interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
 }
 
+export enum ArticleStatus {
+    DELETED = "deleted",
+    UNDELETED = "undeleted",
+    PUBLISHED = "published",
+}
+
 interface IArticleDefaultedData {
     seoName: string; // Displayed in the tag of the page. If empty will be just the name of the article.
     seoDescription: string; // Displayed in the of the page. If empty will be calculated from the article body.
     slug: string; // The path to the article from an import used to support redirects. This is not editable within the UI, but should be accessable via API in case we decide to make it an advanced option.
     sort: number; // The manual sort order of the article.
+    status: ArticleStatus;
 }
 
 interface IArticleServerManagedData {
@@ -49,6 +56,12 @@ export interface IPostArticleResponseBody extends IArticle {}
 export interface IPatchArticleResponseBody extends IArticle {}
 
 export interface IGetArticleResponseBody extends IArticle {}
+
+export interface IDeleteArticleRequestBody {
+    articleID: number;
+}
+
+export interface IDeleteArticleResponseBody {}
 
 export interface IArticleFragment {
     articleID: number;
