@@ -95,7 +95,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 \Garden\Schema\Schema::parse([
                     "knowledgeCategoryID",
                     "sort?",
-                ])->merge($this->fullSchema()),
+                ])->add($this->fullSchema()),
                 "ArticlePost"
             );
         }

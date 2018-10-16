@@ -72,10 +72,17 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     /**
      * Initial setup for the page.
+     *
+     * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        if (this.props.pageState.article.status !== LoadStatus.SUCCESS) {
-            void this.props.actions.initPageFromLocation(this.props.history);
+        const { pageState, match, actions, history } = this.props;
+        if (pageState.article.status !== LoadStatus.SUCCESS) {
+            if (match.params.id === undefined) {
+                void actions.createArticleForEdit(history);
+            } else {
+                void actions.fetchArticleForEdit(match.params.id);
+            }
         }
     }
 
