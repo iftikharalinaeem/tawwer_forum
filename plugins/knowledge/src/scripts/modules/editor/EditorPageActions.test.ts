@@ -30,6 +30,27 @@ describe("EditorPageActions", () => {
         editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
     };
 
+    const initWithCategories = () => {
+        initWithState({
+            knowledge: {
+                categories: {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        categoriesByID: {
+                            5: {
+                                knowledgeCategoryID: 5,
+                                parentID: 1,
+                            },
+                            1: {
+                                knowledgeCategoryID: 1,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    };
+
     before(() => {
         mockApi = new MockAdapter(apiv2);
         initWithState({});
@@ -62,32 +83,43 @@ describe("EditorPageActions", () => {
                 },
             ]);
         });
+
+        it("Can initialize the category picker from a query parameter", async () => {
+            // Initialization
+            initWithCategories();
+            const dummyArticle = { articleID: 1, knowledgeCategoryID: 5 };
+            mockApi.onPost("/api/v2/articles").replyOnce(200, dummyArticle);
+            const history = createMemoryHistory();
+            history.push("/kb/articles/add?knowledgeCategoryID=5");
+
+            // Tests and assertions
+            void (await editorPageActions.createArticleForEdit(history));
+            assertStoreHasActions(mockStore, [
+                {
+                    type: EditorPageActions.POST_ARTICLE_REQUEST,
+                },
+                {
+                    type: EditorPageActions.POST_ARTICLE_RESPONSE,
+                    payload: {
+                        data: dummyArticle,
+                    },
+                },
+                {
+                    type: LocationPickerActions.INIT,
+                    payload: {
+                        categoryID: 5,
+                        parentID: 1,
+                    },
+                },
+            ]);
+        });
     });
     describe("fetchArticleForEdit()", () => {
         it("gets the existing article and sets initializes the location picker from it", async () => {
             const dummyArticle = { articleID: 1, knowledgeCategoryID: 5 };
             mockApi.onGet("/api/v2/articles/1").replyOnce(200, dummyArticle);
-            initWithState({
-                knowledge: {
-                    categories: {
-                        status: LoadStatus.SUCCESS,
-                        data: {
-                            categoriesByID: {
-                                5: {
-                                    knowledgeCategoryID: 5,
-                                    parentID: 1,
-                                },
-                                1: {
-                                    knowledgeCategoryID: 1,
-                                },
-                            },
-                        },
-                    },
-                },
-            });
 
             void (await editorPageActions.fetchArticleForEdit(1));
-
             assertStoreHasActions(mockStore, [
                 {
                     type: EditorPageActions.GET_ARTICLE_REQUEST,

@@ -155,7 +155,13 @@ export default class EditorPageActions extends ReduxActions {
 
         if (response) {
             const article = response.data;
-            this.locationPickerActions.initLocationPickerFromArticle(article);
+
+            // Initialize the category picker if we have a category ID.
+            if (initialCategoryID !== null) {
+                this.locationPickerActions.initLocationPickerFromArticle(article);
+            }
+
+            // Redirect
             const replacementUrl = route.makeEditUrl(article.articleID);
             const newLocation = {
                 ...location,
