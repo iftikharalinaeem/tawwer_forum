@@ -8,7 +8,7 @@ import { IUserFragment } from "@dashboard/@types/api";
 import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {
-    knowledgeCategoryID?: number; //The category the article belongs in.
+    knowledgeCategoryID: number | null; //The category the article belongs in.
 }
 
 interface IArticleDefaultedData {

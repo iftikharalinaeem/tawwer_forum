@@ -96,11 +96,11 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      */
     public static selectMixedRecordTree(
         state: IStoreState,
-        categoryID: number,
+        categoryID: number | null,
         maxDepth: number = 2,
     ): IKbNavigationCategory {
         const category: IKbNavigationCategory =
-            categoryID === -1 ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
+            categoryID === -1 || categoryID === null ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
 
         if (maxDepth > 1) {
             category.children = this.selectChildrenIDsFromParent(state, categoryID).map(id =>

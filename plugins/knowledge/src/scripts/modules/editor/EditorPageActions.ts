@@ -146,7 +146,7 @@ export default class EditorPageActions extends ReduxActions {
      */
     public async createArticleForEdit(history: History) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : 1;
+        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : null;
 
         // We don't have an article so go create one.
         const response = await this.postArticle({
