@@ -93,7 +93,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($this->articlePostSchema === null) {
             $this->articlePostSchema = $this->schema(
                 \Garden\Schema\Schema::parse([
-                    "knowledgeCategoryID?",
+                    "knowledgeCategoryID",
                     "sort?",
                 ])->add($this->fullSchema()),
                 "ArticlePost"
@@ -149,7 +149,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     private function fullSchema(): \Garden\Schema\Schema {
         return \Garden\Schema\Schema::parse([
                 "articleID:i" => "Unique article ID.",
-                "knowledgeCategoryID:i" => "Category the article belongs in.",
+                "knowledgeCategoryID:i" => [
+                    "allowNull" => true,
+                    "Category the article belongs in.",
+                ],
                 "articleRevisionID:i" => [
                     "allowNull" => true,
                     "description" => "Unique ID of the published revision."
