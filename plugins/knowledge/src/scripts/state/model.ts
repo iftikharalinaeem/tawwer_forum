@@ -11,8 +11,8 @@ import { ILocationPickerState } from "@knowledge/modules/locationPicker/Location
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 
 type RecursivePartial<T> = {
-    [P in keyof T]?: T[P] extends (infer U)[]
-        ? RecursivePartial<U>[]
+    [P in keyof T]?: T[P] extends Array<infer U>
+        ? Array<RecursivePartial<U>>
         : T[P] extends object ? RecursivePartial<T[P]> : T[P]
 };
 

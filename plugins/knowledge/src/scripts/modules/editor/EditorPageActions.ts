@@ -201,7 +201,7 @@ export default class EditorPageActions extends ReduxActions {
         } else if (editRegex.test(location.pathname)) {
             // We don't have an article, but we have ID for one. Go get it.
             const articleID = editRegex.exec(location.pathname)![1];
-            this.fetchArticleForEdit(Number.parseInt(articleID, 10));
+            await this.fetchArticleForEdit(Number.parseInt(articleID, 10));
         }
     }
 

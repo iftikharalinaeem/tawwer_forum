@@ -24,7 +24,7 @@ describe("EditorPageActions", () => {
     let mockApi: MockAdapter;
     let editorPageActions: EditorPageActions;
 
-    let initWithState = (state: IPartialStoreState) => {
+    const initWithState = (state: IPartialStoreState) => {
         const middlewares = [thunk];
         mockStore = configureStore(middlewares)(state);
         editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
