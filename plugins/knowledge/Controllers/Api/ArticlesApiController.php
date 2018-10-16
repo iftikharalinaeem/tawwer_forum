@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
+use Garden\Schema\Schema;
 use Gdn_Format;
 use UserModel;
 use Garden\Schema\ValidationException;
@@ -186,7 +187,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "categoryAncestorIDs:a?" => "integer",
                 "status:s" => [
                     'description' => "Article status: draft, published, deleted, undeleted, etc...",
-                    'enum' => [ArticleModel::STATUS_PUBLISHED, ArticleModel::STATUS_DELETED, ArticleModel::STATUS_UNDELETED]
+                    'enum' => ArticleModel::getAllStatuses()
                 ]
             ]);
     }
@@ -389,6 +390,57 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
+        $result = $this->prepareValidatedPatchResult($id, $out);
+        return $result;
+    }
+
+    /**
+     * Update article status an existing article.
+     *
+     * @param int $id ArticleID
+     * @param array $body Incoming json array with 'status' key.
+     *        Possible values: published, deleted, etc
+     *
+     * @return array Data array Article record/item
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function patch_status(int $id, array $body): array {
+        $this->permission();
+        $body['id'] = $id;
+
+        $in = $this->schema(
+            [   "id:i" => "The article ID.",
+                "status:s" => [
+                    'description' => "Article status: published, deleted, etc.",
+                    'enum' => ArticleModel::getAllStatuses()
+                ]
+            ],
+            'in'
+        )
+            ->setDescription('Set status of existing article: published, deleted, etc.');
+        $out = $this->articleSchema("out");
+        $body = $in->validate($body);
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
+        if ($article['status'] !== $body['status']) {
+            $this->articleModel->update(['status'=>$body['status']], ["articleID" => $id]);
+        }
+
+        $result = $this->prepareValidatedPatchResult($id, $out);
+        return $result;
+    }
+
+    /**
+     * Get article from model and normalize and validate data according to out-schema
+     *
+     * @param int $id Article ID to get
+     * @param Schema $out Out-schema to validate output
+     *
+     * @return array
+     */
+    protected function prepareValidatedPatchResult(int $id, Schema $out): array {
         $row = $this->articleByID($id);
         $revision = $this->articleRevisionModel->get([
             "articleID" => $id,
@@ -398,56 +450,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row = $this->normalizeOutput($row, [], $revision);
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * Undelete an existing article.
-     *
-     * @param int $id ArticleID
-     *
-     * @return \Garden\Web\Data
-     *
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function patch_undelete(int $id): \Garden\Web\Data {
-        $this->permission();
-        $in = $this->schema(["id:i" => "The article ID."], 'in')
-            ->setDescription('Undelete an existing article.');
-        $out = $this->schema([], 'out');
-        $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
-        if ($article['status'] !== ArticleModel::STATUS_UNDELETED) {
-            $this->articleModel->update(['status'=>ArticleModel::STATUS_UNDELETED], ["articleID" => $id]);
-        }
-        return new \Garden\Web\Data('', 204);
-    }
-
-    /**
-     * Delete an existing article.
-     *
-     * @param int $id ArticleID
-     *
-     * @return \Garden\Web\Data
-     *
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function patch_delete(int $id): \Garden\Web\Data {
-        $this->permission();
-
-        $in = $this->schema(["id:i" => "The article ID."], 'in')
-            ->setDescription('Delete an existing article.');
-        $out = $this->schema([], 'out');
-
-        $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
-        if ($article['status'] !== ArticleModel::STATUS_DELETED) {
-            $this->articleModel->update(['status'=>ArticleModel::STATUS_DELETED], ["articleID" => $id]);
-        }
-        return new \Garden\Web\Data('', 204);
     }
 
     /**

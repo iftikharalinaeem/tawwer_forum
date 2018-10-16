@@ -102,4 +102,17 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             ->resultArray();
         return $result;
     }
+
+    /**
+     * Return all possible statuses for article record/item
+     *
+     * @return array
+     */
+    public static function getAllStatuses(): array {
+        return [
+            self::STATUS_UNDELETED,
+            self::STATUS_DELETED,
+            self::STATUS_PUBLISHED
+        ];
+    }
 }

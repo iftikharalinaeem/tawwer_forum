@@ -62,10 +62,7 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
-            ->column("status", ["enum",[
-                \Vanilla\Knowledge\Models\ArticleModel::STATUS_PUBLISHED,
-                \Vanilla\Knowledge\Models\ArticleModel::STATUS_DELETED,
-                \Vanilla\Knowledge\Models\ArticleModel::STATUS_UNDELETED]
+            ->column("status", ["enum", \Vanilla\Knowledge\Models\ArticleModel::getAllStatuses()
             ], ['Null'=>false, 'Default' => \Vanilla\Knowledge\Models\ArticleModel::STATUS_PUBLISHED])
             ->set();
 
