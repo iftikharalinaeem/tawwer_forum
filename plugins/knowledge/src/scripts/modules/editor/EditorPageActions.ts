@@ -191,32 +191,6 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     /**
-     * Initialize the editor page data based on our path.
-     *
-     * We have to scenarios:
-     *
-     * - /articles/add - Initialize a new article
-     * - /articles/:id/editor - We already have a new article. Go fetch it.
-     *
-     * @param history - The history object.
-     */
-    // public async initPageFromLocation(history: History) {
-    //     const { location } = history;
-    //     // Use the same path regex as our router.
-    //     const addRegex = pathToRegexp(route.ADD_ROUTE);
-    //     const editRegex = pathToRegexp(route.EDIT_ROUTE);
-
-    //     // Check url
-    //     if (addRegex.test(location.pathname)) {
-    //         await this.createArticleForEdit(history);
-    //     } else if (editRegex.test(location.pathname)) {
-    //         // We don't have an article, but we have ID for one. Go get it.
-    //         const articleID = editRegex.exec(location.pathname)![1];
-    //         await this.fetchArticleForEdit(Number.parseInt(articleID, 10));
-    //     }
-    // }
-
-    /**
      * Submit the editor's form data to the API.
      *
      * @param body - The body of the submit request.
