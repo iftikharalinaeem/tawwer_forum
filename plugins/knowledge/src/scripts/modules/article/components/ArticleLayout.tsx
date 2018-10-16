@@ -117,11 +117,13 @@ export class ArticleLayout extends React.Component<IProps, IState> {
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
-                        <PanelWidget>
-                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                        </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
+                    {this.props.breadcrumbData.length > 1 && (
+                        <PanelLayout.Breadcrumbs>
+                            <PanelWidget>
+                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                            </PanelWidget>
+                        </PanelLayout.Breadcrumbs>
+                    )}
                     <PanelLayout.LeftBottom>
                         <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>

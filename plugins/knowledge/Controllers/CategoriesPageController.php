@@ -57,7 +57,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         $this->categoryId = $id = $this->detectCategoryId($path);
         $category = $this->categoriesApi->get($id);
         $this->data[self::CATEGORY_API_RESPONSE] = $category;
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index_excerpts(['KnowledgeCategoryID'=>$id]);
 
         // Title
         $this->setPageTitle($category['name']);

@@ -24,6 +24,9 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
  */
 class ArticlesApiController extends AbstractKnowledgeApiController {
 
+    // Maximum length before article excerpts are truncated.
+    const EXCERPT_MAX_LENGTH = 325;
+
     /** @var \Garden\Schema\Schema */
     private $articleFragmentSchema;
 
@@ -117,12 +120,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "articleID",
                     "knowledgeCategoryID",
                     "sort",
+                    "url",
+                    "name",
+                    "excerpt",
                 ])->add($this->fullSchema()),
                 "ArticleFragment"
-            );
-            $this->articleFragmentSchema->setField(
-                "properties.articleRevision",
-                \Garden\Schema\Schema::parse(["name"])->add($this->articleRevisionsApiController->articleRevisionSchema())
             );
         }
 
@@ -188,7 +190,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "status:s" => [
                     'description' => "Article status: draft, published, deleted, undeleted, etc...",
                     'enum' => ArticleModel::getAllStatuses()
-                ]
+                ],
+                "name:s?" => [
+                    "allowNull" => true,
+                    "description" => "Title of the article.",
+                ],
+                "excerpt:s?" => [
+                    "allowNull" => true,
+                    "description" => "Plain-text excerpt of the current article body.",
+                ],
             ]);
     }
 
@@ -277,7 +287,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * List published articles in a given knowledge category.
      *
      * @param array $query
-     * @return mixed
+     * @return array
      * @throws ValidationException If input validation fails.
      * @throws ValidationException If output validation fails.
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
@@ -325,6 +335,40 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * List excerpts from published articles in a given knowledge category.
+     *
+     * @param array $query
+     * @return array
+     * @throws ValidationException If input validation fails.
+     * @throws ValidationException If output validation fails.
+     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function index_excerpts(array $query = []) {
+        $this->permission("knowledge.kb.view");
+
+        $in = $this->schema([
+            "knowledgeCategoryID" => [
+                "type" => "integer",
+                "minimum" => 1,
+            ],
+            "limit" => [
+                "default" => ArticleModel::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("List excerpts from published articles in a given knowledge category.");
+        $out = $this->schema([":a" => $this->articleFragmentSchema()], "out");
+
+        $query = $in->validate($query);
+        $articles = $this->index($query);
+
+        $result = $out->validate($articles);
+        return $result;
+    }
+
+    /**
      * Massage article row data for useful API output.
      *
      * @param array $row
@@ -349,9 +393,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             );
             $row["articleRevisionID"] = $articleRevision["articleRevisionID"];
             $slug = Gdn_Format::url($articleRevision["name"] ? "{$row['articleID']}-{$articleRevision['name']}" : $row["articleID"]);
+            $row["name"] = $articleRevision["name"];
+            $row["excerpt"] = sliceString(Gdn_Format::plainText($articleRevision["bodyRendered"], "Html"), self::EXCERPT_MAX_LENGTH);
         } else {
             $row["articleRevisionID"] = null;
             $slug = null;
+            $row["name"] = null;
+            $row["excerpt"] = null;
         }
         if ($this->isExpandField("articleRevision", $expand)) {
             $row["articleRevision"] = $articleRevision;

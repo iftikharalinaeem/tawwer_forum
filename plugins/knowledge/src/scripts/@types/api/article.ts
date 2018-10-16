@@ -55,4 +55,5 @@ export interface IArticleFragment {
     name: string; //The title of the article
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
+    excerpt: string;
 }
