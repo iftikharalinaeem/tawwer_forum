@@ -9,7 +9,7 @@ import className from "classnames";
 
 export interface IContainer {
     className?: string;
-    children?: JSX.Element;
+    children?: React.ReactNode;
     tag?: string;
 }
 

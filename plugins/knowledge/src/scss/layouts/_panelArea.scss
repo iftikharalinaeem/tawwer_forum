@@ -5,6 +5,8 @@
  */
 
 .panelArea {
+    width: 100%;
+
     .heading {
         @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
     }

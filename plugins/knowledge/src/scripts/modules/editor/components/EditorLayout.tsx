@@ -9,14 +9,15 @@ import { t } from "@library/application";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageHeading from "@library/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
+import EditorHeader from "./EditorHeader";
 
 interface IProps {
     device: Devices;
     backUrl: string | null;
     children: React.ReactNode;
+    history: string;
 }
 
 /**
@@ -25,18 +26,18 @@ interface IProps {
 export class EditorLayout extends React.Component<IProps> {
     public render() {
         return (
-            <Container className="inheritHeight">
-                <PanelLayout growMiddleBottom={true} device={this.props.device}>
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <PageHeading backUrl={this.props.backUrl} title={t("Write Discussion")} />
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidget>{this.props.children}</PanelWidget>
-                    </PanelLayout.MiddleBottom>
-                </PanelLayout>
-            </Container>
+            <React.Fragment>
+                <EditorHeader backUrl={this.props.backUrl} device={this.props.device} canSubmit={true} />
+                <Container className="inheritHeight">
+                    <h1 className="sr-only">{t("Write Discussion")}</h1>
+
+                    <PanelLayout growMiddleBottom={true} device={this.props.device}>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidget>{this.props.children}</PanelWidget>
+                        </PanelLayout.MiddleBottom>
+                    </PanelLayout>
+                </Container>
+            </React.Fragment>
         );
     }
 }

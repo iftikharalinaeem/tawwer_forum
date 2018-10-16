@@ -1,7 +1,7 @@
-/**
+/*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
@@ -17,19 +17,24 @@ import {
 } from "@library/components/dropdown";
 import { makeEditUrl } from "@knowledge/modules/editor/route";
 import classNames from "classnames";
+import { getRequiredID } from "@library/componentIDs";
 
 export interface IProps {
-    article: IArticle;
     buttonClassName?: string;
 }
 
 /**
  * Generates drop down menu for Article page
  */
-export default class ArticleMenu extends React.PureComponent<IProps> {
+export default class EditorMenu extends React.PureComponent<IProps> {
+    private id;
+
+    public constructor(props) {
+        super(props);
+        this.id = getRequiredID(props, "siteNav");
+    }
+
     public render() {
-        const { article } = this.props;
-        const domID = "articleMenuDropDown-" + article.articleID;
         // Hard coded data/functions
         const buttonClick = () => {
             alert("Click works");
@@ -77,11 +82,9 @@ export default class ArticleMenu extends React.PureComponent<IProps> {
             },
         ];
 
-        const editUrl = makeEditUrl(article.articleID);
-
         return (
             <DropDown
-                id={domID}
+                id={this.id}
                 name={t("Article Options")}
                 buttonClassName={classNames("dropDown-toggleButtonIcon", this.props.buttonClassName)}
             >
@@ -90,7 +93,6 @@ export default class ArticleMenu extends React.PureComponent<IProps> {
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Customize SEO")} onClick={buttonClick} />
                 <DropDownItemButton name={t("Move")} onClick={buttonClick} />
-                <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                 <DropDownItemSeparator />
                 <DropDownItemButton name={t("Revision History")} onClick={buttonClick} />
                 <DropDownItemSeparator />

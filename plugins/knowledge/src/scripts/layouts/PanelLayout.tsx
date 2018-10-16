@@ -143,7 +143,9 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                     inheritHeight: this.props.growMiddleBottom,
                                 })}
                             >
-                                <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
+                                {children.middleTop && (
+                                    <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
+                                )}
                                 {isMobile && (
                                     <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
                                         {children.leftTop}

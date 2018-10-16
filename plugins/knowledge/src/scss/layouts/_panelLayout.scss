@@ -65,16 +65,16 @@ $panelLayout-border_color                                             : rgba($gl
 // Left Section
 .panelLayout-left {
     position: relative;
-    width: $global-panel_width;
-    flex-basis: $global-panel_width;
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
     padding-right: $global-panel_spacerOuter;
     z-index: 2;
     border-right: solid $panelLayout-border_color 1px;
 }
 
 .panelLayout-right {
-    width: $global-panel_width;
-    flex-basis: $global-panel_width;
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
     padding-left: $global-panel_spacerOuter;
     border-left: solid $panelLayout-border_color 1px;
 }
@@ -82,16 +82,17 @@ $panelLayout-border_color                                             : rgba($gl
 // Middle Column
 .panelLayout-middle {
     flex-grow: 1;
+    width: 100%;
     padding: {
         right: $global-gutter_halfSize;
         left: $global-gutter_halfSize;
     }
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
 
-        @include mediaQuery-panelLayout_twoColumn {
+        @include mediaQuery-panelLayout_oneColumn {
             width: 100%;
             max-width: 100%;
             flex-basis: 100%;
@@ -107,8 +108,8 @@ $panelLayout-border_color                                             : rgba($gl
     }
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             flex-basis: 100%;
@@ -121,13 +122,28 @@ $panelLayout-border_color                                             : rgba($gl
 .panelLayout-content {
     display: flex;
     flex-grow: 1;
+    width: 100%;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        padding: {
+            left: #{$global-relativeSpacer - $global-gutter_halfSize};
+            right: #{$global-relativeSpacer - $global-gutter_halfSize};
+        }
+
+        @include mediaQuery-panelLayout_twoColumn {
+            padding: {
+                left: 0;
+            }
+        }
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;
+            padding: {
+                right: 0;
+            }
             max-width: 100%;
             flex-basis: 100%;
             padding-left: 0;
@@ -136,11 +152,15 @@ $panelLayout-border_color                                             : rgba($gl
 }
 
 
-
-
-
-
 @include mediaQuery-panelLayout_oneColumn {
+
+    .panelLayout-middle {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+
     .panelLayout-sticky {
         position: relative;
         top: auto;

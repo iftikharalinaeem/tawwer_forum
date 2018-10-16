@@ -59,6 +59,13 @@ $dropDown-item_minHeight                       : 45px;
     text-align: left;
 }
 
+.dropDown-toggleButtonIcon {
+    &:hover,
+    &:focus {
+        color: $global-color_primary;
+    }
+}
+
 .dropDownItem-button,
 .dropDownItem-link {
     appearance: none;

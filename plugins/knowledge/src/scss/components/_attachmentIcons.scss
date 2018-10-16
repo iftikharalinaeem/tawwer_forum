@@ -5,6 +5,7 @@
  */
 
 $attachmentIcon_spacing: $utility-baseUnit / 2;
+$attachmentIcon-icon_shadowColor: mix($global-color_fg, $global-color_bg, 90%);
 
 .attachmentsIcons {
     display: block;
@@ -31,6 +32,6 @@ $attachmentIcon_spacing: $utility-baseUnit / 2;
     margin: $attachmentIcon_spacing;
 }
 
-.attachmentsIcons-more {
-
+.attachmentIcon {
+    box-shadow: 0 0 2px 0 $attachmentIcon-icon_shadowColor;
 }
