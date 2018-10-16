@@ -26,16 +26,16 @@ interface IPanelLayoutProps {
  * will attempt to place them all in the best possible way.
  *
  * @layout Desktop
- * |            | Breadcrumbs  |             |
- * | LeftTop    | MiddleTop    | RightTop    |
- * | LeftBottom | MiddleBottom | RightBottom |
+ * | Breadcrumbs |              |             |
+ * | LeftTop     | MiddleTop    | RightTop    |
+ * | LeftBottom  | MiddleBottom | RightBottom |
  *
  * @layout Tablet
- * |            | Breadcrumbs
- * | LeftTop    | RightTop
- * | LeftBottom | MiddleTop
- * |            | MiddelBottom
- * |            | RightBottom
+ * | Breadcrumbs |
+ * | LeftTop     | RightTop
+ * | LeftBottom  | MiddleTop
+ * |             | MiddelBottom
+ * |             | RightBottom
  *
  * @layout Mobile
  *
@@ -99,31 +99,20 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { inheritHeight: this.props.growMiddleBottom },
         );
 
-        const crumbClasses = classNames(
-            "panelLayout-top",
-            { noLeftPanel: !shouldRenderLeftPanel },
-            this.props.className,
-        );
-
         // If applicable, set semantic tag, like "article"
         const ContentTag = `${this.props.contentTag}`;
 
+        const breadcrumbCount = !!children.breadcrumbs ? (children.breadcrumbs! as React.ReactNode[]).length : 0;
+
         return (
             <div className={panelClasses}>
-                {children.breadcrumbs && (
-                    <div className={crumbClasses}>
+                {breadcrumbCount > 0 && (
+                    <div className="panelLayout-breadcrumbs">
                         <div className="panelLayout-container">
-                            {shouldRenderLeftPanel && (
-                                <Panel className="panelLayout-left">
-                                    <PanelArea className="panelArea-breadcrumbsSpacer" />
-                                </Panel>
-                            )}
-                            <Panel
-                                className={classNames("panelLayout-breadcrumbs", {
-                                    hasAdjacentPanel: shouldRenderLeftPanel,
-                                })}
-                            >
-                                <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
+                            <Panel className="panel-breadcrumbs">
+                                <PanelArea className="panelArea-breadcrumbs">
+                                    <Breadcrumbs>{children.breadcrumbs}</Breadcrumbs>
+                                </PanelArea>
                             </Panel>
                         </div>
                     </div>

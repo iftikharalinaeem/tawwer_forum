@@ -13,6 +13,7 @@
     position: relative;
     width: 100%;
     word-break: break-word;
+    font-size: $userContent_fontSize;
     line-height: $global-base_lineHeight;
 
     @include headings {
@@ -34,6 +35,30 @@
                 top: $global-block_margin * .5;
             };
         }
+    }
+
+    h1 {
+        font-size: $userContent-fontSizeH1;
+    }
+
+    h2 {
+        font-size: $userContent-fontSizeH2;
+    }
+
+    h3 {
+        font-size: $userContent-fontSizeH3;
+    }
+
+    h4 {
+        font-size: $userContent-fontSizeH4;
+    }
+
+    h5 {
+        font-size: $userContent-fontSizeH5;
+    }
+
+    h6 {
+        font-size: $userContent-fontSizeH6;
     }
 
     p,
