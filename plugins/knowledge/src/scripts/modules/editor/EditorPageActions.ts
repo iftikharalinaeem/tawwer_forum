@@ -21,9 +21,8 @@ import { History } from "history";
 import pathToRegexp from "path-to-regexp";
 import * as route from "./route";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import LocationPickerActions from "../locationPicker/LocationPickerActions";
-import { IStoreState } from "@knowledge/state/model";
-import CategoryModel from "../categories/CategoryModel";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import qs from "qs";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -146,16 +145,24 @@ export default class EditorPageActions extends ReduxActions {
      * @param history - The history object for redirecting.
      */
     public async createArticleForEdit(history: History) {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        console.log(queryParams, history.location.search);
+        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : 1;
+        // const requestBody = initialCategoryID === null ? {} : { knowledgeCategoryID: initialCategoryID };
+
         // We don't have an article so go create one.
-        const article = await this.postArticle({
-            knowledgeCategoryID: 1,
+        const response = await this.postArticle({
+            knowledgeCategoryID: initialCategoryID,
         });
 
-        if (article) {
-            const replacementUrl = route.makeEditUrl(article.data.articleID);
+        if (response) {
+            const article = response.data;
+            this.locationPickerActions.initLocationPickerFromArticle(article);
+            const replacementUrl = route.makeEditUrl(article.articleID);
             const newLocation = {
                 ...location,
                 pathname: replacementUrl,
+                search: "",
             };
 
             history.replace(newLocation);

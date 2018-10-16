@@ -5,6 +5,7 @@
  */
 
 import { formatUrl } from "@library/application";
+import { match } from "react-router-dom";
 
 // Route constants
 export const EDIT_ROUTE = "/kb/articles/:id/editor";

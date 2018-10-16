@@ -93,7 +93,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($this->articlePostSchema === null) {
             $this->articlePostSchema = $this->schema(
                 \Garden\Schema\Schema::parse([
-                    "knowledgeCategoryID",
+                    "knowledgeCategoryID?",
                     "sort?",
                 ])->add($this->fullSchema()),
                 "ArticlePost"

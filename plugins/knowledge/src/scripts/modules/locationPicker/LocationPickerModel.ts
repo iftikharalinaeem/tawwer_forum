@@ -56,6 +56,9 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         chosenCategoryID: -1,
     };
 
+    /**
+     * @inheritDoc
+     */
     public reducer = (
         state = this.initialState,
         action: typeof LocationPickerActions.ACTION_TYPES,
