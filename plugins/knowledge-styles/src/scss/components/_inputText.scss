@@ -1,9 +1,3 @@
-/*!
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
 .inputText {
   @include outlineStyling($formElement_borderColor);
   @include textInputSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
@@ -19,10 +13,6 @@
   background-color: $formElement_bg;
   padding: $formElement_paddingVertical $formElement_horizontalPadding;
   outline: 0;
-
-  &.isGiant {
-    @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $baseUnit);
-  }
 }
 
 .inputText-inlineLabel {

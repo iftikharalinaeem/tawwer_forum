@@ -1,14 +1,14 @@
-.userContent {
+._userContent {
   @include clearfix;
   @include orderedListStyle;
   @include unorderedListStyle;
 
   position: relative;
   width: 100%;
-  font-size: $userContent_fontSize;
+  font-size: $global-large_fontSize;
 
   h1 {
-    font-size: $userContent_fontSizeH1;
+    font-size: $global-title_fontSize;
   }
 
   h2 {
@@ -38,7 +38,7 @@
   }
 
   > *:not(.emoji):not(:last-child) {
-    margin-bottom: $global-relativeSpacer;
+    margin-bottom: .6em;
 
     + h1,
     + h2,
@@ -47,7 +47,12 @@
     + h5,
     + h6
     {
-      margin-top: $global-relativeSpacer;
+      margin-top: #{$global-large_fontSize * .6};
     }
+  }
+
+  .userSignature {
+    font-size: $global-small_fontSize;
+    margin-bottom: $utility-baseUnit * 2;
   }
 }
