@@ -28,7 +28,7 @@ interface IProps extends IDeviceProps {
     }>;
     article: ILoadable<IArticle>;
     articlePageActions: ArticlePageActions;
-    breadcrumbData: ICrumb[] | null;
+    breadcrumbData: ICrumb[];
 }
 
 /**

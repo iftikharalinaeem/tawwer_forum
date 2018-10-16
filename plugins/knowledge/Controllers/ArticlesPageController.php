@@ -142,11 +142,11 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      */
     protected function detectArticleId(string $path): int {
         $matches = [];
-        if (preg_match('/^\/.*-(\d*)$/', $path, $matches) === 0) {
+        if (preg_match('/^\/(?<articleID>\d+)(-[^\/]*)?$/', $path, $matches) === 0) {
             throw new ClientException('Can\'t detect article id!', 400);
         }
 
-        $id = (int)$matches[1];
+        $id = (int)$matches["articleID"];
 
         return $id;
     }

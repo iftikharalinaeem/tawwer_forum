@@ -8,13 +8,11 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
-import CategoriesPage from "@knowledge/modules/categories/CategoriesPage";
 
-export const ARTICLE_ROUTE = "/kb/articles/(.*)-:id(\\d+)";
+export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 
-export const CATEGORIES_ROUTE = "/kb/categories/";
+export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
@@ -32,6 +30,12 @@ const ArticlePage = Loadable({
 const HomePage = Loadable({
     loading: FullPageLoader,
     loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
+});
+
+/** A loadable version of the article page. */
+const CategoriesPage = Loadable({
+    loading: FullPageLoader,
+    loader: () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
 });
 
 /**
