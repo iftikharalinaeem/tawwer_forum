@@ -6,12 +6,12 @@
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
-import { IKbCategory, IArticle, KbCategoryDisplayType, KbCategorySortMode } from "@knowledge/@types/api";
+import { IKbCategory, IArticleFragment, KbCategoryDisplayType, KbCategorySortMode } from "@knowledge/@types/api";
 import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
 import produce from "immer";
 
 export interface ICategoriesPageState {
-    articles: ILoadable<IArticle[]>;
+    articles: ILoadable<IArticleFragment[]>;
     category: IKbCategory | null;
 }
 

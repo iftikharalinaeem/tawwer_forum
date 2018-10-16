@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IArticle } from "@knowledge/@types/api";
+import { IArticleFragment } from "@knowledge/@types/api";
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 
 /**
@@ -26,7 +26,7 @@ export default class CategoriesPageActions extends ReduxActions {
         CategoriesPageActions.GET_ARTICLES_RESPONSE,
         CategoriesPageActions.GET_ARTICLES_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IArticle[],
+        {} as IArticleFragment[],
         {},
     );
 

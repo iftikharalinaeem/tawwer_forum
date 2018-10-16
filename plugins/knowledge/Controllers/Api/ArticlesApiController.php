@@ -24,7 +24,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 class ArticlesApiController extends AbstractKnowledgeApiController {
 
     // Maximum length before article excerpts are truncated.
-    const EXCERPT_MAX_LENGTH = 150;
+    const EXCERPT_MAX_LENGTH = 350;
 
     /** @var \Garden\Schema\Schema */
     private $articleFragmentSchema;
