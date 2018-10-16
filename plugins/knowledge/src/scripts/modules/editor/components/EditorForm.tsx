@@ -64,7 +64,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return (
             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
-                   <LocationInput initialCategoryID={categoryID} key={categoryID === null ? undefined : categoryID} />
+                    <LocationInput initialCategoryID={categoryID} key={categoryID === null ? undefined : categoryID} />
                     <div className="sr-only">
                         <DocumentTitle title={t("Write Article")} />
                     </div>
