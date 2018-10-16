@@ -668,7 +668,7 @@ class Salesforce {
     public function salesforceFieldExists(string $searchField = '', string $type = '') {
         $salesforceObjectTypes = ['Case', 'Lead'];
 
-        if (!in_array($type, $salesforceObjectTypes ) || !$searchField) {
+        if (!in_array($type, $salesforceObjectTypes) || !$searchField) {
             return false;
         }
 
@@ -676,6 +676,7 @@ class Salesforce {
         if ($response['HttpCode'] != 200) {
             throw new Gdn_UserException('Error getting '.$type.' status Options');
         }
+        
         foreach ($response['Response']['fields'] as $fieldNum => $field) {
             if ($field['name'] == $searchField) {
                 return true;
