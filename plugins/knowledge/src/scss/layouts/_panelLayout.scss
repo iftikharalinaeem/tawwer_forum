@@ -54,8 +54,13 @@ $panelLayout-border_color                                             : rgba($gl
 
 .panelLayout {
     &.isOneCol {
-        width: $global-main_width;
+        width: $global-middleColumn_width;
+        max-width: 100%;
         margin: auto;
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+        }
     }
 }
 

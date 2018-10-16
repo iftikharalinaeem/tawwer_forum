@@ -19,6 +19,11 @@
     background-color: $formElement_bg;
     padding: $formElement_paddingVertical $formElement_horizontalPadding;
     outline: 0;
+
+    &.isGiant {
+        font-weight: $global-semiBold_fontWeight;
+        @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
+    }
 }
 
 .inputText-inlineLabel {

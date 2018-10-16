@@ -13,11 +13,13 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import Button from "@library/components/forms/Button";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
+import classNames from "classnames";
 
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
     articleCategory: IKbCategoryFragment;
+    className?: string;
 }
 
 interface IState {
@@ -59,27 +61,27 @@ export default class EditorForm extends React.Component<IProps, IState> {
     public render() {
         const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
         return (
-            <div className="FormWrapper inheritHeight">
+            <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
                     <LocationInput initialCategory={this.props.articleCategory} />
-                    <div className="inputBlock">
-                        <DocumentTitle title={isLoadingOrPending ? "Loading" : this.state.name || t("Untitled")}>
-                            <input
-                                className="inputBlock-inputText inputText"
-                                type="text"
-                                placeholder={t("Title")}
-                                value={this.state.name}
-                                onChange={this.titleChangeHandler}
-                                disabled={this.isLoading}
-                            />
-                        </DocumentTitle>
+                    <div className="sr-only">
+                        <DocumentTitle title={t("Write Article")} />
                     </div>
+                    <input
+                        className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                        type="text"
+                        placeholder={t("Title")}
+                        value={this.state.name}
+                        onChange={this.titleChangeHandler}
+                        disabled={this.isLoading}
+                    />
                     <Editor
                         allowUpload={true}
                         ref={this.editorRef}
                         isPrimaryEditor={true}
                         onChange={this.editorChangeHandler}
-                        className="inheritHeight"
+                        className="FormWrapper inheritHeight richEditorForm-editor {
+"
                         isLoading={this.isLoading}
                     />
                     <Button disabled={!this.canSubmit} type="submit">

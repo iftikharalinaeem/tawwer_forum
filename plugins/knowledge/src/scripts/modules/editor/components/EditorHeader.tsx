@@ -63,6 +63,7 @@ export default class EditorHeader extends React.Component<IProps> {
                                 {this.props.backUrl && (
                                     <li className="editorHeader-item isPullLeft">
                                         <BackLink
+                                            title={t("Cancel")}
                                             url={this.props.backUrl}
                                             visibleLabel={true}
                                             className="editorHeader-backLink"

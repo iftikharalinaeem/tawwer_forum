@@ -5,10 +5,20 @@
  */
 
 .pageLocation {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: $global-relativeSpacer;
 }
 
 .pageLocation-picker {
   border: solid $formElement_borderColor $formElement_borderWidth;
   border-radius: $global-borderRadius;
   user-select: none;
+  margin-left: $utility-baseUnit;
+  padding: {
+    top: $utility-baseUnit + $formElement_borderWidth;
+    bottom: $utility-baseUnit;
+  }
 }
