@@ -410,7 +410,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $in = $this->schema(
             [   "id:i" => "The article ID.",
                 "status:s" => [
-                    'description' => "Article status: draft, published, deleted, etc.",
+                    'description' => "Article status: published, deleted, etc.",
                     'enum' => ArticleModel::getAllStatuses()
                 ]
             ],
