@@ -5,11 +5,17 @@
  * @license Proprietary
  */
 
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
-import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
+import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
+
+type RecursivePartial<T> = {
+    [P in keyof T]?: T[P] extends Array<infer U>
+        ? Array<RecursivePartial<U>>
+        : T[P] extends object ? RecursivePartial<T[P]> : T[P]
+};
 
 export interface IStoreState {
     knowledge: {
@@ -20,3 +26,5 @@ export interface IStoreState {
         locationPicker: ILocationPickerState;
     };
 }
+
+export type IPartialStoreState = RecursivePartial<IStoreState>;

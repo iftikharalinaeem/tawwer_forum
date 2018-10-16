@@ -17,7 +17,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 interface IProps {
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
-    articleCategory: IKbCategoryFragment;
+    currentCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -58,10 +58,11 @@ export default class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
+        const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
         return (
             <div className="FormWrapper inheritHeight">
                 <form className="inheritHeight" onSubmit={this.onSubmit}>
-                    <LocationInput initialCategory={this.props.articleCategory} />
+                    <LocationInput initialCategoryID={categoryID} key={categoryID === null ? undefined : categoryID} />
                     <div className="inputBlock">
                         <DocumentTitle title={isLoadingOrPending ? "Loading" : this.state.name || t("Untitled")}>
                             <input
@@ -94,6 +95,9 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return this.props.revision.status === LoadStatus.LOADING;
     }
 
+    /**
+     * Whether or not we have all of the data we need to submit the form.
+     */
     private get canSubmit(): boolean {
         if (!this.editorRef.current) {
             return false;
@@ -104,7 +108,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         const title = this.state.name;
         const body = this.editorRef.current.getEditorText().trim();
 
-        return title.length >= minTitleLength && body.length >= minBodyLength;
+        return title.length >= minTitleLength && body.length >= minBodyLength && this.props.currentCategory !== null;
     }
 
     /**

@@ -13,13 +13,16 @@ import { IArticle, IArticleRevision, Format } from "@knowledge/@types/api";
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
     revision: ILoadable<IArticleRevision | undefined>;
-    submit: ILoadable<{}>;
+    submit: {
+        article: ILoadable<{}>;
+        revision: ILoadable<{}>;
+    };
 }
 
 /**
  * Reducer for the article page.
  */
-export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
+export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     public initialState: IEditorPageState = {
         article: {
             status: LoadStatus.PENDING,
@@ -28,7 +31,12 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
             status: LoadStatus.PENDING,
         },
         submit: {
-            status: LoadStatus.PENDING,
+            article: {
+                status: LoadStatus.PENDING,
+            },
+            revision: {
+                status: LoadStatus.PENDING,
+            },
         },
     };
 
@@ -72,16 +80,27 @@ export default class EditorPageReducer extends ReduxReducer<IEditorPageState> {
                     draft.revision.status = LoadStatus.SUCCESS;
                     draft.revision.data = action.payload.data;
                     break;
+                // Patching the article
+                case EditorPageActions.PATCH_ARTICLE_REQUEST:
+                    draft.submit.revision.status = LoadStatus.LOADING;
+                    break;
+                case EditorPageActions.PATCH_ARTICLE_ERROR:
+                    draft.submit.revision.status = LoadStatus.ERROR;
+                    draft.submit.revision.error = action.payload;
+                    break;
+                case EditorPageActions.PATCH_ARTICLE_RESPONSE:
+                    draft.submit.revision.status = LoadStatus.SUCCESS;
+                    break;
                 // Submitting a new revision.
                 case EditorPageActions.POST_REVISION_REQUEST:
-                    draft.submit.status = LoadStatus.LOADING;
+                    draft.submit.revision.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.POST_REVISION_ERROR:
-                    draft.submit.status = LoadStatus.ERROR;
-                    draft.submit.error = action.payload;
+                    draft.submit.revision.status = LoadStatus.ERROR;
+                    draft.submit.revision.error = action.payload;
                     break;
                 case EditorPageActions.POST_REVISION_RESPONSE:
-                    draft.submit.status = LoadStatus.SUCCESS;
+                    draft.submit.revision.status = LoadStatus.SUCCESS;
                     break;
                 case EditorPageActions.RESET:
                     return this.initialState;

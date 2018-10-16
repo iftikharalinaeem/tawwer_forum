@@ -8,17 +8,18 @@ import * as React from "react";
 import classNames from "classnames";
 import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
 import Button from "@library/components/forms/Button";
-import { withLocationPicker, ILocationPickerProps } from "@knowledge/modules/locationPicker/LocationPickerContext";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { connect } from "react-redux";
 
-interface IProps extends ILocationPickerProps {
+interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
-    initialCategory?: IKbCategoryFragment;
+    initialCategoryID: number | null;
 }
 
 interface IState {
@@ -30,15 +31,24 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            showLocationPicker: false,
-        };
-    }
+    private static readonly SELECT_MESSAGE = t("Choose a Category");
+
+    public state: IState = {
+        showLocationPicker: false,
+    };
 
     public render() {
+        const { className, ...passThrough } = this.props;
         const { locationBreadcrumb } = this.props;
+        const buttonTitle = locationBreadcrumb
+            ? LocationBreadcrumbs.renderString(locationBreadcrumb)
+            : LocationInput.SELECT_MESSAGE;
+
+        const buttonContents = locationBreadcrumb ? (
+            <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
+        ) : (
+            LocationInput.SELECT_MESSAGE
+        );
 
         return (
             <React.Fragment>
@@ -47,14 +57,14 @@ export class LocationInput extends React.Component<IProps, IState> {
                         {t("To: ")}
                     </span>
                     <Button
-                        title={LocationBreadcrumbs.renderString(locationBreadcrumb)}
+                        title={buttonTitle}
                         type="button"
                         aria-label={t("Page Location:")}
                         className="pageLocation"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
                     >
-                        <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
+                        {buttonContents}
                     </Button>
                 </div>
                 {this.state.showLocationPicker && (
@@ -64,7 +74,11 @@ export class LocationInput extends React.Component<IProps, IState> {
                         className={classNames(this.props.className)}
                         description={t("Choose a location for this page.")}
                     >
-                        <LocationPicker onChoose={this.hideLocationPicker} onCloseClick={this.hideLocationPicker} />
+                        <LocationPicker
+                            onChoose={this.hideLocationPicker}
+                            onCloseClick={this.hideLocationPicker}
+                            {...passThrough}
+                        />
                     </Modal>
                 )}
             </React.Fragment>
@@ -75,17 +89,10 @@ export class LocationInput extends React.Component<IProps, IState> {
         return this.props.chosenCategoryID;
     }
 
-    public componentDidUpdate(oldProps: IProps) {
-        if (oldProps.initialCategory !== this.props.initialCategory && this.props.initialCategory) {
-            this.props.actions.init(this.props.initialCategory);
-        }
-    }
-
     /**
      * Show the location picker modal.
      */
     private showLocationPicker = () => {
-        void this.props.actions.getKbNavigation({ knowledgeCategoryID: 1 });
         this.setState({
             showLocationPicker: true,
         });
@@ -101,4 +108,9 @@ export class LocationInput extends React.Component<IProps, IState> {
     };
 }
 
-export default withLocationPicker<IProps>(LocationInput);
+const withRedux = connect(
+    LocationPickerModel.mapStateToProps,
+    LocationPickerActions.mapDispatchToProps,
+);
+
+export default withRedux(LocationInput);

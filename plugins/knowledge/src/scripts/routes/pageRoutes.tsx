@@ -8,10 +8,9 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
+import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
 
 export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
-
 export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
 
 /** A loadable version of the Editor Page */
@@ -50,8 +49,9 @@ const CategoriesPage = Loadable({
 export function getPageRoutes() {
     return [
         <Route exact path="/kb" component={HomePage} key={"/kb"} />,
-        <Route path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
-        <Route path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
-        <Route path={ADD_EDIT_ROUTE} component={EditorPage} key={ADD_EDIT_ROUTE} />,
+        <Route exact path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
+        <Route exact path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
+        <Route exact path={ADD_ROUTE} component={EditorPage} key={"editorPage"} />,
+        <Route exact path={EDIT_ROUTE} component={EditorPage} key={"editorPage"} />,
     ];
 }
