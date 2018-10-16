@@ -16,74 +16,22 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
-import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { AttachmentType } from "@knowledge/modules/common/AttachmentIcons";
 import { dummyMetaData } from "../state/dummyMetaData";
 import { LoadStatus } from "@library/@types/api";
+import { IArticle, IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IProps {
-    children: IKbCategoryFragment[];
+    breadcrumbData: ICrumb[];
+    category: IKbCategoryFragment;
+    articles: IArticle[];
     device: Devices;
 }
 
 export class CategoriesLayout extends React.Component<IProps> {
-    public render() {
-        return (
-            <Container>
-                <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
-                        <PanelWidget>
-                            <Breadcrumbs>{this.dummyBreadcrumbData}</Breadcrumbs>
-                        </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
-                    <PanelLayout.MiddleTop>
-                        <PageTitle
-                            backUrl="#Back"
-                            title={t("[Category Name]")}
-                            menu={<CategoryMenu />}
-                            meta={dummyMetaData as any}
-                        />
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <SearchResults children={this.dummySearchResults as any} />
-                    </PanelLayout.MiddleBottom>
-                </PanelLayout>
-            </Container>
-        );
-    }
-
-    private get dummyBreadcrumbData(): ICrumb[] {
-        return [
-            {
-                name: "Home",
-                url: "/kb",
-            },
-            {
-                name: "two",
-                url: "#",
-            },
-            {
-                name: "three",
-                url: "#",
-            },
-            {
-                name: "four",
-                url: "#",
-            },
-            {
-                name: "five",
-                url: "#",
-            },
-            {
-                name: "six",
-                url: "#",
-            },
-        ];
-    }
-
-    private get dummySearchResults(): any {
+    private static dummySearchResults(): any {
         return [
             {
                 name: "Getting Help with your community",
@@ -178,6 +126,51 @@ export class CategoriesLayout extends React.Component<IProps> {
                 ],
             },
         ];
+    }
+
+    public render() {
+        const { category } = this.props;
+
+        return (
+            <Container>
+                <PanelLayout device={this.props.device}>
+                    <PanelLayout.Breadcrumbs>
+                        <PanelWidget>
+                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                        </PanelWidget>
+                    </PanelLayout.Breadcrumbs>
+                    <PanelLayout.MiddleTop>
+                        <PageTitle
+                            backUrl="#Back"
+                            title={category.name}
+                            menu={<CategoryMenu />}
+                            meta={dummyMetaData as any}
+                        />
+                    </PanelLayout.MiddleTop>
+                    <PanelLayout.MiddleBottom>
+                        <SearchResults children={this.getSearchResults()} />
+                    </PanelLayout.MiddleBottom>
+                </PanelLayout>
+            </Container>
+        );
+    }
+
+    private getSearchResults(): IResult[] {
+        const { articles } = this.props;
+        return articles
+            .map(article => {
+                // Temporary hack.
+                const excerpt = new DOMParser().parseFromString(article.articleRevision.bodyRendered, "text/html");
+
+                return {
+                    name: article.articleRevision.name,
+                    meta: dummyMetaData,
+                    url: article.url,
+                    excerpt: excerpt.body.textContent || "",
+                    attachments: [],
+                };
+            })
+            .concat(CategoriesLayout.dummySearchResults());
     }
 }
 

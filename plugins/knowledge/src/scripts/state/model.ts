@@ -9,12 +9,14 @@ import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerReducer";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
+import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
 
 export interface IStoreState {
     knowledge: {
         articlePage: IArticlePageState;
         editorPage: IEditorPageState;
         categories: IKbCategoriesState;
+        categoriesPage: ICategoriesPageState;
         locationPicker: ILocationPickerState;
     };
 }

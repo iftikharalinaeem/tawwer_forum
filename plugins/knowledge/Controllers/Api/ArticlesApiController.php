@@ -344,7 +344,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 ["insertUserID"]
             );
             $row["articleRevisionID"] = $articleRevision["articleRevisionID"];
-            $slug = Gdn_Format::url($articleRevision["name"] ? "{$articleRevision['name']}-{$row['articleID']}" : $row["articleID"]);
+            $slug = Gdn_Format::url($articleRevision["name"] ? "{$row['articleID']}-{$articleRevision['name']}" : $row["articleID"]);
         } else {
             $row["articleRevisionID"] = null;
             $slug = null;
@@ -353,7 +353,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $row["articleRevision"] = $articleRevision;
         }
 
-        $row["url"] = \Gdn::request()->url("/kb/articles/".($slug ?: $row["articleID"]), true);
+        $row["url"] = \Gdn::request()->url("/kb/articles/".($slug ?: $row["articleID"]));
 
         // Placeholder data.
         $row["seoName"] = null;

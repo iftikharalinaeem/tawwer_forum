@@ -9,11 +9,13 @@ import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import LocationPickerReducer from "@knowledge/modules/locationPicker/LocationPickerReducer";
 import ArticlePageReducer from "@knowledge/modules/article/ArticlePageReducer";
 import EditorPageReducer from "@knowledge/modules/editor/EditorPageReducer";
+import CategoriesPageReducer from "@knowledge/modules/categories/CategoriesPageReducer";
 
 const knowledgeReducer = combineReducers({
     articlePage: new ArticlePageReducer().reducer,
     editorPage: new EditorPageReducer().reducer,
     categories: new CategoryModel().reducer,
+    categoriesPage: new CategoriesPageReducer().reducer,
     locationPicker: new LocationPickerReducer().reducer,
 });
 
