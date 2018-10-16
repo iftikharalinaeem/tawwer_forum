@@ -17,15 +17,15 @@ export default class ArticleDeletedNotice extends React.Component<IProps> {
         const message = t("This article has been deleted. To restore it click here:");
 
         return (
-            // <PanelWidget>
-            <div className="message">
-                <div className="message-body">
-                    <h2>This article has been deleted.</h2>
-                    <p>You can see this message because you have special permissions.</p>
+            <div className="messages">
+                <div className="message">
+                    <div className="message-main">
+                        <h2 className="message-title">This article has been deleted.</h2>
+                        <p className="message-text">You can see this message because you have special permissions.</p>
+                    </div>
+                    <Button className="message-button buttonPrimary">Restore</Button>
                 </div>
-                <Button className="message-button">Restore</Button>
             </div>
-            // </PanelWidget>
         );
     }
 }

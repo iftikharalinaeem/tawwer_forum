@@ -10,7 +10,6 @@
  * @license Proprietary
  */
 
-$message-block_topMargin          : $global-gutter_size * 2 !default;
 $message-block_gap                : $utility-baseUnit * 2 !default;
 $message-block_borderColor        : mix($global-color_fg, $global-color_bg, 20%) !default;
 $message-block_borderStyle        : solid !default;
@@ -24,7 +23,7 @@ $message-title_color              : mix($global-color_fg, $global-color_bg, 90%)
 
 .messages {
     display: block;
-    margin-top: $message-block_topMargin;
+    margin-top: $message-block_gap;
 }
 
 .message {
@@ -59,10 +58,14 @@ $message-title_color              : mix($global-color_fg, $global-color_bg, 90%)
     font-weight: $global-bold_fontWeight;
 }
 
+.message-text {
+    font-size: $message-text_fontSize;
+    margin-top: $utility-baseUnit;
+    margin-bottom: 0;
+}
+
 .message-action {
-    color: $message-downloadIcon_color;
-    flex-basis: #{$icon-default_size + $message-downloadIcon_margin};
-    padding-left: $message-downloadIcon_margin;
+
 }
 
 .message-metas {

@@ -60,10 +60,10 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={this.metaData as any}
                         />
+                        {article.status !== ArticleStatus.PUBLISHED && <ArticleDeletedNotice />}
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
-                            {article.status !== ArticleStatus.PUBLISHED && <ArticleDeletedNotice />}
                             <UserContent content={article.articleRevision.bodyRendered} />
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
