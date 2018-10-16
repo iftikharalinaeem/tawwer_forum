@@ -417,8 +417,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'in'
         )
             ->setDescription('Set status of existing article: published, deleted, etc.');
-        $body = $in->validate($body);
         $out = $this->articleSchema("out");
+        $body = $in->validate($body);
         $article = $this->articleByID($id);
         $this->editPermission($article["insertUserID"]);
         if ($article['status'] !== $body['status']) {
