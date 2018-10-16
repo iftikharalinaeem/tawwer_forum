@@ -62,6 +62,19 @@
     }
 }
 
+.buttonAsText {
+    color: $global-color_primary;
+    line-height: $global-condensed_lineHeight;
+    padding: 0;
+    text-align: left;
+    overflow: hidden;
+
+    &:hover,
+    &:focus {
+        color: $state-active_color;
+    }
+}
+
 
 .button-callToAction {
     @include generateButtonClass($buttonPrimary);

@@ -52,7 +52,7 @@ $pageHeading-dropdown_width                    : 150px !default;
 .pageHeading-actions {
     display: flex;
     margin-left: $pageHeading-cta_margin;
-    align-self: center;
+    align-self: flex-start;
     position: relative;
 
     //.choices {

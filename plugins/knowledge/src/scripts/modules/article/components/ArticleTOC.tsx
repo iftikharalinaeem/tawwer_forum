@@ -35,7 +35,7 @@ export default class ArticleTOC extends React.Component<IProps> {
         ) {
             const contents = this.props.children.map((item, i) => {
                 return (
-                    <li className="linkList-item tableOfContents-item" key={"toc-" + i}>
+                    <li className="related-item tableOfContents-item" key={"toc-" + i}>
                         <a href={item.anchor} className="tableOfContents-link" title={item.name}>
                             {item.name}
                         </a>
@@ -45,9 +45,9 @@ export default class ArticleTOC extends React.Component<IProps> {
 
             return (
                 <PanelWidget>
-                    <nav className="linkList tableOfContents">
-                        <Heading title={t("Table of Contents")} className="linkList-title tableOfContents-title" />
-                        <ul className="linkList-items tableOfContents-items">{contents}</ul>
+                    <nav className="related tableOfContents">
+                        <Heading title={t("Table of Contents")} className="related-title tableOfContents-title" />
+                        <ul className="related-items tableOfContents-items">{contents}</ul>
                     </nav>
                 </PanelWidget>
             );

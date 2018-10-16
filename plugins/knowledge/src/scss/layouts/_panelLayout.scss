@@ -135,7 +135,7 @@ $panelLayout-panel_leftPadding                                        : $global-
         flex-basis: calc(100% - #{$global-panel_width});
         max-width: calc(100% - #{$global-panel_width});
 
-        @include mediaQuery-panelLayout_twoColumn {
+        @include mediaQuery-panelLayout_oneColumn {
             width: 100%;
             max-width: 100%;
             flex-basis: 100%;

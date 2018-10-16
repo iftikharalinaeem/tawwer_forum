@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { IKbNavigationItem } from "@knowledge/@types/api";
-import { rightChevron, categoryIcon, selectedCategory } from "@library/components/Icons";
+import { rightChevron, categoryIcon, checkCompact } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 
@@ -48,7 +48,7 @@ export default class NavigationItemCategory extends React.Component<IProps> {
                         })}
                         aria-hidden={true}
                     >
-                        {isSelected ? selectedCategory() : categoryIcon()}
+                        {isSelected ? checkCompact() : categoryIcon()}
                     </span>
                     <span className="folderContents-label">{value.name}</span>
                 </label>
