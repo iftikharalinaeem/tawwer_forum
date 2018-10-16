@@ -12,12 +12,12 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import EditorHeader from "./EditorHeader";
+import { withRouter, RouteComponentProps } from "react-router-dom";
 
-interface IProps {
+interface IProps extends RouteComponentProps<{}> {
     device: Devices;
     backUrl: string | null;
     children: React.ReactNode;
-    history: string;
 }
 
 /**
@@ -30,8 +30,7 @@ export class EditorLayout extends React.Component<IProps> {
                 <EditorHeader backUrl={this.props.backUrl} device={this.props.device} canSubmit={true} />
                 <Container className="inheritHeight">
                     <h1 className="sr-only">{t("Write Discussion")}</h1>
-
-                    <PanelLayout growMiddleBottom={true} device={this.props.device}>
+                    <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
                         <PanelLayout.MiddleBottom>
                             <PanelWidget>{this.props.children}</PanelWidget>
                         </PanelLayout.MiddleBottom>
@@ -42,4 +41,4 @@ export class EditorLayout extends React.Component<IProps> {
     }
 }
 
-export default withDevice<IProps>(EditorLayout);
+export default withRouter(withDevice<IProps>(EditorLayout));

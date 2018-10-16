@@ -52,6 +52,13 @@ $panelLayout-border_color                                             : rgba($gl
     width: 100%;
 }
 
+.panelLayout {
+    &.isOneCol {
+        width: calc(100% - #{2 * $global-panel_paddedWidth});
+        margin: auto;
+    }
+}
+
 .panelLayout-container {
     display: flex;
     flex-wrap: nowrap;

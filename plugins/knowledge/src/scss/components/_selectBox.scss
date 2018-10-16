@@ -12,6 +12,14 @@ $selectBox-check_width: 18px;
     justify-content: flex-start;
     text-align: left;
     max-width: 100%;
+    border: 0;
+
+    &.minimalStyles {
+        justify-content: center;
+        .selectBox-buttonIcon {
+            margin-right: 0;
+        }
+    }
 }
 
 .selectBox-buttonItem {
@@ -44,8 +52,9 @@ $selectBox-check_width: 18px;
     white-space: nowrap;
 }
 
+
+
 .selectBox-dropDownContents {
-    width: 100%;
     padding: {
         top: $utility-baseUnit;
         bottom: $utility-baseUnit;

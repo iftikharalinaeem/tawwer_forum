@@ -32,6 +32,10 @@ $dropDown-item_minHeight                       : 45px;
         width: 1px;
         color: $overlay-border_color;
     }
+
+    &.isParentWidth {
+        width: 100%;
+    }
 }
 
 .dropDownItems {

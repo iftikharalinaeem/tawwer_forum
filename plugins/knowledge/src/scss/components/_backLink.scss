@@ -4,6 +4,24 @@
  * @license Proprietary
  */
 
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+}
+
 .backLink-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
     color: inherit;
+
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
+.backLink-label {
+    padding-right: $utility-baseUnit;
 }

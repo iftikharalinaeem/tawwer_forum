@@ -6,4 +6,7 @@
 
 .pageLocation {
   user-select: none;
+  border: solid $formElement_border_color $formElement_borderWidth;
+  border-radius: $global-borderRadius;
 }
+
