@@ -21,12 +21,12 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import { AttachmentType } from "@knowledge/modules/common/AttachmentIcons";
 import { dummyMetaData } from "../state/dummyMetaData";
 import { LoadStatus } from "@library/@types/api";
-import { IArticle, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IProps {
     breadcrumbData: ICrumb[];
     category: IKbCategoryFragment;
-    articles: IArticle[];
+    articles: IArticleFragment[];
     device: Devices;
 }
 
@@ -159,14 +159,11 @@ export class CategoriesLayout extends React.Component<IProps> {
         const { articles } = this.props;
         return articles
             .map(article => {
-                // Temporary hack.
-                const excerpt = new DOMParser().parseFromString(article.articleRevision.bodyRendered, "text/html");
-
                 return {
-                    name: article.articleRevision.name,
+                    name: article.name || "",
                     meta: dummyMetaData,
                     url: article.url,
-                    excerpt: excerpt.body.textContent || "",
+                    excerpt: article.excerpt || "",
                     attachments: [],
                 };
             })

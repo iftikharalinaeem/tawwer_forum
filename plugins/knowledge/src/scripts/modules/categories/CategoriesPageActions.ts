@@ -43,6 +43,11 @@ export default class CategoriesPageActions extends ReduxActions {
     public reset = this.bindDispatch(CategoriesPageActions.createResetAction);
 
     public getArticles(id: number) {
-        return this.dispatchApi("get", `/articles?knowledgeCategoryID=${id}`, CategoriesPageActions.getArticlesACs, {});
+        return this.dispatchApi(
+            "get",
+            `/articles/excerpts?knowledgeCategoryID=${id}`,
+            CategoriesPageActions.getArticlesACs,
+            {},
+        );
     }
 }
