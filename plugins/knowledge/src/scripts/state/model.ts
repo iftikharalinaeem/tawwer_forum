@@ -10,6 +10,12 @@ import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel"
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 
+type RecursivePartial<T> = {
+    [P in keyof T]?: T[P] extends (infer U)[]
+        ? RecursivePartial<U>[]
+        : T[P] extends object ? RecursivePartial<T[P]> : T[P]
+};
+
 export interface IStoreState {
     knowledge: {
         articlePage: IArticlePageState;
@@ -18,3 +24,5 @@ export interface IStoreState {
         locationPicker: ILocationPickerState;
     };
 }
+
+export type IPartialStoreState = RecursivePartial<IStoreState>;

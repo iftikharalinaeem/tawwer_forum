@@ -76,17 +76,29 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     }
 
     /**
+     * Select the IDs of all of the children for a given parent.
      *
-     * @param state
-     * @param parentID
+     * @param state The full store state.
+     * @param parentID The ID of the parent to check.
      */
-    public static selectChildrenIDsFromParent(state: IStoreState, parentID: number): number[] {
+    private static selectChildrenIDsFromParent(state: IStoreState, parentID: number): number[] {
         return Object.values(state.knowledge.categories.data!.categoriesByID)
             .filter(category => category.parentID === parentID)
             .map(category => category.knowledgeCategoryID);
     }
 
-    public static selectMixedRecordTree(state: IStoreState, categoryID: number, maxDepth = 2): IKbNavigationCategory {
+    /**
+     * Select a category tree from the store state.
+     *
+     * @param state The full store state.
+     * @param categoryID The category ID to get the tree from.
+     * @param maxDepth The maximum depth of the tree to calculate.
+     */
+    public static selectMixedRecordTree(
+        state: IStoreState,
+        categoryID: number,
+        maxDepth: number = 2,
+    ): IKbNavigationCategory {
         const category: IKbNavigationCategory =
             categoryID === -1 ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
 

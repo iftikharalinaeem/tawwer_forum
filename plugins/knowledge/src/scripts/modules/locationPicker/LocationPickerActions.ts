@@ -5,7 +5,7 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { IKbCategoryFragment, IKbNavigationResponse, IKbNavigationRequest } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IKbNavigationResponse, IKbNavigationRequest, IArticle } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
@@ -42,10 +42,11 @@ export default class LocationPickerActions extends ReduxActions {
     /**
      * Initialize the state from a category.
      *
-     * @param initialCategory A category fragment.
+     * @param categoryID The categoryID to initialize with.
+     * @param parentID The parent ID of the category.
      */
-    private static createInitAction(initialCategory: IKbCategoryFragment) {
-        return LocationPickerActions.createAction(LocationPickerActions.INIT, { initialCategory });
+    private static createInitAction(categoryID: number, parentID: number) {
+        return LocationPickerActions.createAction(LocationPickerActions.INIT, { categoryID, parentID });
     }
 
     /**
@@ -79,6 +80,20 @@ export default class LocationPickerActions extends ReduxActions {
     public selectCategory = this.bindDispatch(LocationPickerActions.createSelectAction);
     public chooseCategory = this.bindDispatch(LocationPickerActions.createChooseAction);
     public init = this.bindDispatch(LocationPickerActions.createInitAction);
+
+    /**
+     * Initialize location picker actions from an article.
+     *
+     * @param article The article to init from.
+     */
+    public initLocationPickerFromArticle(article: IArticle) {
+        this.dispatch((a, getState: () => IStoreState) => {
+            const category = CategoryModel.selectKbCategoryFragment(getState(), article.knowledgeCategoryID);
+            if (category) {
+                this.init(article.knowledgeCategoryID, category.parentID);
+            }
+        });
+    }
 
     /**
      * Navigate to a particular category.

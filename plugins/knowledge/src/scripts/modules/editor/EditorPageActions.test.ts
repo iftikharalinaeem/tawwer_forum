@@ -15,17 +15,24 @@ import thunk from "redux-thunk";
 import { Format } from "@knowledge/@types/api";
 import { assertStoreHasActions } from "@library/__tests__/customAssertions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { IPartialStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore;
     let mockApi: MockAdapter;
     let editorPageActions: EditorPageActions;
 
-    before(() => {
+    let initWithState = (state: IPartialStoreState) => {
         const middlewares = [thunk];
-        mockStore = configureStore(middlewares)({});
-        mockApi = new MockAdapter(apiv2);
+        mockStore = configureStore(middlewares)(state);
         editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
+    };
+
+    before(() => {
+        mockApi = new MockAdapter(apiv2);
+        initWithState({});
     });
 
     afterEach(() => {
@@ -34,16 +41,7 @@ describe("EditorPageActions", () => {
     });
 
     describe("initPageFromLocation", () => {
-        it("Does nothing if we are not in the correct location", async () => {
-            const history = createMemoryHistory();
-            history.push("/test-bad-location");
-            const spy = sinon.spy(mockStore, "dispatch");
-            void (await editorPageActions.initPageFromLocation(history));
-            expect(spy.notCalled).eq(true);
-            expect(history.location.pathname).eq("/test-bad-location");
-        });
-
-        it("creates and article if we are on the /kb/articles/add page and redirects to it", async () => {
+        it("creates and article and redirects to it", async () => {
             const dummyArticle = { articleID: 1 };
             mockApi.onPost("/api/v2/articles").replyOnce(200, dummyArticle);
             const history = createMemoryHistory();
@@ -64,13 +62,29 @@ describe("EditorPageActions", () => {
                 },
             ]);
         });
-        it("gets the existing article if it's id is in the URL", async () => {
-            const dummyArticle = { articleID: 1 };
+        it("gets the existing article and sets initializes the location picker from it", async () => {
+            const dummyArticle = { articleID: 1, knowledgeCategoryID: 5 };
             mockApi.onGet("/api/v2/articles/1").replyOnce(200, dummyArticle);
-            const history = createMemoryHistory();
-            history.push("/kb/articles/1/editor");
+            initWithState({
+                knowledge: {
+                    categories: {
+                        status: LoadStatus.SUCCESS,
+                        data: {
+                            categoriesByID: {
+                                5: {
+                                    knowledgeCategoryID: 5,
+                                    parentID: 1,
+                                },
+                                1: {
+                                    knowledgeCategoryID: 1,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
 
-            void (await editorPageActions.initPageFromLocation(history));
+            void (await editorPageActions.fetchArticleForEdit(1));
 
             assertStoreHasActions(mockStore, [
                 {
@@ -82,15 +96,24 @@ describe("EditorPageActions", () => {
                         data: dummyArticle,
                     },
                 },
+                {
+                    type: LocationPickerActions.INIT,
+                    payload: {
+                        categoryID: 5,
+                        parentID: 1,
+                    },
+                },
             ]);
         });
     });
 
     describe("updateArticle()", () => {
-        it("submits a revision and redirects to the page from the response", async () => {
+        it("patches an article, submits a revision and redirects to the page from the response", async () => {
             const dummyRevision = { articleID: 1 };
             const dummyArticle = { url: "/test-redirect-url" };
             mockApi
+                .onPatch("/api/v2/articles/1")
+                .replyOnce(200, dummyArticle)
                 .onPost("/api/v2/article-revisions")
                 .replyOnce(200, dummyRevision)
                 .onGet("/api/v2/articles/1?expand=all")
@@ -105,7 +128,16 @@ describe("EditorPageActions", () => {
 
             assertStoreHasActions(mockStore, [
                 {
+                    type: EditorPageActions.PATCH_ARTICLE_REQUEST,
+                },
+                {
                     type: EditorPageActions.POST_REVISION_REQUEST,
+                },
+                {
+                    type: EditorPageActions.PATCH_ARTICLE_RESPONSE,
+                    payload: {
+                        data: dummyArticle,
+                    },
                 },
                 {
                     type: EditorPageActions.POST_REVISION_RESPONSE,

@@ -72,18 +72,11 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
                     draft.chosenCategoryID = action.payload.categoryID;
                     break;
                 case LocationPickerActions.INIT:
-                    const { initialCategory } = action.payload;
+                    const { categoryID, parentID } = action.payload;
 
-                    // If we are in a top level category.
-                    if (initialCategory.parentID === -1) {
-                        draft.navigatedCategoryID = initialCategory.knowledgeCategoryID;
-                        draft.selectedCategoryID = initialCategory.knowledgeCategoryID;
-                        draft.chosenCategoryID = initialCategory.knowledgeCategoryID;
-                    } else {
-                        draft.navigatedCategoryID = initialCategory.parentID;
-                        draft.selectedCategoryID = initialCategory.knowledgeCategoryID;
-                        draft.chosenCategoryID = initialCategory.knowledgeCategoryID;
-                    }
+                    draft.navigatedCategoryID = parentID === -1 ? categoryID : parentID;
+                    draft.selectedCategoryID = categoryID;
+                    draft.chosenCategoryID = categoryID;
             }
         });
     };
