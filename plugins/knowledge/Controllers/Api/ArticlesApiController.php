@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
+use Garden\Schema\Schema;
 use Gdn_Format;
 use UserModel;
 use Garden\Schema\ValidationException;
@@ -22,6 +23,9 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
  * API controller for managing the articles resource.
  */
 class ArticlesApiController extends AbstractKnowledgeApiController {
+
+    // Maximum length before article excerpts are truncated.
+    const EXCERPT_MAX_LENGTH = 325;
 
     /** @var \Garden\Schema\Schema */
     private $articleFragmentSchema;
@@ -116,12 +120,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "articleID",
                     "knowledgeCategoryID",
                     "sort",
+                    "url",
+                    "name",
+                    "excerpt",
                 ])->add($this->fullSchema()),
                 "ArticleFragment"
-            );
-            $this->articleFragmentSchema->setField(
-                "properties.articleRevision",
-                \Garden\Schema\Schema::parse(["name"])->add($this->articleRevisionsApiController->articleRevisionSchema())
             );
         }
 
@@ -149,7 +152,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     private function fullSchema(): \Garden\Schema\Schema {
         return \Garden\Schema\Schema::parse([
                 "articleID:i" => "Unique article ID.",
-                "knowledgeCategoryID:i" => "Category the article belongs in.",
+                "knowledgeCategoryID:i" => [
+                    "allowNull" => true,
+                    "Category the article belongs in.",
+                ],
                 "articleRevisionID:i" => [
                     "allowNull" => true,
                     "description" => "Unique ID of the published revision."
@@ -183,8 +189,16 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "categoryAncestorIDs:a?" => "integer",
                 "status:s" => [
                     'description' => "Article status: draft, published, deleted, undeleted, etc...",
-                    'enum' => [ArticleModel::STATUS_PUBLISHED, ArticleModel::STATUS_DELETED, ArticleModel::STATUS_UNDELETED]
-                ]
+                    'enum' => ArticleModel::getAllStatuses()
+                ],
+                "name:s?" => [
+                    "allowNull" => true,
+                    "description" => "Title of the article.",
+                ],
+                "excerpt:s?" => [
+                    "allowNull" => true,
+                    "description" => "Plain-text excerpt of the current article body.",
+                ],
             ]);
     }
 
@@ -273,7 +287,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * List published articles in a given knowledge category.
      *
      * @param array $query
-     * @return mixed
+     * @return array
      * @throws ValidationException If input validation fails.
      * @throws ValidationException If output validation fails.
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
@@ -321,6 +335,40 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * List excerpts from published articles in a given knowledge category.
+     *
+     * @param array $query
+     * @return array
+     * @throws ValidationException If input validation fails.
+     * @throws ValidationException If output validation fails.
+     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function index_excerpts(array $query = []) {
+        $this->permission("knowledge.kb.view");
+
+        $in = $this->schema([
+            "knowledgeCategoryID" => [
+                "type" => "integer",
+                "minimum" => 1,
+            ],
+            "limit" => [
+                "default" => ArticleModel::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("List excerpts from published articles in a given knowledge category.");
+        $out = $this->schema([":a" => $this->articleFragmentSchema()], "out");
+
+        $query = $in->validate($query);
+        $articles = $this->index($query);
+
+        $result = $out->validate($articles);
+        return $result;
+    }
+
+    /**
      * Massage article row data for useful API output.
      *
      * @param array $row
@@ -345,9 +393,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             );
             $row["articleRevisionID"] = $articleRevision["articleRevisionID"];
             $slug = Gdn_Format::url($articleRevision["name"] ? "{$row['articleID']}-{$articleRevision['name']}" : $row["articleID"]);
+            $row["name"] = $articleRevision["name"];
+            $row["excerpt"] = sliceString(Gdn_Format::plainText($articleRevision["bodyRendered"], "Html"), self::EXCERPT_MAX_LENGTH);
         } else {
             $row["articleRevisionID"] = null;
             $slug = null;
+            $row["name"] = null;
+            $row["excerpt"] = null;
         }
         if ($this->isExpandField("articleRevision", $expand)) {
             $row["articleRevision"] = $articleRevision;
@@ -386,6 +438,57 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
         $this->articleModel->update($body, ["articleID" => $id]);
+        $result = $this->prepareValidatedPatchResult($id, $out);
+        return $result;
+    }
+
+    /**
+     * Update article status an existing article.
+     *
+     * @param int $id ArticleID
+     * @param array $body Incoming json array with 'status' key.
+     *        Possible values: published, deleted, etc
+     *
+     * @return array Data array Article record/item
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function patch_status(int $id, array $body): array {
+        $this->permission();
+        $body['id'] = $id;
+
+        $in = $this->schema(
+            [   "id:i" => "The article ID.",
+                "status:s" => [
+                    'description' => "Article status: published, deleted, etc.",
+                    'enum' => ArticleModel::getAllStatuses()
+                ]
+            ],
+            'in'
+        )
+            ->setDescription('Set status of existing article: published, deleted, etc.');
+        $out = $this->articleSchema("out");
+        $body = $in->validate($body);
+        $article = $this->articleByID($id);
+        $this->editPermission($article["insertUserID"]);
+        if ($article['status'] !== $body['status']) {
+            $this->articleModel->update(['status'=>$body['status']], ["articleID" => $id]);
+        }
+
+        $result = $this->prepareValidatedPatchResult($id, $out);
+        return $result;
+    }
+
+    /**
+     * Get article from model and normalize and validate data according to out-schema
+     *
+     * @param int $id Article ID to get
+     * @param Schema $out Out-schema to validate output
+     *
+     * @return array
+     */
+    protected function prepareValidatedPatchResult(int $id, Schema $out): array {
         $row = $this->articleByID($id);
         $revision = $this->articleRevisionModel->get([
             "articleID" => $id,
@@ -395,56 +498,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row = $this->normalizeOutput($row, [], $revision);
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * Undelete an existing article.
-     *
-     * @param int $id ArticleID
-     *
-     * @return \Garden\Web\Data
-     *
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function patch_undelete(int $id): \Garden\Web\Data {
-        $this->permission();
-        $in = $this->schema(["id:i" => "The article ID."], 'in')
-            ->setDescription('Undelete an existing article.');
-        $out = $this->schema([], 'out');
-        $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
-        if ($article['status'] !== ArticleModel::STATUS_UNDELETED) {
-            $this->articleModel->update(['status'=>ArticleModel::STATUS_UNDELETED], ["articleID" => $id]);
-        }
-        return new \Garden\Web\Data('', 204);
-    }
-
-    /**
-     * Delete an existing article.
-     *
-     * @param int $id ArticleID
-     *
-     * @return \Garden\Web\Data
-     *
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function patch_delete(int $id): \Garden\Web\Data {
-        $this->permission();
-
-        $in = $this->schema(["id:i" => "The article ID."], 'in')
-            ->setDescription('Delete an existing article.');
-        $out = $this->schema([], 'out');
-
-        $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
-        if ($article['status'] !== ArticleModel::STATUS_DELETED) {
-            $this->articleModel->update(['status'=>ArticleModel::STATUS_DELETED], ["articleID" => $id]);
-        }
-        return new \Garden\Web\Data('', 204);
     }
 
     /**

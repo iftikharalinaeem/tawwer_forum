@@ -80,10 +80,11 @@ class ArticlesTest extends AbstractResourceTest {
         $row = $this->testGetEdit();
 
         $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}/delete"
+            "{$this->baseUrl}/{$row[$this->pk]}/status",
+            ['status' => ArticleModel::STATUS_DELETED]
         );
-        $this->assertEquals(204, $r->getStatusCode());
-        $this->assertEquals('', $r->getBody());
+        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(ArticleModel::STATUS_DELETED, $r->getBody()['status']);
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}"
@@ -99,10 +100,11 @@ class ArticlesTest extends AbstractResourceTest {
         $row = $this->testGetEdit();
 
         $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}/undelete"
+            "{$this->baseUrl}/{$row[$this->pk]}/status",
+            ['status' => ArticleModel::STATUS_UNDELETED]
         );
-        $this->assertEquals(204, $r->getStatusCode());
-        $this->assertEquals('', $r->getBody());
+        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(ArticleModel::STATUS_UNDELETED, $r->getBody()['status']);
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}"

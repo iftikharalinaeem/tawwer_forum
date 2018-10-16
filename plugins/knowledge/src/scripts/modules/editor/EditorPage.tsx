@@ -15,12 +15,15 @@ import EditorLayout from "@knowledge/modules/editor/components/EditorLayout";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageReducer";
+import {
+    IPostArticleRevisionRequestBody,
+    Format,
+    IKbCategoryFragment,
+    IPatchArticleRequestBody,
+} from "@knowledge/@types/api";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { t } from "@library/application";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -30,7 +33,7 @@ interface IOwnProps
 interface IProps extends IOwnProps {
     pageState: IEditorPageState;
     actions: EditorPageActions;
-    articleCategory: IKbCategoryFragment;
+    locationCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -46,15 +49,13 @@ export class EditorPage extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { pageState } = this.props;
-
         const pageContent = (
             <EditorLayout backUrl={this.backLink}>
                 <EditorForm
                     key={this.props.pageState.revision.status}
                     submitHandler={this.formSubmit}
                     revision={this.props.pageState.revision}
-                    articleCategory={this.props.articleCategory}
+                    currentCategory={this.props.locationCategory}
                 />
             </EditorLayout>
         );
@@ -72,10 +73,17 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     /**
      * Initial setup for the page.
+     *
+     * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        if (this.props.pageState.article.status !== LoadStatus.SUCCESS) {
-            void this.props.actions.initPageFromLocation(this.props.history);
+        const { pageState, match, actions, history } = this.props;
+        if (pageState.article.status !== LoadStatus.SUCCESS) {
+            if (match.params.id === undefined) {
+                void actions.createArticleForEdit(history);
+            } else {
+                void actions.fetchArticleForEdit(match.params.id);
+            }
         }
     }
 
@@ -102,17 +110,25 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history, actions } = this.props;
+        const { pageState, history, actions, locationCategory } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
-            const data: IPostArticleRevisionRequestBody = {
+            const articleRequest: IPatchArticleRequestBody = {
+                articleID: article.data.articleID,
+            };
+
+            if (locationCategory !== null) {
+                articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
+            }
+
+            const revisionRequest: IPostArticleRevisionRequestBody = {
                 articleID: article.data.articleID,
                 name: title,
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            void actions.submitNewRevision(data, history);
+            void actions.updateArticle(articleRequest, revisionRequest, history);
         }
     };
 
@@ -145,15 +161,15 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
-    let articleCategory;
-    const { editorPage } = state.knowledge;
+    let locationCategory: IKbCategoryFragment | null = null;
+    const { editorPage, locationPicker } = state.knowledge;
     if (editorPage.article.status === LoadStatus.SUCCESS) {
-        articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
+        locationCategory = categoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
     }
 
     return {
         pageState: editorPage,
-        articleCategory,
+        locationCategory,
     };
 }
 

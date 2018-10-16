@@ -8,7 +8,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import { ModalLoader } from "@library/components/modal";
-import { ADD_EDIT_ROUTE } from "@knowledge/modules/editor/route";
+import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
 
 /** A loadable version of the Editor Page */
 const ModalEditorPage = Loadable({
@@ -24,5 +24,8 @@ const ModalEditorPage = Loadable({
  * <React.Fragment> does not currently work
  */
 export function getModalRoutes(): JSX.Element[] {
-    return [<Route path={ADD_EDIT_ROUTE} component={ModalEditorPage} key={ADD_EDIT_ROUTE} />];
+    return [
+        <Route exact path={ADD_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
+        <Route exact path={EDIT_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
+    ];
 }
