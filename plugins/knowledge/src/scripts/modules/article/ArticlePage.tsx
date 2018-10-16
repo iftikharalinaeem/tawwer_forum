@@ -103,12 +103,10 @@ export class ArticlePage extends React.Component<IProps> {
  */
 function mapStateToProps(state: IStoreState) {
     let breadcrumbData: ICrumb[] | null = null;
+    const { article } = state.knowledge.articlePage;
 
-    if (state.knowledge.articlePage.article.status === LoadStatus.SUCCESS) {
-        const categories = categoryModel.selectKbCategoryBreadcrumb(
-            state,
-            state.knowledge.articlePage.article.data.knowledgeCategoryID,
-        );
+    if (article.status === LoadStatus.SUCCESS && article.data.knowledgeCategoryID !== null) {
+        const categories = categoryModel.selectKbCategoryBreadcrumb(state, article.data.knowledgeCategoryID);
         breadcrumbData = categories.map(category => {
             return {
                 name: category.name,
@@ -118,7 +116,7 @@ function mapStateToProps(state: IStoreState) {
     }
 
     return {
-        article: state.knowledge.articlePage.article,
+        article,
         breadcrumbData,
     };
 }

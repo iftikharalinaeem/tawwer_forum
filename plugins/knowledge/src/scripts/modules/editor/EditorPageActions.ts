@@ -13,17 +13,27 @@ import {
     IPostArticleRevisionResponseBody,
     IPostArticleRevisionRequestBody,
     IGetArticleResponseBody,
+    IArticle,
+    IPatchArticleRequestBody,
+    IPatchArticleResponseBody,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import pathToRegexp from "path-to-regexp";
 import * as route from "./route";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import qs from "qs";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
     public static readonly POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
     public static readonly POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
     public static readonly POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
+
+    // API actions
+    public static readonly PATCH_ARTICLE_REQUEST = "@@articleEditor/PATCH_ARTICLE_REQUEST";
+    public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
+    public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
     public static readonly POST_REVISION_REQUEST = "@@articleEditor/POST_REVISION_REQUEST";
     public static readonly POST_REVISION_RESPONSE = "@@articleEditor/POST_REVISION_RESPONSE";
@@ -48,6 +58,7 @@ export default class EditorPageActions extends ReduxActions {
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
+        | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
     /**
@@ -72,6 +83,18 @@ export default class EditorPageActions extends ReduxActions {
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPostArticleResponseBody,
         {} as IPostArticleRequestBody,
+    );
+
+    /**
+     * Action creators for POST /articles
+     */
+    private static patchArticleACs = ReduxActions.generateApiActionCreators(
+        EditorPageActions.PATCH_ARTICLE_REQUEST,
+        EditorPageActions.PATCH_ARTICLE_RESPONSE,
+        EditorPageActions.PATCH_ARTICLE_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {} as IPatchArticleRequestBody,
+        {} as IPatchArticleResponseBody,
     );
 
     /**
@@ -113,45 +136,57 @@ export default class EditorPageActions extends ReduxActions {
     /** Article page actions instance. */
     private articlePageActions: ArticlePageActions = new ArticlePageActions(this.dispatch, this.api);
 
+    /** Location picker page actions instance. */
+    private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
+
     /**
-     * Initialize the editor page data based on our path.
+     * Create an article and redirect to the edit page for it.
      *
-     * We have to scenarios:
-     *
-     * - /articles/add - Initialize a new article
-     * - /articles/:id/editor - We already have a new article. Go fetch it.
-     *
-     * @param history - The history object.
+     * @param history - The history object for redirecting.
      */
-    public async initPageFromLocation(history: History) {
-        const { location } = history;
-        // Use the same path regex as our router.
-        const addRegex = pathToRegexp(route.ADD_ROUTE);
-        const editRegex = pathToRegexp(route.EDIT_ROUTE);
+    public async createArticleForEdit(history: History) {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : null;
 
-        // Check url
-        if (addRegex.test(location.pathname)) {
-            // We don't have an article so go create one.
-            const article = await this.createArticle({
-                knowledgeCategoryID: 1,
-            });
+        // We don't have an article so go create one.
+        const response = await this.postArticle({
+            knowledgeCategoryID: initialCategoryID,
+        });
 
-            if (article) {
-                const replacementUrl = route.makeEditUrl(article.data.articleID);
-                const newLocation = {
-                    ...location,
-                    pathname: replacementUrl,
-                };
+        if (response) {
+            const article = response.data;
 
-                history.replace(newLocation);
+            // Initialize the category picker if we have a category ID.
+            if (initialCategoryID !== null) {
+                this.locationPickerActions.initLocationPickerFromArticle(article);
             }
-        } else if (editRegex.test(location.pathname)) {
-            // We don't have an article, but we have ID for one. Go get it.
-            const articleID = editRegex.exec(location.pathname)![1];
-            const article = await this.getEditableArticleByID(articleID);
-            if (article && article.data.articleRevisionID !== null) {
-                await this.getRevisionByID(article.data.articleRevisionID);
-            }
+
+            // Redirect
+            const replacementUrl = route.makeEditUrl(article.articleID);
+            const newLocation = {
+                ...location,
+                pathname: replacementUrl,
+                search: "",
+            };
+
+            history.replace(newLocation);
+        }
+    }
+
+    /**
+     * Fetch an existing article for editing.
+     *
+     * @param articleID - The ID of the article to fetch.
+     */
+    public async fetchArticleForEdit(articleID: number) {
+        // We don't have an article, but we have ID for one. Go get it.
+        const response = await this.getEditableArticleByID(articleID);
+
+        if (response && response.data) {
+            await Promise.all([
+                this.fetchRevisionFromArticle(response.data),
+                this.locationPickerActions.initLocationPickerFromArticle(response.data),
+            ]);
         }
     }
 
@@ -160,14 +195,21 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param body - The body of the submit request.
      */
-    public async submitNewRevision(body: IPostArticleRevisionRequestBody, history: History) {
-        const result = await this.postRevision(body);
+    public async updateArticle(
+        article: IPatchArticleRequestBody,
+        revision: IPostArticleRevisionRequestBody,
+        history: History,
+    ) {
+        const [articleResult, revisionResult] = await Promise.all([
+            this.patchArticle(article),
+            this.postRevision(revision),
+        ]);
         // Our API request has failed
-        if (!result) {
+        if (!articleResult || !revisionResult) {
             return;
         }
 
-        const { articleID } = result.data;
+        const { articleID } = article;
         const newArticle = await this.articlePageActions.getArticleByID(articleID);
         // Our API request failed.
         if (!newArticle) {
@@ -188,7 +230,7 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param data The revision data.
      */
-    public postRevision(data: IPostArticleRevisionRequestBody) {
+    private postRevision(data: IPostArticleRevisionRequestBody) {
         return this.dispatchApi<IPostArticleRevisionResponseBody>(
             "post",
             "/article-revisions",
@@ -198,12 +240,34 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     /**
+     * Fetch the current revision from an article resource through the API.
+     */
+    private async fetchRevisionFromArticle(article: IArticle) {
+        if (article.articleRevisionID != null) {
+            await this.getRevisionByID(article.articleRevisionID);
+        }
+    }
+
+    /**
      * Create a new article.
      *
      * @param data The article data.
      */
-    private createArticle(data: IPostArticleRequestBody) {
+    private postArticle(data: IPostArticleRequestBody) {
         return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
+    }
+
+    /**
+     * Update an article
+     */
+    private patchArticle(data: IPatchArticleRequestBody) {
+        const { articleID, ...rest } = data;
+        return this.dispatchApi<IPatchArticleResponseBody>(
+            "patch",
+            `/articles/${articleID}`,
+            EditorPageActions.patchArticleACs,
+            rest,
+        );
     }
 
     /**
@@ -225,7 +289,7 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param articleID
      */
-    private getEditableArticleByID(articleID: string) {
+    private getEditableArticleByID(articleID: number) {
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
             `/articles/${articleID}`,

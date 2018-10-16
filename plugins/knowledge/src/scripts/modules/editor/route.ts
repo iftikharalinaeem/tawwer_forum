@@ -7,9 +7,8 @@
 import { formatUrl } from "@library/application";
 
 // Route constants
-export const EDIT_ROUTE = "/kb/articles/:id/editor";
+export const EDIT_ROUTE = "/kb/articles/:id(\\d+)/editor";
 export const ADD_ROUTE = "/kb/articles/add";
-export const ADD_EDIT_ROUTE = "/kb/articles/(\\d+/editor|add)";
 
 /**
  * Get the route for editing a particular article ID.
