@@ -23,12 +23,12 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import ArticleActionsPanel from "@knowledge/modules/article/components/ArticleActionsPanel";
-import ArticleDeletedNotice from "@knowledge/modules/article/components/ArticleDeletedNotice";
 
 interface IProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
+    messages?: React.ReactNode;
 }
 
 interface IState {}
@@ -38,7 +38,7 @@ interface IState {}
  */
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
-        const { article } = this.props;
+        const { article, messages } = this.props;
 
         return (
             <Container>
@@ -60,7 +60,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={this.metaData as any}
                         />
-                        {article.status !== ArticleStatus.PUBLISHED && <ArticleDeletedNotice />}
+                        <div className="messages">{messages}</div>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>

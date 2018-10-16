@@ -5,10 +5,10 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { IDeleteArticleResponseBody, IDeleteArticleRequestBody } from "@knowledge/@types/api";
+import { IPatchArticleStatusResponseBody, IPatchArticleStatusRequestBody } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 
-export interface IActionsActionsProps {
+export interface IArticleActionsProps {
     articleActions: ArticleActions;
 }
 
@@ -16,46 +16,28 @@ export interface IActionsActionsProps {
  * Actions for the article page.
  */
 export default class ArticleActions extends ReduxActions {
-    public static readonly DELETE_ARTICLE_REQUEST = "@@article/DELETE_ARTICLE_REQUEST";
-    public static readonly DELETE_ARTICLE_RESPONSE = "@@article/DELETE_ARTICLE_RESPONSE";
-    public static readonly DELETE_ARTICLE_ERROR = "@@article/DELETE_ARTICLE_ERROR";
-
-    public static readonly RESTORE_ARTICLE_REQUEST = "@@article/RESTORE_ARTICLE_REQUEST";
-    public static readonly RESTORE_ARTICLE_RESPONSE = "@@article/RESTORE_ARTICLE_RESPONSE";
-    public static readonly RESTORE_ARTICLE_ERROR = "@@article/RESTORE_ARTICLE_ERROR";
+    public static readonly PATCH_ARTICLE_STATUS_REQUEST = "@@article/PATCH_ARTICLE_STATUS_REQUEST";
+    public static readonly PATCH_ARTICLE_STATUS_RESPONSE = "@@article/PATCH_ARTICLE_STATUS_RESPONSE";
+    public static readonly PATCH_ARTICLE_STATUS_ERROR = "@@article/PATCH_ARTICLE_STATUS_ERROR";
 
     /**
      * Union of all possible action types in this class.
      */
-    public static readonly ACTION_TYPES:
-        | ActionsUnion<typeof ArticleActions.deleteArticleACs>
-        | ActionsUnion<typeof ArticleActions.restorerticleACs>;
+    public static readonly ACTION_TYPES: ActionsUnion<typeof ArticleActions.patchArticleStatusACs>;
 
     /**
      * Static action creators for the get article endpoint.
      */
-    private static readonly deleteArticleACs = ReduxActions.generateApiActionCreators(
-        ArticleActions.DELETE_ARTICLE_REQUEST,
-        ArticleActions.DELETE_ARTICLE_RESPONSE,
-        ArticleActions.DELETE_ARTICLE_ERROR,
+    private static readonly patchArticleStatusACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.PATCH_ARTICLE_STATUS_REQUEST,
+        ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE,
+        ArticleActions.PATCH_ARTICLE_STATUS_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IDeleteArticleResponseBody,
-        {} as IDeleteArticleRequestBody,
+        {} as IPatchArticleStatusResponseBody,
+        {} as IPatchArticleStatusRequestBody,
     );
 
-    /**
-     * Static action creators for the get article endpoint.
-     */
-    private static readonly restorerticleACs = ReduxActions.generateApiActionCreators(
-        ArticleActions.RESTORE_ARTICLE_REQUEST,
-        ArticleActions.RESTORE_ARTICLE_RESPONSE,
-        ArticleActions.RESTORE_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IDeleteArticleResponseBody,
-        {} as IDeleteArticleRequestBody,
-    );
-
-    public static mapDispatchToProps(dispatch): IActionsActionsProps {
+    public static mapDispatchToProps(dispatch): IArticleActionsProps {
         return {
             articleActions: new ArticleActions(dispatch, apiv2),
         };
@@ -66,25 +48,11 @@ export default class ArticleActions extends ReduxActions {
      *
      * @param articleID The article ID.
      */
-    public deleteArticle = (body: IDeleteArticleRequestBody) => {
-        return this.dispatchApi<IDeleteArticleResponseBody>(
+    public patchStatus = (body: IPatchArticleStatusRequestBody) => {
+        return this.dispatchApi<IPatchArticleStatusResponseBody>(
             "patch",
-            `/articles/${body.articleID}/delete`,
-            ArticleActions.deleteArticleACs,
-            body,
-        );
-    };
-
-    /**
-     * Restore an article
-     *
-     * @param articleID The article ID.
-     */
-    public restoreArticle = (body: IDeleteArticleRequestBody) => {
-        return this.dispatchApi<IDeleteArticleResponseBody>(
-            "patch",
-            `/articles/${body.articleID}/undelete`,
-            ArticleActions.restorerticleACs,
+            `/articles/${body.articleID}/status`,
+            ArticleActions.patchArticleStatusACs,
             body,
         );
     };

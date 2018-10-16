@@ -19,10 +19,10 @@ import { makeEditUrl } from "@knowledge/modules/editor/route";
 import { ModalConfirm } from "@library/components/modal";
 import { connect } from "react-redux";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
-import ArticleActions, { IActionsActionsProps } from "@knowledge/modules/article/ArticleActions";
+import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import { LoadStatus } from "@library/@types/api";
 
-interface IProps extends IArticleMenuState, IActionsActionsProps {
+interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
     buttonClassName?: string;
 }
@@ -85,7 +85,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
     private handleDeleteDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.deleteArticle({ articleID: article.articleID });
+        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.DELETED });
         this.closeDeleteDialogue();
     };
 
@@ -99,7 +99,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
     private handleRestoreDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.restoreArticle({ articleID: article.articleID });
+        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.PUBLISHED });
         this.closeRestoreDialogue();
     };
 

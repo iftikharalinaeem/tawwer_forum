@@ -34,13 +34,13 @@ export default class ArticleMenuModel implements ReduxReducer<IArticleMenuState>
     ): IArticleMenuState => {
         return produce(state, draft => {
             switch (action.type) {
-                case ArticleActions.DELETE_ARTICLE_REQUEST:
+                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
                     draft.delete.status = LoadStatus.LOADING;
                     break;
-                case ArticleActions.DELETE_ARTICLE_RESPONSE:
+                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
                     draft.delete.status = LoadStatus.SUCCESS;
                     break;
-                case ArticleActions.DELETE_ARTICLE_ERROR:
+                case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
                     draft.delete.status = LoadStatus.ERROR;
                     draft.delete.error = action.payload;
                     break;

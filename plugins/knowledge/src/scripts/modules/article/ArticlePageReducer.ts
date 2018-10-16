@@ -13,6 +13,7 @@ import { produce } from "immer";
 
 export interface IArticlePageState {
     article: ILoadable<IArticle>;
+    restoreStatus: LoadStatus;
 }
 
 /**
@@ -23,6 +24,7 @@ export default class ArticlePageReducer extends ReduxReducer<IArticlePageState> 
         article: {
             status: LoadStatus.PENDING,
         },
+        restoreStatus: LoadStatus.PENDING,
     };
 
     public reducer = (
@@ -42,22 +44,26 @@ export default class ArticlePageReducer extends ReduxReducer<IArticlePageState> 
                     draft.article.status = LoadStatus.ERROR;
                     draft.article.error = action.payload;
                     break;
-                case ArticleActions.DELETE_ARTICLE_RESPONSE:
+                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
                     if (
                         state.article.status === LoadStatus.SUCCESS &&
-                        draft.article.data &&
-                        state.article.data.articleID === action.meta.articleID
+                        state.article.data.articleID === action.meta.articleID &&
+                        action.meta.status === ArticleStatus.PUBLISHED
                     ) {
-                        draft.article.data.status = ArticleStatus.DELETED;
+                        draft.restoreStatus = LoadStatus.LOADING;
                     }
                     break;
-                case ArticleActions.RESTORE_ARTICLE_RESPONSE:
+                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
                     if (
                         state.article.status === LoadStatus.SUCCESS &&
                         draft.article.data &&
                         state.article.data.articleID === action.meta.articleID
                     ) {
-                        draft.article.data.status = ArticleStatus.PUBLISHED;
+                        draft.article.data.status = action.payload.data.status;
+
+                        if (action.meta.status === ArticleStatus.PUBLISHED) {
+                            draft.restoreStatus = LoadStatus.SUCCESS;
+                        }
                     }
                     break;
                 case ArticlePageActions.RESET:

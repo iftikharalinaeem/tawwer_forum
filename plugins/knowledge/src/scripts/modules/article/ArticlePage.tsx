@@ -19,21 +19,30 @@ import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
-import { IArticle } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import ArticleDeletedNotice from "@knowledge/modules/article/components/ArticleDeletedNotice";
+import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
+import { ModalConfirm } from "@library/components/modal";
+import { t } from "@library/application";
 
-interface IProps extends IDeviceProps {
+interface IProps extends IDeviceProps, IArticleActionsProps {
     match: match<{
         id: number;
     }>;
     article: ILoadable<IArticle>;
+    restoreStatus: LoadStatus;
     articlePageActions: ArticlePageActions;
     breadcrumbData: ICrumb[];
+}
+
+interface IState {
+    showRestoreDialogue: boolean;
 }
 
 /**
  * Page component for an article.
  */
-export class ArticlePage extends React.Component<IProps> {
+export class ArticlePage extends React.Component<IProps, IState> {
     /**
      * Render not found or the article.
      */
@@ -49,7 +58,11 @@ export class ArticlePage extends React.Component<IProps> {
             <PageLoader {...article}>
                 {article.status === LoadStatus.SUCCESS && (
                     <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
-                        <ArticleLayout article={article.data} breadcrumbData={breadcrumbData!} />
+                        <ArticleLayout
+                            article={article.data}
+                            breadcrumbData={breadcrumbData!}
+                            messages={this.renderMessages()}
+                        />
                     </DocumentTitle>
                 )}
             </PageLoader>
@@ -82,6 +95,29 @@ export class ArticlePage extends React.Component<IProps> {
         this.props.articlePageActions.reset();
     }
 
+    private renderMessages(): React.ReactNode {
+        const { article } = this.props;
+        let messages: React.ReactNode;
+
+        if (article.status === LoadStatus.SUCCESS) {
+            if (article.data.status === ArticleStatus.DELETED) {
+                messages = (
+                    <ArticleDeletedNotice
+                        onRestoreClick={this.handleRestoreClick}
+                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
+                    />
+                );
+            }
+        }
+
+        return messages;
+    }
+
+    private handleRestoreClick = async () => {
+        const { articleActions, article } = this.props;
+        await articleActions.patchStatus({ articleID: article.data!.articleID, status: ArticleStatus.PUBLISHED });
+    };
+
     /**
      * Initialize the page's data from it's url.
      */
@@ -102,7 +138,7 @@ export class ArticlePage extends React.Component<IProps> {
  */
 function mapStateToProps(state: IStoreState) {
     let breadcrumbData: ICrumb[] | null = null;
-    const { article } = state.knowledge.articlePage;
+    const { article, restoreStatus } = state.knowledge.articlePage;
 
     if (article.status === LoadStatus.SUCCESS && article.data.knowledgeCategoryID !== null) {
         const categories = categoryModel.selectKbCategoryBreadcrumb(state, article.data.knowledgeCategoryID);
@@ -117,6 +153,7 @@ function mapStateToProps(state: IStoreState) {
     return {
         article,
         breadcrumbData,
+        restoreStatus,
     };
 }
 
@@ -126,6 +163,7 @@ function mapStateToProps(state: IStoreState) {
 function mapDispatchToProps(dispatch) {
     return {
         articlePageActions: new ArticlePageActions(dispatch, apiv2),
+        ...ArticleActions.mapDispatchToProps(dispatch),
     };
 }
 

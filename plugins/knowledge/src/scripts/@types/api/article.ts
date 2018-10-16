@@ -57,11 +57,12 @@ export interface IPatchArticleResponseBody extends IArticle {}
 
 export interface IGetArticleResponseBody extends IArticle {}
 
-export interface IDeleteArticleRequestBody {
+export interface IPatchArticleStatusRequestBody {
     articleID: number;
+    status: ArticleStatus;
 }
 
-export interface IDeleteArticleResponseBody {}
+export interface IPatchArticleStatusResponseBody extends IArticle {}
 
 export interface IArticleFragment {
     articleID: number;
