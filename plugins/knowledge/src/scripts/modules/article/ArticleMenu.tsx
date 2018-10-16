@@ -54,11 +54,11 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemMetas>{this.publishedMeta}</DropDownItemMetas>
                     <DropDownItemMetas>{this.updatedMeta}</DropDownItemMetas>
                     <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Customize SEO")} onClick={this.buttonClick} />
-                    <DropDownItemButton name={t("Move")} onClick={this.buttonClick} />
+                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
+                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
                     <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                     <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Revision History")} onClick={this.buttonClick} />
+                    <DropDownItemButton name={t("Revision History")} onClick={this.dummyClick} />
                     <DropDownItemSeparator />
                     {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>
@@ -68,6 +68,9 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /**
+     * Render the delete modal if it should be shown.
+     */
     private renderDeleteModal(): React.ReactNode {
         return (
             this.state.showDeleteDialogue && (
@@ -83,34 +86,59 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /**
+     * Handler for the confirmation of the delete dialogue.
+     *
+     * Calls to update the article status and closes the dialogue after.
+     */
     private handleDeleteDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
         await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.DELETED });
         this.closeDeleteDialogue();
     };
 
+    /**
+     * Open the delete dialogue.
+     */
     private openDeleteDialogue = () => {
         this.setState({ showDeleteDialogue: true });
     };
 
+    /**
+     * Close the delete dialogue.
+     */
     private closeDeleteDialogue = () => {
         this.setState({ showDeleteDialogue: false });
     };
 
+    /**
+     * Handler for the confirmation of the restore dialogue.
+     *
+     * Calls to update the article status and closes the dialogue after.
+     */
     private handleRestoreDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
         await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.PUBLISHED });
         this.closeRestoreDialogue();
     };
 
+    /**
+     * Open the restore dialogue.
+     */
     private openRestoreDialogue = () => {
         this.setState({ showRestoreDialogue: true });
     };
 
+    /**
+     * Close the restore dialogue.
+     */
     private closeRestoreDialogue = () => {
         this.setState({ showRestoreDialogue: false });
     };
 
+    /**
+     * Render the restore modal if it should be shown.
+     */
     private renderRestoreModal(): React.ReactNode {
         return (
             this.state.showRestoreDialogue && (
@@ -130,7 +158,10 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         return "articleMenuDropDown-" + this.props.article.articleID;
     }
 
-    private buttonClick = () => {
+    /**
+     * Fallback click handle until all functionaility has been implemented.
+     */
+    private dummyClick = () => {
         alert("Click works");
     };
 

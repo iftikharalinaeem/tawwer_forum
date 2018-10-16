@@ -20,10 +20,8 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import ArticleDeletedNotice from "@knowledge/modules/article/components/ArticleDeletedNotice";
+import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
-import { ModalConfirm } from "@library/components/modal";
-import { t } from "@library/application";
 
 interface IProps extends IDeviceProps, IArticleActionsProps {
     match: match<{
@@ -102,7 +100,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (article.status === LoadStatus.SUCCESS) {
             if (article.data.status === ArticleStatus.DELETED) {
                 messages = (
-                    <ArticleDeletedNotice
+                    <ArticleDeletedMessage
                         onRestoreClick={this.handleRestoreClick}
                         isLoading={this.props.restoreStatus === LoadStatus.LOADING}
                     />

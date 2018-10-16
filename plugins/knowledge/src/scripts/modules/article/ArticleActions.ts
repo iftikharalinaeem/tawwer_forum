@@ -44,7 +44,7 @@ export default class ArticleActions extends ReduxActions {
     }
 
     /**
-     * Delete an article.
+     * Update an articles status.
      *
      * @param articleID The article ID.
      */

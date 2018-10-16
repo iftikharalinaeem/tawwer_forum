@@ -48,9 +48,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActionsPanel />
-                    </PanelLayout.LeftTop>
                     <PanelLayout.LeftBottom>
                         <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
