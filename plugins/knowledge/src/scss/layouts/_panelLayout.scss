@@ -54,7 +54,7 @@ $panelLayout-border_color                                             : rgba($gl
 
 .panelLayout {
     &.isOneCol {
-        width: calc(100% - #{2 * $global-panel_paddedWidth});
+        width: $global-main_width;
         margin: auto;
     }
 }

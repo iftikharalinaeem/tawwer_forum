@@ -50,7 +50,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                         title={LocationBreadcrumbs.renderString(locationBreadcrumb)}
                         type="button"
                         aria-label={t("Page Location:")}
-                        className="pageLocation"
+                        className="pageLocation-picker"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
                     >

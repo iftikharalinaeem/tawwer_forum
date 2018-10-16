@@ -5,8 +5,10 @@
  */
 
 .pageLocation {
-  user-select: none;
-  border: solid $formElement_border_color $formElement_borderWidth;
-  border-radius: $global-borderRadius;
 }
 
+.pageLocation-picker {
+  border: solid $formElement_borderColor $formElement_borderWidth;
+  border-radius: $global-borderRadius;
+  user-select: none;
+}
