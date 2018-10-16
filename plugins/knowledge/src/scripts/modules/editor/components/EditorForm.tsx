@@ -95,6 +95,9 @@ export default class EditorForm extends React.Component<IProps, IState> {
         return this.props.revision.status === LoadStatus.LOADING;
     }
 
+    /**
+     * Whether or not we have all of the data we need to submit the form.
+     */
     private get canSubmit(): boolean {
         if (!this.editorRef.current) {
             return false;
@@ -105,7 +108,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         const title = this.state.name;
         const body = this.editorRef.current.getEditorText().trim();
 
-        return title.length >= minTitleLength && body.length >= minBodyLength;
+        return title.length >= minTitleLength && body.length >= minBodyLength && this.props.currentCategory !== null;
     }
 
     /**
