@@ -82,8 +82,15 @@ echo $this->Form->errors();
                 </td>
                 <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Level'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo anchor($event['IP'], url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
-
+                <td><?php
+                    $iP = ipDecode($event['IP']);
+                    if (filter_var($iP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                        echo anchor($iP, url('/user/browse?Keywords='.urlencode($iP)), ['title' => $iP]);
+                    } elseif (filter_var($iP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                        echo anchor('IPV6', url('/user/browse?Keywords='.urlencode($iP)), ['title' => $iP]);
+                    }
+                    ?>
+                </td>
             </tr>
             <?php
         }
