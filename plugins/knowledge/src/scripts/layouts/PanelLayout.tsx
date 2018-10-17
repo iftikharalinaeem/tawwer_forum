@@ -96,6 +96,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             "panelLayout",
             { noLeftPanel: !shouldRenderLeftPanel },
             { noRightPanel: !shouldRenderRightPanel },
+            { noBreadcrumbs: !children.breadcrumbs },
             this.props.className,
             { inheritHeight: this.props.growMiddleBottom },
         );

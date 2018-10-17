@@ -43,9 +43,15 @@ $panelLayout-border_color                                             : rgba($gl
         bottom: $panelLayout_bottomMargin;
     }
 
-    > .panelLayout-main {
-        margin-top: $global-gutter_size;
+    &.noBreadcrumbs {
+        > .panelLayout-main {
+            padding-top: $global-gutter_size;
+        }
     }
+}
+
+.overlay .panelLayout.noBreadcrumbs .panelLayout-main {
+    padding-top: 0;
 }
 
 
