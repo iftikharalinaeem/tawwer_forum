@@ -1,7 +1,7 @@
 {
     "name": "Auth0 SSO",
     "className": "Auth0Plugin",
-    "description": "Allows user login to be authenticated on Auth0 SSO.",
+    "description": "Allows user login to be authenticated on Auth0 SSO. This plugin is deprecated. All of its features and more are available in the OAuth2 Plugin.",
     "version": "1.0.1",
     "requiredTheme": false,
     "hasLocale": false,

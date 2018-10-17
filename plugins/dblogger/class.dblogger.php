@@ -70,7 +70,7 @@ class DbLogger implements LoggerInterface {
             $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
-
+        $insert['ip'] = isset($insert['ip']) ? ipEncode($insert['ip']) : null;
         $r = $this->sql->insert('EventLog', $insert);
 
         // Delete a couple of old logs.

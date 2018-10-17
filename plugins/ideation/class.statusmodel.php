@@ -141,6 +141,14 @@ class StatusModel extends Gdn_Model {
     }
 
     /**
+     * Clear cache for idea statuses.
+     * This function should be called on add/edit/delete of idea statuses to make sure the UI represents reality.
+     */
+    public function clearStatusesCache() {
+        Gdn::cache()->remove(self::STATUS_TAG_ID_CACHE_KEY);
+    }
+
+    /**
      * Retrieves the status with the given tag ID.
      *
      * @param $tagID The ID of the tag to find the status from.

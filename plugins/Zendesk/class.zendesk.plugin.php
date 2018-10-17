@@ -450,7 +450,8 @@ class ZendeskPlugin extends Gdn_Plugin {
         $sender->Form->addHidden('InsertEmail', $content->InsertEmail);
 
         $sender->Form->setValue('Title', $ticketTitle);
-        $sender->Form->setValue('Body', Gdn_Format::textEx($content->Body));
+        $content = Gdn_Format::to($content->Body, $content->Format);
+        $sender->Form->setValue('Body', $content);
 
         $sender->setData('Data', [
             'DiscussionID' => $discussionID,

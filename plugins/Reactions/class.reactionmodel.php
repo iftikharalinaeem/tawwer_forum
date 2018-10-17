@@ -462,7 +462,7 @@ class ReactionModel extends Gdn_Model {
         $iDs = [];
         $userIDs = [];
 
-        if (is_a($data, 'stdClass') || (is_array($data) && !isset($data[0]))) {
+        if ((is_object($data) && !($data instanceof Gdn_Dataset)) || (is_array($data) && !isset($data[0]))) {
             $data2 = [&$data];
         } else {
             $data2 =& $data;
@@ -470,11 +470,11 @@ class ReactionModel extends Gdn_Model {
 
         foreach ($data2 as $row) {
             if (!$recordType)
-                $rT = getValue('RecordType', $row);
+                $rT = val('RecordType', $row);
             else
                 $rT = $recordType;
 
-            $iD = getValue($rT.'ID', $row);
+            $iD = val($rT.'ID', $row);
 
             if ($iD)
                 $iDs[$rT][$iD] = 1;
