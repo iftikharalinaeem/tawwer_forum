@@ -9,6 +9,7 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
 import { IArticle, IArticleRevision, Format } from "@knowledge/@types/api";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
@@ -40,7 +41,10 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
     };
 
-    public reducer = (state = this.initialState, action: typeof EditorPageActions.ACTION_TYPES): IEditorPageState => {
+    public reducer = (
+        state = this.initialState,
+        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticlePageActions.ACTION_TYPES,
+    ): IEditorPageState => {
         return produce(state, draft => {
             switch (action.type) {
                 case EditorPageActions.POST_ARTICLE_REQUEST:
@@ -82,14 +86,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     break;
                 // Patching the article
                 case EditorPageActions.PATCH_ARTICLE_REQUEST:
-                    draft.submit.revision.status = LoadStatus.LOADING;
+                    draft.submit.article.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.PATCH_ARTICLE_ERROR:
-                    draft.submit.revision.status = LoadStatus.ERROR;
-                    draft.submit.revision.error = action.payload;
+                    draft.submit.article.status = LoadStatus.ERROR;
+                    draft.submit.article.error = action.payload;
                     break;
-                case EditorPageActions.PATCH_ARTICLE_RESPONSE:
-                    draft.submit.revision.status = LoadStatus.SUCCESS;
+
+                // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
+                case ArticlePageActions.GET_ARTICLE_RESPONSE:
+                    draft.submit.article.status = LoadStatus.SUCCESS;
                     break;
                 // Submitting a new revision.
                 case EditorPageActions.POST_REVISION_REQUEST:

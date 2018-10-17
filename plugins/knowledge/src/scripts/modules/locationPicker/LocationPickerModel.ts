@@ -76,8 +76,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
                     break;
                 case LocationPickerActions.INIT:
                     const { categoryID, parentID } = action.payload;
-
-                    draft.navigatedCategoryID = parentID === -1 ? categoryID : parentID;
+                    draft.navigatedCategoryID = categoryID === -1 ? categoryID : parentID;
                     draft.selectedCategoryID = categoryID;
                     draft.chosenCategoryID = categoryID;
             }

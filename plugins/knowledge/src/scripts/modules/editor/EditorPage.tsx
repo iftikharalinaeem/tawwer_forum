@@ -10,8 +10,7 @@ import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
-import { EditorForm } from "@knowledge/modules/editor/components";
-import EditorLayout from "@knowledge/modules/editor/components/EditorLayout";
+import EditorForm from "@knowledge/modules/editor/components/EditorForm";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
@@ -50,14 +49,14 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     public render() {
         const pageContent = (
-            <EditorLayout backUrl={this.backLink}>
-                <EditorForm
-                    key={this.props.pageState.revision.status}
-                    submitHandler={this.formSubmit}
-                    revision={this.props.pageState.revision}
-                    currentCategory={this.props.locationCategory}
-                />
-            </EditorLayout>
+            <EditorForm
+                backUrl={this.backLink}
+                key={this.props.pageState.revision.status}
+                submitHandler={this.formSubmit}
+                revision={this.props.pageState.revision}
+                currentCategory={this.props.locationCategory}
+                isSubmitLoading={this.isSubmitLoading}
+            />
         );
 
         if (this.isModal) {
@@ -104,6 +103,11 @@ export class EditorPage extends React.Component<IProps, IState> {
         this.setState({
             showFolderPicker: false,
         });
+    }
+
+    private get isSubmitLoading(): boolean {
+        const { submit } = this.props.pageState;
+        return [submit.revision.status, submit.article.status].includes(LoadStatus.LOADING);
     }
 
     /**

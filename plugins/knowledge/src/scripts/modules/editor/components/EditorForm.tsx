@@ -10,16 +10,23 @@ import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
 import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import Button from "@library/components/forms/Button";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
+import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import Container from "@knowledge/layouts/components/Container";
+import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
+import { Devices } from "@library/components/DeviceChecker";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
 
 interface IProps {
+    device: Devices;
+    backUrl: string | null;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
     currentCategory: IKbCategoryFragment | null;
     className?: string;
+    isSubmitLoading: boolean;
 }
 
 interface IState {
@@ -30,7 +37,7 @@ interface IState {
 /**
  * Form for the editor page.
  */
-export default class EditorForm extends React.Component<IProps, IState> {
+export class EditorForm extends React.Component<IProps, IState> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
     public constructor(props: IProps) {
@@ -59,37 +66,53 @@ export default class EditorForm extends React.Component<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const isLoadingOrPending = [LoadStatus.LOADING, LoadStatus.PENDING].includes(this.props.revision.status);
         const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
         return (
-            <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
-                <form className="inheritHeight" onSubmit={this.onSubmit}>
-                    <LocationInput initialCategoryID={categoryID} key={categoryID === null ? undefined : categoryID} />
-                    <div className="sr-only">
-                        <DocumentTitle title={t("Write Article")} />
-                    </div>
-                    <input
-                        className="richEditorForm-title inputBlock-inputText inputText isGiant"
-                        type="text"
-                        placeholder={t("Title")}
-                        value={this.state.name}
-                        onChange={this.titleChangeHandler}
-                        disabled={this.isLoading}
-                    />
-                    <Editor
-                        allowUpload={true}
-                        ref={this.editorRef}
-                        isPrimaryEditor={true}
-                        onChange={this.editorChangeHandler}
-                        className="FormWrapper inheritHeight richEditorForm-editor {
+            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+                <EditorHeader
+                    backUrl={this.props.backUrl}
+                    device={this.props.device}
+                    canSubmit={this.canSubmit}
+                    isSubmitLoading={this.props.isSubmitLoading}
+                    className="richEditorForm-header"
+                />
+                <Container className="richEditorForm-body">
+                    <h1 className="sr-only">{t("Write Discussion")}</h1>
+                    <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidget>
+                                {" "}
+                                <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
+                                    <LocationInput
+                                        initialCategoryID={categoryID}
+                                        key={categoryID === null ? undefined : categoryID}
+                                    />
+                                    <div className="sr-only">
+                                        <DocumentTitle title={this.state.name} />
+                                    </div>
+                                    <input
+                                        className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                                        type="text"
+                                        placeholder={t("Title")}
+                                        value={this.state.name}
+                                        onChange={this.titleChangeHandler}
+                                        disabled={this.isLoading}
+                                    />
+                                    <Editor
+                                        allowUpload={true}
+                                        ref={this.editorRef}
+                                        isPrimaryEditor={true}
+                                        onChange={this.editorChangeHandler}
+                                        className="FormWrapper inheritHeight richEditorForm-editor {
 "
-                        isLoading={this.isLoading}
-                    />
-                    <Button disabled={!this.canSubmit} type="submit">
-                        {t("Submit")}
-                    </Button>
-                </form>
-            </div>
+                                        isLoading={this.isLoading}
+                                    />
+                                </div>
+                            </PanelWidget>
+                        </PanelLayout.MiddleBottom>
+                    </PanelLayout>
+                </Container>
+            </form>
         );
     }
 
@@ -135,3 +158,5 @@ export default class EditorForm extends React.Component<IProps, IState> {
         this.props.submitHandler(this.state.body, this.state.name);
     };
 }
+
+export default withDevice<IProps>(EditorForm);
