@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+$pageLocation_spacer: $utility-baseUnit * 2;
+
 .pageLocation {
   display: flex;
   flex-wrap: nowrap;
@@ -16,9 +18,11 @@
   border: solid $formElement_borderColor $formElement_borderWidth;
   border-radius: $global-borderRadius;
   user-select: none;
-  margin-left: $utility-baseUnit;
+  margin-left: 1ex;
   padding: {
-    top: $utility-baseUnit + $formElement_borderWidth;
+    top: $utility-baseUnit;
     bottom: $utility-baseUnit;
+    left: $pageLocation_spacer;
+    right: $pageLocation_spacer;
   }
 }
