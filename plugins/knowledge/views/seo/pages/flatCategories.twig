@@ -1,18 +1,25 @@
-        <main>
-            {% for category in page %}
-            <ul>
-                {% if category.url %}
-                <li>
-                    <a href="{{ category.url }}">
-                        {{ category.name }}
-                    </a>
-                    {% if category.excerpt %}
-                    <p>
-                        {{ category.excerpt }}
-                    </p>
-                    {% endif %}
-                </li>
-                {% endif %}
-            </ul>
-            {% endfor %}
-        </main>
+<main>
+                        <ul>
+                        {%- for category in page %}
+
+                            {%- if category.url %}
+
+                            <li>
+                                <a href="{{ category.url }}">
+                                    {{ category.name }}
+                                </a>
+                                {%- if category.excerpt %}
+
+                                <p>
+                                    {{ category.excerpt }}
+                                </p>
+                                {%- endif %}
+
+                            </li>
+
+                            {%- endif %}
+
+                        {%- endfor %}
+
+                        </ul>
+                    </main>
