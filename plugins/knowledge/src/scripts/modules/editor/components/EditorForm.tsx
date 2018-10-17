@@ -10,7 +10,6 @@ import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
 import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import Button from "@library/components/forms/Button";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
@@ -69,14 +68,15 @@ export class EditorForm extends React.Component<IProps, IState> {
     public render() {
         const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
         return (
-            <form className="inheritHeight" onSubmit={this.onSubmit}>
+            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
                     backUrl={this.props.backUrl}
                     device={this.props.device}
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.isSubmitLoading}
+                    className="richEditorForm-header"
                 />
-                <Container className="inheritHeight">
+                <Container className="richEditorForm-body">
                     <h1 className="sr-only">{t("Write Discussion")}</h1>
                     <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
                         <PanelLayout.MiddleBottom>

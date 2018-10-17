@@ -25,6 +25,7 @@ interface IProps {
     canSubmit: boolean;
     isSubmitLoading: boolean;
     selectedKey?: string;
+    className?: string;
 }
 
 /**
@@ -56,7 +57,7 @@ export default class EditorHeader extends React.Component<IProps> {
         const label = t("Switch Locale");
 
         return (
-            <div className="editorHeader">
+            <div className={classNames("editorHeader", this.props.className)}>
                 <div className="container">
                     <PanelArea>
                         <PanelWidget>
