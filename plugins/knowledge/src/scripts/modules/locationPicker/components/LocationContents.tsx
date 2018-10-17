@@ -28,12 +28,12 @@ interface IState {
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
 export default class LocationContents extends React.Component<IProps, IState> {
-    private legendID;
+    private legendRef;
     private listID;
 
     public constructor(props) {
         super(props);
-        this.legendID = getRequiredID(props, "navigationItemList-legend");
+        this.legendRef = React.createRef();
         this.listID = getRequiredID(props, "navigationItemList");
     }
 
@@ -60,7 +60,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
         return (
             <NavigationItemList
                 id={this.listID}
-                legendID={this.legendID}
+                legendRef={this.legendRef}
                 categoryName={title}
                 key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
             >
@@ -74,10 +74,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     private setFocusOnLegend() {
-        const legend = document.getElementById(this.legendID);
-        if (legend) {
-            legend.focus();
-        }
+        this.legendRef.current!.focus();
     }
 
     /**

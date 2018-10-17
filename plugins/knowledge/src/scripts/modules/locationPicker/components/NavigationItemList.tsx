@@ -13,7 +13,7 @@ interface IProps {
     categoryName: string;
     children: React.ReactNode;
     id?: string;
-    legendID?: string;
+    legendRef?: React.RefObject<HTMLLegendElement>;
 }
 
 /**
@@ -23,7 +23,7 @@ export default class NavigationItemList extends React.Component<IProps> {
     public render() {
         return (
             <fieldset id={this.props.id} className={classNames("folderContents")}>
-                <legend id={this.props.legendID} tabIndex={-1} className="sr-only">
+                <legend ref={this.props.legendRef} tabIndex={-1} className="sr-only">
                     {t("Contents of folder: " + this.props.categoryName)}
                 </legend>
                 <ul className="folderContents-items">{this.props.children}</ul>
