@@ -21,7 +21,6 @@ interface IProps {
 }
 
 interface IState {
-    id: string;
     selectedRecordID?: number;
 }
 
@@ -29,11 +28,13 @@ interface IState {
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
 export default class LocationContents extends React.Component<IProps, IState> {
+    private legendRef;
+    private listID;
+
     public constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "locationPicker"),
-        };
+        this.legendRef = React.createRef();
+        this.listID = getRequiredID(props, "navigationItemList");
     }
 
     public render() {
@@ -58,6 +59,8 @@ export default class LocationContents extends React.Component<IProps, IState> {
         });
         return (
             <NavigationItemList
+                id={this.listID}
+                legendRef={this.legendRef}
                 categoryName={title}
                 key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
             >
@@ -67,6 +70,17 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     private get radioName(): string {
-        return "folders-" + this.state.id;
+        return "folders-" + this.listID;
+    }
+
+    private setFocusOnLegend() {
+        this.legendRef.current!.focus();
+    }
+
+    /**
+     * Check for focus
+     */
+    public componentDidUpdate() {
+        this.setFocusOnLegend();
     }
 }

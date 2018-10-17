@@ -7,10 +7,13 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { getRequiredID } from "@library/componentIDs";
 
 interface IProps {
     categoryName: string;
     children: React.ReactNode;
+    id?: string;
+    legendRef?: React.RefObject<HTMLLegendElement>;
 }
 
 /**
@@ -19,8 +22,10 @@ interface IProps {
 export default class NavigationItemList extends React.Component<IProps> {
     public render() {
         return (
-            <fieldset className={classNames("folderContents")}>
-                <legend className="sr-only">{t("Contents of folder: " + this.props.categoryName)}</legend>
+            <fieldset id={this.props.id} className={classNames("folderContents")}>
+                <legend ref={this.props.legendRef} tabIndex={-1} className="sr-only">
+                    {t("Contents of folder: " + this.props.categoryName)}
+                </legend>
                 <ul className="folderContents-items">{this.props.children}</ul>
             </fieldset>
         );
