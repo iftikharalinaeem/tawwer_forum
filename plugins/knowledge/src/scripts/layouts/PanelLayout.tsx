@@ -111,9 +111,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     <div className="panelLayout-breadcrumbs">
                         <div className="panelLayout-container">
                             <Panel className="panel-breadcrumbs">
-                                <PanelArea className="panelArea-breadcrumbs">
-                                    <Breadcrumbs>{children.breadcrumbs}</Breadcrumbs>
-                                </PanelArea>
+                                <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
                             </Panel>
                         </div>
                     </div>

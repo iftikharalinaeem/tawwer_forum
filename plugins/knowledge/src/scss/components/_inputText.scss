@@ -22,6 +22,8 @@
 
     &.isGiant {
         font-weight: $global-semiBold_fontWeight;
+        flex-basis: $formElement-giantInput_height;
+        min-height: $formElement-giantInput_height;
         @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
     }
 }

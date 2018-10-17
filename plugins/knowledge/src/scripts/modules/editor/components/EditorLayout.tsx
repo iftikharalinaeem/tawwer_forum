@@ -14,7 +14,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import EditorHeader from "./EditorHeader";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 
-interface IProps extends RouteComponentProps<{}> {
+interface IProps {
     device: Devices;
     backUrl: string | null;
     children: React.ReactNode;
@@ -41,4 +41,4 @@ export class EditorLayout extends React.Component<IProps> {
     }
 }
 
-export default withRouter(withDevice<IProps>(EditorLayout));
+export default withDevice<IProps>(EditorLayout);

@@ -42,6 +42,10 @@ $panelLayout-border_color                                             : rgba($gl
         top: $panelLayout_topMargin;
         bottom: $panelLayout_bottomMargin;
     }
+
+    > .panelLayout-main {
+        margin-top: $global-gutter_size;
+    }
 }
 
 
