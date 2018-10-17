@@ -104,8 +104,6 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         // If applicable, set semantic tag, like "article"
         const ContentTag = `${this.props.contentTag}`;
 
-        const breadcrumbCount = !!children.breadcrumbs ? (children.breadcrumbs! as React.ReactNode[]).length : 0;
-
         return (
             <div className={panelClasses}>
                 {children.breadcrumbs && (

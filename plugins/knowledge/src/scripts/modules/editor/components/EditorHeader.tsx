@@ -17,11 +17,13 @@ import SelectBox from "@library/components/SelectBox";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { getRequiredID } from "@library/componentIDs";
 import EditorMenu from "./EditorMenu";
+import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
     device: Devices;
     backUrl: string | null;
     canSubmit: boolean;
+    isSubmitLoading: boolean;
     selectedKey?: string;
 }
 
@@ -71,11 +73,12 @@ export default class EditorHeader extends React.Component<IProps> {
                                 )}
                                 <li className="editorHeader-item">
                                     <Button
+                                        type="submit"
                                         title={label}
                                         disabled={!this.props.canSubmit}
                                         className={classNames("editorHeader-publish", "buttonPrimary")}
                                     >
-                                        {t("Publish")}
+                                        {this.props.isSubmitLoading ? <ButtonLoader /> : t("Publish")}
                                     </Button>
                                 </li>
                                 <li className="editorHeader-item">
