@@ -153,8 +153,8 @@ $panelLayout-border_color                                             : rgba($gl
         max-width: calc(100% - #{$global-panel_paddedWidth});
 
         padding: {
-            left: #{$global-relativeSpacer - $global-gutter_halfSize};
-            right: #{$global-relativeSpacer - $global-gutter_halfSize};
+            left: #{$global_spacer - $global-gutter_halfSize};
+            right: #{$global_spacer - $global-gutter_halfSize};
         }
 
         @include mediaQuery-panelLayout_twoColumn {

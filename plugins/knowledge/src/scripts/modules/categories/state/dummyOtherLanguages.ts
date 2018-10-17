@@ -10,23 +10,28 @@ export const dummyOtherLanguagesData = {
         {
             name: "English",
             key: "en",
+            selected: false,
         },
         {
             name: "French",
             key: "fr",
+            selected: false,
         },
         {
             name: "Klingon",
             key: "kl",
+            selected: false,
             outdated: true,
         },
         {
             name: "Bajoran",
             key: "ba",
+            selected: false,
         },
         {
             name: "Andorian",
             key: "an",
+            selected: false,
             outdated: true,
         },
     ],

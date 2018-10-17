@@ -23,7 +23,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: $global_relativeSpacer;
+  margin-left: $global_spacer;
 
   &.isPullLeft {
     margin-left: 0;

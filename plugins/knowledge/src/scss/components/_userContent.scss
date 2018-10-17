@@ -18,7 +18,7 @@
 
     @include headings {
         @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
-        margin-top: $userContent_fontSize * 1.5;
+        margin-top: $global_spacer;
     }
 
     > *:not(:last-child) {

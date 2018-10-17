@@ -6,8 +6,7 @@
 
 import React from "react";
 import { t } from "@library/application";
-import Container from "@knowledge/layouts/components/Container";
-import PanelLayout, { PanelArea } from "@knowledge/layouts/PanelLayout";
+import { PanelArea } from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
