@@ -68,7 +68,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
-        $data['template'] = 'seo/pages/category.twig';
+        $data['template'] = 'seo/pages/flatCategories.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
     }

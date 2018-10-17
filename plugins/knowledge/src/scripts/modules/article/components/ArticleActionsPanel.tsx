@@ -11,7 +11,7 @@ import { t } from "@library/application";
 
 interface IProps {}
 
-export default class ArticleActions extends React.Component<IProps> {
+export default class ArticleActionsPanel extends React.Component<IProps> {
     public render() {
         return (
             <PanelWidget>

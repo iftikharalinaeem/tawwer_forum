@@ -4,13 +4,16 @@
  * @license Proprietary
  */
 
-import { IArticle } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { produce } from "immer";
 
 export interface IArticlePageState {
     article: ILoadable<IArticle>;
+    restoreStatus: LoadStatus;
 }
 
 /**
@@ -21,37 +24,51 @@ export default class ArticlePageReducer extends ReduxReducer<IArticlePageState> 
         article: {
             status: LoadStatus.PENDING,
         },
+        restoreStatus: LoadStatus.PENDING,
     };
 
     public reducer = (
         state: IArticlePageState = this.initialState,
-        action: typeof ArticlePageActions.ACTION_TYPES,
+        action: typeof ArticlePageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IArticlePageState => {
-        switch (action.type) {
-            case ArticlePageActions.GET_ARTICLE_REQUEST:
-                return {
-                    article: {
-                        status: LoadStatus.LOADING,
-                    },
-                };
-            case ArticlePageActions.GET_ARTICLE_RESPONSE:
-                return {
-                    article: {
-                        status: LoadStatus.SUCCESS,
-                        data: action.payload.data,
-                    },
-                };
-            case ArticlePageActions.GET_ARTICLE_ERROR:
-                return {
-                    article: {
-                        status: LoadStatus.ERROR,
-                        error: action.payload,
-                    },
-                };
-            case ArticlePageActions.RESET:
-                return this.initialState;
-            default:
-                return state;
-        }
+        return produce(state, draft => {
+            switch (action.type) {
+                case ArticlePageActions.GET_ARTICLE_REQUEST:
+                    draft.article.status = LoadStatus.LOADING;
+                    break;
+                case ArticlePageActions.GET_ARTICLE_RESPONSE:
+                    draft.article.status = LoadStatus.SUCCESS;
+                    draft.article.data = action.payload.data;
+                    break;
+                case ArticlePageActions.GET_ARTICLE_ERROR:
+                    draft.article.status = LoadStatus.ERROR;
+                    draft.article.error = action.payload;
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
+                    if (
+                        state.article.status === LoadStatus.SUCCESS &&
+                        state.article.data.articleID === action.meta.articleID &&
+                        action.meta.status === ArticleStatus.PUBLISHED
+                    ) {
+                        draft.restoreStatus = LoadStatus.LOADING;
+                    }
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
+                    if (
+                        state.article.status === LoadStatus.SUCCESS &&
+                        draft.article.data &&
+                        state.article.data.articleID === action.meta.articleID
+                    ) {
+                        draft.article.data.status = action.payload.data.status;
+
+                        if (action.meta.status === ArticleStatus.PUBLISHED) {
+                            draft.restoreStatus = LoadStatus.SUCCESS;
+                        }
+                    }
+                    break;
+                case ArticlePageActions.RESET:
+                    return this.initialState;
+            }
+        });
     };
 }
