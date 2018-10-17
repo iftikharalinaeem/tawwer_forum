@@ -164,7 +164,7 @@ export default class EditorPageActions extends ReduxActions {
             // Redirect
             const replacementUrl = route.makeEditUrl(article.articleID);
             const newLocation = {
-                ...location,
+                ...history.location,
                 pathname: replacementUrl,
                 search: "",
             };
