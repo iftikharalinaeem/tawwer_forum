@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-export const dummyOtherLanguagesData: any = {
+export const dummyOtherLanguagesData = {
     selected: "en",
     children: [
         {

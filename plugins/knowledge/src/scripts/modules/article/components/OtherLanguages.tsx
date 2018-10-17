@@ -29,7 +29,7 @@ interface IProps {
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default class ArticleOtherLanguages extends React.Component<IProps, IState> {
+export default class OtherLangauges extends React.Component<IProps, IState> {
     private get titleID() {
         return this.state.id + "-title";
     }
