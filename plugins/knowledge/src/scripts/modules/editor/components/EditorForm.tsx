@@ -80,34 +80,31 @@ export class EditorForm extends React.Component<IProps, IState> {
                     <h1 className="sr-only">{t("Write Discussion")}</h1>
                     <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
                         <PanelLayout.MiddleBottom>
-                            <PanelWidget>
-                                {" "}
-                                <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
-                                    <LocationInput
-                                        initialCategoryID={categoryID}
-                                        key={categoryID === null ? undefined : categoryID}
-                                    />
-                                    <div className="sr-only">
-                                        <DocumentTitle title={this.state.name} />
-                                    </div>
-                                    <input
-                                        className="richEditorForm-title inputBlock-inputText inputText isGiant"
-                                        type="text"
-                                        placeholder={t("Title")}
-                                        value={this.state.name}
-                                        onChange={this.titleChangeHandler}
-                                        disabled={this.isLoading}
-                                    />
-                                    <Editor
-                                        allowUpload={true}
-                                        ref={this.editorRef}
-                                        isPrimaryEditor={true}
-                                        onChange={this.editorChangeHandler}
-                                        className="FormWrapper inheritHeight richEditorForm-editor"
-                                        isLoading={this.isLoading}
-                                    />
+                            <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
+                                <LocationInput
+                                    initialCategoryID={categoryID}
+                                    key={categoryID === null ? undefined : categoryID}
+                                />
+                                <div className="sr-only">
+                                    <DocumentTitle title={this.state.name} />
                                 </div>
-                            </PanelWidget>
+                                <input
+                                    className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                                    type="text"
+                                    placeholder={t("Title")}
+                                    value={this.state.name}
+                                    onChange={this.titleChangeHandler}
+                                    disabled={this.isLoading}
+                                />
+                                <Editor
+                                    allowUpload={true}
+                                    ref={this.editorRef}
+                                    isPrimaryEditor={true}
+                                    onChange={this.editorChangeHandler}
+                                    className="FormWrapper inheritHeight richEditorForm-editor"
+                                    isLoading={this.isLoading}
+                                />
+                            </div>
                         </PanelLayout.MiddleBottom>
                     </PanelLayout>
                 </Container>
