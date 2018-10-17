@@ -1,0 +1,18 @@
+{% for categoryGroup in categoryDirectory %}
+    <section>
+        <h1>{{ categoryGroup.title }}</h1>
+        <ul>
+            {% for category in categoryGroup.categories %}
+                <li>
+                    <a href="{{ category.url }}">
+                        {{ category.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endfor %}
+
+<pre>
+    {{ debug() }}
+</pre>
