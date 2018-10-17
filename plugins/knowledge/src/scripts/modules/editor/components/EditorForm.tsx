@@ -103,8 +103,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                         ref={this.editorRef}
                                         isPrimaryEditor={true}
                                         onChange={this.editorChangeHandler}
-                                        className="FormWrapper inheritHeight richEditorForm-editor {
-"
+                                        className="FormWrapper inheritHeight richEditorForm-editor"
                                         isLoading={this.isLoading}
                                     />
                                 </div>
