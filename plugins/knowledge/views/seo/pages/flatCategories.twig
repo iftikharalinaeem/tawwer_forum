@@ -1,18 +1,18 @@
-{% for categoryGroup in categoryDirectory %}
-    <section>
-        <h1>{{ categoryGroup.title }}</h1>
-        <ul>
-            {% for category in categoryGroup.categories %}
+        <main>
+            {% for category in page %}
+            <ul>
+                {% if category.url %}
                 <li>
                     <a href="{{ category.url }}">
                         {{ category.name }}
                     </a>
+                    {% if category.excerpt %}
+                    <p>
+                        {{ category.excerpt }}
+                    </p>
+                    {% endif %}
                 </li>
+                {% endif %}
+            </ul>
             {% endfor %}
-        </ul>
-    </section>
-{% endfor %}
-
-<pre>
-    {{ debug() }}
-</pre>
+        </main>

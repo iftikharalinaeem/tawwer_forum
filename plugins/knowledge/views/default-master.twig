@@ -43,9 +43,11 @@
             </div>
             <div id="app" class="page-minHeight">
                 {% if template %}
-                    <noscript>
-                        {{ include(template) }}
-                    </noscript>
+                <noscript>
+                    <h1>{{ meta.seo.title }}</h1>
+
+                    {{ include(template) }}
+                </noscript>
                 {% endif %}
                 <div class="fullPageLoader"></div>
             </div>
