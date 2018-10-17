@@ -59,7 +59,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={this.metaData as any}
                         />
-                        <div className="messages">{messages}</div>
+                        {messages && <div className="messages">{messages}</div>}
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>

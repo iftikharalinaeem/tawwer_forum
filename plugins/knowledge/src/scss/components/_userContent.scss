@@ -25,6 +25,10 @@
         margin-bottom: $global-block_margin;
     }
 
+    > *:first-child {
+        margin-top: 0;
+    }
+
     p {
         margin: {
             top: 0;
