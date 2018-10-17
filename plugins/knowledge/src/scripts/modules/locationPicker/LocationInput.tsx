@@ -60,7 +60,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                         title={buttonTitle}
                         type="button"
                         aria-label={t("Page Location:")}
-                        className="pageLocation"
+                        className="pageLocation-picker"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
                     >

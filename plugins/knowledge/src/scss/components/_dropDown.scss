@@ -32,6 +32,10 @@ $dropDown-item_minHeight                       : 45px;
         width: 1px;
         color: $overlay-border_color;
     }
+
+    &.isParentWidth {
+        width: 100%;
+    }
 }
 
 .dropDownItems {
@@ -57,6 +61,13 @@ $dropDown-item_minHeight                       : 45px;
 
 .dropDown-item {
     text-align: left;
+}
+
+.dropDown-toggleButtonIcon {
+    &:hover,
+    &:focus {
+        color: $global-color_primary;
+    }
 }
 
 .dropDownItem-button,

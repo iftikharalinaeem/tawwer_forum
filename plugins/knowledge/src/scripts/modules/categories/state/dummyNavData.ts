@@ -33,11 +33,11 @@ export const dummyNavData: IKbNavigationCategory[] = [
                     {
                         recordType: "knowledgeCategory",
                         recordID: 1,
-                        name: "TEST ",
+                        name: "Article 1",
                         parentID: 9,
                         isSection: false,
                         displayType: KbCategoryDisplayType.GUIDE,
-                        url: "/kb/articles/test-articles--all-formatting--embeds-3",
+                        url: "/kb/articles/1-article-one",
                     },
                     {
                         recordType: "knowledgeCategory",
@@ -236,11 +236,11 @@ export const dummyNavData: IKbNavigationCategory[] = [
     {
         recordType: "knowledgeCategory",
         recordID: 1,
-        name: "Test 2",
+        name: "Article 2",
         parentID: 2,
         isSection: false,
         displayType: KbCategoryDisplayType.GUIDE,
-        url: "/kb/articles/test-articles--text-post-1",
+        url: "/kb/articles/2-article-two",
     },
     {
         recordType: "knowledgeCategory",
@@ -267,7 +267,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
         parentID: 2,
         isSection: true,
         displayType: KbCategoryDisplayType.SEARCH,
-        url: "/kb/articles/test-articles--another-test-post-2",
+        url: "/kb/articles/3-article-three",
     },
     {
         recordType: "knowledgeCategory",

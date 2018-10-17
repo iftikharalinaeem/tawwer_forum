@@ -34,6 +34,10 @@ $buttonLoader-thickness: 3px;
         max-width: 100%;
     }
 
+    &.buttonNoMinWidth {
+        min-width: 0;
+    }
+
     &.buttonNoBorder {
         border: 0;
         min-width: $formElement-height;

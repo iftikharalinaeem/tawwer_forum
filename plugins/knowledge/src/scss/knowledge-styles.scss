@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+@import "base/overwrite";
 @import "~library-scss/_coreVariables";
 @import "~library-scss/mixins/_mixins";
 @import "~normalize.css";
@@ -77,6 +78,8 @@
 @import "components/word";
 @import "components/folderContents";
 @import "components/selectBox";
+@import "components/editorHeader";
+@import "components/pageLocation";
 //
 //@import "widget/splash";
 //@import "widget/searchBar";

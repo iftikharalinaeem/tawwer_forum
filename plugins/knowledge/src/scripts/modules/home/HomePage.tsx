@@ -13,7 +13,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 export default class HomePage extends React.Component {
     public render() {
         return (
-            <div>
+            <div className="container">
                 <DocumentTitle title={t("Home")} />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
@@ -30,9 +30,6 @@ export default class HomePage extends React.Component {
                 </p>
                 <p>
                     <Link to="/kb/categories/2-category-two">{t("Category Two")}</Link>
-                </p>
-                <p>
-                    <Link to="/kb/articles/add">{t("Add article")}</Link>
                 </p>
                 <p>
                     <ModalLink to="/kb/articles/add">{t("Add article (in 'modal')")}</ModalLink>

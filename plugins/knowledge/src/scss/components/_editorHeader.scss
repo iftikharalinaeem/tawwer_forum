@@ -1,0 +1,32 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+.editorHeader {
+  margin-top: $global-gutter_halfSize;
+}
+
+.editorHeader-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  padding: {
+    right: $global-gutter_halfSize;
+    left: $global-gutter_halfSize;
+  }
+}
+
+.editorHeader-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: $global_spacer;
+
+  &.isPullLeft {
+    margin-left: 0;
+    margin-right: auto;
+  }
+}
