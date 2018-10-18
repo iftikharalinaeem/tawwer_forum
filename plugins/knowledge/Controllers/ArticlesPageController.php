@@ -22,6 +22,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     const ACTION_VIEW = 'view';
     const ACTION_ADD = 'add';
     const ACTION_EDIT = 'edit';
+    const ACTION_REVISIONS = 'revisions';
 
     /** @var ArticlesApiController */
     protected $articlesApi;
@@ -123,6 +124,31 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
         return $this->twigInit()->render('default-master.twig', $data);
     }
+
+    /**
+     * Render out the /kb/articles/{id}/revisions path page.
+     *
+     * @param int $id URI article id.
+     * @return string Returns HTML page content
+     */
+    public function get_revisions(int $id): string {
+        $this->action = self::ACTION_REVISIONS;
+        $this->articleId = $id;
+        if (!$this->session->isValid()) {
+            self::signInFirst('kb/articles/'.$id.'/revisions');
+        }
+        $article = $this->articlesApi->get_revisions($id);
+
+        // Set the title
+        $this->setPageTitle($article['articleRevision']['name']);
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['template'] = 'seo/pages/articleRevisions.twig';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
 
     /**
      * Get article id.
