@@ -370,4 +370,19 @@ class SiteHubPlugin extends Gdn_Plugin {
             'Items' => ['' => 'None', 'settings' => 'Settings', 'membership' => 'Settings & Membership']
         ];
     }
+
+    /**
+     * Add hub specific control options to the badges.
+     *
+     * @param BadgeController $sender
+     * @param array $args
+     */
+    public function badgeController_beforeSave_handler($sender, $args) {
+        $sender->Data['_ExtendedFields']['HubSync'] = [
+            'Control' => 'RadioList',
+            'Description' => 'Specify if the badge synchronizes to the node sites.',
+            'Items' => ['' => 'None', 'settings' => 'Settings']
+        ];
+    }
+
 }
