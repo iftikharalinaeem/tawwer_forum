@@ -42,6 +42,11 @@ $this->title($Action . ' ' . t('a Badge')); ?>
 
     echo '</ul>';
 
+    $this->fireEvent('BeforeSave');
+    echo $this->Form->simple(
+         $this->data('_ExtendedFields', '')
+    );
+
     echo $this->Form->close('Save');
     ?>
 </div>

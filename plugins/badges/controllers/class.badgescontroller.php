@@ -70,9 +70,11 @@ class BadgesController extends BadgesAppController {
 
         $badges = $result['Badges'];
         foreach ($badges as $badge) {
-            $set = arrayTranslate($badge, ['Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level']);
-            $this->BadgeModel->save($set);
-            $this->BadgeModel->Validation->results(true);
+            if ($badge['HubSync'] === 1) {
+                $set = arrayTranslate($badge, ['Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level']);
+                $this->BadgeModel->save($set);
+                $this->BadgeModel->Validation->results(true);
+            }
         }
     }
 
