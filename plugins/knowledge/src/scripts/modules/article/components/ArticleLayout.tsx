@@ -15,7 +15,7 @@ import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/compo
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/Sentence";
+import { InlineTypes } from "@library/components/translation/Sentence";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";

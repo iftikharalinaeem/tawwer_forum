@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Sentence, { ISentence, InlineTypes } from "@library/components/Sentence";
+import Sentence, { ISentence, InlineTypes } from "@library/components/translation/Sentence";
 import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
 import Paragraph from "@library/components/Paragraph";
 

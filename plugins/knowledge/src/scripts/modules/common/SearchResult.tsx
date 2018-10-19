@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Sentence, { ISentence } from "@library/components/Sentence";
+import Sentence, { ISentence } from "@library/components/translation/Sentence";
 import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import AttachmentIcons, { IIconAttachment } from "@knowledge/modules/common/AttachmentIcons";

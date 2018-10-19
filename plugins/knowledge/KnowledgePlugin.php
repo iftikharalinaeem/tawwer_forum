@@ -30,8 +30,8 @@ class KnowledgePlugin extends Gdn_Plugin {
      */
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(\Garden\Web\Dispatcher::class)
-            ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-article"), 'kb-article']);
-        $container->rule('@kb-article')
+            ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-page"), 'kb-page']);
+        $container->rule('@kb-page')
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/kb/', '*\\Knowledge\\Controllers\\%sPageController'])
             ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8']);

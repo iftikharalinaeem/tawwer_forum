@@ -7,7 +7,7 @@
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
-import { InlineTypes } from "@library/components/Sentence";
+import { InlineTypes } from "@library/components/translation/Sentence";
 import { IArticle } from "@knowledge/@types/api";
 import {
     DropDownItemLink,

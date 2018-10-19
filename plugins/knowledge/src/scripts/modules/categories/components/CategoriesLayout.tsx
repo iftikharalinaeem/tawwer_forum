@@ -10,7 +10,7 @@ import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/Sentence";
+import { InlineTypes } from "@library/components/translation/Sentence";
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { t } from "@library/application";

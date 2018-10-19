@@ -10,7 +10,7 @@ import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
-import Sentence, { InlineTypes } from "@library/components/Sentence";
+import Sentence, { InlineTypes } from "@library/components/translation/Sentence";
 
 interface IProps {
     className?: string;
