@@ -42,6 +42,19 @@ class KbPageController extends KnowledgeTwigPageController {
     }
 
     /**
+     * Render out the /kb/search page.
+     */
+    public function get_search() : string {
+        $this->setPageTitle(\Gdn::translate('Search'));
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
+        $data['template'] = 'seo/pages/search.twig';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
      * Initialize page SEO meta data.
      *
      * (temporary solution, need to be extended and/or refactored later)
