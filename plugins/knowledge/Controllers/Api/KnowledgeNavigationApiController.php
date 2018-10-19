@@ -52,7 +52,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     "enum" => ["article", "knowledgeCategory"],
                     "type" => "string",
                 ],
-                "children:a" => [
+                "children:a?" => [
                     "name" => ["type" => "string"],
                     "displayType" => [
                         "allowNull" => true,
@@ -92,6 +92,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "default" => 2,
                 "description" => "The maximum depth results should be, relative to the target knowledge base or category."
             ],
+            "treeMode:s?" => [
+                "default" => 'flat',
+                "description" => "Result mode: tree or flat.",
+                "enum" => ['flat', 'tree']
+            ],
         ], "in")
             //->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
             ->setDescription("Get a navigation-friendly category hierarchy.");
@@ -99,7 +104,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        $tree = $this->knowledgeCategoryModel->sectionChildren($query["knowledgeCategoryID"]);
+        $tree = $this->knowledgeCategoryModel->sectionChildren($query["knowledgeCategoryID"], true, ($query['treeMode'] == 'flat'));
         foreach ($tree as &$row) {
             $row = $this->normalizeOutput($row);
         }
