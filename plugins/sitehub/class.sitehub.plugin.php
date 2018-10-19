@@ -71,7 +71,12 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('SyncToNodes', 'tinyint(1)', '0')
             ->set();
 
-        touchConfig('Badges.Disabled', true);
+        gdn::structure()
+            ->table('Badge')
+            ->column('HubSync', 'tinyint(1)', '0')
+            ->set();
+
+        //touchConfig('Badges.Disabled', true);
 
         // This table contains a mirror of all of the categories on all of the nodes.
         gdn::structure()
@@ -379,9 +384,9 @@ class SiteHubPlugin extends Gdn_Plugin {
      */
     public function badgeController_beforeSave_handler($sender, $args) {
         $sender->Data['_ExtendedFields']['HubSync'] = [
-            'Control' => 'RadioList',
-            'Description' => 'Specify if the badge synchronizes to the node sites.',
-            'Items' => ['' => 'None', 'settings' => 'Settings']
+            'Control' => 'CheckBox',
+            'LabelCode' => t('Sync to Nodes'),
+            'Default' => false
         ];
     }
 
