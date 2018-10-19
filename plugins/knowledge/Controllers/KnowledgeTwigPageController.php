@@ -15,6 +15,8 @@ use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
+use Vanilla\Web\Assets\WebpackAsset;
+use Vanilla\Web\Assets\WebpackAssetProvider;
 
 /**
  * Knowledge Twig & ArticlesApi controller abstract class.
@@ -54,25 +56,20 @@ abstract class KnowledgeTwigPageController extends PageController {
         $this->knowledgeCategoryModel = $container->get(KnowledgeCategoryModel::class);
         $this->siteMeta = $container->get(SiteMeta::class);
         $this->session = $this->container->get(\Gdn_Session::class);
-        $assetModel = $this->container->get(\AssetModel::class);
+        /** @var WebpackAssetProvider $assetProvider */
+        $assetProvider = $this->container->get(WebpackAssetProvider::class);
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
 
-        // Scripts
-        // Assemble our site context for the frontend.
-        $locale = $container->get(\Gdn_Locale::class);
-        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
-        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
+        $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
+
+        $mapAssetToPath = function(WebpackAsset $asset) { return $asset->getWebPath(); };
+        $this->scripts = array_map($mapAssetToPath, $assetProvider->getScripts('knowledge'));
+        $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
+
         $this->addGdnScript();
-        $this->scripts[] = $assetModel->getJSLocalePath($locale->current());
+        $this->scripts[] = $assetProvider->getLocaleAsset()->getWebPath();
         $this->addGlobalReduxActions();
 
-        // Stylesheets
-        if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = [
-                '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css',
-                '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/rich-editor.min.css',
-            ];
-        }
     }
 
     /**
