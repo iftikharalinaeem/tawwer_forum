@@ -37,7 +37,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      */
     public function categoryNavigationFragment(): Schema {
         if ($this->categoryNavigationFragment === null) {
-            $this->categoryNavigationFragment = $this->schema([
+            $schema = [
                 "name" => ["type" => "string"],
                 "displayType" => [
                     "allowNull" => true,
@@ -68,49 +68,75 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                         "type" => "string",
                     ],
                 ]
-            ], "CategoryNavigationFragment");
+            ];
+
+            $this->categoryNavigationFragment = $this->schema($schema, "CategoryNavigationFragment");
         }
         return $this->categoryNavigationFragment;
     }
 
     /**
-     * Get a navigation-friendly record hierarchy of categories and articles.
+     * Get a navigation-friendly record hierarchy of categories and articles in flat mode.
      *
      * @param array $query Request query.
      * @return array Navigation items, arranged hierarchically.
-     * @throws \Garden\Schema\ValidationException If input or output fails to validate against the schema.
-     * @throws \Garden\Web\Exception\HttpException If a relevant permission ban is on the user's session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access this resource.
      */
-    public function index(array $query = []): array {
+    public function get_flat(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
-        $in = $this->schema([
-            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-            "knowledgeCategoryID:i" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
-            "maxDepth:i" => [
-                "default" => 2,
-                "description" => "The maximum depth results should be, relative to the target knowledge base or category."
-            ],
-            "treeMode:s?" => [
-                "default" => 'flat',
-                "description" => "Result mode: tree or flat.",
-                "enum" => ['flat', 'tree']
-            ],
-        ], "in")
-            //->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
-            ->setDescription("Get a navigation-friendly category hierarchy.");
+        $in = $this->schema($this->defaultSchema(), "in")
+            ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
         $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
 
         $query = $in->validate($query);
 
-        $tree = $this->knowledgeCategoryModel->sectionChildren($query["knowledgeCategoryID"], true, ($query['treeMode'] == 'flat'));
+        $tree = $this->knowledgeCategoryModel->sectionChildren($query["knowledgeCategoryID"], true, true);
         foreach ($tree as &$row) {
             $row = $this->normalizeOutput($row);
         }
 
         $result = $out->validate($tree);
         return $result;
+    }
+
+    /**
+     * Get a navigation-friendly record hierarchy of categories and articles in tree mode.
+     *
+     * @param array $query Request query.
+     * @return array Navigation items, arranged hierarchically.
+     */
+    public function get_tree(array $query = []): array {
+        $this->permission("knowledge.kb.view");
+
+        $in = $this->schema($this->defaultSchema(), "in")
+            ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
+        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
+
+        $query = $in->validate($query);
+
+        $tree = $this->knowledgeCategoryModel->sectionChildren($query["knowledgeCategoryID"], true, false);
+        foreach ($tree as &$row) {
+            $row = $this->normalizeOutput($row);
+        }
+
+        $result = $out->validate($tree);
+        return $result;
+    }
+
+    /**
+     * Prepare default schema array for "in" schema
+     *
+     * @return array
+     */
+    protected function defaultSchema() {
+        return [
+            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
+            "knowledgeCategoryID:i" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
+            "maxDepth:i" => [
+                "default" => 2,
+                "description" => "The maximum depth results should be, relative to the target knowledge base or category."
+            ]
+        ];
     }
 
     /**
