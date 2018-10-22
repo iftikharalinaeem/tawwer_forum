@@ -18,6 +18,7 @@ import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { getRequiredID } from "@library/componentIDs";
 
 interface IProps {
     device: Devices;
@@ -27,6 +28,7 @@ interface IProps {
     currentCategory: IKbCategoryFragment | null;
     className?: string;
     isSubmitLoading: boolean;
+    titleID?: string;
 }
 
 interface IState {
@@ -42,7 +44,6 @@ export class EditorForm extends React.Component<IProps, IState> {
 
     public constructor(props: IProps) {
         super(props);
-
         if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
             this.state = {
                 name: this.props.revision.data.name,
@@ -77,7 +78,9 @@ export class EditorForm extends React.Component<IProps, IState> {
                     className="richEditorForm-header"
                 />
                 <Container className="richEditorForm-body">
-                    <h1 className="sr-only">{t("Write Discussion")}</h1>
+                    <h1 id={this.props.titleID} className="sr-only">
+                        {t("Write Discussion")}
+                    </h1>
                     <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
                         <PanelLayout.MiddleBottom>
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
