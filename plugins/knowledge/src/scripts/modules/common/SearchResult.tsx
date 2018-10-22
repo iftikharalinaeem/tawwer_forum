@@ -6,22 +6,21 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
-import Sentence, { ISentence } from "@library/components/Sentence";
 import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
-import AttachmentIcons, { IIconAttachment } from "@knowledge/modules/common/AttachmentIcons";
+import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
+import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 
 export interface IResult {
     name: string;
     className?: string;
-    meta: ISentence[];
+    meta: React.ReactNode;
     url: string;
     excerpt: string;
     image?: string;
     headingLevel?: 2 | 3;
-    attachments: IIconAttachment[];
+    attachments: IAttachmentIcon[];
 }
 
 /**
@@ -47,7 +46,7 @@ export default class SearchResult extends React.Component<IResult> {
 
         let attachmentOutput;
         if (hasAttachments && this.props.attachments) {
-            attachmentOutput = <AttachmentIcons children={this.props.attachments} />;
+            attachmentOutput = <AttachmentIcons attachments={this.props.attachments} />;
         }
         const HeadingTag = `h${this.props.headingLevel}`;
 
@@ -64,15 +63,7 @@ export default class SearchResult extends React.Component<IResult> {
                     <Link to={this.props.url} className="searchResult">
                         <div className={classNames("searchResult-main", { hasMedia: !!media })}>
                             <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
-                            {this.props.meta && (
-                                <div className="searchResult-metas">
-                                    <Sentence
-                                        directChildClass="metas"
-                                        descendantChildClasses="meta"
-                                        children={this.props.meta as any}
-                                    />
-                                </div>
-                            )}
+                            {this.props.meta && <div className="searchResult-metas metas">{this.props.meta}</div>}
                             {!!this.props.excerpt && (
                                 <Paragraph className="searchResult-excerpt">{this.props.excerpt}</Paragraph>
                             )}

@@ -5,134 +5,41 @@
  */
 
 import * as React from "react";
-import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
-import Sentence, { ISentence, InlineTypes } from "@library/components/Sentence";
-import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
-import Paragraph from "@library/components/Paragraph";
-
-export enum AttachmentType {
-    FILE = "file",
-    PDF = "PDF",
-    EXCEL = "excel",
-    WORD = "word",
-}
-
-// Common to both attachment types
-interface IAttachmentCommon {
-    name: string;
-    type: AttachmentType;
-}
-
-// Attachment of type icon
-export interface IIconAttachment extends IAttachmentCommon {}
+import AttachmentIcon, { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
+import Translate from "@library/components/translation/Translate";
 
 // Array of icon attachments
-export interface IAttachmentsIcons {
-    children: IIconAttachment[];
+interface IProps {
+    attachments: IAttachmentIcon[];
     maxCount?: number;
-}
-
-interface IState {
-    id: string;
 }
 
 /**
  * Generates a list of attachment icons
  */
-export default class AttachmentIcons extends React.Component<IAttachmentsIcons, IState> {
-    private maxCount;
+export default class AttachmentIcons extends React.Component<IProps> {
+    private maxCount = 3;
+    private id = uniqueIDFromPrefix("attachments-");
 
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "attachments-"),
-        };
-        this.maxCount = 3;
-        if (props.maxCount && props.maxCount > 0 && props.maxCount <= props.children.length) {
+        if (props.maxCount && props.maxCount > 0 && props.maxCount <= props.attachments.length) {
             this.maxCount = props.maxCount;
         }
     }
 
     public get titleID() {
-        return this.state.id + "-title";
-    }
-
-    public getAttachmentIcon(type: AttachmentType, className?: string) {
-        switch (type) {
-            case AttachmentType.EXCEL:
-                return fileExcel(className);
-            case AttachmentType.PDF:
-                return filePDF(className);
-            case AttachmentType.WORD:
-                return fileWord(className);
-            default:
-                return fileGeneric(className);
-        }
+        return this.id + "-title";
     }
 
     public render() {
-        const childrenCount = !!this.props.children ? this.props.children.length : 0;
-        const attachments =
-            this.props.children && this.props.children.length > 0
-                ? this.props.children.map((attachment, i) => {
-                      const key = `attachment-${i}`;
-                      const index = i + 1;
-                      const extraCount = childrenCount - index;
-                      if (i < this.maxCount) {
-                          return (
-                              <li className="attachmentsIcons-item" key={key}>
-                                  <div
-                                      className={classNames(
-                                          "attachmentsIcons-file",
-                                          `attachmentsIcons-${attachment.type}`,
-                                      )}
-                                      title={t(attachment.type)}
-                                  >
-                                      <span className="sr-only">
-                                          <Paragraph>{`${attachment.name} (${t("Type: ")}} ${t(
-                                              attachment.type,
-                                          )}})`}</Paragraph>
-                                      </span>
-                                      {this.getAttachmentIcon(attachment.type)}
-                                  </div>
-                              </li>
-                          );
-                      } else if (i === this.maxCount && extraCount > 0) {
-                          const moreMessage = {
-                              children: [
-                                  {
-                                      children: "+ ",
-                                      type: InlineTypes.TEXT,
-                                  },
-                                  {
-                                      children: `${extraCount}`,
-                                      type: InlineTypes.TEXT,
-                                      className: "attachmentsIcons-moreCount",
-                                  },
-                                  {
-                                      children: " more",
-                                      type: InlineTypes.TEXT,
-                                  },
-                              ],
-                          };
+        if (this.attachmentsCount < 1) {
+            return null;
+        }
 
-                          return (
-                              <li className="attachmentsIcons-item" key={key}>
-                                  <span
-                                      className={"attachmentsIcons-more"}
-                                      title={t(attachment.type.toLocaleLowerCase())}
-                                  >
-                                      {<Sentence className="metaStyle" children={...moreMessage as any} />}
-                                  </span>
-                              </li>
-                          );
-                      } else {
-                          return null;
-                      }
-                  })
-                : null;
+        const attachments = this.renderAttachments();
 
         if (attachments) {
             return (
@@ -148,5 +55,42 @@ export default class AttachmentIcons extends React.Component<IAttachmentsIcons, 
         } else {
             return null;
         }
+    }
+
+    /**
+     * Calculate the total attachments to display.
+     */
+    private get attachmentsCount(): number {
+        return this.props.attachments.length;
+    }
+
+    /**
+     * Render out the visible attachments.
+     */
+    private renderAttachments() {
+        return this.props.attachments.map((attachment, i) => {
+            const index = i + 1;
+            const extraCount = this.attachmentsCount - index;
+            if (i < this.maxCount) {
+                return <AttachmentIcon name={attachment.name} type={attachment.type} key={index} />;
+            } else if (i === this.maxCount && extraCount > 0) {
+                return this.renderMorePlacholder(extraCount, index);
+            } else {
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Render a placeholder indicating that there are more unshown attachments.
+     */
+    private renderMorePlacholder(remainingCount: number, index: number): React.ReactNode {
+        const message = <Translate source="+ <0/> more" c0={remainingCount} />;
+
+        return (
+            <li className="attachmentsIcons-item" key={index}>
+                <span className={"attachmentsIcons-more metaStyle"}>{message}</span>
+            </li>
+        );
     }
 }

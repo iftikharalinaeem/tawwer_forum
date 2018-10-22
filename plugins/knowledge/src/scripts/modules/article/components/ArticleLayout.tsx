@@ -15,13 +15,17 @@ import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/compo
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/Sentence";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
+import Translate from "@library/components/translation/Translate";
+import ProfileLink from "@library/components/ProfileLink";
+import DateTime from "@library/components/DateTime";
+import { Link } from "react-router-dom";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 
 interface IProps {
     article: IArticle;
@@ -56,7 +60,13 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <PageTitle
                             title={article.articleRevision.name}
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                            meta={this.metaData as any}
+                            meta={
+                                <ArticleMeta
+                                    updateUser={article.updateUser!}
+                                    dateUpdated={article.dateUpdated}
+                                    permaLink={article.url}
+                                />
+                            }
                         />
                         {messages && <div className="messages">{messages}</div>}
                     </PanelLayout.MiddleTop>
@@ -116,37 +126,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             to: "#theming-guide-for-designers",
         },
     ];
-
-    private metaData = {
-        children: [
-            {
-                children: "By Todd Burry",
-                type: InlineTypes.TEXT,
-            },
-            {
-                children: [
-                    {
-                        children: "Last Updated:" + String.fromCharCode(160),
-                        type: InlineTypes.TEXT,
-                    },
-                    {
-                        timeStamp: "2018-03-03",
-                        type: InlineTypes.DATETIME,
-                        children: [
-                            {
-                                children: "3 March 2018",
-                                type: InlineTypes.TEXT,
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                children: "ID #1029384756",
-                type: InlineTypes.TEXT,
-            },
-        ],
-    };
 }
 
 export default withDevice<IProps>(ArticleLayout);

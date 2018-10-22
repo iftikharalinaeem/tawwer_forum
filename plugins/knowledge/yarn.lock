@@ -5,24 +5,29 @@
 dom7@^2.0.7:
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/dom7/-/dom7-2.0.7.tgz#43940bff361cc0e5f38c349b055fd60c10309b89"
+  integrity sha512-1M6HYWK1NZR3JyrRYy1JjFc0U+eB+OqzPjeAB05TlY87RDo1XJHS1NdUoNGPwDfZqKyCRTO4NkyCosUsyLiKGQ==
   dependencies:
     ssr-window "^1.0.0"
 
 normalize.css@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/normalize.css/-/normalize.css-8.0.0.tgz#14ac5e461612538a4ce9be90a7da23f86e718493"
+  integrity sha512-iXcbM3NWr0XkNyfiSBsoPezi+0V92P9nj84yVV1/UZxRUrGczgX/X91KMAGM0omWLY2+2Q1gKD/XRn4gQRDB2A==
 
 shave@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/shave/-/shave-2.4.0.tgz#129481ce411f35515353ff79b3e1ec3093b9e980"
+  integrity sha512-jg8W88NyFRU4lzz+Hy5P9X5JHwN74fqC+rKGQ6FklvcrcI1IrufDOKyG4o2A0ZWImBZCxMEiBxj6Ssa18AEFvA==
 
 ssr-window@^1.0.0, ssr-window@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ssr-window/-/ssr-window-1.0.1.tgz#30752a6a4666e7767f0b7e6aa6fc2fdbd0d9b369"
+  integrity sha512-dgFqB+f00LJTEgb6UXhx0h+SrG50LJvti2yMKMqAgzfUmUXZrLSv2fjULF7AWGwK25EXu8+smLR3jYsJQChPsg==
 
 swiper@^4.3.5:
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/swiper/-/swiper-4.3.5.tgz#40369d4870e66cd10eb9862329af63b8a582aca1"
+  integrity sha512-zFRvMZNFFrXGJWRSJLeD8wkHcIr5uStqk+Cv1fvPDtZxB687PurfjYgK1Ga7j7XQGm5xfCqGMSELNRSaBn36gA==
   dependencies:
     dom7 "^2.0.7"
     ssr-window "^1.0.1"

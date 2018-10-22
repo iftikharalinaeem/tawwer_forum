@@ -6,56 +6,35 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
-import Sentence, { InlineTypes } from "@library/components/Sentence";
+import Translate from "@library/components/translation/Translate";
 
 interface IProps {
     className?: string;
     searchTerm?: string;
-    children: IResult[];
-}
-interface IState {
-    children: IResult[];
+    results: IResult[];
 }
 
 /**
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
-export default class SearchResults extends React.Component<IProps, IState> {
+export default class SearchResults extends React.Component<IProps> {
     public render() {
-        const hasResults = this.props.children && this.props.children.length > 0;
+        const hasResults = this.props.results && this.props.results.length > 0;
         let content;
 
-        const noResultsMessage = {
-            children: [
-                {
-                    children: "No results for '",
-                    type: InlineTypes.TEXT,
-                },
-                {
-                    children: this.props.searchTerm,
-                    type: InlineTypes.TEXT,
-                },
-                {
-                    children: "'.",
-                    type: InlineTypes.TEXT,
-                },
-            ],
-        };
-
         if (hasResults) {
-            content = this.props.children.map((result, i) => {
-                return <SearchResult {...result} key={`searchResults-${i}`} />;
+            content = this.props.results.map((result, i) => {
+                return <SearchResult {...result} key={i} />;
             });
-        } else if (!this.props.searchTerm || this.props.searchTerm === "") {
-            content = <Paragraph className="searchResults-noResults">{t("No results")}</Paragraph>;
+        } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
+            content = <Paragraph className="searchResults-noResults">{t("No results.")}</Paragraph>;
         } else {
             content = (
                 <Paragraph className="searchResults-noResults isEmpty">
-                    <Sentence children={noResultsMessage as any} />
+                    <Translate source="No results for '<0/>'." c0={this.props.searchTerm} />
                 </Paragraph>
             );
         }

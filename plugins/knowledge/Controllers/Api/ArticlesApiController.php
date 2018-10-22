@@ -123,6 +123,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "url",
                     "name",
                     "excerpt",
+                    "updateUser",
+                    "dateUpdated",
                 ])->add($this->fullSchema()),
                 "ArticleFragment"
             );
@@ -400,9 +402,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ],
         ], "in")->setDescription("List excerpts from published articles in a given knowledge category.");
         $out = $this->schema([":a" => $this->articleFragmentSchema()], "out");
-
         $query = $in->validate($query);
+
         $articles = $this->index($query);
+        $this->userModel->expandUsers(
+            $articles,
+            ["updateUserID"]
+        );
 
         $result = $out->validate($articles);
         return $result;
