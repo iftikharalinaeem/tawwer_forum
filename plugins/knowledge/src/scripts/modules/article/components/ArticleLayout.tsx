@@ -22,9 +22,8 @@ import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
-import ArticleActionsPanel from "@knowledge/modules/article/components/ArticleActionsPanel";
 import Translate from "@library/components/translation/Translate";
-import ProfileLink from "@dashboard/profile/ProfileLink";
+import ProfileLink from "@library/components/ProfileLink";
 import DateTime from "@library/components/DateTime";
 import { Link } from "react-router-dom";
 

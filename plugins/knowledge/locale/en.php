@@ -16,3 +16,7 @@ $Definition['Revision History'] = 'Revision History';
 $Definition['Attachments: '] = 'Attachments: ';
 $Definition['Type: '] = 'Type: ';
 $Definition['+ <0/> more'] = '+ <0/> more';
+
+// Metadata
+$Definition['By <0/>'] = 'By <0/>';
+$Definition['Last Updated: <0/>'] = 'Last Updated: <0/>';

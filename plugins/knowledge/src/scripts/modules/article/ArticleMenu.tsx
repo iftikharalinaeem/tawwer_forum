@@ -24,7 +24,7 @@ import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { Link } from "react-router-dom";
-import ProfileLink from "@dashboard/profile/ProfileLink";
+import ProfileLink from "@library/components/ProfileLink";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
