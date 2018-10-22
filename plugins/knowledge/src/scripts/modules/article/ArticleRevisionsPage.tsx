@@ -25,6 +25,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { IUserFragment } from "@dashboard/@types/api/user";
 import { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionHistory";
 import { t } from "@library/application";
+import { getRequiredID } from "@library/componentIDs";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -49,6 +50,13 @@ interface IState {
  * Page component for an article.
  */
 export class ArticleRevisionsPage extends React.Component<IProps, IState> {
+    private id;
+
+    constructor(props) {
+        super(props);
+        id: getRequiredID(props, "articleRevisionPage");
+    }
+
     /**
      * Render not found or the article.
      */
@@ -60,15 +68,6 @@ export class ArticleRevisionsPage extends React.Component<IProps, IState> {
             return <NotFoundPage type="Page" />;
         }
 
-        /**
-         *     article: IArticle;
-         backUrl: string | null;
-         submitHandler: (revisionID: string, title: string) => void;
-         messages?: React.ReactNode;
-         isSubmitLoading: boolean;
-         revisionHistory: IArticleRevisionWithUrl[];
-         */
-
         return (
             <PageLoader {...article}>
                 {article.status === LoadStatus.SUCCESS && (
@@ -77,7 +76,8 @@ export class ArticleRevisionsPage extends React.Component<IProps, IState> {
                             article={article.data}
                             breadcrumbData={breadcrumbData!}
                             messages={this.renderMessages()}
-                            location={this.state && this.state.lastLocation ? this.state.lastLocation.pathname : "/kb"}
+                            match={this.props.match}
+                            revisionHistory={revisionHistory()}
                         />
                     </DocumentTitle>
                 )}

@@ -24,6 +24,9 @@ import ArticleDeletedMessage from "@knowledge/modules/article/components/Article
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 
 interface IProps extends IDeviceProps, IArticleActionsProps {
+    match: match<{
+        id: number;
+    }>;
     article: ILoadable<IArticle>;
     restoreStatus: LoadStatus;
     articlePageActions: ArticlePageActions;
@@ -43,7 +46,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, breadcrumbData } = this.props;
-        // const { id } = this.props.match.params;
+        const { id } = this.props.match.params;
 
         if (id === null || (article.status === LoadStatus.ERROR && article.error.status === 404)) {
             return <NotFoundPage type="Page" />;

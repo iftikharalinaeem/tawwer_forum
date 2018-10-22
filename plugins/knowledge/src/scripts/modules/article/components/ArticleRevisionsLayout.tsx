@@ -121,11 +121,7 @@ export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        if (this.backLink) {
-            this.props.history.goBack();
-        } else {
-            this.props.history.push("/kb");
-        }
+        return;
     };
 
     /**
