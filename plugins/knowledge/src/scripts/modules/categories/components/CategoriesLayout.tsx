@@ -15,8 +15,8 @@ import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu"
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
-import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
+import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 
 interface IProps {
     breadcrumbData: ICrumb[];
@@ -54,13 +54,13 @@ export class CategoriesLayout extends React.Component<IProps> {
             .map(article => {
                 return {
                     name: article.name || "",
-                    meta: dummyMetaData,
+                    meta: <SearchResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
                     url: article.url,
                     excerpt: article.excerpt || "",
                     attachments: [] as any,
                 };
             })
-            .concat(dummyArticles);
+            .concat(dummyArticles as any);
     }
 }
 

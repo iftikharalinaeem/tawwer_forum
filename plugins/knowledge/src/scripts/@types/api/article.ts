@@ -67,6 +67,7 @@ export interface IPatchArticleStatusResponseBody extends IArticle {}
 export interface IArticleFragment {
     articleID: number;
     name: string; //The title of the article
+    dateUpdated: string;
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
     excerpt: string;
