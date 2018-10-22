@@ -13,7 +13,7 @@ import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import { newFolder } from "@library/components/Icons";
 import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IProps {
     exitHandler: () => void;
@@ -40,7 +40,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
 
     public constructor(props) {
         super(props);
-        this.id = getRequiredID(props, "navigationItemList");
+        this.id = uniqueIDFromPrefix("navigationItemList");
     }
 
     private get titleID() {
