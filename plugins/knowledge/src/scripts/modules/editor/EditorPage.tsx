@@ -23,6 +23,7 @@ import {
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -43,9 +44,20 @@ interface IState {
  * Page for editing an article.
  */
 export class EditorPage extends React.Component<IProps, IState> {
+    private id;
+
     public state = {
         showFolderPicker: false,
     };
+
+    public constructor(props: IProps) {
+        super(props);
+        this.id = uniqueIDFromPrefix("editorPage");
+    }
+
+    get titleID() {
+        return this.id + "-title";
+    }
 
     public render() {
         const pageContent = (
@@ -56,12 +68,13 @@ export class EditorPage extends React.Component<IProps, IState> {
                 revision={this.props.pageState.revision}
                 currentCategory={this.props.locationCategory}
                 isSubmitLoading={this.isSubmitLoading}
+                titleID={this.titleID}
             />
         );
 
         if (this.isModal) {
             return (
-                <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+                <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
                     {pageContent}
                 </Modal>
             );

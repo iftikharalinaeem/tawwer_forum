@@ -35,11 +35,19 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         url: "",
     };
 
+    private id;
+
+    private get titleID() {
+        return this.id + "-title";
+    }
+
     public render() {
         return (
-            <Modal size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
+            <Modal titleID={this.titleID} size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
                 <Frame>
-                    <FrameHeader closeFrame={this.props.exitHandler}>{t("New Folder")}</FrameHeader>
+                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>
+                        {t("New Folder")}
+                    </FrameHeader>
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock
