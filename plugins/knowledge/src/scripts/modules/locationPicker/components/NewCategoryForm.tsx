@@ -13,6 +13,7 @@ import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import { newFolder } from "@library/components/Icons";
 import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IProps {
     exitHandler: () => void;
@@ -35,11 +36,24 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         url: "",
     };
 
+    private id;
+
+    public constructor(props) {
+        super(props);
+        this.id = uniqueIDFromPrefix("navigationItemList");
+    }
+
+    private get titleID() {
+        return this.id + "-title";
+    }
+
     public render() {
         return (
-            <Modal size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
+            <Modal titleID={this.titleID} size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
                 <Frame>
-                    <FrameHeader closeFrame={this.props.exitHandler}>{t("New Folder")}</FrameHeader>
+                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>
+                        {t("New Folder")}
+                    </FrameHeader>
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock

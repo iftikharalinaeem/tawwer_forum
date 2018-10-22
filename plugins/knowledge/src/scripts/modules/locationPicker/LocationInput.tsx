@@ -72,7 +72,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                         exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
                         className={classNames(this.props.className)}
-                        description={t("Choose a location for this page.")}
+                        label={t("Choose a location for this page.")}
                     >
                         <LocationPicker
                             onChoose={this.hideLocationPicker}
