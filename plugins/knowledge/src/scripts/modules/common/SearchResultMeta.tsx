@@ -14,27 +14,19 @@ import { IUserFragment } from "@dashboard/@types/api";
 interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
-    permaLink: string;
 }
 
-export class ArticleMeta extends React.Component<IProps> {
+export class SearchResultMeta extends React.Component<IProps> {
     public render() {
-        const { dateUpdated, updateUser, permaLink } = this.props;
+        const { dateUpdated, updateUser } = this.props;
 
         return (
             <React.Fragment>
-                <span className="meta">
-                    <Translate source="By <0/>" c0={<ProfileLink className="meta" username={updateUser.name} />} />
+                <span className="metaStyle">
+                    <Translate source="By <0/>" c0={updateUser.name} />
                 </span>
-                <span className="meta">
-                    <Translate
-                        source="Last Updated: <0/>"
-                        c0={
-                            <Link to={permaLink} className="meta">
-                                <DateTime timestamp={dateUpdated} />
-                            </Link>
-                        }
-                    />
+                <span className="metaStyle">
+                    <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
             </React.Fragment>
         );

@@ -16,7 +16,7 @@ import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 export interface IResult {
     name: string;
     className?: string;
-    meta: ISentence[];
+    meta: React.ReactNode;
     url: string;
     excerpt: string;
     image?: string;
@@ -64,15 +64,7 @@ export default class SearchResult extends React.Component<IResult> {
                     <Link to={this.props.url} className="searchResult">
                         <div className={classNames("searchResult-main", { hasMedia: !!media })}>
                             <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
-                            {this.props.meta && (
-                                <div className="searchResult-metas">
-                                    <Sentence
-                                        directChildClass="metas"
-                                        descendantChildClasses="meta"
-                                        children={this.props.meta as any}
-                                    />
-                                </div>
-                            )}
+                            {this.props.meta && <div className="searchResult-metas">{this.props.meta}</div>}
                             {!!this.props.excerpt && (
                                 <Paragraph className="searchResult-excerpt">{this.props.excerpt}</Paragraph>
                             )}

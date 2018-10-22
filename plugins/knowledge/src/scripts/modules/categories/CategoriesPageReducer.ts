@@ -6,8 +6,7 @@
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
-import { IKbCategory, IArticleFragment, KbCategoryDisplayType, KbCategorySortMode } from "@knowledge/@types/api";
-import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
+import { IKbCategory, IArticleFragment, KbCategorySortMode } from "@knowledge/@types/api";
 import produce from "immer";
 
 export interface ICategoriesPageState {

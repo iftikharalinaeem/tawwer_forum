@@ -15,18 +15,15 @@ import Sentence, { InlineTypes } from "@library/components/translation/Sentence"
 interface IProps {
     className?: string;
     searchTerm?: string;
-    children: IResult[];
-}
-interface IState {
-    children: IResult[];
+    results: IResult[];
 }
 
 /**
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
-export default class SearchResults extends React.Component<IProps, IState> {
+export default class SearchResults extends React.Component<IProps> {
     public render() {
-        const hasResults = this.props.children && this.props.children.length > 0;
+        const hasResults = this.props.results && this.props.results.length > 0;
         let content;
 
         const noResultsMessage = {
@@ -47,7 +44,7 @@ export default class SearchResults extends React.Component<IProps, IState> {
         };
 
         if (hasResults) {
-            content = this.props.children.map((result, i) => {
+            content = this.props.results.map((result, i) => {
                 return <SearchResult {...result} key={`searchResults-${i}`} />;
             });
         } else if (!this.props.searchTerm || this.props.searchTerm === "") {
