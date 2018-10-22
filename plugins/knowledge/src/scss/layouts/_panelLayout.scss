@@ -92,6 +92,10 @@ $panelLayout-border_color                                             : rgba($gl
     padding-right: $global-panel_spacerOuter;
     z-index: 2;
     border-right: solid $panelLayout-border_color 1px;
+
+    &.noBorder {
+        border-right: 0;
+    }
 }
 
 .panelLayout-right {

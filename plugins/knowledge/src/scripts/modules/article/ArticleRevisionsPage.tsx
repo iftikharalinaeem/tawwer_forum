@@ -5,25 +5,33 @@
  */
 
 import React from "react";
-import { match } from "react-router";
+import { match, RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
-import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
+import ArticleRevisionsLayout from "@knowledge/modules/article/components/ArticleRevisionsLayout";
 import PageLoader from "@library/components/PageLoader";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus, IArticleRevisionFragment, Format, IArticleRevision } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
+import { IUserFragment } from "@dashboard/@types/api/user";
+import { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionHistory";
+import { t } from "@library/application";
 
-interface IProps extends IDeviceProps, IArticleActionsProps {
+interface IOwnProps
+    extends RouteComponentProps<{
+            id?: number;
+        }> {}
+
+interface IProps extends IDeviceProps, IArticleActionsProps, IOwnProps {
     match: match<{
         id: number;
     }>;
@@ -52,14 +60,24 @@ export class ArticleRevisionsPage extends React.Component<IProps, IState> {
             return <NotFoundPage type="Page" />;
         }
 
+        /**
+         *     article: IArticle;
+         backUrl: string | null;
+         submitHandler: (revisionID: string, title: string) => void;
+         messages?: React.ReactNode;
+         isSubmitLoading: boolean;
+         revisionHistory: IArticleRevisionWithUrl[];
+         */
+
         return (
             <PageLoader {...article}>
                 {article.status === LoadStatus.SUCCESS && (
                     <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
-                        <ArticleLayout
+                        <ArticleRevisionsLayout
                             article={article.data}
                             breadcrumbData={breadcrumbData!}
                             messages={this.renderMessages()}
+                            location={this.state && this.state.lastLocation ? this.state.lastLocation.pathname : "/kb"}
                         />
                     </DocumentTitle>
                 )}
@@ -163,6 +181,117 @@ function mapDispatchToProps(dispatch) {
         articlePageActions: new ArticlePageActions(dispatch, apiv2),
         ...ArticleActions.mapDispatchToProps(dispatch),
     };
+}
+
+/**
+ * Dummy data
+ */
+function revisionHistory(): IArticleRevisionWithUrl[] {
+    const revisionUrl = `/kb/articles/2/revisions?revisionID=1`;
+    return [
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+        {
+            articleRevisionID: 1,
+            articleID: 1,
+            status: "published",
+            name: "Some Name",
+            format: Format.RICH,
+            bodyRendered: "Hello",
+            locale: "en",
+            insertUser: {
+                userID: 1,
+                name: "Joe",
+                photoUrl: "#",
+                dateLastActive: "2019-10-18",
+            },
+            dateInserted: "2019-10-19",
+            url: revisionUrl,
+        },
+    ];
 }
 
 const withRedux = connect(

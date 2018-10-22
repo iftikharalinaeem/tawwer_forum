@@ -22,7 +22,6 @@ import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
-import ArticleActionsPanel from "@knowledge/modules/article/components/ArticleActionsPanel";
 
 interface IProps {
     article: IArticle;

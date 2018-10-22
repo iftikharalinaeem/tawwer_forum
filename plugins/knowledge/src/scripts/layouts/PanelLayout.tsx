@@ -16,6 +16,7 @@ interface IPanelLayoutProps {
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
+    forceRenderLeftTop?: boolean; // Some pages have an empty column on the left. Pass in a boolean value to force a render, even if empty.
 }
 
 /**
@@ -120,8 +121,11 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     <div
                         className={classNames("panelLayout-container", { inheritHeight: this.props.growMiddleBottom })}
                     >
-                        {shouldRenderLeftPanel && (
-                            <Panel className="panelLayout-left" tag="aside">
+                        {(shouldRenderLeftPanel || this.props.forceRenderLeftTop) && (
+                            <Panel
+                                className={classNames("panelLayout-left", { noBorder: this.props.forceRenderLeftTop })}
+                                tag="aside"
+                            >
                                 {children.leftTop && (
                                     <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
                                 )}
