@@ -18,17 +18,11 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import { RouteComponentProps } from "react-router";
 import EditorHeader from "../../editor/components/EditorHeader";
 import { t } from "@library/application";
 import RevisionHistory, { IArticleRevisionWithUrl } from "./RevisionHistory";
 
-interface IOwnProps
-    extends RouteComponentProps<{
-            id?: number;
-        }> {}
-
-interface IProps extends IDeviceProps, IOwnProps {
+interface IProps extends IDeviceProps {
     article: IArticle;
     backUrl: string | null;
     submitHandler: (revisionID: string, title: string) => void;
