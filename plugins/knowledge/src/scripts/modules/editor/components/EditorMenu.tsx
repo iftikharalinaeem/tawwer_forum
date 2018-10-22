@@ -7,15 +7,8 @@
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
-import { InlineTypes } from "@library/components/Sentence";
-import { IArticle } from "@knowledge/@types/api";
-import {
-    DropDownItemLink,
-    DropDownItemButton,
-    DropDownItemMetas,
-    DropDownItemSeparator,
-} from "@library/components/dropdown";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { InlineTypes } from "@library/components/translation/Sentence";
+import { DropDownItemButton, DropDownItemMetas, DropDownItemSeparator } from "@library/components/dropdown";
 import classNames from "classnames";
 import { getRequiredID } from "@library/componentIDs";
 

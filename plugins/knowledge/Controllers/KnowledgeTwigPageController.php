@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
@@ -73,7 +74,7 @@ abstract class KnowledgeTwigPageController extends PageController {
         /** @var KnowledgeCategoriesApiController $categoriesApi */
         $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
         $categories = $categoriesApi->index();
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, $categories));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($categories)));
     }
 
     /**

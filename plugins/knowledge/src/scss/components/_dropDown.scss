@@ -59,6 +59,12 @@ $dropDown-item_minHeight                       : 45px;
     }
 }
 
+.dropDownMeta-link {
+    @include allLinkStates {
+        color: $link_default-color;
+    };
+}
+
 .dropDown-item {
     text-align: left;
 }

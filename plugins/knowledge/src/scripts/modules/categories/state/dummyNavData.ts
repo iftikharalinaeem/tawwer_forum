@@ -4,12 +4,7 @@
  * @license Proprietary
  */
 
-import {
-    KbCategoryDisplayType,
-    IKbCategoryFragment,
-    IKbNavigationItem,
-    IKbNavigationCategory,
-} from "@knowledge/@types/api";
+import { KbCategoryDisplayType, IKbNavigationCategory } from "@knowledge/@types/api";
 
 export const dummyNavData: IKbNavigationCategory[] = [
     {

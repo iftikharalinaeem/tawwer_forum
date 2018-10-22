@@ -7,6 +7,8 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Garden\Web\Data;
+
 /**
  * Class ReduxAction.
  */
@@ -26,7 +28,7 @@ class ReduxAction implements \JsonSerializable {
      * @param string $type Redux action type to create
      * @param array $data Redux payload data
      */
-    public function __construct(string $type, array $data) {
+    public function __construct(string $type, Data $data) {
         $this->type = $type;
         $this->payload = $data;
     }
