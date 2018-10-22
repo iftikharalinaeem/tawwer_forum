@@ -137,11 +137,11 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/'.$id.'/revisions');
         }
-        //$revisions = $this->articlesApi->get_revisions($id);
-        //$this->data[self::API_PAGE_KEY][self::ACTION_REVISIONS] = $revisions;
+        $revisions = $this->articlesApi->index_revisions($id);
+        $this->data[self::API_PAGE_KEY][self::ACTION_REVISIONS] = $revisions;
 
         // Set the title
-        //$this->setPageTitle($revisions[0]['articleRevision']['name']);
+        $this->setPageTitle(($revisions[0]['name'] ?? 'Unknown'));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
