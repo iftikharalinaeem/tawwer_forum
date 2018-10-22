@@ -7,15 +7,14 @@
 import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
-import { IArticle } from "@knowledge/@types/api";
 import Sentence, { ISentence } from "@library/components/translation/Sentence";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IDeviceProps {
     title: string;
-    menu?: JSX.Element;
-    meta?: ISentence;
+    menu?: React.ReactNode;
+    meta?: React.ReactNode;
     backUrl?: string | null;
 }
 
@@ -30,11 +29,7 @@ export class PageTitle extends React.Component<IProps> {
         return (
             <PanelWidget>
                 <PageHeading backUrl={backUrl} title={this.props.title} menu={this.props.menu} />
-                {this.props.meta && (
-                    <div className="pageMetas metas">
-                        <Sentence {...this.props.meta} recursiveChildClass="meta pageMetas-meta" />
-                    </div>
-                )}
+                {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
             </PanelWidget>
         );
     }

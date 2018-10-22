@@ -41,7 +41,8 @@ $meta_spacing                 : $global-gutter_quarterSize;
     color: $metas_color;
 }
 
-a.meta {
+a.meta,
+a.metaStyle {
     color: $link-default_color;
     &:hover {
         color: $link-default_hover-color;

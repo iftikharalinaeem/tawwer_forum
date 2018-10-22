@@ -23,6 +23,10 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import ArticleActionsPanel from "@knowledge/modules/article/components/ArticleActionsPanel";
+import Translate from "@library/components/translation/Translate";
+import ProfileLink from "@dashboard/profile/ProfileLink";
+import DateTime from "@library/components/DateTime";
+import { Link } from "react-router-dom";
 
 interface IProps {
     article: IArticle;
@@ -57,7 +61,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <PageTitle
                             title={article.articleRevision.name}
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                            meta={this.metaData as any}
+                            meta={this.renderMetaItems()}
                         />
                         {messages && <div className="messages">{messages}</div>}
                     </PanelLayout.MiddleTop>
@@ -118,36 +122,27 @@ export class ArticleLayout extends React.Component<IProps, IState> {
         },
     ];
 
-    private metaData = {
-        children: [
-            {
-                children: "By Todd Burry",
-                type: InlineTypes.TEXT,
-            },
-            {
-                children: [
-                    {
-                        children: "Last Updated:" + String.fromCharCode(160),
-                        type: InlineTypes.TEXT,
-                    },
-                    {
-                        timeStamp: "2018-03-03",
-                        type: InlineTypes.DATETIME,
-                        children: [
-                            {
-                                children: "3 March 2018",
-                                type: InlineTypes.TEXT,
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                children: "ID #1029384756",
-                type: InlineTypes.TEXT,
-            },
-        ],
-    };
+    private renderMetaItems(): React.ReactNode {
+        const { updateUser, dateUpdated, url } = this.props.article;
+
+        return (
+            <React.Fragment>
+                <span className="meta">
+                    <Translate source="By <0/>" c0={<ProfileLink className="meta" username={updateUser!.name} />} />
+                </span>
+                <span className="meta">
+                    <Translate
+                        source="Last Updated: <0/>"
+                        c0={
+                            <Link to={url} className="meta meta-link">
+                                <DateTime timestamp={dateUpdated} />
+                            </Link>
+                        }
+                    />
+                </span>
+            </React.Fragment>
+        );
+    }
 }
 
 export default withDevice<IProps>(ArticleLayout);
