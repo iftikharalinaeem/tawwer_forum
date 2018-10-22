@@ -405,8 +405,8 @@ class ZendeskPlugin extends Gdn_Plugin {
             if ($sender->Form->errorCount() == 0) {
                 $formValues = $sender->Form->formValues();
                 $body = $formValues['Body'];
-
-                $body .= "\n--\n\nThis ticket was generated from: ".$url."\n\n";
+                $ticketUrl = Gdn_Format::to($url, 'Html');
+                $body .= "\n--\n\nThis ticket was generated from: ".$ticketUrl."\n\n";
                 $this->setZendesk();
                 $ticketID = $this->zendesk->createTicket(
                     $formValues['Title'],
