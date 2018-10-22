@@ -9,18 +9,13 @@ import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/translation/Sentence";
-import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
-import { t } from "@library/application";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { AttachmentType } from "@knowledge/modules/common/AttachmentIcons";
+import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import { dummyMetaData } from "../state/dummyMetaData";
-import { LoadStatus } from "@library/@types/api";
 import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IProps {

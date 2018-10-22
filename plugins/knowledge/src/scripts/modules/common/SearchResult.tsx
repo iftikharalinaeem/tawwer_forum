@@ -6,12 +6,12 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
 import { t } from "@library/application";
 import Sentence, { ISentence } from "@library/components/translation/Sentence";
 import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
-import AttachmentIcons, { IIconAttachment } from "@knowledge/modules/common/AttachmentIcons";
+import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
+import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 
 export interface IResult {
     name: string;
@@ -21,7 +21,7 @@ export interface IResult {
     excerpt: string;
     image?: string;
     headingLevel?: 2 | 3;
-    attachments: IIconAttachment[];
+    attachments: IAttachmentIcon[];
 }
 
 /**
@@ -47,7 +47,7 @@ export default class SearchResult extends React.Component<IResult> {
 
         let attachmentOutput;
         if (hasAttachments && this.props.attachments) {
-            attachmentOutput = <AttachmentIcons children={this.props.attachments} />;
+            attachmentOutput = <AttachmentIcons attachments={this.props.attachments} />;
         }
         const HeadingTag = `h${this.props.headingLevel}`;
 

@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
@@ -65,7 +66,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $this->setPageTitle($article['articleRevision']['name']);
 
         // Put together pre-loaded redux actions.
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, $article));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();

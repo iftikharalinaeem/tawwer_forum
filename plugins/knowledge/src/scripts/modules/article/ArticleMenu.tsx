@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import { t } from "@library/application";
+import { t, makeProfileUrl } from "@library/application";
 import { InlineTypes } from "@library/components/translation/Sentence";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import {
@@ -21,6 +21,9 @@ import { connect } from "react-redux";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import { LoadStatus } from "@library/@types/api";
+import Translate from "@library/components/translation/Translate";
+import DateTime from "@library/components/DateTime";
+import { Link } from "react-router-dom";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -48,11 +51,33 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
 
+        const { insertUser, updateUser, dateInserted, dateUpdated } = article;
+
         return (
             <React.Fragment>
                 <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
-                    <DropDownItemMetas>{this.publishedMeta}</DropDownItemMetas>
-                    <DropDownItemMetas>{this.updatedMeta}</DropDownItemMetas>
+                    <DropDownItemMetas>
+                        <Translate
+                            source="Published on <0/> by <1/>"
+                            c0={<DateTime timestamp={dateInserted} />}
+                            c1={
+                                <a className="dropDownMeta-link" href={makeProfileUrl(insertUser!.name)}>
+                                    {insertUser!.name}
+                                </a>
+                            }
+                        />
+                    </DropDownItemMetas>
+                    <DropDownItemMetas>
+                        <Translate
+                            source="Updated on <0/> by <1/>"
+                            c0={<DateTime timestamp={dateUpdated} />}
+                            c1={
+                                <a className="dropDownItem-link" href={makeProfileUrl(updateUser!.name)}>
+                                    {updateUser!.name}
+                                </a>
+                            }
+                        />
+                    </DropDownItemMetas>
                     <DropDownItemSeparator />
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
@@ -164,48 +189,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
     private dummyClick = () => {
         alert("Click works");
     };
-
-    private publishedMeta = [
-        {
-            type: InlineTypes.TEXT,
-            children: "Published ",
-        },
-        {
-            type: InlineTypes.DATETIME,
-            timeStamp: "2017-05-20 10:00",
-            children: "20th May, 2018 10:00 AM",
-        },
-        {
-            type: InlineTypes.TEXT,
-            children: t(" by "),
-        },
-        {
-            type: InlineTypes.LINK,
-            to: "#user/Todd_Burry",
-            children: "Todd Burry",
-        },
-    ];
-
-    private updatedMeta = [
-        {
-            type: InlineTypes.TEXT,
-            children: "Updated ",
-        },
-        {
-            type: InlineTypes.DATETIME,
-            timeStamp: "2017-05-20 10:00",
-            children: "20th May, 2018 10:00 AM",
-        },
-        {
-            type: InlineTypes.TEXT,
-            children: t(" by "),
-        },
-        {
-            type: InlineTypes.LINK,
-            to: "#user/Todd_Burry",
-            children: "Todd Burry",
-        },
-    ];
 }
 
 const withRedux = connect(
