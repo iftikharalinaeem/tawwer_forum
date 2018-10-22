@@ -73,8 +73,6 @@ export interface IKbCategoryFragment {
     displayType: KbCategoryDisplayType; //How the category is layed out.
     isSection: boolean; // Determines if the category is cutoff point in navigation or not.
     url: string; // Full URL to the resource
-    lastUpdated: string;
-    updateUser: IUserFragment;
 }
 
 export type IKbCategoryMultiTypeFragment = MultiTypeRecord<
