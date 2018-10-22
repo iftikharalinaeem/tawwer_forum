@@ -203,6 +203,49 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get a schema representing all available revision fields.
+     *
+     * @return Schema
+     */
+    private function fullRevisionSchema() {
+        return Schema::parse([
+            "articleRevisionID:i" => "Unique article revision ID.",
+            "articleID:i" => "Associated article ID.",
+            "status:s" => [
+                "allowNull" => true,
+                "description" => "",
+                "enum" => ["published"],
+            ],
+            "name:s" => [
+                "allowNull" => true,
+                "description" => "Title of the article.",
+            ],
+            "format:s" => [
+                "allowNull" => true,
+                "enum" => ["text", "textex", "markdown", "wysiwyg", "html", "bbcode", "rich"],
+                "description" => "Format of the raw body content.",
+            ],
+            "body:s" => [
+                "allowNull" => true,
+                "description" => "Raw body contents.",
+            ],
+            "bodyRendered:s" => [
+                "allowNull" => true,
+                "description" => "Rendered body contents.",
+            ],
+            "locale:s" => [
+                "allowNull" => true,
+                "description" => "Locale the article was written in.",
+            ],
+
+            "insertUserID:i" => "Unique ID of the user who originally created the article.",
+            "dateInserted:dt" => "When the article was created.",
+            "insertUser?" => $this->getUserFragmentSchema(),
+            "updateUser?" => $this->getUserFragmentSchema(),
+        ]);
+    }
+
+    /**
      * Handle GET requests to the root of the endpoint.
      *
      * @param int $id
@@ -275,10 +318,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function idParamSchema(string $type = "in"): \Garden\Schema\Schema {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                \Garden\Schema\Schema::parse(["id:i" => "The article ID."]),
-                $type
-            );
+            $this->idParamSchema = \Garden\Schema\Schema::parse(["id:i" => "The article ID."]);
         }
         return $this->schema($this->idParamSchema, $type);
     }
@@ -365,6 +405,46 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articles = $this->index($query);
 
         $result = $out->validate($articles);
+        return $result;
+    }
+
+    /**
+     * Get revisions from a specific article.
+     *
+     * @param int $id
+     * @return array
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If the output fails to validate against the schema.
+     */
+    public function index_revisions(int $id): array {
+        $this->permission();
+
+        $this->idParamSchema()->setDescription("Get revisions from a specific article.");
+        $out = $this->schema(\Garden\Schema\Schema::parse([
+            ":a" => Schema::parse([
+                "articleRevisionID",
+                "articleID",
+                "status",
+                "name",
+                "locale",
+                "insertUser",
+                "dateInserted",
+            ])->add($this->fullRevisionSchema())
+        ]), "out");
+
+        $article = $this->articleByID($id);
+        $revisions = $this->articleRevisionModel->get(["articleID" => $article["articleID"]]);
+
+        foreach ($revisions as &$revision) {
+            $this->userModel->expandUsers(
+                $revision,
+                ["insertUserID", "updateUserID"]
+            );
+        }
+
+        $result = $out->validate($revisions);
         return $result;
     }
 
