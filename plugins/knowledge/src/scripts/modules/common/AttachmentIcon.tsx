@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
 import Paragraph from "@library/components/Paragraph";
+import Translate from "@library/components/translation/Translate";
 
 export enum AttachmentType {
     FILE = "file",
@@ -38,7 +39,9 @@ export default class AttachmentIcon extends React.Component<IProps> {
                     title={t(this.props.type)}
                 >
                     <span className="sr-only">
-                        <Paragraph>{`${this.props.name} (${t("Type: ")}} ${t(this.props.type)}})`}</Paragraph>
+                        <Paragraph>
+                            <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
+                        </Paragraph>
                     </span>
                     {this.getAttachmentIcon(this.props.type)}
                 </div>

@@ -20,6 +20,7 @@ $Definition['+ <0/> more'] = '+ <0/> more';
 // Metadata
 $Definition['By <0/>'] = 'By <0/>';
 $Definition['Last Updated: <0/>'] = 'Last Updated: <0/>';
+$Definition['<0/> (Type: <1/>)'] = '<0/> (Type: <1/>)';
 
 // Search
 $Definition["No results for '<0/>'."] = "No results for '<0/>'.";
