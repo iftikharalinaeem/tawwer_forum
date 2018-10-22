@@ -7,7 +7,6 @@
 import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
-import Sentence, { ISentence } from "@library/components/translation/Sentence";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 

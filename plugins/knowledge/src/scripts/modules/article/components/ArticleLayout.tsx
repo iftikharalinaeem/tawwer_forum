@@ -15,7 +15,6 @@ import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/compo
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/translation/Sentence";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
@@ -26,6 +25,7 @@ import Translate from "@library/components/translation/Translate";
 import ProfileLink from "@library/components/ProfileLink";
 import DateTime from "@library/components/DateTime";
 import { Link } from "react-router-dom";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 
 interface IProps {
     article: IArticle;
@@ -60,7 +60,13 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <PageTitle
                             title={article.articleRevision.name}
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                            meta={this.renderMetaItems()}
+                            meta={
+                                <ArticleMeta
+                                    updateUser={article.updateUser!}
+                                    dateUpdated={article.dateUpdated}
+                                    permaLink={article.url}
+                                />
+                            }
                         />
                         {messages && <div className="messages">{messages}</div>}
                     </PanelLayout.MiddleTop>
@@ -120,28 +126,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             to: "#theming-guide-for-designers",
         },
     ];
-
-    private renderMetaItems(): React.ReactNode {
-        const { updateUser, dateUpdated, url } = this.props.article;
-
-        return (
-            <React.Fragment>
-                <span className="meta">
-                    <Translate source="By <0/>" c0={<ProfileLink className="meta" username={updateUser!.name} />} />
-                </span>
-                <span className="meta">
-                    <Translate
-                        source="Last Updated: <0/>"
-                        c0={
-                            <Link to={url} className="meta meta-link">
-                                <DateTime timestamp={dateUpdated} />
-                            </Link>
-                        }
-                    />
-                </span>
-            </React.Fragment>
-        );
-    }
 }
 
 export default withDevice<IProps>(ArticleLayout);

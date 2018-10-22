@@ -5,7 +5,7 @@
  */
 
 import { KbCategoryDisplayType } from "@knowledge/@types/api";
-import { InlineTypes } from "@library/components/translation/Sentence";
+import { InlineTypes } from "@library/components/Sentence";
 
 export const dummyMetaData: any = {
     children: [
