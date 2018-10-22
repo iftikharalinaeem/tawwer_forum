@@ -20,12 +20,11 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IArticle, ArticleStatus, IArticleRevisionFragment, Format, IArticleRevision } from "@knowledge/@types/api";
-import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import { IUserFragment } from "@dashboard/@types/api/user";
-import { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionHistory";
 import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
+import { IArticleRevisionWithUrl } from "./components/RevisionsList";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -69,18 +68,16 @@ export class ArticleRevisionsPage extends React.Component<IProps, IState> {
         }
 
         return (
-            <PageLoader {...article}>
-                {article.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
-                        <ArticleRevisionsLayout
-                            article={article.data}
-                            breadcrumbData={breadcrumbData!}
-                            messages={this.renderMessages()}
-                            match={this.props.match}
-                            revisionHistory={revisionHistory()}
-                        />
-                    </DocumentTitle>
-                )}
+            <PageLoader {...article} status={LoadStatus.SUCCESS}>
+                <DocumentTitle title={t("Article Revisions")}>
+                    <ArticleRevisionsLayout
+                        backUrl="#Back"
+                        article={article.data!}
+                        revisionHistory={revisionHistory()}
+                        submitHandler={submitHandler}
+                        isSubmitLoading={false}
+                    />
+                </DocumentTitle>
             </PageLoader>
         );
     }
@@ -110,29 +107,6 @@ export class ArticleRevisionsPage extends React.Component<IProps, IState> {
     public componentWillUnmount() {
         this.props.articlePageActions.reset();
     }
-
-    private renderMessages(): React.ReactNode {
-        const { article } = this.props;
-        let messages: React.ReactNode;
-
-        if (article.status === LoadStatus.SUCCESS) {
-            if (article.data.status === ArticleStatus.DELETED) {
-                messages = (
-                    <ArticleDeletedMessage
-                        onRestoreClick={this.handleRestoreClick}
-                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
-                    />
-                );
-            }
-        }
-
-        return messages;
-    }
-
-    private handleRestoreClick = async () => {
-        const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.data!.articleID, status: ArticleStatus.PUBLISHED });
-    };
 
     /**
      * Initialize the page's data from it's url.
@@ -184,7 +158,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 /**
- * Dummy data
+ * Placeholder submit handler
+ */
+
+function submitHandler() {
+    return;
+}
+
+/**
+ * Dummy revisions data
  */
 function revisionHistory(): IArticleRevisionWithUrl[] {
     const revisionUrl = `/kb/articles/2/revisions?revisionID=1`;

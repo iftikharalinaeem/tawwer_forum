@@ -13,14 +13,14 @@ import { IInternalLink } from "@knowledge/modules/article/components/RelatedArti
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { InlineTypes } from "@library/components/Sentence";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import EditorHeader from "../../editor/components/EditorHeader";
 import { t } from "@library/application";
-import RevisionHistory, { IArticleRevisionWithUrl } from "./RevisionHistory";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import RevisionsList, { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionsList";
 
 interface IProps extends IDeviceProps {
     article: IArticle;
@@ -41,10 +41,9 @@ interface IState {
  */
 export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
     public render() {
-        const { article, messages, device } = this.props;
-        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const { article, device } = this.props;
 
-        const revisions = <RevisionHistory>{this.props.revisionHistory}</RevisionHistory>;
+        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return (
             <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink} label={t("Article Revisions")}>
@@ -60,48 +59,31 @@ export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
                     <Container className="richEditorRevisionsForm-body">
                         <PanelLayout device={this.props.device} forceRenderLeftTop={isFullWidth}>
                             <PanelLayout.MiddleTop>
-                                <PageTitle
-                                    title={article.articleRevision.name}
-                                    menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                                    meta={this.metaData as any}
-                                />
-                                {messages && <div className="messages">{messages}</div>}
+                                {/*<PageTitle*/}
+                                {/*title={article}*/}
+                                {/*menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}*/}
+                                {/*meta={*/}
+                                {/*<ArticleMeta*/}
+                                {/*updateUser={article.updateUser!}*/}
+                                {/*dateUpdated={article.dateUpdated}*/}
+                                {/*permaLink={article.url}*/}
+                                {/*/>*/}
+                                {/*}*/}
+                                {/*/>*/}
                             </PanelLayout.MiddleTop>
                             <PanelLayout.MiddleBottom>
-                                <PanelWidget>
-                                    <UserContent content={article.articleRevision.bodyRendered} />
-                                </PanelWidget>
+                                {article && <PanelWidget>{/*<UserContent content= />*/}</PanelWidget>}
                             </PanelLayout.MiddleBottom>
-                            <PanelLayout.RightTop />
+                            <PanelLayout.RightTop>
+                                {this.props.revisionHistory && (
+                                    <RevisionsList>{this.props.revisionHistory}</RevisionsList>
+                                )}
+                            </PanelLayout.RightTop>
                         </PanelLayout>
                     </Container>
                 </form>
             </Modal>
         );
-    }
-
-    private articleTOC: IPageHeading[] = [
-        {
-            name: "Overview",
-            anchor: "#overview",
-        },
-        {
-            name: "Changing Themes",
-            anchor: "#changing-themes",
-        },
-        {
-            name: "Configuration Guide",
-            anchor: "#configuration-guide",
-        },
-        {
-            name: "Theming Guide for Designers",
-            anchor: "#theming-guide-for-designers",
-        },
-    ];
-
-    private get backLink(): string | null {
-        const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
     }
 
     /**
@@ -126,36 +108,24 @@ export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
         this.props.submitHandler(this.state.revisionID, this.state.title);
     };
 
-    private metaData = {
-        children: [
-            {
-                children: "By Todd Burry",
-                type: InlineTypes.TEXT,
-            },
-            {
-                children: [
-                    {
-                        children: "Last Updated:" + String.fromCharCode(160),
-                        type: InlineTypes.TEXT,
-                    },
-                    {
-                        timeStamp: "2018-03-03",
-                        type: InlineTypes.DATETIME,
-                        children: [
-                            {
-                                children: "3 March 2018",
-                                type: InlineTypes.TEXT,
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                children: "ID #1029384756",
-                type: InlineTypes.TEXT,
-            },
-        ],
-    };
+    private metaData: IInternalLink[] = [
+        {
+            name: "Overview",
+            to: "/kb",
+        },
+        {
+            name: "Changing Themes",
+            to: "/kb",
+        },
+        {
+            name: "Configuration Guide",
+            to: "/kb",
+        },
+        {
+            name: "Theming Guide for Designers",
+            to: "/kb",
+        },
+    ];
 }
 
 export default withDevice<IProps>(ArticleRevisionsLayout);
