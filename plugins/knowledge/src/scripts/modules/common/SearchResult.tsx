@@ -7,7 +7,6 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import Sentence, { ISentence } from "@library/components/translation/Sentence";
 import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
@@ -64,7 +63,7 @@ export default class SearchResult extends React.Component<IResult> {
                     <Link to={this.props.url} className="searchResult">
                         <div className={classNames("searchResult-main", { hasMedia: !!media })}>
                             <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
-                            {this.props.meta && <div className="searchResult-metas">{this.props.meta}</div>}
+                            {this.props.meta && <div className="searchResult-metas metas">{this.props.meta}</div>}
                             {!!this.props.excerpt && (
                                 <Paragraph className="searchResult-excerpt">{this.props.excerpt}</Paragraph>
                             )}

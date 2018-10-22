@@ -6,9 +6,7 @@
 
 import React from "react";
 import Translate from "@library/components/translation/Translate";
-import ProfileLink from "@library/components/ProfileLink";
 import DateTime from "@library/components/DateTime";
-import { Link } from "react-router-dom";
 import { IUserFragment } from "@dashboard/@types/api";
 
 interface IProps {
@@ -22,10 +20,10 @@ export class SearchResultMeta extends React.Component<IProps> {
 
         return (
             <React.Fragment>
-                <span className="metaStyle">
+                <span className="meta">
                     <Translate source="By <0/>" c0={updateUser.name} />
                 </span>
-                <span className="metaStyle">
+                <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
             </React.Fragment>
