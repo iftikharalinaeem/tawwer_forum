@@ -62,14 +62,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "url?" => ["type" => "string"],
                 "parentID?" => ["type" => "integer"],
                 "recordID" => ["type" => "integer"],
-                "body?" => [
-                    "allowNull" => true,
-                    "type" => "string"
-                ],
-                "bodyRendered?" => [
-                    "allowNull" => true,
-                    "type" => "string"
-                ],
                 "sort" => [
                     "allowNull" => true,
                     "type" => "integer"
@@ -93,14 +85,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     "url?" => ["type" => "string"],
                     "parentID?" => ["type" => "integer"],
                     "recordID" => ["type" => "integer"],
-                    "body?" => [
-                        "allowNull" => true,
-                        "type" => "string"
-                    ],
-                    "bodyRendered?" => [
-                        "allowNull" => true,
-                        "type" => "string"
-                    ],
                     "sort" => [
                         "allowNull" => true,
                         "type" => "integer"

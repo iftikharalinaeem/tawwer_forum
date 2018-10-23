@@ -121,7 +121,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         $sql = $this->sql()
             ->from('article a')
-            ->select('a.*, ar.name, ar.body, ar.bodyRendered')
+            ->select('a.*, ar.name')
             ->leftJoin("articleRevision ar", "a.articleRevisionID = ar.articleRevisionID and a.articleID = ar.articleID");
         foreach ($pseudoFields as $field => $val) {
             $sql->select('"'.$val.'" as '.$field);
