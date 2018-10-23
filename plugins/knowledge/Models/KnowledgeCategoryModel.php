@@ -91,6 +91,18 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get child categories in a section.
+     *
+     * @param int $knowledgeSectionID
+     *
+     * @return array
+     */
+    public function sectionCategories(int $knowledgeSectionID): array {
+        $categories = $this->get(["sectionID" => $knowledgeSectionID]);
+
+        return $categories;
+    }
+    /**
      * Convert array form Tree to Flat mode.
      *
      * @param array $tree

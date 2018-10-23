@@ -104,6 +104,42 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Return extended article records joined with article revisions
+     *
+     * @param array $where
+     * @param array $options
+     * @param array $pseudoFields
+     *
+     * @return array
+     */
+    public function getOutline(array $where = [], array $options = [], array $pseudoFields = []): array {
+        $orderFields = $options["orderFields"] ?? "";
+        $orderDirection = $options["orderDirection"] ?? "asc";
+        $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
+        $offset = $options["offset"] ?? 0;
+        $page = $offset / $limit;
+
+        $sql = $this->sql()
+            ->from('article a')
+            ->select('a.*, ar.name, ar.body, ar.bodyRendered')
+            ->leftJoin("articleRevision ar", "a.articleRevisionID = ar.articleRevisionID and a.articleID = ar.articleID");
+        foreach ($pseudoFields as $field => $val) {
+            $sql->select('"'.$val.'" as '.$field);
+        }
+        foreach ($where as $field => $op) {
+            if (is_array($op) && array_key_exists('in', $op)) {
+                $sql->whereIn($field, $op['in']);
+            } else {
+                $sql->where([$field => $op]);
+            }
+        }
+        $result = $sql->get('', $orderFields, $orderDirection, $limit, $page)
+            ->resultArray();
+
+        return $result;
+    }
+
+    /**
      * Return all possible statuses for article record/item
      *
      * @return array
@@ -114,5 +150,26 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             self::STATUS_DELETED,
             self::STATUS_PUBLISHED
         ];
+    }
+
+    /**
+     * Generate a URL to the provided article.
+     *
+     * @param array $article
+     * @param bool $withDomain
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function url(array $article, bool $withDomain = true): string {
+        $name = $article["name"] ?? 'article';
+        $articleID = $article["articleID"] ?? null;
+
+        if (!$name || !$articleID) {
+            throw new \Exception("Invalid article row. ".json_encode($article));
+        }
+
+        $slug = \Gdn_Format::url("{$articleID}-{$name}");
+        $result = \Gdn::request()->url("/kb/articles/".$slug, $withDomain);
+        return $result;
     }
 }
