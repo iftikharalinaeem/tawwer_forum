@@ -20,7 +20,7 @@ export interface IResult {
     excerpt: string;
     image?: string;
     headingLevel?: 2 | 3;
-    attachments: IAttachmentIcon[];
+    attachments?: IAttachmentIcon[];
 }
 
 /**

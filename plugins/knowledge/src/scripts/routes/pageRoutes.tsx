@@ -13,6 +13,7 @@ import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
 export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 export const ARTICLE_REVISIONS_ROUTE = "/kb/articles/:id(\\d+)/revisions";
 export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
+export const SEARCH_ROUTE = "/kb/search";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
@@ -45,6 +46,12 @@ const CategoriesPage = Loadable({
     loader: () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
 });
 
+/** A loadable version of the search page. */
+const SearchPage = Loadable({
+    loading: FullPageLoader,
+    loader: () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
+});
+
 /**
  * Get the data for routes that can render in a modal.
  *
@@ -60,7 +67,8 @@ export function getPageRoutes() {
         <Route exact path={ARTICLE_REVISIONS_ROUTE} component={ArticleRevisionsPage} key={ARTICLE_REVISIONS_ROUTE} />,
         <Route exact path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
         <Route exact path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
-        <Route exact path={ADD_ROUTE} component={EditorPage} key={"editorPage"} />,
-        <Route exact path={EDIT_ROUTE} component={EditorPage} key={"editorPage"} />,
+        <Route exact path={ADD_ROUTE} component={EditorPage} key={ADD_ROUTE} />,
+        <Route exact path={EDIT_ROUTE} component={EditorPage} key={EDIT_ROUTE} />,
+        <Route exact path={SEARCH_ROUTE} component={SearchPage} key={SEARCH_ROUTE} />,
     ];
 }
