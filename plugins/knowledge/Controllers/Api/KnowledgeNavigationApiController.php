@@ -156,7 +156,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $categories = $this->normalizeOutput($categories, self::RECORD_TYPE_CATEGORY);
         $catIds = array_column($categories, 'knowledgeCategoryID');
         $catIds[] = $category["sectionID"];
-        $articles = $this->articleModel->getOutline(
+        $articles = $this->articleModel->getExtended(
             [
             'a.knowledgeCategoryID' => ['in' => $catIds],
             'a.status' => ArticleModel::STATUS_PUBLISHED

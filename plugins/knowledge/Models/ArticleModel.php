@@ -112,7 +112,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      *
      * @return array
      */
-    public function getOutline(array $where = [], array $options = [], array $pseudoFields = []): array {
+    public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
