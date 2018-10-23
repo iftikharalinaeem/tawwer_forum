@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import { t, makeProfileUrl } from "@library/application";
-import { InlineTypes } from "@library/components/translation/Sentence";
+import { t } from "@library/application";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import {
     DropDownItemLink,
@@ -23,7 +22,6 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { Link } from "react-router-dom";
 import ProfileLink from "@library/components/ProfileLink";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
@@ -189,4 +187,4 @@ const withRedux = connect(
     ArticleActions.mapDispatchToProps,
 );
 
-export default withRedux<IProps>(ArticleMenu);
+export default withRedux(ArticleMenu);
