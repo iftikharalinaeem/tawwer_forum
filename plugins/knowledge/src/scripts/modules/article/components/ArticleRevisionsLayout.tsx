@@ -10,17 +10,15 @@ import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
-import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import UserContent from "@library/components/UserContent";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import EditorHeader from "../../editor/components/EditorHeader";
 import { t } from "@library/application";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import RevisionsList, { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionsList";
+import { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionsListItem";
+import RevisionsList from "./RevisionsList";
 
 interface IProps extends IDeviceProps {
     article: IArticle;

@@ -24,7 +24,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { IUserFragment } from "@dashboard/@types/api/user";
 import { t } from "@library/application";
 import { getRequiredID } from "@library/componentIDs";
-import { IArticleRevisionWithUrl } from "./components/RevisionsList";
+import { IArticleRevisionWithUrl } from "@knowledge/modules/article/components/RevisionsListItem";
 
 interface IOwnProps
     extends RouteComponentProps<{
