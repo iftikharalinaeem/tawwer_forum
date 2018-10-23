@@ -26,12 +26,17 @@ interface IProps {
     isSubmitLoading: boolean;
     selectedKey?: string;
     className?: string;
+    callToAction?: string;
 }
 
 /**
  * Implement editor header component
  */
 export default class EditorHeader extends React.Component<IProps> {
+    public static defaultProps = {
+        callToAction: t("Publish"),
+    };
+
     private localeTitleID;
 
     public constructor(props) {
@@ -79,7 +84,7 @@ export default class EditorHeader extends React.Component<IProps> {
                                         disabled={!this.props.canSubmit}
                                         className={classNames("editorHeader-publish", "buttonPrimary")}
                                     >
-                                        {this.props.isSubmitLoading ? <ButtonLoader /> : t("Publish")}
+                                        {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                                     </Button>
                                 </li>
                                 <li className="editorHeader-item">
