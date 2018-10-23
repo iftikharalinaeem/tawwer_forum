@@ -68,7 +68,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 ],
                 "knowledgeCategoryID?" => ["type" => "integer"],
                 "recordType" => [
-                    "enum" => [self::RECORD_TYPE_ARTICLE, self::RECORD_TYPE_CATEGORY],
+                    "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
                     "type" => "string",
                 ],
                 "children:a?" => [
@@ -91,7 +91,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     ],
                     "knowledgeCategoryID?" => ["type" => "integer"],
                     "recordType" => [
-                        "enum" => [self::RECORD_TYPE_ARTICLE, self::RECORD_TYPE_CATEGORY],
+                        "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
                         "type" => "string",
                     ],
                 ]
