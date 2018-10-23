@@ -107,25 +107,6 @@ export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
         event.preventDefault();
         this.props.submitHandler(this.state.revisionID, this.state.title);
     };
-
-    private metaData: IInternalLink[] = [
-        {
-            name: "Overview",
-            to: "/kb",
-        },
-        {
-            name: "Changing Themes",
-            to: "/kb",
-        },
-        {
-            name: "Configuration Guide",
-            to: "/kb",
-        },
-        {
-            name: "Theming Guide for Designers",
-            to: "/kb",
-        },
-    ];
 }
 
 export default withDevice<IProps>(ArticleRevisionsLayout);
