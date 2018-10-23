@@ -76,7 +76,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('HubSync', 'tinyint(1)', '0')
             ->set();
 
-        //touchConfig('Badges.Disabled', true);
+        touchConfig('Badges.Disabled', true);
 
         // This table contains a mirror of all of the categories on all of the nodes.
         gdn::structure()
