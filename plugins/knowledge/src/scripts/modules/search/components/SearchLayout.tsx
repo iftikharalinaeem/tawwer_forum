@@ -12,46 +12,97 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
+import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import SearchResults from "@knowledge/modules/common/SearchResults";
+import { t } from "@library/application";
+import SearchBar from "./SearchBar";
+import AdvancedSearch from "./AdvancedSearch";
+import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 
-interface IProps extends IDeviceProps {
-    children: IArticleFragment[];
+interface IProps extends IDeviceProps, ISearchState {}
+
+export enum ISearchDomain {
+    ARTICLES = "articles",
+    EVERYWHERE = "everywhere",
 }
 
-export class SearchLayout extends React.Component<IProps> {
+export enum ISearchWithin {
+    ONE_DAY = "1 day",
+    THREE_DAY = "3 days",
+    ONE_WEEK = "1 week",
+    TWO_WEEKS = "2 weeks",
+    ONE_MONTH = "1 month",
+    SIX_MONTHS = "6 months",
+    ONE_YEAR = "1 year",
+}
+
+export interface ISearchState {
+    query: string;
+    results: IResult[];
+    advanced: {
+        domain: ISearchDomain;
+        title: string;
+        author: any[]; // TBD in next PR
+        fileName: string;
+        within: ISearchWithin;
+        of: string;
+        deletedArticles: boolean;
+    };
+}
+
+export class SearchLayout extends React.Component<IProps, ISearchState> {
+    private clearQuery = () => {
+        this.setState({
+            query: "",
+        });
+    };
+
+    private setQuery = () => {
+        this.setState({
+            query: "TEST",
+        });
+    };
+
+    constructor(props: IProps) {
+        super(props);
+        // Hard coded state for now, until it's hooked up to redux
+        this.state = {
+            query: "My query",
+            results: dummySearchResults,
+            advanced: {
+                domain: ISearchDomain.ARTICLES,
+                title: "My Title",
+                author: ["Todd", "Dan", "Mister Clean"], // TBD in next PR
+                fileName: "My File Name",
+                within: ISearchWithin.ONE_DAY,
+                of: "Monday",
+                deletedArticles: false,
+            },
+        };
+    }
+
     public render() {
         return (
             <Container>
-                {this.getSearchResults()}
-                {/*<PanelLayout device={this.props.device}>*/}
-                {/*<PanelLayout.Breadcrumbs>*/}
-                {/*<PanelWidget>*/}
-                {/*<Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>*/}
-                {/*</PanelWidget>*/}
-                {/*</PanelLayout.Breadcrumbs>*/}
-                {/*<PanelLayout.MiddleTop>*/}
-                {/*<PageTitle backUrl="#Back" title={category.name} menu={<CategoryMenu />} />*/}
-                {/*</PanelLayout.MiddleTop>*/}
-                {/*<PanelLayout.MiddleBottom>*/}
-                {/*<SearchResults results={this.getSearchResults()} />*/}
-                {/*</PanelLayout.MiddleBottom>*/}
-                {/*</PanelLayout>*/}
+                <PanelLayout device={this.props.device}>
+                    <PanelLayout.MiddleTop>
+                        <SearchBar
+                            query={this.state.query}
+                            placeholder={t("Help")}
+                            clearQuery={this.clearQuery}
+                            setSearchQuery={this.setQuery}
+                        />
+                    </PanelLayout.MiddleTop>
+                    <PanelLayout.MiddleBottom>
+                        <SearchResults results={this.state.results} />
+                    </PanelLayout.MiddleBottom>
+                    <PanelLayout.RightTop>
+                        <AdvancedSearch />
+                    </PanelLayout.RightTop>
+                </PanelLayout>
             </Container>
         );
-    }
-
-    private getSearchResults(): IResult[] {
-        const { children } = this.props;
-        return children
-            .map(article => {
-                return {
-                    name: article.name || "",
-                    meta: <SearchResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
-                    url: article.url,
-                    excerpt: article.excerpt || "",
-                    attachments: [] as any,
-                };
-            })
-            .concat(dummyArticles as any);
     }
 }
 

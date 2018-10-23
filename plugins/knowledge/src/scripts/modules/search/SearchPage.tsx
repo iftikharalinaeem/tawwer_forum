@@ -23,20 +23,23 @@ import { connect } from "react-redux";
 import NotFoundPage from "@library/components/NotFoundPage";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
-import { SearchLayout } from "./components/SearchLayout";
 import { dummySearchResults } from "./state/dummySearchResults";
+import SearchLayout, { ISearchState } from "./components/SearchLayout";
+import { IResult } from "@knowledge/modules/common/SearchResult";
 
 interface IProps extends IDeviceProps {}
 
+interface IState extends ISearchState {}
+
 /**
- * Page component for a flat category list.
+ * Page component for search Page
  */
-export class SearchPage extends React.Component<IProps> {
+export class SearchPage extends React.Component<IProps, IState> {
     public render() {
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
                 <DocumentTitle title={t("Search Results")}>
-                    <SearchLayout>{dummySearchResults}</SearchLayout>
+                    <SearchLayout {...this.state} />
                 </DocumentTitle>
             </PageLoader>
         );
