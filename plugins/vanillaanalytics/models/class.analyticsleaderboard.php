@@ -119,10 +119,10 @@ class AnalyticsLeaderboard {
                 if (array_key_exists($currentType, $firstResult)) {
                     $typeID = $currentType;
                     if ($typeID === 'reaction.recordID') {
-                        if (!isset($firstResult->{'reaction.recordType'})) {
+                        if (!isset($firstResult['reaction.recordType'])) {
                             throw new Gdn_UserException('You need to group by that query with reaction.recordType');
                         }
-                        if ($firstResult->{'reaction.recordType'} === 'discussion') {
+                        if ($firstResult['reaction.recordType'] === 'discussion') {
                             $emulatedTypeID = 'discussion.discussionID';
                         } else {
                             throw new Gdn_UserException('Comments are not supported yet!');
