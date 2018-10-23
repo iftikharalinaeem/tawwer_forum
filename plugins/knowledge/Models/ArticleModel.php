@@ -14,7 +14,11 @@ use Exception;
 /**
  * A model for managing articles.
  */
-class ArticleModel extends \Vanilla\Models\Model {
+class ArticleModel extends \Vanilla\Models\PipelineModel {
+
+    const STATUS_PUBLISHED = 'published'; //default state
+    const STATUS_DELETED = 'deleted';
+    const STATUS_UNDELETED = 'undeleted';
 
     /** Default limit on the number of results returned. */
     const LIMIT_DEFAULT = 30;
@@ -30,6 +34,16 @@ class ArticleModel extends \Vanilla\Models\Model {
     public function __construct(Gdn_Session $session) {
         parent::__construct("article");
         $this->session = $session;
+
+        $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
+            ->setUpdateFields(["dateUpdated"]);
+        $this->addPipelineProcessor($dateProcessor);
+
+        $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
+            ->setUpdateFields(["updateUserID"]);
+        $this->addPipelineProcessor($userProcessor);
     }
 
     /**
@@ -90,31 +104,15 @@ class ArticleModel extends \Vanilla\Models\Model {
     }
 
     /**
-     * Add an article.
+     * Return all possible statuses for article record/item
      *
-     * @param array $set Field values to set.
-     * @return mixed ID of the inserted row.
-     * @throws Exception If an error is encountered while performing the query.
+     * @return array
      */
-    public function insert(array $set) {
-        $set["insertUserID"] = $set["updateUserID"] = $this->session->UserID;
-        $set["dateInserted"] = $set["dateUpdated"] = new DateTimeImmutable("now");
-
-        $result = parent::insert($set);
-        return $result;
-    }
-
-    /**
-     * Update existing articles.
-     *
-     * @param array $set Field values to set.
-     * @param array $where Conditions to restrict the update.
-     * @throws Exception If an error is encountered while performing the query.
-     * @return bool True.
-     */
-    public function update(array $set, array $where): bool {
-        $set["updateUserID"] = $this->session->UserID;
-        $set["dateUpdated"] = new DateTimeImmutable("now");
-        return parent::update($set, $where);
+    public static function getAllStatuses(): array {
+        return [
+            self::STATUS_UNDELETED,
+            self::STATUS_DELETED,
+            self::STATUS_PUBLISHED
+        ];
     }
 }

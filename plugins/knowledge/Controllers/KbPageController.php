@@ -31,11 +31,25 @@ class KbPageController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->data['title'] = 'Knowledge Base Title';
+        $this->setPageTitle(\Gdn::translate('Home'));
+
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
         $data['page']['classes'][] = 'isLoading';
         $data['template'] = 'seo/pages/home.twig';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * Render out the /kb/search page.
+     */
+    public function get_search() : string {
+        $this->setPageTitle(\Gdn::translate('Search'));
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
+        $data['template'] = 'seo/pages/search.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
     }

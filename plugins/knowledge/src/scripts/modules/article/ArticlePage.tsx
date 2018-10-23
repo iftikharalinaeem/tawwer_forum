@@ -5,77 +5,129 @@
  */
 
 import React from "react";
-import { bindActionCreators } from "redux";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, ILoadable } from "@library/@types/api";
 import NotFoundPage from "@library/components/NotFoundPage";
-import { actions, thunks, model } from "@knowledge/modules/article/state";
-import { ArticleLayout, ArticleMenu } from "@knowledge/modules/article/components";
+import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import apiv2 from "@library/apiv2";
+import DocumentTitle from "@library/components/DocumentTitle";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
+import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
+import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 
-interface IProps extends IDeviceProps {
+interface IProps extends IDeviceProps, IArticleActionsProps {
     match: match<{
         id: number;
     }>;
-    articlePageState: model.IState;
-    getArticle: typeof thunks.getArticle;
-    clearPageState: typeof actions.clearPageState;
+    article: ILoadable<IArticle>;
+    restoreStatus: LoadStatus;
+    articlePageActions: ArticlePageActions;
+    breadcrumbData: ICrumb[];
+}
+
+interface IState {
+    showRestoreDialogue: boolean;
 }
 
 /**
  * Page component for an article.
  */
-export class ArticlePage extends React.Component<IProps> {
+export class ArticlePage extends React.Component<IProps, IState> {
     /**
      * Render not found or the article.
      */
     public render() {
-        const { articlePageState } = this.props;
+        const { article, breadcrumbData } = this.props;
         const { id } = this.props.match.params;
 
-        if (id === null || (articlePageState.status === LoadStatus.ERROR && articlePageState.error.status === 404)) {
+        if (id === null || (article.status === LoadStatus.ERROR && article.error.status === 404)) {
             return <NotFoundPage type="Page" />;
         }
 
-        if (articlePageState.status !== LoadStatus.SUCCESS) {
-            return null;
-        }
-
-        const { article } = articlePageState.data;
-
         return (
-            <PageLoader {...articlePageState}>
-                <ArticleLayout article={article} />
+            <PageLoader {...article}>
+                {article.status === LoadStatus.SUCCESS && (
+                    <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
+                        <ArticleLayout
+                            article={article.data}
+                            breadcrumbData={breadcrumbData!}
+                            messages={this.renderMessages()}
+                        />
+                    </DocumentTitle>
+                )}
             </PageLoader>
         );
     }
 
     /**
-     * If the component mounts without any data we need to fetch request it.
+     * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        const { articlePageState, getArticle } = this.props;
-        const { id } = this.props.match.params;
-        if (articlePageState.status !== LoadStatus.PENDING) {
-            return;
+        const { article } = this.props;
+        if (article.status !== LoadStatus.SUCCESS) {
+            this.initializeFromUrl();
         }
+    }
 
-        if (id === null) {
-            return;
+    /**
+     * If the pages url changes we need to fetch the article data again.
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.props.match.url !== prevProps.match.url) {
+            this.initializeFromUrl();
         }
-
-        getArticle(id);
     }
 
     /**
      * When the component unmounts we need to be sure to clear out the data we requested in componentDidMount.
      */
     public componentWillUnmount() {
-        this.props.clearPageState();
+        this.props.articlePageActions.reset();
+    }
+
+    private renderMessages(): React.ReactNode {
+        const { article } = this.props;
+        let messages: React.ReactNode;
+
+        if (article.status === LoadStatus.SUCCESS) {
+            if (article.data.status === ArticleStatus.DELETED) {
+                messages = (
+                    <ArticleDeletedMessage
+                        onRestoreClick={this.handleRestoreClick}
+                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
+                    />
+                );
+            }
+        }
+
+        return messages;
+    }
+
+    private handleRestoreClick = async () => {
+        const { articleActions, article } = this.props;
+        await articleActions.patchStatus({ articleID: article.data!.articleID, status: ArticleStatus.PUBLISHED });
+    };
+
+    /**
+     * Initialize the page's data from it's url.
+     */
+    private initializeFromUrl() {
+        const { articlePageActions } = this.props;
+        const { id } = this.props.match.params;
+
+        if (id === null) {
+            return;
+        }
+
+        void articlePageActions.getArticleByID(id);
     }
 }
 
@@ -83,8 +135,23 @@ export class ArticlePage extends React.Component<IProps> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
+    let breadcrumbData: ICrumb[] | null = null;
+    const { article, restoreStatus } = state.knowledge.articlePage;
+
+    if (article.status === LoadStatus.SUCCESS && article.data.knowledgeCategoryID !== null) {
+        const categories = categoryModel.selectKbCategoryBreadcrumb(state, article.data.knowledgeCategoryID);
+        breadcrumbData = categories.map(category => {
+            return {
+                name: category.name,
+                url: category.url,
+            };
+        });
+    }
+
     return {
-        articlePageState: state.knowledge.articlePage,
+        article,
+        breadcrumbData,
+        restoreStatus,
     };
 }
 
@@ -92,9 +159,10 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    const { getArticle } = thunks;
-    const { clearPageState } = actions;
-    return bindActionCreators({ getArticle, clearPageState }, dispatch);
+    return {
+        articlePageActions: new ArticlePageActions(dispatch, apiv2),
+        ...ArticleActions.mapDispatchToProps(dispatch),
+    };
 }
 
 const withRedux = connect(

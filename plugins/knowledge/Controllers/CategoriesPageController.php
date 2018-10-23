@@ -8,21 +8,22 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiActions;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
-/**
+/*
  * Knowledge base Categories controller for article view.
  */
 class CategoriesPageController extends KnowledgeTwigPageController {
     const ACTION_VIEW_ARTICLES = 'view';
     const CATEGORY_API_RESPONSE = 'category';
 
-    /** @var CategoriesApiController */
+    /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
     /** @var ArticlesApiController */
     protected $articlesApi;
@@ -55,21 +56,20 @@ class CategoriesPageController extends KnowledgeTwigPageController {
     public function index(string $path) : string {
         $this->action = self::ACTION_VIEW_ARTICLES;
         $this->categoryId = $id = $this->detectCategoryId($path);
-        $this->data[self::CATEGORY_API_RESPONSE] = $this->categoriesApi->get($id);
-        //$this->data[self::API_PAGE_KEY] = $this->articlesApi->index(['KnowledgeCategoryID'=>$id]);
+        $category = $this->categoriesApi->get($id);
+        $this->data[self::CATEGORY_API_RESPONSE] = $category;
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index_excerpts(['KnowledgeCategoryID'=>$id]);
+
+        // Title
+        $this->setPageTitle($category['name']);
 
         // Put together pre-loaded redux actions.
-//        $categoriesGetRedux = new ReduxAction(ArticlesApiActions::GET_CATEGORY_RESPONSE, $this->data[self::CATEGORY_API_RESPONSE]);
-//        $articlesGetRedux = new ReduxAction(ArticlesApiActions::GET_ARTICLE_RESPONSE, $this->data[self::API_PAGE_KEY]);
-//        $reduxActions = [
-//            $categoriesGetRedux->getReduxAction(),
-//            $articlesGetRedux->getReduxAction(),
-//        ];
-//        $this->addInlineScript($this->createInlineScriptContent("__ACTIONS__", $reduxActions));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_CATEGORY_RESPONSE, Data::box($this->data[self::CATEGORY_API_RESPONSE])));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLES_RESPONSE, Data::box($this->data[self::API_PAGE_KEY])));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
-        $data['template'] = 'seo/pages/category.twig';
+        $data['template'] = 'seo/pages/flatCategories.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
     }
@@ -141,7 +141,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
                     if ($apiUrl = $this->data[self::CATEGORY_API_RESPONSE]['url'] ?? false) {
                         $url = $apiUrl;
                     } else {
-                        $url = \Gdn::request()->url('/kb/categories/'.$this->articleId.'-', true);
+                        $url = \Gdn::request()->url('/kb/categories/'.$this->categoryId.'-', true);
                     }
                     break;
                 default:

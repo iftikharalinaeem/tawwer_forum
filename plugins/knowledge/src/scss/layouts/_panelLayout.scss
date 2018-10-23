@@ -4,9 +4,10 @@
  * @license Proprietary
  */
 
-$panelLayout_topMargin                                                : $utility-baseUnit * 4;
-$panelLayout_bottomMargin                                             : $utility-baseUnit * 4;
+$panelLayout_topMargin                                                : 0;
+$panelLayout_bottomMargin                                             : 48px;
 
+$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth +  2 * $icon-default_size + $utility-baseUnit !default;
 $panelLayout-twoColumn_breakpoint                                     : $global-main_paddedWidth !default;
 $panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
 
@@ -14,6 +15,15 @@ $panelLayout-panel_topPadding                                         : $global-
 $panelLayout-panel_rightPadding                                       : $global-widgetInner_padding !default;
 $panelLayout-panel_bottomPadding                                      : $global-widgetInner_padding !default;
 $panelLayout-panel_leftPadding                                        : $global-widgetInner_padding !default;
+
+$panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
+
+@mixin mediaQuery-panelLayout_noBleed {
+    @media (max-width: #{$panelLayout-noBleed_breakpoint}) {
+        @content;
+    }
+}
+
 
 @mixin mediaQuery-panelLayout_twoColumn {
     @media (max-width: #{$panelLayout-twoColumn_breakpoint}) {
@@ -32,6 +42,16 @@ $panelLayout-panel_leftPadding                                        : $global-
         top: $panelLayout_topMargin;
         bottom: $panelLayout_bottomMargin;
     }
+
+    &.noBreadcrumbs {
+        > .panelLayout-main {
+            padding-top: $global-gutter_size;
+        }
+    }
+}
+
+.overlay .panelLayout.noBreadcrumbs .panelLayout-main {
+    padding-top: 0;
 }
 
 
@@ -40,6 +60,18 @@ $panelLayout-panel_leftPadding                                        : $global-
 .panelLayout-top,
 .panelLayout-main {
     width: 100%;
+}
+
+.panelLayout {
+    &.isOneCol {
+        width: $global-middleColumn_width;
+        max-width: 100%;
+        margin: auto;
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+        }
+    }
 }
 
 .panelLayout-container {
@@ -55,40 +87,53 @@ $panelLayout-panel_leftPadding                                        : $global-
 // Left Section
 .panelLayout-left {
     position: relative;
-    width: $global-panel_width;
-    flex-basis: $global-panel_width;
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
+    padding-right: $global-panel_spacerOuter;
     z-index: 2;
-
-    //@include mediaQuery-panelLayout_oneColumn {
-    //    position: absolute;
-    //    top: 0;
-    //    left: 0;
-    //    width: 100vw;
-    //
-    //    margin: 0;
-    //    transform: translateX(-100vw);
-    //    height: 100%;
-    //    overflow: auto;
-    //
-    //    .panelArea-leftTop {
-    //        display: none;
-    //    }
-    //
-    //    &.isOpen {
-    //        transform: translateX(0);
-    //    }
-    //}
+    border-right: solid $panelLayout-border_color 1px;
 }
 
-.panelLayout-breadcrumbs {
+.panelLayout-right {
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
+    padding-left: $global-panel_spacerOuter;
+    border-left: solid $panelLayout-border_color 1px;
+}
+
+// Middle Column
+.panelLayout-middle {
+    flex-grow: 1;
+    width: 100%;
     padding: {
-        right: $global-gutter_quarterSize;
-        left: $global-gutter_quarterSize;
+        right: $global-gutter_halfSize;
+        left: $global-gutter_halfSize;
     }
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
+}
+
+
+.panelLayout-breadcrumbs {
+    padding: {
+        top: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+        bottom: $global-gutter_halfSize;
+        left: $global-gutter_halfSize;
+    }
+
+    &.hasAdjacentPanel {
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             flex-basis: 100%;
@@ -101,13 +146,28 @@ $panelLayout-panel_leftPadding                                        : $global-
 .panelLayout-content {
     display: flex;
     flex-grow: 1;
+    width: 100%;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        padding: {
+            left: #{$global_spacer - $global-gutter_halfSize};
+            right: #{$global_spacer - $global-gutter_halfSize};
+        }
+
+        @include mediaQuery-panelLayout_twoColumn {
+            padding: {
+                left: 0;
+            }
+        }
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;
+            padding: {
+                right: 0;
+            }
             max-width: 100%;
             flex-basis: 100%;
             padding-left: 0;
@@ -115,34 +175,16 @@ $panelLayout-panel_leftPadding                                        : $global-
     }
 }
 
-// Middle Column
-.panelLayout-middle {
-    flex-grow: 1;
-    padding: {
-        right: $global-gutter_quarterSize;
-        left: $global-gutter_quarterSize;
-    }
-
-    &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_width});
-        max-width: calc(100% - #{$global-panel_width});
-
-        @include mediaQuery-panelLayout_twoColumn {
-            width: 100%;
-            max-width: 100%;
-            flex-basis: 100%;
-        }
-    }
-}
-
-.panelLayout-right {
-    width: $global-panel_width;
-    flex-basis: $global-panel_width;
-}
-
-
 
 @include mediaQuery-panelLayout_oneColumn {
+
+    .panelLayout-middle {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+
     .panelLayout-sticky {
         position: relative;
         top: auto;

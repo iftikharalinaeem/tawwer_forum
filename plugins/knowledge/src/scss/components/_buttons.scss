@@ -4,6 +4,9 @@
  * @license Proprietary
  */
 
+$buttonLoader-size: 16px;
+$buttonLoader-thickness: 3px;
+
 .button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
@@ -29,6 +32,10 @@
     &.button-fullWidth {
         width: 100%;
         max-width: 100%;
+    }
+
+    &.buttonNoMinWidth {
+        min-width: 0;
     }
 
     &.buttonNoBorder {
@@ -62,6 +69,19 @@
     }
 }
 
+.buttonAsText {
+    color: $global-color_primary;
+    line-height: $global-condensed_lineHeight;
+    padding: 0;
+    text-align: left;
+    overflow: hidden;
+
+    &:hover,
+    &:focus {
+        color: $state-active_color;
+    }
+}
+
 
 .button-callToAction {
     @include generateButtonClass($buttonPrimary);
@@ -81,8 +101,26 @@
 }
 
 
+.buttonLoader {
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    &::after {
+        @include spinnerLoader($buttonLoader-size, $buttonLoader-thickness);
+        content: ' ';
+    }
+}
+
 .buttonPrimary {
     @include generateButtonClass($buttonPrimary);
+
+    .buttonLoader::after {
+        @include spinnerLoader($buttonLoader-size, $buttonLoader-thickness, $button-primary_fg);
+    }
 }
 
 .button-pushLeft {

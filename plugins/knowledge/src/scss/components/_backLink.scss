@@ -4,10 +4,24 @@
  * @license Proprietary
  */
 
-$fullWidthLayout-backLink_breakpoint  : $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    user-select: none;
+}
 
-@mixin mediaQuery-backLink_breakPoint {
-    @media (max-width: #{$fullWidthLayout-backLink_breakpoint}) {
-        @content;
+.backLink-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: inherit;
+
+    &:hover {
+        color: $global-color_primary;
     }
+}
+
+.backLink-label {
+    padding-right: $utility-baseUnit;
 }

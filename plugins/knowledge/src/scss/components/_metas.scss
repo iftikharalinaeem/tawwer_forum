@@ -9,10 +9,10 @@ $metas_color                  : mix($global-color_fg, $global-color_bg, 50%) !de
 $meta_spacing                 : $global-gutter_quarterSize;
 
 .metas {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: center;
+    display: inline-block;
+    //flex-wrap: wrap;
+    //justify-content: flex-start;
+    //align-items: center;
     color: $metas_color;
     width: calc(100% + #{$meta_spacing * 2});
 
@@ -25,7 +25,7 @@ $meta_spacing                 : $global-gutter_quarterSize;
 }
 
 .meta {
-    display: flex;
+    display: inline-block;
     margin: 0 $utility-baseUnit;
     font-size: $metaText_fontSize;
     color: $metas_color;
@@ -35,7 +35,14 @@ $meta_spacing                 : $global-gutter_quarterSize;
     }
 }
 
-a.meta {
+.metaStyle {
+    display: inline-block;
+    font-size: $metaText_fontSize;
+    color: $metas_color;
+}
+
+a.meta,
+a.metaStyle {
     color: $link-default_color;
     &:hover {
         color: $link-default_hover-color;

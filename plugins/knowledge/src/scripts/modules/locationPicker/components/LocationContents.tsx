@@ -6,23 +6,21 @@
 
 import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { ILocationPickerProps, withLocationPicker } from "@knowledge/modules/locationPicker/state";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
-import { ILoadable, LoadStatus } from "@library/@types/api";
-import MediumLoader from "@library/components/MediumLoader";
+import { t } from "@library/application";
 
 interface IProps {
-    initialCategoryID: number;
     onCategoryNavigate: (categoryID: number) => void;
     onItemSelect: (categoryID: number) => void;
-    selectedCategory: IKbCategoryFragment;
-    items: ILoadable<IKbNavigationItem[]>;
+    selectedCategory: IKbCategoryFragment | null;
+    navigatedCategory: IKbCategoryFragment | null;
+    chosenCategory: IKbCategoryFragment | null;
+    items: IKbNavigationItem[];
 }
 
 interface IState {
-    id: string;
     selectedRecordID?: number;
 }
 
@@ -30,44 +28,59 @@ interface IState {
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
 export default class LocationContents extends React.Component<IProps, IState> {
+    private legendRef;
+    private listID;
+
     public constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "locationPicker"),
-        };
+        this.legendRef = React.createRef();
+        this.listID = getRequiredID(props, "navigationItemList");
     }
 
     public render() {
-        const { selectedCategory, items } = this.props;
+        const { selectedCategory, items, navigatedCategory, chosenCategory } = this.props;
+        const title = navigatedCategory ? navigatedCategory.name : t("Knowledge Bases");
 
-        if (items.status === LoadStatus.SUCCESS) {
-            const contents = items.data.map((item, index) => {
-                const isSelected = selectedCategory.knowledgeCategoryID === item.recordID;
-                const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
-                const selectCallback = () => this.props.onItemSelect(item.recordID);
-                return (
-                    <NavigationItemCategory
-                        key={index}
-                        isInitialSelection={false}
-                        isSelected={isSelected}
-                        name={this.radioName}
-                        value={item}
-                        onNavigate={navigateCallback}
-                        onSelect={selectCallback}
-                    />
-                );
-            });
-            return <NavigationItemList categoryName={selectedCategory.name}>{contents}</NavigationItemList>;
-        } else {
+        const contents = items.map((item, index) => {
+            const isSelected = !!selectedCategory && selectedCategory.knowledgeCategoryID === item.recordID;
+            const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
+            const selectCallback = () => this.props.onItemSelect(item.recordID);
             return (
-                <div className="folderContents">
-                    <MediumLoader />
-                </div>
+                <NavigationItemCategory
+                    key={index}
+                    isInitialSelection={!!chosenCategory && item.recordID === chosenCategory.knowledgeCategoryID}
+                    isSelected={isSelected}
+                    name={this.radioName}
+                    value={item}
+                    onNavigate={navigateCallback}
+                    onSelect={selectCallback}
+                />
             );
-        }
+        });
+        return (
+            <NavigationItemList
+                id={this.listID}
+                legendRef={this.legendRef}
+                categoryName={title}
+                key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
+            >
+                {contents}
+            </NavigationItemList>
+        );
     }
 
     private get radioName(): string {
-        return "folders-" + this.state.id;
+        return "folders-" + this.listID;
+    }
+
+    private setFocusOnLegend() {
+        this.legendRef.current!.focus();
+    }
+
+    /**
+     * Check for focus
+     */
+    public componentDidUpdate() {
+        this.setFocusOnLegend();
     }
 }

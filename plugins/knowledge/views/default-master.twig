@@ -29,20 +29,33 @@
             <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
+        <noscript>
+            <style>
+                .fullPageLoader { display: none }
+            </style>
+        </noscript>
+
     </head>
     <body class="{{ page.classes|join(' ') }}">
-        <div class="page">
+        <div id="page" class="page">
             <div id="headerContainer">
                 {{ include('partials/header.twig') }}
             </div>
             <div id="app" class="page-minHeight">
-                <div class="fullPageLoader">
-                    {% if template %}
-                        <noscript>
-                            {{ include(template) }}
-                        </noscript>
-                    {% endif %}
-                </div>
+            {%- if template -%}
+
+                <noscript>
+
+                    <h1>
+                        {{- meta.seo.title -}}
+                    </h1>
+
+                    {{- include(template) }}
+
+                </noscript>
+            {%- endif -%}
+
+                <div class="fullPageLoader"></div>
             </div>
             <div id="footerContainer">
                 {{ include('partials/footer.twig') }}
@@ -53,7 +66,7 @@
         <script>
             WebFont.load({
                 google: {
-                    families: ['Open Sans:400,400italic,600'] // Will be dynamic at some point
+                    families: ['Open Sans:400,400italic,600,700'] // Will be dynamic at some point
                 }
             });
         </script>

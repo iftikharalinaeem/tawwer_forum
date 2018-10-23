@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\ArticleModel;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -70,6 +71,46 @@ class ArticlesTest extends AbstractResourceTest {
         } else {
             $this->fail("Missing test for deleting an article.");
         }
+    }
+
+    /**
+     * Test PATCH /articles/<id>/delete.
+     */
+    public function testPatchDelete() {
+        $row = $this->testGetEdit();
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}/status",
+            ['status' => ArticleModel::STATUS_DELETED]
+        );
+        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(ArticleModel::STATUS_DELETED, $r->getBody()['status']);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}"
+        );
+        $body = $r->getBody();
+        $this->assertEquals(ArticleModel::STATUS_DELETED, $body['status'], 'Status deleted has not been updated!');
+    }
+
+    /**
+     * Test PATCH /articles/<id>/undelete.
+     */
+    public function testPatchUndelete() {
+        $row = $this->testGetEdit();
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}/status",
+            ['status' => ArticleModel::STATUS_UNDELETED]
+        );
+        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(ArticleModel::STATUS_UNDELETED, $r->getBody()['status']);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}"
+        );
+        $body = $r->getBody();
+        $this->assertEquals(ArticleModel::STATUS_UNDELETED, $body['status'], 'Status undeleted has not been updated!');
     }
 
     /**

@@ -4,8 +4,8 @@
  * @license Proprietary
  */
 
-$linkList_fontSize        : $global-medium_fontSize;
-$linkList_offset          : $utility-baseUnit * 2;
+$linkList_fontSize        : $global-small_fontSize;
+$linkList_offset          : 12px;
 
 .linkList {
     position: relative;

@@ -1,7 +1,7 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 $dropDown_width                                : 200px;
@@ -32,6 +32,10 @@ $dropDown-item_minHeight                       : 45px;
         width: 1px;
         color: $overlay-border_color;
     }
+
+    &.isParentWidth {
+        width: 100%;
+    }
 }
 
 .dropDownItems {
@@ -55,8 +59,21 @@ $dropDown-item_minHeight                       : 45px;
     }
 }
 
+.dropDownMeta-link {
+    @include allLinkStates {
+        color: $link_default-color;
+    };
+}
+
 .dropDown-item {
     text-align: left;
+}
+
+.dropDown-toggleButtonIcon {
+    &:hover,
+    &:focus {
+        color: $global-color_primary;
+    }
 }
 
 .dropDownItem-button,

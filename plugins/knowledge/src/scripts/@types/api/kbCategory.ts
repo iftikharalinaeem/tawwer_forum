@@ -9,6 +9,7 @@ import { IArticleFragment } from "@knowledge/@types/api";
 import { MultiTypeRecord } from "@library/@types/api";
 
 export enum KbCategoryDisplayType {
+    ROOT = "root",
     HELP = "help",
     GUIDE = "guide",
     SEARCH = "search",

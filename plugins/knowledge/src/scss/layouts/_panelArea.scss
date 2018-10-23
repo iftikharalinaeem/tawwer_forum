@@ -1,38 +1,18 @@
-/*!
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-$panelArea-gap: $global-gutter_size;
-
 .panelArea {
+    width: 100%;
 
     .heading {
         @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
     }
-
-    + .panelArea {
-        margin-top: $panelArea-gap;
-    }
-
     &.inheritHeight {
         > .panelWidget {
             flex-grow: 1;
         }
     }
-}
-
-.panelArea-rightTop {
-    margin-bottom: $panelArea-gap;
-}
-
-.panelArea-leftTop {
-    margin-bottom: $panelArea-gap;
-    position: relative;
-}
-
-.panelArea-leftBottom {
-    margin-bottom: $panelArea-gap;
-    position: relative;
 }

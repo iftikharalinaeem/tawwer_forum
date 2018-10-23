@@ -1,7 +1,7 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 $folderContents-item_minHeight: 42px;
@@ -38,6 +38,19 @@ $folderContents_minHeight: 396px;
 }
 
 .folderContents-folder {
+    display: block;
+    width: 100%;
+}
+
+.folderContents-input {
+    &:focus {
+        + .folderContents-content {
+            background-color: $state-hover_color;
+        }
+    }
+}
+
+.folderContents-content {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,7 +62,6 @@ $folderContents_minHeight: 396px;
         left: $folderContents-item_spacing;
         right: $folderContents-item_spacing;
     }
-
     &:hover {
         background-color: $state-hover_color;
     }

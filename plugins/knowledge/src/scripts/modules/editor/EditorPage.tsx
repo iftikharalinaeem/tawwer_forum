@@ -6,17 +6,24 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
-import { Modal } from "@library/components/modal";
-import { EditorForm, EditorLayout } from "@knowledge/modules/editor/components";
-import { thunks, actions, model } from "@knowledge/modules/editor/state";
-import { model as categoryModel } from "@knowledge/modules/categories/state";
+import apiv2 from "@library/apiv2";
+import Modal from "@library/components/modal/Modal";
+import EditorForm from "@knowledge/modules/editor/components/EditorForm";
+import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { IPostArticleRevisionRequestBody, Format, IKbCategoryFragment } from "@knowledge/@types/api";
+import {
+    IPostArticleRevisionRequestBody,
+    Format,
+    IKbCategoryFragment,
+    IPatchArticleRequestBody,
+} from "@knowledge/@types/api";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -24,11 +31,9 @@ interface IOwnProps
         }> {}
 
 interface IProps extends IOwnProps {
-    pageState: model.IState;
-    clearPageState: () => void;
-    initPageFromLocation: typeof thunks.initPageFromLocation;
-    submitNewRevision: typeof thunks.submitNewRevision;
-    articleCategory: IKbCategoryFragment;
+    pageState: IEditorPageState;
+    actions: EditorPageActions;
+    locationCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -39,26 +44,37 @@ interface IState {
  * Page for editing an article.
  */
 export class EditorPage extends React.Component<IProps, IState> {
+    private id;
+
     public state = {
         showFolderPicker: false,
     };
 
+    public constructor(props: IProps) {
+        super(props);
+        this.id = uniqueIDFromPrefix("editorPage");
+    }
+
+    get titleID() {
+        return this.id + "-title";
+    }
+
     public render() {
         const pageContent = (
-            <React.Fragment>
-                <EditorLayout backUrl={this.backLink}>
-                    <EditorForm
-                        submitHandler={this.formSubmit}
-                        revision={this.props.pageState.revision}
-                        articleCategory={this.props.articleCategory}
-                    />
-                </EditorLayout>
-            </React.Fragment>
+            <EditorForm
+                backUrl={this.backLink}
+                key={this.props.pageState.revision.status}
+                submitHandler={this.formSubmit}
+                revision={this.props.pageState.revision}
+                currentCategory={this.props.locationCategory}
+                isSubmitLoading={this.isSubmitLoading}
+                titleID={this.titleID}
+            />
         );
 
         if (this.isModal) {
             return (
-                <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+                <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
                     {pageContent}
                 </Modal>
             );
@@ -69,16 +85,25 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     /**
      * Initial setup for the page.
+     *
+     * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        this.props.initPageFromLocation(this.props.history);
+        const { pageState, match, actions, history } = this.props;
+        if (pageState.article.status !== LoadStatus.SUCCESS) {
+            if (match.params.id === undefined) {
+                void actions.createArticleForEdit(history);
+            } else {
+                void actions.fetchArticleForEdit(match.params.id);
+            }
+        }
     }
 
     /**
      * Cleanup the page contents.
      */
     public componentWillUnmount() {
-        this.props.clearPageState();
+        this.props.actions.reset();
     }
 
     public showLocationPicker() {
@@ -93,21 +118,34 @@ export class EditorPage extends React.Component<IProps, IState> {
         });
     }
 
+    private get isSubmitLoading(): boolean {
+        const { submit } = this.props.pageState;
+        return [submit.revision.status, submit.article.status].includes(LoadStatus.LOADING);
+    }
+
     /**
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history } = this.props;
+        const { pageState, history, actions, locationCategory } = this.props;
         const { article } = pageState;
 
         if (article.status === LoadStatus.SUCCESS) {
-            const data: IPostArticleRevisionRequestBody = {
+            const articleRequest: IPatchArticleRequestBody = {
+                articleID: article.data.articleID,
+            };
+
+            if (locationCategory !== null) {
+                articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
+            }
+
+            const revisionRequest: IPostArticleRevisionRequestBody = {
                 articleID: article.data.articleID,
                 name: title,
                 body: JSON.stringify(content),
                 format: Format.RICH,
             };
-            this.props.submitNewRevision(data, history);
+            void actions.updateArticle(articleRequest, revisionRequest, history);
         }
     };
 
@@ -140,15 +178,15 @@ export class EditorPage extends React.Component<IProps, IState> {
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IStoreState) {
-    let articleCategory;
-    const { editorPage } = state.knowledge;
+    let locationCategory: IKbCategoryFragment | null = null;
+    const { editorPage, locationPicker } = state.knowledge;
     if (editorPage.article.status === LoadStatus.SUCCESS) {
-        articleCategory = categoryModel.selectKbCategoryFragment(state, editorPage.article.data.knowledgeCategoryID);
+        locationCategory = categoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
     }
 
     return {
         pageState: editorPage,
-        articleCategory,
+        locationCategory,
     };
 }
 
@@ -156,9 +194,9 @@ function mapStateToProps(state: IStoreState) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
-    const { initPageFromLocation, submitNewRevision } = thunks;
-    const { clearPageState } = actions;
-    return bindActionCreators({ initPageFromLocation, submitNewRevision, clearPageState }, dispatch);
+    return {
+        actions: new EditorPageActions(dispatch, apiv2),
+    };
 }
 
 const withRedux = connect(

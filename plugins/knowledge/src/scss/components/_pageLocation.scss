@@ -1,9 +1,28 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
+$pageLocation_spacer: $utility-baseUnit * 2;
+
 .pageLocation {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: $global-spacer;
+}
+
+.pageLocation-picker {
+  border: solid $formElement_borderColor $formElement_borderWidth;
+  border-radius: $global-borderRadius;
   user-select: none;
+  margin-left: 1ex;
+  padding: {
+    top: $utility-baseUnit;
+    bottom: $utility-baseUnit;
+    left: $pageLocation_spacer;
+    right: $pageLocation_spacer;
+  }
 }

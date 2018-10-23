@@ -8,7 +8,13 @@ import { IUserFragment } from "@dashboard/@types/api";
 import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {
-    knowledgeCategoryID: number; //The category the article belongs in.
+    knowledgeCategoryID: number | null; //The category the article belongs in.
+}
+
+export enum ArticleStatus {
+    DELETED = "deleted",
+    UNDELETED = "undeleted",
+    PUBLISHED = "published",
 }
 
 interface IArticleDefaultedData {
@@ -16,6 +22,7 @@ interface IArticleDefaultedData {
     seoDescription: string; // Displayed in the of the page. If empty will be calculated from the article body.
     slug: string; // The path to the article from an import used to support redirects. This is not editable within the UI, but should be accessable via API in case we decide to make it an advanced option.
     sort: number; // The manual sort order of the article.
+    status: ArticleStatus;
 }
 
 interface IArticleServerManagedData {
@@ -40,13 +47,28 @@ export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, I
 // Request/Response interfaces
 export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
 
+export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
+    articleID: number;
+}
+
 export interface IPostArticleResponseBody extends IArticle {}
 
+export interface IPatchArticleResponseBody extends IArticle {}
+
 export interface IGetArticleResponseBody extends IArticle {}
+
+export interface IPatchArticleStatusRequestBody {
+    articleID: number;
+    status: ArticleStatus;
+}
+
+export interface IPatchArticleStatusResponseBody extends IArticle {}
 
 export interface IArticleFragment {
     articleID: number;
     name: string; //The title of the article
+    dateUpdated: string;
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
+    excerpt: string;
 }

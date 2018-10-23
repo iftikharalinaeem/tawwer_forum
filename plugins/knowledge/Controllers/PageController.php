@@ -9,14 +9,15 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
-use Vanilla\Knowledge\Models\SiteContextModel;
+use Vanilla\Knowledge\Models\ReduxAction;
+use Vanilla\Knowledge\Models\SiteMeta;
 
 /**
  * Knowledge Base base controller class.
  *
  * This controller expects most content to come from api
  */
-abstract class PageController extends \Garden\Controller implements InjectableInterface {
+abstract class PageController extends \Garden\Controller {
     /** @var \Gdn_Session */
     protected $session;
 
@@ -27,6 +28,8 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     protected $inlineScripts = [];
 
     protected $styles = [];
+
+    protected $reduxActions = [];
 
     protected $inlineStyles = [];
 
@@ -46,19 +49,12 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
     }
 
     /**
-     * Get dependencies injected by the container.
+     * Add a redux action to the page.
      *
-     * @param SiteContextModel $siteContext Needed to pass data to the frontend.
+     * @param ReduxAction $action The action to add.
      */
-    public function setDependencies(SiteContextModel $siteContext) {
-        // Assemble our site context for the frontend.
-        $gdnData = [
-            'meta' => [
-                'context' => $siteContext->getContext(),
-            ],
-        ];
-
-        $this->addInlineScript($this->createInlineScriptContent("gdn", $gdnData));
+    public function addReduxAction(ReduxAction $action) {
+        $this->reduxActions[] = $action;
     }
 
     /**
@@ -109,7 +105,7 @@ abstract class PageController extends \Garden\Controller implements InjectableIn
      * @return array
      */
     public function getInlineScripts() {
-        return $this->inlineScripts;
+        return array_merge($this->inlineScripts, [self::createInlineScriptContent('__ACTIONS__', $this->reduxActions)]);
     }
 
     /**

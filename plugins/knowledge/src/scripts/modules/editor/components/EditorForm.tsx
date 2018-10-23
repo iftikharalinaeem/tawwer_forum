@@ -10,13 +10,25 @@ import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
 import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import Button from "@library/components/forms/Button";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
+import DocumentTitle from "@library/components/DocumentTitle";
+import classNames from "classnames";
+import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import Container from "@knowledge/layouts/components/Container";
+import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
+import { Devices } from "@library/components/DeviceChecker";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { getRequiredID } from "@library/componentIDs";
 
 interface IProps {
+    device: Devices;
+    backUrl: string | null;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     revision: ILoadable<IArticleRevision | undefined>;
-    articleCategory: IKbCategoryFragment;
+    currentCategory: IKbCategoryFragment | null;
+    className?: string;
+    isSubmitLoading: boolean;
+    titleID?: string;
 }
 
 interface IState {
@@ -27,44 +39,79 @@ interface IState {
 /**
  * Form for the editor page.
  */
-export default class EditorForm extends React.Component<IProps, IState> {
-    public state = {
-        name: "",
-        body: [],
-    };
+export class EditorForm extends React.Component<IProps, IState> {
     private editorRef: React.RefObject<Editor> = React.createRef();
+
+    public constructor(props: IProps) {
+        super(props);
+        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
+            this.state = {
+                name: this.props.revision.data.name,
+                body: [],
+            };
+        } else {
+            this.state = {
+                name: "",
+                body: [],
+            };
+        }
+    }
+
+    public componentDidMount() {
+        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
+            this.editorRef.current!.setEditorContent(JSON.parse(this.props.revision.data.body));
+        }
+    }
 
     /**
      * @inheritdoc
      */
     public render() {
+        const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
         return (
-            <div className="FormWrapper inheritHeight">
-                <form className="inheritHeight" onSubmit={this.onSubmit}>
-                    <LocationInput initialCategory={this.props.articleCategory} />
-                    <div className="inputBlock">
-                        <input
-                            className="inputBlock-inputText inputText"
-                            type="text"
-                            placeholder={t("Title")}
-                            value={this.state.name}
-                            onChange={this.titleChangeHandler}
-                            disabled={this.isLoading}
-                        />
-                    </div>
-                    <Editor
-                        allowUpload={true}
-                        ref={this.editorRef}
-                        isPrimaryEditor={true}
-                        onChange={this.editorChangeHandler}
-                        className="inheritHeight"
-                        isLoading={this.isLoading}
-                    />
-                    <Button disabled={!this.canSubmit} type="submit">
-                        {t("Submit")}
-                    </Button>
-                </form>
-            </div>
+            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+                <EditorHeader
+                    backUrl={this.props.backUrl}
+                    device={this.props.device}
+                    canSubmit={this.canSubmit}
+                    isSubmitLoading={this.props.isSubmitLoading}
+                    className="richEditorForm-header"
+                />
+                <Container className="richEditorForm-body">
+                    <h1 id={this.props.titleID} className="sr-only">
+                        {t("Write Discussion")}
+                    </h1>
+                    <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
+                        <PanelLayout.MiddleBottom>
+                            <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
+                                <LocationInput
+                                    initialCategoryID={categoryID}
+                                    key={categoryID === null ? undefined : categoryID}
+                                />
+                                <div className="sr-only">
+                                    <DocumentTitle title={this.state.name} />
+                                </div>
+                                <input
+                                    className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                                    type="text"
+                                    placeholder={t("Title")}
+                                    value={this.state.name}
+                                    onChange={this.titleChangeHandler}
+                                    disabled={this.isLoading}
+                                />
+                                <Editor
+                                    allowUpload={true}
+                                    ref={this.editorRef}
+                                    isPrimaryEditor={true}
+                                    onChange={this.editorChangeHandler}
+                                    className="FormWrapper inheritHeight richEditorForm-editor"
+                                    isLoading={this.isLoading}
+                                />
+                            </div>
+                        </PanelLayout.MiddleBottom>
+                    </PanelLayout>
+                </Container>
+            </form>
         );
     }
 
@@ -73,20 +120,8 @@ export default class EditorForm extends React.Component<IProps, IState> {
     }
 
     /**
-     * Handle prop changes on the form.
-     *
-     * - If the revision changes from non successful to successful, initialize the form with values from that revision.
-     *
-     * @inheritdoc
+     * Whether or not we have all of the data we need to submit the form.
      */
-    public componentDidUpdate(oldProps: IProps) {
-        const oldRevision = oldProps.revision;
-        const revision = this.props.revision;
-        if (oldRevision.status !== LoadStatus.SUCCESS && revision.status === LoadStatus.SUCCESS && revision.data) {
-            this.initFormFromRevision(revision.data);
-        }
-    }
-
     private get canSubmit(): boolean {
         if (!this.editorRef.current) {
             return false;
@@ -97,17 +132,7 @@ export default class EditorForm extends React.Component<IProps, IState> {
         const title = this.state.name;
         const body = this.editorRef.current.getEditorText().trim();
 
-        return title.length >= minTitleLength && body.length >= minBodyLength;
-    }
-
-    /**
-     * Use a revision to initialize form values.
-     *
-     * @param revision - The revision to pull data from.
-     */
-    private initFormFromRevision(revision: IArticleRevision) {
-        this.editorRef.current!.setEditorContent(JSON.parse(revision.body));
-        this.setState({ name: revision.name });
+        return title.length >= minTitleLength && body.length >= minBodyLength && this.props.currentCategory !== null;
     }
 
     /**
@@ -132,3 +157,5 @@ export default class EditorForm extends React.Component<IProps, IState> {
         this.props.submitHandler(this.state.body, this.state.name);
     };
 }
+
+export default withDevice<IProps>(EditorForm);

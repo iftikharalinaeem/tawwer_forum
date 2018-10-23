@@ -5,137 +5,127 @@
  */
 
 import * as React from "react";
-import { IArticle } from "@knowledge/@types/api";
+import SiteNav from "@library/components/siteNav/SiteNav";
+import { Devices } from "@library/components/DeviceChecker";
+import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { Devices } from "@library/components/DeviceChecker";
-import {
-    ArticleBreadcrumbs,
-    ArticleActions,
-    ArticleNavigation,
-    ArticleTitle,
-    ArticleContent,
-    ArticleTOC,
-    RelatedArticles,
-    ArticleMenu,
-} from "@knowledge/modules/article/components";
+import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
+import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
+import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
-import { IInternalLink } from "@knowledge/modules/article/components/ArticleRelatedArticles";
-import { InlineTypes } from "@library/components/Sentence";
+import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import UserContent from "@library/components/UserContent";
+import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
+import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
+import { dummyNavData } from "../../categories/state/dummyNavData";
+import Translate from "@library/components/translation/Translate";
+import ProfileLink from "@library/components/ProfileLink";
+import DateTime from "@library/components/DateTime";
+import { Link } from "react-router-dom";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 
 interface IProps {
     article: IArticle;
     device: Devices;
+    breadcrumbData: ICrumb[];
+    messages?: React.ReactNode;
 }
 
 interface IState {}
 
+/**
+ * Implements the article's layout
+ */
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
-        const { article } = this.props;
-
-        const articleTOC: IPageHeading[] = [
-            {
-                name: "Overview",
-                anchor: "#overview",
-            },
-            {
-                name: "Changing Themes",
-                anchor: "#changing-themes",
-            },
-            {
-                name: "Configuration Guide",
-                anchor: "#configuration-guide",
-            },
-            {
-                name: "Theming Guide for Designers",
-                anchor: "#theming-guide-for-designers",
-            },
-        ];
-
-        const articleRelatedArticles: IInternalLink[] = [
-            {
-                name: "Overview",
-                to: "#overview",
-            },
-            {
-                name: "Changing Themes",
-                to: "#changing-themes",
-            },
-            {
-                name: "Configuration Guide",
-                to: "#configuration-guide",
-            },
-            {
-                name: "Theming Guide for Designers",
-                to: "#theming-guide-for-designers",
-            },
-        ];
-
-        const metaData = {
-            children: [
-                {
-                    children: "By Todd Burry",
-                    type: InlineTypes.TEXT,
-                },
-                {
-                    children: [
-                        {
-                            children: "Last Updated:" + String.fromCharCode(160),
-                            type: InlineTypes.TEXT,
-                        },
-                        {
-                            timeStamp: "2018-03-03",
-                            type: InlineTypes.DATETIME,
-                            children: [
-                                {
-                                    children: "3 March 2018",
-                                    type: InlineTypes.TEXT,
-                                },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    children: "ID #1029384756",
-                    type: InlineTypes.TEXT,
-                },
-            ],
-        };
+        const { article, messages } = this.props;
 
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
-                        <ArticleBreadcrumbs />
-                    </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftTop>
-                        <ArticleActions />
-                    </PanelLayout.LeftTop>
+                    {this.props.breadcrumbData.length > 1 && (
+                        <PanelLayout.Breadcrumbs>
+                            <PanelWidget>
+                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                            </PanelWidget>
+                        </PanelLayout.Breadcrumbs>
+                    )}
                     <PanelLayout.LeftBottom>
-                        <ArticleNavigation />
+                        <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <ArticleTitle
-                            article={article}
-                            menu={<ArticleMenu article={article} />}
-                            meta={metaData as any}
+                        <PageTitle
+                            title={article.articleRevision.name}
+                            menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                            meta={
+                                <ArticleMeta
+                                    updateUser={article.updateUser!}
+                                    dateUpdated={article.dateUpdated}
+                                    permaLink={article.url}
+                                />
+                            }
                         />
+                        {messages && <div className="messages">{messages}</div>}
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <ArticleContent article={article} />
+                        <PanelWidget>
+                            <UserContent content={article.articleRevision.bodyRendered} />
+                        </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <ArticleTOC children={articleTOC} />
+                        <ArticleTOC children={this.articleTOC} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
-                        <RelatedArticles children={articleRelatedArticles} />
+                        <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
+                            {dummyOtherLanguagesData.children as any}
+                        </OtherLanguages>
+                        <RelatedArticles children={this.articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>
             </Container>
         );
     }
+
+    private articleTOC: IPageHeading[] = [
+        {
+            name: "Overview",
+            anchor: "#overview",
+        },
+        {
+            name: "Changing Themes",
+            anchor: "#changing-themes",
+        },
+        {
+            name: "Configuration Guide",
+            anchor: "#configuration-guide",
+        },
+        {
+            name: "Theming Guide for Designers",
+            anchor: "#theming-guide-for-designers",
+        },
+    ];
+
+    private articleRelatedArticles: IInternalLink[] = [
+        {
+            name: "Overview",
+            to: "#overview",
+        },
+        {
+            name: "Changing Themes",
+            to: "#changing-themes",
+        },
+        {
+            name: "Configuration Guide",
+            to: "#configuration-guide",
+        },
+        {
+            name: "Theming Guide for Designers",
+            to: "#theming-guide-for-designers",
+        },
+    ];
 }
 
 export default withDevice<IProps>(ArticleLayout);

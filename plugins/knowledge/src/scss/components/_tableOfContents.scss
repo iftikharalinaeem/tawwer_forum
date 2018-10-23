@@ -1,11 +1,12 @@
-/*!
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 $tableOfContents_color           : $metaText_color;
 
 .tableOfContents-link {
     color: $tableOfContents_color;
+    font-size: $global-medium_fontSize;
 }
