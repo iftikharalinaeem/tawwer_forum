@@ -76,7 +76,9 @@ export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
                             </PanelLayout.MiddleBottom>
                             <PanelLayout.RightTop>
                                 {this.props.revisionHistory && (
-                                    <RevisionsList>{this.props.revisionHistory}</RevisionsList>
+                                    <PanelWidget className="isSelfPadded">
+                                        <RevisionsList>{this.props.revisionHistory}</RevisionsList>
+                                    </PanelWidget>
                                 )}
                             </PanelLayout.RightTop>
                         </PanelLayout>

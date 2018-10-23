@@ -4,9 +4,10 @@
  * @license Proprietary
  */
 
+$panelList-title_fontSize  : $global-large_fontSize;
 $panelList_fontSize        : $global-medium_fontSize;
 $panelList_offset          : $utility-baseUnit * 2;
-$panelList-link_color           : $link_default-color;
+$panelList-link_color      : $link_default-color;
 
 .panelList {
     position: relative;
@@ -14,11 +15,11 @@ $panelList-link_color           : $link_default-color;
 }
 
 .panelList-title {
+    font-size: $panelList-title_fontSize;
     margin-bottom: $panelList_offset;
 }
 
 .panelList-item {
-
     + .panelList-item {
         margin-top: $panelList_offset;
     }
@@ -29,10 +30,15 @@ $panelList-link_color           : $link_default-color;
     position: relative;
     width: 100%;
     font-size: $panelList_fontSize;
-    color: $panelList-link_color;
+    color: inherit;
 
-    &:hover,
+    &:hover {
+        color: $link_default_hover-color;
+        text-decoration: underline;
+    }
+
     &:focus {
+        color: $link_default_focus-color;
         text-decoration: underline;
     }
 }

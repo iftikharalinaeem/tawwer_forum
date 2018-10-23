@@ -14,4 +14,8 @@
         bottom: $global-widgetInner_padding;
         left: $global-widgetInner_padding;
     }
+
+    &.isSelfPadded {
+        padding: 0;
+    }
 }
