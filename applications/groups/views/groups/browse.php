@@ -31,7 +31,7 @@ $groups = $this->data('Groups');
 $groupModel = new GroupModel();
 $groupModel->joinRecentPosts($groups);
 
-$groupSearch = $this->data('GroupSearch', false);
+$groupSearch = htmlspecialchars($this->data('GroupSearch', false));
 if ($groupSearch && count($groups) === 0) {
     echo '<p class="NoResults">', sprintf(t('No results for %s.', 'No results for <b>%s</b>.'), $groupSearch), '</p>';
 } else {
