@@ -124,7 +124,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             ->select('a.*, ar.name')
             ->leftJoin("articleRevision ar", "a.articleRevisionID = ar.articleRevisionID and a.articleID = ar.articleID");
         foreach ($pseudoFields as $field => $val) {
-            $sql->select('"'.$val.'" as '.$field);
+            $sql->select('"' . $val . '" as ' . $field);
         }
         $sql->where($where);
 
