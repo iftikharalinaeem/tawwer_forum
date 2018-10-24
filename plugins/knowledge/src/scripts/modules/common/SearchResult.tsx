@@ -21,6 +21,8 @@ export interface IResult {
     image?: string;
     headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];
+    dateUpdated: string;
+    location: string[];
 }
 
 /**

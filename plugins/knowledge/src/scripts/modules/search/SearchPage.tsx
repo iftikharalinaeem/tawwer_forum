@@ -27,19 +27,17 @@ import { dummySearchResults } from "./state/dummySearchResults";
 import SearchLayout, { ISearchState } from "./components/SearchLayout";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 
-interface IProps extends IDeviceProps {}
-
-interface IState extends ISearchState {}
+interface IProps extends IDeviceProps, ISearchState {}
 
 /**
  * Page component for search Page
  */
-export class SearchPage extends React.Component<IProps, IState> {
+export class SearchPage extends React.Component<IProps> {
     public render() {
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
                 <DocumentTitle title={t("Search Results")}>
-                    <SearchLayout {...this.state} />
+                    <SearchLayout {...this.props} />
                 </DocumentTitle>
             </PageLoader>
         );

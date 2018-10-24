@@ -16,11 +16,10 @@ import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { t } from "@library/application";
-import SearchBar from "./SearchBar";
 import AdvancedSearch from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
-
-interface IProps extends IDeviceProps, ISearchState {}
+import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
+import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -37,30 +36,38 @@ export enum ISearchWithin {
     ONE_YEAR = "1 year",
 }
 
+export interface IAdvancedFields {
+    domain: ISearchDomain;
+    title: string;
+    author: any[]; // TBD in next PR
+    fileName: string;
+    within: ISearchWithin;
+    of: string;
+    deletedArticles: boolean;
+}
+
 export interface ISearchState {
     query: string;
     results: IResult[];
-    advanced: {
-        domain: ISearchDomain;
-        title: string;
-        author: any[]; // TBD in next PR
-        fileName: string;
-        within: ISearchWithin;
-        of: string;
-        deletedArticles: boolean;
-    };
+    autoComplete: boolean;
+    advanced: IAdvancedFields;
 }
 
-export class SearchLayout extends React.Component<IProps, ISearchState> {
+interface IProps extends ISearchState {
+    placeholder: string;
+    device: Devices;
+}
+
+class SearchLayout extends React.Component<IProps, ISearchState> {
     private clearQuery = () => {
         this.setState({
             query: "",
         });
     };
 
-    private setQuery = () => {
+    private setQuery = value => {
         this.setState({
-            query: "TEST",
+            query: value,
         });
     };
 
@@ -70,6 +77,7 @@ export class SearchLayout extends React.Component<IProps, ISearchState> {
         this.state = {
             query: "My query",
             results: dummySearchResults,
+            autoComplete: false,
             advanced: {
                 domain: ISearchDomain.ARTICLES,
                 title: "My Title",
@@ -83,27 +91,46 @@ export class SearchLayout extends React.Component<IProps, ISearchState> {
     }
 
     public render() {
+        const options = this.loadSearchSuggestions();
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.MiddleTop>
-                        <SearchBar
+                        <BigSearch
+                            // query={this.state.query}
+                            placeholder={this.props.placeholder || t("Help")}
+                            // clearQuery={this.clearQuery}
+                            // setSearchQuery={this.setQuery}
+                            options={options as any}
+                            setQuery={this.setQuery}
                             query={this.state.query}
-                            placeholder={t("Help")}
-                            clearQuery={this.clearQuery}
-                            setSearchQuery={this.setQuery}
                         />
                     </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <SearchResults results={this.state.results} />
-                    </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <AdvancedSearch />
-                    </PanelLayout.RightTop>
+                    {/*<PanelLayout.MiddleBottom>*/}
+                    {/*<SearchResults results={this.state.results} />*/}
+                    {/*</PanelLayout.MiddleBottom>*/}
+                    {/*<PanelLayout.RightTop>*/}
+                    {/*<AdvancedSearch />*/}
+                    {/*</PanelLayout.RightTop>*/}
                 </PanelLayout>
             </Container>
         );
     }
+
+    /**
+     * Simulate Search query
+     * @param inputValue
+     */
+    public loadSearchSuggestions = () => {
+        const data = dummySearchResults.map((result, index) => {
+            return {
+                label: result.name,
+                value: index,
+                data: result,
+            };
+        });
+        return data || [];
+    };
 }
 
 export default withDevice<IProps>(SearchLayout);

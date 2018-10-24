@@ -17,6 +17,7 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
+import { t } from "@library/application";
 
 interface IProps {
     breadcrumbData: ICrumb[];
@@ -58,6 +59,8 @@ export class CategoriesLayout extends React.Component<IProps> {
                     url: article.url,
                     excerpt: article.excerpt || "",
                     attachments: [] as any,
+                    dateUpdated: "2018-10-22T16:56:37.423Z",
+                    location: [t("Help & Training"), t("Getting Started")],
                 };
             })
             .concat(dummyArticles as any);
