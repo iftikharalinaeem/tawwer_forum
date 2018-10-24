@@ -126,13 +126,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         foreach ($pseudoFields as $field => $val) {
             $sql->select('"'.$val.'" as '.$field);
         }
-        foreach ($where as $field => $op) {
-            if (is_array($op) && array_key_exists('in', $op)) {
-                $sql->whereIn($field, $op['in']);
-            } else {
-                $sql->where([$field => $op]);
-            }
-        }
+        $sql->where($where);
+
         $result = $sql->get('', $orderFields, $orderDirection, $limit, $page)
             ->resultArray();
 
@@ -161,11 +156,11 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @throws \Exception If the row does not contain a valid ID or name.
      */
     public function url(array $article, bool $withDomain = true): string {
-        $name = $article["name"] ?? 'article';
+        $name = $article["name"] ?? null;
         $articleID = $article["articleID"] ?? null;
 
         if (!$name || !$articleID) {
-            throw new \Exception("Invalid article row. ".json_encode($article));
+            throw new \Exception('Invalid article row.');
         }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");

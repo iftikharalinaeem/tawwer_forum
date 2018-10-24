@@ -158,8 +158,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $catIds[] = $category["sectionID"];
         $articles = $this->articleModel->getExtended(
             [
-            'a.knowledgeCategoryID' => ['in' => $catIds],
-            'a.status' => ArticleModel::STATUS_PUBLISHED
+                'a.knowledgeCategoryID' => $catIds,
+                'a.status' => ArticleModel::STATUS_PUBLISHED
             ],
             [],
             ['recordType' => self::RECORD_TYPE_ARTICLE]
@@ -201,7 +201,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @return array Transformed tree array
      */
-    private function createTree(array &$list, array $parent): array {
+    private function createTree(array $list, array $parent): array {
         $tree = array();
         foreach ($parent as $k => $l) {
             if (isset($list[$l['knowledgeCategoryID']]) && $l['recordType'] === self::RECORD_TYPE_CATEGORY) {
