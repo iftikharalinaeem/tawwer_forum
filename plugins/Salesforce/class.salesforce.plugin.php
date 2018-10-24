@@ -430,7 +430,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Content Type not supported');
         }
         $sender->Form->addHidden('ForumUrl', $url);
-        $sender->Form->addHidden('Description', Gdn_Format::textEx($content->Body));
+        $sender->Form->addHidden('Description', Gdn_Format::textEx(Gdn_Format::to($content->Body, $content->Format)));
 
         //See if user is already registered in Sales Force
         if (!c('Plugins.Salesforce.AllowDuplicateLeads', false)) {
@@ -674,7 +674,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
             'Options' => $salesforce->getCaseStatusOptions(),
             'Priorities' => $salesforce->getCasePriorityOptions(),
-            'Body' => Gdn_Format::textEx($content->Body),
+            'Body' => Gdn_Format::textEx(Gdn_Format::to($content->Body, $content->Format)),
             'Type' => $type,
             'CommentID' => val('CommentID', $content),
             'InsertUserID' => val('InsertUserID', $content),
