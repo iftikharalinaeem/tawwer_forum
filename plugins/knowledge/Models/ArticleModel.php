@@ -105,6 +105,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
     /**
      * Return extended article records joined with article revisions
+     * Note: it only returns articles with published revisions.
+     *       if there is no any - will not return those articles
      *
      * @param array $where
      * @param array $options
@@ -113,6 +115,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
+        $selectColumns = $options["columns"] ?? 'a.*, ar.name';
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
@@ -121,8 +124,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         $sql = $this->sql()
             ->from('article a')
-            ->select('a.*, ar.name')
-            ->leftJoin("articleRevision ar", "a.articleRevisionID = ar.articleRevisionID and a.articleID = ar.articleID");
+            ->select($selectColumns)
+            ->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID');
         foreach ($pseudoFields as $field => $val) {
             $sql->select('"' . $val . '" as ' . $field);
         }

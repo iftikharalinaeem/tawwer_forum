@@ -86,7 +86,6 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("name", "varchar(255)")
             ->column("parentID", "int")
             ->column("isSection", "tinyint", "0")
-            ->column("sectionID", "int", "0")
             ->column("displayType", ["help", "guide", "search"], true)
             ->column("sortChildren", ["name", "dateInserted", "dateInsertedDesc", "manual"], true)
             ->column("sort", "int", true)

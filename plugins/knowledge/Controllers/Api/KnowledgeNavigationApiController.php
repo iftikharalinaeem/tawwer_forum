@@ -58,7 +58,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     "enum" => ["help", "guide", "search"],
                     "type" => "string",
                 ],
-                "isSection?" => ["type" => "boolean"],
                 "url?" => ["type" => "string"],
                 "parentID?" => ["type" => "integer"],
                 "recordID" => ["type" => "integer"],
@@ -81,7 +80,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                         "enum" => ["help", "guide", "search"],
                         "type" => "string",
                     ],
-                    "isSection?" => ["type" => "boolean"],
                     "url?" => ["type" => "string"],
                     "parentID?" => ["type" => "integer"],
                     "recordID" => ["type" => "integer"],
@@ -94,6 +92,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                         "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
                         "type" => "string",
                     ],
+                    "children:a?"
                 ]
             ];
 
@@ -115,9 +114,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
         $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
 
-        $query = $in->validate($query);
+        //$query = $in->validate($query);
 
-        $tree = $this->getNavigation($query["knowledgeCategoryID"]);
+        $tree = $this->getNavigation();
         $result = $out->validate($tree);
         return $result;
     }
@@ -135,9 +134,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
         $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
 
-        $query = $in->validate($query);
+        //$query = $in->validate($query);
 
-        $tree = $this->getNavigation($query["knowledgeCategoryID"], false);
+        $tree = $this->getNavigation(false);
         $result = $out->validate($tree);
         return $result;
     }
@@ -145,17 +144,15 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /**
      * Return navigation array of a section
      *
-     * @param int $knowledgeCategoryID Category ID to detect section need to be returned
      * @param bool $flatMode Mode: flat or tree
      * @return array
      */
-    private function getNavigation(int $knowledgeCategoryID, bool $flatMode = true): array {
-        $category = $this->knowledgeCategoryModel->get(['knowledgeCategoryID' => $knowledgeCategoryID])[0];
-        $sectionID = ($category['isSection'] === 1) ? $category["knowledgeCategoryID"] : $category["sectionID"];
-        $categories = $this->knowledgeCategoryModel->sectionCategories($sectionID, true);
+    private function getNavigation(bool $flatMode = true): array {
+
+        $categories = $this->knowledgeCategoryModel->get();
         $categories = $this->normalizeOutput($categories, self::RECORD_TYPE_CATEGORY);
+
         $catIds = array_column($categories, 'knowledgeCategoryID');
-        $catIds[] = $category["sectionID"];
         $articles = $this->articleModel->getExtended(
             [
                 'a.knowledgeCategoryID' => $catIds,
@@ -168,19 +165,19 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($flatMode) {
             return array_merge($categories, $articles);
         } else {
-            return $this->makeNavigationTree($sectionID, $categories, $articles);
+            return $this->makeNavigationTree(KnowledgeCategoryModel::ROOT_ID, $categories, $articles);
         }
     }
 
     /**
      * Transform flat array into tree array when tree mode is required
      *
-     * @param int $sectionID Top level section category ID
+     * @param int $parentID Top level category ID
      * @param array $categories List of categories in section
      * @param array $articles List of articles in section
      * @return array
      */
-    private function makeNavigationTree(int $sectionID, array $categories, array $articles): array {
+    private function makeNavigationTree(int $parentID, array $categories, array $articles): array {
         $parentsIndex = [];
         foreach ($categories as $c) {
             $parentsIndex[$c['parentID']][] = $c;
@@ -188,7 +185,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         foreach ($articles as $a) {
             $parentsIndex[$a['knowledgeCategoryID']][] = $a;
         }
-        $result = $this->createTree($parentsIndex, $parentsIndex[$sectionID]);
+        $result = $this->createTree($parentsIndex, $parentsIndex[$parentID]);
 
         return $result;
     }
@@ -220,7 +217,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     protected function defaultSchema() {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-            "knowledgeCategoryID:i" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
+            "knowledgeCategoryID:i?" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
             "maxDepth:i" => [
                 "default" => 2,
                 "description" => "The maximum depth results should be, relative to the target knowledge base or category."
