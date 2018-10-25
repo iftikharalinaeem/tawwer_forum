@@ -27,6 +27,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /** @var Schema */
     private $categoryNavigationFragment;
 
+    /** @var Schema */
+    private $navigationTreeSchema;
+
     /**
      * KnowledgeNavigationApiController constructor.
      *
@@ -48,33 +51,42 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      */
     public function categoryNavigationFragment(): Schema {
         if ($this->categoryNavigationFragment === null) {
-            $schema = [
-                "name" => [
-                    "allowNull" => true,
-                    "type" => "string"
-                ],
-                "displayType?" => [
-                    "allowNull" => true,
-                    "enum" => ["help", "guide", "search"],
-                    "type" => "string",
-                ],
-                "url?" => ["type" => "string"],
-                "parentID?" => ["type" => "integer"],
-                "recordID" => ["type" => "integer"],
-                "sort" => [
-                    "allowNull" => true,
-                    "type" => "integer"
-                ],
-                "knowledgeCategoryID?" => ["type" => "integer"],
-                "recordType" => [
-                    "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
-                    "type" => "string",
-                ]
-            ];
+            $schema = Schema::parse($this->getFragmentSchema());
 
             $this->categoryNavigationFragment = $this->schema($schema, "CategoryNavigationFragment");
         }
         return $this->categoryNavigationFragment;
+    }
+
+    /**
+     * Get navigation fragment schema attributes array
+     *
+     * @return array
+     */
+    protected function getFragmentSchema(): array {
+        return [
+            "name" => [
+                "allowNull" => true,
+                "type" => "string"
+            ],
+            "displayType?" => [
+                "allowNull" => true,
+                "enum" => ["help", "guide", "search"],
+                "type" => "string",
+            ],
+            "url?" => ["type" => "string"],
+            "parentID?" => ["type" => "integer"],
+            "recordID" => ["type" => "integer"],
+            "sort" => [
+                "allowNull" => true,
+                "type" => "integer"
+            ],
+            "knowledgeCategoryID?" => ["type" => "integer"],
+            "recordType" => [
+                "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
+                "type" => "string",
+            ]
+        ];
     }
 
     /**
@@ -191,14 +203,16 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @return Schema
      */
     public function schemaWithChildren() {
-        $schema = $this->categoryNavigationFragment();
+        if ($this->navigationTreeSchema === null) {
+            $schema = Schema::parse($this->getFragmentSchema())
+                ->setID('navigationTreeSchema');
 
-        $schema->merge(Schema::parse([
-            'children:a?' => $this->categoryNavigationFragment()->merge(Schema::parse([
-                'children:a?'
-            ]))
-        ]));
-        return $schema;
+            $schema->merge(Schema::parse([
+                'children:a?' =>  $schema
+            ]));
+            $this->navigationTreeSchema = $schema;
+        }
+        return $this->navigationTreeSchema;
     }
 
     /**
@@ -208,12 +222,12 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      */
     protected function defaultSchema() {
         return [
-            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-            "knowledgeCategoryID:i?" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
-            "maxDepth:i" => [
-                "default" => 2,
-                "description" => "The maximum depth results should be, relative to the target knowledge base or category."
-            ]
+//            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
+//            "knowledgeCategoryID:i?" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
+//            "maxDepth:i" => [
+//                "default" => 2,
+//                "description" => "The maximum depth results should be, relative to the target knowledge base or category."
+//            ]
         ];
     }
 
