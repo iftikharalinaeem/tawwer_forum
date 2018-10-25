@@ -58,8 +58,8 @@ export default class OtherLangauges extends React.Component<IProps, IState> {
             }
             return (
                 <PanelWidget>
-                    <div className="otherLanguages related">
-                        <Heading id={this.titleID} title={t("Other Languages")} className="related-title" />
+                    <div className="otherLanguages panelList">
+                        <Heading id={this.titleID} title={t("Other Languages")} className="panelList-title" />
                         <SelectBox
                             describedBy={this.titleID}
                             widthOfParent={true}

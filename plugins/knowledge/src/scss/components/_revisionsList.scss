@@ -1,0 +1,112 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$revisionList-avatar_size           : 30px;
+$revisionList-avatar_margin         : 9px;
+$revisionList-avatar_borderRadius   : 50%;
+$revisionList-avatar_borderColor    : mix($global-color_fg, $global-color_bg, 10%);
+
+$revisionList-status_color          : mix($global-color_fg, $global-color_bg, 50%);
+$revisionList-status_size           : $icon-default_size;
+
+$revisionList-spacing               : 16px;
+$revisionList-item_minHeight        : 63px;
+
+$revisionList-user_fontSize         : 14px;
+
+$revisionList-border_color          : $global-border_color;
+
+.revisionsList {
+  padding: {
+    top: $global-widgetInner_padding;
+    bottom: $global-widgetInner_padding;
+  }
+}
+
+.revisionsList-item {
+  + .revisionsList-item {
+    border-top: solid $revisionList-border_color 1px;
+  }
+}
+
+.revisionsList-link {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: $revisionList-item_minHeight;
+  padding: 0 $global-widgetInner_padding;
+  user-select: none;
+
+  @include allLinkStates {
+    text-decoration: none !important;
+    color: inherit;
+  }
+
+  &:hover {
+    background-color: $state-hover_color;
+  }
+
+
+}
+
+.revisionsList-title {
+  padding: {
+    right: $global-widgetInner_padding;
+    left: $global-widgetInner_padding;
+  }
+}
+
+.revisionsList-photoFrame {
+  position: relative;
+  width: $revisionList-avatar_size;
+  height: $revisionList-avatar_size;
+  margin-right: $revisionList-avatar_margin;
+  border-radius: $revisionList-avatar_borderRadius;
+  border: solid $revisionList-avatar_borderColor 1px;
+  overflow: hidden;
+}
+
+.revisionsList-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-grow: 1;
+  line-height: $global-condensed_lineHeight;
+}
+
+.revisionsList-photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-width: $revisionList-avatar_size;
+  min-height: $revisionList-avatar_size;
+
+  @supports (object-fit: cover) {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.revisionsList-userName {
+  @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
+  text-decoration: none;
+  color: inherit;
+  font-size: $revisionList-user_fontSize;
+}
+
+.revisionsList-status {
+  width: $revisionList-status_size;
+  color: $revisionList-status_color;
+
+  &.status-published {
+    color: $global-color_primary;
+  }
+}

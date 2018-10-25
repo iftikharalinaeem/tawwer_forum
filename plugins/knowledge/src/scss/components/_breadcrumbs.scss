@@ -4,8 +4,9 @@
  * @license Proprietary
  */
 
-$breadcrumbs-accentColor: $global-color_primary;
-$breadcrumbs-activeLink_opacity: 1;
+$breadcrumbs-accentColor            : $global-color_primary;
+$breadcrumbs-activeLink_opacity     : 1;
+$breadcrumbs-separator_margin       : .2em;
 
 .breadcrumbs {
     display: flex;
@@ -22,7 +23,7 @@ $breadcrumbs-activeLink_opacity: 1;
 
 .breadcrumbs-separator {
     user-select: none;
-    margin: 0 $utility-baseUnit;
+    margin: 0 $breadcrumbs-separator_margin;
 }
 
 .breadcrumbs-separatorIcon {
@@ -30,7 +31,7 @@ $breadcrumbs-activeLink_opacity: 1;
     justify-content: center;
     align-items: center;
     font-family: arial, sans-serif !important; // Make sure character exists, no matter what the body font is
-    margin: 0 .5em;
+    width: 1ex;
     opacity: .5;
     position: relative;
     color: inherit;
@@ -46,8 +47,10 @@ $breadcrumbs-activeLink_opacity: 1;
 .breadcrumb-link {
     @include singleLineEllipsis;
     display: inline-flex;
+    font-size: $global-small_fontSize;
     line-height: $global-condensed_lineHeight;
-    color: inherit;
+    color: $link_default-color;
+    text-transform: uppercase;
 }
 
 a.breadcrumb-link { // The location chooser component uses spans and we don't want to underline them

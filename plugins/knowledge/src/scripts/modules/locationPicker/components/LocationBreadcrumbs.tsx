@@ -56,10 +56,10 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
             const crumbSeparator = `›`;
             return (
                 <React.Fragment key={`locationBreadcrumb-${index}`}>
-                    <span className="breadcrumb-link">{crumb.name}</span>
+                    <span className="locationBreadcrumb-link">{crumb.name}</span>
                     {!lastElement && (
-                        <span className="breadcrumb-item breadcrumbs-separator">
-                            <span aria-hidden={true} className="breadcrumbs-separatorIcon">
+                        <span className="locationBreadcrumb-item locationBreadcrumb-separator">
+                            <span aria-hidden={true} className="locationBreadcrumb-separatorIcon">
                                 {crumbSeparator}
                             </span>
                             <span className="sr-only">{accessibleCrumbSeparator}</span>
