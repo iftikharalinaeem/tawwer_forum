@@ -69,30 +69,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "recordType" => [
                     "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
                     "type" => "string",
-                ],
-                "children:a?" => [
-                    "name" => [
-                        "allowNull" => true,
-                        "type" => "string"
-                    ],
-                    "displayType?" => [
-                        "allowNull" => true,
-                        "enum" => ["help", "guide", "search"],
-                        "type" => "string",
-                    ],
-                    "url?" => ["type" => "string"],
-                    "parentID?" => ["type" => "integer"],
-                    "recordID" => ["type" => "integer"],
-                    "sort" => [
-                        "allowNull" => true,
-                        "type" => "integer"
-                    ],
-                    "knowledgeCategoryID?" => ["type" => "integer"],
-                    "recordType" => [
-                        "enum" => [self::RECORD_TYPE_CATEGORY, self::RECORD_TYPE_ARTICLE],
-                        "type" => "string",
-                    ],
-                    "children:a?"
                 ]
             ];
 
@@ -132,7 +108,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
-        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
+        $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
 
         //$query = $in->validate($query);
 
@@ -207,6 +183,22 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $tree[] = $l;
         }
         return $tree;
+    }
+
+    /**
+     * Get a category schema with an additional field for an array of children.
+     *
+     * @return Schema
+     */
+    public function schemaWithChildren() {
+        $schema = $this->categoryNavigationFragment();
+
+        $schema->merge(Schema::parse([
+            'children:a?' => $this->categoryNavigationFragment()->merge(Schema::parse([
+                'children:a?'
+            ]))
+        ]));
+        return $schema;
     }
 
     /**
