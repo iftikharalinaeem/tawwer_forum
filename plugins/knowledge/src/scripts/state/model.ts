@@ -11,6 +11,7 @@ import { ILocationPickerState } from "@knowledge/modules/locationPicker/Location
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
 import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
+import { IUsersStoreState } from "@library/users/UsersModel";
 
 type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
@@ -18,7 +19,7 @@ type RecursivePartial<T> = {
         : T[P] extends object ? RecursivePartial<T[P]> : T[P]
 };
 
-export interface IStoreState {
+export interface IStoreState extends IUsersStoreState {
     knowledge: {
         articleMenu: IArticleMenuState;
         articlePage: IArticlePageState;
