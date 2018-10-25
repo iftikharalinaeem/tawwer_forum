@@ -22,6 +22,7 @@ import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
+import Permission from "@library/users/Permission";
 
 interface IProps extends IDeviceProps, IArticleActionsProps {
     match: match<{
@@ -100,10 +101,12 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (article.status === LoadStatus.SUCCESS) {
             if (article.data.status === ArticleStatus.DELETED) {
                 messages = (
-                    <ArticleDeletedMessage
-                        onRestoreClick={this.handleRestoreClick}
-                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
-                    />
+                    <Permission permission="articles.add">
+                        <ArticleDeletedMessage
+                            onRestoreClick={this.handleRestoreClick}
+                            isLoading={this.props.restoreStatus === LoadStatus.LOADING}
+                        />
+                    </Permission>
                 );
             }
         }
