@@ -107,7 +107,24 @@ export const dummySearchResults: IResult[] = [
         ],
         image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        locationData: [t("Help & Training"), t("Getting Started")],
+        locationData: [
+            {
+                name: "Help",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+            {
+                name: "Getting Started",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+        ],
     },
     {
         name:

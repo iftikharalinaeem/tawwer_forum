@@ -27,7 +27,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         breadcrumbData: IKbCategoryFragment[],
         noDataMessage: string = t("Set Page Location"),
     ): string {
-        if (!breadcrumbData && breadcrumbData.length === 0) {
+        if (!breadcrumbData || breadcrumbData.length === 0) {
             return noDataMessage;
         }
 
