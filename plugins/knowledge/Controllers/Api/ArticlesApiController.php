@@ -514,7 +514,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "locale",
                 "insertUser",
                 "dateInserted",
-                "outline",
             ])->add($this->fullRevisionSchema())
         ], "out");
 
@@ -552,8 +551,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row['outline'] = $this->getOutline($row["body"] ?? '');
         $row["body"] = $bodyRendered;
-
-
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
