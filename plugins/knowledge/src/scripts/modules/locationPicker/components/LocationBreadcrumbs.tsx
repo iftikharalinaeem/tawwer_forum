@@ -10,7 +10,7 @@ import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 interface IProps {
     locationData: IKbCategoryFragment[];
-    asString: boolean;
+    noDataMessage: string;
 }
 
 /**
@@ -21,10 +21,14 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
      * Render a string version of a breadcrumb.
      *
      * @param breadcrumbData - The category data to render.
+     * @param noDataMessage - The message if no breadcrumb is given
      */
-    public static renderString(breadcrumbData: IKbCategoryFragment[]): string {
-        if (breadcrumbData.length === 0) {
-            return t("Set Page Location");
+    public static renderString(
+        breadcrumbData: IKbCategoryFragment[],
+        noDataMessage: string = t("Set Page Location"),
+    ): string {
+        if (!breadcrumbData && breadcrumbData.length === 0) {
+            return noDataMessage;
         }
 
         const accessibleCrumbSeparator = `/`;

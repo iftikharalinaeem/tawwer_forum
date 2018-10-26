@@ -20,6 +20,7 @@ import AdvancedSearch from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -54,7 +55,7 @@ export interface ISearchState {
 }
 
 interface IProps extends ISearchState {
-    placeholder: string;
+    placeholder?: string;
     device: Devices;
 }
 
@@ -66,8 +67,14 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
     };
 
     private setQuery = value => {
+        let newValue = "";
+        if (typeof value === "string") {
+            newValue = value;
+        } else if (value.data) {
+            newValue = value.data;
+        }
         this.setState({
-            query: value,
+            query: newValue,
         });
     };
 
@@ -90,6 +97,10 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
         };
     }
 
+    public doNothing() {
+        return;
+    }
+
     public render() {
         const options = this.loadSearchSuggestions();
         return (
@@ -101,9 +112,15 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                             placeholder={this.props.placeholder || t("Help")}
                             // clearQuery={this.clearQuery}
                             // setSearchQuery={this.setQuery}
-                            options={options as any}
+                            options={options}
                             setQuery={this.setQuery}
-                            query={this.state.query}
+                            query={this.state.query || ""}
+                        />
+                        <InputTextBlock
+                            label={t("Name")}
+                            placeholder={t("Example: Appearance")}
+                            value=""
+                            onChange={this.doNothing}
                         />
                     </PanelLayout.MiddleTop>
                     {/*<PanelLayout.MiddleBottom>*/}
@@ -125,8 +142,8 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
         const data = dummySearchResults.map((result, index) => {
             return {
                 label: result.name,
-                value: index,
-                data: result,
+                value: index.toString(),
+                ...result,
             };
         });
         return data || [];

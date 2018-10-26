@@ -20,11 +20,23 @@
     padding: $formElement_paddingVertical $formElement_horizontalPadding;
     outline: 0;
 
+    &.isLarge {
+        min-height: $formElement_largeInput_height;
+        @include textInputSizing($formElement_largeInput_height, $formElement_largeInput_fontSize, $utility-baseUnit);
+    }
+
     &.isGiant {
         font-weight: $global-bold_fontWeight;
-        flex-basis: $formElement-giantInput_height;
         min-height: $formElement-giantInput_height;
         @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
+    }
+
+    &.isClearable {
+        &,
+        &.isLarge,
+        &.isGiant {
+            padding-right: 0;
+        }
     }
 }
 
