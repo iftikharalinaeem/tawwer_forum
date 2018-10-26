@@ -11,7 +11,6 @@ import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus, ILoadable } from "@library/@types/api";
-import NotFoundPage from "@library/components/NotFoundPage";
 import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
@@ -23,6 +22,7 @@ import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import Permission from "@library/users/Permission";
+import ErrorPage from "@knowledge/routes/ErrorPage";
 
 interface IProps extends IDeviceProps, IArticleActionsProps {
     match: match<{
@@ -47,24 +47,22 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, breadcrumbData } = this.props;
-        const { id } = this.props.match.params;
-
-        if (id === null || (article.status === LoadStatus.ERROR && article.error.status === 404)) {
-            return <NotFoundPage type="Page" />;
-        }
 
         return (
-            <PageLoader {...article}>
-                {article.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
-                        <ArticleLayout
-                            article={article.data}
-                            breadcrumbData={breadcrumbData!}
-                            messages={this.renderMessages()}
-                        />
-                    </DocumentTitle>
-                )}
-            </PageLoader>
+            <>
+                <ErrorPage loadable={article} />
+                <PageLoader status={article.status}>
+                    {article.status === LoadStatus.SUCCESS && (
+                        <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
+                            <ArticleLayout
+                                article={article.data}
+                                breadcrumbData={breadcrumbData!}
+                                messages={this.renderMessages()}
+                            />
+                        </DocumentTitle>
+                    )}
+                </PageLoader>
+            </>
         );
     }
 
@@ -73,7 +71,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         const { article } = this.props;
-        if (article.status !== LoadStatus.SUCCESS) {
+        if (article.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
     }

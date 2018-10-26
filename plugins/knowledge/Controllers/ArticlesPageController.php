@@ -9,12 +9,14 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
 use Garden\Web\Data;
-use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\ReduxErrorAction;
 
 /**
  * Knowledge base Articles controller for article view.
@@ -57,23 +59,33 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @param string $path URI slug page action string.
      * @return string Returns HTML page content
      */
-    public function index(string $path): string {
+    public function index(string $path) {
         $this->action = self::ACTION_VIEW;
-        $this->articleId = $id = $this->detectArticleId($path);
+        $status = 200;
 
-        $article = $this->articlesApi->get($id, ["expand" => "all"]);
-        $this->data[self::API_PAGE_KEY] = $article;
+        try {
+            $this->articleId = $id = $this->detectArticleId($path);
+            $article = $this->articlesApi->get($id, ["expand" => "all"]);
+            $this->data[self::API_PAGE_KEY] = $article;
+            $this->setPageTitle($article['articleRevision']['name'] ?? "");
 
-        $this->setPageTitle($article['articleRevision']['name']);
-
-        // Put together pre-loaded redux actions.
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
+            // Put together pre-loaded redux actions.
+            $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
+        } catch(NotFoundException $e) {
+            $status = $e->getCode();
+            $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
+            $this->setPageTitle(t("Article not found"));
+        } catch(PermissionException $e) {
+            $status = $e->getCode();
+            $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
+            $this->setPageTitle(t("Permission Denied"));
+        }
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
         $data['template'] = 'seo/pages/article.twig';
 
-        return $this->twigInit()->render('default-master.twig', $data);
+        return new Data($this->twigInit()->render('default-master.twig', $data), $status);
     }
 
 
@@ -158,12 +170,12 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @param string $path The path of the article.
      *
      * @return int Returns article id as int.
-     * @throws ClientException If the URL can't be parsed properly.
+     * @throws NotFoundException If the URL can't be parsed properly.
      */
     protected function detectArticleId(string $path): int {
         $matches = [];
         if (preg_match('/^\/(?<articleID>\d+)(-[^\/]*)?$/', $path, $matches) === 0) {
-            throw new ClientException('Can\'t detect article id!', 400);
+            throw new NotFoundException('Article');
         }
 
         $id = (int)$matches["articleID"];

@@ -5,8 +5,6 @@
  */
 
 import React from "react";
-import { t } from "@library/application";
-import { ModalLink } from "@library/components/modal";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";

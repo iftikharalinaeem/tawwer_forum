@@ -27,7 +27,9 @@ export class PageTitle extends React.Component<IProps> {
         const backUrl = isDesktop ? this.props.backUrl : null;
         return (
             <PanelWidget>
-                <PageHeading backUrl={backUrl} title={this.props.title} menu={this.props.menu} />
+                <PageHeading backUrl={backUrl} menu={this.props.menu}>
+                    {this.props.title}
+                </PageHeading>
                 {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
             </PanelWidget>
         );
