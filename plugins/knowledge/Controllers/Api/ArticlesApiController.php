@@ -16,6 +16,8 @@ use Gdn_Format;
 use UserModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -155,6 +157,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "knowledgeCategoryID",
                 "name",
                 "body",
+                "outline",
                 "seoName",
                 "seoDescription",
                 "slug",
@@ -268,6 +271,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "allowNull" => true,
                 "description" => "Plain-text excerpt of the current article body.",
             ],
+            "outline:a?" => Schema::parse([
+                'ref:s' => 'Heading blot reference id. Ex: #title',
+                'level:i' => 'Heading level',
+                'text:s' => 'Heading text line'
+            ]),
         ]);
     }
 
@@ -340,6 +348,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $article,
             ["insertUserID", "updateUserID"]
         );
+
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
@@ -505,6 +514,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "locale",
                 "insertUser",
                 "dateInserted",
+                "outline",
             ])->add($this->fullRevisionSchema())
         ], "out");
 
@@ -540,7 +550,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}");
 
         $bodyRendered = $row["bodyRendered"] ?? null;
+        $row['outline'] = $this->getOutline($row["body"] ?? '');
         $row["body"] = $bodyRendered;
+
 
         // Placeholder data.
         $row["seoName"] = null;
@@ -550,6 +562,33 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         return $row;
     }
 
+    /**
+     * Generate outline array from article body
+     *
+     * @param string $body
+     * @return array
+     */
+    public function getOutline(string $body): array {
+        $outline = [];
+        $body = json_decode($body, true);
+        if (is_array($body) && count($body) > 0) {
+            $parser = (new Parser())
+                ->addBlot(HeadingTerminatorBlot::class);
+            $blotGroups = $parser->parse($body);
+
+            foreach ($blotGroups as $idx => $blotGroup) {
+                $blot = $blotGroup->getPrimaryBlot();
+                if ($blot instanceof HeadingTerminatorBlot) {
+                    $outline[] = [
+                        'ref' => $blotGroup->getReference(),
+                        'level' => $blot->getHeadingLevel(),
+                        'text' => $blotGroup->getText(),
+                    ];
+                }
+            }
+        }
+        return $outline;
+    }
     /**
      * Update an existing article.
      *
