@@ -117,7 +117,7 @@ describe("EditorPageActions", () => {
     describe("fetchArticleForEdit()", () => {
         it("gets the existing article and sets initializes the location picker from it", async () => {
             const dummyArticle = { articleID: 1, knowledgeCategoryID: 5 };
-            mockApi.onGet("/api/v2/articles/1").replyOnce(200, dummyArticle);
+            mockApi.onGet("/api/v2/articles/1/edit").replyOnce(200, dummyArticle);
 
             void (await editorPageActions.fetchArticleForEdit(1));
             assertStoreHasActions(mockStore, [
@@ -154,29 +154,16 @@ describe("EditorPageActions", () => {
                 .replyOnce(200, dummyArticle);
             const history = createMemoryHistory();
 
-            void (await editorPageActions.updateArticle(
-                { articleID: 1 },
-                { name: "test", body: "asd", articleID: 1, format: Format.RICH },
-                history,
-            ));
+            void (await editorPageActions.updateArticle({ articleID: 1 }, history));
 
             assertStoreHasActions(mockStore, [
                 {
                     type: EditorPageActions.PATCH_ARTICLE_REQUEST,
                 },
                 {
-                    type: EditorPageActions.POST_REVISION_REQUEST,
-                },
-                {
                     type: EditorPageActions.PATCH_ARTICLE_RESPONSE,
                     payload: {
                         data: dummyArticle,
-                    },
-                },
-                {
-                    type: EditorPageActions.POST_REVISION_RESPONSE,
-                    payload: {
-                        data: dummyRevision,
                     },
                 },
                 {

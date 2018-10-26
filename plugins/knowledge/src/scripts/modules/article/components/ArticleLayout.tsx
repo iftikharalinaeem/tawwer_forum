@@ -54,7 +54,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PageTitle
-                            title={article.articleRevision.name}
+                            title={article.name}
                             menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={
                                 <ArticleMeta
@@ -68,7 +68,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
-                            <UserContent content={article.articleRevision.bodyRendered} />
+                            <UserContent content={article.body} />
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
