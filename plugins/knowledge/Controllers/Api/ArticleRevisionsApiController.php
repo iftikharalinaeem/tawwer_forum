@@ -83,7 +83,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 "insertUser?",
             ])->add($this->fullSchema()), "ArticleRevision");
         }
-        return $this->articleRevisionSchema;
+        return $this->schema($this->articleRevisionSchema, $type);
     }
 
     /**
