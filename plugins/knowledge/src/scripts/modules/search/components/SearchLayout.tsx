@@ -116,12 +116,6 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                             setQuery={this.setQuery}
                             query={this.state.query || ""}
                         />
-                        <InputTextBlock
-                            label={t("Name")}
-                            placeholder={t("Example: Appearance")}
-                            value=""
-                            onChange={this.doNothing}
-                        />
                     </PanelLayout.MiddleTop>
                     {/*<PanelLayout.MiddleBottom>*/}
                     {/*<SearchResults results={this.state.results} />*/}

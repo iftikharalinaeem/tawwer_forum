@@ -14,7 +14,7 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IArticleFragment, IKbCategoryFragment, KbCategoryDisplayType } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import { t } from "@library/application";
@@ -60,7 +60,32 @@ export class CategoriesLayout extends React.Component<IProps> {
                     excerpt: article.excerpt || "",
                     attachments: [] as any,
                     dateUpdated: "2018-10-22T16:56:37.423Z",
-                    location: [t("Help & Training"), t("Getting Started")],
+                    locationData: [
+                        {
+                            name: "Article",
+                            knowledgeCategoryID: 1,
+                            parentID: 1,
+                            displayType: KbCategoryDisplayType.HELP,
+                            isSection: false,
+                            url: "#",
+                        },
+                        {
+                            name: "Location",
+                            knowledgeCategoryID: 1,
+                            parentID: 1,
+                            displayType: KbCategoryDisplayType.HELP,
+                            isSection: false,
+                            url: "#",
+                        },
+                        {
+                            name: "Breadcrumb",
+                            knowledgeCategoryID: 1,
+                            parentID: 1,
+                            displayType: KbCategoryDisplayType.HELP,
+                            isSection: false,
+                            url: "#",
+                        },
+                    ],
                 };
             })
             .concat(dummyArticles as any);
