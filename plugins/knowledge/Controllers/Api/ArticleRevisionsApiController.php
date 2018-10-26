@@ -15,6 +15,13 @@ use Vanilla\Knowledge\Models\ArticleModel;
 
 /**
  * API controller for managing the article revisions resource.
+ *
+ * This API controller currently exists here instead of as a subresource on the articles controller
+ * due to limitations of our routing system. There is currently no way to differentiate
+ * - /articles/revisions/:revisionID
+ * - /articles/:articleID/revisions
+ * As a result we have to do /article-revisions/:id
+ * @see https://github.com/vanilla/knowledge/issues/264
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
