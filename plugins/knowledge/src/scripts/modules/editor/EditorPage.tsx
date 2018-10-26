@@ -62,7 +62,7 @@ export class EditorPage extends React.Component<IProps, IState> {
     }
 
     public render() {
-        let pageContent = (
+        const pageContent = (
             <Permission permission="articles.add" fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}>
                 <EditorForm
                     backUrl={this.backLink}
