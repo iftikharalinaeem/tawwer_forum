@@ -10,8 +10,6 @@ import {
     IPostArticleRequestBody,
     IGetArticleRevisionResponseBody,
     IGetArticleRevisionRequestBody,
-    IPostArticleRevisionResponseBody,
-    IPostArticleRevisionRequestBody,
     IGetArticleResponseBody,
     IArticle,
     IPatchArticleRequestBody,
@@ -35,10 +33,6 @@ export default class EditorPageActions extends ReduxActions {
     public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
     public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
-    public static readonly POST_REVISION_REQUEST = "@@articleEditor/POST_REVISION_REQUEST";
-    public static readonly POST_REVISION_RESPONSE = "@@articleEditor/POST_REVISION_RESPONSE";
-    public static readonly POST_REVISION_ERROR = "@@articleEditor/POST_REVISION_ERROR";
-
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
     public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_ARTICLE_ERROR";
@@ -54,7 +48,6 @@ export default class EditorPageActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static ACTION_TYPES:
-        | ActionsUnion<typeof EditorPageActions.postRevisionACs>
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
@@ -107,18 +100,6 @@ export default class EditorPageActions extends ReduxActions {
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IGetArticleRevisionResponseBody,
         {} as IGetArticleRevisionRequestBody,
-    );
-
-    /**
-     * Action creators for POST /article-revisions
-     */
-    private static postRevisionACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.POST_REVISION_REQUEST,
-        EditorPageActions.POST_REVISION_RESPONSE,
-        EditorPageActions.POST_REVISION_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IPostArticleRevisionResponseBody,
-        {} as IPostArticleRevisionRequestBody,
     );
 
     /**
@@ -183,10 +164,7 @@ export default class EditorPageActions extends ReduxActions {
         const response = await this.getEditableArticleByID(articleID);
 
         if (response && response.data) {
-            await Promise.all([
-                this.fetchRevisionFromArticle(response.data),
-                this.locationPickerActions.initLocationPickerFromArticle(response.data),
-            ]);
+            await this.locationPickerActions.initLocationPickerFromArticle(response.data);
         }
     }
 
@@ -195,17 +173,10 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param body - The body of the submit request.
      */
-    public async updateArticle(
-        article: IPatchArticleRequestBody,
-        revision: IPostArticleRevisionRequestBody,
-        history: History,
-    ) {
-        const [articleResult, revisionResult] = await Promise.all([
-            this.patchArticle(article),
-            this.postRevision(revision),
-        ]);
+    public async updateArticle(article: IPatchArticleRequestBody, history: History) {
+        const articleResult = await this.patchArticle(article);
         // Our API request has failed
-        if (!articleResult || !revisionResult) {
+        if (!articleResult) {
             return;
         }
 
@@ -223,29 +194,6 @@ export default class EditorPageActions extends ReduxActions {
 
         // Redirect to the new url.
         history.push(link.pathname);
-    }
-
-    /**
-     * Post a revision to the API.
-     *
-     * @param data The revision data.
-     */
-    private postRevision(data: IPostArticleRevisionRequestBody) {
-        return this.dispatchApi<IPostArticleRevisionResponseBody>(
-            "post",
-            "/article-revisions",
-            EditorPageActions.postRevisionACs,
-            data,
-        );
-    }
-
-    /**
-     * Fetch the current revision from an article resource through the API.
-     */
-    private async fetchRevisionFromArticle(article: IArticle) {
-        if (article.articleRevisionID != null) {
-            await this.getRevisionByID(article.articleRevisionID);
-        }
     }
 
     /**
@@ -292,7 +240,7 @@ export default class EditorPageActions extends ReduxActions {
     private getEditableArticleByID(articleID: number) {
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
-            `/articles/${articleID}`,
+            `/articles/${articleID}/edit`,
             EditorPageActions.getArticleACs,
             {},
         );

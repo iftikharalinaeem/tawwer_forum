@@ -18,7 +18,14 @@ class ArticlesTest extends AbstractResourceTest {
     protected $baseUrl = "/articles";
 
     /** @var array Fields to be checked with get/<id>/edit */
-    protected $editFields = ["knowledgeCategoryID", "sort"];
+    protected $editFields = [
+        "body",
+        "format",
+        "knowledgeCategoryID",
+        "locale",
+        "name",
+        "sort",
+    ];
 
     /** @var string The name of the primary key of the resource. */
     protected $pk = "articleID";
@@ -40,13 +47,31 @@ class ArticlesTest extends AbstractResourceTest {
      * @param array $row The row to modify.
      * @return array Returns the modified row.
      */
-    public function modifyRow(array $row) {
-        $row["knowledgeCategoryID"] = $row["knowledgeCategoryID"] ?? 0;
-        $row["sort"] = $row["sort"] ?? 0;
+    public function modifyRow(array $row): array {
+        $row = $row + $this->record();
 
+        $row["body"] = md5($row["body"]);
+        $row["format"] = $row["body"] === "markdown" ? "text" : "markdown";
         $row["knowledgeCategoryID"]++;
+        $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
+        $row["name"] = md5($row["name"]);
         $row["sort"]++;
+
         return $row;
+    }
+
+    /**
+     * Provide status patching data.
+     *
+     * @return array
+     */
+    public function providePatchStatusData(): array {
+        // PHPUnit has issues with auto-loading the ArticleModel class for the status constants when data providers are invoked.
+        return [
+            ["deleted"], // ArticleModel::STATUS_DELETED
+            ["published"], // ArticleModel::STATUS_PUBLISHED
+            ["undeleted"], // ArticleModel::STATUS_UNDELETED
+        ];
     }
 
     /**
@@ -54,9 +79,13 @@ class ArticlesTest extends AbstractResourceTest {
      *
      * @return array
      */
-    public function record() {
+    public function record(): array {
         $record = [
+            "body" => "Hello. I am a test for articles.",
+            "format" => "markdown",
             "knowledgeCategoryID" => 1,
+            "locale" => "en",
+            "name" => "Example Article",
             "sort" => 1,
         ];
         return $record;
@@ -74,43 +103,27 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test PATCH /articles/<id>/delete.
+     * Test PATCH /articles/<id>/status.
+     *
+     * @param string $status
+     * @dataProvider providePatchStatusData
      */
-    public function testPatchDelete() {
+    public function testPatchStatus(string $status) {
         $row = $this->testGetEdit();
 
-        $r = $this->api()->patch(
+        $patchResponse = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}/status",
-            ['status' => ArticleModel::STATUS_DELETED]
+            ["status" => $status]
         );
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertEquals(ArticleModel::STATUS_DELETED, $r->getBody()['status']);
+        $this->assertEquals(200, $patchResponse->getStatusCode());
+        $patchResponseBody = $patchResponse->getBody();
+        $this->assertEquals($status, $patchResponseBody["status"]);
 
-        $r = $this->api()->get(
+        $getResponse = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}"
         );
-        $body = $r->getBody();
-        $this->assertEquals(ArticleModel::STATUS_DELETED, $body['status'], 'Status deleted has not been updated!');
-    }
-
-    /**
-     * Test PATCH /articles/<id>/undelete.
-     */
-    public function testPatchUndelete() {
-        $row = $this->testGetEdit();
-
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}/status",
-            ['status' => ArticleModel::STATUS_UNDELETED]
-        );
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertEquals(ArticleModel::STATUS_UNDELETED, $r->getBody()['status']);
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}"
-        );
-        $body = $r->getBody();
-        $this->assertEquals(ArticleModel::STATUS_UNDELETED, $body['status'], 'Status undeleted has not been updated!');
+        $getResponseBody = $getResponse->getBody();
+        $this->assertEquals($status, $getResponseBody["status"]);
     }
 
     /**
@@ -131,21 +144,15 @@ class ArticlesTest extends AbstractResourceTest {
 
         // Setup the test articles.
         for ($i = 1; $i <= 5; $i++) {
-            $primaryArticle = $this->api()->post($this->baseUrl, [
-                "knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]
-            ])->getBody();
-            $this->api()->post("article-revisions", [
-                "articleID" => $primaryArticle["articleID"],
+            $this->api()->post($this->baseUrl, [
+                "knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"],
                 "name" => "Primary Category Article",
                 "body" => "Hello world.",
                 "format" => "markdown",
             ])->getBody();
 
-            $secondaryArticle = $this->api()->post($this->baseUrl, [
-                "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"]
-            ])->getBody();
-            $this->api()->post("article-revisions", [
-                "articleID" => $secondaryArticle["articleID"],
+            $this->api()->post($this->baseUrl, [
+                "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"],
                 "name" => "Secondary Category Article",
                 "body" => "Hello world.",
                 "format" => "markdown",
@@ -168,5 +175,48 @@ class ArticlesTest extends AbstractResourceTest {
             }
         }
         $this->assertTrue($success, "Unable to limit index to articles in a specific category.");
+    }
+
+    /**
+     * Test getting history of article revisions.
+     */
+    public function testGetRevisions() {
+        $article = $this->testPost();
+        $articleID = $article["articleID"];
+        $originalResponse = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
+        $originalResponseBody = $originalResponse->getBody();
+
+        // Baseline. We should only have one revision and it should be the current one.
+        $this->assertEquals(200, $originalResponse->getStatusCode());
+        $this->assertInternalType("array", $originalResponseBody);
+        $this->assertCount(1, $originalResponseBody);
+        $this->assertEquals(ArticleModel::STATUS_PUBLISHED, $originalResponseBody[0]["status"]);
+        $this->assertEquals($article["name"], $originalResponseBody[0]["name"]);
+
+        // Add five new revisions.
+        for ($i = 1; $i <= 5; $i++) {
+            $latest = ["name" => __FUNCTION__ . " {$i}"] + $article;
+            $this->api()->patch("{$this->baseUrl}/{$articleID}", $latest);
+        }
+
+        // Ensure we now have six revisions.
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
+        $responseBody = $response->getBody();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertInternalType("array", $responseBody);
+        $this->assertCount(6, $responseBody);
+
+        // Verify there is one, and only one, published revision and that it is the latest revision.
+        $published = null;
+        foreach ($responseBody as $revision) {
+            if ($revision["status"] === ArticleModel::STATUS_PUBLISHED) {
+                if ($published) {
+                    $this->fail("Multiple published revisions detected for a single article.");
+                }
+                $published = $revision;
+            }
+        }
+        $this->assertNotNull($published, "No published revisions detected for the article.");
+        $this->assertEquals($latest["name"], $published["name"]);
     }
 }

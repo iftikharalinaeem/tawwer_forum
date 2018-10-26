@@ -55,7 +55,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         return (
             <PageLoader {...article}>
                 {article.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
+                    <DocumentTitle title={article.data.seoName || article.data.name}>
                         <ArticleLayout
                             article={article.data}
                             breadcrumbData={breadcrumbData!}
