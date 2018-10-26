@@ -104,7 +104,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "body?",
                     "format?",
                     "name?",
-                    "locale" => ["default" => $this->getLocale()->current()],
+                    "locale?",
                     "sort?",
                 ])->add($this->fullSchema()),
                 "ArticlePost"
@@ -288,6 +288,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name:s" => [
                 "allowNull" => true,
                 "description" => "Title of the article.",
+                "minLength" => 0,
             ],
             "format:s" => [
                 "allowNull" => true,
@@ -297,6 +298,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "body:s" => [
                 "allowNull" => true,
                 "description" => "Body contents.",
+                "minLength" => 0,
             ],
             "bodyRendered:s" => [
                 "allowNull" => true,
@@ -662,11 +664,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $currentRevision = array_intersect_key($this->articleModel->getIDWithRevision($articleID), $revisionFields);
             $revision = array_merge($currentRevision, $revision);
             $revision["articleID"] = $articleID;
+            $revision["locale"] = $fields["locale"] ?? $this->getLocale()->current();
 
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
             $revision["name"] = $revision["name"] ?? "";
             $revision["body"] = $revision["body"] ?? "";
             $revision["format"] = $revision["format"] ?? strtolower(\Gdn_Format::defaultFormat());
+
+            // Temporary hack to avoid a Rich format error if we have no body.
+            if ($revision["body"] === "" && $revision["format"] === "rich") {
+                $revision["body"] = "[]";
+            }
 
             $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
             $articleRevisionID = $this->articleRevisionModel->insert($revision);

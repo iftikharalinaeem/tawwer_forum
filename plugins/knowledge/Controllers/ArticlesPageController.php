@@ -64,7 +64,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
         $this->data[self::API_PAGE_KEY] = $article;
 
-        $this->setPageTitle($article['articleRevision']['name']);
+        $this->setPageTitle($article['name']);
 
         // Put together pre-loaded redux actions.
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
