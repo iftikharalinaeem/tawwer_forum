@@ -129,8 +129,7 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
     }
 
     /**
-     * Simulate Search query
-     * @param inputValue
+     * Load dummy data
      */
     public loadSearchSuggestions = () => {
         const data = dummySearchResults.map((result, index) => {
