@@ -109,6 +109,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     prefix="advancedSearchDomain"
                     setData={this.props.setDomain}
                     defaultTab={ISearchDomain.ARTICLES}
+                    childClass="advancedSearchDomain-tab"
                 >
                     <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
                     <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />

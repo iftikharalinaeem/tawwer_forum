@@ -4,3 +4,13 @@
  * @license Proprietary
  */
 
+.advancedSearch-title {
+  margin-bottom: $global_spacer;
+}
+
+.advancedSearchDomain-tab {
+  flex-grow: 1;
+  .radioButtonsAsTabs-label {
+    width: 100%;
+  }
+}
