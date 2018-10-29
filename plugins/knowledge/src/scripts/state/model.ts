@@ -13,6 +13,7 @@ import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPa
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { IArticleState } from "@knowledge/modules/article/ArticleModel";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
+import { IUsersStoreState } from "@library/users/UsersModel";
 
 type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
@@ -20,7 +21,7 @@ type RecursivePartial<T> = {
         : T[P] extends object ? RecursivePartial<T[P]> : T[P]
 };
 
-export interface IStoreState {
+export interface IStoreState extends IUsersStoreState {
     knowledge: {
         articles: IArticleState;
         articleMenu: IArticleMenuState;

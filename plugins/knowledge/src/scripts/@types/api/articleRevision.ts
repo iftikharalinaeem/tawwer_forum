@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 export enum Format {
     TEXT = "text",

@@ -19,6 +19,8 @@ import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
+import Permission from "@library/users/Permission";
+import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -51,21 +53,22 @@ export class EditorPage extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const pageContent = (
-            <EditorForm
-                backUrl=""
-                key={this.props.pageState.article.status}
-                article={this.props.pageState.article}
-                submitHandler={this.formSubmit}
-                currentCategory={this.props.locationCategory}
-                isSubmitLoading={this.isSubmitLoading}
-                titleID={this.titleID}
-            />
-        );
-
         return (
             <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
-                {pageContent}
+                <Permission
+                    permission="articles.add"
+                    fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
+                >
+                    <EditorForm
+                        backUrl=""
+                        key={this.props.pageState.article.status}
+                        article={this.props.pageState.article}
+                        submitHandler={this.formSubmit}
+                        currentCategory={this.props.locationCategory}
+                        isSubmitLoading={this.isSubmitLoading}
+                        titleID={this.titleID}
+                    />
+                </Permission>
             </Modal>
         );
     }
@@ -77,7 +80,7 @@ export class EditorPage extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         const { pageState, match, actions, history } = this.props;
-        if (pageState.article.status !== LoadStatus.SUCCESS) {
+        if (pageState.article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
                 void actions.createArticleForEdit(history);
             } else {

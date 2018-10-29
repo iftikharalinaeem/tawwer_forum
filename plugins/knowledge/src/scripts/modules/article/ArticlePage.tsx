@@ -11,18 +11,17 @@ import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus, ILoadable } from "@library/@types/api";
-import NotFoundPage from "@library/components/NotFoundPage";
 import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
-import { ICrumb } from "@library/components/Breadcrumbs";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
+import Permission from "@library/users/Permission";
+import ErrorPage from "@knowledge/routes/ErrorPage";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -44,24 +43,23 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { loadable } = this.props;
-        const { id } = this.props.match.params;
-
-        if (id === null || (loadable.status === LoadStatus.ERROR && loadable.error!.status === 404)) {
-            return <NotFoundPage type="Page" />;
-        }
 
         return (
-            <PageLoader {...loadable}>
-                {loadable.data && (
-                    <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
-                        <ArticleLayout
-                            article={loadable.data.article}
-                            breadcrumbData={loadable.data.breadcrumbs}
-                            messages={this.renderMessages()}
-                        />
-                    </DocumentTitle>
-                )}
-            </PageLoader>
+            <>
+                <ErrorPage loadable={loadable} />
+                <PageLoader status={loadable.status}>
+                    {loadable.status === LoadStatus.SUCCESS &&
+                        loadable.data && (
+                            <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
+                                <ArticleLayout
+                                    article={loadable.data.article}
+                                    breadcrumbData={loadable.data.breadcrumbs}
+                                    messages={this.renderMessages()}
+                                />
+                            </DocumentTitle>
+                        )}
+                </PageLoader>
+            </>
         );
     }
 
@@ -70,7 +68,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         const { loadable } = this.props;
-        if (loadable.status !== LoadStatus.SUCCESS) {
+        if (loadable.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
     }
@@ -98,10 +96,12 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (loadable.data) {
             if (loadable.data.article.status === ArticleStatus.DELETED) {
                 messages = (
-                    <ArticleDeletedMessage
-                        onRestoreClick={this.handleRestoreClick}
-                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
-                    />
+                    <Permission permission="articles.add">
+                        <ArticleDeletedMessage
+                            onRestoreClick={this.handleRestoreClick}
+                            isLoading={this.props.restoreStatus === LoadStatus.LOADING}
+                        />
+                    </Permission>
                 );
             }
         }

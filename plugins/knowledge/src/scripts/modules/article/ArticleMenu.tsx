@@ -23,6 +23,7 @@ import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import ProfileLink from "@library/components/ProfileLink";
+import Permission from "@library/users/Permission";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -54,7 +55,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
         return (
-            <React.Fragment>
+            <Permission permission="articles.add">
                 <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
                     <DropDownItemMetas>
                         <Translate
@@ -81,7 +82,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}
-            </React.Fragment>
+            </Permission>
         );
     }
 
