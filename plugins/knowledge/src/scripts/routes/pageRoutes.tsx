@@ -11,6 +11,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import { ADD_ROUTE, EDIT_ROUTE, REVISIONS_ROUTE } from "@knowledge/modules/editor/route";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
+import { ModalLoader } from "@library/components/modal";
 
 export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 
@@ -18,13 +19,13 @@ export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
-    loading: FullPageLoader,
+    loading: ModalLoader,
     loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage"),
 });
 
 /** A loadable version of the article revisions page. */
 const RevisionsPage = Loadable({
-    loading: FullPageLoader,
+    loading: ModalLoader,
     loader: () => import(/* webpackChunkName: "pages/kb/revisions" */ "@knowledge/modules/editor/RevisionsPage"),
 });
 

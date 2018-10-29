@@ -15,6 +15,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import { t } from "@library/application";
 import RevisionsPageModel, { IInjectableRevisionsState } from "./RevisionsPageModel";
 import RevisionsPageActions, { IInjectableRevisionsPageActions } from "./RevisionsPageActions";
+import { Modal, ModalSizes } from "@library/components/modal";
 
 interface IProps
     extends IDeviceProps,
@@ -38,15 +39,17 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         return (
-            <PageLoader status={this.props.revisions.status}>
-                <DocumentTitle title={t("Article Revisions")}>
-                    <RevisionsLayout
-                        selectedRevision={this.props.selectedRevision}
-                        revisions={this.props.revisions}
-                        selectedRevisionID={this.props.selectedRevisionID}
-                    />
-                </DocumentTitle>
-            </PageLoader>
+            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink} label={t("Article Revisions")}>
+                <PageLoader status={this.props.revisions.status}>
+                    <DocumentTitle title={t("Article Revisions")}>
+                        <RevisionsLayout
+                            selectedRevision={this.props.selectedRevision}
+                            revisions={this.props.revisions}
+                            selectedRevisionID={this.props.selectedRevisionID}
+                        />
+                    </DocumentTitle>
+                </PageLoader>
+            </Modal>
         );
     }
 
@@ -90,20 +93,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         void revisionsPageActions.init(numID, numRevID);
     }
 
-    private get backLink(): string | null {
-        const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
-    }
-
     /**
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        if (this.backLink) {
-            this.props.history.goBack();
-        } else {
-            this.props.history.push("/kb");
-        }
+        this.props.history.goBack();
     };
 }
 

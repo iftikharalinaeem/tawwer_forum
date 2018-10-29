@@ -62,7 +62,6 @@ export default class EditorHeader extends React.Component<IProps> {
                             <ul className="editorHeader-items">
                                 <li className="editorHeader-item isPullLeft">
                                     <BackLink
-                                        url="/kb"
                                         title={t("Cancel")}
                                         visibleLabel={true}
                                         className="editorHeader-backLink"

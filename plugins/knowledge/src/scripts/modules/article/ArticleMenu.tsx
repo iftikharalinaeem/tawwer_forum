@@ -74,9 +74,9 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
-                    <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
+                    <DropDownItemLink name={t("Edit article")} to={editUrl} />
                     <DropDownItemSeparator />
-                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} isModalLink={true} />
+                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
                     <DropDownItemSeparator />
                     {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>
