@@ -16,47 +16,22 @@ import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { t } from "@library/application";
-import AdvancedSearch from "./AdvancedSearch";
+import AdvancedSearch, { IAdvancedFields, ISearchDomain, ISearchWithin } from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
-export enum ISearchDomain {
-    ARTICLES = "articles",
-    EVERYWHERE = "everywhere",
-}
-
-export enum ISearchWithin {
-    ONE_DAY = "1 day",
-    THREE_DAY = "3 days",
-    ONE_WEEK = "1 week",
-    TWO_WEEKS = "2 weeks",
-    ONE_MONTH = "1 month",
-    SIX_MONTHS = "6 months",
-    ONE_YEAR = "1 year",
-}
-
-export interface IAdvancedFields {
-    domain: ISearchDomain;
-    title: string;
-    author: any[]; // TBD in next PR
-    fileName: string;
-    within: ISearchWithin;
-    of: string;
-    deletedArticles: boolean;
-}
-
-export interface ISearchState {
+export interface ISearchState extends IAdvancedFields {
     query: string;
     results: IResult[];
     autoComplete: boolean;
-    advanced: IAdvancedFields;
 }
 
 interface IProps extends ISearchState {
     placeholder?: string;
     device: Devices;
+    deletedArticles: boolean;
 }
 
 class SearchLayout extends React.Component<IProps, ISearchState> {
@@ -85,21 +60,56 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
             query: "My query",
             results: dummySearchResults,
             autoComplete: false,
-            advanced: {
-                domain: ISearchDomain.ARTICLES,
-                title: "My Title",
-                author: ["Todd", "Dan", "Mister Clean"], // TBD in next PR
-                fileName: "My File Name",
-                within: ISearchWithin.ONE_DAY,
-                of: "Monday",
-                deletedArticles: false,
-            },
+            domain: ISearchDomain.ARTICLES,
+            title: "My Title",
+            author: ["Todd", "Dan", "Mister Clean"], // TBD in next PR
+            fileName: "My File Name",
+            within: ISearchWithin.ONE_DAY,
+            of: "Monday",
+            deletedArticles: false,
         };
     }
 
-    public doNothing() {
-        return;
-    }
+    private setDomain = (domain: ISearchDomain) => {
+        this.setState({
+            domain,
+        });
+    };
+
+    private setTitle = (title: string) => {
+        this.setState({
+            title,
+        });
+    };
+
+    private setAuthor = (author: string[]) => {
+        this.setState({
+            author,
+        });
+    };
+
+    private setFileName = (fileName: string) => {
+        this.setState({
+            fileName,
+        });
+    };
+
+    private setWithin = (within: ISearchWithin) => {
+        this.setState({
+            within,
+        });
+    };
+
+    private setOf = (of: string) => {
+        this.setState({
+            of,
+        });
+    };
+    private setDeletedArticles = (deletedArticles: boolean) => {
+        this.setState({
+            deletedArticles,
+        });
+    };
 
     public render() {
         const options = this.loadSearchSuggestions();
@@ -108,21 +118,33 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.MiddleTop>
                         <BigSearch
-                            // query={this.state.query}
                             placeholder={this.props.placeholder || t("Help")}
-                            // clearQuery={this.clearQuery}
-                            // setSearchQuery={this.setQuery}
                             options={options}
                             setQuery={this.setQuery}
                             query={this.state.query || ""}
                         />
                     </PanelLayout.MiddleTop>
-                    {/*<PanelLayout.MiddleBottom>*/}
-                    {/*<SearchResults results={this.state.results} />*/}
-                    {/*</PanelLayout.MiddleBottom>*/}
-                    {/*<PanelLayout.RightTop>*/}
-                    {/*<AdvancedSearch />*/}
-                    {/*</PanelLayout.RightTop>*/}
+                    <PanelLayout.MiddleBottom>
+                        {<SearchResults results={dummySearchResults} />}
+                    </PanelLayout.MiddleBottom>
+                    <PanelLayout.RightTop>
+                        <AdvancedSearch
+                            domain={this.state.domain}
+                            setDomain={this.setDomain}
+                            title={this.state.title}
+                            setTitle={this.setTitle}
+                            setAuthor={this.setAuthor}
+                            author={this.state.author}
+                            setFileName={this.setFileName}
+                            fileName={this.state.fileName}
+                            setWithin={this.setWithin}
+                            within={this.state.within}
+                            setOf={this.setOf}
+                            of={this.state.of}
+                            setDeletedArticles={this.setDeletedArticles}
+                            deletedArticles={!!this.state.deletedArticles}
+                        />
+                    </PanelLayout.RightTop>
                 </PanelLayout>
             </Container>
         );
