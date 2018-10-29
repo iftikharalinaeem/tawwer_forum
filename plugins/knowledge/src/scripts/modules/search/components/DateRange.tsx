@@ -7,10 +7,9 @@
 import * as React from "react";
 import { t } from "@library/application";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
-import { ISearchWithin } from "./AdvancedSearch";
-import { dummyDateWithin } from "../state/dummyDateWithin";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { help } from "@library/components/Icons";
+import { ISearchWithin, dateWithin } from "../state/dateWithin";
 
 interface IProps {
     within: ISearchWithin;
@@ -67,19 +66,19 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
         );
         return (
             <div className="dateRange">
-                {/*<SelectOne*/}
-                {/*label={t("Date Within")}*/}
-                {/*className="dateRange-within dateRange-column"*/}
-                {/*setOption={this.setWithin}*/}
-                {/*options={dummyDateWithin}*/}
-                {/*/>*/}
+                <SelectOne
+                    label={t("Date Within")}
+                    className="dateRange-within dateRange-column"
+                    options={dateWithin}
+                    setData={this.setWithin}
+                />
                 <InputTextBlock
                     className="dateRange-of dateRange-column"
                     label={ofLabel}
                     labelClassName="dateRangeOfLabel"
                     onChange={this.setOf}
                     value={this.props.of}
-                    inputHelp={this.state.showHelp ? ofLabelMessage : undefined}
+                    noteAfterInput={this.state.showHelp ? ofLabelMessage : undefined}
                 />
             </div>
         );

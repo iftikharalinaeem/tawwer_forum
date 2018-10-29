@@ -13,12 +13,13 @@ import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import SearchResults from "@knowledge/modules/common/SearchResults";
 import { t } from "@library/application";
-import AdvancedSearch, { IAdvancedFields, ISearchDomain, ISearchWithin } from "./AdvancedSearch";
+import AdvancedSearch, { IAdvancedFields, ISearchDomain } from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import SearchResults from "@knowledge/modules/common/SearchResults";
+import { ISearchWithin } from "../state/dateWithin";
 
 export interface ISearchState extends IAdvancedFields {
     query?: string;
@@ -108,9 +109,15 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
 
     public render() {
         const options = this.loadSearchSuggestions();
+        const { device } = this.props;
+        const isMobile = device === Devices.MOBILE;
+        const isTablet = device === Devices.TABLET;
+        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
+
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
+                    {isFullWidth && <PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
                         <BigSearch
                             placeholder={this.props.placeholder || t("Help")}

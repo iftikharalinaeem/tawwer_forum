@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
@@ -14,24 +13,16 @@ import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
 import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
-import { dummyDateWithin } from "@knowledge/modules/search/state/dummyDateWithin";
 import DateRange from "@knowledge/modules/search/components/DateRange";
 import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
 import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
+import { ISearchWithin } from "@knowledge/modules/search/state/dateWithin";
+import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
+import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
     EVERYWHERE = "everywhere",
-}
-
-export enum ISearchWithin {
-    ONE_DAY = "1 day",
-    THREE_DAYS = "3 days",
-    ONE_WEEK = "1 week",
-    TWO_WEEKS = "2 weeks",
-    ONE_MONTH = "1 month",
-    SIX_MONTHS = "6 months",
-    ONE_YEAR = "1 year",
 }
 
 export interface IAdvancedFields {
@@ -71,8 +62,8 @@ export default class AdvancedSearch extends React.Component<IProps> {
         this.props.setDomain(domain);
     };
 
-    private setTitle = (title: IComboBoxOption): void => {
-        this.props.setTitle(title.label);
+    private setTitle = (title: string): void => {
+        this.props.setTitle(title);
     };
 
     private setAuthor = (author: IComboBoxOption[]): void => {
@@ -101,10 +92,18 @@ export default class AdvancedSearch extends React.Component<IProps> {
         this.setDeletedArticles(event.target.checked || false);
     };
 
+    /**
+     * Handler for title field.
+     */
+    private handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        this.setTitle(value || "");
+    };
+
     public render() {
         return (
             <form className="advancedSearch" onSubmit={doNothing}>
-                <Heading>{t("AdvancedSearch")}</Heading>
+                <Heading className="advancedSearch-title pageSubTitle">{t("AdvancedSearch")}</Heading>
                 <RadioButtonsAsTabs
                     accessibleTitle={t("Search in:")}
                     prefix="advancedSearchDomain"
@@ -114,7 +113,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
                     <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
                 </RadioButtonsAsTabs>
-                {<InputTextBlock label={t("Title")} onChange={this.setTitle} value={this.props.title} />}
+                {<InputTextBlock label={t("Title")} onChange={this.handleTitleChange} value={this.props.title} />}
                 <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor} />
                 <DateRange
                     within={this.props.within}
@@ -122,11 +121,21 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     setOf={this.props.setOf}
                     setWithin={this.props.setWithin}
                 />
+                {dummyKnowledgeBaseList &&
+                    dummyKnowledgeBaseList.length > 0 && (
+                        <SelectOne
+                            label={t("Knowledge Base")}
+                            className="dateRange-within dateRange-column"
+                            options={dummyKnowledgeBaseList}
+                            setData={this.setWithin}
+                        />
+                    )}
                 <Checkbox
                     label={t("Deleted Articles")}
                     onChange={this.handleCheckBoxDeletedArticleChange}
                     checked={this.props.deletedArticles}
                 />
+                <ButtonSubmit>{t("Search")}</ButtonSubmit>
             </form>
         );
     }
