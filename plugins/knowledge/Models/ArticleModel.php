@@ -151,9 +151,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Generate a URL to the provided article.
+     * Generate a URL to the provided article row with revision fields.
      *
-     * @param array $article
+     * @param array $article An article row, joined with fields from a revision. A standard article row will not work.
      * @param bool $withDomain
      * @return string
      * @throws \Exception If the row does not contain a valid ID or name.
@@ -167,7 +167,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
-        $result = \Gdn::request()->url("/kb/articles/".$slug, $withDomain);
+        $result = \Gdn::request()->url("/kb/articles/" . $slug, $withDomain);
         return $result;
     }
 }
