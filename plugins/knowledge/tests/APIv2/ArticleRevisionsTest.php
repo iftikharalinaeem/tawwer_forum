@@ -6,25 +6,15 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 
 /**
  * Test the /api/v2/article-revisions endpoint.
  */
-class ArticleRevisionsTest extends AbstractResourceTest {
+class ArticleRevisionsTest extends AbstractAPIv2Test {
 
-    /** @var string The resource route. */
-    protected $baseUrl = "/article-revisions";
-
-    /** @var array Fields to be checked with get/<id>/edit */
-    protected $editFields = [];
-
-    /** @var string The name of the primary key of the resource. */
-    protected $pk = "articleRevisionID";
-
-    /** @var string The singular name of the resource. */
-    protected $singular = "articleRevision";
+    /** @var int */
+    private static $articleID;
 
     /**
      * This method is called before the first test of this test class is run.
@@ -36,95 +26,43 @@ class ArticleRevisionsTest extends AbstractResourceTest {
         // We're going to need at least one article to associate these revisions with.
         /** @var ArticleModel $articleModel */
         $articleModel = self::container()->get(ArticleModel::class);
-        $articleModel->insert([
+        self::$articleID = $articleModel->insert([
             "knowledgeCategoryID" => 1,
             "sort" => 1,
         ]);
     }
 
     /**
-     * Grab values for inserting a new article revision.
-     *
-     * @return array
+     * Test if a revision posted to the articles resource can be retrieved from the article-revisions endpoint.
      */
-    public function record() {
-        $record = [
-            "articleID" => 1,
-            "name" => "Article Revision",
-            "locale" => "en",
-            "body" => "Hello world.",
+    public function testGetRevision() {
+        $row = [
+            "body" => __FUNCTION__,
             "format" => "markdown",
+            "locale" => "en",
+            "name" => uniqid(__FUNCTION__, true),
         ];
-        return $record;
-    }
 
-    /**
-     * Test DELETE /article-revisions/<id>.
-     */
-    public function testDelete() {
-        if (!method_exists(ArticleRevisionsApiController::class, "delete")) {
-            $this->markTestSkipped("Deleting an article revision is not implemented.");
-        } else {
-            $this->fail("Missing test for DELETE.");
-        }
-    }
+        // Create the revision.
+        $this->api()->patch(
+            "articles/" . self::$articleID,
+            $row
+        );
 
-    /**
-     * Test GET /article-revisions/<id>/edit.
-     *
-     * @param array|null $record An article revision to use for comparison.
-     */
-    public function testGetEdit($record = null) {
-        if (!method_exists(ArticleRevisionsApiController::class, "get_edit")) {
-            $this->markTestSkipped("Getting editable fields of an article revision is not implemented.");
-        } else {
-            $this->fail("Missing test for GET (edit).");
+        // Use its unique name to pull the ID from the list of revisions.
+        $revisionID = null;
+        $revisions = $this->api()->get("articles/" . self::$articleID . "/revisions");
+        foreach ($revisions->getBody() as $currentRevision) {
+            if ($currentRevision["name"] === $row["name"]) {
+                $revisionID = $currentRevision["articleRevisionID"];
+                break;
+            }
         }
-    }
+        $this->assertNotNull($revisionID, "Unable to locate revision.");
 
-    /**
-     * The GET /article-revisions/<id>/edit endpoint should have the same fields as patch fields.
-     */
-    public function testGetEditFields() {
-        if (!method_exists(ArticleRevisionsApiController::class, "get_edit")) {
-            $this->markTestSkipped("Getting editable fields of an article revision is not implemented.");
-        } else {
-            $this->fail("Missing test for GET (edit).");
-        }
-    }
-
-    /**
-     * Test GET /article-revisions.
-     */
-    public function testIndex() {
-        if (!method_exists(ArticleRevisionsApiController::class, "index")) {
-            $this->markTestSkipped("Getting a list of article revisions is not implemented.");
-        } else {
-            $this->fail("Missing test for GET /article-revisions.");
-        }
-    }
-
-    /**
-     * Test PATCH /article-revisions/<id> with a full record overwrite.
-     */
-    public function testPatchFull() {
-        if (!method_exists(ArticleRevisionsApiController::class, "patch")) {
-            $this->markTestSkipped("Editing an article revision is not implemented.");
-        } else {
-            $this->fail("Missing test for PATCH (full).");
-        }
-    }
-
-    /**
-     * Test PATCH /article-revisions/<id> with a a single field update.
-     *
-     * @param string $field The name of the field to patch.
-     */
-    public function testPatchSparse($field = null) {
-        if (!method_exists(ArticleRevisionsApiController::class, "patch")) {
-            $this->markTestSkipped("Editing an article revision is not implemented.");
-        } else {
-            $this->fail("Missing test for PATCH (sparse).");
-        }
+        $response = $this->api()->get("article-revisions/{$revisionID}");
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertRowsEqual($row, $body);
     }
 }

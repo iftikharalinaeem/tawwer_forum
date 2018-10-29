@@ -66,9 +66,9 @@ export class EditorPage extends React.Component<IProps, IState> {
             <Permission permission="articles.add" fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}>
                 <EditorForm
                     backUrl={this.backLink}
-                    key={this.props.pageState.revision.status}
+                    key={this.props.pageState.article.status}
+                    article={this.props.pageState.article}
                     submitHandler={this.formSubmit}
-                    revision={this.props.pageState.revision}
                     currentCategory={this.props.locationCategory}
                     isSubmitLoading={this.isSubmitLoading}
                     titleID={this.titleID}
@@ -124,7 +124,7 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     private get isSubmitLoading(): boolean {
         const { submit } = this.props.pageState;
-        return [submit.revision.status, submit.article.status].includes(LoadStatus.LOADING);
+        return submit.status === LoadStatus.LOADING;
     }
 
     /**
@@ -137,19 +137,15 @@ export class EditorPage extends React.Component<IProps, IState> {
         if (article.status === LoadStatus.SUCCESS) {
             const articleRequest: IPatchArticleRequestBody = {
                 articleID: article.data.articleID,
+                name: title,
+                body: JSON.stringify(content),
+                format: Format.RICH,
             };
 
             if (locationCategory !== null) {
                 articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
             }
-
-            const revisionRequest: IPostArticleRevisionRequestBody = {
-                articleID: article.data.articleID,
-                name: title,
-                body: JSON.stringify(content),
-                format: Format.RICH,
-            };
-            void actions.updateArticle(articleRequest, revisionRequest, history);
+            void actions.updateArticle(articleRequest, history);
         }
     };
 

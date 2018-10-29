@@ -8,16 +8,12 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, IArticleRevision, Format } from "@knowledge/@types/api";
+import { IArticle, Format } from "@knowledge/@types/api";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
-    revision: ILoadable<IArticleRevision | undefined>;
-    submit: {
-        article: ILoadable<{}>;
-        revision: ILoadable<{}>;
-    };
+    submit: ILoadable<{}>;
 }
 
 /**
@@ -28,16 +24,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         article: {
             status: LoadStatus.PENDING,
         },
-        revision: {
-            status: LoadStatus.PENDING,
-        },
+
         submit: {
-            article: {
-                status: LoadStatus.PENDING,
-            },
-            revision: {
-                status: LoadStatus.PENDING,
-            },
+            status: LoadStatus.PENDING,
         },
     };
 
@@ -52,61 +41,29 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     break;
                 case EditorPageActions.GET_ARTICLE_REQUEST:
                     draft.article.status = LoadStatus.LOADING;
-                    // When fetching an existing article, we will also need to look for
-                    // An existing revision.
-                    draft.revision.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.GET_ARTICLE_RESPONSE:
                 case EditorPageActions.POST_ARTICLE_RESPONSE:
                     draft.article.status = LoadStatus.SUCCESS;
                     draft.article.data = action.payload.data;
-                    // When receving an article, not having a revision ID means there is nothing new to load.
-                    // As a result we need to clear the optomistic loading indicator we put up earlier.
-                    // as the user will be making a totally new revision.
-                    if (action.payload.data.articleRevisionID === null) {
-                        draft.revision.status = LoadStatus.SUCCESS;
-                    }
                     break;
                 case EditorPageActions.GET_ARTICLE_ERROR:
                 case EditorPageActions.POST_ARTICLE_ERROR:
                     draft.article.status = LoadStatus.ERROR;
                     draft.article.error = action.payload;
                     break;
-                // Getting an existing revision.
-                case EditorPageActions.GET_REVISION_REQUEST:
-                    draft.revision.status = LoadStatus.LOADING;
-                    break;
-                case EditorPageActions.GET_REVISION_ERROR:
-                    draft.revision.status = LoadStatus.ERROR;
-                    draft.revision.error = action.payload;
-                    break;
-                case EditorPageActions.GET_REVISION_RESPONSE:
-                    draft.revision.status = LoadStatus.SUCCESS;
-                    draft.revision.data = action.payload.data;
-                    break;
                 // Patching the article
                 case EditorPageActions.PATCH_ARTICLE_REQUEST:
-                    draft.submit.article.status = LoadStatus.LOADING;
+                    draft.submit.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.PATCH_ARTICLE_ERROR:
-                    draft.submit.article.status = LoadStatus.ERROR;
-                    draft.submit.article.error = action.payload;
+                    draft.submit.status = LoadStatus.ERROR;
+                    draft.submit.error = action.payload;
                     break;
 
                 // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
                 case ArticlePageActions.GET_ARTICLE_RESPONSE:
-                    draft.submit.article.status = LoadStatus.SUCCESS;
-                    break;
-                // Submitting a new revision.
-                case EditorPageActions.POST_REVISION_REQUEST:
-                    draft.submit.revision.status = LoadStatus.LOADING;
-                    break;
-                case EditorPageActions.POST_REVISION_ERROR:
-                    draft.submit.revision.status = LoadStatus.ERROR;
-                    draft.submit.revision.error = action.payload;
-                    break;
-                case EditorPageActions.POST_REVISION_RESPONSE:
-                    draft.submit.revision.status = LoadStatus.SUCCESS;
+                    draft.submit.status = LoadStatus.SUCCESS;
                     break;
                 case EditorPageActions.RESET:
                     return this.initialState;

@@ -53,7 +53,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                 <ErrorPage loadable={article} />
                 <PageLoader status={article.status}>
                     {article.status === LoadStatus.SUCCESS && (
-                        <DocumentTitle title={article.data.seoName || article.data.articleRevision.name}>
+                        <DocumentTitle title={article.data.seoName || article.data.name}>
                             <ArticleLayout
                                 article={article.data}
                                 breadcrumbData={breadcrumbData!}
