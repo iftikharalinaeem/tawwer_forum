@@ -13,19 +13,16 @@ import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import PageTitle from "@knowledge/modules/common/PageTitle";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { t } from "@library/application";
 import AdvancedSearch, { IAdvancedFields, ISearchDomain, ISearchWithin } from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 
 export interface ISearchState extends IAdvancedFields {
-    query: string;
-    results: IResult[];
-    autoComplete: boolean;
+    query?: string;
+    results?: IResult[];
 }
 
 interface IProps extends ISearchState {
@@ -41,6 +38,21 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
         });
     };
 
+    public constructor(props) {
+        super(props);
+        this.state = {
+            domain: ISearchDomain.ARTICLES,
+            title: this.props.title || "",
+            query: this.props.query || "",
+            author: this.props.author || "",
+            fileName: this.props.fileName || "",
+            within: this.props.within,
+            of: this.props.of || "",
+            deletedArticles: !!this.props.deletedArticles,
+            results: this.props.results || [],
+        };
+    }
+
     private setQuery = value => {
         let newValue = "";
         if (typeof value === "string") {
@@ -52,23 +64,6 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
             query: newValue,
         });
     };
-
-    constructor(props: IProps) {
-        super(props);
-        // Hard coded state for now, until it's hooked up to redux
-        this.state = {
-            query: "My query",
-            results: dummySearchResults,
-            autoComplete: false,
-            domain: ISearchDomain.ARTICLES,
-            title: "My Title",
-            author: ["Todd", "Dan", "Mister Clean"], // TBD in next PR
-            fileName: "My File Name",
-            within: ISearchWithin.ONE_DAY,
-            of: "Monday",
-            deletedArticles: false,
-        };
-    }
 
     private setDomain = (domain: ISearchDomain) => {
         this.setState({
@@ -82,7 +77,7 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
         });
     };
 
-    private setAuthor = (author: string[]) => {
+    private setAuthor = (author: IComboBoxOption[]) => {
         this.setState({
             author,
         });

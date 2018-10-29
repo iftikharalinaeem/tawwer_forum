@@ -11,6 +11,12 @@ import Heading from "@library/components/Heading";
 import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/radioButtonsAsTabs";
 import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import Tokens from "@library/components/forms/select/Tokens";
+import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
+import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import Checkbox from "@library/components/forms/Checkbox";
+import SelectOne from "@library/components/forms/select/SelectOne";
+import { dummyDateWithin } from "@knowledge/modules/search/state/dummyDateWithin";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -19,7 +25,7 @@ export enum ISearchDomain {
 
 export enum ISearchWithin {
     ONE_DAY = "1 day",
-    THREE_DAY = "3 days",
+    THREE_DAYS = "3 days",
     ONE_WEEK = "1 week",
     TWO_WEEKS = "2 weeks",
     ONE_MONTH = "1 month",
@@ -40,7 +46,7 @@ export interface IAdvancedFields {
 interface IProps extends IAdvancedFields {
     setDomain: (domain: ISearchDomain) => void;
     setTitle: (title: string) => void;
-    setAuthor: (author: string[]) => void;
+    setAuthor: (author: IComboBoxOption[]) => void;
     setFileName: (fileName: string) => void;
     setWithin: (within: ISearchWithin) => void;
     setOf: (of: string) => void;
@@ -64,11 +70,11 @@ export default class AdvancedSearch extends React.Component<IProps> {
         this.props.setDomain(domain);
     };
 
-    private setTitle = (title: string): void => {
-        this.props.setTitle(title);
+    private setTitle = (title: IComboBoxOption): void => {
+        this.props.setTitle(title.label);
     };
 
-    private setAuthor = (author: string[]): void => {
+    private setAuthor = (author: IComboBoxOption[]): void => {
         this.props.setAuthor(author);
     };
 
@@ -87,25 +93,32 @@ export default class AdvancedSearch extends React.Component<IProps> {
         this.props.setDeletedArticles(deletedArticles);
     };
 
+    /**
+     * Handler for the deleted articles checkbox.
+     */
+    private handleCheckBoxDeletedArticleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setDeletedArticles(event.target.checked || false);
+    };
+
     public render() {
         return (
             <form className="advancedSearch" onSubmit={doNothing}>
                 <Heading>{t("AdvancedSearch")}</Heading>
+                {/*<RadioButtonsAsTabs*/}
+                {/*selectedTab={this.props.domain || ISearchDomain.ARTICLES}*/}
+                {/*accessibleTitle={t("Search in:")}*/}
+                {/*prefix="advancedSearchDomain"*/}
+                {/*setData={this.props.setDomain}*/}
+                {/*/>*/}
                 {<InputTextBlock label={t("Title")} onChange={this.setTitle} value={this.props.title} />}
+                {/*<Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor}/>*/}
+                {/*<DateRange label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor}/>*/}
+                <Checkbox
+                    label={t("Deleted Articles")}
+                    onChange={this.handleCheckBoxDeletedArticleChange}
+                    checked={this.props.deletedArticles}
+                />
             </form>
         );
     }
 }
-
-/*
-    <RadioButtonsAsTabs
-        selectedTab={this.props.domain || ISearchDomain.ARTICLES}
-        accessibleTitle={t("Search in:")}
-        prefix="advancedSearchDomain"
-        setData={this.props.setDomain}
-    >
-        {<RadioButtonTab}
-        {render={{ label: t("Articles"), setData: this.props.setDomain, data: ISearchDomain.ARTICLES }}}
-        {/>}
-    </RadioButtonsAsTabs>
-*/
