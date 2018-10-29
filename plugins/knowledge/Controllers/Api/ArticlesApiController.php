@@ -8,14 +8,16 @@ namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
 use Garden\Schema\Schema;
-use Gdn_Format;
-use UserModel;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\ApiUtils;
+use Gdn_Format;
+use UserModel;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -27,14 +29,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     // Maximum length before article excerpts are truncated.
     const EXCERPT_MAX_LENGTH = 325;
 
-    /** @var \Garden\Schema\Schema */
+    /** @var Schema */
     private $articleFragmentSchema;
 
-    /** @var \Garden\Schema\Schema */
+    /** @var Schema */
     private $articlePostSchema;
 
-    /** @var \Garden\Schema\Schema */
+    /** @var Schema */
     private $articleSchema;
+
+    /** @var Schema */
+    private $articleNoBodySchema;
 
     /** @var ArticleModel */
     private $articleModel;
@@ -42,10 +47,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
-    /** @var ArticleRevisionsApiController */
-    private $articleRevisionsApiController;
-
-    /** @var \Garden\Schema\Schema */
+    /** @var Schema */
     private $idParamSchema;
 
     /** @var UserModel */
@@ -56,18 +58,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
-     * @param ArticleRevisionsApiController $articleRevisionsApiController
      * @param UserModel $userModel
      */
     public function __construct(
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
-        ArticleRevisionsApiController $articleRevisionsApiController,
         UserModel $userModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
-        $this->articleRevisionsApiController = $articleRevisionsApiController;
         $this->userModel = $userModel;
     }
 
@@ -75,13 +74,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article by its numeric ID.
      *
      * @param int $id Article ID.
+     * @param bool $includeRevision
      * @return array
      * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If the result fails schema validation.
      */
-    private function articleByID(int $id): array {
+    private function articleByID(int $id, bool $includeRevision = false): array {
         try {
-            $article = $this->articleModel->getID($id);
-        } catch (Exception $e) {
+            if ($includeRevision) {
+                $article = $this->articleModel->getIDWithRevision($id);
+            } else {
+                $article = $this->articleModel->selectSingle(["articleID" => $id]);
+            }
+        } catch (NoResultsException $e) {
             throw new NotFoundException("Article");
         }
         return $article;
@@ -91,13 +96,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article schema with minimal add/edit fields.
      *
      * @param string $type The type of schema.
-     * @return \Garden\Schema\Schema Returns a schema object.
+     * @return Schema Returns a schema object.
      */
-    public function articlePostSchema(string $type = ""): \Garden\Schema\Schema {
+    public function articlePostSchema(string $type = ""): Schema {
         if ($this->articlePostSchema === null) {
             $this->articlePostSchema = $this->schema(
-                \Garden\Schema\Schema::parse([
+                Schema::parse([
                     "knowledgeCategoryID",
+                    "body?",
+                    "format?",
+                    "name?",
+                    "locale?",
                     "sort?",
                 ])->add($this->fullSchema()),
                 "ArticlePost"
@@ -111,18 +120,20 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article schema with minimal fields.
      *
      * @param string $type The type of schema.
-     * @return \Garden\Schema\Schema Returns a schema object.
+     * @return Schema Returns a schema object.
      */
-    public function articleFragmentSchema(string $type = ""): \Garden\Schema\Schema {
+    public function articleFragmentSchema(string $type = ""): Schema {
         if ($this->articleFragmentSchema === null) {
             $this->articleFragmentSchema = $this->schema(
-                \Garden\Schema\Schema::parse([
+                Schema::parse([
                     "articleID",
                     "knowledgeCategoryID",
                     "sort",
                     "url",
                     "name",
                     "excerpt",
+                    "insertUser",
+                    "dateInserted",
                     "updateUser",
                     "dateUpdated",
                 ])->add($this->fullSchema()),
@@ -137,79 +148,143 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get the full schema for an article. This includes current revision fields.
      *
      * @param string $type
-     * @return \Garden\Schema\Schema
+     * @return Schema
      */
-    public function articleSchema(string $type = ""): \Garden\Schema\Schema {
+    public function articleSchema(string $type = ""): Schema {
         if ($this->articleSchema === null) {
-            $this->articleSchema = $this->schema($this->fullSchema(), "Article");
+            $this->articleSchema = $this->schema(Schema::parse([
+                "articleID",
+                "knowledgeCategoryID",
+                "name",
+                "body",
+                "outline",
+                "seoName",
+                "seoDescription",
+                "slug",
+                "sort",
+                "score",
+                "views",
+                "url",
+                "insertUserID",
+                "dateInserted",
+                "updateUserID",
+                "dateUpdated",
+                "insertUser?",
+                "updateUser?",
+                "status",
+                "locale",
+            ])->add($this->fullSchema()), "Article");
         }
         return $this->schema($this->articleSchema, $type);
     }
 
     /**
-     * Get a schema representing the combined available fields from articles and revisions.
+     * Get a full article schema that also includes its name from a revision.
      *
-     * @return \Garden\Schema\Schema
+     * @param string $type
+     * @return Schema
      */
-    private function fullSchema(): \Garden\Schema\Schema {
-        return \Garden\Schema\Schema::parse([
-                "articleID:i" => "Unique article ID.",
-                "knowledgeCategoryID:i" => [
-                    "allowNull" => true,
-                    "Category the article belongs in.",
-                ],
-                "articleRevisionID:i" => [
-                    "allowNull" => true,
-                    "description" => "Unique ID of the published revision."
-                ],
-                "articleRevision?" => $this->articleRevisionsApiController->articleRevisionFragmentSchema(),
-                "seoName:s" => [
-                    "allowNull" => true,
-                    "description" => "SEO-optimized name for the article.",
-                ],
-                "seoDescription:s" => [
-                    "allowNull" => true,
-                    "description" => "SEO-optimized description of the article content.",
-                ],
-                "slug:s" => [
-                    "allowNull" => true,
-                    "description" => "URL slug",
-                ],
-                "sort:i" => [
-                    "allowNull" => true,
-                    "description" => "Manual sort order of the article.",
-                ],
-                "score:i" => "Score of the article.",
-                "views:i" => "How many times the article has been viewed.",
-                "url:s" => "Full URL to the article.",
-                "insertUserID:i" => "Unique ID of the user who originally created the article.",
-                "dateInserted:dt" => "When the article was created.",
-                "updateUserID:i" => "Unique ID of the last user to update the article.",
-                "dateUpdated:dt" => "When the article was last updated.",
-                "insertUser?" => $this->getUserFragmentSchema(),
-                "updateUser?" => $this->getUserFragmentSchema(),
-                "categoryAncestorIDs:a?" => "integer",
-                "status:s" => [
-                    'description' => "Article status: draft, published, deleted, undeleted, etc...",
-                    'enum' => ArticleModel::getAllStatuses()
-                ],
-                "name:s?" => [
-                    "allowNull" => true,
-                    "description" => "Title of the article.",
-                ],
-                "excerpt:s?" => [
-                    "allowNull" => true,
-                    "description" => "Plain-text excerpt of the current article body.",
-                ],
-            ]);
+    public function articleNoBodySchema(string $type = ""): Schema {
+        if ($this->articleNoBodySchema === null) {
+            $this->articleNoBodySchema = $this->schema(Schema::parse([
+                "articleID",
+                "knowledgeCategoryID",
+                "name",
+                "seoName",
+                "seoDescription",
+                "slug",
+                "sort",
+                "score",
+                "views",
+                "url",
+                "insertUserID",
+                "dateInserted",
+                "updateUserID",
+                "dateUpdated",
+                "insertUser?",
+                "updateUser?",
+                "status",
+            ])->add($this->fullSchema()), "ArticleNoBody");
+        }
+        return $this->schema($this->articleNoBodySchema, $type);
     }
 
     /**
-     * Get a schema representing all available revision fields.
+     * Get a schema representing the combined available fields from articles and revisions.
      *
      * @return Schema
      */
-    private function fullRevisionSchema() {
+    private function fullSchema(): Schema {
+        return $this->fullArticleSchema()
+            ->merge(Schema::parse([
+                "status",
+                "name",
+                "format",
+                "body",
+                "bodyRendered",
+                "locale",
+            ])->add($this->fullRevisionSchema()));
+    }
+
+    /**
+     * Get a schema representing an article.
+     *
+     * @return Schema
+     */
+    private function fullArticleSchema(): Schema {
+        return Schema::parse([
+            "articleID:i" => "Unique article ID.",
+            "knowledgeCategoryID:i" => [
+                "allowNull" => true,
+                "Category the article belongs in.",
+            ],
+            "seoName:s" => [
+                "allowNull" => true,
+                "description" => "SEO-optimized name for the article.",
+            ],
+            "seoDescription:s" => [
+                "allowNull" => true,
+                "description" => "SEO-optimized description of the article content.",
+            ],
+            "slug:s" => [
+                "allowNull" => true,
+                "description" => "URL slug",
+            ],
+            "sort:i" => [
+                "allowNull" => true,
+                "description" => "Manual sort order of the article.",
+            ],
+            "score:i" => "Score of the article.",
+            "views:i" => "How many times the article has been viewed.",
+            "url:s" => "Full URL to the article.",
+            "insertUserID:i" => "Unique ID of the user who originally created the article.",
+            "dateInserted:dt" => "When the article was created.",
+            "updateUserID:i" => "Unique ID of the last user to update the article.",
+            "dateUpdated:dt" => "When the article was last updated.",
+            "insertUser?" => $this->getUserFragmentSchema(),
+            "updateUser?" => $this->getUserFragmentSchema(),
+            "status:s" => [
+                'description' => "Article status.",
+                'enum' => ArticleModel::getAllStatuses()
+            ],
+            "excerpt:s?" => [
+                "allowNull" => true,
+                "description" => "Plain-text excerpt of the current article body.",
+            ],
+            "outline:a?" => Schema::parse([
+                'ref:s' => 'Heading blot reference id. Ex: #title',
+                'level:i' => 'Heading level',
+                'text:s' => 'Heading text line'
+            ]),
+        ]);
+    }
+
+    /**
+     * Get a schema representing an article revision.
+     *
+     * @return Schema
+     */
+    private function fullRevisionSchema(): Schema {
         return Schema::parse([
             "articleRevisionID:i" => "Unique article revision ID.",
             "articleID:i" => "Associated article ID.",
@@ -221,6 +296,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name:s" => [
                 "allowNull" => true,
                 "description" => "Title of the article.",
+                "minLength" => 0,
             ],
             "format:s" => [
                 "allowNull" => true,
@@ -229,7 +305,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ],
             "body:s" => [
                 "allowNull" => true,
-                "description" => "Raw body contents.",
+                "description" => "Body contents.",
+                "minLength" => 0,
             ],
             "bodyRendered:s" => [
                 "allowNull" => true,
@@ -251,7 +328,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Handle GET requests to the root of the endpoint.
      *
      * @param int $id
-     * @param array $query
      * @return array
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
@@ -261,28 +337,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ServerException If there was an error normalizing the output.
      */
-    public function get(int $id, array $query = []) {
+    public function get(int $id) {
         $this->permission("knowledge.kb.view");
 
-        $this->idParamSchema();
-        $in = $this->schema([
-            "expand" => ApiUtils::getExpandDefinition(["all", "ancestors", "articleRevision"]),
-        ], "in")->setDescription("Get an article.");
+        $in = $this->idParamSchema()->setDescription("Get an article.");
         $out = $this->articleSchema("out");
 
-        $query = $in->validate($query);
-
-        $article = $this->articleByID($id);
+        $article = $this->articleByID($id, true);
         $this->userModel->expandUsers(
             $article,
             ["insertUserID", "updateUserID"]
         );
-        $revision = $this->articleRevisionModel->get([
-            "articleID" => $id,
-            "status" => "published"
-        ]);
-        $revision = array_column($revision, null, "articleID");
-        $article = $this->normalizeOutput($article, $query["expand"] ?: [], $revision);
+
+        $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
     }
@@ -301,13 +368,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission();
 
         $this->idParamSchema()->setDescription("Get an article for editing.");
-        $out = $this->schema(\Garden\Schema\Schema::parse([
+        $out = $this->schema(Schema::parse([
             "articleID",
             "knowledgeCategoryID",
             "sort",
+            "name",
+            "body",
+            "format",
+            "locale",
         ])->add($this->fullSchema()), "out");
 
-        $article = $this->articleByID($id);
+        $article = $this->articleByID($id, true);
         $result = $out->validate($article);
         return $result;
     }
@@ -316,11 +387,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an ID-only article schema.
      *
      * @param string $type The type of schema.
-     * @return \Garden\Schema\Schema Returns a schema object.
+     * @return Schema Returns a schema object.
      */
-    public function idParamSchema(string $type = "in"): \Garden\Schema\Schema {
+    public function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema = \Garden\Schema\Schema::parse(["id:i" => "The article ID."]);
+            $this->idParamSchema = Schema::parse(["id:i" => "The article ID."]);
         }
         return $this->schema($this->idParamSchema, $type);
     }
@@ -350,27 +421,24 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "type" => "integer",
             ],
         ], "in")->setDescription("List published articles in a given knowledge category.");
-        $out = $this->schema([":a" => $this->articleSchema()], "out");
+        $out = $this->schema([":a" => $this->articleNoBodySchema()], "out");
 
         $query = $in->validate($query);
 
-        $rows = $this->articleModel->getPublishedByCategory(
-            $query["knowledgeCategoryID"],
-            ["limit" => $query["limit"]]
+        $rows = $this->articleModel->getWithRevision(
+            ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
+            [
+                "limit" => $query["limit"],
+                "includeBody" => false,
+            ]
         );
-        $articleIDs = array_column($rows, "articleID");
-        if ($articleIDs) {
-            $revisions = $this->articleRevisionModel->get([
-                "articleID" => $articleIDs,
-                "status" => "published",
-            ]);
-            $revisions = array_column($revisions, null, "articleID");
-        } else {
-            $revisions = [];
-        }
         foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row, ["articleRevision"], $revisions);
+            $row = $this->normalizeOutput($row);
         }
+        $this->userModel->expandUsers(
+            $rows,
+            ["insertUserID", "updateUserID"]
+        );
 
         $result = $out->validate($rows);
         return $result;
@@ -404,11 +472,20 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema([":a" => $this->articleFragmentSchema()], "out");
         $query = $in->validate($query);
 
-        $articles = $this->index($query);
+        $articles = $this->articleModel->getWithRevision(
+            ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
+            ["limit" => $query["limit"]]
+        );
+        foreach ($articles as &$article) {
+            $article = $this->normalizeOutput($article);
+        }
         $this->userModel->expandUsers(
             $articles,
-            ["updateUserID"]
+            ["insertUserID", "updateUserID"]
         );
+        foreach ($articles as &$article) {
+            $article["excerpt"] = $article["body"] ? sliceString(Gdn_Format::plainText($article["body"], "Html"), self::EXCERPT_MAX_LENGTH) : null;
+        }
 
         $result = $out->validate($articles);
         return $result;
@@ -428,7 +505,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission();
 
         $this->idParamSchema()->setDescription("Get revisions from a specific article.");
-        $out = $this->schema(\Garden\Schema\Schema::parse([
+        $out = $this->schema([
             ":a" => Schema::parse([
                 "articleRevisionID",
                 "articleID",
@@ -438,7 +515,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "insertUser",
                 "dateInserted",
             ])->add($this->fullRevisionSchema())
-        ]), "out");
+        ], "out");
 
         $article = $this->articleByID($id);
         $revisions = $this->articleRevisionModel->get(["articleID" => $article["articleID"]]);
@@ -458,52 +535,57 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Massage article row data for useful API output.
      *
      * @param array $row
-     * @param array $expand
-     * @param array $revisions Relevant published revisions. Indexed by article ID.
      * @return array
      * @throws ServerException If no article ID was found in the row.
-     * @throws ValidationException If a fetched article fails to validate against the article schema.
-     * @throws ValidationException If a fetched article revision fails to validate against the article revision schema.
      */
-    public function normalizeOutput(array $row, array $expand = [], array $revisions = []): array {
+    public function normalizeOutput(array $row): array {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
 
-        $articleRevision = $revisions[$articleID] ?? null;
-        if ($articleRevision) {
-            $this->userModel->expandUsers(
-                $articleRevision,
-                ["insertUserID"]
-            );
-            $row["articleRevisionID"] = $articleRevision["articleRevisionID"];
-            $slug = Gdn_Format::url($articleRevision["name"] ? "{$row['articleID']}-{$articleRevision['name']}" : $row["articleID"]);
-            $row["name"] = $articleRevision["name"];
-            $row["excerpt"] = sliceString(Gdn_Format::plainText($articleRevision["bodyRendered"], "Html"), self::EXCERPT_MAX_LENGTH);
-        } else {
-            $row["articleRevisionID"] = null;
-            $slug = null;
-            $row["name"] = null;
-            $row["excerpt"] = null;
-        }
-        if ($this->isExpandField("articleRevision", $expand)) {
-            $row["articleRevision"] = $articleRevision;
-        }
+        $name = $row["name"] ?? null;
+        $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
+        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}");
 
-        $row["url"] = \Gdn::request()->url("/kb/articles/".($slug ?: $row["articleID"]));
-
+        $bodyRendered = $row["bodyRendered"] ?? null;
+        $row['outline'] = $this->getOutline($row["body"] ?? '');
+        $row["body"] = $bodyRendered;
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
         $row["slug"] = $slug;
-        if ($this->isExpandField("ancestors", $expand)) {
-            $row["categoryAncestorIDs"] = [1, 2, 3];
-        }
 
         return $row;
     }
 
+    /**
+     * Generate outline array from article body
+     *
+     * @param string $body
+     * @return array
+     */
+    public function getOutline(string $body): array {
+        $outline = [];
+        $body = json_decode($body, true);
+        if (is_array($body) && count($body) > 0) {
+            $parser = (new Parser())
+                ->addBlot(HeadingTerminatorBlot::class);
+            $blotGroups = $parser->parse($body);
+
+            foreach ($blotGroups as $idx => $blotGroup) {
+                $blot = $blotGroup->getPrimaryBlot();
+                if ($blot instanceof HeadingTerminatorBlot) {
+                    $outline[] = [
+                        'ref' => $blotGroup->getReference(),
+                        'level' => $blot->getHeadingLevel(),
+                        'text' => $blotGroup->getText(),
+                    ];
+                }
+            }
+        }
+        return $outline;
+    }
     /**
      * Update an existing article.
      *
@@ -523,8 +605,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $article = $this->articleByID($id);
         $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
-        $this->articleModel->update($body, ["articleID" => $id]);
-        $result = $this->prepareValidatedPatchResult($id, $out);
+        $this->save($body, $id);
+        $row = $this->articleByID($id, true);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
         return $result;
     }
 
@@ -542,46 +626,27 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function patch_status(int $id, array $body): array {
         $this->permission();
-        $body['id'] = $id;
 
-        $in = $this->schema(
-            [   "id:i" => "The article ID.",
-                "status:s" => [
-                    'description' => "Article status: published, deleted, etc.",
-                    'enum' => ArticleModel::getAllStatuses()
-                ]
-            ],
-            'in'
-        )
-            ->setDescription('Set status of existing article: published, deleted, etc.');
+        $this->idParamSchema();
+        $in = $this->schema([
+            "status:s" => [
+                "description" => "Article status.",
+                "enum" => ArticleModel::getAllStatuses()
+            ]
+        ], "in")->setDescription("Set the status of an article.");
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
         $article = $this->articleByID($id);
         $this->editPermission($article["insertUserID"]);
         if ($article['status'] !== $body['status']) {
-            $this->articleModel->update(['status'=>$body['status']], ["articleID" => $id]);
+            $this->articleModel->update(
+                ['status' => $body['status']],
+                ["articleID" => $id]
+            );
         }
 
-        $result = $this->prepareValidatedPatchResult($id, $out);
-        return $result;
-    }
-
-    /**
-     * Get article from model and normalize and validate data according to out-schema
-     *
-     * @param int $id Article ID to get
-     * @param Schema $out Out-schema to validate output
-     *
-     * @return array
-     */
-    protected function prepareValidatedPatchResult(int $id, Schema $out): array {
-        $row = $this->articleByID($id);
-        $revision = $this->articleRevisionModel->get([
-            "articleID" => $id,
-            "status" => "published"
-        ]);
-        $revision = array_column($revision, null, "articleID");
-        $row = $this->normalizeOutput($row, [], $revision);
+        $row = $this->articleByID($id, true);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -602,15 +667,56 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body);
-        $articleID = $this->articleModel->insert($body);
-        $row = $this->articleByID($articleID);
-        $revision = $this->articleRevisionModel->get([
-            "articleID" => $articleID,
-            "status" => "published"
-        ]);
-        $revision = array_column($revision, null, "articleID");
-        $row = $this->normalizeOutput($row, [], $revision);
+        $articleID = $this->save($body);
+        $row = $this->articleByID($articleID, true);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Separate article and revision fields from request input and save to the proper resources.
+     *
+     * @param array $fields
+     * @param int|null $articleID
+     * @return int
+     * @throws Exception If an error is encountered while performing underlying database operations.
+     * @throws NoResultsException If the article could not be found.
+     */
+    private function save(array $fields, int $articleID = null): int {
+        $revisionFields = ["body" => true, "format" => true, "locale" => true, "name" => true];
+
+        $article = array_diff_key($fields, $revisionFields);
+        $revision = array_intersect_key($fields, $revisionFields);
+
+        if ($articleID !== null) {
+            $this->articleModel->update($article, ["articleID" => $articleID]);
+        } else {
+            $articleID = $this->articleModel->insert($fields);
+        }
+
+        if (!empty($revision)) {
+            // Grab the current revision, if available, to load as initial defaults.
+            $currentRevision = array_intersect_key($this->articleModel->getIDWithRevision($articleID), $revisionFields);
+            $revision = array_merge($currentRevision, $revision);
+            $revision["articleID"] = $articleID;
+            $revision["locale"] = $fields["locale"] ?? $this->getLocale()->current();
+
+            // Temporary defaults until drafts are implemented, at which point these fields will be required.
+            $revision["name"] = $revision["name"] ?? "";
+            $revision["body"] = $revision["body"] ?? "";
+            $revision["format"] = $revision["format"] ?? strtolower(\Gdn_Format::defaultFormat());
+
+            // Temporary hack to avoid a Rich format error if we have no body.
+            if ($revision["body"] === "" && $revision["format"] === "rich") {
+                $revision["body"] = "[]";
+            }
+
+            $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
+            $articleRevisionID = $this->articleRevisionModel->insert($revision);
+            $this->articleRevisionModel->publish($articleRevisionID);
+        }
+
+        return $articleID;
     }
 }

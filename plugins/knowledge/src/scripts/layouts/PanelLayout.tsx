@@ -268,30 +268,37 @@ interface IPanelItemProps {
     children?: React.ReactNode;
 }
 
-export function LeftTop(props: IPanelItemProps) {
+function LeftTop(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+LeftTop.type = "LeftTop";
 
-export function LeftBottom(props: IPanelItemProps) {
+function LeftBottom(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+LeftBottom.type = "LeftBottom";
 
-export function MiddleTop(props: IPanelItemProps) {
+function MiddleTop(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+MiddleTop.type = "MiddleTop";
 
-export function MiddleBottom(props: IPanelItemProps) {
+function MiddleBottom(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+MiddleBottom.type = "MiddleBottom";
 
-export function RightTop(props: IPanelItemProps) {
+function RightTop(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+RightTop.type = "RightTop";
 
-export function RightBottom(props: IPanelItemProps) {
+function RightBottom(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+RightBottom.type = "RightBottom";
 
-export function Breadcrumbs(props: IPanelItemProps) {
+function Breadcrumbs(props: IPanelItemProps) {
     return <React.Fragment>{props.children}</React.Fragment>;
 }
+Breadcrumbs.type = "Breadcrumbs";

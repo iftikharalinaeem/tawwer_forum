@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
-import { t, makeProfileUrl } from "@library/application";
-import { InlineTypes } from "@library/components/translation/Sentence";
+import { t } from "@library/application";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import {
     DropDownItemLink,
@@ -23,8 +22,8 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { Link } from "react-router-dom";
 import ProfileLink from "@library/components/ProfileLink";
+import Permission from "@library/users/Permission";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -55,7 +54,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
         return (
-            <React.Fragment>
+            <Permission permission="articles.add">
                 <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
                     <DropDownItemMetas>
                         <Translate
@@ -82,7 +81,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}
-            </React.Fragment>
+            </Permission>
         );
     }
 
@@ -189,4 +188,4 @@ const withRedux = connect(
     ArticleActions.mapDispatchToProps,
 );
 
-export default withRedux<IProps>(ArticleMenu);
+export default withRedux(ArticleMenu);

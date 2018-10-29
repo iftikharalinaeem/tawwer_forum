@@ -9,7 +9,7 @@ import Translate from "@library/components/translation/Translate";
 import ProfileLink from "@library/components/ProfileLink";
 import DateTime from "@library/components/DateTime";
 import { Link } from "react-router-dom";
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 interface IProps {
     updateUser: IUserFragment;

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {
@@ -23,12 +23,14 @@ interface IArticleDefaultedData {
     slug: string; // The path to the article from an import used to support redirects. This is not editable within the UI, but should be accessable via API in case we decide to make it an advanced option.
     sort: number; // The manual sort order of the article.
     status: ArticleStatus;
+    body: string; // Content of the article. Defaults to an empty string.
+    name: string; // Name of the article. Defaults to an empty string.
+    format: string; // Format of the content. Defaults to the site's configured default format.
+    locale: string; // Defaults to the current locale.
 }
 
 interface IArticleServerManagedData {
     articleID: number;
-    articleRevisionID: number;
-    articleRevision: IArticleRevisionFragment;
     insertUserID: number;
     updateUserID: number;
     insertUser?: IUserFragment;
@@ -38,7 +40,6 @@ interface IArticleServerManagedData {
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
-    categoryAncestorIDs?: number[]; // The tree of parent category IDs as a flay array.;
 }
 
 // The record
@@ -70,5 +71,5 @@ export interface IArticleFragment {
     dateUpdated: string;
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
-    excerpt: string;
+    excerpt: string; // Excerpt of the article's content.
 }

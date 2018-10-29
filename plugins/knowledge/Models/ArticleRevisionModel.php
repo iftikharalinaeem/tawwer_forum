@@ -6,7 +6,6 @@
 
 namespace Vanilla\Knowledge\Models;
 
-use DateTimeImmutable;
 use Gdn_Session;
 
 /**
@@ -34,5 +33,29 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
         $userProcessor->setInsertFields(["insertUserID"])
             ->setUpdateFields([]);
         $this->addPipelineProcessor($userProcessor);
+    }
+
+    /**
+     * Update the published revision on an article.
+     *
+     * @param int $articleRevisionID
+     * @throws \Exception If a general database error is encountered while updating the rows.
+     * @throws \Garden\Schema\ValidationException If row field updates fail validating against the schema.
+     * @throws \Vanilla\Exception\Database\NoResultsException If the revision's article could not be found.
+     */
+    public function publish(int $articleRevisionID) {
+        $row = $this->selectSingle(["articleRevisionID" => $articleRevisionID]);
+        $articleID = $row["articleID"];
+
+        // Remove the "published" flag from the currently-published revision.
+        $this->update(
+            ["status" => null],
+            ["articleID" => $articleID, "status" => "published"]
+        );
+        // Publish this revision.
+        $this->update(
+            ["status" => "published"],
+            ["articleRevisionID" => $articleRevisionID]
+        );
     }
 }

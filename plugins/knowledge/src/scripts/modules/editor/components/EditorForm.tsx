@@ -8,7 +8,7 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IArticleRevision, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IArticleRevision, IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -24,7 +24,7 @@ interface IProps {
     device: Devices;
     backUrl: string | null;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
-    revision: ILoadable<IArticleRevision | undefined>;
+    article: ILoadable<IArticle>;
     currentCategory: IKbCategoryFragment | null;
     className?: string;
     isSubmitLoading: boolean;
@@ -44,9 +44,9 @@ export class EditorForm extends React.Component<IProps, IState> {
 
     public constructor(props: IProps) {
         super(props);
-        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
+        if (this.props.article.status === LoadStatus.SUCCESS && this.props.article.data) {
             this.state = {
-                name: this.props.revision.data.name,
+                name: this.props.article.data.name,
                 body: [],
             };
         } else {
@@ -58,8 +58,10 @@ export class EditorForm extends React.Component<IProps, IState> {
     }
 
     public componentDidMount() {
-        if (this.props.revision.status === LoadStatus.SUCCESS && this.props.revision.data) {
-            this.editorRef.current!.setEditorContent(JSON.parse(this.props.revision.data.body));
+        if (this.props.article.status === LoadStatus.SUCCESS && this.props.article.data) {
+            if (this.props.article.data.body) {
+                this.editorRef.current!.setEditorContent(JSON.parse(this.props.article.data.body));
+            }
         }
     }
 
@@ -89,13 +91,13 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     key={categoryID === null ? undefined : categoryID}
                                 />
                                 <div className="sr-only">
-                                    <DocumentTitle title={this.state.name} />
+                                    <DocumentTitle title={this.state.name || "Untitled"} />
                                 </div>
                                 <input
                                     className="richEditorForm-title inputBlock-inputText inputText isGiant"
                                     type="text"
                                     placeholder={t("Title")}
-                                    value={this.state.name}
+                                    value={this.state.name || ""}
                                     onChange={this.titleChangeHandler}
                                     disabled={this.isLoading}
                                 />
@@ -116,7 +118,7 @@ export class EditorForm extends React.Component<IProps, IState> {
     }
 
     private get isLoading(): boolean {
-        return this.props.revision.status === LoadStatus.LOADING;
+        return this.props.article.status === LoadStatus.LOADING;
     }
 
     /**
@@ -129,7 +131,7 @@ export class EditorForm extends React.Component<IProps, IState> {
         const minTitleLength = 1;
         const minBodyLength = 1;
 
-        const title = this.state.name;
+        const title = this.state.name || "";
         const body = this.editorRef.current.getEditorText().trim();
 
         return title.length >= minTitleLength && body.length >= minBodyLength && this.props.currentCategory !== null;
