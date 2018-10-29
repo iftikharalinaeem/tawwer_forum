@@ -11,10 +11,14 @@ $radioButtonsAsTabs-horizontalPadding: $utility-baseUnit;
 $radioButtonsAsTabs-borderRadius: $global-borderRadius;
 $radioButtonsAsTabs-borderWidth: $formElement-borderWidth;
 $radioButtonsAsTabs-borderColor: $formElement-borderColor;
+
 $radioButtonsAsTabs_active_borderColor: mix($global-color_bg, $global-color_primary, 50%);
 $radioButtonsAsTabs_bg: $global-color_bg;
+$radioButtonsAsTabs_bg_hover: mix($global-color_bg, $global-color_primary, 10%);
+$radioButtonsAsTabs_fg_hover: $global-color_bg;
+
 $radioButtonsAsTabs_fg: $global-color_fg;
-$radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
+$radioButtonsAsTabs_selected_bg: mix($global-color_fg, $global-color_bg, 10%);
 
 .radioButtonsAsTabs {
     display: block;
@@ -26,6 +30,22 @@ $radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+}
+
+.radioButtonsAsTabs-input {
+
+    &:focus {
+        + .radioButtonsAsTabs-label {
+            border-color: $radioButtonsAsTabs_active_borderColor;
+        }
+    }
+
+    &:hover {
+        + .radioButtonsAsTabs-label {
+            background-color: $radioButtonsAsTabs_bg_hover;
+            color: $radioButtonsAsTabs_fg_hover;
+        }
+    }
 }
 
 .radioButtonsAsTabs-tab {
@@ -70,7 +90,15 @@ $radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
 
     &:checked {
         & + .radioButtonsAsTabs-label {
-            background-color: $radioButtonsAsTabs_active_bg;
+            background-color: $radioButtonsAsTabs_selected_bg;
+        }
+
+        & + .radioButtonsAsTabs-label {
+            &:hover,
+            &:focus {
+                background-color: $radioButtonsAsTabs_bg_hover;
+                color: $radioButtonsAsTabs_fg_hover;
+            }
         }
     }
 }

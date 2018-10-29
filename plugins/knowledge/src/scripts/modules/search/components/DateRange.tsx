@@ -6,16 +6,18 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock, { InputTextBlockBaseClass } from "@dashboard/components/forms/InputTextBlock";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { help } from "@library/components/Icons";
 import { ISearchWithin, dateWithin } from "../state/dateWithin";
+import classNames from "classnames";
 
 interface IProps {
     within: ISearchWithin;
     setWithin: (within: ISearchWithin) => void;
     of: string;
     setOf: (of: string) => void;
+    className?: string;
 }
 
 interface IState {
@@ -65,21 +67,24 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
             </React.Fragment>
         );
         return (
-            <div className="dateRange">
-                <SelectOne
-                    label={t("Date Within")}
-                    className="dateRange-within dateRange-column"
-                    options={dateWithin}
-                    setData={this.setWithin}
-                />
-                <InputTextBlock
-                    className="dateRange-of dateRange-column"
-                    label={ofLabel}
-                    labelClassName="dateRangeOfLabel"
-                    onChange={this.setOf}
-                    value={this.props.of}
-                    noteAfterInput={this.state.showHelp ? ofLabelMessage : undefined}
-                />
+            <div className={classNames("dateRange", this.props.className)}>
+                <div className="dateRange-row">
+                    <SelectOne
+                        label={t("Date Within")}
+                        className="dateRange-within dateRange-column"
+                        options={dateWithin}
+                        setData={this.setWithin}
+                    />
+                    <InputTextBlock
+                        className="dateRange-of dateRange-column"
+                        baseClass={InputTextBlockBaseClass.CUSTOM}
+                        label={ofLabel}
+                        labelClassName="dateRangeOfLabel"
+                        onChange={this.setOf}
+                        value={this.props.of}
+                        noteAfterInput={this.state.showHelp ? ofLabelMessage : undefined}
+                    />
+                </div>
             </div>
         );
     }

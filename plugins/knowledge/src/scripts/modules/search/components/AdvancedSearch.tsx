@@ -19,6 +19,7 @@ import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTa
 import { ISearchWithin } from "@knowledge/modules/search/state/dateWithin";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
+import Button from "@library/components/forms/Button";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -117,6 +118,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                 {<InputTextBlock label={t("Title")} onChange={this.handleTitleChange} value={this.props.title} />}
                 <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor} />
                 <DateRange
+                    className="inputBlock"
                     within={this.props.within}
                     of={this.props.of}
                     setOf={this.props.setOf}
@@ -126,7 +128,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     dummyKnowledgeBaseList.length > 0 && (
                         <SelectOne
                             label={t("Knowledge Base")}
-                            className="dateRange-within dateRange-column"
+                            className="inputBlock dateRange-within"
                             options={dummyKnowledgeBaseList}
                             setData={this.setWithin}
                         />
@@ -135,8 +137,11 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     label={t("Deleted Articles")}
                     onChange={this.handleCheckBoxDeletedArticleChange}
                     checked={this.props.deletedArticles}
+                    className="inputBlock"
                 />
-                <ButtonSubmit>{t("Search")}</ButtonSubmit>
+                <Button type="submit" className="advancedSearch-submit" prefix="submitButton">
+                    {t("Search")}
+                </Button>
             </form>
         );
     }
