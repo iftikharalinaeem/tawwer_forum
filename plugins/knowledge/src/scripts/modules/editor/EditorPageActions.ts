@@ -8,12 +8,11 @@ import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 import {
     IPostArticleResponseBody,
     IPostArticleRequestBody,
-    IGetArticleRevisionResponseBody,
-    IGetArticleRevisionRequestBody,
     IGetArticleResponseBody,
-    IArticle,
     IPatchArticleRequestBody,
     IPatchArticleResponseBody,
+    IGetArticleRevisionsResponseBody,
+    IGetArticleRevisionsRequestBody,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import pathToRegexp from "path-to-regexp";
@@ -21,6 +20,7 @@ import * as route from "./route";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
+import ArticleActions from "../article/ArticleActions";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -98,8 +98,8 @@ export default class EditorPageActions extends ReduxActions {
         EditorPageActions.GET_REVISION_RESPONSE,
         EditorPageActions.GET_REVISION_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IGetArticleRevisionResponseBody,
-        {} as IGetArticleRevisionRequestBody,
+        {} as IGetArticleRevisionsResponseBody,
+        {} as IGetArticleRevisionsRequestBody,
     );
 
     /**
@@ -115,7 +115,7 @@ export default class EditorPageActions extends ReduxActions {
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
 
     /** Article page actions instance. */
-    private articlePageActions: ArticlePageActions = new ArticlePageActions(this.dispatch, this.api);
+    private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
 
     /** Location picker page actions instance. */
     private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
@@ -143,7 +143,7 @@ export default class EditorPageActions extends ReduxActions {
             }
 
             // Redirect
-            const replacementUrl = route.makeEditUrl(article.articleID);
+            const replacementUrl = route.makeEditUrl(article);
             const newLocation = {
                 ...history.location,
                 pathname: replacementUrl,
@@ -181,7 +181,7 @@ export default class EditorPageActions extends ReduxActions {
         }
 
         const { articleID } = article;
-        const newArticle = await this.articlePageActions.getArticleByID(articleID);
+        const newArticle = await this.articleActions.fetchByID({ articleID });
         // Our API request failed.
         if (!newArticle) {
             return;
@@ -224,7 +224,7 @@ export default class EditorPageActions extends ReduxActions {
      * @param revisionID
      */
     private getRevisionByID(revisionID: number) {
-        return this.dispatchApi<IGetArticleRevisionResponseBody>(
+        return this.dispatchApi<IGetArticleRevisionsResponseBody>(
             "get",
             `/article-revisions/${revisionID}`,
             EditorPageActions.getRevisionACs,

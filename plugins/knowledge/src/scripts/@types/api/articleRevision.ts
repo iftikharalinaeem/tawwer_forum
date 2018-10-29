@@ -15,53 +15,46 @@ export enum Format {
     RICH = "rich",
 }
 
-export interface IArticleRevisionFragment {
+export interface IRevisionFragment {
     articleRevisionID: number;
     articleID: number;
-    status: string;
+    status: "published" | null;
     name: string;
-    format: Format;
-    bodyRendered: string;
     locale: string;
     insertUser: IUserFragment;
     dateInserted: string;
 }
 
-interface IArticleRevisionRequiredData {
+interface IRevisionRequiredData {
     articleID: number;
     name: string; // The title of the article
     body: string; // The content of the article.
     format: Format; // The format of the article.
 }
 
-interface IArticleRevisionDefaultedData {
+interface IRevisionDefaultedData {
     locale: string; // The locale the article was written in
     status: string; // Revision status (e.g. "published")
 }
 
-interface IArticleRevisionServerManagedData {
+interface IRevisionServerManagedData {
     articleRevisionID: number;
     insertUserID: number;
     insertUser?: IUserFragment;
     dateInserted: string;
-    bodyRendered: string;
 }
 
 // The record
-export interface IArticleRevision
-    extends IArticleRevisionRequiredData,
-        IArticleRevisionDefaultedData,
-        IArticleRevisionServerManagedData {}
+export interface IRevision extends IRevisionRequiredData, IRevisionDefaultedData, IRevisionServerManagedData {}
 
-// Request/Response interfaces
-export interface IPostArticleRevisionRequestBody
-    extends IArticleRevisionRequiredData,
-        Partial<IArticleRevisionDefaultedData> {}
-
-export interface IPostArticleRevisionResponseBody extends IArticleRevision {}
-
-export interface IGetArticleRevisionRequestBody {
-    id: number;
+export interface IGetArticleRevisionsRequestBody {
+    articleID: number;
 }
 
-export interface IGetArticleRevisionResponseBody extends IArticleRevision {}
+export type IGetArticleRevisionsResponseBody = IRevisionFragment[];
+
+export interface IGetRevisionRequestBody {
+    revisionID: number;
+}
+
+export interface IGetRevisionResponseBody extends IRevision {}

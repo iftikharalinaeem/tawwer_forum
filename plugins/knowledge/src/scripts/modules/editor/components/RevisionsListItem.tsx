@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Heading from "@library/components/Heading";
-import { IArticleRevisionFragment } from "@knowledge/@types/api";
+import { IRevisionFragment } from "@knowledge/@types/api";
 import { Link } from "react-router-dom";
 import DateTime from "@library/components/DateTime";
 import classNames from "classnames";
@@ -19,20 +18,25 @@ import {
     revisionStatus_deleted,
 } from "@library/components/Icons";
 
-export interface IArticleRevisionWithUrl extends IArticleRevisionFragment {
+interface IProps extends IRevisionFragment {
     url: string;
+    isSelected: boolean;
 }
 
 /**
  * Implements the Article Revision Item Component
  */
-export default class RevisionsListItem extends React.Component<IArticleRevisionWithUrl> {
+export default class RevisionsListItem extends React.Component<IProps> {
     public render() {
-        const { name, status, dateInserted, url } = this.props;
+        const { name, status, dateInserted, url, isSelected } = this.props;
         const { photoUrl } = this.props.insertUser;
         return (
             <li className="revisionsList-item">
-                <Link to={url} className="revisionsList-link panelList-link" tabIndex={-1}>
+                <Link
+                    to={url}
+                    className={classNames("revisionsList-link", "panelList-link", { isSelected })}
+                    tabIndex={-1}
+                >
                     <div className="revisionsList-photoFrame">
                         <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
                     </div>
@@ -42,9 +46,11 @@ export default class RevisionsListItem extends React.Component<IArticleRevisionW
                             <DateTime timestamp={dateInserted} className="metaStyle" />
                         </div>
                     </div>
-                    <div className={classNames("revisionsList-status", `status-${status.toLowerCase()}`)}>
-                        {this.icon(status)}
-                    </div>
+                    {status && (
+                        <div className={classNames("revisionsList-status", `status-${status.toLowerCase()}`)}>
+                            {this.icon(status)}
+                        </div>
+                    )}
                 </Link>
             </li>
         );

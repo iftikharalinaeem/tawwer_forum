@@ -5,7 +5,6 @@
  */
 
 import { IUserFragment } from "@dashboard/@types/api";
-import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -55,6 +54,10 @@ export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBod
 export interface IPostArticleResponseBody extends IArticle {}
 
 export interface IPatchArticleResponseBody extends IArticle {}
+
+export interface IGetArticleRequestBody {
+    articleID: number;
+}
 
 export interface IGetArticleResponseBody extends IArticle {}
 

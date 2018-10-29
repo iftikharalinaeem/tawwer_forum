@@ -14,12 +14,7 @@ import EditorForm from "@knowledge/modules/editor/components/EditorForm";
 import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import {
-    IPostArticleRevisionRequestBody,
-    Format,
-    IKbCategoryFragment,
-    IPatchArticleRequestBody,
-} from "@knowledge/@types/api";
+import { Format, IKbCategoryFragment, IPatchArticleRequestBody } from "@knowledge/@types/api";
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
@@ -55,14 +50,10 @@ export class EditorPage extends React.Component<IProps, IState> {
         this.id = uniqueIDFromPrefix("editorPage");
     }
 
-    get titleID() {
-        return this.id + "-title";
-    }
-
     public render() {
         const pageContent = (
             <EditorForm
-                backUrl={this.backLink}
+                backUrl=""
                 key={this.props.pageState.article.status}
                 article={this.props.pageState.article}
                 submitHandler={this.formSubmit}
@@ -72,15 +63,11 @@ export class EditorPage extends React.Component<IProps, IState> {
             />
         );
 
-        if (this.isModal) {
-            return (
-                <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
-                    {pageContent}
-                </Modal>
-            );
-        } else {
-            return pageContent;
-        }
+        return (
+            <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+                {pageContent}
+            </Modal>
+        );
     }
 
     /**
@@ -130,7 +117,7 @@ export class EditorPage extends React.Component<IProps, IState> {
         const { pageState, history, actions, locationCategory } = this.props;
         const { article } = pageState;
 
-        if (article.status === LoadStatus.SUCCESS) {
+        if (article.status === LoadStatus.SUCCESS && article.data) {
             const articleRequest: IPatchArticleRequestBody = {
                 articleID: article.data.articleID,
                 name: title,
@@ -145,24 +132,15 @@ export class EditorPage extends React.Component<IProps, IState> {
         }
     };
 
-    /**
-     * Whether or not the we are navigated inside of a router.
-     */
-    private get isModal(): boolean {
-        const { location } = this.props;
-        return !!(location && location.state && location.state.modal);
-    }
-
-    private get backLink(): string | null {
-        const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
+    private get titleID() {
+        return this.id + "-title";
     }
 
     /**
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        if (this.backLink) {
+        if (this.props.history.length > 1) {
             this.props.history.goBack();
         } else {
             this.props.history.push("/kb");

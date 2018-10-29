@@ -8,17 +8,16 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IArticleRevision, IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PanelLayout from "@knowledge/layouts/PanelLayout";
 import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { getRequiredID } from "@library/componentIDs";
 
 interface IProps {
     device: Devices;
@@ -73,7 +72,6 @@ export class EditorForm extends React.Component<IProps, IState> {
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
-                    backUrl={this.props.backUrl}
                     device={this.props.device}
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.isSubmitLoading}

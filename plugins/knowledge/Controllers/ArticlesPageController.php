@@ -132,7 +132,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @param int $id URI article id.
      * @return string Returns HTML page content
      */
-    public function get_revisions(int $id): string {
+    public function get_revisions(int $id, $revisionID = null): string {
         $this->action = self::ACTION_REVISIONS;
         $this->articleId = $id;
         if (!$this->session->isValid()) {

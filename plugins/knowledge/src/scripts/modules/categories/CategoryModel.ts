@@ -13,6 +13,7 @@ import {
 } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {
@@ -116,7 +117,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectKbCategoryBreadcrumb(state: IStoreState, categoryID: number): IKbCategoryFragment[] {
+    public static selectKbCategoryBreadcrumb(state: IStoreState, categoryID: number): ICrumb[] {
         const crumbs: IKbCategoryFragment[] = [];
         let complete = false;
         let lookupID = categoryID;

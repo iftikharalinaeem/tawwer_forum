@@ -8,8 +8,8 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, Format } from "@knowledge/@types/api";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import { IArticle } from "@knowledge/@types/api";
+import ArticleActions from "../article/ArticleActions";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
@@ -32,7 +32,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
     public reducer = (
         state = this.initialState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticlePageActions.ACTION_TYPES,
+        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IEditorPageState => {
         return produce(state, draft => {
             switch (action.type) {
@@ -62,7 +62,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     break;
 
                 // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
-                case ArticlePageActions.GET_ARTICLE_RESPONSE:
+                case ArticleActions.GET_ARTICLE_RESPONSE:
                     draft.submit.status = LoadStatus.SUCCESS;
                     break;
                 case EditorPageActions.RESET:

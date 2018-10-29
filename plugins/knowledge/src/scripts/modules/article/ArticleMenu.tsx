@@ -14,7 +14,7 @@ import {
     DropDownItemMetas,
     DropDownItemSeparator,
 } from "@library/components/dropdown";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { makeEditUrl, makeRevisionsUrl } from "@knowledge/modules/editor/route";
 import { ModalConfirm } from "@library/components/modal";
 import { connect } from "react-redux";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
@@ -45,7 +45,8 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { article } = this.props;
-        const editUrl = makeEditUrl(article.articleID);
+        const editUrl = makeEditUrl(article);
+        const revisionUrl = makeRevisionsUrl(article);
 
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
@@ -74,7 +75,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
                     <DropDownItemLink name={t("Edit article")} to={editUrl} isModalLink={true} />
                     <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Revision History")} onClick={this.dummyClick} />
+                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} isModalLink={true} />
                     <DropDownItemSeparator />
                     {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>

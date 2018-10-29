@@ -8,9 +8,11 @@
 import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { IArticlePageState } from "@knowledge/modules/article/ArticlePageReducer";
+import { IArticlePageState } from "@knowledge/modules/article/ArticlePageModel";
 import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
+import { IArticleState } from "@knowledge/modules/article/ArticleModel";
+import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
 
 type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
@@ -20,8 +22,10 @@ type RecursivePartial<T> = {
 
 export interface IStoreState {
     knowledge: {
+        articles: IArticleState;
         articleMenu: IArticleMenuState;
         articlePage: IArticlePageState;
+        revisionsPage: IRevisionsPageState;
         editorPage: IEditorPageState;
         categories: IKbCategoriesState;
         categoriesPage: ICategoriesPageState;

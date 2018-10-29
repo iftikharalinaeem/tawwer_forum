@@ -5,9 +5,11 @@
  */
 
 import { formatUrl } from "@library/application";
+import { IArticleFragment, IRevisionFragment, IArticle, IRevision } from "@knowledge/@types/api";
 
 // Route constants
 export const EDIT_ROUTE = "/kb/articles/:id(\\d+)/editor";
+export const REVISIONS_ROUTE = "/kb/articles/:id(\\d+)/revisions/:revisionID(\\d+)?";
 export const ADD_ROUTE = "/kb/articles/add";
 
 /**
@@ -15,6 +17,25 @@ export const ADD_ROUTE = "/kb/articles/add";
  *
  * @param articleID - The articleID.
  */
-export function makeEditUrl(articleID: string | number) {
-    return formatUrl(`/kb/articles/${articleID}/editor`);
+export function makeEditUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
+    if ("articleRevisionID" in articleOrRevison) {
+        return formatUrl(
+            `/kb/articles/${articleOrRevison.articleID}/editor/?revisionID=${articleOrRevison.articleRevisionID}`,
+        );
+    } else {
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/editor`);
+    }
+}
+
+/**
+ * Get the route for editing a particular article ID.
+ *
+ * @param articleID - The articleID.
+ */
+export function makeRevisionsUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
+    if ("articleRevisionID" in articleOrRevison) {
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`);
+    } else {
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions`);
+    }
 }

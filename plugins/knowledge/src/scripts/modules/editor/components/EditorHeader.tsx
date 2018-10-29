@@ -8,20 +8,18 @@ import React from "react";
 import { t } from "@library/application";
 import { PanelArea } from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import SelectBox from "@library/components/SelectBox";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import EditorMenu from "./EditorMenu";
 import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
     device: Devices;
-    backUrl: string | null;
     canSubmit: boolean;
     isSubmitLoading: boolean;
     selectedKey?: string;
@@ -37,12 +35,7 @@ export default class EditorHeader extends React.Component<IProps> {
         callToAction: t("Publish"),
     };
 
-    private localeTitleID;
-
-    public constructor(props) {
-        super(props);
-        this.localeTitleID = getRequiredID(props, "editorHeader");
-    }
+    private localeTitleID = uniqueIDFromPrefix("editorHeader");
 
     public render() {
         let foundIndex = false;
@@ -67,16 +60,14 @@ export default class EditorHeader extends React.Component<IProps> {
                     <PanelArea>
                         <PanelWidget>
                             <ul className="editorHeader-items">
-                                {this.props.backUrl && (
-                                    <li className="editorHeader-item isPullLeft">
-                                        <BackLink
-                                            title={t("Cancel")}
-                                            url={this.props.backUrl}
-                                            visibleLabel={true}
-                                            className="editorHeader-backLink"
-                                        />
-                                    </li>
-                                )}
+                                <li className="editorHeader-item isPullLeft">
+                                    <BackLink
+                                        url="/kb"
+                                        title={t("Cancel")}
+                                        visibleLabel={true}
+                                        className="editorHeader-backLink"
+                                    />
+                                </li>
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"

@@ -22,15 +22,13 @@ import categoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
+import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 
-interface IProps extends IDeviceProps, IArticleActionsProps {
+interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
         id: number;
     }>;
-    article: ILoadable<IArticle>;
-    restoreStatus: LoadStatus;
     articlePageActions: ArticlePageActions;
-    breadcrumbData: ICrumb[];
 }
 
 interface IState {
@@ -45,20 +43,20 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render() {
-        const { article, breadcrumbData } = this.props;
+        const { loadable } = this.props;
         const { id } = this.props.match.params;
 
-        if (id === null || (article.status === LoadStatus.ERROR && article.error.status === 404)) {
+        if (id === null || (loadable.status === LoadStatus.ERROR && loadable.error!.status === 404)) {
             return <NotFoundPage type="Page" />;
         }
 
         return (
-            <PageLoader {...article}>
-                {article.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle title={article.data.seoName || article.data.name}>
+            <PageLoader {...loadable}>
+                {loadable.data && (
+                    <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
                         <ArticleLayout
-                            article={article.data}
-                            breadcrumbData={breadcrumbData!}
+                            article={loadable.data.article}
+                            breadcrumbData={loadable.data.breadcrumbs}
                             messages={this.renderMessages()}
                         />
                     </DocumentTitle>
@@ -71,8 +69,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        const { article } = this.props;
-        if (article.status !== LoadStatus.SUCCESS) {
+        const { loadable } = this.props;
+        if (loadable.status !== LoadStatus.SUCCESS) {
             this.initializeFromUrl();
         }
     }
@@ -94,11 +92,11 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     private renderMessages(): React.ReactNode {
-        const { article } = this.props;
+        const { loadable } = this.props;
         let messages: React.ReactNode;
 
-        if (article.status === LoadStatus.SUCCESS) {
-            if (article.data.status === ArticleStatus.DELETED) {
+        if (loadable.data) {
+            if (loadable.data.article.status === ArticleStatus.DELETED) {
                 messages = (
                     <ArticleDeletedMessage
                         onRestoreClick={this.handleRestoreClick}
@@ -112,8 +110,11 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     private handleRestoreClick = async () => {
-        const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.data!.articleID, status: ArticleStatus.PUBLISHED });
+        const { articleActions, loadable } = this.props;
+        await articleActions.patchStatus({
+            articleID: loadable.data!.article.articleID,
+            status: ArticleStatus.PUBLISHED,
+        });
     };
 
     /**
@@ -127,32 +128,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
             return;
         }
 
-        void articlePageActions.getArticleByID(id);
+        void articlePageActions.init(id);
     }
-}
-
-/**
- * Map in the state from the redux store.
- */
-function mapStateToProps(state: IStoreState) {
-    let breadcrumbData: ICrumb[] | null = null;
-    const { article, restoreStatus } = state.knowledge.articlePage;
-
-    if (article.status === LoadStatus.SUCCESS && article.data.knowledgeCategoryID !== null) {
-        const categories = categoryModel.selectKbCategoryBreadcrumb(state, article.data.knowledgeCategoryID);
-        breadcrumbData = categories.map(category => {
-            return {
-                name: category.name,
-                url: category.url,
-            };
-        });
-    }
-
-    return {
-        article,
-        breadcrumbData,
-        restoreStatus,
-    };
 }
 
 /**
@@ -166,7 +143,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const withRedux = connect(
-    mapStateToProps,
+    ArticlePageModel.getInjectableState,
     mapDispatchToProps,
 );
 

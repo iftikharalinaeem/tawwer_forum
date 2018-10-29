@@ -8,12 +8,18 @@ import React from "react";
 import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import { ModalLoader } from "@library/components/modal";
-import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
+import { ADD_ROUTE, EDIT_ROUTE, REVISIONS_ROUTE } from "@knowledge/modules/editor/route";
 
 /** A loadable version of the Editor Page */
 const ModalEditorPage = Loadable({
     loading: ModalLoader,
     loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage"),
+});
+
+/** A loadable version of the article revisions page. */
+const ModalRevisionsPage = Loadable({
+    loading: ModalLoader,
+    loader: () => import(/* webpackChunkName: "pages/kb/revisions" */ "@knowledge/modules/editor/RevisionsPage"),
 });
 
 /**
@@ -25,7 +31,8 @@ const ModalEditorPage = Loadable({
  */
 export function getModalRoutes(): JSX.Element[] {
     return [
-        <Route exact path={ADD_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
-        <Route exact path={EDIT_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
+        // <Route exact path={ADD_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
+        // <Route exact path={EDIT_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
+        // <Route exact path={REVISIONS_ROUTE} component={ModalRevisionsPage} key={REVISIONS_ROUTE} />,
     ];
 }

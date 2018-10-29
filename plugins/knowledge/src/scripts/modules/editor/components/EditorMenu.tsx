@@ -10,7 +10,7 @@ import { t } from "@library/application";
 import { InlineTypes } from "@library/components/translation/Sentence";
 import { DropDownItemButton, DropDownItemMetas, DropDownItemSeparator } from "@library/components/dropdown";
 import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 export interface IProps {
     buttonClassName?: string;
@@ -20,12 +20,7 @@ export interface IProps {
  * Generates drop down menu for Article page
  */
 export default class EditorMenu extends React.PureComponent<IProps> {
-    private id;
-
-    public constructor(props) {
-        super(props);
-        this.id = getRequiredID(props, "siteNav");
-    }
+    private id = uniqueIDFromPrefix("siteNav");
 
     public render() {
         // Hard coded data/functions
