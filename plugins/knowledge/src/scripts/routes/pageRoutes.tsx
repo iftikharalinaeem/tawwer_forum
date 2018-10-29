@@ -9,6 +9,8 @@ import { Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
 import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
+import ErrorPage from "@knowledge/routes/ErrorPage";
+import { LoadStatus } from "@library/@types/api";
 
 export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 export const ARTICLE_REVISIONS_ROUTE = "/kb/articles/:id(\\d+)/revisions";
@@ -45,6 +47,10 @@ const CategoriesPage = Loadable({
     loader: () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
 });
 
+const NotFound = () => {
+    return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
+};
+
 /**
  * Get the data for routes that can render in a modal.
  *
@@ -62,5 +68,6 @@ export function getPageRoutes() {
         <Route exact path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
         <Route exact path={ADD_ROUTE} component={EditorPage} key={"editorPage"} />,
         <Route exact path={EDIT_ROUTE} component={EditorPage} key={"editorPage"} />,
+        <Route component={NotFound} key={"not found"} />,
     ];
 }

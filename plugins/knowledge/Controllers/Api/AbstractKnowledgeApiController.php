@@ -18,10 +18,6 @@ abstract class AbstractKnowledgeApiController extends \AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have access to edit the article.
      */
     protected function editPermission(int $insertUserID) {
-        if ($insertUserID === $this->getSession()->UserID) {
-            $this->permission("knowledge.articles.add");
-        } else {
-            $this->permission("knowledge.articles.manage");
-        }
+        $this->permission("knowledge.articles.add");
     }
 }

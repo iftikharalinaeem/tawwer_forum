@@ -1,0 +1,20 @@
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$errorPage-spacer: $global-gutter_size * 2;
+
+.errorPage {
+    margin-top: $errorPage-spacer;
+    text-align: center;
+}
+
+.errorPage-cta {
+    margin-top: $errorPage-spacer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+

@@ -7,7 +7,7 @@
 import React from "react";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 interface IProps {
     updateUser: IUserFragment;
