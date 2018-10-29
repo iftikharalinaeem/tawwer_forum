@@ -67,16 +67,11 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         return produce(state, draft => {
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                    try {
-                        const { articlesByID } = draft;
-                        let articleToUpdate = articlesByID[action.payload.data.articleID];
-                        if (articleToUpdate) {
-                            articleToUpdate.status = action.payload.data.status;
-                        }
-                    } catch (e) {
-                        console.error(e);
+                    const { articlesByID } = draft;
+                    const articleToUpdate = articlesByID[action.payload.data.articleID];
+                    if (articleToUpdate) {
+                        articleToUpdate.status = action.payload.data.status;
                     }
-
                     break;
                 case ArticleActions.GET_ARTICLE_RESPONSE: {
                     const { articleID } = action.payload.data;

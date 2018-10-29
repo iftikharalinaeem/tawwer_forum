@@ -16,7 +16,6 @@ import { formatUrl, t } from "@library/application";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import DocumentTitle from "@library/components/DocumentTitle";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import UsersActions from "@library/users/UsersActions";
 import { connect } from "react-redux";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
@@ -36,7 +35,7 @@ export const DefaultErrors: { [key: string]: ILoadable<any> } = {
 export class ErrorPage extends React.Component<IProps> {
     public render() {
         const { loadable, currentUser } = this.props;
-        if (loadable.status !== LoadStatus.ERROR) {
+        if (loadable.status !== LoadStatus.ERROR || !loadable.error) {
             return null;
         }
 
@@ -48,7 +47,11 @@ export class ErrorPage extends React.Component<IProps> {
             case 401:
                 title = t("No Permission");
                 message = t("You don't have permission to view this resource.");
-                if (currentUser.status === LoadStatus.SUCCESS && currentUser.data.userID === UsersModel.GUEST_ID) {
+                if (
+                    currentUser.status === LoadStatus.SUCCESS &&
+                    currentUser.data &&
+                    currentUser.data.userID === UsersModel.GUEST_ID
+                ) {
                     showSignIn = true;
                 }
                 break;

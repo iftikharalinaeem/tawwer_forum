@@ -7,9 +7,10 @@
 import * as React from "react";
 import { t } from "@library/application";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IProps {
-    locationData: IKbCategoryFragment[];
+    locationData: ICrumb[];
     asString: boolean;
 }
 
@@ -22,7 +23,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
      *
      * @param breadcrumbData - The category data to render.
      */
-    public static renderString(breadcrumbData: IKbCategoryFragment[]): string {
+    public static renderString(breadcrumbData: ICrumb[]): string {
         if (breadcrumbData.length === 0) {
             return t("Set Page Location");
         }
@@ -53,7 +54,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         const crumbCount = locationData.length - 1;
         const crumbs = locationData.map((crumb, index) => {
             const lastElement = index === crumbCount;
-            const crumbSeparator = ` › `;
+            const crumbSeparator = `›`;
             return (
                 <React.Fragment key={`locationBreadcrumb-${index}`}>
                     <span className="locationBreadcrumb-link">{crumb.name}</span>

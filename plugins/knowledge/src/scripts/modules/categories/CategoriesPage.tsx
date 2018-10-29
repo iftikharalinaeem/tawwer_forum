@@ -43,6 +43,7 @@ export class CategoriesPage extends React.Component<IProps> {
         const noCategoryID = id === null;
         const categoryNotFound =
             categoriesPageState.articles.status === LoadStatus.ERROR &&
+            !!categoriesPageState.articles.error &&
             categoriesPageState.articles.error.status === 404;
         if (noCategoryID || categoryNotFound) {
             return <NotFoundPage type="Page" />;
@@ -50,15 +51,16 @@ export class CategoriesPage extends React.Component<IProps> {
 
         return (
             <PageLoader {...categoriesPageState.articles}>
-                {categoriesPageState.articles.status === LoadStatus.SUCCESS && (
-                    <DocumentTitle title={category.name}>
-                        <CategoriesLayout
-                            articles={categoriesPageState.articles.data}
-                            breadcrumbData={breadcrumbData}
-                            category={category}
-                        />
-                    </DocumentTitle>
-                )}
+                {categoriesPageState.articles.status === LoadStatus.SUCCESS &&
+                    categoriesPageState.articles.data && (
+                        <DocumentTitle title={category.name}>
+                            <CategoriesLayout
+                                articles={categoriesPageState.articles.data}
+                                breadcrumbData={breadcrumbData}
+                                category={category}
+                            />
+                        </DocumentTitle>
+                    )}
             </PageLoader>
         );
     }

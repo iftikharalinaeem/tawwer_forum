@@ -170,7 +170,7 @@ export default class EditorPageActions extends ReduxActions {
         const response = await this.getEditableArticleByID(articleID);
 
         if (response && response.data) {
-            await this.locationPickerActions.initLocationPickerFromArticle(response.data);
+            this.locationPickerActions.initLocationPickerFromArticle(response.data);
         }
     }
 

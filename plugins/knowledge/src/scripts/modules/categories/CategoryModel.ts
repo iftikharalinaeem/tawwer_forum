@@ -108,8 +108,6 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
                 this.selectMixedRecordTree(state, id, maxDepth - 1),
             );
         }
-
-        console.log("tree", category);
         return category;
     }
 

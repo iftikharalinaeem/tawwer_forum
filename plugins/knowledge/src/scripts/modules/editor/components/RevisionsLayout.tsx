@@ -6,22 +6,11 @@
 
 import * as React from "react";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { IRevisionFragment, IRevision } from "@knowledge/@types/api";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import Modal from "@library/components/modal/Modal";
-import ModalSizes from "@library/components/modal/ModalSizes";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { t } from "@library/application";
-import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
-import RevisionsListItem from "./RevisionsListItem";
-import { LoadStatus } from "@library/@types/api";
-import { makeRevisionsUrl, makeEditUrl } from "../route";
-import UserContent from "@library/components/UserContent";
-import { IInjectableRevisionsState } from "../RevisionsPageModel";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import { RouteComponentProps, withRouter } from "react-router";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
