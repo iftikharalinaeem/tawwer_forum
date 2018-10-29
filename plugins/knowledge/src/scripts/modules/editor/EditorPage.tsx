@@ -11,26 +11,23 @@ import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/components/EditorForm";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
-import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { Format, IKbCategoryFragment, IPatchArticleRequestBody } from "@knowledge/@types/api";
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import { Format, IPatchArticleRequestBody } from "@knowledge/@types/api";
+import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
+import qs from "qs";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: number;
+            id?: string;
         }> {}
 
-interface IProps extends IOwnProps {
-    pageState: IEditorPageState;
+interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
-    locationCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -41,16 +38,11 @@ interface IState {
  * Page for editing an article.
  */
 export class EditorPage extends React.Component<IProps, IState> {
-    private id;
+    private id = uniqueIDFromPrefix("editorPage");
 
     public state = {
         showFolderPicker: false,
     };
-
-    public constructor(props: IProps) {
-        super(props);
-        this.id = uniqueIDFromPrefix("editorPage");
-    }
 
     public render() {
         return (
@@ -60,9 +52,10 @@ export class EditorPage extends React.Component<IProps, IState> {
                     fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
                 >
                     <EditorForm
-                        backUrl=""
-                        key={this.props.pageState.article.status}
-                        article={this.props.pageState.article}
+                        key={this.props.article.status}
+                        content={
+                            this.props.revision.status !== LoadStatus.PENDING ? this.props.revision : this.props.article
+                        }
                         submitHandler={this.formSubmit}
                         currentCategory={this.props.locationCategory}
                         isSubmitLoading={this.isSubmitLoading}
@@ -79,12 +72,20 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        const { pageState, match, actions, history } = this.props;
-        if (pageState.article.status === LoadStatus.PENDING) {
+        const { article, match, actions, history } = this.props;
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
                 void actions.createArticleForEdit(history);
             } else {
-                void actions.fetchArticleForEdit(match.params.id);
+                const articleID = parseInt(match.params.id, 10);
+                if (queryParams.revisionID) {
+                    const revisionID = parseInt(queryParams.revisionID, 10);
+                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
+                } else {
+                    void actions.fetchArticleForEdit(articleID);
+                }
             }
         }
     }
@@ -109,7 +110,7 @@ export class EditorPage extends React.Component<IProps, IState> {
     }
 
     private get isSubmitLoading(): boolean {
-        const { submit } = this.props.pageState;
+        const { submit } = this.props;
         return submit.status === LoadStatus.LOADING;
     }
 
@@ -117,8 +118,7 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history, actions, locationCategory } = this.props;
-        const { article } = pageState;
+        const { article, history, actions, locationCategory } = this.props;
 
         if (article.status === LoadStatus.SUCCESS && article.data) {
             const articleRequest: IPatchArticleRequestBody = {
@@ -152,22 +152,6 @@ export class EditorPage extends React.Component<IProps, IState> {
 }
 
 /**
- * Map in the state from the redux store.
- */
-function mapStateToProps(state: IStoreState) {
-    let locationCategory: IKbCategoryFragment | null = null;
-    const { editorPage, locationPicker } = state.knowledge;
-    if (editorPage.article.status === LoadStatus.SUCCESS) {
-        locationCategory = categoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
-    }
-
-    return {
-        pageState: editorPage,
-        locationCategory,
-    };
-}
-
-/**
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
@@ -177,7 +161,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const withRedux = connect(
-    mapStateToProps,
+    EditorPageModel.getInjectableProps,
     mapDispatchToProps,
 );
 

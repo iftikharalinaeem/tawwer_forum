@@ -25,6 +25,7 @@ interface IProps {
     selectedKey?: string;
     className?: string;
     callToAction?: string;
+    optionsMenu?: React.ReactNode;
 }
 
 /**
@@ -91,9 +92,9 @@ export default class EditorHeader extends React.Component<IProps> {
                                         {processedChildren}
                                     </SelectBox>
                                 </li>
-                                <li className="editorHeader-item">
-                                    <EditorMenu buttonClassName="editorHeader-menu" />
-                                </li>
+                                {this.props.optionsMenu && (
+                                    <li className="editorHeader-item">{this.props.optionsMenu}</li>
+                                )}
                             </ul>
                         </PanelWidget>
                     </PanelArea>

@@ -13,11 +13,10 @@ import {
     IPatchArticleResponseBody,
     IGetArticleRevisionsResponseBody,
     IGetArticleRevisionsRequestBody,
+    IGetRevisionResponseBody,
 } from "@knowledge/@types/api";
 import { History } from "history";
-import pathToRegexp from "path-to-regexp";
 import * as route from "./route";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
@@ -43,6 +42,7 @@ export default class EditorPageActions extends ReduxActions {
 
     // Frontend only actions
     public static readonly RESET = "@@articleEditor/RESET";
+    public static readonly SET_ACTIVE_REVISION = "@@articleEditor/SET_ACTIVE_REVISION";
 
     /**
      * Union of all possible action types in this class.
@@ -52,6 +52,7 @@ export default class EditorPageActions extends ReduxActions {
         | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ActionsUnion<typeof EditorPageActions.patchArticleACs>
+        | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
     /**
@@ -109,6 +110,10 @@ export default class EditorPageActions extends ReduxActions {
         return EditorPageActions.createAction(EditorPageActions.RESET);
     }
 
+    private static createSetRevision(revisionID: number) {
+        return EditorPageActions.createAction(EditorPageActions.SET_ACTIVE_REVISION, { revisionID });
+    }
+
     /**
      * Reset the page state.
      */
@@ -158,6 +163,7 @@ export default class EditorPageActions extends ReduxActions {
      * Fetch an existing article for editing.
      *
      * @param articleID - The ID of the article to fetch.
+     * @param revision - Start from a particular revision.
      */
     public async fetchArticleForEdit(articleID: number) {
         // We don't have an article, but we have ID for one. Go get it.
@@ -166,6 +172,22 @@ export default class EditorPageActions extends ReduxActions {
         if (response && response.data) {
             await this.locationPickerActions.initLocationPickerFromArticle(response.data);
         }
+    }
+
+    /**
+     * Fetch an existing an article and revision for editing.
+     *
+     * Useful for restoring a revision.
+     *
+     * @param articleID - The ID of the article to fetch.
+     * @param revision - Start from a particular revision.
+     */
+    public async fetchArticleAndRevisionForEdit(articleID: number, revisionID: number) {
+        this.dispatch(EditorPageActions.createSetRevision(revisionID));
+        return Promise.all([
+            this.fetchArticleForEdit(articleID),
+            this.articleActions.fetchRevisionByID({ revisionID }),
+        ]);
     }
 
     /**
@@ -215,20 +237,6 @@ export default class EditorPageActions extends ReduxActions {
             `/articles/${articleID}`,
             EditorPageActions.patchArticleACs,
             rest,
-        );
-    }
-
-    /**
-     * Get an existing revision by its ID.
-     *
-     * @param revisionID
-     */
-    private getRevisionByID(revisionID: number) {
-        return this.dispatchApi<IGetArticleRevisionsResponseBody>(
-            "get",
-            `/article-revisions/${revisionID}`,
-            EditorPageActions.getRevisionACs,
-            {},
         );
     }
 

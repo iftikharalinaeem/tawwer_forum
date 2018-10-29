@@ -16,6 +16,13 @@ import { t } from "@library/application";
 import RevisionsPageModel, { IInjectableRevisionsState } from "./RevisionsPageModel";
 import RevisionsPageActions, { IInjectableRevisionsPageActions } from "./RevisionsPageActions";
 import { Modal, ModalSizes } from "@library/components/modal";
+import { LoadStatus } from "@library/@types/api";
+import PageTitle from "../common/PageTitle";
+import { ArticleMeta } from "../article/components/ArticleMeta";
+import RevisionsList from "./components/RevisionsList";
+import RevisionsListItem from "./components/RevisionsListItem";
+import { makeRevisionsUrl, makeEditUrl } from "./route";
+import UserContent from "@library/components/UserContent";
 
 interface IProps
     extends IDeviceProps,
@@ -42,14 +49,60 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink} label={t("Article Revisions")}>
                 <PageLoader status={this.props.revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
-                        <RevisionsLayout
-                            selectedRevision={this.props.selectedRevision}
-                            revisions={this.props.revisions}
-                            selectedRevisionID={this.props.selectedRevisionID}
-                        />
+                        <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+                            <RevisionsLayout
+                                bodyHeading={this.renderTitle()}
+                                bodyContent={
+                                    this.props.selectedRevision.data && (
+                                        <UserContent content={this.props.selectedRevision.data.bodyRendered} />
+                                    )
+                                }
+                                revisionList={this.renderList()}
+                                canSubmit={this.canSubmit}
+                            />
+                        </form>
                     </DocumentTitle>
                 </PageLoader>
             </Modal>
+        );
+    }
+
+    private renderTitle(): React.ReactNode {
+        const { selectedRevision } = this.props;
+        return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
+            <PageTitle
+                title={selectedRevision.data.name}
+                backUrl={null}
+                meta={
+                    <ArticleMeta
+                        updateUser={selectedRevision.data.insertUser!}
+                        dateUpdated={selectedRevision.data.dateInserted}
+                        permaLink={makeRevisionsUrl(selectedRevision.data)}
+                    />
+                }
+            />
+        ) : null;
+    }
+
+    private renderList(): React.ReactNode {
+        const { revisions, selectedRevisionID } = this.props;
+        return (
+            revisions.status === LoadStatus.SUCCESS &&
+            revisions.data && (
+                <RevisionsList>
+                    {revisions.data
+                        .slice()
+                        .reverse()
+                        .map(item => (
+                            <RevisionsListItem
+                                {...item}
+                                isSelected={item.articleRevisionID === selectedRevisionID}
+                                url={makeRevisionsUrl(item)}
+                                key={item.articleRevisionID}
+                            />
+                        ))}
+                </RevisionsList>
+            )
         );
     }
 
@@ -79,6 +132,25 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public componentWillUnmount() {
         // this.props.revisionsPageActions.();
+    }
+
+    /**
+     * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
+     */
+    private onSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        if (this.canSubmit) {
+            this.props.history.push(makeEditUrl(this.props.selectedRevision.data!));
+        }
+    };
+
+    private get canSubmit(): boolean {
+        const { selectedRevision } = this.props;
+        return (
+            selectedRevision.status === LoadStatus.SUCCESS &&
+            !!selectedRevision.data &&
+            selectedRevision.data.status !== "published"
+        );
     }
 
     /**

@@ -20,7 +20,7 @@ export const ADD_ROUTE = "/kb/articles/add";
 export function makeEditUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
     if ("articleRevisionID" in articleOrRevison) {
         return formatUrl(
-            `/kb/articles/${articleOrRevison.articleID}/editor/?revisionID=${articleOrRevison.articleRevisionID}`,
+            `/kb/articles/${articleOrRevison.articleID}/editor?revisionID=${articleOrRevison.articleRevisionID}`,
         );
     } else {
         return formatUrl(`/kb/articles/${articleOrRevison.articleID}/editor`);

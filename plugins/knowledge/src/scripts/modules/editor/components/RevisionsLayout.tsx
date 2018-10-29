@@ -22,92 +22,46 @@ import UserContent from "@library/components/UserContent";
 import { IInjectableRevisionsState } from "../RevisionsPageModel";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import { Redirect, RouteComponentProps, withRouter } from "react-router";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
+import { RouteComponentProps, withRouter } from "react-router";
 
-interface IProps extends IDeviceProps, IInjectableRevisionsState, RouteComponentProps<{}> {}
-
-interface IState {
-    wasSubmitted: boolean;
+interface IProps extends IDeviceProps, RouteComponentProps<{}> {
+    bodyHeading: React.ReactNode;
+    bodyContent: React.ReactNode;
+    revisionList: React.ReactNode;
+    canSubmit: boolean;
 }
 
 /**
  * Implements the article's layout
  */
-export class ArticleRevisionsLayout extends React.Component<IProps, IState> {
-    public state: IState = {
-        wasSubmitted: false,
-    };
-
+export class ArticleRevisionsLayout extends React.Component<IProps> {
     public render() {
-        const { device, revisions, selectedRevisionID, selectedRevision } = this.props;
-
-        if (this.state.wasSubmitted) {
-            return <Redirect to={makeEditUrl(selectedRevision.data!)} />;
-        }
-
+        const { device } = this.props;
         const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return (
-            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+            <>
                 <EditorHeader
                     device={this.props.device}
-                    canSubmit={selectedRevision.status === LoadStatus.SUCCESS}
+                    canSubmit={this.props.canSubmit}
                     isSubmitLoading={false}
                     className="richEditorRevisionsForm-header"
                     callToAction={t("Restore")}
                 />
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout device={this.props.device} forceRenderLeftTop={isFullWidth}>
-                        <PanelLayout.MiddleTop>
-                            {selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
-                                <>
-                                    <PageTitle title={selectedRevision.data.name} />
-                                    <ArticleMeta
-                                        updateUser={selectedRevision.data.insertUser!}
-                                        dateUpdated={selectedRevision.data.dateInserted}
-                                        permaLink={makeRevisionsUrl(selectedRevision.data)}
-                                    />
-                                </>
-                            ) : null}
-                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleTop>{this.props.bodyHeading}</PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
-                            {this.props.selectedRevision.data && (
-                                <PanelWidget>
-                                    <UserContent content={this.props.selectedRevision.data.body} />
-                                </PanelWidget>
-                            )}
+                            <PanelWidget>{this.props.bodyContent}</PanelWidget>
                         </PanelLayout.MiddleBottom>
                         <PanelLayout.RightTop>
-                            <PanelWidget className="isSelfPadded">
-                                {revisions.status === LoadStatus.SUCCESS &&
-                                    revisions.data && (
-                                        <RevisionsList>
-                                            {revisions.data.reverse().map(item => (
-                                                <RevisionsListItem
-                                                    {...item}
-                                                    isSelected={item.articleRevisionID === selectedRevisionID}
-                                                    url={makeRevisionsUrl(item)}
-                                                    key={item.articleRevisionID}
-                                                />
-                                            ))}
-                                        </RevisionsList>
-                                    )}
-                            </PanelWidget>
+                            <PanelWidget className="isSelfPadded">{this.props.revisionList}</PanelWidget>
                         </PanelLayout.RightTop>
                     </PanelLayout>
                 </Container>
-            </form>
+            </>
         );
     }
-
-    /**
-     * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
-     */
-    private onSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        this.props.history.push(makeEditUrl(this.props.selectedRevision.data!));
-    };
 }
 
 export default withRouter(withDevice<IProps>(ArticleRevisionsLayout));

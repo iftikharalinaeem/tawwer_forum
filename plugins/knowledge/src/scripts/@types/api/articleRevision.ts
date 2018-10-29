@@ -41,6 +41,7 @@ interface IRevisionServerManagedData {
     articleRevisionID: number;
     insertUserID: number;
     insertUser?: IUserFragment;
+    bodyRendered: string;
     dateInserted: string;
 }
 

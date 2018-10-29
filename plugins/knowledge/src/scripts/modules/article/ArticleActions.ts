@@ -144,7 +144,9 @@ export default class ArticleActions extends ReduxActions {
         return this.dispatch((c, getState) => {
             const existingRevision = ArticleModel.selectRevision(getState(), options.revisionID);
             if (existingRevision) {
-                return this.dispatch(ArticleActions.getRevisionACs.response({ data: existingRevision, status: 200 }));
+                return this.dispatch(
+                    ArticleActions.getRevisionACs.response({ data: existingRevision, status: 200 }, options),
+                );
             } else {
                 return this.dispatchApi<IGetRevisionResponseBody>(
                     "get",
