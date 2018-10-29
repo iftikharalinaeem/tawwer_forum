@@ -8,8 +8,6 @@ import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
-import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/radioButtonsAsTabs";
-import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Tokens from "@library/components/forms/select/Tokens";
 import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
@@ -18,6 +16,8 @@ import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { dummyDateWithin } from "@knowledge/modules/search/state/dummyDateWithin";
 import DateRange from "@knowledge/modules/search/components/DateRange";
+import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
+import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -105,12 +105,15 @@ export default class AdvancedSearch extends React.Component<IProps> {
         return (
             <form className="advancedSearch" onSubmit={doNothing}>
                 <Heading>{t("AdvancedSearch")}</Heading>
-                {/*<RadioButtonsAsTabs*/}
-                {/*selectedTab={this.props.domain || ISearchDomain.ARTICLES}*/}
-                {/*accessibleTitle={t("Search in:")}*/}
-                {/*prefix="advancedSearchDomain"*/}
-                {/*setData={this.props.setDomain}*/}
-                {/*/>*/}
+                <RadioButtonsAsTabs
+                    accessibleTitle={t("Search in:")}
+                    prefix="advancedSearchDomain"
+                    setData={this.props.setDomain}
+                    defaultTab={ISearchDomain.ARTICLES}
+                >
+                    <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
+                    <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
+                </RadioButtonsAsTabs>
                 {<InputTextBlock label={t("Title")} onChange={this.setTitle} value={this.props.title} />}
                 <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor} />
                 <DateRange
