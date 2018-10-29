@@ -187,7 +187,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @return array Transformed tree array
      */
     private function createTree(array $list, array $parent): array {
-        $tree = array();
+        $tree = [];
         foreach ($parent as $k => $l) {
             if (isset($list[$l['knowledgeCategoryID']]) && $l['recordType'] === self::RECORD_TYPE_CATEGORY) {
                 $l['children'] = $this->createTree($list, $list[$l['knowledgeCategoryID']]);
