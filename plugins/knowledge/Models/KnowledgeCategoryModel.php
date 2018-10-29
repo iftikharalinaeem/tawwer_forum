@@ -68,48 +68,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Get child categories in a section, starting at a specific category.
-     *
-     * @param int $knowledgeCategoryID
-     * @param bool $recursive
-     * @param bool $flat Tree mode: true => flat, false => tree
-     * @return array
-     */
-    public function sectionChildren(int $knowledgeCategoryID, bool $recursive = true, bool $flat = false): array {
-        $result = $this->get(["parentID" => $knowledgeCategoryID]);
-        foreach ($result as &$row) {
-            if ($recursive === false || $row["isSection"]) {
-                $row["children"] = [];
-                continue;
-            }
-            $row["children"] = $this->sectionChildren($row["knowledgeCategoryID"]);
-        }
-        if ($flat) {
-            $result = $this->treeToFlat($result);
-        }
-        return $result;
-    }
-
-    /**
-     * Convert array form Tree to Flat mode.
-     *
-     * @param array $tree
-     * @return array
-     */
-    public function treeToFlat(array $tree): array {
-        $result = [];
-        foreach ($tree as $item) {
-            $children = $item['children'] ?? [];
-            if (array_key_exists('children', $item)) {
-                unset($item['children']);
-            }
-            $result[] = $item;
-            $result = array_merge($result, $this->treeToFlat($children));
-        }
-        return $result;
-    }
-
-    /**
      * Get the full knowledge category tree containing the target category.
      *
      * @param int $knowledgeCategoryID
