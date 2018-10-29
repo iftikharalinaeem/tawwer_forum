@@ -116,7 +116,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        this.initializeFromUrl();
+        void this.initializeFromUrl();
     }
 
     /**
@@ -126,7 +126,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         const { params } = this.props.match;
         const prevParams = prevProps.match.params;
         if (params.id !== prevParams.id) {
-            this.initializeFromUrl();
+            void this.initializeFromUrl();
         } else if (params.revisionID !== prevParams.revisionID) {
             const revisionID = params.revisionID !== undefined ? parseInt(params.revisionID, 10) : undefined;
             this.props.revisionsPageActions.setActiveRevision(revisionID);
