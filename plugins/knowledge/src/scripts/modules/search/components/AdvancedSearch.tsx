@@ -17,6 +17,7 @@ import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { dummyDateWithin } from "@knowledge/modules/search/state/dummyDateWithin";
+import DateRange from "@knowledge/modules/search/components/DateRange";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -111,8 +112,15 @@ export default class AdvancedSearch extends React.Component<IProps> {
                 {/*setData={this.props.setDomain}*/}
                 {/*/>*/}
                 {<InputTextBlock label={t("Title")} onChange={this.setTitle} value={this.props.title} />}
-                {/*<Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor}/>*/}
-                {/*<DateRange label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor}/>*/}
+                <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor} />
+                <DateRange
+                    within={this.props.within}
+                    of={this.props.of}
+                    setOf={this.props.setOf}
+                    setWithin={this.props.setWithin}
+                    options={dummyAuthors}
+                    setAuthor={this.setAuthor}
+                />
                 <Checkbox
                     label={t("Deleted Articles")}
                     onChange={this.handleCheckBoxDeletedArticleChange}

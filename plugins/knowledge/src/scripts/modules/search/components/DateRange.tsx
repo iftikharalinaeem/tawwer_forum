@@ -5,25 +5,12 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
-import Heading from "@library/components/Heading";
-import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/radioButtonsAsTabs";
-import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
-import Tokens from "@library/components/forms/select/Tokens";
-import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
-import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
-import Checkbox from "@library/components/forms/Checkbox";
-import {ISearchWithin} from "./AdvancedSearch";
-import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
-import Select from "react-select";
-import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
-import menu from "@library/components/forms/select/overwrites/menu";
-import menuList from "@library/components/forms/select/overwrites/menuList";
-import SelectOption from "@library/components/forms/select/overwrites/SelectOption";
-import {dummyDateWithin} from "../state/dummyDateWithin";
+import { ISearchWithin } from "./AdvancedSearch";
+import { dummyDateWithin } from "../state/dummyDateWithin";
 import SelectOne from "@library/components/forms/select/SelectOne";
+import { help } from "@library/components/Icons";
 
 interface IProps {
     within: ISearchWithin;
@@ -32,23 +19,69 @@ interface IProps {
     setOf: (of: string) => void;
 }
 
+interface IState {
+    showHelp: boolean;
+}
+
 /**
  * Implements the DateRange component
  */
-export default class DateRange extends React.PureComponent<IProps> {
+export default class DateRange extends React.PureComponent<IProps, IState> {
+    public constructor(props) {
+        super(props);
+        this.state = {
+            showHelp: false,
+        };
+    }
+
     /**
      * Change handler for date within
      */
     private setWithin = (newValue: any) => {
-        this.props.setWithin(newValue.data.within);
+        this.props.setWithin(newValue);
+    };
+
+    /**
+     * Change handler for of
+     */
+    private setOf = (newValue: any) => {
+        this.props.setWithin(newValue);
+    };
+
+    private showHelp = () => {
+        this.setState({
+            showHelp: true,
+        });
     };
 
     public render() {
+        const ofLabelMessage = t("Examples: Monday, today, last week, Mar 26, 3/26/04");
+        const ofLabel = (
+            <React.Fragment>
+                <span className="dateRangeOfLabel-label">{t("Of")}</span>
+                <span className="dateRangeOfLabel-help" title={ofLabelMessage} onClick={this.showHelp}>
+                    {help()}
+                    <span className="sr-only">{ofLabelMessage}</span>
+                </span>
+            </React.Fragment>
+        );
         return (
-            <div className="">
-                <SelectOne label={t("Date Within")} className="" setOption={this.setWithin} options={dummyDateWithin} />
-                <InputTextBlock label={t("Of")} onChange={this.handleWithinChange} value={this.props.title} />}
-            of
+            <div className="dateRange">
+                {/*<SelectOne*/}
+                {/*label={t("Date Within")}*/}
+                {/*className="dateRange-within dateRange-column"*/}
+                {/*setOption={this.setWithin}*/}
+                {/*options={dummyDateWithin}*/}
+                {/*/>*/}
+                <InputTextBlock
+                    className="dateRange-of dateRange-column"
+                    label={ofLabel}
+                    labelClassName="dateRangeOfLabel"
+                    onChange={this.setOf}
+                    value={this.props.of}
+                    inputHelp={this.state.showHelp ? ofLabelMessage : undefined}
+                />
+            </div>
         );
     }
 }

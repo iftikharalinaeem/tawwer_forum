@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import {t} from "@library/application";
-import {ISearchWithin} from "../components/AdvancedSearch";
+import { t } from "@library/application";
+import { ISearchWithin } from "../components/AdvancedSearch";
 
 export const dummyDateWithin = [
     {
@@ -57,5 +57,4 @@ export const dummyDateWithin = [
             within: ISearchWithin.ONE_YEAR,
         },
     },
-
 ];
