@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
@@ -17,12 +17,12 @@ import RevisionsPageModel, { IInjectableRevisionsState } from "./RevisionsPageMo
 import RevisionsPageActions, { IInjectableRevisionsPageActions } from "./RevisionsPageActions";
 import { Modal, ModalSizes } from "@library/components/modal";
 import { LoadStatus } from "@library/@types/api";
-import PageTitle from "../common/PageTitle";
-import { ArticleMeta } from "../article/components/ArticleMeta";
-import RevisionsList from "./components/RevisionsList";
-import RevisionsListItem from "./components/RevisionsListItem";
-import { makeRevisionsUrl, makeEditUrl } from "./route";
 import UserContent from "@library/components/UserContent";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import { makeRevisionsUrl, makeEditUrl } from "@knowledge/modules/editor/route";
+import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
+import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 
 interface IProps
     extends IDeviceProps,
@@ -46,7 +46,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         return (
-            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink} label={t("Article Revisions")}>
+            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.props.history.goBack} label={t("Article Revisions")}>
                 <PageLoader status={this.props.revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
@@ -67,6 +67,9 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Render the active revisions title and metadata.
+     */
     private renderTitle(): React.ReactNode {
         const { selectedRevision } = this.props;
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
@@ -84,6 +87,9 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         ) : null;
     }
 
+    /**
+     * Render the list of revisions.
+     */
     private renderList(): React.ReactNode {
         const { revisions, selectedRevisionID } = this.props;
         return (
@@ -131,7 +137,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * When the component unmounts we need to be sure to clear out the data we requested in componentDidMount.
      */
     public componentWillUnmount() {
-        // this.props.revisionsPageActions.();
+        this.props.revisionsPageActions.reset();
     }
 
     /**
@@ -144,6 +150,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Determine whether or not we can submit the form or not.
+     *
+     * Loading or already published revisions cannot be submitted.
+     */
     private get canSubmit(): boolean {
         const { selectedRevision } = this.props;
         return (
@@ -156,21 +167,15 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     /**
      * Initialize the page's data from it's url.
      */
-    private initializeFromUrl() {
+    private async initializeFromUrl() {
         const { revisionsPageActions } = this.props;
         const { id, revisionID } = this.props.match.params;
 
         const numID = parseInt(id, 10);
         const numRevID = revisionID !== undefined ? parseInt(revisionID, 10) : undefined;
-        void revisionsPageActions.init(numID, numRevID);
+        await revisionsPageActions.setActiveArticle(numID);
+        await revisionsPageActions.setActiveRevision(numRevID);
     }
-
-    /**
-     * Route back to the previous location if its available.
-     */
-    private navigateToBacklink = () => {
-        this.props.history.goBack();
-    };
 }
 
 const withRedux = connect(

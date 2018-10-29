@@ -12,8 +12,8 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import { IStoreState } from "@knowledge/state/model";
-import ArticleModel from "./ArticleModel";
-import CategoryModel from "../categories/CategoryModel";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface IArticlePageState {
     articleID: number | null;
@@ -36,8 +36,7 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
     public static getInjectableState(state: IStoreState): IInjectableArticlePageState {
         const { articleID, articleLoadable, restoreStatus } = state.knowledge.articlePage;
 
-        const hasArticle = articleLoadable.status === LoadStatus.SUCCESS && articleID;
-        if (hasArticle) {
+        if (articleLoadable.status === LoadStatus.SUCCESS && articleID !== null) {
             const article = ArticleModel.selectArticle(state, articleID)!;
             const breadcrumbs = CategoryModel.selectKbCategoryBreadcrumb(state, article.knowledgeCategoryID || 1);
 

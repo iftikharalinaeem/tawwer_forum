@@ -8,11 +8,10 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api";
-import { number } from "prop-types";
-import RevisionsPageActions from "./RevisionsPageActions";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
-import ArticleModel from "../article/ArticleModel";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 
 export interface IRevisionsPageState {
     articleID: number | null;
@@ -32,6 +31,11 @@ export interface IInjectableRevisionsState {
  * Reducer for the article page.
  */
 export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageState> {
+    /**
+     * Select the latest revision from the currently loaded revisions.
+     *
+     * @param state A full state object.
+     */
     public static selectLatestRevision(state: IStoreState): IRevisionFragment | null {
         const revs = this.selectRevisions(state);
         if (revs.length === 0) {
@@ -41,11 +45,21 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         }
     }
 
+    /**
+     * Select all revisions currently loaded.
+     *
+     * @param state A full state object.
+     */
     public static selectRevisions(state: IStoreState): IRevisionFragment[] {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionIDs.map(id => ArticleModel.selectRevisionFragment(state, id)!);
     }
 
+    /**
+     * Get props for injecting into react.
+     *
+     * @param state A full state object.
+     */
     public static getInjectableProps(state: IStoreState): IInjectableRevisionsState {
         const stateSlice = RevisionsPageModel.stateSlice(state);
         const { selectedRevisionID, selectedRevisionStatus, revisionsStatus } = stateSlice;
@@ -56,12 +70,18 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
             },
             selectedRevision: {
                 ...selectedRevisionStatus,
-                data: ArticleModel.selectRevision(state, selectedRevisionID)!,
+                data: selectedRevisionID ? ArticleModel.selectRevision(state, selectedRevisionID)! : null,
             },
             selectedRevisionID,
         };
     }
 
+    /**
+     * Get the slice of state that this model works with.
+     *
+     * @param state A full state instance.
+     * @throws An error if the state wasn't initialized properly.
+     */
     private static stateSlice(state: IStoreState): IRevisionsPageState {
         if (!state.knowledge || !state.knowledge.revisionsPage) {
             throw new Error(
@@ -84,6 +104,9 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         },
     };
 
+    /**
+     * Reducer implementation for the revisions page resources.
+     */
     public reducer = (
         state: IRevisionsPageState = this.initialState,
         action: typeof ArticleActions.ACTION_TYPES | typeof RevisionsPageActions.ACTION_TYPES,
@@ -100,6 +123,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
                     return this.initialState;
             }
 
+            // Handle some revision actions if they pertain to our own revision.
             if (action.meta && action.meta.revisionID && draft.selectedRevisionID === action.meta.revisionID) {
                 switch (action.type) {
                     case ArticleActions.GET_REVISION_REQUEST:
@@ -115,6 +139,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
                 }
             }
 
+            // Handle some revision actions if they pertain to our own article.
             if (action.meta && action.meta.articleID && draft.articleID === action.meta.articleID) {
                 switch (action.type) {
                     case ArticleActions.GET_ARTICLE_REVISIONS_REQUEST:

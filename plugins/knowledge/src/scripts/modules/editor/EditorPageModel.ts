@@ -32,6 +32,11 @@ export interface IInjectableEditorProps {
  * Reducer for the article page.
  */
 export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
+    /**
+     * Get properties for injection into components.
+     *
+     * @param state A full state tree.
+     */
     public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
         const stateSlice = EditorPageModel.getStateSlice(state);
 
@@ -55,6 +60,12 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         };
     }
 
+    /**
+     * Get the slice of state that this model works with.
+     *
+     * @param state A full state instance.
+     * @throws An error if the state wasn't initialized properly.
+     */
     private static getStateSlice(state: IStoreState): IEditorPageState {
         if (!state.knowledge || !state.knowledge.revisionsPage) {
             throw new Error(
@@ -78,6 +89,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
     };
 
+    /**
+     * Reducer implementation for the editor page.
+     */
     public reducer = (
         state = this.initialState,
         action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,

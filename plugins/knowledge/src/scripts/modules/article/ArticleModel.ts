@@ -26,24 +26,48 @@ export interface IArticleState {
 }
 
 /**
- * Reducer for the article page.
+ * Selectors and reducer for the article resources.
  */
 export default class ArticleModel implements ReduxReducer<IArticleState> {
-    public static selectArticle(state: IStoreState, articleID): IArticle | null {
+    /**
+     * Select an article out of the stored articles.
+     *
+     * @param state A full state instance.
+     * @param articleID The ID of the article to select.
+     */
+    public static selectArticle(state: IStoreState, articleID: number): IArticle | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.articlesByID[articleID] || null;
     }
 
-    public static selectRevision(state: IStoreState, revisionID): IRevision | null {
+    /**
+     * Select a full revision out of the stored revisions.
+     *
+     * @param state A full state instance.
+     * @param revisionID The ID of the revision to select.
+     */
+    public static selectRevision(state: IStoreState, revisionID: number): IRevision | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionsByID[revisionID] || null;
     }
 
-    public static selectRevisionFragment(state: IStoreState, revisionID): IRevisionFragment | null {
+    /**
+     * Select a revision revision fragment out of the stored fragments.
+     *
+     * @param state A full state instance.
+     * @param revisionID The ID of the revision to select.
+     */
+    public static selectRevisionFragment(state: IStoreState, revisionID: number): IRevisionFragment | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionFragmentsByID[revisionID] || null;
     }
 
+    /**
+     * Get the slice of state that this model works with.
+     *
+     * @param state A full state instance.
+     * @throws An error if the state wasn't initialized properly.
+     */
     private static stateSlice(state: IStoreState): IArticleState {
         if (!state.knowledge || !state.knowledge.articles) {
             throw new Error(

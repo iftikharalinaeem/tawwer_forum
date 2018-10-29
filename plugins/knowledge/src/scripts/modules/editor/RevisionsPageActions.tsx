@@ -4,15 +4,18 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import ArticleActions from "../article/ArticleActions";
+import ReduxActions from "@library/state/ReduxActions";
 import apiv2 from "@library/apiv2";
-import RevisionsPageModel from "./RevisionsPageModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 
 export interface IInjectableRevisionsPageActions {
     revisionsPageActions: RevisionsPageActions;
 }
 
+/**
+ * Actions for the revisions page.
+ */
 export default class RevisionsPageActions extends ReduxActions {
     // API actions
     public static readonly SET_ARTICLE = "@@revisionsPage/SET_ARTICLE";
@@ -29,15 +32,23 @@ export default class RevisionsPageActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static ACTION_TYPES:
-        | ReturnType<typeof RevisionsPageActions.createSetArtAction>
-        | ReturnType<typeof RevisionsPageActions.createSetRevAction>
+        | ReturnType<typeof RevisionsPageActions.setArticleAC>
+        | ReturnType<typeof RevisionsPageActions.setRevisionAC>
         | ReturnType<typeof RevisionsPageActions.createResetAction>;
 
-    private static createSetArtAction(articleID: number) {
+    /**
+     * Action creator for setting the current article.
+     */
+    private static setArticleAC(articleID: number) {
         return RevisionsPageActions.createAction(RevisionsPageActions.SET_ARTICLE, { articleID });
     }
 
-    private static createSetRevAction(revisionID: number) {
+    /**
+     * Action creator for setting the current revision.
+     *
+     * @param revisionID
+     */
+    private static setRevisionAC(revisionID: number) {
         return RevisionsPageActions.createAction(RevisionsPageActions.SET_REVISION, { revisionID });
     }
 
@@ -48,37 +59,41 @@ export default class RevisionsPageActions extends ReduxActions {
         return RevisionsPageActions.createAction(RevisionsPageActions.RESET);
     }
 
+    /**
+     * Reset the page state.
+     */
+    public reset = this.bindDispatch(RevisionsPageActions.createResetAction);
+
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
 
-    public init = (articleID: number, revisionID: number | null = null) => {
-        return this.dispatch(async (c, getState) => {
-            this.dispatch(RevisionsPageActions.createSetArtAction(articleID));
+    /**
+     * Initialize the revisions page.
+     *
+     * - Fetch the list of revisions for the current article.
+     * - Initialize the active revision and loads it from either  (explicitly passed or takes the latest revision).
+     */
+    public setActiveArticle = async (articleID: number) => {
+        this.dispatch(RevisionsPageActions.setArticleAC(articleID));
 
-            const revisions = await this.articleActions.fetchRevisionsForArticle({ articleID });
-            if (!revisions || revisions.data.length === 0) {
-                return;
-            }
-
-            const initialRevisionID =
-                revisionID !== null
-                    ? revisionID
-                    : RevisionsPageModel.selectLatestRevision(getState())!.articleRevisionID;
-            this.dispatch(RevisionsPageActions.createSetRevAction(initialRevisionID));
-            void this.articleActions.fetchRevisionByID({ revisionID: initialRevisionID });
-        });
+        void (await this.articleActions.fetchRevisionsForArticle({ articleID }));
     };
 
+    /**
+     * Set the active revision to display.
+     *
+     * @param revisionID
+     */
     public setActiveRevision(revisionID: number | null = null) {
-        return this.dispatch(async (c, getState) => {
+        return this.dispatch((c, getState) => {
             if (revisionID) {
-                this.dispatch(RevisionsPageActions.createSetRevAction(revisionID));
-                void this.articleActions.fetchRevisionByID({ revisionID });
+                this.dispatch(RevisionsPageActions.setRevisionAC(revisionID));
+                return this.articleActions.fetchRevisionByID({ revisionID });
             } else {
                 const rev = RevisionsPageModel.selectLatestRevision(getState());
                 if (rev) {
-                    this.dispatch(RevisionsPageActions.createSetRevAction(rev.articleRevisionID));
-                    void this.articleActions.fetchRevisionByID({ revisionID: rev.articleRevisionID });
+                    this.dispatch(RevisionsPageActions.setRevisionAC(rev.articleRevisionID));
+                    return this.articleActions.fetchRevisionByID({ revisionID: rev.articleRevisionID });
                 }
             }
         });

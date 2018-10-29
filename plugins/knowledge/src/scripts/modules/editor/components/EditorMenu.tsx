@@ -49,6 +49,9 @@ export default class EditorMenu extends React.PureComponent<IProps> {
         );
     }
 
+    /**
+     * HTML ID for the component.
+     */
     private get domID(): string {
         return "articleMenuDropDown-" + this.props.article.articleID;
     }

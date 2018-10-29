@@ -5,8 +5,8 @@
  */
 
 import ReduxActions from "@library/state/ReduxActions";
-import ArticleActions from "./ArticleActions";
-import ArticleModel from "./ArticleModel";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
 /**
  * Actions for the article page.

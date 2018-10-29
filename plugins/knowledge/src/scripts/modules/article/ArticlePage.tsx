@@ -7,7 +7,6 @@
 import React from "react";
 import { match } from "react-router";
 import { connect } from "react-redux";
-import { IStoreState } from "@knowledge/state/model";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { LoadStatus, ILoadable } from "@library/@types/api";
