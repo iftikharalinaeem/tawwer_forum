@@ -42,7 +42,6 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
         return (
             <>
                 <EditorHeader
-                    device={this.props.device}
                     canSubmit={this.props.canSubmit}
                     isSubmitLoading={false}
                     className="richEditorRevisionsForm-header"

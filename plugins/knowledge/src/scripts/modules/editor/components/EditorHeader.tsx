@@ -8,18 +8,17 @@ import React from "react";
 import { t } from "@library/application";
 import { PanelArea } from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { Devices } from "@library/components/DeviceChecker";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import SelectBox from "@library/components/SelectBox";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import EditorMenu from "./EditorMenu";
 import ButtonLoader from "@library/components/ButtonLoader";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
 
-interface IProps {
-    device: Devices;
+interface IProps extends IDeviceProps {
     canSubmit: boolean;
     isSubmitLoading: boolean;
     selectedKey?: string;
@@ -31,8 +30,8 @@ interface IProps {
 /**
  * Implement editor header component
  */
-export default class EditorHeader extends React.Component<IProps> {
-    public static defaultProps = {
+export class EditorHeader extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
     };
 
@@ -103,3 +102,5 @@ export default class EditorHeader extends React.Component<IProps> {
         );
     }
 }
+
+export default withDevice<IProps>(EditorHeader);

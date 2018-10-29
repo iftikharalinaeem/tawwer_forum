@@ -8,7 +8,7 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -28,6 +28,7 @@ type LoadableContent = ILoadable<{
 interface IProps {
     device: Devices;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
+    article: ILoadable<IArticle>;
     content: LoadableContent;
     currentCategory: IKbCategoryFragment | null;
     className?: string;
@@ -74,14 +75,18 @@ export class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
+        const { article } = this.props;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
-                    device={this.props.device}
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.isSubmitLoading}
                     className="richEditorForm-header"
-                    optionsMenu={<EditorMenu buttonClassName="editorHeader-menu" />}
+                    optionsMenu={
+                        article.status === LoadStatus.SUCCESS && article.data ? (
+                            <EditorMenu article={article.data} />
+                        ) : null
+                    }
                 />
                 <Container className="richEditorForm-body">
                     <h1 id={this.props.titleID} className="sr-only">

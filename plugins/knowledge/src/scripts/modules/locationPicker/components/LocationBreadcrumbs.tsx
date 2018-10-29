@@ -53,7 +53,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         const crumbCount = locationData.length - 1;
         const crumbs = locationData.map((crumb, index) => {
             const lastElement = index === crumbCount;
-            const crumbSeparator = `›`;
+            const crumbSeparator = ` › `;
             return (
                 <React.Fragment key={`locationBreadcrumb-${index}`}>
                     <span className="locationBreadcrumb-link">{crumb.name}</span>

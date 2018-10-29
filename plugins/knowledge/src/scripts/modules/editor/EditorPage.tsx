@@ -56,6 +56,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                         content={
                             this.props.revision.status !== LoadStatus.PENDING ? this.props.revision : this.props.article
                         }
+                        article={this.props.article}
                         submitHandler={this.formSubmit}
                         currentCategory={this.props.locationCategory}
                         isSubmitLoading={this.isSubmitLoading}

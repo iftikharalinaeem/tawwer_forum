@@ -10,6 +10,7 @@ import produce from "immer";
 import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 export interface ILocationPickerState {
     navigatedCategoryID: number; // What page the user is on in the picker.
@@ -19,7 +20,7 @@ export interface ILocationPickerState {
 
 export interface ILPConnectedData extends ILocationPickerState {
     pageContents: IKbNavigationItem[];
-    locationBreadcrumb: IKbCategoryFragment[] | null;
+    locationBreadcrumb: ICrumb[] | null;
     navigatedCategory: IKbCategoryFragment | null; // What page the user is on in the picker.
     selectedCategory: IKbCategoryFragment | null; // What category is selected (still not chosen).
     choosenCategory: IKbCategoryFragment | null; // What category is chosen (input closes after a selection)

@@ -47,7 +47,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
             return null;
         }
 
-        const category = state.knowledge.categories.data.categoriesByID[categoryID];
+        const category = state.knowledge.categories.data!.categoriesByID[categoryID];
 
         if (category === undefined) {
             throw new Error(`Category ${categoryID} not found.`);
@@ -98,7 +98,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     public static selectMixedRecordTree(
         state: IStoreState,
         categoryID: number,
-        maxDepth: number = 2,
+        maxDepth: number = 3,
     ): IKbNavigationCategory {
         const category: IKbNavigationCategory =
             categoryID === -1 || categoryID === null ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
@@ -108,6 +108,8 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
                 this.selectMixedRecordTree(state, id, maxDepth - 1),
             );
         }
+
+        console.log("tree", category);
         return category;
     }
 
