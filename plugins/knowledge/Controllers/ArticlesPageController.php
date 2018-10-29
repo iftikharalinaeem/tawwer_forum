@@ -71,11 +71,11 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
             // Put together pre-loaded redux actions.
             $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
-        } catch(NotFoundException $e) {
+        } catch (NotFoundException $e) {
             $status = $e->getCode();
             $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
             $this->setPageTitle(t("Article not found"));
-        } catch(PermissionException $e) {
+        } catch (PermissionException $e) {
             $status = $e->getCode();
             $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
             $this->setPageTitle(t("Permission Denied"));
