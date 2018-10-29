@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 import { IArticleRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IArticleRequiredData {

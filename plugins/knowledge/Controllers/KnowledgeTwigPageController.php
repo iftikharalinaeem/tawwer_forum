@@ -75,6 +75,11 @@ abstract class KnowledgeTwigPageController extends PageController {
         $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
         $categories = $categoriesApi->index();
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($categories)));
+
+        /** @var \UsersApiController $usersApi */
+        $usersApi = $this->container->get(\UsersApiController::class);
+        $me = $usersApi->get_me([]);
+        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me)));
     }
 
     /**

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 import { IArticleFragment } from "@knowledge/@types/api";
 import { MultiTypeRecord } from "@library/@types/api";
 
