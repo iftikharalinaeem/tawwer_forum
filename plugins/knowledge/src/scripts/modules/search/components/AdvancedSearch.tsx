@@ -118,8 +118,6 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     of={this.props.of}
                     setOf={this.props.setOf}
                     setWithin={this.props.setWithin}
-                    options={dummyAuthors}
-                    setAuthor={this.setAuthor}
                 />
                 <Checkbox
                     label={t("Deleted Articles")}
