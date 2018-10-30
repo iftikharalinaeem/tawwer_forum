@@ -374,10 +374,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "sort",
             "name",
             "body",
-            "url",
             "format",
             "locale",
-            "status",
         ])->add($this->fullSchema()), "out");
 
         $article = $this->articleByID($id, true);
