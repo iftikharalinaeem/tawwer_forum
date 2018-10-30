@@ -45,8 +45,11 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { category } = this.props;
+        const { category, device } = this.props;
         const options = this.loadSearchSuggestions();
+        const isMobile = device === Devices.MOBILE;
+        const isTablet = device === Devices.TABLET;
+        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return (
             <Container>
@@ -56,7 +59,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
-                    {<PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
+                    {isFullWidth && <PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
                             <SearchBar
@@ -75,7 +78,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     <PanelLayout.MiddleBottom>
                         <SearchResults results={this.getSearchResults()} />
                     </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>{}</PanelLayout.RightTop>
+                    {isFullWidth && <PanelLayout.RightTop>{}</PanelLayout.RightTop>}
                 </PanelLayout>
             </Container>
         );
@@ -108,11 +111,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     };
 
     private getSearchResults(): IResult[] {
-        const { articles, device } = this.props;
-        const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
-        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
+        const { articles } = this.props;
         return articles
             .map(article => {
                 return {
