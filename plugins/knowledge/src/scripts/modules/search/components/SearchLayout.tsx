@@ -17,7 +17,7 @@ import { t } from "@library/application";
 import AdvancedSearch, { IAdvancedFields, ISearchDomain } from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
-import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { ISearchWithin } from "../state/dateWithin";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
@@ -67,7 +67,7 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                 <PanelLayout device={this.props.device}>
                     {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
-                        <BigSearch
+                        <SearchBar
                             placeholder={this.props.placeholder || t("Help")}
                             options={options}
                             setQuery={this.setQuery}
