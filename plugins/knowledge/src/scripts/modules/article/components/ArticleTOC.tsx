@@ -28,7 +28,12 @@ export default class ArticleTOC extends React.Component<IProps> {
         const contents = this.props.items.map(item => {
             return (
                 <li className="panelList-item tableOfContents-item" key={item.ref}>
-                    <a href={"#" + item.ref} className="tableOfContents-link" title={item.text}>
+                    <a
+                        href={"#" + item.ref}
+                        onClick={this.forceHashChange}
+                        className="tableOfContents-link"
+                        title={item.text}
+                    >
                         {item.text}
                     </a>
                 </li>
@@ -44,4 +49,13 @@ export default class ArticleTOC extends React.Component<IProps> {
             </PanelWidget>
         );
     }
+
+    /**
+     * Force a hash change event to occur.
+     *
+     * This is so that clicking a hash link __always__ results in scrolling to that link.
+     */
+    private forceHashChange = () => {
+        window.dispatchEvent(new Event("hashchange"));
+    };
 }
