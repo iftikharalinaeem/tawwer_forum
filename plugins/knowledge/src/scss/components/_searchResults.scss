@@ -17,7 +17,7 @@ $searchResult-separator_color                 : $global-separator_color;
 $searchResult-separator_width                 : $global-separator_width;
 
 $searchResult_verticalPadding                 : $utility-baseUnit * 3;
-$searchResult_horizontalPadding               : $utility-baseUnit;
+$searchResult_horizontalPadding               : $global-widgetInner_padding;
 
 $searchResult-media_width                     : 115px;
 

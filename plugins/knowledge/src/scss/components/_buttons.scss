@@ -57,14 +57,29 @@ $buttonLoader-thickness: 3px;
 }
 
 .buttonIcon {
+    display: flex;
     align-items: center;
     justify-content: center;
     height: $formElement-height;
     width: $formElement-height;
     min-width: $formElement-height;
     padding: 0;
+    color: $global-color_fg;
+
+    &:visited {
+        color: $global-color_fg;
+    }
+
+    .icon {
+        display: block;
+    }
 
     &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
         color: $global-color_primary;
     }
 }
