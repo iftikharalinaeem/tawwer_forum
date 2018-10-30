@@ -10,7 +10,6 @@ import Heading from "@library/components/Heading";
 import InputTextBlock from "@library/components/forms/InputTextBlock";
 import Tokens from "@library/components/forms/select/Tokens";
 import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
-import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import DateRange from "@knowledge/modules/search/components/DateRange";
@@ -18,8 +17,8 @@ import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButt
 import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 import { ISearchWithin } from "@knowledge/modules/search/state/dateWithin";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Button from "@library/components/forms/Button";
+import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -29,11 +28,12 @@ export enum ISearchDomain {
 export interface IAdvancedFields {
     domain: ISearchDomain;
     title: string;
-    author: any[]; // TBD in next PR
+    author: IComboBoxOption[];
     fileName: string;
     within: ISearchWithin;
     of: string;
     deletedArticles: boolean;
+    kb?: IComboBoxOption;
 }
 
 interface IProps extends IAdvancedFields {
@@ -43,6 +43,7 @@ interface IProps extends IAdvancedFields {
     setFileName: (fileName: string) => void;
     setWithin: (within: ISearchWithin) => void;
     setOf: (of: string) => void;
+    setKnowedge?: (kb: IComboBoxOption) => void;
     setDeletedArticles: (deletedArticles: boolean) => void;
 }
 
@@ -59,38 +60,11 @@ export default class AdvancedSearch extends React.Component<IProps> {
         deletedArticles: false,
     };
 
-    private setDomain = (domain: ISearchDomain) => {
-        this.props.setDomain(domain);
-    };
-
-    private setTitle = (title: string): void => {
-        this.props.setTitle(title);
-    };
-
-    private setAuthor = (author: IComboBoxOption[]): void => {
-        this.props.setAuthor(author);
-    };
-
-    private setFileName = (fileName: string): void => {
-        this.props.setFileName(fileName);
-    };
-
-    private setWithin = (within: ISearchWithin): void => {
-        this.props.setWithin(within);
-    };
-
-    private setOf = (of: string): void => {
-        this.props.setOf(of);
-    };
-    private setDeletedArticles = (deletedArticles: boolean): void => {
-        this.props.setDeletedArticles(deletedArticles);
-    };
-
     /**
      * Handler for the deleted articles checkbox.
      */
     private handleCheckBoxDeletedArticleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setDeletedArticles(event.target.checked || false);
+        this.props.setDeletedArticles(event.target.checked || false);
     };
 
     /**
@@ -98,7 +72,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
      */
     private handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        this.setTitle(value || "");
+        this.props.setTitle(value || "");
     };
 
     public render() {
@@ -116,7 +90,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                     <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
                 </RadioButtonsAsTabs>
                 {<InputTextBlock label={t("Title")} onChange={this.handleTitleChange} value={this.props.title} />}
-                <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.setAuthor} />
+                <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.props.setAuthor} />
                 <DateRange
                     className="inputBlock"
                     within={this.props.within}
@@ -130,7 +104,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
                             label={t("Knowledge Base")}
                             className="inputBlock dateRange-within"
                             options={dummyKnowledgeBaseList}
-                            setData={this.setWithin}
+                            setData={this.props.setKnowedge!}
                         />
                     )}
                 <Checkbox

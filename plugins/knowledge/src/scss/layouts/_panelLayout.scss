@@ -62,6 +62,13 @@ $panelLayout-border_color                                             : rgba($gl
     width: 100%;
 }
 
+.panelLayout-main {
+    .panelArea + .panelArea {
+        margin-top: $global_spacer;
+    }
+}
+
+
 .panelLayout {
     &.isOneCol {
         width: $global-middleColumn_width;

@@ -56,6 +56,15 @@ $radioButtonsAsTabs_selected_bg: mix($global-color_fg, $global-color_bg, 10%);
     + .radioButtonsAsTabs-tab {
         margin-left: -$radioButtonsAsTabs-borderWidth;
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-grow: 0;
+
+        .radioButtonsAsTabs-label {
+            min-height: $formElement_height;
+            line-height: $formElement_height;
+        }
+    }
 }
 
 .radioButtonsAsTabs-label {
@@ -63,10 +72,10 @@ $radioButtonsAsTabs_selected_bg: mix($global-color_fg, $global-color_bg, 10%);
     position: relative;
     cursor: pointer;
     min-height: $radioButtonsAsTabs-height;
+    line-height: $radioButtonsAsTabs-height;
     min-width: $radioButtonsAsTabs-minWidth;
     font-size: $radioButtonsAsTabs-fontSize;
-    line-height: 1;
-    padding: #{$utility-baseUnit - $radioButtonsAsTabs-borderWidth} #{$utility-baseUnit * 2};
+    padding: 0 #{$utility-baseUnit * 2};
     text-align: center;
     user-select: none;
     border: {

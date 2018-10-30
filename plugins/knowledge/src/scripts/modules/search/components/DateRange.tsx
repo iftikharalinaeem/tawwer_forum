@@ -34,21 +34,11 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
         };
     }
 
-    /**
-     * Change handler for date within
-     */
-    private setWithin = (newValue: any) => {
-        this.props.setWithin(newValue);
+    private setOf = e => {
+        this.props.setOf(e.value);
     };
 
-    /**
-     * Change handler for of
-     */
-    private setOf = (newValue: any) => {
-        this.props.setWithin(newValue);
-    };
-
-    private showHelp = () => {
+    private showHelp = e => {
         this.setState({
             showHelp: true,
         });
@@ -72,7 +62,7 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
                         label={t("Date Within")}
                         className="dateRange-within dateRange-column"
                         options={dateWithin}
-                        setData={this.setWithin}
+                        setData={this.props.setWithin}
                     />
                     <InputTextBlock
                         className="dateRange-of dateRange-column"

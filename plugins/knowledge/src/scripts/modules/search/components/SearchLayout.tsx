@@ -20,6 +20,7 @@ import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import BigSearch, { IComboBoxOption } from "@library/components/forms/select/BigSearch";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { ISearchWithin } from "../state/dateWithin";
+import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 
 export interface ISearchState extends IAdvancedFields {
     query?: string;
@@ -52,6 +53,52 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
             deletedArticles: !!this.props.deletedArticles,
             results: this.props.results || [],
         };
+    }
+
+    public render() {
+        const options = this.loadSearchSuggestions();
+        const { device } = this.props;
+        const isMobile = device === Devices.MOBILE;
+        const isTablet = device === Devices.TABLET;
+        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+
+        return (
+            <Container>
+                <PanelLayout device={this.props.device}>
+                    {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
+                    <PanelLayout.MiddleTop>
+                        <BigSearch
+                            placeholder={this.props.placeholder || t("Help")}
+                            options={options}
+                            setQuery={this.setQuery}
+                            query={this.state.query || ""}
+                        />
+                    </PanelLayout.MiddleTop>
+                    <PanelLayout.MiddleBottom>
+                        {<SearchResults results={dummySearchResults} />}
+                    </PanelLayout.MiddleBottom>
+                    <PanelLayout.RightTop>
+                        <AdvancedSearch
+                            domain={this.state.domain}
+                            setDomain={this.setDomain}
+                            title={this.state.title}
+                            setTitle={this.setTitle}
+                            setAuthor={this.setAuthor}
+                            author={this.state.author}
+                            setFileName={this.setFileName}
+                            fileName={this.state.fileName}
+                            setWithin={this.setWithin}
+                            within={this.state.within}
+                            setOf={this.setOf}
+                            of={this.state.of}
+                            setDeletedArticles={this.setDeletedArticles}
+                            deletedArticles={!!this.state.deletedArticles}
+                            setKnowedge={this.setKnowedge}
+                        />
+                    </PanelLayout.RightTop>
+                </PanelLayout>
+            </Container>
+        );
     }
 
     private setQuery = value => {
@@ -101,56 +148,18 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
             of,
         });
     };
+
+    private setKnowedge = (kb: IComboBoxOption) => {
+        this.setState({
+            kb,
+        });
+    };
+
     private setDeletedArticles = (deletedArticles: boolean) => {
         this.setState({
             deletedArticles,
         });
     };
-
-    public render() {
-        const options = this.loadSearchSuggestions();
-        const { device } = this.props;
-        const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
-        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
-
-        return (
-            <Container>
-                <PanelLayout device={this.props.device}>
-                    {isFullWidth && <PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
-                    <PanelLayout.MiddleTop>
-                        <BigSearch
-                            placeholder={this.props.placeholder || t("Help")}
-                            options={options}
-                            setQuery={this.setQuery}
-                            query={this.state.query || ""}
-                        />
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        {<SearchResults results={dummySearchResults} />}
-                    </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <AdvancedSearch
-                            domain={this.state.domain}
-                            setDomain={this.setDomain}
-                            title={this.state.title}
-                            setTitle={this.setTitle}
-                            setAuthor={this.setAuthor}
-                            author={this.state.author}
-                            setFileName={this.setFileName}
-                            fileName={this.state.fileName}
-                            setWithin={this.setWithin}
-                            within={this.state.within}
-                            setOf={this.setOf}
-                            of={this.state.of}
-                            setDeletedArticles={this.setDeletedArticles}
-                            deletedArticles={!!this.state.deletedArticles}
-                        />
-                    </PanelLayout.RightTop>
-                </PanelLayout>
-            </Container>
-        );
-    }
 
     /**
      * Load dummy data
