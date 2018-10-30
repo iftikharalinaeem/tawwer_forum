@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import InputTextBlock, { InputTextBlockBaseClass } from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputTextBlock";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { help } from "@library/components/Icons";
 import { ISearchWithin, dateWithin } from "../state/dateWithin";
@@ -59,7 +59,7 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
         const ofLabelMessage = t("Examples: Monday, today, last week, Mar 26, 3/26/04");
         const ofLabel = (
             <React.Fragment>
-                <span className="dateRangeOfLabel-label">{t("Of")}</span>
+                <span className="dateRangeOfLabel-label">{t("of")}</span>
                 <span className="dateRangeOfLabel-help" title={ofLabelMessage} onClick={this.showHelp}>
                     {help()}
                     <span className="sr-only">{ofLabelMessage}</span>

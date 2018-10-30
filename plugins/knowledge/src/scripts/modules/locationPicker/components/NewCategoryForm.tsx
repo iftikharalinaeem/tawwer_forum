@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
 import Button from "@library/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
 import { newFolder } from "@library/components/Icons";
 import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 import ModalSizes from "@library/components/modal/ModalSizes";
