@@ -148,7 +148,6 @@ class KnowledgeApiController extends AbstractApiController {
      *
      * @param array $row
      * @return array
-     * @throws \Exception If $row is not a valid knowledge category.
      */
     private function normalizeOutput(array $row): array {
         $row["recordID"] = $row["articleID"];
