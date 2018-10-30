@@ -76,7 +76,10 @@ export default class RevisionsPageActions extends ReduxActions {
     public setActiveArticle = async (articleID: number) => {
         this.dispatch(RevisionsPageActions.setArticleAC(articleID));
 
-        void (await this.articleActions.fetchRevisionsForArticle({ articleID }));
+        void Promise.all([
+            this.articleActions.fetchByID({ articleID }),
+            this.articleActions.fetchRevisionsForArticle({ articleID }),
+        ]);
     };
 
     /**

@@ -57,6 +57,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                                         <UserContent content={this.props.selectedRevision.data.bodyRendered} />
                                     )
                                 }
+                                crumbs={this.props.article.data ? this.props.article.data.crumbs : []}
                                 revisionList={this.renderList()}
                                 canSubmit={this.canSubmit}
                             />

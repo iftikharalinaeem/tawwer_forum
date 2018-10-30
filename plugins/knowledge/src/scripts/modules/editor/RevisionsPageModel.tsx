@@ -8,13 +8,16 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IRevisionFragment, IRevision } from "@knowledge/@types/api";
+import { IRevisionFragment, IRevision, IArticle } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface IRevisionsPageState {
     articleID: number | null;
+    articleStatus: ILoadable<any>;
     revisionIDs: number[];
     revisionsStatus: ILoadable<any>;
     selectedRevisionStatus: ILoadable<any>;
@@ -22,6 +25,10 @@ export interface IRevisionsPageState {
 }
 
 export interface IInjectableRevisionsState {
+    article: ILoadable<null | {
+        article: IArticle;
+        crumbs: ICrumb[];
+    }>;
     revisions: ILoadable<IRevisionFragment[]>;
     selectedRevision: ILoadable<IRevision | null>;
     selectedRevisionID: number | null;
@@ -62,11 +69,24 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      */
     public static getInjectableProps(state: IStoreState): IInjectableRevisionsState {
         const stateSlice = RevisionsPageModel.stateSlice(state);
-        const { selectedRevisionID, selectedRevisionStatus, revisionsStatus } = stateSlice;
+        const { selectedRevisionID, selectedRevisionStatus, revisionsStatus, articleID, articleStatus } = stateSlice;
+        const article = articleID ? ArticleModel.selectArticle(state, articleID) : null;
         return {
+            // article:
             revisions: {
                 ...revisionsStatus,
                 data: RevisionsPageModel.selectRevisions(state),
+            },
+            article: {
+                ...articleStatus,
+                data: article
+                    ? {
+                          article,
+                          crumbs: article.knowledgeCategoryID
+                              ? CategoryModel.selectKbCategoryBreadcrumb(state, article.knowledgeCategoryID)
+                              : [],
+                      }
+                    : null,
             },
             selectedRevision: {
                 ...selectedRevisionStatus,
@@ -94,6 +114,9 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
 
     public initialState: IRevisionsPageState = {
         articleID: null,
+        articleStatus: {
+            status: LoadStatus.PENDING,
+        },
         selectedRevisionID: null,
         selectedRevisionStatus: {
             status: LoadStatus.PENDING,
@@ -142,6 +165,16 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
             // Handle some revision actions if they pertain to our own article.
             if (action.meta && action.meta.articleID && draft.articleID === action.meta.articleID) {
                 switch (action.type) {
+                    case ArticleActions.GET_ARTICLE_REQUEST:
+                        draft.articleStatus.status = LoadStatus.LOADING;
+                        break;
+                    case ArticleActions.GET_ARTICLE_RESPONSE:
+                        draft.articleStatus.status = LoadStatus.SUCCESS;
+                        break;
+                    case ArticleActions.GET_ARTICLE_ERROR:
+                        draft.articleStatus.status = LoadStatus.ERROR;
+                        draft.articleStatus.error = action.payload;
+                        break;
                     case ArticleActions.GET_ARTICLE_REVISIONS_REQUEST:
                         draft.revisionsStatus.status = LoadStatus.LOADING;
                         break;

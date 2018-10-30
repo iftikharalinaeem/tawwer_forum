@@ -12,12 +12,14 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { t } from "@library/application";
 import { RouteComponentProps, withRouter } from "react-router";
+import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
     bodyContent: React.ReactNode;
     revisionList: React.ReactNode;
     canSubmit: boolean;
+    crumbs: ICrumb[];
 }
 
 /**
@@ -38,7 +40,12 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                 />
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout device={this.props.device} forceRenderLeftTop={isFullWidth}>
-                        <PanelLayout.MiddleTop>{this.props.bodyHeading}</PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>
+                                <Breadcrumbs children={this.props.crumbs} />
+                            </PanelWidget>
+                            {this.props.bodyHeading}
+                        </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidget>{this.props.bodyContent}</PanelWidget>
                         </PanelLayout.MiddleBottom>
