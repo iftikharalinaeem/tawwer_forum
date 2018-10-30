@@ -130,8 +130,6 @@ class KnowledgeApiController extends AbstractApiController {
         return $results;
     }
 
-
-
     /**
      * Prepare default schema array for "in" schema
      *
