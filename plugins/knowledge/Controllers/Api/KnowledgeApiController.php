@@ -72,7 +72,6 @@ class KnowledgeApiController extends AbstractApiController {
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
 
-
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
 
         $query = $in->validate($query);
