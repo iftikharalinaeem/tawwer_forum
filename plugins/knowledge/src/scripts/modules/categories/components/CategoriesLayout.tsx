@@ -20,7 +20,7 @@ import SearchBar, { IComboBoxOption } from "@library/components/forms/select/Sea
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/Icons";
-import LinkAsButton from "@library/components/forms/LinkAsButton";
+import LinkAsButton from "@library/components/LinkAsButton";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
