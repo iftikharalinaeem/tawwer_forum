@@ -53,6 +53,17 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
     }
 
     /**
+     * Select the currently selected revision.
+     *
+     * @param state A full state object.
+     */
+    public static selectActiveRevision(state: IStoreState): IRevision | null {
+        const stateSlice = this.stateSlice(state);
+        const { selectedRevisionID } = stateSlice;
+        return selectedRevisionID ? ArticleModel.selectRevision(state, selectedRevisionID)! : null;
+    }
+
+    /**
      * Select all revisions currently loaded.
      *
      * @param state A full state object.
@@ -90,7 +101,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
             },
             selectedRevision: {
                 ...selectedRevisionStatus,
-                data: selectedRevisionID ? ArticleModel.selectRevision(state, selectedRevisionID)! : null,
+                data: RevisionsPageModel.selectActiveRevision(state),
             },
             selectedRevisionID,
         };

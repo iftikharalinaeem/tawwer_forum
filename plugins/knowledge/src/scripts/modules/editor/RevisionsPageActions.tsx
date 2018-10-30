@@ -78,7 +78,7 @@ export default class RevisionsPageActions extends ReduxActions {
 
         void Promise.all([
             this.articleActions.fetchByID({ articleID }),
-            this.articleActions.fetchRevisionsForArticle({ articleID }),
+            this.articleActions.fetchRevisionsForArticle({ articleID }).then(() => this.setActiveRevision()),
         ]);
     };
 
@@ -93,10 +93,13 @@ export default class RevisionsPageActions extends ReduxActions {
                 this.dispatch(RevisionsPageActions.setRevisionAC(revisionID));
                 return this.articleActions.fetchRevisionByID({ revisionID });
             } else {
-                const rev = RevisionsPageModel.selectLatestRevision(getState());
-                if (rev) {
-                    this.dispatch(RevisionsPageActions.setRevisionAC(rev.articleRevisionID));
-                    return this.articleActions.fetchRevisionByID({ revisionID: rev.articleRevisionID });
+                const activeRevision = RevisionsPageModel.selectActiveRevision(getState());
+                if (!activeRevision) {
+                    const rev = RevisionsPageModel.selectLatestRevision(getState());
+                    if (rev) {
+                        this.dispatch(RevisionsPageActions.setRevisionAC(rev.articleRevisionID));
+                        return this.articleActions.fetchRevisionByID({ revisionID: rev.articleRevisionID });
+                    }
                 }
             }
         });
