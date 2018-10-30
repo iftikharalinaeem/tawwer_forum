@@ -8,31 +8,93 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, Format } from "@knowledge/@types/api";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import { IArticle, IRevision, IKbCategoryFragment } from "@knowledge/@types/api";
+import ArticleActions from "../article/ArticleActions";
+import { IStoreState } from "@knowledge/state/model";
+import ArticleModel from "../article/ArticleModel";
+import CategoryModel from "../categories/CategoryModel";
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
+    revisionID: number | null;
+    revisionStatus: ILoadable<{}>;
     submit: ILoadable<{}>;
+}
+
+export interface IInjectableEditorProps {
+    article: ILoadable<IArticle>;
+    revision: ILoadable<IRevision>;
+    submit: ILoadable<{}>;
+    locationCategory: IKbCategoryFragment | null;
 }
 
 /**
  * Reducer for the article page.
  */
 export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
+    /**
+     * Get properties for injection into components.
+     *
+     * @param state A full state tree.
+     */
+    public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
+        const stateSlice = EditorPageModel.getStateSlice(state);
+
+        let locationCategory: IKbCategoryFragment | null = null;
+        const { editorPage, locationPicker } = state.knowledge;
+        if (editorPage.article.status === LoadStatus.SUCCESS) {
+            locationCategory = CategoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
+        }
+
+        return {
+            article: stateSlice.article,
+            submit: stateSlice.submit,
+            revision: {
+                ...stateSlice.revisionStatus,
+                data:
+                    stateSlice.revisionID !== null
+                        ? ArticleModel.selectRevision(state, stateSlice.revisionID) || undefined
+                        : undefined,
+            },
+            locationCategory,
+        };
+    }
+
+    /**
+     * Get the slice of state that this model works with.
+     *
+     * @param state A full state instance.
+     * @throws An error if the state wasn't initialized properly.
+     */
+    private static getStateSlice(state: IStoreState): IEditorPageState {
+        if (!state.knowledge || !state.knowledge.revisionsPage) {
+            throw new Error(
+                "The revision page model has not been wired up properly. Expected to find 'state.knowledge.revisionsPage'.",
+            );
+        }
+
+        return state.knowledge.editorPage;
+    }
+
     public initialState: IEditorPageState = {
         article: {
             status: LoadStatus.PENDING,
         },
-
+        revisionID: null,
+        revisionStatus: {
+            status: LoadStatus.PENDING,
+        },
         submit: {
             status: LoadStatus.PENDING,
         },
     };
 
+    /**
+     * Reducer implementation for the editor page.
+     */
     public reducer = (
         state = this.initialState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticlePageActions.ACTION_TYPES,
+        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IEditorPageState => {
         return produce(state, draft => {
             switch (action.type) {
@@ -60,13 +122,28 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     draft.submit.status = LoadStatus.ERROR;
                     draft.submit.error = action.payload;
                     break;
-
+                case EditorPageActions.SET_ACTIVE_REVISION:
+                    draft.revisionID = action.payload.revisionID;
+                    break;
                 // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
-                case ArticlePageActions.GET_ARTICLE_RESPONSE:
+                case ArticleActions.GET_ARTICLE_RESPONSE:
                     draft.submit.status = LoadStatus.SUCCESS;
                     break;
                 case EditorPageActions.RESET:
                     return this.initialState;
+            }
+
+            if (action.meta && action.meta.revisionID && action.meta.revisionID === draft.revisionID) {
+                switch (action.type) {
+                    case ArticleActions.GET_REVISION_REQUEST:
+                        draft.revisionStatus.status = LoadStatus.LOADING;
+                        break;
+                    case ArticleActions.GET_REVISION_RESPONSE:
+                        draft.revisionStatus.status = LoadStatus.SUCCESS;
+                        break;
+                    case ArticleActions.GET_REVISION_ERROR:
+                        break;
+                }
             }
         });
     };

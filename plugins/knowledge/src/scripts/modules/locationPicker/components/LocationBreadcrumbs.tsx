@@ -6,10 +6,10 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IProps {
-    locationData: IKbCategoryFragment[];
+    locationData: ICrumb[];
     noDataMessage: string;
 }
 
@@ -23,10 +23,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
      * @param breadcrumbData - The category data to render.
      * @param noDataMessage - The message if no breadcrumb is given
      */
-    public static renderString(
-        breadcrumbData: IKbCategoryFragment[],
-        noDataMessage: string = t("Set Page Location"),
-    ): string {
+    public static renderString(breadcrumbData: ICrumb[], noDataMessage: string = t("Set Page Location")): string {
         if (!breadcrumbData || breadcrumbData.length === 0) {
             return noDataMessage;
         }

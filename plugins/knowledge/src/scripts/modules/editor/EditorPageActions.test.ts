@@ -18,6 +18,7 @@ import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { IPartialStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
+import ArticleActions from "../article/ArticleActions";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore;
@@ -46,7 +47,7 @@ describe("EditorPageActions", () => {
                             },
                         },
                     },
-                },
+                } as any,
             },
         });
     };
@@ -167,10 +168,10 @@ describe("EditorPageActions", () => {
                     },
                 },
                 {
-                    type: ArticlePageActions.GET_ARTICLE_REQUEST,
+                    type: ArticleActions.GET_ARTICLE_REQUEST,
                 },
                 {
-                    type: ArticlePageActions.GET_ARTICLE_RESPONSE,
+                    type: ArticleActions.GET_ARTICLE_RESPONSE,
                     payload: {
                         data: dummyArticle,
                     },

@@ -144,9 +144,10 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * Render out the /kb/articles/{id}/revisions path page.
      *
      * @param int $id URI article id.
+     * @param int $revisionID URI revision ID.
      * @return string Returns HTML page content
      */
-    public function get_revisions(int $id): string {
+    public function get_revisions(int $id, $revisionID = null): string {
         $this->action = self::ACTION_REVISIONS;
         $this->articleId = $id;
         if (!$this->session->isValid()) {

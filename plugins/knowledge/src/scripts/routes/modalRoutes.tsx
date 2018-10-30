@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { Route } from "react-router-dom";
-import Loadable from "react-loadable";
-import { ModalLoader } from "@library/components/modal";
-import { ADD_ROUTE, EDIT_ROUTE } from "@knowledge/modules/editor/route";
-
-/** A loadable version of the Editor Page */
-const ModalEditorPage = Loadable({
-    loading: ModalLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage"),
-});
-
 /**
  * Get the data for routes that can render in a modal.
  *
@@ -24,8 +12,5 @@ const ModalEditorPage = Loadable({
  * <React.Fragment> does not currently work
  */
 export function getModalRoutes(): JSX.Element[] {
-    return [
-        <Route exact path={ADD_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
-        <Route exact path={EDIT_ROUTE} component={ModalEditorPage} key={"editorModal"} />,
-    ];
+    return [];
 }

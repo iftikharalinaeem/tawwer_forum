@@ -379,6 +379,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ])->add($this->fullSchema()), "out");
 
         $article = $this->articleByID($id, true);
+        $body = $article['body'];
+        $article = $this->normalizeOutput($article);
+        $article['body'] = $body;
         $result = $out->validate($article);
         return $result;
     }

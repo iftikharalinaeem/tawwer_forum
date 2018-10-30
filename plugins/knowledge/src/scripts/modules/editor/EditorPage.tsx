@@ -11,31 +11,23 @@ import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/components/EditorForm";
-import categoryModel from "@knowledge/modules/categories/CategoryModel";
-import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import {
-    IPostArticleRevisionRequestBody,
-    Format,
-    IKbCategoryFragment,
-    IPatchArticleRequestBody,
-} from "@knowledge/@types/api";
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import { Format, IPatchArticleRequestBody } from "@knowledge/@types/api";
+import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
+import qs from "qs";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: number;
+            id?: string;
         }> {}
 
-interface IProps extends IOwnProps {
-    pageState: IEditorPageState;
+interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
-    locationCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
@@ -46,45 +38,33 @@ interface IState {
  * Page for editing an article.
  */
 export class EditorPage extends React.Component<IProps, IState> {
-    private id;
+    private id = uniqueIDFromPrefix("editorPage");
 
     public state = {
         showFolderPicker: false,
     };
 
-    public constructor(props: IProps) {
-        super(props);
-        this.id = uniqueIDFromPrefix("editorPage");
-    }
-
-    get titleID() {
-        return this.id + "-title";
-    }
-
     public render() {
-        const pageContent = (
-            <Permission permission="articles.add" fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}>
-                <EditorForm
-                    backUrl={this.backLink}
-                    key={this.props.pageState.article.status}
-                    article={this.props.pageState.article}
-                    submitHandler={this.formSubmit}
-                    currentCategory={this.props.locationCategory}
-                    isSubmitLoading={this.isSubmitLoading}
-                    titleID={this.titleID}
-                />
-            </Permission>
+        return (
+            <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+                <Permission
+                    permission="articles.add"
+                    fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
+                >
+                    <EditorForm
+                        key={this.props.article.status}
+                        content={
+                            this.props.revision.status !== LoadStatus.PENDING ? this.props.revision : this.props.article
+                        }
+                        article={this.props.article}
+                        submitHandler={this.formSubmit}
+                        currentCategory={this.props.locationCategory}
+                        isSubmitLoading={this.isSubmitLoading}
+                        titleID={this.titleID}
+                    />
+                </Permission>
+            </Modal>
         );
-
-        if (this.isModal) {
-            return (
-                <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
-                    {pageContent}
-                </Modal>
-            );
-        }
-
-        return pageContent;
     }
 
     /**
@@ -93,12 +73,20 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        const { pageState, match, actions, history } = this.props;
-        if (pageState.article.status === LoadStatus.PENDING) {
+        const { article, match, actions, history } = this.props;
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
                 void actions.createArticleForEdit(history);
             } else {
-                void actions.fetchArticleForEdit(match.params.id);
+                const articleID = parseInt(match.params.id, 10);
+                if (queryParams.revisionID) {
+                    const revisionID = parseInt(queryParams.revisionID, 10);
+                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
+                } else {
+                    void actions.fetchArticleForEdit(articleID);
+                }
             }
         }
     }
@@ -123,7 +111,7 @@ export class EditorPage extends React.Component<IProps, IState> {
     }
 
     private get isSubmitLoading(): boolean {
-        const { submit } = this.props.pageState;
+        const { submit } = this.props;
         return submit.status === LoadStatus.LOADING;
     }
 
@@ -131,10 +119,9 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { pageState, history, actions, locationCategory } = this.props;
-        const { article } = pageState;
+        const { article, history, actions, locationCategory } = this.props;
 
-        if (article.status === LoadStatus.SUCCESS) {
+        if (article.status === LoadStatus.SUCCESS && article.data) {
             const articleRequest: IPatchArticleRequestBody = {
                 articleID: article.data.articleID,
                 name: title,
@@ -149,44 +136,19 @@ export class EditorPage extends React.Component<IProps, IState> {
         }
     };
 
-    /**
-     * Whether or not the we are navigated inside of a router.
-     */
-    private get isModal(): boolean {
-        const { location } = this.props;
-        return !!(location && location.state && location.state.modal);
-    }
-
-    private get backLink(): string | null {
-        const { state } = this.props.location;
-        return state && state.lastLocation ? state.lastLocation.pathname : "/kb";
+    private get titleID() {
+        return this.id + "-title";
     }
 
     /**
      * Route back to the previous location if its available.
      */
     private navigateToBacklink = () => {
-        if (this.backLink) {
+        if (this.props.history.length > 1) {
             this.props.history.goBack();
         } else {
             this.props.history.push("/kb");
         }
-    };
-}
-
-/**
- * Map in the state from the redux store.
- */
-function mapStateToProps(state: IStoreState) {
-    let locationCategory: IKbCategoryFragment | null = null;
-    const { editorPage, locationPicker } = state.knowledge;
-    if (editorPage.article.status === LoadStatus.SUCCESS) {
-        locationCategory = categoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
-    }
-
-    return {
-        pageState: editorPage,
-        locationCategory,
     };
 }
 
@@ -200,7 +162,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const withRedux = connect(
-    mapStateToProps,
+    EditorPageModel.getInjectableProps,
     mapDispatchToProps,
 );
 

@@ -4,36 +4,27 @@
  * @license Proprietary
  */
 
-import { IGetArticleResponseBody } from "@knowledge/@types/api";
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import ReduxActions from "@library/state/ReduxActions";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
 /**
  * Actions for the article page.
  */
 export default class ArticlePageActions extends ReduxActions {
-    public static readonly GET_ARTICLE_REQUEST = "@@articlePage/GET_ARTICLE_REQUEST";
-    public static readonly GET_ARTICLE_RESPONSE = "@@articlePage/GET_ARTICLE_RESPONSE";
-    public static readonly GET_ARTICLE_ERROR = "@@articlePage/GET_ARTICLE_ERROR";
+    public static readonly INIT = "@@articlePage/INIT";
     public static readonly RESET = "@@articlePage/RESET";
 
     /**
      * Union of all possible action types in this class.
      */
     public static readonly ACTION_TYPES:
-        | ActionsUnion<typeof ArticlePageActions.getArticleActionCreators>
+        | ReturnType<typeof ArticlePageActions.createInitAction>
         | ReturnType<typeof ArticlePageActions.createResetAction>;
 
-    /**
-     * Static action creators for the get article endpoint.
-     */
-    private static readonly getArticleActionCreators = ReduxActions.generateApiActionCreators(
-        ArticlePageActions.GET_ARTICLE_REQUEST,
-        ArticlePageActions.GET_ARTICLE_RESPONSE,
-        ArticlePageActions.GET_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IGetArticleResponseBody,
-        {},
-    );
+    private static createInitAction(articleID: number, preloaded: boolean = false) {
+        return ReduxActions.createAction(ArticlePageActions.INIT, { articleID, preloaded });
+    }
 
     /**
      * Static action creator for the reset action.
@@ -42,22 +33,22 @@ export default class ArticlePageActions extends ReduxActions {
         return ReduxActions.createAction(ArticlePageActions.RESET);
     }
 
+    private articleActions = new ArticleActions(this.dispatch, this.api);
+
     /**
      * Reset the page state.
      */
     public reset = this.bindDispatch(ArticlePageActions.createResetAction);
 
-    /**
-     * Get an article by its ID from the API.
-     *
-     * @param id The article ID.
-     */
-    public getArticleByID = (id: number) => {
-        return this.dispatchApi<IGetArticleResponseBody>(
-            "get",
-            `/articles/${id}?expand=all`,
-            ArticlePageActions.getArticleActionCreators,
-            {},
-        );
+    public init = async (articleID: number) => {
+        this.dispatch((a, getState) => {
+            const article = ArticleModel.selectArticle(getState(), articleID);
+            if (article) {
+                this.dispatch(ArticlePageActions.createInitAction(articleID, true));
+            } else {
+                this.dispatch(ArticlePageActions.createInitAction(articleID));
+                return this.articleActions.fetchByID({ articleID });
+            }
+        });
     };
 }

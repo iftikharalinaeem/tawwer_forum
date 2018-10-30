@@ -38,7 +38,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     public function testGetRevision() {
         $row = [
             "body" => __FUNCTION__,
-            "format" => "markdown",
+            "format" => "text",
             "locale" => "en",
             "name" => uniqid(__FUNCTION__, true),
         ];

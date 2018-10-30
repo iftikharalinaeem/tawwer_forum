@@ -8,23 +8,28 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IArticleRevision, IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PanelLayout from "@knowledge/layouts/PanelLayout";
 import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { getRequiredID } from "@library/componentIDs";
+import EditorMenu from "./EditorMenu";
+
+type LoadableContent = ILoadable<{
+    name: string;
+    body: string;
+}>;
 
 interface IProps {
     device: Devices;
-    backUrl: string | null;
     submitHandler: (editorContent: DeltaOperation[], title: string) => void;
     article: ILoadable<IArticle>;
+    content: LoadableContent;
     currentCategory: IKbCategoryFragment | null;
     className?: string;
     isSubmitLoading: boolean;
@@ -44,9 +49,9 @@ export class EditorForm extends React.Component<IProps, IState> {
 
     public constructor(props: IProps) {
         super(props);
-        if (this.props.article.status === LoadStatus.SUCCESS && this.props.article.data) {
+        if (this.props.content.status === LoadStatus.SUCCESS && this.props.content.data) {
             this.state = {
-                name: this.props.article.data.name,
+                name: this.props.content.data.name,
                 body: [],
             };
         } else {
@@ -58,9 +63,9 @@ export class EditorForm extends React.Component<IProps, IState> {
     }
 
     public componentDidMount() {
-        if (this.props.article.status === LoadStatus.SUCCESS && this.props.article.data) {
-            if (this.props.article.data.body) {
-                this.editorRef.current!.setEditorContent(JSON.parse(this.props.article.data.body));
+        if (this.props.content.status === LoadStatus.SUCCESS && this.props.content.data) {
+            if (this.props.content.data.body) {
+                this.editorRef.current!.setEditorContent(JSON.parse(this.props.content.data.body));
             }
         }
     }
@@ -70,14 +75,18 @@ export class EditorForm extends React.Component<IProps, IState> {
      */
     public render() {
         const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
+        const { article } = this.props;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
-                    backUrl={this.props.backUrl}
-                    device={this.props.device}
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.isSubmitLoading}
                     className="richEditorForm-header"
+                    optionsMenu={
+                        article.status === LoadStatus.SUCCESS && article.data ? (
+                            <EditorMenu article={article.data} />
+                        ) : null
+                    }
                 />
                 <Container className="richEditorForm-body">
                     <h1 id={this.props.titleID} className="sr-only">
@@ -118,7 +127,7 @@ export class EditorForm extends React.Component<IProps, IState> {
     }
 
     private get isLoading(): boolean {
-        return this.props.article.status === LoadStatus.LOADING;
+        return this.props.content.status === LoadStatus.LOADING;
     }
 
     /**

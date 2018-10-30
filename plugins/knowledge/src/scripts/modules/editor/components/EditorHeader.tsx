@@ -8,41 +8,34 @@ import React from "react";
 import { t } from "@library/application";
 import { PanelArea } from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { Devices } from "@library/components/DeviceChecker";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import SelectBox from "@library/components/SelectBox";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
-import { getRequiredID } from "@library/componentIDs";
-import EditorMenu from "./EditorMenu";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
 
-interface IProps {
-    device: Devices;
-    backUrl: string | null;
+interface IProps extends IDeviceProps {
     canSubmit: boolean;
     isSubmitLoading: boolean;
     selectedKey?: string;
     className?: string;
     callToAction?: string;
+    optionsMenu?: React.ReactNode;
 }
 
 /**
  * Implement editor header component
  */
-export default class EditorHeader extends React.Component<IProps> {
-    public static defaultProps = {
+export class EditorHeader extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
     };
 
-    private localeTitleID;
-
-    public constructor(props) {
-        super(props);
-        this.localeTitleID = getRequiredID(props, "editorHeader");
-    }
+    private localeTitleID = uniqueIDFromPrefix("editorHeader");
 
     public render() {
         let foundIndex = false;
@@ -67,16 +60,13 @@ export default class EditorHeader extends React.Component<IProps> {
                     <PanelArea>
                         <PanelWidget>
                             <ul className="editorHeader-items">
-                                {this.props.backUrl && (
-                                    <li className="editorHeader-item isPullLeft">
-                                        <BackLink
-                                            title={t("Cancel")}
-                                            url={this.props.backUrl}
-                                            visibleLabel={true}
-                                            className="editorHeader-backLink"
-                                        />
-                                    </li>
-                                )}
+                                <li className="editorHeader-item isPullLeft">
+                                    <BackLink
+                                        title={t("Cancel")}
+                                        visibleLabel={true}
+                                        className="editorHeader-backLink"
+                                    />
+                                </li>
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
@@ -101,9 +91,9 @@ export default class EditorHeader extends React.Component<IProps> {
                                         {processedChildren}
                                     </SelectBox>
                                 </li>
-                                <li className="editorHeader-item">
-                                    <EditorMenu buttonClassName="editorHeader-menu" />
-                                </li>
+                                {this.props.optionsMenu && (
+                                    <li className="editorHeader-item">{this.props.optionsMenu}</li>
+                                )}
                             </ul>
                         </PanelWidget>
                     </PanelArea>
@@ -112,3 +102,5 @@ export default class EditorHeader extends React.Component<IProps> {
         );
     }
 }
+
+export default withDevice<IProps>(EditorHeader);

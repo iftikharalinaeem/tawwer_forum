@@ -84,6 +84,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 "status",
                 "name",
                 "body",
+                "bodyRendered",
                 "locale",
                 "insertUserID",
                 "dateInserted",
@@ -183,8 +184,6 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     private function normalizeOutput(array $row): array {
-        $bodyRendered = $row["bodyRendered"] ?? null;
-        $row["body"] = $bodyRendered;
         return $row;
     }
 }

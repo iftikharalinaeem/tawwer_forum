@@ -13,6 +13,7 @@ import {
 } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {
@@ -46,7 +47,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
             return null;
         }
 
-        const category = state.knowledge.categories.data.categoriesByID[categoryID];
+        const category = state.knowledge.categories.data!.categoriesByID[categoryID];
 
         if (category === undefined) {
             throw new Error(`Category ${categoryID} not found.`);
@@ -97,7 +98,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     public static selectMixedRecordTree(
         state: IStoreState,
         categoryID: number,
-        maxDepth: number = 2,
+        maxDepth: number = 3,
     ): IKbNavigationCategory {
         const category: IKbNavigationCategory =
             categoryID === -1 || categoryID === null ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
@@ -116,7 +117,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectKbCategoryBreadcrumb(state: IStoreState, categoryID: number): IKbCategoryFragment[] {
+    public static selectKbCategoryBreadcrumb(state: IStoreState, categoryID: number): ICrumb[] {
         const crumbs: IKbCategoryFragment[] = [];
         let complete = false;
         let lookupID = categoryID;
