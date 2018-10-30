@@ -104,6 +104,11 @@ $panelLayout-border_color                                             : rgba($gl
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
     padding-left: $global-panel_spacerOuter;
+
+    @include mediaQuery-panelLayout_twoColumn {
+        padding-left: $global-gutter_halfSize;
+        padding-right: $global-gutter_halfSize;
+    }
 }
 
 // Middle Column
