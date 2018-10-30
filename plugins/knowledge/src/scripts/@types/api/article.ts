@@ -28,6 +28,12 @@ interface IArticleDefaultedData {
     locale: string; // Defaults to the current locale.
 }
 
+export interface IOutlineItem {
+    ref: string; // A uniqueID
+    level: number; // The heading level.
+    text: string; // The text content of the heading.
+}
+
 interface IArticleServerManagedData {
     articleID: number;
     insertUserID: number;
@@ -39,6 +45,7 @@ interface IArticleServerManagedData {
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
+    outline: IOutlineItem[];
 }
 
 // The record

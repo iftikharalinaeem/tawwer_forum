@@ -8,51 +8,40 @@ import * as React from "react";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
-
-export interface IPageHeading {
-    name: string;
-    anchor: string;
-}
+import { IOutlineItem } from "@knowledge/@types/api";
 
 interface IProps {
-    children?: IPageHeading[];
-    minimumChildrenCount?: number;
+    items: IOutlineItem[];
 }
 
 /**
  * Implements the table of contents component
  */
 export default class ArticleTOC extends React.Component<IProps> {
-    public static defaultProps = {
-        minimumChildrenCount: 2,
-    };
+    private static readonly minimumChildrenCount = 2;
 
     public render() {
-        if (
-            !!this.props.children &&
-            this.props.children.length > 0 &&
-            this.props.children.length >= this.props.minimumChildrenCount!
-        ) {
-            const contents = this.props.children.map((item, i) => {
-                return (
-                    <li className="panelList-item tableOfContents-item" key={"toc-" + i}>
-                        <a href={item.anchor} className="tableOfContents-link" title={item.name}>
-                            {item.name}
-                        </a>
-                    </li>
-                );
-            });
-
-            return (
-                <PanelWidget>
-                    <nav className="panelList tableOfContents">
-                        <Heading title={t("Table of Contents")} className="panelList-title tableOfContents-title" />
-                        <ul className="panelList-items tableOfContents-items">{contents}</ul>
-                    </nav>
-                </PanelWidget>
-            );
-        } else {
+        if (this.props.items.length < ArticleTOC.minimumChildrenCount) {
             return null;
         }
+
+        const contents = this.props.items.map(item => {
+            return (
+                <li className="panelList-item tableOfContents-item" key={item.ref}>
+                    <a href={"#" + item.ref} className="tableOfContents-link" title={item.text}>
+                        {item.text}
+                    </a>
+                </li>
+            );
+        });
+
+        return (
+            <PanelWidget>
+                <nav className="panelList tableOfContents">
+                    <Heading title={t("Table of Contents")} className="panelList-title tableOfContents-title" />
+                    <ul className="panelList-items tableOfContents-items">{contents}</ul>
+                </nav>
+            </PanelWidget>
+        );
     }
 }

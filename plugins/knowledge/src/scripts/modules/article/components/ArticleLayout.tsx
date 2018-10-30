@@ -14,7 +14,6 @@ import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { IPageHeading } from "@knowledge/modules/article/components/ArticleTOC";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
@@ -74,7 +73,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <ArticleTOC children={this.articleTOC} />
+                        <ArticleTOC items={article.outline} />
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
                         <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
@@ -86,25 +85,6 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             </Container>
         );
     }
-
-    private articleTOC: IPageHeading[] = [
-        {
-            name: "Overview",
-            anchor: "#overview",
-        },
-        {
-            name: "Changing Themes",
-            anchor: "#changing-themes",
-        },
-        {
-            name: "Configuration Guide",
-            anchor: "#configuration-guide",
-        },
-        {
-            name: "Theming Guide for Designers",
-            anchor: "#theming-guide-for-designers",
-        },
-    ];
 
     private articleRelatedArticles: IInternalLink[] = [
         {
