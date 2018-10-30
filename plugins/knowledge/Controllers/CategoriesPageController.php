@@ -42,6 +42,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
      * @var $action view | edit | add | delete etc...
      */
     private $action;
+
     /**
      * @var int $articleId Article id of current action.
      */
@@ -55,8 +56,9 @@ class CategoriesPageController extends KnowledgeTwigPageController {
      */
     public function index(string $path) : string {
         $this->action = self::ACTION_VIEW_ARTICLES;
-        $this->categoryId = $id = $this->detectCategoryId($path);
+        $id = $this->detectCategoryId($path);
         $category = $this->categoriesApi->get($id);
+        $this->setCategoryID($id);
         $this->data[self::CATEGORY_API_RESPONSE] = $category;
         $this->data[self::API_PAGE_KEY] = $this->articlesApi->index_excerpts(['KnowledgeCategoryID'=>$id]);
 
@@ -126,7 +128,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->breadcrumbs()));
         return $this;
     }
 
@@ -141,7 +143,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
                     if ($apiUrl = $this->data[self::CATEGORY_API_RESPONSE]['url'] ?? false) {
                         $url = $apiUrl;
                     } else {
-                        $url = \Gdn::request()->url('/kb/categories/'.$this->categoryId.'-', true);
+                        $url = \Gdn::request()->url('/kb/categories/' . $this->getCategoryID() . '-', true);
                     }
                     break;
                 default:
@@ -161,18 +163,5 @@ class CategoriesPageController extends KnowledgeTwigPageController {
      */
     public function getCategoryApiPageData(string $key) {
         return $this->data[self::CATEGORY_API_RESPONSE][$key] ?? '';
-    }
-    /**
-     * Get Breadcrumbs data array
-     * This is temporary implementation need to be refactored
-     *
-     * @return array
-     */
-    public function getBreadcrumbs(): array {
-        return [
-            new Breadcrumb('Home', \Gdn::request()->url('/', true)),
-            new Breadcrumb('Knowledge', \Gdn::request()->url('/kb/', true)),
-            new Breadcrumb('Knowledge', $this->getCanonicalLink()),
-        ];
     }
 }

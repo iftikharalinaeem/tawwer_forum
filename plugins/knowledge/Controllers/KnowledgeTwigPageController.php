@@ -10,8 +10,9 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
+use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
 
@@ -24,6 +25,12 @@ abstract class KnowledgeTwigPageController extends PageController {
     use \Garden\TwigTrait;
 
     const API_PAGE_KEY = 'page';
+
+    /** @var int Category of the current page. Used for breadcrumbs. */
+    private $categoryID;
+
+    /** @var KnowledgeCategoryModel */
+    protected $knowledgeCategoryModel;
 
     /** @var Container */
     protected $container;
@@ -44,6 +51,7 @@ abstract class KnowledgeTwigPageController extends PageController {
     public function __construct(Container $container) {
         parent::__construct();
         $this->container = $container;
+        $this->knowledgeCategoryModel = $container->get(KnowledgeCategoryModel::class);
         $this->siteMeta = $container->get(SiteMeta::class);
         $this->session = $this->container->get(\Gdn_Session::class);
         $assetModel = $this->container->get(\AssetModel::class);
@@ -91,6 +99,49 @@ abstract class KnowledgeTwigPageController extends PageController {
         ];
 
         $this->addInlineScript($this->createInlineScriptContent("gdn", $gdnData));
+    }
+
+    /**
+     * Get page's breadcrumb trail.
+     *
+     * @return array
+     * @throws \Exception If attempting to generate a URL for an invalid category row.
+     */
+    protected function breadcrumbs(): array {
+        $categoryID = $this->getCategoryID();
+        $result = [];
+
+        if ($categoryID) {
+            $categories = $this->knowledgeCategoryModel->selectWithAncestors($categoryID);
+            foreach ($categories as $category) {
+                $result[] = new Breadcrumb(
+                    $category["name"],
+                    $this->knowledgeCategoryModel->url($category)
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the ID of the current page's category.
+     *
+     * @return int|null
+     */
+    protected function getCategoryID() {
+        return $this->categoryID;
+    }
+
+    /**
+     * Set the ID of the current page's category.
+     *
+     * @param int $categoryID
+     * @return KnowledgeTwigPageController
+     */
+    protected function setCategoryID(int $categoryID): self {
+        $this->categoryID = $categoryID;
+        return $this;
     }
 
     /**
