@@ -113,8 +113,9 @@ abstract class KnowledgeTwigPageController extends PageController {
 
         if ($categoryID) {
             $categories = $this->knowledgeCategoryModel->selectWithAncestors($categoryID);
+            $index = 1;
             foreach ($categories as $category) {
-                $result[] = new Breadcrumb(
+                $result[$index++] = new Breadcrumb(
                     $category["name"],
                     $this->knowledgeCategoryModel->url($category)
                 );
