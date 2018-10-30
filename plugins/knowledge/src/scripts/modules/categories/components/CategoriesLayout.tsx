@@ -74,6 +74,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     to="/kb/articles/add"
                                     className="searchBar-actionButton"
                                     baseClass={ButtonBaseClass.ICON}
+                                    title={t("Compose")}
                                 >
                                     {compose()}
                                 </LinkAsButton>
