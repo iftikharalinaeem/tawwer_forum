@@ -18,8 +18,9 @@ import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import { t } from "@library/application";
 import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/Icons";
+import LinkAsButton from "@library/components/forms/LinkAsButton";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
@@ -69,9 +70,13 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                 query={this.state.query || ""}
                             >
                                 {category.name}
-                                <Button className="searchBar-actionButton" baseClass={ButtonBaseClass.ICON}>
+                                <LinkAsButton
+                                    to="/kb/articles/add"
+                                    className="searchBar-actionButton"
+                                    baseClass={ButtonBaseClass.ICON}
+                                >
                                     {compose()}
-                                </Button>
+                                </LinkAsButton>
                             </SearchBar>
                         </PanelWidget>
                     </PanelLayout.MiddleTop>

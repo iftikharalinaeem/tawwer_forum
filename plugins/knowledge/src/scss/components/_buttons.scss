@@ -64,6 +64,11 @@ $buttonLoader-thickness: 3px;
     width: $formElement-height;
     min-width: $formElement-height;
     padding: 0;
+    color: $global-color_fg;
+
+    &:visited {
+        color: $global-color_fg;
+    }
 
     .icon {
         display: block;
