@@ -12,11 +12,13 @@ export default class CategoryActions extends ReduxActions {
     public static readonly GET_ALL_RESPONSE = "@@kbCategories/GET_ALL_RESPONSE";
     public static readonly GET_ALL_ERROR = "@@kbCategories/GET_ALL_ERROR";
 
-    public static readonly POST_CATEGORY_REQUEST = "@@article/POST_CATEGORY_REQUEST";
-    public static readonly POST_CATEGORY_RESPONSE = "@@article/POST_CATEGORY_RESPONSE";
-    public static readonly POST_CATEGORY_ERROR = "@@article/POST_CATEGORY_ERROR";
+    public static readonly POST_CATEGORY_REQUEST = "@@kbCategories/POST_CATEGORY_REQUEST";
+    public static readonly POST_CATEGORY_RESPONSE = "@@kbCategories/POST_CATEGORY_RESPONSE";
+    public static readonly POST_CATEGORY_ERROR = "@@kbCategories/POST_CATEGORY_ERROR";
 
-    public static ACTION_TYPES: ActionsUnion<typeof CategoryActions.getAllCategoriesACs>;
+    public static ACTION_TYPES:
+        | ActionsUnion<typeof CategoryActions.getAllCategoriesACs>
+        | ActionsUnion<typeof CategoryActions.postCategoryACs>;
 
     // Raw actions for getting all knowledge categories
     private static getAllCategoriesACs = ReduxActions.generateApiActionCreators(
@@ -35,7 +37,7 @@ export default class CategoryActions extends ReduxActions {
         CategoryActions.POST_CATEGORY_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IKbCategory,
-        {},
+        {} as IPostKbCategoryRequestBody,
     );
 
     // Usable action for getting a list of all categories.

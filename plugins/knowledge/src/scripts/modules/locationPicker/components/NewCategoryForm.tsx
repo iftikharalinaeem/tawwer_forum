@@ -19,7 +19,6 @@ import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import getStore from "@library/state/getStore";
 import apiv2 from "@library/apiv2";
-import { debug, log } from "@library/utility";
 import { LoadStatus } from "@library/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 
@@ -84,8 +83,8 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         <Button
                             title={t("New Folder")}
                             className="locationPicker-newFolder buttonPrimary"
-                            onClick={this.addCategory}
                             disabled={!this.state.valid}
+                            onClick={this.handleFormSubmit}
                         >
                             {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
@@ -98,20 +97,17 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     /**
      * Attempt to add category.
      */
-    private addCategory = async () => {
+    private handleFormSubmit = async () => {
         const parentCategoryID = this.props.parentCategory ? this.props.parentCategory.knowledgeCategoryID : -1;
 
         this.setState({
             isSubmitLoading: true,
         });
 
-        const response = await this.categoryActions.postCategory({
+        await this.categoryActions.postCategory({
             name: this.state.categoryName,
             parentID: parentCategoryID,
         });
-        if (response) {
-            // Do something.
-        }
 
         this.props.exitHandler();
     };

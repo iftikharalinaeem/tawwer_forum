@@ -68,8 +68,6 @@ export interface IKbCategoryFragment {
     name: string; // The human readable name of the category.
     knowledgeCategoryID: number; // The id.
     parentID: number; // The parent category to promote a tree-structure.
-    displayType: KbCategoryDisplayType; //How the category is layed out.
-    isSection: boolean; // Determines if the category is cutoff point in navigation or not.
     url: string; // Full URL to the resource
 }
 

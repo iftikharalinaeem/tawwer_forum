@@ -55,7 +55,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     <PanelLayout.MiddleTop>
                         <PageTitle
                             title={article.name}
-                            menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                            actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
                             meta={
                                 <ArticleMeta
                                     updateUser={article.updateUser!}
