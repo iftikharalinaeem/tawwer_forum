@@ -1,12 +1,11 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
-
 import * as React from "react";
 import { t } from "@library/application";
-import InputTextBlock, { InputTextBlockBaseClass } from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputTextBlock";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { help } from "@library/components/Icons";
 import { ISearchWithin, dateWithin } from "../state/dateWithin";
@@ -35,21 +34,11 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
         };
     }
 
-    /**
-     * Change handler for date within
-     */
-    private setWithin = (newValue: any) => {
-        this.props.setWithin(newValue);
+    private setOf = e => {
+        this.props.setOf(e.value);
     };
 
-    /**
-     * Change handler for of
-     */
-    private setOf = (newValue: any) => {
-        this.props.setWithin(newValue);
-    };
-
-    private showHelp = () => {
+    private showHelp = e => {
         this.setState({
             showHelp: true,
         });
@@ -73,7 +62,7 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
                         label={t("Date Within")}
                         className="dateRange-within dateRange-column"
                         options={dateWithin}
-                        setData={this.setWithin}
+                        setData={this.props.setWithin}
                     />
                     <InputTextBlock
                         className="dateRange-of dateRange-column"

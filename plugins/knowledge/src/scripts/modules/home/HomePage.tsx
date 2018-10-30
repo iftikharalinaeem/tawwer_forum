@@ -34,6 +34,9 @@ export default class HomePage extends React.Component {
                 <p>
                     <ModalLink to="/kb/articles/add">{t("Add article (in 'modal')")}</ModalLink>
                 </p>
+                <p>
+                    <Link to="/kb/search">{t("Search")}</Link>
+                </p>
             </div>
         );
     }
