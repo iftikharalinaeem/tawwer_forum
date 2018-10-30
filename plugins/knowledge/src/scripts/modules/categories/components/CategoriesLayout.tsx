@@ -10,7 +10,6 @@ import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
-import PageTitle from "@knowledge/modules/common/PageTitle";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment, KbCategoryDisplayType } from "@knowledge/@types/api";
@@ -112,7 +111,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         const { articles, device } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
-        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return articles
             .map(article => {
