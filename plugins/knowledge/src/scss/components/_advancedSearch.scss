@@ -1,0 +1,21 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+.advancedSearch-title {
+  margin-bottom: $global_spacer;
+}
+
+.advancedSearchDomain-tab {
+  flex-grow: 1;
+  .radioButtonsAsTabs-label {
+    width: 100%;
+  }
+}
+
+.advancedSearch-submit {
+  display: block;
+  margin-left: auto;
+}

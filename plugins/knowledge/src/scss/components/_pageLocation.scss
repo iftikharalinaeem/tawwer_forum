@@ -19,10 +19,16 @@ $pageLocation_spacer: $utility-baseUnit * 2;
   border-radius: $global-borderRadius;
   user-select: none;
   margin-left: 1ex;
+  font-size: $global-small_fontSize;
+  color: $metaText_color;
   padding: {
     top: $utility-baseUnit;
     bottom: $utility-baseUnit;
     left: $pageLocation_spacer;
     right: $pageLocation_spacer;
   }
+}
+
+.locationBreadcrumb-separator {
+  margin: 0 .4em;
 }

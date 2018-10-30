@@ -6,10 +6,11 @@
 
 import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
 import { t } from "@library/application";
+import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
+import { KbCategoryDisplayType } from "@knowledge/@types/api/kbCategory";
 
-export const dummyArticles: IResult[] = [
+export const dummySearchResults: IResult[] = [
     {
         name: "Getting Help with your community",
         meta: dummyMetaData,
@@ -56,10 +57,35 @@ export const dummyArticles: IResult[] = [
             },
         ],
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        location: [t("Help & Training"), t("Getting Started")],
+        locationData: [
+            {
+                name: "Article",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+            {
+                name: "Location",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+            {
+                name: "Breadcrumb",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+        ],
     },
     {
-        name: "Getting Help with your community",
+        name: "Some Fake Search Results!",
         meta: dummyMetaData,
         url: "#",
         excerpt: "Standard with your order.",
@@ -69,7 +95,7 @@ export const dummyArticles: IResult[] = [
         location: [t("Help & Training"), t("Getting Started")],
     },
     {
-        name: "Getting Help with your community",
+        name: "Beaver defeats Hyena; Hyena quits.",
         meta: dummyMetaData,
         url: "#",
         excerpt: "Standard with your order.",
@@ -81,7 +107,24 @@ export const dummyArticles: IResult[] = [
         ],
         image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        location: [t("Help & Training"), t("Getting Started")],
+        locationData: [
+            {
+                name: "Help",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+            {
+                name: "Getting Started",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+        ],
     },
     {
         name:
@@ -109,6 +152,23 @@ export const dummyArticles: IResult[] = [
             },
         ],
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        location: [t("Help & Training"), t("Getting Started")],
+        locationData: [
+            {
+                name: "Help",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+            {
+                name: "Getting Started",
+                knowledgeCategoryID: 1,
+                parentID: 1,
+                displayType: KbCategoryDisplayType.HELP,
+                isSection: false,
+                url: "#",
+            },
+        ],
     },
 ];

@@ -147,9 +147,10 @@ fieldset {
   border: 0;
 }
 
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
 
-// Supported browsers only show outlines on focussed elements for keyboard users. Browsers with no support will ignore.
-//noinspection CssInvalidPseudoSelector
-:focus:not(:focus-visible) {
-  outline: none !important;
+.js-focus-visible .focus-visible {
+  outline: none;
 }
