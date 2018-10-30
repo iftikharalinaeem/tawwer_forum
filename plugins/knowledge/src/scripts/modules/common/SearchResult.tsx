@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
+import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 
 export interface IResult {
     name: string;
@@ -20,7 +21,9 @@ export interface IResult {
     excerpt: string;
     image?: string;
     headingLevel?: 2 | 3;
-    attachments: IAttachmentIcon[];
+    attachments?: IAttachmentIcon[];
+    dateUpdated: string;
+    location: IKbCategoryFragment[];
 }
 
 /**

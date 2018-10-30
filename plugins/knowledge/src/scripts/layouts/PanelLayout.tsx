@@ -5,18 +5,16 @@
  */
 
 import * as React from "react";
-import { Devices } from "@library/components/DeviceChecker";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import classNames from "classnames";
 import CompoundComponent from "@knowledge/layouts/CompoundComponent";
 
-interface IPanelLayoutProps {
-    device: Devices;
+interface IPanelLayoutProps extends IDeviceProps {
     children: React.ReactNode;
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
-    forceRenderLeftTop?: boolean; // Some pages have an empty column on the left. Pass in a boolean value to force a render, even if empty.
 }
 
 /**
@@ -87,9 +85,10 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         // Calculate some rendering variables.
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
-        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const shouldRenderLeftPanel: boolean = isFullWidth && !!(children.leftTop || children.leftBottom);
-        const shouldRenderRightPanel: boolean = !isMobile && !!(children.rightTop || children.rightBottom);
+        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || children.leftBottom);
+        const shouldRenderRightPanel: boolean =
+            (isFullWidth || (isTablet && !shouldRenderLeftPanel)) && !!(children.rightTop || children.rightBottom);
         const renderMobilePanel: boolean = isMobile && !!children.leftBottom;
 
         // Determine the classes we want to display.
@@ -121,11 +120,8 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     <div
                         className={classNames("panelLayout-container", { inheritHeight: this.props.growMiddleBottom })}
                     >
-                        {(shouldRenderLeftPanel || this.props.forceRenderLeftTop) && (
-                            <Panel
-                                className={classNames("panelLayout-left", { noBorder: this.props.forceRenderLeftTop })}
-                                tag="aside"
-                            >
+                        {shouldRenderLeftPanel && (
+                            <Panel className={classNames("panelLayout-left")} tag="aside">
                                 {children.leftTop && (
                                     <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
                                 )}
@@ -147,12 +143,13 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 {children.middleTop && (
                                     <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
                                 )}
-                                {isMobile && (
-                                    <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
-                                        {children.leftTop}
-                                    </PanelArea>
-                                )}
-                                {!isFullWidth && (
+                                {!shouldRenderLeftPanel &&
+                                    children.leftTop && (
+                                        <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
+                                            {children.leftTop}
+                                        </PanelArea>
+                                    )}
+                                {!shouldRenderRightPanel && (
                                     <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
                                         {children.rightTop}
                                     </PanelArea>
@@ -164,7 +161,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 >
                                     {children.middleBottom}
                                 </PanelArea>
-                                {!isFullWidth && (
+                                {!shouldRenderRightPanel && (
                                     <PanelArea className="panelAndNav-tabletBottom" tag="aside">
                                         {children.rightBottom}
                                     </PanelArea>

@@ -68,6 +68,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
             $article = $this->articlesApi->get($id, ["expand" => "all"]);
             $this->data[self::API_PAGE_KEY] = $article;
             $this->setPageTitle($article['articleRevision']['name'] ?? "");
+            $this->setCategoryID($article["knowledgeCategoryID"]);
 
             // Put together pre-loaded redux actions.
             $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
@@ -103,6 +104,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         }
 
         $article = $this->articlesApi->get($id, ["expand" => "all"]);
+        $this->setCategoryID($article["knowledgeCategoryID"]);
 
         // Set the title
         if (isset($article['articleRevision'])) {
@@ -150,6 +152,8 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         if (!$this->session->isValid()) {
             self::signInFirst('kb/articles/'.$id.'/revisions');
         }
+        $article = $this->articlesApi->get($id);
+        $this->setCategoryID($article["knowledgeCategoryID"]);
         $revisions = $this->articlesApi->index_revisions($id);
         $this->data[self::API_PAGE_KEY][self::ACTION_REVISIONS] = $revisions;
 
@@ -218,7 +222,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()))
+            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->breadcrumbs()))
         ;
 
         return $this;
@@ -262,19 +266,5 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      */
     public function getApiPageData(string $key) {
         return $this->data[self::API_PAGE_KEY][$key] ?? '';
-    }
-
-    /**
-     * Get Breadcrumbs data array
-     * This is temporary implementation need to be refactored
-     *
-     * @return array
-     */
-    public function getBreadcrumbs(): array {
-        return [
-            new Breadcrumb('Home', \Gdn::request()->url('/', true)),
-            new Breadcrumb('Knowledge', \Gdn::request()->url('/kb/', true)),
-            new Breadcrumb('Knowledge', $this->getCanonicalLink()),
-        ];
     }
 }

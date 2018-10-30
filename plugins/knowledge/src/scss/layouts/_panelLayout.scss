@@ -62,6 +62,13 @@ $panelLayout-border_color                                             : rgba($gl
     width: 100%;
 }
 
+.panelLayout-main {
+    .panelArea + .panelArea {
+        margin-top: $global_spacer;
+    }
+}
+
+
 .panelLayout {
     &.isOneCol {
         width: $global-middleColumn_width;
@@ -97,6 +104,11 @@ $panelLayout-border_color                                             : rgba($gl
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
     padding-left: $global-panel_spacerOuter;
+
+    @include mediaQuery-panelLayout_twoColumn {
+        padding-left: $global-gutter_halfSize;
+        padding-right: $global-gutter_halfSize;
+    }
 }
 
 // Middle Column

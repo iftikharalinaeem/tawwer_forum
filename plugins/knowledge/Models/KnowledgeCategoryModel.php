@@ -87,6 +87,26 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Given a category ID, get the row and the rows of all its ancestors in order.
+     *
+     * @param int $categoryID
+     * @return array
+     * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
+     * @throws \Vanilla\Exception\Database\NoResultsException If the target category or its ancestors cannot be found.
+     */
+    public function selectWithAncestors(int $categoryID): array {
+        $result = [];
+
+        do {
+            $row = $this->selectSingle(["knowledgeCategoryID" => $categoryID]);
+            array_unshift($result, $row);
+            $categoryID = $row["parentID"];
+        } while ($categoryID > 0);
+
+        return $result;
+    }
+
+    /**
      * Update existing knowledge categories.
      *
      * @param array $set Field values to set.
