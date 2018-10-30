@@ -14,16 +14,26 @@ import { newFolder } from "@library/components/Icons";
 import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
+import ButtonLoader from "@library/components/ButtonLoader";
+import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import getStore from "@library/state/getStore";
+import apiv2 from "@library/apiv2";
+import { debug, log } from "@library/utility";
+import { LoadStatus } from "@library/@types/api";
+import { IStoreState } from "@knowledge/state/model";
 
 interface IProps {
     exitHandler: () => void;
     className?: string;
+    parentCategory: IKbCategoryFragment | null;
 }
 
 interface IState {
     valid: boolean;
     categoryName: string;
     url: string;
+    isSubmitLoading: boolean;
 }
 
 /**
@@ -34,7 +44,10 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         valid: false,
         categoryName: "",
         url: "",
+        isSubmitLoading: false,
     };
+
+    private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
     private id;
 
@@ -62,12 +75,6 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                 onChange={this.handleNameChange}
                                 value={this.state.categoryName}
                             />
-                            <InputTextBlock
-                                label={t("URL Code")}
-                                placeholder={t("Example: appearance")}
-                                onChange={this.handleUrlCodeChange}
-                                value={this.state.url}
-                            />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
@@ -77,10 +84,10 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         <Button
                             title={t("New Folder")}
                             className="locationPicker-newFolder buttonPrimary"
-                            onClick={this.tempClick}
+                            onClick={this.addCategory}
                             disabled={!this.state.valid}
                         >
-                            {t("Save")}
+                            {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
                     </FrameFooter>
                 </Frame>
@@ -89,18 +96,39 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     }
 
     /**
-     * Dummy click handler until full functionality is introduced.
+     * Attempt to add category.
      */
-    private tempClick = () => {
-        alert("do click");
+    private addCategory = async () => {
+        const parentCategoryID = this.props.parentCategory ? this.props.parentCategory.knowledgeCategoryID : -1;
+
+        this.setState({
+            isSubmitLoading: true,
+        });
+
+        const response = await this.categoryActions.postCategory({
+            name: this.state.categoryName,
+            parentID: parentCategoryID,
+        });
+        if (response) {
+            // Do something.
+        }
+
+        this.props.exitHandler();
     };
 
     /**
-     * Change handler for the email input.
+     * Change handler for the name input.
      */
     private handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        this.setState({ categoryName: value });
+        const state = {
+            categoryName: value,
+            valid: false,
+        };
+        if (value.length > 0) {
+            state.valid = true;
+        }
+        this.setState(state);
     };
 
     /**

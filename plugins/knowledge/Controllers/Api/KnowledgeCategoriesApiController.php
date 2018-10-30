@@ -270,7 +270,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
-                    "isSection",
                     "displayType?",
                     "sort?",
                     "sortChildren?",
