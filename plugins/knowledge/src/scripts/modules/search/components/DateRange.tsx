@@ -59,7 +59,7 @@ export default class DateRange extends React.PureComponent<IProps, IState> {
         const ofLabelMessage = t("Examples: Monday, today, last week, Mar 26, 3/26/04");
         const ofLabel = (
             <React.Fragment>
-                <span className="dateRangeOfLabel-label">{t("Of")}</span>
+                <span className="dateRangeOfLabel-label">{t("of")}</span>
                 <span className="dateRangeOfLabel-help" title={ofLabelMessage} onClick={this.showHelp}>
                     {help()}
                     <span className="sr-only">{ofLabelMessage}</span>

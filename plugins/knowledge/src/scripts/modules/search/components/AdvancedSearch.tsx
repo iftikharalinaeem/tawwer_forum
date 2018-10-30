@@ -10,7 +10,7 @@ import Heading from "@library/components/Heading";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Tokens from "@library/components/forms/select/Tokens";
 import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
-import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import DateRange from "@knowledge/modules/search/components/DateRange";

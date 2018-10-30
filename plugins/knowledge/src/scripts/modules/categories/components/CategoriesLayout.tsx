@@ -7,28 +7,47 @@
 import * as React from "react";
 import Container from "@knowledge/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { Devices } from "@library/components/DeviceChecker";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
-import CategoryMenu from "@knowledge/modules/categories/components/CategoryMenu";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment, KbCategoryDisplayType } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import { t } from "@library/application";
+import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { compose } from "@library/components/Icons";
 
-interface IProps {
+interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
     category: IKbCategoryFragment;
     articles: IArticleFragment[];
-    device: Devices;
+    query?: string;
 }
 
-export class CategoriesLayout extends React.Component<IProps> {
+interface IState {
+    query?: string;
+}
+
+export class CategoriesLayout extends React.Component<IProps, IState> {
+    public defaultProps = {
+        query: "",
+    };
+
+    public constructor(props) {
+        super(props);
+        this.state = {
+            query: props.query || "",
+        };
+    }
+
     public render() {
         const { category } = this.props;
+        const options = this.loadSearchSuggestions();
 
         return (
             <Container>
@@ -38,19 +57,63 @@ export class CategoriesLayout extends React.Component<IProps> {
                             <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
+                    {<PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
-                        <PageTitle backUrl="#Back" title={category.name} menu={<CategoryMenu />} />
+                        <PanelWidget>
+                            <SearchBar
+                                placeholder={t("Search")}
+                                options={options}
+                                setQuery={this.setQuery}
+                                query={this.state.query || ""}
+                            >
+                                {category.name}
+                                <Button className="searchBar-actionButton" baseClass={ButtonBaseClass.ICON}>
+                                    {compose()}
+                                </Button>
+                            </SearchBar>
+                        </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <SearchResults results={this.getSearchResults()} />
                     </PanelLayout.MiddleBottom>
+                    <PanelLayout.RightTop>{}</PanelLayout.RightTop>
                 </PanelLayout>
             </Container>
         );
     }
 
+    private setQuery = value => {
+        let newValue = "";
+        if (typeof value === "string") {
+            newValue = value;
+        } else if (value.data) {
+            newValue = value.data;
+        }
+        this.setState({
+            query: newValue,
+        });
+    };
+
+    /**
+     * Load dummy data
+     */
+    public loadSearchSuggestions = () => {
+        const data = dummySearchResults.map((result, index) => {
+            return {
+                label: result.name,
+                value: index.toString(),
+                ...result,
+            };
+        });
+        return data || [];
+    };
+
     private getSearchResults(): IResult[] {
-        const { articles } = this.props;
+        const { articles, device } = this.props;
+        const isMobile = device === Devices.MOBILE;
+        const isTablet = device === Devices.TABLET;
+        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
+
         return articles
             .map(article => {
                 return {
@@ -68,6 +131,8 @@ export class CategoriesLayout extends React.Component<IProps> {
                             displayType: KbCategoryDisplayType.HELP,
                             isSection: false,
                             url: "#",
+                            dateUpdated: "2018-10-22T16:56:37.423Z",
+                            location: [t("Help & Training"), t("Getting Started")],
                         },
                         {
                             name: "Location",
@@ -76,6 +141,8 @@ export class CategoriesLayout extends React.Component<IProps> {
                             displayType: KbCategoryDisplayType.HELP,
                             isSection: false,
                             url: "#",
+                            dateUpdated: "2018-10-22T16:56:37.423Z",
+                            location: [t("Help & Training"), t("Getting Started")],
                         },
                         {
                             name: "Breadcrumb",
@@ -84,6 +151,8 @@ export class CategoriesLayout extends React.Component<IProps> {
                             displayType: KbCategoryDisplayType.HELP,
                             isSection: false,
                             url: "#",
+                            dateUpdated: "2018-10-22T16:56:37.423Z",
+                            location: [t("Help & Training"), t("Getting Started")],
                         },
                     ],
                 };

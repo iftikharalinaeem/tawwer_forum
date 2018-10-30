@@ -57,6 +57,7 @@ $buttonLoader-thickness: 3px;
 }
 
 .buttonIcon {
+    display: flex;
     align-items: center;
     justify-content: center;
     height: $formElement-height;
@@ -64,7 +65,16 @@ $buttonLoader-thickness: 3px;
     min-width: $formElement-height;
     padding: 0;
 
+    .icon {
+        display: block;
+    }
+
     &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
         color: $global-color_primary;
     }
 }

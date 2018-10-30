@@ -12,9 +12,10 @@ import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IDeviceProps {
     title: string;
-    menu?: React.ReactNode;
+    actions?: React.ReactNode;
     meta?: React.ReactNode;
     backUrl?: string | null;
+    className?: string;
 }
 
 /**
@@ -26,12 +27,12 @@ export class PageTitle extends React.Component<IProps> {
         const isDesktop = device === Devices.DESKTOP;
         const backUrl = isDesktop ? this.props.backUrl : null;
         return (
-            <PanelWidget>
-                <PageHeading backUrl={backUrl} menu={this.props.menu}>
+            <div className={this.props.className}>
+                <PageHeading backUrl={backUrl} actions={this.props.actions}>
                     {this.props.title}
                 </PageHeading>
                 {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
-            </PanelWidget>
+            </div>
         );
     }
 }
