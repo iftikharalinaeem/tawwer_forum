@@ -50,21 +50,25 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelLayout.Breadcrumbs>
                     )}
                     <PanelLayout.LeftBottom>
-                        <SiteNav>{dummyNavData}</SiteNav>
+                        <PanelWidget>
+                            <SiteNav>{dummyNavData}</SiteNav>
+                        </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <PageTitle
-                            title={article.name}
-                            menu={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                            meta={
-                                <ArticleMeta
-                                    updateUser={article.updateUser!}
-                                    dateUpdated={article.dateUpdated}
-                                    permaLink={article.url}
-                                />
-                            }
-                        />
-                        {messages && <div className="messages">{messages}</div>}
+                        <PanelWidget>
+                            <PageTitle
+                                title={article.name}
+                                actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                                meta={
+                                    <ArticleMeta
+                                        updateUser={article.updateUser!}
+                                        dateUpdated={article.dateUpdated}
+                                        permaLink={article.url}
+                                    />
+                                }
+                            />
+                            {messages && <div className="messages">{messages}</div>}
+                        </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
@@ -72,13 +76,17 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <ArticleTOC children={this.articleTOC} />
+                        <PanelWidget>
+                            <ArticleTOC children={this.articleTOC} />
+                        </PanelWidget>
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
-                        <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
-                            {dummyOtherLanguagesData.children as any}
-                        </OtherLanguages>
-                        <RelatedArticles children={this.articleRelatedArticles} />
+                        <PanelWidget>
+                            <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
+                                {dummyOtherLanguagesData.children as any}
+                            </OtherLanguages>
+                            <RelatedArticles children={this.articleRelatedArticles} />
+                        </PanelWidget>
                     </PanelLayout.RightBottom>
                 </PanelLayout>
             </Container>

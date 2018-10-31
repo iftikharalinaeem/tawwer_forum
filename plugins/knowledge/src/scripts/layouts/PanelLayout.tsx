@@ -149,11 +149,12 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                             {children.leftTop}
                                         </PanelArea>
                                     )}
-                                {!shouldRenderRightPanel && (
-                                    <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
-                                        {children.rightTop}
-                                    </PanelArea>
-                                )}
+                                {!shouldRenderRightPanel &&
+                                    children.rightTop && (
+                                        <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
+                                            {children.rightTop}
+                                        </PanelArea>
+                                    )}
                                 <PanelArea
                                     className={classNames("panelAndNav-middleBottom", {
                                         inheritHeight: this.props.growMiddleBottom,
@@ -161,11 +162,12 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 >
                                     {children.middleBottom}
                                 </PanelArea>
-                                {!shouldRenderRightPanel && (
-                                    <PanelArea className="panelAndNav-tabletBottom" tag="aside">
-                                        {children.rightBottom}
-                                    </PanelArea>
-                                )}
+                                {!shouldRenderRightPanel &&
+                                    children.rightBottom && (
+                                        <PanelArea className="panelAndNav-tabletBottom" tag="aside">
+                                            {children.rightBottom}
+                                        </PanelArea>
+                                    )}
                             </div>
                             {shouldRenderRightPanel && (
                                 <Panel className="panelLayout-right">
@@ -258,6 +260,10 @@ export function PanelArea(props: IContainerProps) {
 
 export function PanelWidget(props: IContainerProps) {
     return <div className={classNames("panelWidget", props.className)}>{props.children}</div>;
+}
+
+export function PanelWidgetVerticalPadding(props: IContainerProps) {
+    return <div className={classNames("panelWidget", "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
 
 // The components that make up the Layout itself.

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import Container from "@knowledge/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
@@ -82,7 +82,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        <SearchResults results={this.getSearchResults()} />
+                        <PanelWidgetVerticalPadding>
+                            <SearchResults results={this.getSearchResults()} />
+                        </PanelWidgetVerticalPadding>
                     </PanelLayout.MiddleBottom>
                     {isFullWidth && <PanelLayout.RightTop>{}</PanelLayout.RightTop>}
                 </PanelLayout>

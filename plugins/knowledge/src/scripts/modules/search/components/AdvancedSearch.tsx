@@ -18,7 +18,7 @@ import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTa
 import { ISearchWithin } from "@knowledge/modules/search/state/dateWithin";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import Button from "@library/components/forms/Button";
-import { IComboBoxOption } from "@library/components/forms/select/BigSearch";
+import { IComboBoxOption } from "@library/components/forms/select/searchBar";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -78,7 +78,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
     public render() {
         return (
             <form className="advancedSearch" onSubmit={doNothing}>
-                <Heading className="advancedSearch-title pageSubTitle">{t("AdvancedSearch")}</Heading>
+                <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
                 <RadioButtonsAsTabs
                     accessibleTitle={t("Search in:")}
                     prefix="advancedSearchDomain"

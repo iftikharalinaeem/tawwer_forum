@@ -12,7 +12,7 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import AdvancedSearch, { IAdvancedFields, ISearchDomain } from "./AdvancedSearch";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
@@ -67,34 +67,40 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                 <PanelLayout device={this.props.device}>
                     {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
-                        <SearchBar
-                            placeholder={this.props.placeholder || t("Help")}
-                            options={options}
-                            setQuery={this.setQuery}
-                            query={this.state.query || ""}
-                        />
+                        <PanelWidget>
+                            <SearchBar
+                                placeholder={this.props.placeholder || t("Help")}
+                                options={options}
+                                setQuery={this.setQuery}
+                                query={this.state.query || ""}
+                            />
+                        </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
-                        {<SearchResults results={dummySearchResults} />}
+                        <PanelWidgetVerticalPadding>
+                            {<SearchResults results={dummySearchResults} />}
+                        </PanelWidgetVerticalPadding>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <AdvancedSearch
-                            domain={this.state.domain}
-                            setDomain={this.setDomain}
-                            title={this.state.title}
-                            setTitle={this.setTitle}
-                            setAuthor={this.setAuthor}
-                            author={this.state.author}
-                            setFileName={this.setFileName}
-                            fileName={this.state.fileName}
-                            setWithin={this.setWithin}
-                            within={this.state.within}
-                            setOf={this.setOf}
-                            of={this.state.of}
-                            setDeletedArticles={this.setDeletedArticles}
-                            deletedArticles={!!this.state.deletedArticles}
-                            setKnowedge={this.setKnowedge}
-                        />
+                        <PanelWidget>
+                            <AdvancedSearch
+                                domain={this.state.domain}
+                                setDomain={this.setDomain}
+                                title={this.state.title}
+                                setTitle={this.setTitle}
+                                setAuthor={this.setAuthor}
+                                author={this.state.author}
+                                setFileName={this.setFileName}
+                                fileName={this.state.fileName}
+                                setWithin={this.setWithin}
+                                within={this.state.within}
+                                setOf={this.setOf}
+                                of={this.state.of}
+                                setDeletedArticles={this.setDeletedArticles}
+                                deletedArticles={!!this.state.deletedArticles}
+                                setKnowedge={this.setKnowedge}
+                            />
+                        </PanelWidget>
                     </PanelLayout.RightTop>
                 </PanelLayout>
             </Container>
