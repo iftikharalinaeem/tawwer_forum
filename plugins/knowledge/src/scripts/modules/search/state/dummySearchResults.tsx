@@ -57,7 +57,7 @@ export const dummySearchResults: IResult[] = [
             },
         ],
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        locationData: [
+        location: [
             {
                 name: "Article",
                 knowledgeCategoryID: 1,
@@ -107,7 +107,7 @@ export const dummySearchResults: IResult[] = [
         ],
         image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        locationData: [
+        location: [
             {
                 name: "Help",
                 knowledgeCategoryID: 1,
@@ -152,7 +152,7 @@ export const dummySearchResults: IResult[] = [
             },
         ],
         dateUpdated: "2018-10-22T16:56:37.423Z",
-        locationData: [
+        location: [
             {
                 name: "Help",
                 knowledgeCategoryID: 1,

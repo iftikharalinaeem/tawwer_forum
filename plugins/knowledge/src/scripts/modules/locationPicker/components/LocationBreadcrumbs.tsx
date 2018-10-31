@@ -10,7 +10,6 @@ import { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IProps {
     locationData: ICrumb[];
-    noDataMessage: string;
 }
 
 /**
