@@ -40,11 +40,12 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                 />
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout device={this.props.device}>
+                        <PanelLayout.LeftTop />
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
                                 <Breadcrumbs children={this.props.crumbs} />
                             </PanelWidget>
-                            {this.props.bodyHeading}
+                            <PanelWidget>{this.props.bodyHeading}</PanelWidget>
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidget>{this.props.bodyContent}</PanelWidget>

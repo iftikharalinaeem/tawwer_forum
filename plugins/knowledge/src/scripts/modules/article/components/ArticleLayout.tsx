@@ -53,18 +53,20 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         <SiteNav>{dummyNavData}</SiteNav>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
-                        <PageTitle
-                            title={article.name}
-                            actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                            meta={
-                                <ArticleMeta
-                                    updateUser={article.updateUser!}
-                                    dateUpdated={article.dateUpdated}
-                                    permaLink={article.url}
-                                />
-                            }
-                        />
-                        {messages && <div className="messages">{messages}</div>}
+                        <PanelWidget>
+                            <PageTitle
+                                title={article.name}
+                                actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                                meta={
+                                    <ArticleMeta
+                                        updateUser={article.updateUser!}
+                                        dateUpdated={article.dateUpdated}
+                                        permaLink={article.url}
+                                    />
+                                }
+                            />
+                            {messages && <div className="messages">{messages}</div>}
+                        </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
