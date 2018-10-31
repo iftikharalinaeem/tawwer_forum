@@ -32,7 +32,7 @@ export default class HomePage extends React.Component {
                     <Link to="/kb/categories/2-category-two">{t("Category Two")}</Link>
                 </p>
                 <p>
-                    <ModalLink to="/kb/articles/add">{t("Add article (in 'modal')")}</ModalLink>
+                    <Link to="/kb/articles/add">{t("Add article (in 'modal')")}</Link>
                 </p>
                 <p>
                     <Link to="/kb/search">{t("Search")}</Link>
