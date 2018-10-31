@@ -191,7 +191,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "name",
             "parentID",
             "displayType",
-            "isSection",
             "sort",
             "sortChildren",
         ])->add($this->fullSchema()), "out");
