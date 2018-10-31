@@ -18,7 +18,7 @@ import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTa
 import { ISearchWithin } from "@knowledge/modules/search/state/dateWithin";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import Button from "@library/components/forms/Button";
-import { IComboBoxOption } from "@library/components/forms/select/searchBar";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 
 export enum ISearchDomain {
     ARTICLES = "articles",

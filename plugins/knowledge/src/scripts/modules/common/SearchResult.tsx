@@ -23,7 +23,7 @@ export interface IResult {
     headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];
     dateUpdated: string;
-    location: IKbCategoryFragment[];
+    location: IKbCategoryFragment[] | string[];
 }
 
 /**

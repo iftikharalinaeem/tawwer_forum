@@ -45,7 +45,7 @@ export class LocationInput extends React.Component<IProps, IState> {
             : LocationInput.SELECT_MESSAGE;
 
         const buttonContents = locationBreadcrumb ? (
-            <LocationBreadcrumbs locationData={locationBreadcrumb} asString={false} />
+            <LocationBreadcrumbs locationData={locationBreadcrumb} />
         ) : (
             LocationInput.SELECT_MESSAGE
         );
