@@ -578,9 +578,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             foreach ($blotGroups as $idx => $blotGroup) {
                 $blot = $blotGroup->getPrimaryBlot();
-                if ($blot instanceof HeadingTerminatorBlot) {
+                if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
                     $outline[] = [
-                        'ref' => $blotGroup->getReference(),
+                        'ref' => $blot->getReference(),
                         'level' => $blot->getHeadingLevel(),
                         'text' => $blotGroup->getText(),
                     ];
