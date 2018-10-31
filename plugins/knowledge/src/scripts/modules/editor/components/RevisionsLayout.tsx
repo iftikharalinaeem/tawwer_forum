@@ -39,7 +39,7 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                     callToAction={t("Restore")}
                 />
                 <Container className="richEditorRevisionsForm-body">
-                    <PanelLayout device={this.props.device} forceRenderLeftTop={isFullWidth}>
+                    <PanelLayout device={this.props.device}>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
                                 <Breadcrumbs children={this.props.crumbs} />

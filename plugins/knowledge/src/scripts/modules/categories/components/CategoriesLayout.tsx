@@ -127,7 +127,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     excerpt: article.excerpt || "",
                     attachments: [] as any,
                     dateUpdated: "2018-10-22T16:56:37.423Z",
-                    locationData: [
+                    location: [
                         {
                             name: "Article",
                             knowledgeCategoryID: 1,
