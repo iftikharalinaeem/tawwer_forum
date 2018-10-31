@@ -191,7 +191,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "name",
             "parentID",
             "displayType",
-            "isSection",
             "sort",
             "sortChildren",
         ])->add($this->fullSchema()), "out");
@@ -270,7 +269,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
-                    "isSection",
                     "displayType?",
                     "sort?",
                     "sortChildren?",
@@ -349,7 +347,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
-        $body["isSection"] = intval($body["isSection"]);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
         $row = $this->knowledgeCategoryByID($knowledgeCategoryID);
