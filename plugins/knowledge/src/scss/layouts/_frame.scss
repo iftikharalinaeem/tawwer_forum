@@ -27,9 +27,9 @@ $frame-panel_minHeight: 500px;
 
 
 .frame {
+    @include shadow-modal;
     position: relative;
     background-color: $frame-bgColor;
-    box-shadow: $overlay-dropShadow;
     border: {
         style: solid;
         width: 1px;
