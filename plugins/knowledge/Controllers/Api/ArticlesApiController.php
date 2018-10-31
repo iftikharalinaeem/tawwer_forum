@@ -719,7 +719,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
             $outline = $this->getOutline($revision["body"]);
-//            die($outline);
             $revision["outline"] = json_encode($outline);
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
             $this->articleRevisionModel->publish($articleRevisionID);
