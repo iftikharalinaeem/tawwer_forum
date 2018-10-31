@@ -83,6 +83,10 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 "allowNull" => true,
                 "type" => "string",
             ],
+            "outline?" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
             "locale?" => [
                 "allowNull" => true,
                 "type" => "string",
@@ -177,7 +181,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             if ($includeBody) {
                 $sql->select("ar.format")
                     ->select("ar.body")
-                    ->select("ar.bodyRendered");
+                    ->select("ar.bodyRendered")
+                    ->select("ar.outline");
             }
             if ($orderFields) {
                 $sql->orderBy($orderFields, $orderDirection);

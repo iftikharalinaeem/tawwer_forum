@@ -318,7 +318,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "allowNull" => true,
                 "description" => "Locale the article was written in.",
             ],
-
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
             "insertUser?" => $this->getUserFragmentSchema(),
@@ -554,8 +553,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}");
 
         $bodyRendered = $row["bodyRendered"] ?? null;
-        $row['outline'] = $this->getOutline($row["body"] ?? '');
         $row["body"] = $bodyRendered;
+        $row["outline"] = $row["outline"] ? json_decode($row["outline"], true) : [];
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
@@ -719,6 +718,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
 
             $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
+            $outline = $this->getOutline($revision["body"]);
+//            die($outline);
+            $revision["outline"] = json_encode($outline);
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
             $this->articleRevisionModel->publish($articleRevisionID);
         }
