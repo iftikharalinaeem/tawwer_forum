@@ -16,6 +16,8 @@ use Gdn_Format;
 use UserModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Quill\BlotGroup;
+use Vanilla\Formatting\Quill\BlotGroupCollection;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -265,7 +267,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "updateUser?" => $this->getUserFragmentSchema(),
             "status:s" => [
                 'description' => "Article status.",
-                'enum' => ArticleModel::getAllStatuses()
+                'enum' => ArticleModel::getAllStatuses(),
             ],
             "excerpt:s?" => [
                 "allowNull" => true,
@@ -274,7 +276,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "outline:a?" => Schema::parse([
                 'ref:s' => 'Heading blot reference id. Ex: #title',
                 'level:i' => 'Heading level',
-                'text:s' => 'Heading text line'
+                'text:s' => 'Heading text line',
             ]),
         ]);
     }
@@ -517,7 +519,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "locale",
                 "insertUser",
                 "dateInserted",
-            ])->add($this->fullRevisionSchema())
+            ])->add($this->fullRevisionSchema()),
         ], "out");
 
         $article = $this->articleByID($id);
@@ -576,13 +578,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 ->addBlot(HeadingTerminatorBlot::class);
             $blotGroups = $parser->parse($body);
 
-            foreach ($blotGroups as $idx => $blotGroup) {
+            /** @var BlotGroup $blotGroup */
+            foreach ($blotGroups as $blotGroup) {
                 $blot = $blotGroup->getPrimaryBlot();
                 if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
                     $outline[] = [
                         'ref' => $blot->getReference(),
                         'level' => $blot->getHeadingLevel(),
-                        'text' => $blotGroup->getText(),
+                        'text' => $blotGroup->getUnsafeText(),
                     ];
                 }
             }
@@ -634,8 +637,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $in = $this->schema([
             "status:s" => [
                 "description" => "Article status.",
-                "enum" => ArticleModel::getAllStatuses()
-            ]
+                "enum" => ArticleModel::getAllStatuses(),
+            ],
         ], "in")->setDescription("Set the status of an article.");
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
