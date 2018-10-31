@@ -20,10 +20,12 @@ import { getMeta } from "@library/application";
 // Knowledge Modules
 import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
+import { initAllUserContent } from "@library/user-content";
 
 debug(getMeta("context.debug"));
 
 onReady(() => {
+    initAllUserContent();
     registerReducer("knowledge", rootReducer);
     const app = document.querySelector("#app");
     ReactDOM.render(<KnowledgeApp />, app);
