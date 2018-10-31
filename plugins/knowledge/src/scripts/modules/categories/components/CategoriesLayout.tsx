@@ -71,7 +71,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             >
                                 {category.name}
                                 <LinkAsButton
-                                    to="/kb/articles/add"
+                                    to={`/kb/articles/add?knowledgeCategoryID=${
+                                        this.props.category.knowledgeCategoryID
+                                    }`}
                                     className="searchBar-actionButton"
                                     baseClass={ButtonBaseClass.ICON}
                                     title={t("Compose")}

@@ -73,6 +73,7 @@ class SearchLayout extends React.Component<IProps, ISearchState> {
                                 options={options}
                                 setQuery={this.setQuery}
                                 query={this.state.query || ""}
+                                isBigInput={true}
                             />
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
