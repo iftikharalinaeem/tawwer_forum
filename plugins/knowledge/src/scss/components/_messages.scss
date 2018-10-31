@@ -49,7 +49,7 @@ $message-title_color              : mix($global-color_fg, $global-color_bg, 90%)
 .message-title {
     font-size: $message-text_fontSize;
     color: $message-title_color;
-    font-weight: $global-bold_fontWeight;
+    font-weight: $global-fontWeight_bold;
 }
 
 .message-text {

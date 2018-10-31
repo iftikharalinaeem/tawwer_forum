@@ -166,7 +166,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 
 ._pagination-label {
   user-select: none;
-  font-weight: $global-bold_fontWeight;
+  font-weight: $global-fontWeight_bold;
   &:focus {
     outline: 0;
   }
