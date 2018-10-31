@@ -348,7 +348,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
-        $body["isSection"] = intval($body["isSection"]);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
         $row = $this->knowledgeCategoryByID($knowledgeCategoryID);
