@@ -10,3 +10,9 @@ $tableOfContents_color           : $metaText_color;
     color: $tableOfContents_color;
     font-size: $global-medium_fontSize;
 }
+
+.tableOfContents-item.isActive {
+    .tableOfContents-link {
+        font-weight: $global-bold_fontWeight;
+    }
+}
