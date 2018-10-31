@@ -9,6 +9,7 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
+import classNames from "classnames";
 
 interface IProps extends IDeviceProps {
     title: string;
@@ -27,7 +28,7 @@ export class PageTitle extends React.Component<IProps> {
         const isDesktop = device === Devices.DESKTOP;
         const backUrl = isDesktop ? this.props.backUrl : null;
         return (
-            <div className={this.props.className}>
+            <div className={classNames("pageTitleContainer", this.props.className)}>
                 <PageHeading backUrl={backUrl} actions={this.props.actions}>
                     {this.props.title}
                 </PageHeading>

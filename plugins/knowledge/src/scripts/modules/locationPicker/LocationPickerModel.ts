@@ -5,9 +5,10 @@
  */
 
 import ReduxReducer from "@library/state/ReduxReducer";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import produce from "immer";
-import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { IKbCategory, IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -62,7 +63,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
      */
     public reducer = (
         state = this.initialState,
-        action: typeof LocationPickerActions.ACTION_TYPES,
+        action: typeof LocationPickerActions.ACTION_TYPES | typeof CategoryActions.ACTION_TYPES,
     ): ILocationPickerState => {
         return produce(state, draft => {
             switch (action.type) {
@@ -75,11 +76,13 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
                 case LocationPickerActions.CHOOSE_CATEGORY:
                     draft.chosenCategoryID = action.payload.categoryID;
                     break;
-                case LocationPickerActions.INIT:
+                case LocationPickerActions.INIT: {
                     const { categoryID, parentID } = action.payload;
                     draft.navigatedCategoryID = categoryID === -1 ? categoryID : parentID;
                     draft.selectedCategoryID = categoryID;
                     draft.chosenCategoryID = categoryID;
+                    break;
+                }
             }
         });
     };

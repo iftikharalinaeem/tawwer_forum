@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { KbCategoryDisplayType, IKbNavigationCategory } from "@knowledge/@types/api";
+import { IKbNavigationCategory } from "@knowledge/@types/api";
 
 export const dummyNavData: IKbNavigationCategory[] = [
     {
@@ -12,8 +12,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Example Category",
         parentID: -1,
-        isSection: true,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/1-example-root",
         children: [
             {
@@ -21,8 +19,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Test Article - All Formatting & Embeds",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
                 children: [
                     {
@@ -30,8 +26,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         recordID: 1,
                         name: "Article 1",
                         parentID: 9,
-                        isSection: false,
-                        displayType: KbCategoryDisplayType.GUIDE,
                         url: "/kb/articles/1-article-one",
                     },
                     {
@@ -39,8 +33,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         recordID: 1,
                         name: "Chipmunks",
                         parentID: 9,
-                        isSection: false,
-                        displayType: KbCategoryDisplayType.GUIDE,
                         url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
                         children: [
                             {
@@ -48,8 +40,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                 recordID: 1,
                                 name: "Armadillos",
                                 parentID: 9,
-                                isSection: false,
-                                displayType: KbCategoryDisplayType.GUIDE,
                                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
                             },
                             {
@@ -57,8 +47,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                 recordID: 1,
                                 name: "CurrentPage",
                                 parentID: 9,
-                                isSection: false,
-                                displayType: KbCategoryDisplayType.GUIDE,
                                 url: "asfasdfasd",
                             },
                         ],
@@ -70,8 +58,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
             },
             {
@@ -79,8 +65,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
                 children: [
                     {
@@ -88,8 +72,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         recordID: 1,
                         name: "Armadillos",
                         parentID: 9,
-                        isSection: false,
-                        displayType: KbCategoryDisplayType.GUIDE,
                         url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
                     },
                     {
@@ -97,8 +79,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         recordID: 1,
                         name: "Chipmunks",
                         parentID: 9,
-                        isSection: false,
-                        displayType: KbCategoryDisplayType.GUIDE,
                         url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
                         children: [
                             {
@@ -106,8 +86,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                 recordID: 1,
                                 name: "Armadillos",
                                 parentID: 9,
-                                isSection: false,
-                                displayType: KbCategoryDisplayType.GUIDE,
                                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
                             },
                             {
@@ -115,8 +93,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                 recordID: 1,
                                 name: "Chipmunks",
                                 parentID: 9,
-                                isSection: false,
-                                displayType: KbCategoryDisplayType.GUIDE,
                                 url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
                                 children: [
                                     {
@@ -124,8 +100,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                         recordID: 1,
                                         name: "Armadillos",
                                         parentID: 9,
-                                        isSection: false,
-                                        displayType: KbCategoryDisplayType.GUIDE,
                                         url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
                                     },
                                     {
@@ -133,8 +107,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                         recordID: 1,
                                         name: "Chipmunks",
                                         parentID: 9,
-                                        isSection: false,
-                                        displayType: KbCategoryDisplayType.GUIDE,
                                         url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
                                     },
                                 ],
@@ -150,8 +122,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Pee Mart",
         parentID: 1,
-        isSection: true,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/2-pee-mart",
     },
     {
@@ -159,8 +129,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Predator Urine",
         parentID: 2,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/3-predator-urine",
     },
     {
@@ -168,8 +136,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Coyote Urine",
         parentID: 3,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/4-coyote-urine",
     },
     {
@@ -177,8 +143,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Fox Urine",
         parentID: 3,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/5-fox-urine",
     },
     {
@@ -186,8 +150,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Bobcat Urine",
         parentID: 3,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/6-bobcat-urine",
     },
     {
@@ -195,8 +157,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "P-Gel",
         parentID: 2,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/7-p-gel",
     },
     {
@@ -204,8 +164,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "P-Cover Granules",
         parentID: 2,
-        isSection: true,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/8-p-cover-granules",
         children: [
             {
@@ -213,8 +171,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
             },
             {
@@ -222,8 +178,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
             },
         ],
@@ -233,8 +187,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Article 2",
         parentID: 2,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "/kb/articles/2-article-two",
     },
     {
@@ -242,8 +194,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Armadillos",
         parentID: 9,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
     },
     {
@@ -251,8 +201,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Chipmunks",
         parentID: 9,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
     },
     {
@@ -260,8 +208,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Test 3",
         parentID: 2,
-        isSection: true,
-        displayType: KbCategoryDisplayType.SEARCH,
         url: "/kb/articles/3-article-three",
     },
     {
@@ -269,8 +215,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Mountain Lion",
         parentID: 8,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/13-mountain-lion",
     },
     {
@@ -278,8 +222,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Bear",
         parentID: 8,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/14-bear",
         children: [
             {
@@ -287,8 +229,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/10-armadillos",
             },
             {
@@ -296,8 +236,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
-                isSection: false,
-                displayType: KbCategoryDisplayType.GUIDE,
                 url: "https://dev.vanilla.localhost/kb/categories/11-chipmunks",
             },
         ],
@@ -307,8 +245,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "Wolf",
         parentID: 8,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/15-wolf",
     },
     {
@@ -316,8 +252,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "P-Wicks",
         parentID: 12,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/16-p-wicks",
     },
     {
@@ -325,8 +259,6 @@ export const dummyNavData: IKbNavigationCategory[] = [
         recordID: 1,
         name: "P-Dispensers",
         parentID: 12,
-        isSection: false,
-        displayType: KbCategoryDisplayType.GUIDE,
         url: "https://dev.vanilla.localhost/kb/categories/17-p-dispensers",
     },
 ];

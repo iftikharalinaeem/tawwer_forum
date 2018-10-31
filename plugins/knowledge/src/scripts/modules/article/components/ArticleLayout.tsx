@@ -49,7 +49,9 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelLayout.Breadcrumbs>
                     )}
                     <PanelLayout.LeftBottom>
-                        <SiteNav>{dummyNavData}</SiteNav>
+                        <PanelWidget>
+                            <SiteNav>{dummyNavData}</SiteNav>
+                        </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
@@ -73,13 +75,17 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
-                        <ArticleTOC items={article.outline} />
+                        <PanelWidget>
+                            <ArticleTOC items={article.outline} />
+                        </PanelWidget>
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
-                        <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
-                            {dummyOtherLanguagesData.children as any}
-                        </OtherLanguages>
-                        <RelatedArticles children={this.articleRelatedArticles} />
+                        <PanelWidget>
+                            <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
+                                {dummyOtherLanguagesData.children as any}
+                            </OtherLanguages>
+                            <RelatedArticles children={this.articleRelatedArticles} />
+                        </PanelWidget>
                     </PanelLayout.RightBottom>
                 </PanelLayout>
             </Container>

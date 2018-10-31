@@ -206,9 +206,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($this->navigationTreeSchema === null) {
             $schema = Schema::parse($this->getFragmentSchema())
                 ->setID('navigationTreeSchema');
-
             $schema->merge(Schema::parse([
-                'children:a?' =>  $this->getFragmentSchema()
+                'children:a?' =>  $schema
             ]));
             $this->navigationTreeSchema = $schema;
         }

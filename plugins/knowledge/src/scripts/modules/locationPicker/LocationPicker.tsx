@@ -70,7 +70,12 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal && <NewCategoryForm exitHandler={this.hideNewFolderModal} />}
+                {this.state.showNewCategoryModal && (
+                    <NewCategoryForm
+                        exitHandler={this.hideNewFolderModal}
+                        parentCategory={this.props.navigatedCategory}
+                    />
+                )}
             </React.Fragment>
         );
     }

@@ -78,7 +78,7 @@ export default class AdvancedSearch extends React.Component<IProps> {
     public render() {
         return (
             <form className="advancedSearch" onSubmit={doNothing}>
-                <Heading className="advancedSearch-title pageSubTitle">{t("AdvancedSearch")}</Heading>
+                <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
                 <RadioButtonsAsTabs
                     accessibleTitle={t("Search in:")}
                     prefix="advancedSearchDomain"

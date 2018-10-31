@@ -27,8 +27,6 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
         recordID: -1,
         recordType: "knowledgeCategory",
         parentID: -1,
-        displayType: KbCategoryDisplayType.ROOT,
-        isSection: true,
         url: "#",
     };
 
@@ -170,6 +168,18 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
                     status: LoadStatus.ERROR,
                     error: action.payload,
                 };
+            case CategoryActions.POST_CATEGORY_RESPONSE: {
+                if (state.status === LoadStatus.SUCCESS) {
+                    const { categoriesByID } = state.data!;
+                    categoriesByID[action.payload.data.knowledgeCategoryID] = action.payload.data;
+                    return {
+                        status: LoadStatus.SUCCESS,
+                        data: {
+                            categoriesByID,
+                        },
+                    };
+                }
+            }
         }
 
         return state;

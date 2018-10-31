@@ -73,7 +73,7 @@ $searchResult_breakPoint                      : 800px;
   display: block;
   overflow: hidden;
   font-size: $global-title_fontSize;
-  font-weight: $global-bold_fontWeight;
+  font-weight: $global-fontWeight_bold;
   flex-grow: 1;
   margin: 0;
 }
@@ -121,7 +121,7 @@ $searchResult_breakPoint                      : 800px;
   }
   font: {
     size: $global-medium_fontSize;
-    weight: $global-bold_fontWeight;
+    weight: $global-fontWeight_bold;
   }
 
   @include mediaQuery-searchResults_smallScreen {

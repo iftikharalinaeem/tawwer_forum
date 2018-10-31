@@ -26,7 +26,7 @@
     }
 
     &.isGiant {
-        font-weight: $global-bold_fontWeight;
+        font-weight: $global-fontWeight_bold;
         min-height: $formElement-giantInput_height;
         @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
     }

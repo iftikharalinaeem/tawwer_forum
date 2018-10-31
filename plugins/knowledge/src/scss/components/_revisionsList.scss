@@ -21,8 +21,8 @@ $revisionList-border_color: $global-border_color;
 
 .revisionsList {
     padding: {
-        top: $global-widgetInner_padding;
-        bottom: $global-widgetInner_padding;
+        top: $global-gutter_halfSize;
+        bottom: $global-gutter_halfSize;
     }
 }
 
@@ -38,7 +38,7 @@ $revisionList-border_color: $global-border_color;
     justify-content: flex-start;
     align-items: center;
     min-height: $revisionList-item_minHeight;
-    padding: 0 $global-widgetInner_padding;
+    padding: 0 $global-gutter_quarterSize;
     user-select: none;
 
     @include allLinkStates {
@@ -57,8 +57,8 @@ $revisionList-border_color: $global-border_color;
 
 .revisionsList-title {
     padding: {
-        right: $global-widgetInner_padding;
-        left: $global-widgetInner_padding;
+        right: $global-gutter_quarterSize;
+        left: $global-gutter_quarterSize;
     }
 }
 

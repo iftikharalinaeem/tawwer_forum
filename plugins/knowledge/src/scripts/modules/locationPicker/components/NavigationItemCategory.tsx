@@ -26,9 +26,7 @@ interface IProps {
 export default class NavigationItemCategory extends React.Component<IProps> {
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
-        const hasChildren =
-            value.recordType === "knowledgeCategory" &&
-            ((value.children && value.children.length > 0) || value.isSection);
+        const hasChildren = value.recordType === "knowledgeCategory" && (value.children && value.children.length > 0);
         return (
             <li className="folderContents-item">
                 <label className="folderContents-folder">

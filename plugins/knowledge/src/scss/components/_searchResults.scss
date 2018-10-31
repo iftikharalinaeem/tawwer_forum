@@ -17,7 +17,7 @@ $searchResult-separator_color                 : $global-separator_color;
 $searchResult-separator_width                 : $global-separator_width;
 
 $searchResult_verticalPadding                 : $utility-baseUnit * 3;
-$searchResult_horizontalPadding               : $global-widgetInner_padding;
+$searchResult_horizontalPadding               : $global-gutter_halfSize;
 
 $searchResult-media_width                     : 115px;
 
@@ -127,7 +127,7 @@ $searchResult_breakPoint                      : 800px;
     display: block;
     color: $searchResult-title_color;
     font-size: $global-title_fontSize;
-    font-weight: $global-bold_fontWeight;
+    font-weight: $global-fontWeight_bold;
     overflow: hidden;
     flex-grow: 1;
     margin: 0;
@@ -136,7 +136,7 @@ $searchResult_breakPoint                      : 800px;
     }
     font: {
         size: $global-medium_fontSize;
-        weight: $global-bold_fontWeight;
+        weight: $global-fontWeight_bold;
     }
 }
 

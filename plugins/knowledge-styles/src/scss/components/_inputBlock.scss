@@ -32,19 +32,19 @@
 .inputBlock-labelNote {
   display: block;
   font-size: $global-small_fontSize;
-  font-weight: $global-normal_fontWeight;
+  font-weight: $global-fontWeight_normal;
   opacity: .6;
 }
 
 .inputBlock-labelText {
   display: block;
-  font-weight: $global-bold_fontWeight;
+  font-weight: $global-fontWeight_bold;
   font-size: $global-medium_fontSize;
   margin-bottom: $utility-baseUnit;
 }
 
 .inputBlock-inlineLabel {
-  font-weight: $global-bold_fontWeight;
+  font-weight: $global-fontWeight_bold;
   font-size: $global-medium_fontSize;
 }
 

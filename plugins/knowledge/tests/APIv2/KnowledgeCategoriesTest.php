@@ -19,7 +19,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         "name",
         "parentID",
         "displayType",
-        "isSection",
         "sort",
         "sortChildren",
     ];
@@ -50,13 +49,11 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     public function modifyRow(array $row) {
         $row["name"] = $row["name"] ?? "Knowledge Category";
         $row["parentID"] = $row["parentID"] ?? -1;
-        $row["isSection"] = $row["isSection"] ?? false;
         $row["sort"] = $row["sort"] ?? 1;
         $row["sortChildren"] = $row["sortChildren"] ?? "name";
         $row["displayType"] = $row["displayType"] ?? null;
 
         $row["name"] = md5($row["name"]);
-        $row["isSection"] = !$row["isSection"];
         $row["sort"]++;
 
         $sortChildrenDiff = array_diff(
@@ -64,12 +61,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             [$row["sortChildren"]]
         );
         $row["sortChildren"] = array_rand(array_flip($sortChildrenDiff));
-
-        if ($row["isSection"]) {
-            $row["displayType"] = array_rand(array_flip(["help", "guide", "search"]));
-        } else {
-            $row["displayType"] = null;
-        }
 
         return $row;
     }
@@ -83,7 +74,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $record = [
             "name" => "Test Knowledge Category",
             "parentID" => -1,
-            "isSection" => false,
             "sortChildren" => "name",
             "displayType" => null,
             "sort" => 0,

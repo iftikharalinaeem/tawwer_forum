@@ -7,14 +7,9 @@
 $panelLayout_topMargin                                                : 0;
 $panelLayout_bottomMargin                                             : 48px;
 
-$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth +  2 * $icon-default_size + $utility-baseUnit !default;
-$panelLayout-twoColumn_breakpoint                                     : $global-main_paddedWidth !default;
+$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth !default;
+$panelLayout-twoColumn_breakpoint                                     : $global-main_width !default;
 $panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
-
-$panelLayout-panel_topPadding                                         : $global-widgetInner_padding !default;
-$panelLayout-panel_rightPadding                                       : $global-widgetInner_padding !default;
-$panelLayout-panel_bottomPadding                                      : $global-widgetInner_padding !default;
-$panelLayout-panel_leftPadding                                        : $global-widgetInner_padding !default;
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
 
@@ -23,7 +18,6 @@ $panelLayout-border_color                                             : rgba($gl
         @content;
     }
 }
-
 
 @mixin mediaQuery-panelLayout_twoColumn {
     @media (max-width: #{$panelLayout-twoColumn_breakpoint}) {
@@ -62,13 +56,6 @@ $panelLayout-border_color                                             : rgba($gl
     width: 100%;
 }
 
-.panelLayout-main {
-    .panelArea + .panelArea {
-        margin-top: $global_spacer;
-    }
-}
-
-
 .panelLayout {
     &.isOneCol {
         width: $global-middleColumn_width;
@@ -96,18 +83,19 @@ $panelLayout-border_color                                             : rgba($gl
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-    padding-right: $global-panel_spacerOuter;
     z-index: 2;
+    padding: {
+        left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+    }
 }
 
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-    padding-left: $global-panel_spacerOuter;
-
-    @include mediaQuery-panelLayout_twoColumn {
-        padding-left: $global-gutter_halfSize;
-        padding-right: $global-gutter_halfSize;
+    padding: {
+        left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
     }
 }
 
@@ -116,8 +104,8 @@ $panelLayout-border_color                                             : rgba($gl
     flex-grow: 1;
     width: 100%;
     padding: {
-        right: $global-gutter_halfSize;
         left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
     }
 
     &.hasAdjacentPanel {
@@ -130,15 +118,20 @@ $panelLayout-border_color                                             : rgba($gl
             flex-basis: 100%;
         }
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
 }
 
 
 .panelLayout-breadcrumbs {
     padding: {
         top: $global-gutter_halfSize;
-        right: $global-gutter_halfSize;
         bottom: $global-gutter_halfSize;
-        left: $global-gutter_halfSize;
     }
 
     &.hasAdjacentPanel {
@@ -162,39 +155,16 @@ $panelLayout-border_color                                             : rgba($gl
         flex-basis: calc(100% - #{$global-panel_paddedWidth});
         max-width: calc(100% - #{$global-panel_paddedWidth});
 
-        padding: {
-            left: #{$global_spacer - $global-gutter_halfSize};
-            right: #{$global_spacer - $global-gutter_halfSize};
-        }
-
-        @include mediaQuery-panelLayout_twoColumn {
-            padding: {
-                left: 0;
-            }
-        }
-
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;
-            padding: {
-                right: 0;
-            }
             max-width: 100%;
             flex-basis: 100%;
-            padding-left: 0;
         }
     }
 }
 
 
 @include mediaQuery-panelLayout_oneColumn {
-
-    .panelLayout-middle {
-        padding: {
-            left: 0;
-            right: 0;
-        }
-    }
-
     .panelLayout-sticky {
         position: relative;
         top: auto;
