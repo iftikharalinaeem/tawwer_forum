@@ -92,7 +92,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     protected function sphinxSearch(array $query): array {
         $sphinx = $this->sphinxClient();
-        $sphinx->SetLimits(0, self::SPHINX_DEFAULT_LIMIT);
+        $sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
         $sphinx->setMatchMode(SPH_MATCH_EXTENDED);
 
         if (isset($query['knowledgeCategoryID'])) {
@@ -100,10 +100,10 @@ class KnowledgeApiController extends AbstractApiController {
         }
         $sphinxQuery = '';
         if (isset($query['name']) && !empty(trim($query['name']))) {
-            $sphinxQuery .= '@name ('.$sphinx->EscapeString($query['name']).')*';
+            $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
         }
         if (isset($query['body']) && !empty(trim($query['body']))) {
-            $sphinxQuery .= '@body ('.$sphinx->EscapeString($query['body']).')*';
+            $sphinxQuery .= '@bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
         }
         return $sphinx->query($sphinxQuery, $this->sphinxIndexName('KnowledgeArticle'));
     }
