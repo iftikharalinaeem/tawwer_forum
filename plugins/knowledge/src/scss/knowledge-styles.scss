@@ -38,6 +38,7 @@
 @import "layouts/mobileMenu";
 @import "layouts/deviceChecker";
 //
+@import "components/userContent"; // Keep first of components
 //@import "components/widgets";
 @import "components/metas";
 @import "components/icons";
@@ -61,7 +62,7 @@
 @import "components/navMenu";
 @import "components/tableOfContents";
 @import "components/panelList";
-@import "components/userContent";
+
 @import "components/searchResults";
 //@import "components/sortAndFilter";
 //@import "components/formatIcons";
