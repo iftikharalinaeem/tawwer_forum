@@ -75,6 +75,7 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("format", "varchar(20)")
             ->column("body", "text")
             ->column("bodyRendered", "text")
+            ->column("outline", "text")
             ->column("locale", "varchar(10)", true)
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
