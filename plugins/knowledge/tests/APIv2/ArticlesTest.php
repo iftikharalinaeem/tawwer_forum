@@ -130,6 +130,7 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles.
      */
     public function testIndex() {
+        $helloWorldBody = json_encode([["insert" => "Hello World"]]);
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Primary",
@@ -147,15 +148,15 @@ class ArticlesTest extends AbstractResourceTest {
             $this->api()->post($this->baseUrl, [
                 "knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"],
                 "name" => "Primary Category Article",
-                "body" => "Hello world.",
-                "format" => "markdown",
+                "body" => $helloWorldBody,
+                "format" => "rich",
             ])->getBody();
 
             $this->api()->post($this->baseUrl, [
                 "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"],
                 "name" => "Secondary Category Article",
-                "body" => "Hello world.",
-                "format" => "markdown",
+                "body" => $helloWorldBody,
+                "format" => "rich",
             ])->getBody();
         }
 

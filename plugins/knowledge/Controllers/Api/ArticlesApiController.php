@@ -554,7 +554,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
-        $row["outline"] = $row["outline"] ? json_decode($row["outline"], true) : [];
+        $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
