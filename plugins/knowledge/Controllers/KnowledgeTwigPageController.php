@@ -15,6 +15,7 @@ use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
+use Vanilla\Web\Assets\AbstractAsset;
 use Vanilla\Web\Assets\WebpackAsset;
 use Vanilla\Web\Assets\WebpackAssetProvider;
 
@@ -62,7 +63,7 @@ abstract class KnowledgeTwigPageController extends PageController {
 
         $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
 
-        $mapAssetToPath = function(WebpackAsset $asset) { return $asset->getWebPath(); };
+        $mapAssetToPath = function(AbstractAsset $asset) { return $asset->getWebPath(); };
         $this->scripts = array_map($mapAssetToPath, $assetProvider->getScripts('knowledge'));
         $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
 
