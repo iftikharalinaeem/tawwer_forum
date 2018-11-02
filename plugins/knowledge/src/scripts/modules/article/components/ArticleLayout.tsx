@@ -3,7 +3,6 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
-
 import * as React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { Devices } from "@library/components/DeviceChecker";
@@ -21,9 +20,9 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import { IFileAttachment } from "@knowledge/src/scripts/modules/article/components/AttachmentItem";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
+import { IFileAttachment } from "./AttachmentItem";
 
 interface IProps {
     article: IArticle;

@@ -10,7 +10,7 @@ import { t } from "@library/application";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { download } from "@library/components/Icons";
-import { getAttachmentIcon } from "@library/components/attachments";
+import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -44,6 +44,7 @@ export function getUnabbreviatedFileSizeUnit(unit: string) {
 export default class AttachmentItem extends React.PureComponent<IFileAttachment> {
     public render() {
         const { title, name, type, url, dateUploaded, mimeType, sizeValue, sizeUnit } = this.props;
+        const unabbreviatedTitle = getUnabbreviatedFileSizeUnit(sizeUnit);
         return (
             <li className="attachment">
                 <a href={url} className="attachment-link" type={mimeType} download={name} tabIndex={-1}>
@@ -58,7 +59,7 @@ export default class AttachmentItem extends React.PureComponent<IFileAttachment>
                             )}
                             <span className="meta">
                                 {sizeValue}
-                                <abbr title={getUnabbreviatedFileSizeUnit(sizeUnit)}>{sizeUnit}</abbr>
+                                <abbr title={unabbreviatedTitle || undefined}>{sizeUnit}</abbr>
                             </span>
                         </div>
                     </div>

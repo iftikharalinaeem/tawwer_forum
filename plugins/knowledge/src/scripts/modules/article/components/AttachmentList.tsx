@@ -7,8 +7,7 @@
 import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
-import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
-import AttachmentItem from "@knowledge/modules/article/components/AttachmentItem";
+import AttachmentItem, { IFileAttachment } from "@knowledge/modules/article/components/AttachmentItem";
 
 interface IProps {
     children: IFileAttachment[];
