@@ -33,9 +33,9 @@ interface IProps extends IAttachmentIcon {}
 export default class AttachmentIcon extends React.Component<IProps> {
     public render() {
         return (
-            <li className="attachmentsIcons-item">
+            <li className="attachments-item">
                 <div
-                    className={classNames("attachmentsIcons-file", `attachmentsIcons-${this.props.type}`)}
+                    className={classNames("attachment-file", `attachment-${this.props.type}`)}
                     title={t(this.props.type)}
                 >
                     <span className="sr-only">
@@ -43,22 +43,35 @@ export default class AttachmentIcon extends React.Component<IProps> {
                             <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
                         </Paragraph>
                     </span>
-                    {this.getAttachmentIcon(this.props.type)}
+                    {getAttachmentIcon(this.props.type)}
                 </div>
             </li>
         );
     }
+}
 
-    private getAttachmentIcon(type: AttachmentType, className?: string) {
-        switch (type) {
-            case AttachmentType.EXCEL:
-                return fileExcel(className);
-            case AttachmentType.PDF:
-                return filePDF(className);
-            case AttachmentType.WORD:
-                return fileWord(className);
-            default:
-                return fileGeneric(className);
-        }
+export function getAttachmentIcon(type: AttachmentType, className?: string) {
+    switch (type) {
+        case AttachmentType.EXCEL:
+            return fileExcel(className);
+        case AttachmentType.PDF:
+            return filePDF(className);
+        case AttachmentType.WORD:
+            return fileWord(className);
+        default:
+            return fileGeneric(className);
+    }
+}
+
+export function getUnabbreviatedAttachmentType(type: AttachmentType) {
+    switch (type) {
+        case AttachmentType.EXCEL:
+            return t("Microsoft Excel Document");
+        case AttachmentType.PDF:
+            return t("Adobe Portable Document Format");
+        case AttachmentType.WORD:
+            return t("Microsoft Word Document");
+        default:
+            return null;
     }
 }
