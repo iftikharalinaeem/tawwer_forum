@@ -27,11 +27,11 @@ export function getUnabbreviatedFileSizeUnit(unit: string) {
     switch (unit.toLowerCase()) {
         case "bit":
             return t("Bit");
-        case "Byte":
+        case "byte":
             return t("Byte");
-        case "Kilobyte":
+        case "kilobyte":
             return t("Kilobyte");
-        case "Megabyte":
+        case "megabyte":
             return t("Megabyte");
         default:
             return null;

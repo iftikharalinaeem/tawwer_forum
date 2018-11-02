@@ -10,7 +10,7 @@ import { t } from "@library/application";
 import AttachmentItem, { IFileAttachment } from "@knowledge/modules/article/components/AttachmentItem";
 
 interface IProps {
-    children: IFileAttachment[];
+    attachments: IFileAttachment[];
 }
 
 /**
@@ -24,7 +24,7 @@ export default class AttachmentList extends React.Component<IProps> {
     }
 
     public render() {
-        const attachments = this.props.children.map((attachment, index) => {
+        const attachments = this.props.attachments.map((attachment, index) => {
             return <AttachmentItem {...attachment} key={index} />;
         });
         if (attachments) {

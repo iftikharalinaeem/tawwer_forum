@@ -74,7 +74,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
                             <UserContent content={article.body} />
-                            <AttachmentList>{this.articleAttachmentList}</AttachmentList>
+                            <AttachmentList attachments={this.articleAttachmentList} />
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
