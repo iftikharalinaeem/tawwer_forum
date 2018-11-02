@@ -7,28 +7,36 @@
 $pageLocation_spacer: $utility-baseUnit * 2;
 
 .pageLocation {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: $global-spacer;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: $global-spacer;
 }
 
 .pageLocation-picker {
-  border: solid $formElement_borderColor $formElement_borderWidth;
-  border-radius: $global-borderRadius;
-  user-select: none;
-  margin-left: 1ex;
-  font-size: $global-small_fontSize;
-  color: $metaText_color;
-  padding: {
-    top: $utility-baseUnit;
-    bottom: $utility-baseUnit;
-    left: $pageLocation_spacer;
-    right: $pageLocation_spacer;
-  }
+    @include shadow-embed;
+    border: solid $global-border_color $formElement_borderWidth;
+    border-radius: $formElement_height / 2;
+    user-select: none;
+
+    font-size: $global-small_fontSize;
+    color: $metaText_color;
+    padding: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+        left: $pageLocation_spacer;
+        right: $pageLocation_spacer;
+    }
+
+    &:active,
+    &:hover,
+    &:focus {
+        border-color: $global-color_primary;
+        color: $global-color_primary;
+    }
 }
 
 .locationBreadcrumb-separator {
-  margin: 0 .4em;
+    margin: 0 .4em;
 }

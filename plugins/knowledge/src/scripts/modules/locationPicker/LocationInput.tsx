@@ -53,9 +53,6 @@ export class LocationInput extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <div className={classNames("pageLocation", this.props.className)}>
-                    <span className="pageLocation-label" aria-hidden={true}>
-                        {t("To: ")}
-                    </span>
                     <Button
                         title={buttonTitle}
                         type="button"
