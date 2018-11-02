@@ -7,7 +7,7 @@
 import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
-import AttachmentIcon, { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
+import AttachmentIcon from "@knowledge/modules/common/AttachmentIcon";
 import Translate from "@library/components/translation/Translate";
 
 // Array of icon attachments
