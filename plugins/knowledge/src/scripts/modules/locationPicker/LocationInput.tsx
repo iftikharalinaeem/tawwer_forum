@@ -16,6 +16,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
+import { plusCircle } from "@library/components/Icons";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
@@ -31,7 +32,7 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
-    private static readonly SELECT_MESSAGE = t("Choose a Category");
+    private static readonly SELECT_MESSAGE = t("Select a Category");
 
     public state: IState = {
         showLocationPicker: false,
@@ -47,7 +48,10 @@ export class LocationInput extends React.Component<IProps, IState> {
         const buttonContents = locationBreadcrumb ? (
             <LocationBreadcrumbs locationData={locationBreadcrumb} />
         ) : (
-            LocationInput.SELECT_MESSAGE
+            <React.Fragment>
+                {plusCircle("pageLocation-placeholderIcon")}
+                {LocationInput.SELECT_MESSAGE}
+            </React.Fragment>
         );
 
         return (

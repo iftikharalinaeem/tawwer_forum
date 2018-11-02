@@ -5,6 +5,7 @@
  */
 
 $pageLocation_spacer: $utility-baseUnit * 2;
+$pageLocation-placeholderIcon_size: 14px;
 
 .pageLocation {
     display: flex;
@@ -16,6 +17,10 @@ $pageLocation_spacer: $utility-baseUnit * 2;
 
 .pageLocation-picker {
     @include shadow-embed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $global-fontWeight_semiBold;
     border: solid $global-border_color $formElement_borderWidth;
     border-radius: $formElement_height / 2;
     user-select: none;
@@ -39,4 +44,10 @@ $pageLocation_spacer: $utility-baseUnit * 2;
 
 .locationBreadcrumb-separator {
     margin: 0 .4em;
+}
+
+.pageLocation-placeholderIcon {
+    width: $pageLocation-placeholderIcon_size;
+    height: $pageLocation-placeholderIcon_size;
+    margin-right: .6em;
 }
