@@ -7,6 +7,9 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Garden\Web\RequestInterface;
+use Vanilla\Contracts;
+
 /**
  * A class for gathering particular data about the site.
  */
@@ -30,16 +33,16 @@ class SiteMeta implements \JsonSerializable {
     /**
      * SiteMeta constructor.
      *
-     * @param \Gdn_Request $request The request to gather data from.
-     * @param \Gdn_Configuration $config The configuration object.
+     * @param RequestInterface $request The request to gather data from.
+     * @param Contracts\ConfigurationInterface $config The configuration object.
      */
-    public function __construct(\Gdn_Request $request, \Gdn_Configuration $config) {
-        $this->host = $request->domain();
+    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config) {
+        $this->host = $request->getHost();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
         // But never with a trailing slash.
-        $this->basePath = rtrim('/'.trim($request->webRoot(), '/'), '/');
-        $this->assetPath = rtrim('/'.trim($request->assetRoot(), '/'), '/');
+        $this->basePath = rtrim('/'.trim($request->getRoot(), '/'), '/');
+        $this->assetPath = rtrim('/'.trim($request->getAssetRoot(), '/'), '/');
         $this->debugModeEnabled = $config->get('Debug');
 
         // Get some ui metadata

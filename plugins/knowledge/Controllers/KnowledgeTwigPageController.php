@@ -9,15 +9,14 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
 use Garden\Web\Data;
+use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
-use Vanilla\Web\Assets\AbstractAsset;
-use Vanilla\Web\Assets\WebpackAsset;
-use Vanilla\Web\Assets\WebpackAssetProvider;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 
 /**
  * Knowledge Twig & ArticlesApi controller abstract class.
@@ -63,7 +62,7 @@ abstract class KnowledgeTwigPageController extends PageController {
 
         $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
 
-        $mapAssetToPath = function(AbstractAsset $asset) { return $asset->getWebPath(); };
+        $mapAssetToPath = function(AssetInterface $asset) { return $asset->getWebPath(); };
         $this->scripts = array_map($mapAssetToPath, $assetProvider->getScripts('knowledge'));
         $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
 
