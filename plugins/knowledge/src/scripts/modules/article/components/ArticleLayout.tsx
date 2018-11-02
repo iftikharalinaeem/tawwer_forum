@@ -21,6 +21,7 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import { IFileAttachment } from "@knowledge/src/scripts/modules/article/components/AttachmentItem";
 import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 
