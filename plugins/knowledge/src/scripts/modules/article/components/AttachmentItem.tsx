@@ -7,14 +7,10 @@
 import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
-import {
-    AttachmentType,
-    getUnabbreviatedAttachmentType,
-    getAttachmentIcon,
-} from "@knowledge/modules/common/AttachmentIcon";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { download } from "@library/components/Icons";
+import { getAttachmentIcon } from "@library/components/attachments";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -51,7 +47,7 @@ export default class AttachmentItem extends React.PureComponent<IFileAttachment>
         return (
             <li className="attachment">
                 <a href={url} className="attachment-link" type={mimeType} download={name} tabIndex={-1}>
-                    <div className="attachment-format">{getAttachmentIcon(type as AttachmentType)}</div>
+                    <div className="attachment-format">{getAttachmentIcon(type)}</div>
                     <div className="attachment-main">
                         <div className="attachment-title">{title || name}</div>
                         <div className="attachment-metas metas">

@@ -22,8 +22,8 @@ import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLangua
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import { IFileAttachment } from "@knowledge/src/scripts/modules/article/components/AttachmentItem";
-import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
+import { AttachmentType } from "@library/components/attachments";
 
 interface IProps {
     article: IArticle;

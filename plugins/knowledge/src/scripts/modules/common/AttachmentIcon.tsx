@@ -7,16 +7,9 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-
-export enum AttachmentType {
-    FILE = "file",
-    PDF = "PDF",
-    EXCEL = "excel",
-    WORD = "word",
-}
+import { AttachmentType, getAttachmentIcon } from "@library/components/attachments";
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -47,31 +40,5 @@ export default class AttachmentIcon extends React.Component<IProps> {
                 </div>
             </li>
         );
-    }
-}
-
-export function getAttachmentIcon(type: AttachmentType, className?: string) {
-    switch (type) {
-        case AttachmentType.EXCEL:
-            return fileExcel(className);
-        case AttachmentType.PDF:
-            return filePDF(className);
-        case AttachmentType.WORD:
-            return fileWord(className);
-        default:
-            return fileGeneric(className);
-    }
-}
-
-export function getUnabbreviatedAttachmentType(type: AttachmentType) {
-    switch (type) {
-        case AttachmentType.EXCEL:
-            return t("Microsoft Excel Document");
-        case AttachmentType.PDF:
-            return t("Adobe Portable Document Format");
-        case AttachmentType.WORD:
-            return t("Microsoft Word Document");
-        default:
-            return null;
     }
 }
