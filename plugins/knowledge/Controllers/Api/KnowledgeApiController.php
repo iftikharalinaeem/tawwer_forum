@@ -20,6 +20,12 @@ class KnowledgeApiController extends AbstractApiController {
 
     const SPHINX_DEFAULT_LIMIT = 100;
 
+    const ARTICLE_STATUSES = [
+        1 => ArticleModel::STATUS_PUBLISHED,
+        2 => ArticleModel::STATUS_DELETED,
+        3 => ArticleModel::STATUS_UNDELETED
+    ];
+
     /** @var Schema */
     private $searchResultSchema;
 
@@ -46,11 +52,14 @@ class KnowledgeApiController extends AbstractApiController {
         return $this->schema(
             [
                 "name" => ["type" => "string"],
-                "bodyPlainText?"  => ["type" => "string"],
-                "bodyRendered?"  => ["type" => "string"],
+                "body?"  => ["type" => "string"],
                 "url" => ["type" => "string"],
+                "insertUserID" => ["type" => "integer"],
                 "recordID" => ["type" => "integer"],
+                "dateInserted" => ["type" => "datetime"],
+                "dateUpdated" => ["type" => "datetime"],
                 "knowledgeCategoryID?"=> ["type" => "integer"],
+                "status" => ["type" => "string"],
                 "recordType" => [
                     "enum" => ["article", "knowledgeCategory"],
                     "type" => "string",
@@ -94,9 +103,22 @@ class KnowledgeApiController extends AbstractApiController {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
         $sphinx->setMatchMode(SPH_MATCH_EXTENDED);
+        //$sphinx->setSelect(' id, status');
 
         if (isset($query['knowledgeCategoryID'])) {
             $sphinx->setFilter('knowledgeCategoryID', [$query['knowledgeCategoryID']]);
+        }
+        if (isset($query['status'])) {
+            $statuses = array_map(
+                function ($status) {
+                    return array_search($status, self::ARTICLE_STATUSES);
+                },
+                $query['status']
+            );
+            $sphinx->setFilter('status', $statuses);
+        }
+        if (isset($query['insertUserID'])) {
+            $sphinx->setFilter('insertUserID', $query['insertUserID']);
         }
         $sphinxQuery = '';
         if (isset($query['name']) && !empty(trim($query['name']))) {
@@ -124,6 +146,7 @@ class KnowledgeApiController extends AbstractApiController {
         }
 
         foreach ($results as &$article) {
+            $article = array_merge($article, $searchResults['matches'][$article['articleRevisionID']]['attrs']);
             $article = $this->normalizeOutput($article);
         }
         return $results;
@@ -138,6 +161,8 @@ class KnowledgeApiController extends AbstractApiController {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
+            "insertUserID:a?" => "User ID (author of article) to filter results.",
+            "status:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
         ];
@@ -152,8 +177,9 @@ class KnowledgeApiController extends AbstractApiController {
     private function normalizeOutput(array $row): array {
         $row["recordID"] = $row["articleID"];
         $row["recordType"] = "article";
-        $row["bodyPlainText"] = strip_tags($row["bodyRendered"]);
+        $row["body"] = strip_tags($row["bodyRendered"]);
         $row["url"] = $this->articleModel->url($row);
+        $row["status"] = self::ARTICLE_STATUSES[$row["status"]];
 
         return $row;
     }
