@@ -103,7 +103,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     <DocumentTitle title={this.state.name || "Untitled"} />
                                 </div>
                                 <input
-                                    className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                                    className="richEditorForm-title inputBlock-inputText inputText"
                                     type="text"
                                     placeholder={t("Title")}
                                     value={this.state.name || ""}

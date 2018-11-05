@@ -16,7 +16,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
-import { plusCircle } from "@library/components/Icons";
+import { plusCircle, categoryIcon } from "@library/components/Icons";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
@@ -46,10 +46,13 @@ export class LocationInput extends React.Component<IProps, IState> {
             : LocationInput.SELECT_MESSAGE;
 
         const buttonContents = locationBreadcrumb ? (
-            <LocationBreadcrumbs locationData={locationBreadcrumb} />
+            <React.Fragment>
+                {categoryIcon("pageLocation-icon")}
+                <LocationBreadcrumbs locationData={locationBreadcrumb} />
+            </React.Fragment>
         ) : (
             <React.Fragment>
-                {plusCircle("pageLocation-placeholderIcon")}
+                {plusCircle("pageLocation-icon")}
                 {LocationInput.SELECT_MESSAGE}
             </React.Fragment>
         );
@@ -60,7 +63,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                     <Button
                         title={buttonTitle}
                         type="button"
-                        aria-label={t("Page Location:")}
+                        aria-label={t("Page Location")}
                         className="pageLocation-picker"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}

@@ -6,6 +6,9 @@
 
 $pageLocation_spacer: $utility-baseUnit * 2;
 $pageLocation-placeholderIcon_size: 14px;
+$pageLocation-picker_color: mixContentBgAndFg(17%);
+$pageLocation-picker_verticalPadding: 8px;
+$pageLocation-icon_opacity: .8;
 
 .pageLocation {
     display: flex;
@@ -26,12 +29,12 @@ $pageLocation-placeholderIcon_size: 14px;
     user-select: none;
 
     font-size: $global-small_fontSize;
-    color: $metaText_color;
+    color: $pageLocation-picker_color;
     padding: {
-        top: $utility-baseUnit;
-        bottom: $utility-baseUnit;
-        left: $pageLocation_spacer;
+        top: $pageLocation-picker_verticalPadding;
         right: $pageLocation_spacer;
+        bottom: $pageLocation-picker_verticalPadding;
+        left: $pageLocation_spacer;
     }
 
     &:active,
@@ -46,8 +49,9 @@ $pageLocation-placeholderIcon_size: 14px;
     margin: 0 .4em;
 }
 
-.pageLocation-placeholderIcon {
+.pageLocation-icon {
     width: $pageLocation-placeholderIcon_size;
     height: $pageLocation-placeholderIcon_size;
     margin-right: .6em;
+    opacity: $pageLocation-icon_opacity;
 }
