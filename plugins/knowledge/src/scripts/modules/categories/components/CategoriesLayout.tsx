@@ -66,8 +66,8 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             <SearchBar
                                 placeholder={t("Search")}
                                 options={options}
-                                setQuery={this.setQuery}
-                                query={this.state.query || ""}
+                                onChange={this.setQuery}
+                                value={this.state.query || ""}
                             >
                                 {category.name}
                                 <LinkAsButton

@@ -70,9 +70,11 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         <FramePanel>
                             <InputTextBlock
                                 label={t("Name")}
-                                placeholder={t("Example: Appearance")}
-                                onChange={this.handleNameChange}
-                                value={this.state.categoryName}
+                                inputProps={{
+                                    value: this.state.categoryName,
+                                    onChange: this.handleNameChange,
+                                    placeholder: t("Example: Appearance"),
+                                }}
                             />
                         </FramePanel>
                     </FrameBody>
