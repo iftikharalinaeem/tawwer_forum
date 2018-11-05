@@ -21,12 +21,6 @@ class ReactionModel extends Gdn_Model {
 
     const FORCE_REMOVE = 'remove';
 
-    /** Cache key. */
-    public static $MASTER_VOTE_KEY = 'Reactions';
-
-    /** Cache time to live. */
-    const CACHE_TTL = 600;
-
     /** Cache grace. */
     const CACHE_GRACE = 60;
 
@@ -35,11 +29,6 @@ class ReactionModel extends Gdn_Model {
 
     /** @var null  */
     public static $TagIDs = null;
-
-    /** @var bool */
-    public static $assignThreadNumber = false;
-
-    public static $currentPID = null;
 
     /**  @var int Contains the last count from {@link getRecordsWhere()}. */
     public $LastCount;
@@ -934,6 +923,8 @@ class ReactionModel extends Gdn_Model {
      * @param string|null $force Force a reaction status. One of the FORCE_* class constants.
      */
     public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false, $force = null) {
+        $inserted = false;
+
         if (is_null($userID)) {
             $userID = Gdn::session()->UserID;
             $isModerator = checkPermission('Garden.Moderation.Manage');
@@ -992,19 +983,16 @@ class ReactionModel extends Gdn_Model {
         // Allow addons to validate or modify data before save.
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
-        $key = 'Reactions_'. $iD .'_'.$userID;
-        $reactionsMutex = Gdn::cache()->exists($key);
-        $haveRebuildLock = false;
+        // Create unique key based on the RecordID and UserID to limit requests on a record.
+        $lockKey = 'Reactions.'. $iD .'.'.$userID;
+        $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
 
-        if (!$reactionsMutex) {
-            $haveRebuildLock = self::rebuildLock(false, $key);
-        } else {
-            throw new Gdn_UserException(t("Record is locked"));
-        }
-
-        if ($haveRebuildLock) {
+        if ($haveLock) {
             $inserted = $this->toggleUserTag($data, $row, $model, $force);
-            self::rebuildLock(true, '');
+            $this->releaseCacheLock($lockKey);
+        } else {
+            // Fail silently because we don't have a lock, so we shouldn't execute the trailing code.
+            return;
         }
 
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
@@ -1100,27 +1088,7 @@ class ReactionModel extends Gdn_Model {
             'UserID' => $userID
         ];
         ReactionsPlugin::instance()->fireEvent('Reaction');
-    }
 
-    protected static function rebuildLock($release = false, $key = '') {
-        $isMaster = null;
-        if ($release) {
-            Gdn::cache()->remove(self::$MASTER_VOTE_KEY);
-            return false;
-        }
-
-        if (is_null($isMaster)) {
-            self::$MASTER_VOTE_KEY = $key;
-
-            // Vote for master
-            $instanceKey = getmypid();
-            $masterKey = Gdn::cache()->add(self::$MASTER_VOTE_KEY, $instanceKey, [
-                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_GRACE
-            ]);
-
-            $isMaster = ($instanceKey == $masterKey);
-        }
-        return (bool)$isMaster;
     }
 
     /**
