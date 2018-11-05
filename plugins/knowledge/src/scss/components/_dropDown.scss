@@ -36,6 +36,10 @@ $dropDown-item_minHeight                       : 45px;
     &.isParentWidth {
         width: 100%;
     }
+
+    &.isOwnWidth {
+        width: initial;
+    }
 }
 
 .dropDownItems {
