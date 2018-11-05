@@ -118,6 +118,8 @@ class KnowledgeApiController extends AbstractApiController {
                 $query['status']
             );
             $sphinx->setFilter('status', $statuses);
+        } else {
+            $sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
         }
         if (isset($query['insertUserID'])) {
             $sphinx->setFilter('insertUserID', $query['insertUserID']);
