@@ -9,6 +9,8 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\SphinxTrait;
+use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
@@ -120,6 +122,10 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($query['insertUserID'])) {
             $sphinx->setFilter('insertUserID', $query['insertUserID']);
         }
+        if (isset($query['dateUpdated'])) {
+            $range = DateFilterSchema::dateFilterRange($query['dateUpdated']);
+            $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp(), $range['exclude']);
+        }
         $sphinxQuery = '';
         if (isset($query['name']) && !empty(trim($query['name']))) {
             $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
@@ -162,6 +168,9 @@ class KnowledgeApiController extends AbstractApiController {
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
             "insertUserID:a?" => "User ID (author of article) to filter results.",
+            'dateUpdated?' => new DateFilterSchema([
+                'description' => 'Filter by date when the article was updated.',
+            ]),
             "status:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
