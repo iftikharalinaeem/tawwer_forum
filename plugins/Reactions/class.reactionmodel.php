@@ -7,6 +7,7 @@
 use Garden\EventManager;
 use Vanilla\Addon;
 
+
 /**
  * Class ReactionModel
  */
@@ -20,11 +21,25 @@ class ReactionModel extends Gdn_Model {
 
     const FORCE_REMOVE = 'remove';
 
+    /** Cache key. */
+    public static $MASTER_VOTE_KEY = 'Reactions';
+
+    /** Cache time to live. */
+    const CACHE_TTL = 600;
+
+    /** Cache grace. */
+    const CACHE_GRACE = 60;
+
     /** @var null  */
     public static $ReactionTypes = null;
 
     /** @var null  */
     public static $TagIDs = null;
+
+    /** @var bool */
+    public static $assignThreadNumber = false;
+
+    public static $currentPID = null;
 
     /**  @var int Contains the last count from {@link getRecordsWhere()}. */
     public $LastCount;
@@ -977,7 +992,20 @@ class ReactionModel extends Gdn_Model {
         // Allow addons to validate or modify data before save.
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
-        $inserted = $this->toggleUserTag($data, $row, $model, $force);
+        $key = 'Reactions_'. $iD .'_'.$userID;
+        $reactionsMutex = Gdn::cache()->exists($key);
+        $haveRebuildLock = false;
+
+        if (!$reactionsMutex) {
+            $haveRebuildLock = self::rebuildLock(false, $key);
+        } else {
+            throw new Gdn_UserException(t("Record is locked"));
+        }
+
+        if ($haveRebuildLock) {
+            $inserted = $this->toggleUserTag($data, $row, $model, $force);
+            self::rebuildLock(true, '');
+        }
 
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 
@@ -1074,6 +1102,27 @@ class ReactionModel extends Gdn_Model {
         ReactionsPlugin::instance()->fireEvent('Reaction');
     }
 
+    protected static function rebuildLock($release = false, $key = '') {
+        $isMaster = null;
+        if ($release) {
+            Gdn::cache()->remove(self::$MASTER_VOTE_KEY);
+            return false;
+        }
+
+        if (is_null($isMaster)) {
+            self::$MASTER_VOTE_KEY = $key;
+
+            // Vote for master
+            $instanceKey = getmypid();
+            $masterKey = Gdn::cache()->add(self::$MASTER_VOTE_KEY, $instanceKey, [
+                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_GRACE
+            ]);
+
+            $isMaster = ($instanceKey == $masterKey);
+        }
+        return (bool)$isMaster;
+    }
+
     /**
      *
      *
@@ -1119,6 +1168,7 @@ class ReactionModel extends Gdn_Model {
             // Check the cache first.
             $reactionTypes = Gdn::cache()->get('ReactionTypes');
 
+
             if ($reactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
                 $reactionTypes = Gdn::sql()->get('ReactionType', 'Sort, Name')->resultArray();
                 foreach ($reactionTypes as $type) {
@@ -1132,6 +1182,8 @@ class ReactionModel extends Gdn_Model {
                     }
 
                     self::$ReactionTypes[strtolower($row['UrlCode'])] = $row;
+
+
                 }
                 Gdn::cache()->store('ReactionTypes', self::$ReactionTypes);
             } else {
@@ -1145,6 +1197,8 @@ class ReactionModel extends Gdn_Model {
 
         return self::$ReactionTypes;
     }
+
+
 
     /**
      *
