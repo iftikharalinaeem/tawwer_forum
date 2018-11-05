@@ -10,7 +10,7 @@ import { Modal } from "@library/components/modal";
 import Button from "@library/components/forms/Button";
 import FramePanel from "@library/components/frame/FramePanel";
 import InputTextBlock from "@library/components/forms/InputTextBlock";
-import { newFolder } from "@library/components/Icons";
+import { newFolder } from "@library/components/icons/icons";
 import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";

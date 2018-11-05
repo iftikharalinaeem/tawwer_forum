@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { IKbNavigationItem } from "@knowledge/@types/api";
-import { rightChevron, categoryIcon, checkCompact } from "@library/components/Icons";
+import { rightChevron, categoryIcon, checkCompact } from "@library/components/icons/common";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 

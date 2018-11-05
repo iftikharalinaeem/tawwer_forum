@@ -16,7 +16,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
-import { plusCircle, categoryIcon } from "@library/components/Icons";
+import { plusCircle, categoryIcon } from "@library/components/icons/common";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
