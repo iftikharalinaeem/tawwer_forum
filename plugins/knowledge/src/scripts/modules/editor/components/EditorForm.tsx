@@ -117,6 +117,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     onChange={this.editorChangeHandler}
                                     className="FormWrapper inheritHeight richEditorForm-editor"
                                     isLoading={this.isLoading}
+                                    device={this.props.device}
                                 />
                             </div>
                         </PanelLayout.MiddleBottom>
