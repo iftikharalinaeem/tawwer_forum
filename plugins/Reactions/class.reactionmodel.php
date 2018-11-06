@@ -1088,7 +1088,6 @@ class ReactionModel extends Gdn_Model {
             'UserID' => $userID
         ];
         ReactionsPlugin::instance()->fireEvent('Reaction');
-
     }
 
     /**
@@ -1136,7 +1135,6 @@ class ReactionModel extends Gdn_Model {
             // Check the cache first.
             $reactionTypes = Gdn::cache()->get('ReactionTypes');
 
-
             if ($reactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
                 $reactionTypes = Gdn::sql()->get('ReactionType', 'Sort, Name')->resultArray();
                 foreach ($reactionTypes as $type) {
@@ -1148,25 +1146,20 @@ class ReactionModel extends Gdn_Model {
                             $row[$name] = $value;
                         }
                     }
-
                     self::$ReactionTypes[strtolower($row['UrlCode'])] = $row;
-
-
                 }
                 Gdn::cache()->store('ReactionTypes', self::$ReactionTypes);
             } else {
                 self::$ReactionTypes = $reactionTypes;
             }
         }
-
+        
         if ($urlCode) {
             return val(strtolower($urlCode), self::$ReactionTypes, NULL);
         }
 
         return self::$ReactionTypes;
     }
-
-
 
     /**
      *
