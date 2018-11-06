@@ -21,7 +21,7 @@ interface IProps {
  */
 export default class AttachmentIcons extends React.Component<IProps> {
     private maxCount = 3;
-    private id = uniqueIDFromPrefix("attachments-");
+    private id = uniqueIDFromPrefix("attachmentIcons-");
 
     constructor(props: IProps) {
         super(props);
@@ -43,7 +43,7 @@ export default class AttachmentIcons extends React.Component<IProps> {
 
         if (attachments) {
             return (
-                <section className="attachments attachmentsIcons">
+                <section className="attachmentsIcons">
                     <h3 id={this.titleID} className="sr-only">
                         {t("Attachments: ")}
                     </h3>

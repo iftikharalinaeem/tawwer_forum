@@ -3,7 +3,6 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
-
 import * as React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { Devices } from "@library/components/DeviceChecker";
@@ -21,6 +20,9 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
+import { AttachmentType } from "@library/components/attachments";
+import { IFileAttachment } from "./AttachmentItem";
 
 interface IProps {
     article: IArticle;
@@ -72,6 +74,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     <PanelLayout.MiddleBottom>
                         <PanelWidget>
                             <UserContent content={article.body} />
+                            <AttachmentList attachments={this.articleAttachmentList} />
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
                     <PanelLayout.RightTop>
@@ -91,6 +94,46 @@ export class ArticleLayout extends React.Component<IProps, IState> {
             </Container>
         );
     }
+
+    private articleAttachmentList: IFileAttachment[] = [
+        {
+            url: "#",
+            name: "Configuration_Guide_New.doc",
+            title: "Guide",
+            type: AttachmentType.WORD,
+            dateUploaded: "2018-10-22T16:56:37.423Z",
+            sizeValue: "1.1",
+            sizeUnit: "MB",
+            mimeType: "application/msword",
+        },
+        {
+            url: "#",
+            name: "Expenses.xls",
+            type: AttachmentType.EXCEL,
+            dateUploaded: "2018-10-22T16:56:37.423Z",
+            sizeValue: "3.1",
+            sizeUnit: "MB",
+            mimeType: "application/vnd.ms-excel",
+        },
+        {
+            url: "#",
+            name: "PeeMartBrochure.pdf",
+            type: AttachmentType.PDF,
+            dateUploaded: "2018-10-22T16:56:37.423Z",
+            sizeValue: "10.1",
+            sizeUnit: "GB",
+            mimeType: "application/pdf",
+        },
+        {
+            url: "#",
+            name: "HowToDrinkWater.txt",
+            type: AttachmentType.FILE,
+            dateUploaded: "2018-10-22T16:56:37.423Z",
+            sizeValue: "1",
+            sizeUnit: "KB",
+            mimeType: "text/*",
+        },
+    ];
 
     private articleRelatedArticles: IInternalLink[] = [
         {

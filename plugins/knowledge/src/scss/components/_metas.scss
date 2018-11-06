@@ -5,7 +5,7 @@
  */
 
 $metas_verticalMargin         : $utility-baseUnit * 2;
-$metas_color                  : mix($global-color_fg, $global-color_bg, 50%) !default;
+$metas_color                  : $metaText_color !default;
 $meta_spacing                 : $global-gutter_quarterSize;
 
 .metas {
