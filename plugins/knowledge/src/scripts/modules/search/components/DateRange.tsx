@@ -35,7 +35,7 @@ export default class DateRange extends React.PureComponent<IProps> {
                         <DateInput />
                     </InputBlock>
                     <InputBlock label={t("To")} baseClass={InputTextBlockBaseClass.CUSTOM} className="dateRange-column">
-                        <DateInput />
+                        <DateInput alignment="right" />
                     </InputBlock>
                 </div>
             </div>

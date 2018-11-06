@@ -40,6 +40,11 @@ $dropDown-item_minHeight                       : 45px;
     &.isOwnWidth {
         width: initial;
     }
+
+    &.isRightAligned {
+        right: 0;
+        top: 0;
+    }
 }
 
 .dropDownItems {

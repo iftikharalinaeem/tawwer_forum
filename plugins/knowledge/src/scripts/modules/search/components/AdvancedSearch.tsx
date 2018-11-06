@@ -12,14 +12,13 @@ import Tokens from "@library/components/forms/select/Tokens";
 import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
-import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
-import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import Button from "@library/components/forms/Button";
 import { connect } from "react-redux";
 import SearchPageModel, { ISearchFormState, ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import DateRange from "@knowledge/modules/search/components/DateRange";
+import MultiUserInput from "@library/users/MultiUserInput";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -38,16 +37,6 @@ export class AdvancedSearch extends React.Component<IProps> {
         return (
             <form className="advancedSearch" onSubmit={this.noop}>
                 <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
-                <RadioButtonsAsTabs
-                    accessibleTitle={t("Search in:")}
-                    prefix="advancedSearchDomain"
-                    setData={this.noop}
-                    defaultTab={ISearchDomain.ARTICLES}
-                    childClass="advancedSearchDomain-tab"
-                >
-                    <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
-                    <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
-                </RadioButtonsAsTabs>
                 <InputTextBlock
                     label={t("Title")}
                     inputProps={{
@@ -55,7 +44,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                         value: formData.title,
                     }}
                 />
-                <Tokens label={t("Author")} options={dummyAuthors} setAuthor={this.noop} />
+                <MultiUserInput />
                 <DateRange />
                 {dummyKnowledgeBaseList &&
                     dummyKnowledgeBaseList.length > 0 && (
