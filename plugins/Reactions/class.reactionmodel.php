@@ -7,7 +7,6 @@
 use Garden\EventManager;
 use Vanilla\Addon;
 
-
 /**
  * Class ReactionModel
  */
@@ -1153,7 +1152,6 @@ class ReactionModel extends Gdn_Model {
                 self::$ReactionTypes = $reactionTypes;
             }
         }
-        
         if ($urlCode) {
             return val(strtolower($urlCode), self::$ReactionTypes, NULL);
         }
