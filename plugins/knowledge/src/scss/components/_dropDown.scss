@@ -24,7 +24,7 @@ $dropDown-item_minHeight                       : 45px;
 .dropDown-contents {
     @include shadow-dropDown;
     position: absolute;
-    width: $dropDown_width;
+    min-width: $dropDown_width;
     background-color: $dropdown_bg;
     border: {
         radius: $global_borderRadius;
