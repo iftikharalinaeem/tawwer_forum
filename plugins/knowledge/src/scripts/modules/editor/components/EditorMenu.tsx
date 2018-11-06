@@ -35,7 +35,12 @@ export default class EditorMenu extends React.PureComponent<IProps> {
 
         return (
             <Permission permission="articles.add">
-                <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
+                <DropDown
+                    id={this.domID}
+                    name={t("Article Options")}
+                    buttonClassName={this.props.buttonClassName}
+                    renderLeft={true}
+                >
                     <DropDownItemSeparator />
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
