@@ -18,7 +18,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     protected $editFields = [
         "name",
         "parentID",
-        "displayType",
         "sort",
         "sortChildren",
     ];
@@ -51,7 +50,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $row["parentID"] = $row["parentID"] ?? -1;
         $row["sort"] = $row["sort"] ?? 1;
         $row["sortChildren"] = $row["sortChildren"] ?? "name";
-        $row["displayType"] = $row["displayType"] ?? null;
 
         $row["name"] = md5($row["name"]);
         $row["sort"]++;
@@ -75,7 +73,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "name" => "Test Knowledge Category",
             "parentID" => -1,
             "sortChildren" => "name",
-            "displayType" => null,
             "sort" => 0,
         ];
         return $record;

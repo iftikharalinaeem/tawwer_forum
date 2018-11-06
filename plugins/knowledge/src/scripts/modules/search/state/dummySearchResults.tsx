@@ -8,7 +8,6 @@ import { AttachmentType } from "@library/components/attachments";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { t } from "@library/application";
 import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
-import { KbCategoryDisplayType } from "@knowledge/@types/api/kbCategory";
 
 export const dummySearchResults: IResult[] = [
     {
