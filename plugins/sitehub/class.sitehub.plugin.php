@@ -73,7 +73,7 @@ class SiteHubPlugin extends Gdn_Plugin {
 
         gdn::structure()
             ->table('Badge')
-            ->column('HubSync', 'tinyint(1)', '0')
+            ->column('HubSync', 'tinyint(1)', '1')
             ->set();
 
         touchConfig('Badges.Disabled', true);
@@ -386,7 +386,7 @@ class SiteHubPlugin extends Gdn_Plugin {
         $sender->Data['_ExtendedFields']['HubSync'] = [
             'Control' => 'CheckBox',
             'LabelCode' => t('Sync to Nodes'),
-            'Default' => false
+            'Default' => true
         ];
     }
 
