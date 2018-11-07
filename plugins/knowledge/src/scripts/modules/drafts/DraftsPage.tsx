@@ -19,7 +19,7 @@ interface IProps extends IDeviceProps {}
 
 interface IState {
     data: IDraftPreview[];
-    truncatedResults: boolean;
+    hasMoreResults: boolean;
 }
 
 /**
@@ -30,7 +30,7 @@ export class SearchPage extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             data: dummyDraftListData,
-            truncatedResults: this.truncatedResults(),
+            hasMoreResults: this.hasMoreResults(dummyDraftListData),
         };
     }
 
@@ -40,9 +40,9 @@ export class SearchPage extends React.Component<IProps, IState> {
                 <DocumentTitle title={t("Drafts")}>
                     <DraftsLayout
                         {...this.props}
-                        data={this.state.data || []}
+                        data={this.state.data}
                         loadMoreResults={this.loadMoreResults}
-                        truncatedResults={this.truncatedResults()}
+                        hasMoreResults={this.hasMoreResults(this.state.data)}
                     />
                 </DocumentTitle>
             </PageLoader>
@@ -54,12 +54,12 @@ export class SearchPage extends React.Component<IProps, IState> {
         const newData = [...this.state.data, ...dummyDraftListData];
         this.setState({
             data: newData,
-            truncatedResults: this.truncatedResults(newData),
+            hasMoreResults: this.hasMoreResults(newData),
         });
     }
 
     // Temporary function to simulate checking if we have more data
-    private truncatedResults(data: any[]) {
+    private hasMoreResults(data: any[]) {
         return data.length >= 15;
     }
 }

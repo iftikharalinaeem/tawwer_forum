@@ -16,7 +16,7 @@ import Button from "@library/components/forms/Button";
 interface IProps {
     className?: string;
     data: IDraftPreview[];
-    truncatedResults: boolean;
+    hasMoreResults: boolean;
     loadMoreResults?: () => void;
 }
 
@@ -40,7 +40,7 @@ export default class DraftsList extends React.Component<IProps> {
         return (
             <Tag className={classNames("draftList", this.props.className)}>
                 {content}
-                {this.props.truncatedResults && <Button onClick={this.props.loadMoreResults}>{t("Next")}</Button>}
+                {this.props.hasMoreResults && <Button onClick={this.props.loadMoreResults}>{t("Next")}</Button>}
             </Tag>
         );
     }

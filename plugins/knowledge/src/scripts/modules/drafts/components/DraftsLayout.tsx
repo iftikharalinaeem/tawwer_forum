@@ -19,13 +19,13 @@ import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { PageTitle } from "@knowledge/modules/common/PageTitle";
 import { dummyDraftListData } from "@knowledge/modules/drafts/state/dummyDrafts";
-import DraftList from "plugins/knowledge/src/scripts/modules/drafts/components/DraftList";
+import DraftList from "@knowledge/modules/drafts/components/DraftList";
 import { IDraftPreview } from "./DraftPreview";
 
 interface IProps {
     device: Devices;
     data: IDraftPreview[];
-    truncatedResults: boolean;
+    hasMoreResults: boolean;
     loadMoreResults?: () => void;
 }
 
@@ -47,7 +47,7 @@ class DraftsLayout extends React.Component<IProps> {
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>
                         <PanelWidgetVerticalPadding>
-                            {<DraftList data={dummyDraftListData} truncatedResults={} />}
+                            {<DraftList data={dummyDraftListData} hasMoreResults={this.props.hasMoreResults} />}
                         </PanelWidgetVerticalPadding>
                     </PanelLayout.MiddleBottom>
                     {isFullWidth && <PanelLayout.RightTop>{<PanelEmptyColumn />}</PanelLayout.RightTop>}
