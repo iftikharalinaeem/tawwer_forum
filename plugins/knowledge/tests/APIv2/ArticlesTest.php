@@ -135,12 +135,10 @@ class ArticlesTest extends AbstractResourceTest {
         $primaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Primary",
             "parentID" => -1,
-            "isSection" => false,
         ])->getBody();
         $secondaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Secondary",
             "parentID" => -1,
-            "isSection" => false,
         ])->getBody();
 
         // Setup the test articles.
