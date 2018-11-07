@@ -7,9 +7,16 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/icons/fileTypes";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-import { AttachmentType, getAttachmentIcon } from "@library/components/attachments";
+
+export enum AttachmentType {
+    FILE = "file",
+    PDF = "PDF",
+    EXCEL = "excel",
+    WORD = "word",
+}
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -26,9 +33,9 @@ interface IProps extends IAttachmentIcon {}
 export default class AttachmentIcon extends React.Component<IProps> {
     public render() {
         return (
-            <li className="attachments-item">
+            <li className="attachmentsIcons-item">
                 <div
-                    className={classNames("attachment-file", `attachment-${this.props.type}`)}
+                    className={classNames("attachmentsIcons-file", `attachmentsIcons-${this.props.type}`)}
                     title={t(this.props.type)}
                 >
                     <span className="sr-only">
@@ -36,9 +43,22 @@ export default class AttachmentIcon extends React.Component<IProps> {
                             <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
                         </Paragraph>
                     </span>
-                    {getAttachmentIcon(this.props.type)}
+                    {this.getAttachmentIcon(this.props.type)}
                 </div>
             </li>
         );
+    }
+
+    private getAttachmentIcon(type: AttachmentType, className?: string) {
+        switch (type) {
+            case AttachmentType.EXCEL:
+                return fileExcel(className);
+            case AttachmentType.PDF:
+                return filePDF(className);
+            case AttachmentType.WORD:
+                return fileWord(className);
+            default:
+                return fileGeneric(className);
+        }
     }
 }

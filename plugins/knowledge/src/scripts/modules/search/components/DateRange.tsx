@@ -7,7 +7,7 @@ import * as React from "react";
 import { t } from "@library/application";
 import InputTextBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputTextBlock";
 import SelectOne from "@library/components/forms/select/SelectOne";
-import { help } from "@library/components/Icons";
+import { help } from "@library/components/icons/common";
 import { ISearchWithin, dateWithin } from "../state/dateWithin";
 import classNames from "classnames";
 

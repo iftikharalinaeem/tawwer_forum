@@ -9,7 +9,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { download } from "@library/components/Icons";
+import { download } from "@library/components/icons/common";
 import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
 
 export interface IFileAttachment {

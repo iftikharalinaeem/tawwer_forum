@@ -19,7 +19,7 @@ import { t } from "@library/application";
 import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { compose } from "@library/components/Icons";
+import { compose } from "@library/components/icons/common";
 import LinkAsButton from "@library/components/LinkAsButton";
 
 interface IProps extends IDeviceProps {
