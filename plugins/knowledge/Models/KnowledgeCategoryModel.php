@@ -167,4 +167,25 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $result = \Gdn::request()->url("/kb/categories/".$slug, $withDomain);
         return $result;
     }
+
+    /**
+     * Build bredcrumbs array for particular knowledge category
+     *
+     * @param int $knowledgeCategoryID
+     * @return array
+     */
+    public function buildBreadcrumbs(int $knowledgeCategoryID) {
+        $result = [];
+        if ($knowledgeCategoryID) {
+            $categories = $this->selectWithAncestors($knowledgeCategoryID);
+            $index = 1;
+            foreach ($categories as $category) {
+                $result[$index++] = new Breadcrumb(
+                    $category["name"],
+                    $this->url($category)
+                );
+            }
+        }
+        return $result;
+    }
 }

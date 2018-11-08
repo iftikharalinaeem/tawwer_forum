@@ -12,6 +12,8 @@ use Garden\SphinxTrait;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -35,13 +37,19 @@ class KnowledgeApiController extends AbstractApiController {
      *
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
+     * @param UserModel $userModel
+     * @param knowledgeCategoryModel $knowledgeCategoryModel
      */
     public function __construct(
         ArticleRevisionModel $articleRevisionModel,
-        ArticleModel $articleModel
+        ArticleModel $articleModel,
+        \UserModel $userModel,
+        KnowledgeCategoryModel $knowledgeCategoryModel
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
+        $this->userModel = $userModel;
+        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
     /**
@@ -56,6 +64,7 @@ class KnowledgeApiController extends AbstractApiController {
                 "body?"  => ["type" => "string"],
                 "url" => ["type" => "string"],
                 "insertUserID" => ["type" => "integer"],
+                "updateUserID" => ["type" => "integer"],
                 "recordID" => ["type" => "integer"],
                 "dateInserted" => ["type" => "datetime"],
                 "dateUpdated" => ["type" => "datetime"],
@@ -64,10 +73,38 @@ class KnowledgeApiController extends AbstractApiController {
                 "recordType" => [
                     "enum" => ["article", "knowledgeCategory"],
                     "type" => "string",
-                ]
+                ],
+                "updateUser?" => $this->userFragmentSchema(),
+                "knowledgeCategory?" => $this->categoryFragmentSchema()
             ],
             "searchResultSchema"
         );
+    }
+
+    /**
+     * Get user fragment schema.
+     *
+     * @return Schema
+     */
+    public function userFragmentSchema(): Schema {
+        return $this->schema([
+            'userID:i' => 'The ID of the user.',
+            'name:s' => 'The username of the user.',
+            'photoUrl:s' => 'The URL of the user\'s avatar picture.',
+            'dateLastActive:dt|n' => 'Time the user was last active.',
+        ], 'UserFragment');
+    }
+
+    /**
+     * Get category breadcrumbs fragment schema.
+     *
+     * @return Schema
+     */
+    public function categoryFragmentSchema(): Schema {
+        return $this->schema([
+            'knowledgeCategoryID:i' => 'Knowledge category ID.',
+            'breadcrumbs?' => 'Breadcrumbs items array'
+        ], 'CategoryBreadcrumbsFragment');
     }
 
     /**
@@ -88,7 +125,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $searchResults = $this->sphinxSearch($query);
 
-        $results = $this->getNormalizedData($searchResults);
+        $results = $this->getNormalizedData($searchResults, $query['expand'] ?? []);
 
         $result = $out->validate($results);
         return $result;
@@ -123,6 +160,9 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($query['insertUserID'])) {
             $sphinx->setFilter('insertUserID', $query['insertUserID']);
         }
+        if (isset($query['updateUserID'])) {
+            $sphinx->setFilter('updateUserID', $query['updateUserID']);
+        }
         if (isset($query['dateUpdated'])) {
             $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
             $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
@@ -143,9 +183,11 @@ class KnowledgeApiController extends AbstractApiController {
      * Get articles data from articleRevisionsModel and normalize records for output
      *
      * @param array $searchResults Result set returned by Sphinx search
+     * @param array $expand List of properties need to provide extra details.
+     *        Ex ['category','user']
      * @return array
      */
-    protected function getNormalizedData(array $searchResults): array {
+    protected function getNormalizedData(array $searchResults, array $expand = []): array {
         $results = [];
         if (($searchResults['total'] ?? 0) > 0) {
             $results = $this->articleRevisionModel->get(
@@ -153,12 +195,63 @@ class KnowledgeApiController extends AbstractApiController {
                     'status' => ArticleModel::STATUS_PUBLISHED]
             );
         }
+        $userResults = $this->getUsersData($searchResults, $expand);
+
+        $categoryResults = $this->getCategoriesData($searchResults, $expand);
 
         foreach ($results as &$article) {
             $article = array_merge($article, $searchResults['matches'][$article['articleRevisionID']]['attrs']);
-            $article = $this->normalizeOutput($article);
+
+            $article = $this->normalizeOutput($article, $userResults, $categoryResults);
         }
         return $results;
+    }
+
+    /**
+     * Check if need to expand user fragment and return users data.
+     *
+     * @param array $searchResults Sphinx search results array
+     * @param array $expand Query param: expand
+     * @return array
+     */
+    protected function getUsersData(array $searchResults, array $expand): array {
+        $userResults = [];
+        if (in_array('user', $expand)) {
+            $users = [];
+            foreach ($searchResults['matches'] as $key => $article) {
+                $users[$article['attrs']['updateuserid']] = true;
+            };
+            $userResults = $this->userModel->getIDs(array_keys($users));
+            foreach ($userResults as $id => &$user) {
+                $user['photoUrl'] = $user['Photo'] ?? \UserModel::getDefaultAvatarUrl($user);
+            }
+        }
+        return $userResults;
+    }
+
+    /**
+     * Check if need to expand category and return categories data.
+     *
+     * @param array $searchResults Sphinx search results array
+     * @param array $expand Query param: expand
+     * @return array
+     */
+    protected function getCategoriesData(array $searchResults, array $expand): array {
+        $categoryResults = [];
+        if (in_array('category', $expand)) {
+            $categories = [];
+            foreach ($searchResults['matches'] as $key => $article) {
+                $categories[$article['attrs']['knowledgecategoryid']] = true;
+            };
+
+            foreach ($categories as $categoryID => $drop) {
+                $categoryResults[$categoryID] = [
+                    'knowledgeCategoryID' => $categoryID,
+                    'breadcrumbs' => json_decode(Breadcrumb::crumbsAsJsonLD($this->knowledgeCategoryModel->buildBreadcrumbs($categoryID)), true)
+                ];
+            }
+        }
+        return $categoryResults;
     }
 
     /**
@@ -171,6 +264,14 @@ class KnowledgeApiController extends AbstractApiController {
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
             "insertUserID:a?" => "User ID (author of article) to filter results.",
+            "updateUserID:a?" => "User ID (last editor of an article) to filter results.",
+            "expand:a?" => [
+                "description" => "Expand data for: user, category.",
+                'items' => [
+                    'enum' => ["user", "category"],
+                    'type' => 'string'
+                ]
+            ],
             'dateUpdated?' => new DateFilterSphinxSchema([
                 'description' => 'Filter by date when the article was updated.',
             ]),
@@ -184,13 +285,22 @@ class KnowledgeApiController extends AbstractApiController {
      * Massage tree data for useful API output.
      *
      * @param array $row
+     * @param array $users Array of userID => [user fields]
+     * @param array $categories Array of knowldegCategoryID => [category fields]
      * @return array
      */
-    private function normalizeOutput(array $row): array {
+    private function normalizeOutput(array $row, array $users, array $categories): array {
         $row["recordID"] = $row["articleID"];
         $row["recordType"] = "article";
         $row["body"] = strip_tags($row["bodyRendered"]);
         $row["url"] = $this->articleModel->url($row);
+        if (isset($users[$row['updateuserid']])) {
+            $row["updateUser"] = $users[$row['updateuserid']];
+        }
+        if (isset($categories[$row['knowledgecategoryid']])) {
+            $row["knowledgeCategory"] = $categories[$row['knowledgecategoryid']];
+        }
+
         $row["status"] = self::ARTICLE_STATUSES[$row["status"]];
 
         return $row;
