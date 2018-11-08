@@ -32,14 +32,12 @@ interface IProps {
 class DraftsLayout extends React.Component<IProps> {
     public render() {
         const { device } = this.props;
-        const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
-                    {!isMobile && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
+                    {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
                             <PageTitle title={t("Drafts")} device={device} />

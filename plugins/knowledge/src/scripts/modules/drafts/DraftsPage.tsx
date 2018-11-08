@@ -30,7 +30,7 @@ export class SearchPage extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             data: dummyDraftListData,
-            hasMoreResults: this.hasMoreResults(dummyDraftListData),
+            hasMoreResults: true,
         };
     }
 

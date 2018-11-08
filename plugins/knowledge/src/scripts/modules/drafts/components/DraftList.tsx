@@ -34,11 +34,11 @@ export default class DraftsList extends React.Component<IProps> {
                 return <DraftPreview {...result} key={`draftPreview-${i}`} />;
             });
         } else {
-            content = <Paragraph className="searchResults-noResults">{t("You do not have any drafts.")}</Paragraph>;
+            content = <Paragraph className="draftList-noResults">{t("You do not have any drafts.")}</Paragraph>;
         }
 
         return (
-            <Tag className={classNames("draftList", this.props.className)}>
+            <Tag className={classNames("draftList-list", this.props.className)}>
                 {content}
                 {this.props.hasMoreResults && <Button onClick={this.props.loadMoreResults}>{t("Next")}</Button>}
             </Tag>
