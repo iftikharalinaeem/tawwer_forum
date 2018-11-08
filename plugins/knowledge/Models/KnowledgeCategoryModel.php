@@ -54,25 +54,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Get the full knowledge category tree containing the target category.
-     *
-     * @param int $knowledgeCategoryID
-     * @return array
-     * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
-     */
-    public function sectionTree(int $knowledgeCategoryID): array {
-        // Search upward to get the container section.
-        do {
-            $result = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
-            $knowledgeCategoryID = $result["parentID"];
-        } while (!$result["isSection"]);
-
-        // Fetch all child categories in this section.
-        $result["children"] = $this->sectionChildren($result["knowledgeCategoryID"]);
-        return $result;
-    }
-
-    /**
      * Given a category ID, get the row and the rows of all its ancestors in order.
      *
      * @param int $categoryID
