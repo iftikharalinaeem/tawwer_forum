@@ -45,6 +45,10 @@ $dropDown-item_minHeight                       : 45px;
         right: 0;
         top: 0;
     }
+
+    &:empty {
+        display: none;
+    }
 }
 
 .dropDownItems {
