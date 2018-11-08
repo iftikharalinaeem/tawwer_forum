@@ -86,7 +86,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         className="editorHeader-otherLanguages"
                                         buttonClassName="buttonNoBorder buttonNoMinWidth"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
-                                        stickRight={true}
+                                        renderLeft={true}
                                     >
                                         {processedChildren}
                                     </SelectBox>

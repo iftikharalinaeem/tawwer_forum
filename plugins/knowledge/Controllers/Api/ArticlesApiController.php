@@ -18,7 +18,6 @@ use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Quill\BlotGroup;
-use Vanilla\Formatting\Quill\BlotGroupCollection;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -510,7 +509,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function get_edit(int $id): array {
-        $this->permission();
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema()->setDescription("Get an article for editing.");
         $out = $this->schema(Schema::parse([
@@ -692,7 +691,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function index_revisions(int $id): array {
-        $this->permission();
+        $this->permission("knowledge.kb.view");
 
         $this->idParamSchema()->setDescription("Get revisions from a specific article.");
         $out = $this->schema([
@@ -788,13 +787,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission();
+        $this->permission("knowledge.articles.add");
 
         $in = $this->articlePostSchema("in")->setDescription("Update an existing article.");
         $out = $this->articleSchema("out");
 
         $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
         $body = $in->validate($body, true);
         $this->save($body, $id);
         $row = $this->articleByID($id, true);
@@ -848,7 +846,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch_status(int $id, array $body): array {
-        $this->permission();
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -860,7 +858,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
         $article = $this->articleByID($id);
-        $this->editPermission($article["insertUserID"]);
         if ($article['status'] !== $body['status']) {
             $this->articleModel->update(
                 ['status' => $body['status']],
@@ -884,7 +881,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body): array {
-        $this->permission(["knowledge.articles.add", "knowledge.articles.manage"]);
+        $this->permission("knowledge.articles.add");
 
         $in = $this->articlePostSchema("in")->setDescription("Create a new article.");
         $out = $this->articleSchema("out");
