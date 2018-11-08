@@ -74,25 +74,11 @@ class KnowledgeApiController extends AbstractApiController {
                     "enum" => ["article", "knowledgeCategory"],
                     "type" => "string",
                 ],
-                "updateUser?" => $this->userFragmentSchema(),
+                "updateUser?" => $this->getUserFragmentSchema(),
                 "knowledgeCategory?" => $this->categoryFragmentSchema()
             ],
             "searchResultSchema"
         );
-    }
-
-    /**
-     * Get user fragment schema.
-     *
-     * @return Schema
-     */
-    public function userFragmentSchema(): Schema {
-        return $this->schema([
-            'userID:i' => 'The ID of the user.',
-            'name:s' => 'The username of the user.',
-            'photoUrl:s' => 'The URL of the user\'s avatar picture.',
-            'dateLastActive:dt|n' => 'Time the user was last active.',
-        ], 'UserFragment');
     }
 
     /**
@@ -103,7 +89,11 @@ class KnowledgeApiController extends AbstractApiController {
     public function categoryFragmentSchema(): Schema {
         return $this->schema([
             'knowledgeCategoryID:i' => 'Knowledge category ID.',
-            'breadcrumbs?' => 'Breadcrumbs items array'
+            'breadcrumbs:a' => Schema::parse([
+                "name:s" => "Breadcrumb element name.",
+                "url:s" => "Breadcrumb element url.",
+            ]),
+
         ], 'CategoryBreadcrumbsFragment');
     }
 
@@ -141,27 +131,26 @@ class KnowledgeApiController extends AbstractApiController {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
         $sphinx->setMatchMode(SPH_MATCH_EXTENDED);
-        //$sphinx->setSelect(' id, status');
 
         if (isset($query['knowledgeCategoryID'])) {
             $sphinx->setFilter('knowledgeCategoryID', [$query['knowledgeCategoryID']]);
         }
-        if (isset($query['status'])) {
+        if (isset($query['statuses'])) {
             $statuses = array_map(
                 function ($status) {
                     return array_search($status, self::ARTICLE_STATUSES);
                 },
-                $query['status']
+                $query['statuses']
             );
             $sphinx->setFilter('status', $statuses);
         } else {
             $sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
         }
-        if (isset($query['insertUserID'])) {
-            $sphinx->setFilter('insertUserID', $query['insertUserID']);
+        if (isset($query['insertUserIDs'])) {
+            $sphinx->setFilter('insertUserID', $query['insertUserIDs']);
         }
-        if (isset($query['updateUserID'])) {
-            $sphinx->setFilter('updateUserID', $query['updateUserID']);
+        if (isset($query['updateUserIDs'])) {
+            $sphinx->setFilter('updateUserID', $query['updateUserIDs']);
         }
         if (isset($query['dateUpdated'])) {
             $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
@@ -247,7 +236,12 @@ class KnowledgeApiController extends AbstractApiController {
             foreach ($categories as $categoryID => $drop) {
                 $categoryResults[$categoryID] = [
                     'knowledgeCategoryID' => $categoryID,
-                    'breadcrumbs' => json_decode(Breadcrumb::crumbsAsJsonLD($this->knowledgeCategoryModel->buildBreadcrumbs($categoryID)), true)
+                    'breadcrumbs' => array_map(
+                        function (Breadcrumb $breadcrumb) {
+                            return $breadcrumb->asArray();
+                        },
+                        array_values($this->knowledgeCategoryModel->buildBreadcrumbs($categoryID))
+                    )
                 ];
             }
         }
@@ -263,8 +257,8 @@ class KnowledgeApiController extends AbstractApiController {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
-            "insertUserID:a?" => "User ID (author of article) to filter results.",
-            "updateUserID:a?" => "User ID (last editor of an article) to filter results.",
+            "insertUserIDs:a?" => "Array of insertUserIDs (authors of article) to filter results.",
+            "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
             "expand:a?" => [
                 "description" => "Expand data for: user, category.",
                 'items' => [
@@ -275,7 +269,7 @@ class KnowledgeApiController extends AbstractApiController {
             'dateUpdated?' => new DateFilterSphinxSchema([
                 'description' => 'Filter by date when the article was updated.',
             ]),
-            "status:a?" => "Article statuses array to filter results.",
+            "statuses:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
         ];
