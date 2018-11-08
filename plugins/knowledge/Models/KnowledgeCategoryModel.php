@@ -54,20 +54,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Delete knowledge categories.
-     *
-     * @param array $where
-     * @param int $limit
-     */
-    public function delete(array $where, int $limit = 1) {
-        $this->sql()->delete(
-            $this->getTable(),
-            $where,
-            $limit
-        );
-    }
-
-    /**
      * Get the full knowledge category tree containing the target category.
      *
      * @param int $knowledgeCategoryID
