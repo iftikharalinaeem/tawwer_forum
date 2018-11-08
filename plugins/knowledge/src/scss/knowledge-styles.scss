@@ -18,8 +18,6 @@
 @import "~library-scss/userContent/_codeBlocks";
 @import "~library-scss/userContent/_accessibility";
 
-
-
 @import "base/scaffolding";
 @import "base/typography";
 @import "base/utilities";
@@ -71,7 +69,6 @@
 @import "components/radioButtonsAsTabs";
 //@import "components/autoComplete";
 //@import "components/layoutWidget";
-@import "components/editor";
 @import "components/dropDown";
 @import "components/word";
 @import "components/folderContents";
@@ -92,6 +89,7 @@
 @import "~library-scss/components/_checkboxAndRadioButton";
 @import "~library-scss/components/_tokens";
 @import "~library-scss/components/_dateRange";
+@import "~library-scss/components/richEditorForm";
 
 @import "~library-scss/embeds/_embeds";
 

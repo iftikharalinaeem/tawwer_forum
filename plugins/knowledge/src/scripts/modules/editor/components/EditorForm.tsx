@@ -34,6 +34,7 @@ interface IProps {
     className?: string;
     isSubmitLoading: boolean;
     titleID?: string;
+    legacyMode?: boolean;
 }
 
 interface IState {
@@ -103,7 +104,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     <DocumentTitle title={this.state.name || "Untitled"} />
                                 </div>
                                 <input
-                                    className="richEditorForm-title inputBlock-inputText inputText isGiant"
+                                    className="richEditorForm-title inputBlock-inputText inputText"
                                     type="text"
                                     placeholder={t("Title")}
                                     value={this.state.name || ""}
@@ -117,6 +118,8 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     onChange={this.editorChangeHandler}
                                     className="FormWrapper inheritHeight richEditorForm-editor"
                                     isLoading={this.isLoading}
+                                    device={this.props.device}
+                                    legacyMode={!!this.props.legacyMode}
                                 />
                             </div>
                         </PanelLayout.MiddleBottom>

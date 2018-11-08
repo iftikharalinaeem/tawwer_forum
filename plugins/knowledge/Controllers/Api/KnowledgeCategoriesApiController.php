@@ -81,16 +81,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 "description" => "Unique ID of the parent for a category.",
                 "type" => "integer",
             ],
-            "isSection" => [
-                "description" => "Is the category flagged as being its own section?",
-                "type" => "boolean",
-            ],
-            "displayType" => [
-                "allowNull" => true,
-                "description" => "Preferred method the category's contents should be displayed.",
-                "enum" => ["help", "guide", "search"],
-                "type" => "string",
-            ],
             "sortChildren" => [
                 "allowNull" => true,
                 "description" => "Sort order for contents of the category.",
@@ -190,7 +180,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "knowledgeCategoryID",
             "name",
             "parentID",
-            "displayType",
             "sort",
             "sortChildren",
         ])->add($this->fullSchema()), "out");
@@ -269,7 +258,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
-                    "displayType?",
                     "sort?",
                     "sortChildren?",
                 ])->add($this->fullSchema()),
@@ -314,9 +302,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
-        if (array_key_exists("isSection", $body)) {
-            $body["isSection"] = intval($body["isSection"]);
-        }
 
         $this->knowledgeCategoryByID($id);
 

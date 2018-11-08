@@ -16,6 +16,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
+import { plusCircle, categoryIcon } from "@library/components/icons/common";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
@@ -31,7 +32,7 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
-    private static readonly SELECT_MESSAGE = t("Choose a Category");
+    private static readonly SELECT_MESSAGE = t("Select a Category");
 
     public state: IState = {
         showLocationPicker: false,
@@ -45,21 +46,24 @@ export class LocationInput extends React.Component<IProps, IState> {
             : LocationInput.SELECT_MESSAGE;
 
         const buttonContents = locationBreadcrumb ? (
-            <LocationBreadcrumbs locationData={locationBreadcrumb} />
+            <React.Fragment>
+                {categoryIcon("pageLocation-icon")}
+                <LocationBreadcrumbs locationData={locationBreadcrumb} />
+            </React.Fragment>
         ) : (
-            LocationInput.SELECT_MESSAGE
+            <React.Fragment>
+                {plusCircle("pageLocation-icon")}
+                {LocationInput.SELECT_MESSAGE}
+            </React.Fragment>
         );
 
         return (
             <React.Fragment>
                 <div className={classNames("pageLocation", this.props.className)}>
-                    <span className="pageLocation-label" aria-hidden={true}>
-                        {t("To: ")}
-                    </span>
                     <Button
                         title={buttonTitle}
                         type="button"
-                        aria-label={t("Page Location:")}
+                        aria-label={t("Page Location")}
                         className="pageLocation-picker"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}

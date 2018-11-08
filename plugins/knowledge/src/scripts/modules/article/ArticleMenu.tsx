@@ -56,7 +56,12 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         return (
             <Permission permission="articles.add">
-                <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
+                <DropDown
+                    id={this.domID}
+                    name={t("Article Options")}
+                    buttonClassName={this.props.buttonClassName}
+                    renderLeft={true}
+                >
                     <DropDownItemMetas>
                         <Translate
                             source="Published on <0/> by <1/>"
