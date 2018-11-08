@@ -40,7 +40,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     private $articleSchema;
 
     /** @var Schema */
-    private $articleNoBodySchema;
+    private $articleSimpleSchema;
 
     /** @var ArticleModel */
     private $articleModel;
@@ -180,17 +180,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Get a full article schema that also includes its name from a revision.
+     * Get a slimmed down article schema. No body is included, but an excerpt is optional.
      *
      * @param string $type
      * @return Schema
      */
-    public function articleNoBodySchema(string $type = ""): Schema {
-        if ($this->articleNoBodySchema === null) {
-            $this->articleNoBodySchema = $this->schema(Schema::parse([
+    public function articleSimpleSchema(string $type = ""): Schema {
+        if ($this->articleSimpleSchema === null) {
+            $this->articleSimpleSchema = $this->schema(Schema::parse([
                 "articleID",
                 "knowledgeCategoryID",
                 "name",
+                "excerpt?",
                 "seoName",
                 "seoDescription",
                 "slug",
@@ -205,9 +206,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "insertUser?",
                 "updateUser?",
                 "status",
-            ])->add($this->fullSchema()), "ArticleNoBody");
+            ])->add($this->fullSchema()), "ArticleSimple");
         }
-        return $this->schema($this->articleNoBodySchema, $type);
+        return $this->schema($this->articleSimpleSchema, $type);
     }
 
     /**
@@ -403,7 +404,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * List published articles in a given knowledge category.
      *
      * @param array $query
-     * @return array
+     * @return \Garden\Web\Data
      * @throws ValidationException If input validation fails.
      * @throws ValidationException If output validation fails.
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
@@ -413,6 +414,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema([
+            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
             "knowledgeCategoryID" => [
                 "type" => "integer",
                 "minimum" => 1,
@@ -423,20 +425,47 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "maximum" => 100,
                 "type" => "integer",
             ],
+            "order:s?" => [
+                "description" => "Sort method for results.",
+                "enum" => ["dateInserted", "dateUpdated", "sort"],
+                "default" => "dateInserted",
+            ],
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
         ], "in")->setDescription("List published articles in a given knowledge category.");
-        $out = $this->schema([":a" => $this->articleNoBodySchema()], "out");
+        $out = $this->schema([":a" => $this->articleSimpleSchema()], "out");
 
         $query = $in->validate($query);
 
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        $includeExcerpts = $this->isExpandField("excerpt", $query["expand"]);
+
+        $options = [
+            "includeBody" => $includeExcerpts,
+            "limit" => $limit,
+            "offset" => $offset,
+            "orderFields" => $query["order"],
+        ];
+        switch ($query["order"]) {
+            case "dateUpdated":
+                $options["orderDirection"] = "desc";
+                break;
+            default:
+                $options["orderDirection"] = "asc";
+        }
         $rows = $this->articleModel->getWithRevision(
             ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
-            [
-                "limit" => $query["limit"],
-                "includeBody" => false,
-            ]
+            $options
         );
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
+            if ($includeExcerpts) {
+                $row["excerpt"] = $row["body"] ? sliceString(Gdn_Format::plainText($row["body"], "Html"), self::EXCERPT_MAX_LENGTH) : null;
+            }
         }
         $this->userModel->expandUsers(
             $rows,
@@ -444,54 +473,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
 
         $result = $out->validate($rows);
-        return $result;
-    }
 
-    /**
-     * List excerpts from published articles in a given knowledge category.
-     *
-     * @param array $query
-     * @return array
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function index_excerpts(array $query = []) {
-        $this->permission("knowledge.kb.view");
-
-        $in = $this->schema([
-            "knowledgeCategoryID" => [
-                "type" => "integer",
-                "minimum" => 1,
-            ],
-            "limit" => [
-                "default" => ArticleModel::LIMIT_DEFAULT,
-                "minimum" => 1,
-                "maximum" => 100,
-                "type" => "integer",
-            ],
-        ], "in")->setDescription("List excerpts from published articles in a given knowledge category.");
-        $out = $this->schema([":a" => $this->articleFragmentSchema()], "out");
-        $query = $in->validate($query);
-
-        $articles = $this->articleModel->getWithRevision(
-            ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
-            ["limit" => $query["limit"]]
-        );
-        foreach ($articles as &$article) {
-            $article = $this->normalizeOutput($article);
-        }
-        $this->userModel->expandUsers(
-            $articles,
-            ["insertUserID", "updateUserID"]
-        );
-        foreach ($articles as &$article) {
-            $article["excerpt"] = $article["body"] ? sliceString(Gdn_Format::plainText($article["body"], "Html"), self::EXCERPT_MAX_LENGTH) : null;
-        }
-
-        $result = $out->validate($articles);
-        return $result;
+        return new \Garden\Web\Data($result, [
+            'paging' => \Vanilla\ApiUtils::morePagerInfo($result, "/api/v2/articles", $query, $in)
+        ]);
     }
 
     /**
@@ -521,7 +506,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out");
 
         $article = $this->articleByID($id);
-        $revisions = $this->articleRevisionModel->get(["articleID" => $article["articleID"]]);
+        $revisions = $this->articleRevisionModel->get(
+            ["articleID" => $article["articleID"]],
+            [
+                "orderFields" => "dateInserted",
+                "orderDirection" => "desc",
+            ]
+        );
 
         foreach ($revisions as &$revision) {
             $this->userModel->expandUsers(
