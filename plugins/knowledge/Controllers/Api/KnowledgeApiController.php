@@ -130,7 +130,6 @@ class KnowledgeApiController extends AbstractApiController {
     protected function sphinxSearch(array $query): array {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
-        $sphinx->setMatchMode(SPH_MATCH_EXTENDED);
 
         if (isset($query['knowledgeCategoryID'])) {
             $sphinx->setFilter('knowledgeCategoryID', [$query['knowledgeCategoryID']]);
