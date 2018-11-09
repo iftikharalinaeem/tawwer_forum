@@ -243,8 +243,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $this->permission("settings.manage");
         }
         $this->draftModel->delete(
-            ["draftID" => $draft["draftID"]],
-            ["limit" => 1]
+            ["draftID" => $draft["draftID"]]
         );
     }
 
