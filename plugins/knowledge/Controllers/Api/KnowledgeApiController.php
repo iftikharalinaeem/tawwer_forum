@@ -155,7 +155,7 @@ class KnowledgeApiController extends AbstractApiController {
             $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
             $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
             $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-            $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp(), $range['exclude']);
+            $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
         }
         $sphinxQuery = '';
 
