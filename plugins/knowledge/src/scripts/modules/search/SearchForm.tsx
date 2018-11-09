@@ -88,6 +88,10 @@ class SearchForm extends React.Component<IProps> {
                 });
             }
 
+            if ("includeDeleted" in initialForm) {
+                initialForm.includeDeleted = JSON.parse(initialForm.includeDeleted);
+            }
+
             this.props.searchActions.updateForm(initialForm);
             this.props.searchActions.search();
         }
