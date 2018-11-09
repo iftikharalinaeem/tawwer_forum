@@ -981,7 +981,7 @@ class ReactionModel extends Gdn_Model {
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
-        $lockKey = 'Reactions.'. $iD .'.'. $userID;
+        $lockKey = 'Reactions.' . $iD . '.' . $userID;
         $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
 
         if ($haveLock) {
