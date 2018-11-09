@@ -12,6 +12,8 @@ import Paragraph from "@library/components/Paragraph";
 import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IResult {
     name: string;
@@ -22,8 +24,7 @@ export interface IResult {
     image?: string;
     headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];
-    dateUpdated: string;
-    location: IKbCategoryFragment[] | string[];
+    location: ICrumb[] | string[];
 }
 
 /**
@@ -63,7 +64,7 @@ export default class SearchResult extends React.Component<IResult> {
         return (
             <li className={classNames("searchResults-item", this.props.className)}>
                 <article className="searchResults-result">
-                    <Link to={this.props.url} className="searchResult">
+                    <SmartLink to={this.props.url} className="searchResult">
                         <div className={classNames("searchResult-main", { hasMedia: !!media })}>
                             <HeadingTag className="searchResult-title">{this.props.name}</HeadingTag>
                             {this.props.meta && <div className="searchResult-metas metas">{this.props.meta}</div>}
@@ -72,7 +73,7 @@ export default class SearchResult extends React.Component<IResult> {
                             )}
                         </div>
                         {media}
-                    </Link>
+                    </SmartLink>
                 </article>
             </li>
         );

@@ -19,6 +19,7 @@ import SearchPageModel, { ISearchFormState, ISearchPageState } from "@knowledge/
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import DateRange from "@knowledge/modules/search/components/DateRange";
 import MultiUserInput from "@library/users/MultiUserInput";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -44,8 +45,13 @@ export class AdvancedSearch extends React.Component<IProps> {
                         value: formData.title,
                     }}
                 />
-                <MultiUserInput />
-                <DateRange />
+                <MultiUserInput onChange={this.handleUserChange} value={this.props.form.authors} />
+                <DateRange
+                    onStartChange={this.handleStartDateChange}
+                    onEndChange={this.handleEndDateChange}
+                    start={this.props.form.startDate}
+                    end={this.props.form.endDate}
+                />
                 {dummyKnowledgeBaseList &&
                     dummyKnowledgeBaseList.length > 0 && (
                         <SelectOne
@@ -81,6 +87,18 @@ export class AdvancedSearch extends React.Component<IProps> {
     private handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         this.props.searchActions.updateForm({ title: value });
+    };
+
+    private handleStartDateChange = (date: Date) => {
+        this.props.searchActions.updateForm({ startDate: date });
+    };
+
+    private handleEndDateChange = (date: Date) => {
+        this.props.searchActions.updateForm({ endDate: date });
+    };
+
+    private handleUserChange = (options: IComboBoxOption[]) => {
+        this.props.searchActions.updateForm({ authors: options });
     };
 
     private noop = () => {

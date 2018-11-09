@@ -22,7 +22,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import ProfileLink from "@library/components/ProfileLink";
+import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {

@@ -5,25 +5,41 @@
  */
 
 import { ArticleStatus } from "@knowledge/@types/api";
+import { IUserFragment } from "@library/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 export interface ISearchResult {
     name: string;
-    bodyPlainText: string;
-    bodyRendered: string;
+    body: string;
     url: string;
-    recordID: string;
+    insertUserID: number;
+    updateUserID: number;
+    dateInserted: string;
+    dateUpdated: string;
+    knowledgeCategoryID: number;
+    status: ArticleStatus;
+    recordID: number;
     recordType: string;
+    updateUser?: IUserFragment;
+    knowledgeCategory?: {
+        knowledgeCategoryID: number;
+        breadcrumbs: ICrumb[];
+    };
 }
 
 export interface ISearchRequestBody {
-    query?: string;
-    title?: string;
-    dateInserted?: string;
+    body?: string;
+    name?: string;
+    dateUpdated?: string;
+    // Filter by date when the article was updated.
+    // This filter receive a string that can take two forms.
     // A single date that matches '{Operator}{DateTime}' where {Operator} can be =, <, >, <=, >= and, if omitted, defaults to =.
     // A date range that matches '{Opening}{DateTime},{DateTime}{Closing}' where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'. '[]' are inclusive and '()' are exclusive.
-    authorIDs?: number[];
+    insertUserIDs?: number[];
+    updateUserIDs?: number[];
     knowledgeBaseID?: number;
-    allowedStatuses?: ArticleStatus[];
+    statuses?: ArticleStatus[];
+    expand?: string[];
 }
 
 export type ISearchResponseBody = ISearchResult[];

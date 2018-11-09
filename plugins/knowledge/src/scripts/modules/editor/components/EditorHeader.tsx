@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import { PanelArea } from "@knowledge/layouts/PanelLayout";
 import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import BackLink from "@library/components/BackLink";
+import BackLink from "@library/components/navigation/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import SelectBox from "@library/components/SelectBox";

@@ -12,6 +12,7 @@ import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import produce from "immer";
 import { IStoreState } from "@knowledge/state/model";
 import { ISearchResponseBody } from "@knowledge/@types/api";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 
 export enum SearchDomain {
     ARTICLES = "articles",
@@ -37,10 +38,10 @@ export interface ISearchFormState {
     query: string;
     title: string;
     domain: SearchDomain;
-    authors: IUserFragment[];
+    authors: IComboBoxOption[];
     fileName: string;
-    within: SearchPeriod | null;
-    of: string;
+    startDate: Date | undefined;
+    endDate: Date | undefined;
     includeDeleted: boolean;
     kb?: null;
 }
@@ -55,7 +56,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         return SearchPageModel.stateSlice(state);
     }
 
-    private static stateSlice(state: IStoreState) {
+    public static stateSlice(state: IStoreState) {
         if (!state.knowledge || !state.knowledge.searchPage) {
             throw new Error(`Could not find "knowledge.searchPage" in state ${state}`);
         }
@@ -73,8 +74,8 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
             domain: SearchDomain.ARTICLES,
             authors: [],
             fileName: "",
-            within: null,
-            of: "",
+            startDate: undefined,
+            endDate: undefined,
             includeDeleted: false,
             kb: null,
         },

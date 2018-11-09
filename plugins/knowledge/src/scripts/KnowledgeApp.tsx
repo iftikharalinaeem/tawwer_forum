@@ -15,6 +15,8 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
+import { LinkContext } from "@library/components/navigation/SmartLink";
+import { formatUrl } from "@library/application";
 
 /*
  * Top level application component for knowledge.
@@ -33,16 +35,18 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <React.Fragment>
-                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                    <DeviceContext.Provider
-                        value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
-                    >
-                        <BrowserRouter>
-                            <Route component={KnowledgeRoutes} />
-                        </BrowserRouter>
-                    </DeviceContext.Provider>
-                </React.Fragment>
+                <LinkContext.Provider value={formatUrl("/kb")}>
+                    <React.Fragment>
+                        <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                        <DeviceContext.Provider
+                            value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
+                        >
+                            <BrowserRouter>
+                                <Route component={KnowledgeRoutes} />
+                            </BrowserRouter>
+                        </DeviceContext.Provider>
+                    </React.Fragment>
+                </LinkContext.Provider>
             </Provider>
         );
     }

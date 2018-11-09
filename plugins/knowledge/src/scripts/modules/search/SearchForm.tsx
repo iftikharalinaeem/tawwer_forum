@@ -34,33 +34,34 @@ class SearchForm extends React.Component<IProps> {
 
         return (
             <Container>
-                <PanelLayout device={this.props.device}>
-                    {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <SearchBar
-                                placeholder={this.props.placeholder || t("Help")}
-                                options={options}
-                                onChange={quer => {
-                                    console.log("new query", quer);
-                                    this.props.searchActions.updateForm({ query: quer ? quer.label : "" });
-                                }}
-                                value={this.props.form.query}
-                                isBigInput={true}
-                            />
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidgetVerticalPadding>
-                            {<SearchResults results={dummySearchResults} />}
-                        </PanelWidgetVerticalPadding>
-                    </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <PanelWidget>
-                            <AdvancedSearch />
-                        </PanelWidget>
-                    </PanelLayout.RightTop>
-                </PanelLayout>
+                <form onSubmit={this.onSubmit}>
+                    <PanelLayout device={this.props.device}>
+                        {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>
+                                <SearchBar
+                                    placeholder={this.props.placeholder || t("Help")}
+                                    options={options}
+                                    onChange={value => {
+                                        this.props.searchActions.updateForm({ query: value });
+                                    }}
+                                    value={this.props.form.query}
+                                    isBigInput={true}
+                                />
+                            </PanelWidget>
+                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidgetVerticalPadding>
+                                {<SearchResults results={this.props.results} />}
+                            </PanelWidgetVerticalPadding>
+                        </PanelLayout.MiddleBottom>
+                        <PanelLayout.RightTop>
+                            <PanelWidget>
+                                <AdvancedSearch />
+                            </PanelWidget>
+                        </PanelLayout.RightTop>
+                    </PanelLayout>
+                </form>
             </Container>
         );
     }
@@ -77,6 +78,11 @@ class SearchForm extends React.Component<IProps> {
             };
         });
         return data || [];
+    };
+
+    private onSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        this.props.searchActions.search();
     };
 }
 

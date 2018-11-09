@@ -5,9 +5,9 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { ISearchFormState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchFormState } from "@knowledge/modules/search/SearchPageModel";
 import apiv2 from "@library/apiv2";
-import { ISearchResponseBody, ISearchRequestBody } from "@knowledge/@types/api";
+import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -45,7 +45,21 @@ export default class SearchPageActions extends ReduxActions {
     public updateForm = this.bindDispatch(SearchPageActions.updateFormAC);
 
     public async search() {
-        const result = await this.getSearch({});
+        const form = SearchPageModel.stateSlice(this.getState()).form;
+        console.log(form);
+        const statuses = [ArticleStatus.PUBLISHED];
+        if (form.includeDeleted) {
+            statuses.push(ArticleStatus.DELETED);
+        }
+        const requestOptions: ISearchRequestBody = {
+            name: form.title ? form.title : form.query,
+            body: form.query,
+            updateUserIDs: form.authors.map(author => author.value as number),
+            statuses,
+            expand: ["user", "category"],
+        };
+
+        return await this.getSearch(requestOptions);
     }
 
     private getSearch(request: ISearchRequestBody) {

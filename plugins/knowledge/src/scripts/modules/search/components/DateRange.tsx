@@ -10,10 +10,10 @@ import { t } from "@library/application";
 import DateInput from "@library/components/forms/DateInput";
 
 interface IProps {
-    // start: string;
-    // end: string;
-    // onStartChange: (value: string) => void;
-    // onEndChange: (value: string) => void;
+    start: Date | undefined;
+    end: Date | undefined;
+    onStartChange: (value: Date) => void;
+    onEndChange: (value: Date) => void;
     className?: string;
 }
 
@@ -32,10 +32,10 @@ export default class DateRange extends React.PureComponent<IProps> {
                         baseClass={InputTextBlockBaseClass.CUSTOM}
                         className="dateRange-column"
                     >
-                        <DateInput alignment="right" />
+                        <DateInput alignment="right" onChange={this.props.onStartChange} value={this.props.start} />
                     </InputBlock>
                     <InputBlock label={t("To")} baseClass={InputTextBlockBaseClass.CUSTOM} className="dateRange-column">
-                        <DateInput alignment="right" />
+                        <DateInput alignment="right" onChange={this.props.onEndChange} value={this.props.end} />
                     </InputBlock>
                 </div>
             </div>
