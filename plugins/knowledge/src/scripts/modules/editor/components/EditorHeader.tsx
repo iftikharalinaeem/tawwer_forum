@@ -73,8 +73,11 @@ export class EditorHeader extends React.Component<IProps> {
                                         type="submit"
                                         title={label}
                                         disabled={!this.props.canSubmit}
-                                        baseClass={ButtonBaseClass.TEXT}
-                                        className={classNames("editorHeader-publish")}
+                                        className={classNames(
+                                            "editorHeader-publish",
+                                            "buttonNoHorizontalPadding",
+                                            "buttonNoBorder",
+                                        )}
                                     >
                                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                                     </Button>
@@ -86,7 +89,7 @@ export class EditorHeader extends React.Component<IProps> {
                                     <SelectBox
                                         describedBy={this.localeTitleID}
                                         className="editorHeader-otherLanguages"
-                                        buttonClassName="buttonNoBorder buttonNoMinWidth"
+                                        buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
                                         renderLeft={true}
                                     >
