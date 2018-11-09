@@ -26,6 +26,9 @@ interface IProps {
     loadMoreResults?: () => void;
 }
 
+/*
+ * Implements Draft layout
+ */
 class DraftsLayout extends React.Component<IProps> {
     public render() {
         const { device } = this.props;

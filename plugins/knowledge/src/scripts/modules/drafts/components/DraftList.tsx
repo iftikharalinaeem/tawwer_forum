@@ -20,7 +20,7 @@ interface IProps {
 }
 
 /**
- * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
+ * Generates a list of drafts
  */
 export default class DraftsList extends React.Component<IProps> {
     public render() {

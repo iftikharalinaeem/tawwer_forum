@@ -33,7 +33,7 @@ interface IState {
 }
 
 /**
- * Generates search result list. Note that this template is used in other contexts, such as the flat category list
+ * Implements draft preview
  */
 export default class DraftPreview extends React.Component<IProps, IState> {
     public static defaultProps = {

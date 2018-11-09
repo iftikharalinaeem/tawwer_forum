@@ -18,6 +18,9 @@ interface IProps {
     className?: string;
 }
 
+/*
+ * Implements draft preview meta data
+ */
 export class DraftPreviewMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, location } = this.props;

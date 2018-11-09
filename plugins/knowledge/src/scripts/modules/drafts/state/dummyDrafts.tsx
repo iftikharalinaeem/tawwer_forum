@@ -11,6 +11,9 @@ import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
 
+/*
+ * Dummy draft data for developing front-end components
+ */
 export const dummyDraftListData: IDraftPreview[] = [
     {
         id: 1,
