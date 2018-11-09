@@ -117,8 +117,10 @@ export class LocationInput extends React.Component<IProps, IState> {
         });
     };
 
-    public componentDidMount() {
-        this.forceUpdate();
+    public componentDidUpdate(prevProps, prevState) {
+        if (prevState.showLocationPicker !== this.state.showLocationPicker) {
+            this.forceUpdate();
+        }
     }
 }
 
