@@ -922,8 +922,6 @@ class ReactionModel extends Gdn_Model {
      * @param string|null $force Force a reaction status. One of the FORCE_* class constants.
      */
     public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false, $force = null) {
-        $inserted = false;
-
         if (is_null($userID)) {
             $userID = Gdn::session()->UserID;
             $isModerator = checkPermission('Garden.Moderation.Manage');
@@ -983,7 +981,7 @@ class ReactionModel extends Gdn_Model {
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
-        $lockKey = 'Reactions.'. $iD .'.'.$userID;
+        $lockKey = 'Reactions.'. $iD .'.'. $userID;
         $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
 
         if ($haveLock) {
