@@ -26,7 +26,7 @@ interface IProps {
     exitHandler: () => void;
     className?: string;
     parentCategory: IKbCategoryFragment | null;
-    newFolderButton?: HTMLButtonElement;
+    buttonRef: React.RefObject<HTMLButtonElement>;
 }
 
 interface IState {
@@ -66,7 +66,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 titleID={this.titleID}
                 size={ModalSizes.SMALL}
                 exitHandler={this.props.exitHandler}
-                elementToFocusOnExit={this.props.newFolderButton!}
+                elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
             >
                 <Frame>
                     <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>
@@ -91,6 +91,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             className="locationPicker-newFolder buttonPrimary"
                             disabled={!this.state.valid}
                             onClick={this.handleFormSubmit}
+                            buttonRef={this.props.buttonRef}
                         >
                             {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
@@ -140,10 +141,4 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         const { value } = event.target;
         this.setState({ url: value });
     };
-
-    public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.newFolderButton !== this.props.newFolderButton) {
-            this.forceUpdate();
-        }
-    }
 }
