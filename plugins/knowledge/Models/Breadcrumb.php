@@ -45,7 +45,7 @@ class Breadcrumb {
     /**
      * Convert an array of breadcrumbs into
      *
-     * @param Breadcrumb[] $crumbs The array of breadcrumbs to convert to JSON-LD.
+     * @param array Breadcrumb[] $crumbs The array of breadcrumbs to convert to JSON-LD.
      *
      * @return string Breadcrumb data serialized into the JSON-LD breadcrumb micro-data format.
      */
@@ -67,5 +67,17 @@ class Breadcrumb {
         ];
 
         return json_encode($data);
+    }
+
+    /**
+     * Return breadcrumb data as structure ['name'=>'breadcrumb title', 'url'=>'breadcrumb url']
+     *
+     * @return array
+     */
+    public function asArray(): array {
+        return [
+            'name' => $this->getName(),
+            'url' => $this->getUrl(),
+        ];
     }
 }
