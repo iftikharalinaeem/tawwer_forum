@@ -65,4 +65,4 @@ export class DraftsPage extends React.Component<IProps, IState> {
     };
 }
 
-export default withDevice(SearchPage);
+export default withDevice(DraftsPage);
