@@ -8,7 +8,6 @@ import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
-import Translate from "@library/components/translation/Translate";
 import DraftPreview from "@knowledge/modules/drafts/components/DraftPreview";
 import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
 import Button from "@library/components/forms/Button";
@@ -25,12 +24,12 @@ interface IProps {
  */
 export default class DraftsList extends React.Component<IProps> {
     public render() {
-        const hasResults = this.props.data.length > 0;
-        const Tag = hasResults ? `ul` : `div`;
+        const { hasMoreResults, data, className } = this.props;
+        const Tag = hasMoreResults ? `ul` : `div`;
         let content;
 
-        if (hasResults) {
-            content = this.props.data.map((result, i) => {
+        if (data.length > 0) {
+            content = data.map((result, i) => {
                 return <DraftPreview {...result} key={`draftPreview-${i}`} />;
             });
         } else {
@@ -38,10 +37,14 @@ export default class DraftsList extends React.Component<IProps> {
         }
 
         return (
-            <Tag className={classNames("draftList-list", this.props.className)}>
-                {content}
-                {this.props.hasMoreResults && <Button onClick={this.props.loadMoreResults}>{t("Next")}</Button>}
-            </Tag>
+            <div className="draftList">
+                <Tag className={classNames("draftList-list", className)}>{content}</Tag>
+                {hasMoreResults && (
+                    <Button className="draftList-loadMore" onClick={this.props.loadMoreResults}>
+                        {t("Next")}
+                    </Button>
+                )}
+            </div>
         );
     }
 }

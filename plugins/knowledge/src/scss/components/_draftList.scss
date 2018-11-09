@@ -7,3 +7,18 @@
 .draftList-list {
     border-top: solid $formElement_borderColor $formElement_borderWidth;
 }
+
+.draftList-noResults {
+    font-size: $userContent_fontSize;
+    padding: #{$global_spacer} $global_gutter_halfSize;
+}
+
+.draftList-loadMore {
+    display: block;
+    min-width: 208px;
+    margin: $global_spacer auto;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        min-width: 100px;
+    }
+}

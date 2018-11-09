@@ -42,7 +42,7 @@ export class SearchPage extends React.Component<IProps, IState> {
                         {...this.props}
                         data={this.state.data}
                         loadMoreResults={this.loadMoreResults}
-                        hasMoreResults={this.hasMoreResults(this.state.data)}
+                        hasMoreResults={this.state.hasMoreResults}
                     />
                 </DocumentTitle>
             </PageLoader>
@@ -50,18 +50,19 @@ export class SearchPage extends React.Component<IProps, IState> {
     }
 
     // Temporary function to simulate loading data from API
-    private loadMoreResults() {
+    private loadMoreResults = () => {
         const newData = [...this.state.data, ...dummyDraftListData];
         this.setState({
             data: newData,
             hasMoreResults: this.hasMoreResults(newData),
         });
-    }
+        this.forceUpdate();
+    };
 
     // Temporary function to simulate checking if we have more data
-    private hasMoreResults(data: any[]) {
-        return data.length >= 15;
-    }
+    private hasMoreResults = (data: any[]) => {
+        return data.length <= 15;
+    };
 }
 
 export default withDevice(SearchPage);
