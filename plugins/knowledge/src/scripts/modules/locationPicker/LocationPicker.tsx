@@ -131,10 +131,4 @@ export default class LocationPicker extends React.Component<IProps, IState> {
     public componentDidMount() {
         this.forceUpdate();
     }
-
-    public componentDidUpdate(oldProps: IProps, oldState: IState) {
-        if (oldState.showNewCategoryModal !== this.state.showNewCategoryModal && !!this.state.showNewCategoryModal) {
-            this.forceUpdate();
-        }
-    }
 }

@@ -91,7 +91,6 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             className="locationPicker-newFolder buttonPrimary"
                             disabled={!this.state.valid}
                             onClick={this.handleFormSubmit}
-                            buttonRef={this.props.buttonRef}
                         >
                             {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
