@@ -7,7 +7,6 @@
 import { t } from "@library/application";
 import { IUserFragment, ILoadable, LoadStatus } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import { string } from "prop-types";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import produce from "immer";
 import { IStoreState } from "@knowledge/state/model";
@@ -40,8 +39,8 @@ export interface ISearchFormState {
     domain: SearchDomain;
     authors: IComboBoxOption[];
     fileName: string;
-    startDate: Date | undefined;
-    endDate: Date | undefined;
+    startDate: string | undefined;
+    endDate: string | undefined;
     includeDeleted: boolean;
     kb?: null;
 }

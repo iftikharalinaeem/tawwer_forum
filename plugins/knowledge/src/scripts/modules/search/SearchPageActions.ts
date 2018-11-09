@@ -51,13 +51,26 @@ export default class SearchPageActions extends ReduxActions {
         if (form.includeDeleted) {
             statuses.push(ArticleStatus.DELETED);
         }
+
+        let dateUpdated: string | undefined = undefined;
+        if (form.startDate && form.endDate) {
+            dateUpdated = `[${form.startDate},${form.endDate}]`;
+        } else if (form.startDate) {
+            dateUpdated = `>${form.startDate}`;
+        } else if (form.endDate) {
+            dateUpdated = `<${form.endDate}`;
+        }
+
         const requestOptions: ISearchRequestBody = {
             name: form.title ? form.title : form.query,
             body: form.query,
             updateUserIDs: form.authors.map(author => author.value as number),
             statuses,
+            dateUpdated,
             expand: ["user", "category"],
         };
+
+        console.log(requestOptions);
 
         return await this.getSearch(requestOptions);
     }

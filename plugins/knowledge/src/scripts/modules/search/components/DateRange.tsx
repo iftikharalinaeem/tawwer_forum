@@ -10,10 +10,10 @@ import { t } from "@library/application";
 import DateInput from "@library/components/forms/DateInput";
 
 interface IProps {
-    start: Date | undefined;
-    end: Date | undefined;
-    onStartChange: (value: Date) => void;
-    onEndChange: (value: Date) => void;
+    start: string | undefined;
+    end: string | undefined;
+    onStartChange: (value: string) => void;
+    onEndChange: (value: string) => void;
     className?: string;
 }
 

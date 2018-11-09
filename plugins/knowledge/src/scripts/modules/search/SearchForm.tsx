@@ -18,6 +18,8 @@ import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyCol
 import { connect } from "react-redux";
 import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
+import QueryString from "@library/components/navigation/QueryString";
+import qs from "qs";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -34,6 +36,7 @@ class SearchForm extends React.Component<IProps> {
 
         return (
             <Container>
+                <QueryString value={this.props.form} />
                 <form onSubmit={this.onSubmit}>
                     <PanelLayout device={this.props.device}>
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
@@ -64,6 +67,21 @@ class SearchForm extends React.Component<IProps> {
                 </form>
             </Container>
         );
+    }
+
+    public componentDidMount() {
+        if (window.location.search) {
+            const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
+
+            if ("authors" in initialForm) {
+                initialForm.authors.map(option => {
+                    option.value = Number.parseInt(option.value, 10);
+                });
+            }
+
+            this.props.searchActions.updateForm(initialForm);
+            this.props.searchActions.search();
+        }
     }
 
     /**

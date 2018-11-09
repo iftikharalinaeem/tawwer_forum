@@ -78,6 +78,7 @@ export class AdvancedSearch extends React.Component<IProps> {
      * Handler for the deleted articles checkbox.
      */
     private handleCheckBoxDeletedArticleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.checked);
         this.props.searchActions.updateForm({ includeDeleted: event.target.checked || false });
     };
 
@@ -89,11 +90,11 @@ export class AdvancedSearch extends React.Component<IProps> {
         this.props.searchActions.updateForm({ title: value });
     };
 
-    private handleStartDateChange = (date: Date) => {
+    private handleStartDateChange = (date: string) => {
         this.props.searchActions.updateForm({ startDate: date });
     };
 
-    private handleEndDateChange = (date: Date) => {
+    private handleEndDateChange = (date: string) => {
         this.props.searchActions.updateForm({ endDate: date });
     };
 
