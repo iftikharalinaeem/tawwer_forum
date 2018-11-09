@@ -44,6 +44,10 @@ $pageLocation-icon_opacity: .8;
         border-color: $global-color_primary;
         color: $global-color_primary;
     }
+
+    &[disabled] {
+        opacity: 0;
+    }
 }
 
 .locationBreadcrumb-separator {

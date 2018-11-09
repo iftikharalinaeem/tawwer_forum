@@ -99,6 +99,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                 <LocationInput
                                     initialCategoryID={categoryID}
                                     key={categoryID === null ? undefined : categoryID}
+                                    disabled={this.isLoading}
                                 />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.state.name || "Untitled"} />

@@ -12,6 +12,7 @@ import Paragraph from "@library/components/Paragraph";
 import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import DraftActions from "@knowledge/modules/drafts/components/DraftActions";
+import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
 
 export interface IDraftPreview {
     id: number;
@@ -19,7 +20,7 @@ export interface IDraftPreview {
     body: string | null;
     dateUpdated: string;
     url: string;
-    location?: IKbCategoryFragment[] | string[];
+    location?: IKbCategoryFragment[];
 }
 
 interface IProps extends IDraftPreview {
@@ -47,27 +48,28 @@ export default class DraftPreview extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const HeadingTag = `h${this.props.headingLevel}`;
+        const { name, body, dateUpdated, url, location, headingLevel, className } = this.props;
+        const HeadingTag = `h${headingLevel}`;
+        const hasMeta = dateUpdated || location;
         // We can't nest links, so we need to simulate a click on the <li> element
         if (this.state.doRedirect) {
-            return <Redirect to={this.props.url} />;
+            return <Redirect to={url} />;
         } else {
             return (
-                <li className={classNames("draftPreview", this.props.className)} onClick={this.doRedirect}>
+                <li className={classNames("draftPreview", className)} onClick={this.doRedirect}>
                     <article className="draftPreview-item">
                         <div className="draftPreview-header">
-                            <HeadingTag className="searchResult-title" level={this.props.headingLevel}>
-                                <Link to={this.props.url} className="draftPreview-link">
-                                    {this.props.name}
+                            <HeadingTag className="draftPreview-title" level={this.props.headingLevel}>
+                                <Link to={url} className="draftPreview-link">
+                                    {!!name ? name : <em>{t("(Untitled)")}</em>}
                                 </Link>
                             </HeadingTag>
-                            <DraftActions
-                                className="draftPreview-menu"
-                                deleteFunction={this.deleteArticle}
-                                url={this.props.url}
-                            />
+                            <DraftActions className="draftPreview-menu" deleteFunction={this.deleteArticle} url={url} />
                         </div>
-                        <Paragraph className="draftPreview-excerpt">{this.props.body}</Paragraph>
+                        <Paragraph className="draftPreview-excerpt">
+                            {!!body ? body : <em>{t("(No Body)")}</em>}
+                        </Paragraph>
+                        <DraftPreviewMeta dateUpdated={dateUpdated} location={location!} />
                     </article>
                 </li>
             );

@@ -48,7 +48,12 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+            <Modal
+                titleID={this.titleID}
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.navigateToBacklink}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
                 <Permission
                     permission="articles.add"
                     fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}

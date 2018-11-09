@@ -17,10 +17,12 @@ import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locati
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
 import { plusCircle, categoryIcon } from "@library/components/icons/common";
+import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
     initialCategoryID: number | null;
+    disabled?: boolean;
 }
 
 interface IState {
@@ -32,6 +34,7 @@ interface IState {
  * Creates a location picker in a modal when activated.
  */
 export class LocationInput extends React.Component<IProps, IState> {
+    private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
 
     public state: IState = {
@@ -67,8 +70,11 @@ export class LocationInput extends React.Component<IProps, IState> {
                         className="pageLocation-picker"
                         onClick={this.showLocationPicker}
                         baseClass={ButtonBaseClass.CUSTOM}
+                        buttonRef={this.changeLocationButton}
+                        disabled={!!this.props.disabled}
                     >
-                        {buttonContents}
+                        {!this.props.disabled && buttonContents}
+                        {this.props.disabled && <ButtonLoader />}
                     </Button>
                 </div>
                 {this.state.showLocationPicker && (
@@ -77,6 +83,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                         size={ModalSizes.SMALL}
                         className={classNames(this.props.className)}
                         label={t("Choose a location for this page.")}
+                        elementToFocusOnExit={this.changeLocationButton.current!}
                     >
                         <LocationPicker
                             onChoose={this.hideLocationPicker}
@@ -110,6 +117,10 @@ export class LocationInput extends React.Component<IProps, IState> {
             showLocationPicker: false,
         });
     };
+
+    public componentDidMount() {
+        this.forceUpdate();
+    }
 }
 
 const withRedux = connect(

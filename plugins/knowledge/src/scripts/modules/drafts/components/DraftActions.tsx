@@ -6,7 +6,7 @@
 import * as React from "react";
 import { t } from "@library/application";
 import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import DropDown from "@library/components/dropdown/DropDown";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
@@ -21,6 +21,7 @@ interface IProps {
 
 interface IState {
     showDeleteDialogue: boolean;
+    toggleButtonElement: HTMLElement | null;
 }
 
 /**
@@ -32,6 +33,7 @@ export default class DraftActions extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             showDeleteDialogue: false,
+            toggleButtonElement: null,
         };
     }
 
@@ -39,19 +41,26 @@ export default class DraftActions extends React.Component<IProps, IState> {
         return (
             <React.Fragment>
                 <DropDown
-                    toggleButtonRef={this.toggleButtonRef}
                     name={t("Draft Options")}
-                    buttonClassName={ButtonBaseClass.ICON}
+                    buttonClassName={ButtonBaseClass.CUSTOM}
                     renderLeft={true}
+                    setButtonElement={this.setButtonElement}
+                    toggleButtonClassName="draftPreview-actionsToggle"
+                    className="draftPreview-actions"
                 >
-                    <DropDownItemLink name={t("Edit")} to={this.props.url} />
-                    <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />
+                    <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
+                    <DropDownItemButton
+                        name={t("Delete")}
+                        onClick={this.openDeleteDialogue}
+                        className="draftPreview-option"
+                    />
                 </DropDown>
                 {this.state.showDeleteDialogue && (
                     <ModalConfirm
                         title={t("Delete Draft")}
                         onCancel={this.closeDeleteDialogue}
                         onConfirm={this.props.deleteFunction}
+                        elementToFocusOnExit={this.state.toggleButtonElement!}
                     >
                         {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
                     </ModalConfirm>
@@ -72,5 +81,14 @@ export default class DraftActions extends React.Component<IProps, IState> {
      */
     private closeDeleteDialogue = () => {
         this.setState({ showDeleteDialogue: false });
+    };
+
+    /**
+     * Set Button Ref
+     */
+    private setButtonElement = (toggleButtonElement: HTMLElement) => {
+        this.setState({
+            toggleButtonElement,
+        });
     };
 }

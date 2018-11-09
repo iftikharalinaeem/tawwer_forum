@@ -27,6 +27,8 @@ interface IState {
  * Component for choosing a location for a new article.
  */
 export default class LocationPicker extends React.Component<IProps, IState> {
+    private newFolderButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+
     public state = {
         showNewCategoryModal: false,
     };
@@ -62,6 +64,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
+                            buttonRef={this.newFolderButtonRef}
                         >
                             {newFolder()}
                         </Button>
@@ -74,6 +77,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                     <NewCategoryForm
                         exitHandler={this.hideNewFolderModal}
                         parentCategory={this.props.navigatedCategory}
+                        newFolderButton={this.newFolderButtonRef.current!}
                     />
                 )}
             </React.Fragment>
@@ -99,7 +103,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
     /**
      * Display the modal for creating a new category.
      */
-    private showNewCategoryModal = () => {
+    private showNewCategoryModal = e => {
         this.setState({
             showNewCategoryModal: true,
         });
@@ -124,4 +128,8 @@ export default class LocationPicker extends React.Component<IProps, IState> {
             this.props.onChoose();
         }
     };
+
+    public componentDidMount() {
+        this.forceUpdate();
+    }
 }

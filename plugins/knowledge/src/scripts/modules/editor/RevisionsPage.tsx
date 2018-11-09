@@ -46,7 +46,12 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         return (
-            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.props.history.goBack} label={t("Article Revisions")}>
+            <Modal
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.props.history.goBack}
+                label={t("Article Revisions")}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
                 <PageLoader status={this.props.revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
