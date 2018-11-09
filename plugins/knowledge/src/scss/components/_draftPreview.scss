@@ -45,6 +45,17 @@
     padding: 0;
 }
 
+.draftPreview-actionsToggle {
+    &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
 .draftPreview-metas,
 .draftPreview-excerpt {
     margin-top: $metaText_margin;

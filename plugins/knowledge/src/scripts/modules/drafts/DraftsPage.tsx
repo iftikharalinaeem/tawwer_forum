@@ -14,8 +14,17 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import { LoadStatus } from "@library/@types/api/core";
 import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
 import { dummyDraftListData } from "./state/dummyDrafts";
+import ModalSizes from "@library/components/modal/ModalSizes";
+import Modal from "@library/components/modal/Modal";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
+import { RouteComponentProps } from "react-router-dom";
 
-interface IProps extends IDeviceProps {}
+interface IOwnProps
+    extends RouteComponentProps<{
+            id?: string;
+        }> {}
+
+interface IProps extends IOwnProps, IDeviceProps {}
 
 interface IState {
     data: IDraftPreview[];
@@ -26,6 +35,7 @@ interface IState {
  * Page component for drafts page
  */
 export class DraftsPage extends React.Component<IProps, IState> {
+    private id = uniqueIDFromPrefix("draftsPage");
     public constructor(props) {
         super(props);
         this.state = {
@@ -36,16 +46,23 @@ export class DraftsPage extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <PageLoader status={LoadStatus.SUCCESS}>
-                <DocumentTitle title={t("Drafts")}>
-                    <DraftsLayout
-                        {...this.props}
-                        data={this.state.data}
-                        loadMoreResults={this.loadMoreResults}
-                        hasMoreResults={this.state.hasMoreResults}
-                    />
-                </DocumentTitle>
-            </PageLoader>
+            <Modal
+                titleID={this.titleID}
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.navigateToBacklink}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
+                <PageLoader status={LoadStatus.SUCCESS}>
+                    <DocumentTitle title={t("Drafts")}>
+                        <DraftsLayout
+                            {...this.props}
+                            data={this.state.data}
+                            loadMoreResults={this.loadMoreResults}
+                            hasMoreResults={this.state.hasMoreResults}
+                        />
+                    </DocumentTitle>
+                </PageLoader>
+            </Modal>
         );
     }
 
@@ -62,6 +79,21 @@ export class DraftsPage extends React.Component<IProps, IState> {
     // Temporary function to simulate checking if we have more data
     private hasMoreResults = (data: any[]) => {
         return data.length <= 15;
+    };
+
+    private get titleID() {
+        return this.id + "-title";
+    }
+
+    /**
+     * Route back to the previous location if its available.
+     */
+    private navigateToBacklink = () => {
+        if (this.props.history.length > 1) {
+            this.props.history.goBack();
+        } else {
+            this.props.history.push("/kb");
+        }
     };
 }
 
