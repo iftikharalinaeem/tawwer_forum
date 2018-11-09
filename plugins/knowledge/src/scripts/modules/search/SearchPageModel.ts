@@ -93,7 +93,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
                     };
                     break;
                 case SearchPageActions.GET_SEARCH_REQUEST:
-                    next.results.status === LoadStatus.LOADING;
+                    next.results.status = LoadStatus.LOADING;
                     break;
                 case SearchPageActions.GET_SEARCH_RESPONSE:
                     next.results.status = LoadStatus.SUCCESS;

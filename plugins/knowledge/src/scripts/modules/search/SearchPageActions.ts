@@ -44,7 +44,7 @@ export default class SearchPageActions extends ReduxActions {
 
     public updateForm = this.bindDispatch(SearchPageActions.updateFormAC);
 
-    public async search() {
+    public search = async () => {
         const form = SearchPageModel.stateSlice(this.getState()).form;
         console.log(form);
         const statuses = [ArticleStatus.PUBLISHED];
@@ -61,9 +61,16 @@ export default class SearchPageActions extends ReduxActions {
             dateUpdated = `<${form.endDate}`;
         }
 
+        const query: any = {};
+        if (!form.title) {
+            query.both = form.query;
+        } else {
+            query.title = form.title;
+            query.body = form.query;
+        }
+
         const requestOptions: ISearchRequestBody = {
-            name: form.title ? form.title : form.query,
-            body: form.query,
+            ...query,
             updateUserIDs: form.authors.map(author => author.value as number),
             statuses,
             dateUpdated,
@@ -73,7 +80,7 @@ export default class SearchPageActions extends ReduxActions {
         console.log(requestOptions);
 
         return await this.getSearch(requestOptions);
-    }
+    };
 
     private getSearch(request: ISearchRequestBody) {
         return this.dispatchApi<ISearchResponseBody>(

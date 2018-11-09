@@ -24,6 +24,9 @@ interface IState {}
  */
 export default class DateRange extends React.PureComponent<IProps> {
     public render() {
+        const endDate = this.props.end ? new Date(this.props.end) : undefined;
+        const startDate = this.props.start ? new Date(this.props.start) : undefined;
+
         return (
             <div className={classNames("dateRange inputBlock", this.props.className)}>
                 <div className="dateRange-row">
@@ -32,10 +35,28 @@ export default class DateRange extends React.PureComponent<IProps> {
                         baseClass={InputTextBlockBaseClass.CUSTOM}
                         className="dateRange-column"
                     >
-                        <DateInput alignment="right" onChange={this.props.onStartChange} value={this.props.start} />
+                        <DateInput
+                            alignment="right"
+                            onChange={this.props.onStartChange}
+                            value={this.props.start}
+                            disabledDays={[
+                                {
+                                    after: endDate,
+                                },
+                            ]}
+                        />
                     </InputBlock>
                     <InputBlock label={t("To")} baseClass={InputTextBlockBaseClass.CUSTOM} className="dateRange-column">
-                        <DateInput alignment="right" onChange={this.props.onEndChange} value={this.props.end} />
+                        <DateInput
+                            alignment="right"
+                            onChange={this.props.onEndChange}
+                            value={this.props.end}
+                            disabledDays={[
+                                {
+                                    before: startDate,
+                                },
+                            ]}
+                        />
                     </InputBlock>
                 </div>
             </div>

@@ -19,7 +19,9 @@ import { connect } from "react-redux";
 import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import QueryString from "@library/components/navigation/QueryString";
+import apiv2 from "@library/apiv2";
 import qs from "qs";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -45,11 +47,14 @@ class SearchForm extends React.Component<IProps> {
                                 <SearchBar
                                     placeholder={this.props.placeholder || t("Help")}
                                     options={options}
-                                    onChange={value => {
+                                    onChange={(value: any) => {
                                         this.props.searchActions.updateForm({ query: value });
                                     }}
+                                    loadOptions={this.loadOptions}
                                     value={this.props.form.query}
                                     isBigInput={true}
+                                    onSearch={this.queueSearch}
+                                    isLoading={this.props.results.status === LoadStatus.LOADING}
                                 />
                             </PanelWidget>
                         </PanelLayout.MiddleTop>
@@ -69,6 +74,10 @@ class SearchForm extends React.Component<IProps> {
         );
     }
 
+    private queueSearch = () => {
+        this.props.searchActions.search();
+    };
+
     public componentDidMount() {
         if (window.location.search) {
             const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
@@ -83,6 +92,19 @@ class SearchForm extends React.Component<IProps> {
             this.props.searchActions.search();
         }
     }
+
+    private loadOptions = (value: string) => {
+        return apiv2.get(`/knowledge/search?name=${value}`).then(results => {
+            results = results.data.map(result => {
+                return {
+                    label: result.name,
+                    value: result.name,
+                    data: result,
+                };
+            });
+            return results;
+        });
+    };
 
     /**
      * Load dummy data

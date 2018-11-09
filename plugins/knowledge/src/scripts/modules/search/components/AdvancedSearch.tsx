@@ -15,7 +15,7 @@ import SelectOne from "@library/components/forms/select/SelectOne";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import Button from "@library/components/forms/Button";
 import { connect } from "react-redux";
-import SearchPageModel, { ISearchFormState, ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import DateRange from "@knowledge/modules/search/components/DateRange";
 import MultiUserInput from "@library/users/MultiUserInput";
@@ -78,7 +78,6 @@ export class AdvancedSearch extends React.Component<IProps> {
      * Handler for the deleted articles checkbox.
      */
     private handleCheckBoxDeletedArticleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.checked);
         this.props.searchActions.updateForm({ includeDeleted: event.target.checked || false });
     };
 

@@ -14,6 +14,7 @@ import { ISearchResult } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
     searchTerm?: string;
@@ -38,13 +39,11 @@ export default class SearchResults extends React.Component<IProps> {
             );
         }
 
-        if (results.status === LoadStatus.LOADING) {
-            return <FullPageLoader />;
-        }
-
-        if (results.status === LoadStatus.SUCCESS && results.data) {
+        if (results.data) {
             return this.renderSuccess(results.data);
         }
+
+        return null;
     }
 
     private renderSuccess(data: ISearchResult[]): React.ReactNode {
