@@ -5,7 +5,6 @@
  */
 
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
-import { KbCategoryDisplayType } from "@knowledge/@types/api";
 import { LoadStatus } from "@library/@types/api";
 
 export const dummyData: IKbCategoriesState = {

@@ -54,7 +54,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $row = $this->knowledgeCategoryByID($id);
         if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
-            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]], 1);
+            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
         } else {
             throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.");
         }
@@ -80,16 +80,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 "allowNull" => true,
                 "description" => "Unique ID of the parent for a category.",
                 "type" => "integer",
-            ],
-            "isSection" => [
-                "description" => "Is the category flagged as being its own section?",
-                "type" => "boolean",
-            ],
-            "displayType" => [
-                "allowNull" => true,
-                "description" => "Preferred method the category's contents should be displayed.",
-                "enum" => ["help", "guide", "search"],
-                "type" => "string",
             ],
             "sortChildren" => [
                 "allowNull" => true,
@@ -190,7 +180,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "knowledgeCategoryID",
             "name",
             "parentID",
-            "displayType",
             "sort",
             "sortChildren",
         ])->add($this->fullSchema()), "out");
@@ -269,7 +258,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
-                    "displayType?",
                     "sort?",
                     "sortChildren?",
                 ])->add($this->fullSchema()),
@@ -314,9 +302,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
-        if (array_key_exists("isSection", $body)) {
-            $body["isSection"] = intval($body["isSection"]);
-        }
 
         $this->knowledgeCategoryByID($id);
 

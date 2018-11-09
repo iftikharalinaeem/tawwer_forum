@@ -8,13 +8,6 @@ import { IUserFragment } from "@library/@types/api";
 import { IArticleFragment } from "@knowledge/@types/api";
 import { MultiTypeRecord } from "@library/@types/api";
 
-export enum KbCategoryDisplayType {
-    ROOT = "root",
-    HELP = "help",
-    GUIDE = "guide",
-    SEARCH = "search",
-}
-
 export enum KbCategorySortMode {
     NAME = "name",
     DATE_INSERTED = "dateInserted",

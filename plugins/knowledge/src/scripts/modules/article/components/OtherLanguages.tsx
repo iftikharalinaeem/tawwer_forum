@@ -64,7 +64,7 @@ export default class OtherLangauges extends React.Component<IProps, IState> {
                             describedBy={this.titleID}
                             widthOfParent={true}
                             className="otherLanguages-select"
-                            stickRight={true}
+                            renderLeft={true}
                         >
                             {processedChildren}
                         </SelectBox>

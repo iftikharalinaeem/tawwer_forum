@@ -18,13 +18,12 @@ $dropDown-item_minHeight                       : 45px;
 
 .dropDown {
     position: relative;
-    z-index: 1;
 }
 
 .dropDown-contents {
     @include shadow-dropDown;
     position: absolute;
-    width: $dropDown_width;
+    min-width: $dropDown_width;
     background-color: $dropdown_bg;
     border: {
         radius: $global_borderRadius;
@@ -32,6 +31,7 @@ $dropDown-item_minHeight                       : 45px;
         width: 1px;
         color: $global-border_color;
     }
+    z-index: 1;
 
     &.isParentWidth {
         width: 100%;

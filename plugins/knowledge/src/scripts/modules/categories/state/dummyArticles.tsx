@@ -4,10 +4,10 @@
  * @license Proprietary
  */
 
-import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
 import { t } from "@library/application";
+import { AttachmentType } from "@library/components/attachments";
 
 export const dummyArticles: IResult[] = [
     {

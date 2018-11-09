@@ -20,13 +20,15 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
 import qs from "qs";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{
             id?: string;
         }> {}
 
-interface IProps extends IOwnProps, IInjectableEditorProps {
+interface IProps extends IOwnProps, IInjectableEditorProps, IDeviceProps {
     actions: EditorPageActions;
 }
 
@@ -166,4 +168,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRouter(withRedux(EditorPage));
+export default withDevice(withRouter(withRedux(EditorPage)));

@@ -1,0 +1,8 @@
+
+<main>
+    DRAFT TWIG TEMPLATE
+    <article>
+        {% include 'seo/components/title.twig' with {'title': page.name} %}
+        {{ page.bodyRendered|raw }}
+    </article>
+</main>

@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/Icons";
+import { fileExcel, fileWord, filePDF, fileGeneric } from "@library/components/icons/fileTypes";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
 

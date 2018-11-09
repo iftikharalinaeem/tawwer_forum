@@ -8,7 +8,7 @@ import * as React from "react";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
-import { newFolder } from "@library/components/Icons";
+import { newFolder } from "@library/components/icons/common";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
