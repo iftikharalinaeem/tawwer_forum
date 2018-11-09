@@ -25,7 +25,7 @@ interface IState {
 /**
  * Page component for drafts page
  */
-export class SearchPage extends React.Component<IProps, IState> {
+export class DraftsPage extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
