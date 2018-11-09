@@ -21,14 +21,14 @@ interface IProps {
 
 interface IState {
     showDeleteDialogue: boolean;
-    toggleButtonElement: HTMLElement | null;
 }
 
 /**
  * Implements actions to take on draft
  */
 export default class DraftActions extends React.Component<IProps, IState> {
-    private toggleButtonRef = React.createRef();
+    private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+
     public constructor(props) {
         super(props);
         this.state = {
@@ -44,7 +44,7 @@ export default class DraftActions extends React.Component<IProps, IState> {
                     name={t("Draft Options")}
                     buttonClassName={ButtonBaseClass.CUSTOM}
                     renderLeft={true}
-                    setButtonElement={this.setButtonElement}
+                    setExternalButtonRef={this.setButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
                     className="draftPreview-actions"
                 >
@@ -60,7 +60,7 @@ export default class DraftActions extends React.Component<IProps, IState> {
                         title={t("Delete Draft")}
                         onCancel={this.closeDeleteDialogue}
                         onConfirm={this.props.deleteFunction}
-                        elementToFocusOnExit={this.state.toggleButtonElement!}
+                        elementToFocusOnExit={this.toggleButtonRef.current! as HTMLElement}
                     >
                         {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
                     </ModalConfirm>
@@ -83,12 +83,11 @@ export default class DraftActions extends React.Component<IProps, IState> {
         this.setState({ showDeleteDialogue: false });
     };
 
-    /**
-     * Set Button Ref
+    /*
+     * Set reference to button we need to target
      */
-    private setButtonElement = (toggleButtonElement: HTMLElement) => {
-        this.setState({
-            toggleButtonElement,
-        });
+    private setButtonRef = (ref: React.RefObject<HTMLButtonElement>) => {
+        this.toggleButtonRef = ref;
+        this.forceUpdate();
     };
 }
