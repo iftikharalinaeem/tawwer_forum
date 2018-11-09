@@ -33,7 +33,6 @@ export default class DraftActions extends React.Component<IProps, IState> {
         super(props);
         this.state = {
             showDeleteDialogue: false,
-            toggleButtonElement: null,
         };
     }
 
