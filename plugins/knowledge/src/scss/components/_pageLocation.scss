@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$pageLocation_spacer: $utility-baseUnit * 2;
+$pageLocation_spacer: $utility-baseUnit * 2.5;
 $pageLocation-placeholderIcon_size: 14px;
 $pageLocation-picker_color: mixContentBgAndFg(17%);
 $pageLocation-picker_verticalPadding: 8px;
@@ -12,7 +12,7 @@ $pageLocation-icon_opacity: .8;
 
 .pageLocation {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
     margin-bottom: $global-spacer;
@@ -55,8 +55,9 @@ $pageLocation-icon_opacity: .8;
 }
 
 .pageLocation-icon {
-    width: $pageLocation-placeholderIcon_size;
     height: $pageLocation-placeholderIcon_size;
+    width: $pageLocation-placeholderIcon_size;
+    flex-basis: $pageLocation-placeholderIcon_size;
     margin-right: .6em;
     opacity: $pageLocation-icon_opacity;
 }

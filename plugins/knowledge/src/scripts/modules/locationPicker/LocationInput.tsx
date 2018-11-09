@@ -50,8 +50,7 @@ export class LocationInput extends React.Component<IProps, IState> {
 
         const buttonContents = locationBreadcrumb ? (
             <React.Fragment>
-                {categoryIcon("pageLocation-icon")}
-                <LocationBreadcrumbs locationData={locationBreadcrumb} />
+                <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
             </React.Fragment>
         ) : (
             <React.Fragment>
