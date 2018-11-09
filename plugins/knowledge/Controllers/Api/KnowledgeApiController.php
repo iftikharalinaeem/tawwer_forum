@@ -158,11 +158,15 @@ class KnowledgeApiController extends AbstractApiController {
             $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp(), $range['exclude']);
         }
         $sphinxQuery = '';
+
         if (isset($query['name']) && !empty(trim($query['name']))) {
             $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
         }
         if (isset($query['body']) && !empty(trim($query['body']))) {
-            $sphinxQuery .= '@bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
+            $sphinxQuery .= ' @bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
+        }
+        if (isset($query['all']) && !empty(trim($query['all']))) {
+            $sphinxQuery .= '@(name,bodyRendered) (' . $sphinx->escapeString($query['all']) . ')*';
         }
         return $sphinx->query($sphinxQuery, $this->sphinxIndexName('KnowledgeArticle'));
     }
@@ -271,6 +275,7 @@ class KnowledgeApiController extends AbstractApiController {
             "statuses:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
+            "all:s?" => "Keywords to search against article name or body.",
         ];
     }
 
