@@ -54,7 +54,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $row = $this->knowledgeCategoryByID($id);
         if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
-            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]], 1);
+            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
         } else {
             throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.");
         }
