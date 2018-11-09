@@ -14,6 +14,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
+use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Quill\BlotGroup;
@@ -48,6 +49,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
+    /** @var DraftModel */
+    private $draftModel;
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -60,14 +64,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
      * @param UserModel $userModel
+     * @param DraftModel $draftModel
      */
     public function __construct(
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
-        UserModel $userModel
+        UserModel $userModel,
+        DraftModel $draftModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
+        $this->draftModel = $draftModel;
         $this->userModel = $userModel;
     }
 
@@ -208,6 +215,116 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ])->add($this->fullSchema()), "ArticleNoBody");
         }
         return $this->schema($this->articleNoBodySchema, $type);
+    }
+
+    /**
+     * Delete an article draft.
+     *
+     * @param int $draftID
+     * @return mixed
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws NotFoundException If the article draft could not be found.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ValidationException If the output fails to validate against the schema.
+     */
+    public function delete_drafts(int $draftID) {
+        $this->permission("signin.allow");
+
+        $in = $this->schema([
+            "draftID" => [
+                "description" => "Target article draft ID.",
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("Delete an article draft.");
+        $out = $this->schema([], "out");
+
+        $draft = $this->draftByID($draftID);
+        if ($draft["insertUserID"] !== $this->getSession()->UserID) {
+            $this->permission("settings.manage");
+        }
+        $this->draftModel->delete(
+            ["draftID" => $draft["draftID"]]
+        );
+    }
+
+    /**
+     * Get an article draft by its numeric ID.
+     *
+     * @param int $id Article ID.
+     * @return array
+     * @throws NotFoundException If the draft could not be found.
+     * @throws ValidationException If the result fails schema validation.
+     */
+    private function draftByID(int $id): array {
+        try {
+            $draft = $this->draftModel->selectSingle([
+                "draftID" => $id,
+                "recordType" => "article",
+            ]);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Draft");
+        }
+        return $draft;
+    }
+
+    /**
+     * Get post/patch fields for a draft.
+     *
+     * @return array
+     */
+    private function draftPostSchema(): Schema {
+        $result = Schema::parse([
+            "recordID?",
+            "parentRecordID?",
+            "attributes",
+        ])->add($this->fullDraftSchema());
+        return $result;
+    }
+
+    /**
+     * Get all available fields for a draft.
+     *
+     * @return Schema
+     */
+    private function fullDraftSchema(): Schema {
+        $result = Schema::parse([
+            "draftID" => [
+                "description" => "The unique ID of the draft.",
+                "type" => "integer",
+            ],
+            "recordType" => [
+                "description" => "The type of record associated with this draft.",
+                "type" => "string",
+            ],
+            "recordID" => [
+                "allowNull" => true,
+                "description" => "Unique ID of an existing record to associate with this draft.",
+                "type" => "integer",
+            ],
+            "parentRecordID" => [
+                "allowNull" => true,
+                "description" => "The unique ID of the intended parent to this record.",
+                "type" => "integer",
+            ],
+            "attributes:o" => "A free-form object containing all custom data for this draft.",
+            "insertUserID" => [
+                "description" => "Unique ID of the user who originally created the draft.",
+                "type" => "integer",
+            ],
+            "dateInserted" => [
+                "description" => "When the draft was created.",
+                "type" => "datetime",
+            ],
+            "updateUserID" => [
+                "description" => "Unique ID of the last user to update the draft.",
+                "type" => "integer",
+            ],
+            "dateUpdated" => [
+                "description" => "When the draft was last updated",
+                "type" => "datetime",
+            ],
+        ]);
+        return $result;
     }
 
     /**
@@ -355,6 +472,32 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get a single article draft.
+     *
+     * @param int $draftID
+     * @return mixed
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws NotFoundException If the article draft could not be found.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ValidationException If the output fails to validate against the schema.
+     */
+    public function get_drafts(int $draftID) {
+        $this->permission("articles.add");
+
+        $in = $this->schema([
+            "draftID" => [
+                "description" => "Target article draft ID.",
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("Get a single article draft.");
+        $out = $this->schema($this->fullDraftSchema(), "out");
+
+        $draft = $this->draftByID($draftID);
+        $result = $out->validate($draft);
+        return $result;
+    }
+
+    /**
      * Get an article for editing.
      *
      * @param int $id
@@ -442,6 +585,48 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $rows,
             ["insertUserID", "updateUserID"]
         );
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * List article drafts.
+     *
+     * @param array $query
+     * @return mixed
+     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ValidationException If input validation fails.
+     * @throws ValidationException If output validation fails.
+     */
+    public function index_drafts(array $query) {
+        $this->permission("articles.add");
+
+        $in = $this->schema([
+            "articleID?" => [
+                "description" => "Unique ID article associated with a draft.",
+                "type" => "integer",
+                "x-filter" => [
+                    "field" => "recordID",
+                ],
+            ],
+            "insertUserID?" => [
+                "description" => "Unique ID of the user who created the article draft.",
+                "type" => "integer",
+                "x-filter" => [
+                    "field" => "insertUserID",
+                ],
+            ],
+        ], "in")->setDescription("List article drafts.")->requireOneOf(["articleID", "insertUserID"]);
+        $out = $this->schema([
+            ":a" => $this->fullDraftSchema(),
+        ], "out");
+
+        $query = $in->validate($query);
+
+        $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
+        $rows = $this->draftModel->get($where);
 
         $result = $out->validate($rows);
         return $result;
@@ -616,6 +801,38 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Update an article draft.
+     *
+     * @param int $draftID
+     * @param array $body
+     * @return array
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function patch_drafts(int $draftID, array $body): array {
+        $this->permission("articles.add");
+
+        $this->schema(["draftID" => "Target article draft ID."], "in");
+        $in = $this->schema($this->draftPostSchema(), "in")
+            ->setDescription("Update an article draft.");
+        $out = $this->schema($this->fullDraftSchema(), "out");
+
+        $body = $in->validate($body, true);
+        $body["recordType"] = "article";
+
+        $draft = $this->draftByID($draftID);
+        if ($draft["insertUserID"] !== $this->getSession()->UserID) {
+            $this->permission("settings.manage");
+        }
+
+        $this->draftModel->update($body, ["draftID" => $draftID]);
+        $row = $this->draftByID($draftID);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Update article status an existing article.
      *
      * @param int $id ArticleID
@@ -672,6 +889,30 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Create a new article draft.
+     *
+     * @param array $body
+     * @return array
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function post_drafts(array $body): array {
+        $this->permission("articles.add");
+
+        $in = $this->schema($this->draftPostSchema(), "in")
+            ->setDescription("Create a new article draft.");
+        $out = $this->schema($this->fullDraftSchema(), "out");
+
+        $body = $in->validate($body);
+        $body["recordType"] = "article";
+        $draftID = $this->draftModel->insert($body);
+        $row = $this->draftByID($draftID);
         $result = $out->validate($row);
         return $result;
     }
