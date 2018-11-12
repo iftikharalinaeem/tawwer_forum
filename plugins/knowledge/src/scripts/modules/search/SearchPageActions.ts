@@ -46,7 +46,6 @@ export default class SearchPageActions extends ReduxActions {
 
     public search = async () => {
         const form = SearchPageModel.stateSlice(this.getState()).form;
-        console.log(form);
         const statuses = [ArticleStatus.PUBLISHED];
         if (form.includeDeleted) {
             statuses.push(ArticleStatus.DELETED);
@@ -76,8 +75,6 @@ export default class SearchPageActions extends ReduxActions {
             dateUpdated,
             expand: ["user", "category"],
         };
-
-        console.log(requestOptions);
 
         return await this.getSearch(requestOptions);
     };

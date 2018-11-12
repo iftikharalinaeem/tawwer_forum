@@ -35,7 +35,7 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <LinkContext.Provider value={formatUrl("/kb")}>
+                <LinkContext.Provider value={formatUrl("/kb", true)}>
                     <React.Fragment>
                         <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
                         <DeviceContext.Provider

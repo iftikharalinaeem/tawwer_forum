@@ -17,7 +17,6 @@ import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import { t } from "@library/application";
 import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/common";
 import LinkAsButton from "@library/components/LinkAsButton";
@@ -47,7 +46,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
 
     public render() {
         const { category, device } = this.props;
-        const options = this.loadSearchSuggestions();
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
@@ -65,7 +63,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         <PanelWidget>
                             <SearchBar
                                 placeholder={t("Search")}
-                                options={options}
                                 onChange={this.setQuery}
                                 value={this.state.query || ""}
                             >
@@ -104,20 +101,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         this.setState({
             query: newValue,
         });
-    };
-
-    /**
-     * Load dummy data
-     */
-    public loadSearchSuggestions = () => {
-        const data = dummySearchResults.map((result, index) => {
-            return {
-                label: result.name,
-                value: index.toString(),
-                ...result,
-            };
-        });
-        return data || [];
     };
 
     private getSearchResults(): IResult[] {

@@ -10,78 +10,37 @@ import { t } from "@library/application";
 import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-import { ISearchResult } from "@knowledge/@types/api";
-import { ILoadable, LoadStatus } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
-import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
+    className?: string;
     searchTerm?: string;
-    results: ILoadable<ISearchResult[]>;
+    results: IResult[];
 }
 
 /**
  * Generates a single search result. Note that this template is used in other contexts, such as the flat category list
  */
 export default class SearchResults extends React.Component<IProps> {
-    public render(): React.ReactNode {
-        const { results } = this.props;
-        if (results.status === LoadStatus.PENDING) {
-            return null;
-        }
-
-        if (results.status === LoadStatus.ERROR) {
-            return (
-                <Paragraph className="searchResults-noResults">
-                    <Translate source="There was an error searching for '<0/>'." c0={this.props.searchTerm} />
-                </Paragraph>
-            );
-        }
-
-        if (results.data) {
-            return this.renderSuccess(results.data);
-        }
-
-        return null;
-    }
-
-    private renderSuccess(data: ISearchResult[]): React.ReactNode {
-        const { searchTerm } = this.props;
-        const hasResults = data && data.length > 0;
+    public render() {
+        const hasResults = this.props.results && this.props.results.length > 0;
         let content;
 
         if (hasResults) {
-            content = data.map((result, i) => {
-                return (
-                    <SearchResult
-                        name={result.name}
-                        excerpt={result.body}
-                        meta={
-                            <ArticleMeta
-                                updateUser={result.updateUser!}
-                                dateUpdated={result.dateUpdated}
-                                permaLink={result.url}
-                            />
-                        }
-                        url={result.url}
-                        location={result.knowledgeCategory!.breadcrumbs}
-                        key={i}
-                    />
-                );
+            content = this.props.results.map((result, i) => {
+                return <SearchResult {...result} key={i} />;
             });
-        } else if (searchTerm === undefined || searchTerm === "") {
+        } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
             content = <Paragraph className="searchResults-noResults">{t("No results.")}</Paragraph>;
         } else {
             content = (
                 <Paragraph className="searchResults-noResults isEmpty">
-                    <Translate source="No results for '<0/>'." c0={searchTerm} />
+                    <Translate source="No results for '<0/>'." c0={this.props.searchTerm} />
                 </Paragraph>
             );
         }
 
         const Tag = hasResults ? `ul` : `div`;
 
-        return <Tag className={classNames("searchResults")}>{content}</Tag>;
+        return <Tag className={classNames("searchResults", this.props.className)}>{content}</Tag>;
     }
 }

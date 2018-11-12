@@ -8,8 +8,6 @@ import * as React from "react";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import InputTextBlock from "@library/components/forms/InputTextBlock";
-import Tokens from "@library/components/forms/select/Tokens";
-import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
 import Checkbox from "@library/components/forms/Checkbox";
 import SelectOne from "@library/components/forms/select/SelectOne";
 import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";

@@ -11,7 +11,6 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
 import AdvancedSearch from "@knowledge/modules/search/components/AdvancedSearch";
-import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
@@ -22,6 +21,10 @@ import QueryString from "@library/components/navigation/QueryString";
 import apiv2 from "@library/apiv2";
 import qs from "qs";
 import { LoadStatus } from "@library/@types/api";
+import { IResult } from "@knowledge/modules/common/SearchResult";
+import { ISearchResult } from "@knowledge/@types/api";
+import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
+import SearchOption from "@knowledge/modules/search/components/SearchOption";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -30,7 +33,6 @@ interface IProps extends ISearchFormActionProps, ISearchPageState {
 
 class SearchForm extends React.Component<IProps> {
     public render() {
-        const options = this.loadSearchSuggestions();
         const { device } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
@@ -46,21 +48,19 @@ class SearchForm extends React.Component<IProps> {
                             <PanelWidget>
                                 <SearchBar
                                     placeholder={this.props.placeholder || t("Help")}
-                                    options={options}
-                                    onChange={(value: any) => {
-                                        this.props.searchActions.updateForm({ query: value });
-                                    }}
+                                    onChange={this.handleSearchChange}
                                     loadOptions={this.loadOptions}
                                     value={this.props.form.query}
                                     isBigInput={true}
-                                    onSearch={this.queueSearch}
+                                    onSearch={this.props.searchActions.search}
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
+                                    optionComponent={SearchOption}
                                 />
                             </PanelWidget>
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidgetVerticalPadding>
-                                {<SearchResults results={this.props.results} />}
+                                {<SearchResults results={this.unwrapResults()} />}
                             </PanelWidgetVerticalPadding>
                         </PanelLayout.MiddleBottom>
                         <PanelLayout.RightTop>
@@ -73,10 +73,6 @@ class SearchForm extends React.Component<IProps> {
             </Container>
         );
     }
-
-    private queueSearch = () => {
-        this.props.searchActions.search();
-    };
 
     public componentDidMount() {
         if (window.location.search) {
@@ -93,12 +89,40 @@ class SearchForm extends React.Component<IProps> {
             }
 
             this.props.searchActions.updateForm(initialForm);
-            this.props.searchActions.search();
+            void this.props.searchActions.search();
         }
     }
 
+    private handleSearchChange = (value: string) => {
+        this.props.searchActions.updateForm({ query: value });
+    };
+
+    private unwrapResults(): IResult[] {
+        const { results } = this.props;
+        if (results.data) {
+            return results.data.map(this.mapResult);
+        } else {
+            return [];
+        }
+    }
+
+    private mapResult(searchResult: ISearchResult): IResult {
+        return {
+            name: searchResult.name,
+            excerpt: searchResult.body,
+            meta: <SearchResultMeta updateUser={searchResult.updateUser!} dateUpdated={searchResult.dateUpdated} />,
+            url: searchResult.url,
+            location: searchResult.knowledgeCategory!.breadcrumbs,
+        };
+    }
+
     private loadOptions = (value: string) => {
-        return apiv2.get(`/knowledge/search?name=${value}`).then(results => {
+        const queryObj = {
+            name: value,
+            expand: ["user", "category"],
+        };
+        const query = qs.stringify(queryObj);
+        return apiv2.get(`/knowledge/search?${query}`).then(results => {
             results = results.data.map(result => {
                 return {
                     label: result.name,
@@ -110,23 +134,9 @@ class SearchForm extends React.Component<IProps> {
         });
     };
 
-    /**
-     * Load dummy data
-     */
-    public loadSearchSuggestions = () => {
-        const data = dummySearchResults.map((result, index) => {
-            return {
-                label: result.name,
-                value: index.toString(),
-                ...result,
-            };
-        });
-        return data || [];
-    };
-
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        this.props.searchActions.search();
+        void this.props.searchActions.search();
     };
 }
 
