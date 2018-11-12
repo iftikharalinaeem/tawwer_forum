@@ -23,6 +23,7 @@ import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
+import VanillaHeader from "@library/components/VanillaHeader";
 
 interface IProps {
     article: IArticle;
@@ -42,6 +43,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
 
         return (
             <Container>
+                <VanillaHeader />
                 <PanelLayout device={this.props.device}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
@@ -84,9 +86,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
                         <PanelWidget>
-                            <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
-                                {dummyOtherLanguagesData.children as any}
-                            </OtherLanguages>
+                            <OtherLanguages {...dummyOtherLanguagesData} />
                             <RelatedArticles children={this.articleRelatedArticles} />
                         </PanelWidget>
                     </PanelLayout.RightBottom>

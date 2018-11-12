@@ -9,28 +9,28 @@ export const dummyOtherLanguagesData = {
     children: [
         {
             name: "English",
-            key: "en",
+            lang: "en",
             selected: false,
         },
         {
             name: "French",
-            key: "fr",
+            lang: "fr",
             selected: false,
         },
         {
             name: "Klingon",
-            key: "kl",
+            lang: "kl",
             selected: false,
             outdated: true,
         },
         {
             name: "Bajoran",
-            key: "ba",
+            lang: "ba",
             selected: false,
         },
         {
             name: "Andorian",
-            key: "an",
+            lang: "an",
             selected: false,
             outdated: true,
         },

@@ -21,6 +21,7 @@ import { connect } from "react-redux";
 import NotFoundPage from "@library/components/NotFoundPage";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { VanillaHeader } from "@library/components/VanillaHeader";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
@@ -51,6 +52,7 @@ export class CategoriesPage extends React.Component<IProps> {
 
         return (
             <PageLoader {...categoriesPageState.articles}>
+                <VanillaHeader device={this.props.device} />
                 {categoriesPageState.articles.status === LoadStatus.SUCCESS &&
                     categoriesPageState.articles.data && (
                         <DocumentTitle title={category.name}>
