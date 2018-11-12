@@ -25,6 +25,7 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import { ISearchResult } from "@knowledge/@types/api";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import SearchOption from "@knowledge/modules/search/components/SearchOption";
+import DocumentTitle from "@library/components/DocumentTitle";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -33,42 +34,44 @@ interface IProps extends ISearchFormActionProps, ISearchPageState {
 
 class SearchForm extends React.Component<IProps> {
     public render() {
-        const { device } = this.props;
+        const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
 
         return (
-            <Container>
-                <QueryString value={this.props.form} />
-                <PanelLayout device={this.props.device}>
-                    {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <SearchBar
-                                placeholder={this.props.placeholder || t("Help")}
-                                onChange={this.handleSearchChange}
-                                loadOptions={this.loadOptions}
-                                value={this.props.form.query}
-                                isBigInput={true}
-                                onSearch={this.props.searchActions.search}
-                                isLoading={this.props.results.status === LoadStatus.LOADING}
-                                optionComponent={SearchOption}
-                            />
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidgetVerticalPadding>
-                            {<SearchResults results={this.unwrapResults()} />}
-                        </PanelWidgetVerticalPadding>
-                    </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <PanelWidget>
-                            <AdvancedSearch />
-                        </PanelWidget>
-                    </PanelLayout.RightTop>
-                </PanelLayout>
-            </Container>
+            <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+                <Container>
+                    <QueryString value={this.props.form} />
+                    <PanelLayout device={this.props.device}>
+                        {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>
+                                <SearchBar
+                                    placeholder={this.props.placeholder || t("Help")}
+                                    onChange={this.handleSearchChange}
+                                    loadOptions={this.loadOptions}
+                                    value={this.props.form.query}
+                                    isBigInput={true}
+                                    onSearch={this.props.searchActions.search}
+                                    isLoading={this.props.results.status === LoadStatus.LOADING}
+                                    optionComponent={SearchOption}
+                                />
+                            </PanelWidget>
+                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidgetVerticalPadding>
+                                {<SearchResults results={this.unwrapResults()} />}
+                            </PanelWidgetVerticalPadding>
+                        </PanelLayout.MiddleBottom>
+                        <PanelLayout.RightTop>
+                            <PanelWidget>
+                                <AdvancedSearch />
+                            </PanelWidget>
+                        </PanelLayout.RightTop>
+                    </PanelLayout>
+                </Container>
+            </DocumentTitle>
         );
     }
 

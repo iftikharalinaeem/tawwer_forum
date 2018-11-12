@@ -11,6 +11,7 @@ import { OptionProps } from "react-select/lib/components/Option";
 import { ISearchResult } from "@knowledge/@types/api";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { SelectOption } from "@library/components/forms/select/overwrites";
+import classNames from "classnames";
 
 interface IProps extends OptionProps<any> {
     data: IComboBoxOption<ISearchResult>;
@@ -19,18 +20,22 @@ interface IProps extends OptionProps<any> {
 /**
  */
 export default function SearchOption(props: IProps) {
-    const { data, innerProps } = props;
+    const { data, innerProps, isSelected, isFocused } = props;
 
     if (data.data) {
         const { dateUpdated, knowledgeCategory } = data.data!;
         const hasLocationData = knowledgeCategory && knowledgeCategory.breadcrumbs.length > 0;
         return (
-            <li {...innerProps} className="suggestedTextInput-item">
+            <li className="suggestedTextInput-item">
                 <button
+                    {...innerProps}
                     type="button"
                     title={props.label}
                     aria-label={props.label}
-                    className="suggestedTextInput-option"
+                    className={classNames("suggestedTextInput-option", {
+                        isSelected,
+                        isFocused,
+                    })}
                 >
                     <span className="suggestedTextInput-head">
                         <span className="suggestedTextInput-title">{props.children}</span>
