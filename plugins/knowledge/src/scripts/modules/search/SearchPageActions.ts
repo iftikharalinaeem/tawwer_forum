@@ -83,7 +83,7 @@ export default class SearchPageActions extends ReduxActions {
         // Put together the search query.
         const query: any = {};
         if (!form.title) {
-            query.both = form.query;
+            query.all = form.query;
         } else {
             query.title = form.title;
             query.body = form.query;
