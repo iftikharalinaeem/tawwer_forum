@@ -14,6 +14,16 @@ import {
     IGetArticleRevisionsResponseBody,
     IGetRevisionRequestBody,
     IGetRevisionResponseBody,
+    IGetArticleDraftsRequest,
+    IGetArticleDraftsResponse,
+    IGetArticleDraftResponse,
+    IGetArticleDraftRequest,
+    IPostArticleDraftResponse,
+    IPostArticleDraftRequest,
+    IPatchArticleDraftResponse,
+    IPatchArticleDraftRequest,
+    IDeleteArticleDraftResponse,
+    IDeleteArticleDraftRequest,
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
@@ -118,6 +128,106 @@ export default class ArticleActions extends ReduxActions {
         {} as IGetRevisionResponseBody,
         {} as IGetRevisionRequestBody,
     );
+
+    /**
+     * Static action creators for the /articles/drafts endpoint.
+     */
+    private static readonly getDraftsACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.GET_DRAFTS_REQUEST,
+        ArticleActions.GET_DRAFTS_RESPONSE,
+        ArticleActions.GET_DRAFTS_ERROR,
+        {} as IGetArticleDraftsResponse,
+        {} as IGetArticleDraftsRequest,
+    );
+
+    public getDrafts(request: IGetArticleDraftsRequest) {
+        return this.dispatchApi<IGetArticleDraftsResponse>(
+            "get",
+            `/articles/drafts`,
+            ArticleActions.getDraftsACs,
+            request,
+        );
+    }
+
+    /**
+     * Static action creators for the /articles/drafts endpoint.
+     */
+    private static readonly getDraftACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.GET_DRAFT_REQUEST,
+        ArticleActions.GET_DRAFT_RESPONSE,
+        ArticleActions.GET_DRAFT_ERROR,
+        {} as IGetArticleDraftResponse,
+        {} as IGetArticleDraftRequest,
+    );
+
+    public getDraft(request: IGetArticleDraftRequest) {
+        const { draftID } = request;
+        return this.dispatchApi<IGetArticleDraftResponse>(
+            "get",
+            `/articles/drafts/${draftID}`,
+            ArticleActions.getDraftACs,
+            request,
+        );
+    }
+
+    // POST /articles/drafts
+    private static readonly postDraftACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.POST_DRAFT_REQUEST,
+        ArticleActions.POST_DRAFT_RESPONSE,
+        ArticleActions.POST_DRAFT_ERROR,
+        {} as IPostArticleDraftResponse,
+        {} as IPostArticleDraftRequest,
+    );
+
+    public postDraft(request: IPostArticleDraftRequest) {
+        return this.dispatchApi<IPostArticleDraftResponse>(
+            "post",
+            "/articles/drafts",
+            ArticleActions.postDraftACs,
+            request,
+        );
+    }
+
+    /**
+     * Static action creators for the /articles/drafts endpoint.
+     */
+    private static readonly patchDraftACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.PATCH_DRAFT_REQUEST,
+        ArticleActions.PATCH_DRAFT_RESPONSE,
+        ArticleActions.PATCH_DRAFT_ERROR,
+        {} as IPatchArticleDraftResponse,
+        {} as IPatchArticleDraftRequest,
+    );
+
+    public patchDraft(request: IPatchArticleDraftRequest) {
+        const { draftID, ...rest } = request;
+        return this.dispatchApi<IPatchArticleDraftResponse>(
+            "patch",
+            `/articles/drafts/${draftID}`,
+            ArticleActions.patchDraftACs,
+            rest,
+        );
+    }
+
+    /**
+     * Static action creators for the /articles/drafts endpoint.
+     */
+    private static readonly deleteDraftACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.PATCH_DRAFT_REQUEST,
+        ArticleActions.PATCH_DRAFT_RESPONSE,
+        ArticleActions.PATCH_DRAFT_ERROR,
+        {} as IDeleteArticleDraftResponse,
+        {} as IDeleteArticleDraftRequest,
+    );
+
+    public deleteDraft(request: IDeleteArticleDraftRequest) {
+        return this.dispatchApi<IDeleteArticleDraftResponse>(
+            "patch",
+            `/articles/drafts/${request.draftID}`,
+            ArticleActions.deleteDraftACs,
+            request,
+        );
+    }
 
     public static mapDispatchToProps(dispatch): IArticleActionsProps {
         return {
