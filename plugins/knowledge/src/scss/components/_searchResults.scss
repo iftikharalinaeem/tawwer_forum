@@ -41,6 +41,11 @@ $searchResult_breakPoint                      : 800px;
 
 }
 
+.searchResults-noResults {
+    font-size: $userContent_fontSize;
+    padding: #{$global_spacer} $global_gutter_halfSize;
+}
+
 .searchResults-item {
     position: relative;
     display: block;
