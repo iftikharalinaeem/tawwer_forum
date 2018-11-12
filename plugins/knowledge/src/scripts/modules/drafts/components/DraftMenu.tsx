@@ -5,13 +5,11 @@
  */
 import * as React from "react";
 import { t } from "@library/application";
-import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 import DropDown from "@library/components/dropdown/DropDown";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
-import { LoadStatus } from "@library/@types/api/core";
 
 interface IProps {
     className?: string;
@@ -26,7 +24,7 @@ interface IState {
 /**
  * Implements actions to take on draft
  */
-export default class DraftActions extends React.Component<IProps, IState> {
+export default class DraftMenu extends React.Component<IProps, IState> {
     private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public constructor(props) {

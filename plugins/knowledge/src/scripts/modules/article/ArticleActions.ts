@@ -42,6 +42,26 @@ export default class ArticleActions extends ReduxActions {
     public static readonly GET_REVISION_RESPONSE = "@@article/GET_REVISION_RESPONSE";
     public static readonly GET_REVISION_ERROR = "@@article/GET_REVISION_ERROR";
 
+    public static readonly GET_DRAFTS_REQUEST = "@@article/GET_DRAFTS_REQUEST";
+    public static readonly GET_DRAFTS_RESPONSE = "@@article/GET_DRAFTS_RESPONSE";
+    public static readonly GET_DRAFTS_ERROR = "@@article/GET_DRAFTS_ERROR";
+
+    public static readonly POST_DRAFT_REQUEST = "@@article/POST_DRAFT_REQUEST";
+    public static readonly POST_DRAFT_RESPONSE = "@@article/POST_DRAFT_RESPONSE";
+    public static readonly POST_DRAFT_ERROR = "@@article/POST_DRAFT_ERROR";
+
+    public static readonly PATCH_DRAFT_REQUEST = "@@article/PATCH_DRAFT_REQUEST";
+    public static readonly PATCH_DRAFT_RESPONSE = "@@article/PATCH_DRAFT_RESPONSE";
+    public static readonly PATCH_DRAFT_ERROR = "@@article/PATCH_DRAFT_ERROR";
+
+    public static readonly GET_DRAFT_REQUEST = "@@article/GET_DRAFT_REQUEST";
+    public static readonly GET_DRAFT_RESPONSE = "@@article/GET_DRAFT_RESPONSE";
+    public static readonly GET_DRAFT_ERROR = "@@article/GET_DRAFT_ERROR";
+
+    public static readonly DELETE_DRAFT_REQUEST = "@@article/DELETE_DRAFT_REQUEST";
+    public static readonly DELETE_DRAFT_RESPONSE = "@@article/DELETE_DRAFT_RESPONSE";
+    public static readonly DELETE_DRAFT_ERROR = "@@article/DELETE_DRAFT_ERROR";
+
     /**
      * Union of all possible action types in this class.
      */
