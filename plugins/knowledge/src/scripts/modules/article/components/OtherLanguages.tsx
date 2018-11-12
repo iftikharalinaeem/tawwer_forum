@@ -9,7 +9,7 @@ import { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import LanguagesDropDown, { ILanguageProps } from "@knowledge/modules/article/components/LanguagesDropDown";
+import LanguagesDropDown, { ILanguageProps } from "./LanguagesDropDown";
 
 export interface IOtherLangaugesProps {
     id?: string;

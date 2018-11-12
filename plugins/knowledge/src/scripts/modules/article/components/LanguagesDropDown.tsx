@@ -37,7 +37,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
         if (showPicker) {
             let foundIndex = false;
             const processedChildren = this.props.children.map(language => {
-                const selected = language.key === this.props.selected;
+                const selected = language.lang === this.props.selected;
                 language.selected = selected;
                 if (selected) {
                     foundIndex = selected;

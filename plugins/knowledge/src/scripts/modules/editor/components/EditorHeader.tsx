@@ -18,11 +18,12 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
+import LanguagesDropDown from "@knowledge/modules/article/components/LanguagesDropDown";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
     isSubmitLoading: boolean;
-    selectedKey?: string;
+    selectedLang?: string;
     className?: string;
     callToAction?: string;
     optionsMenu?: React.ReactNode;
@@ -39,22 +40,7 @@ export class EditorHeader extends React.Component<IProps> {
     private localeTitleID = uniqueIDFromPrefix("editorHeader");
 
     public render() {
-        let foundIndex = false;
-        const processedChildren = dummyOtherLanguagesData.children.map(language => {
-            // This is all hard coded for now.
-            const selected = language.key === this.props.selectedKey;
-            language.selected = selected;
-            if (selected) {
-                foundIndex = selected;
-            }
-            return language;
-        });
-        if (!foundIndex) {
-            processedChildren[0].selected = true;
-        }
-
         const label = t("Switch Locale");
-
         return (
             <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
                 <Container>
@@ -83,18 +69,18 @@ export class EditorHeader extends React.Component<IProps> {
                                     </Button>
                                 </li>
                                 <li className="editorHeader-item">
-                                    <h3 id={this.localeTitleID} className="sr-only">
-                                        {label}
-                                    </h3>
-                                    <SelectBox
-                                        describedBy={this.localeTitleID}
+                                    <LanguagesDropDown
+                                        label={label}
+                                        titleID={this.localeTitleID}
+                                        widthOfParent={true}
                                         className="editorHeader-otherLanguages"
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
-                                        buttonBaseClass={ButtonBaseClass.STANDARD}
                                         renderLeft={true}
+                                        buttonBaseClass={ButtonBaseClass.STANDARD}
+                                        selected={this.props.selectedLang}
                                     >
-                                        {processedChildren}
-                                    </SelectBox>
+                                        {dummyOtherLanguagesData}
+                                    </LanguagesDropDown>
                                 </li>
                                 {this.props.optionsMenu && (
                                     <li className="editorHeader-item">{this.props.optionsMenu}</li>
