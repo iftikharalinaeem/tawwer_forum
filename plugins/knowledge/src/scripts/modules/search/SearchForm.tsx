@@ -41,62 +41,80 @@ class SearchForm extends React.Component<IProps> {
         return (
             <Container>
                 <QueryString value={this.props.form} />
-                <form onSubmit={this.onSubmit}>
-                    <PanelLayout device={this.props.device}>
-                        {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
-                        <PanelLayout.MiddleTop>
-                            <PanelWidget>
-                                <SearchBar
-                                    placeholder={this.props.placeholder || t("Help")}
-                                    onChange={this.handleSearchChange}
-                                    loadOptions={this.loadOptions}
-                                    value={this.props.form.query}
-                                    isBigInput={true}
-                                    onSearch={this.props.searchActions.search}
-                                    isLoading={this.props.results.status === LoadStatus.LOADING}
-                                    optionComponent={SearchOption}
-                                />
-                            </PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
-                            <PanelWidgetVerticalPadding>
-                                {<SearchResults results={this.unwrapResults()} />}
-                            </PanelWidgetVerticalPadding>
-                        </PanelLayout.MiddleBottom>
-                        <PanelLayout.RightTop>
-                            <PanelWidget>
-                                <AdvancedSearch />
-                            </PanelWidget>
-                        </PanelLayout.RightTop>
-                    </PanelLayout>
-                </form>
+                <PanelLayout device={this.props.device}>
+                    {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
+                    <PanelLayout.MiddleTop>
+                        <PanelWidget>
+                            <SearchBar
+                                placeholder={this.props.placeholder || t("Help")}
+                                onChange={this.handleSearchChange}
+                                loadOptions={this.loadOptions}
+                                value={this.props.form.query}
+                                isBigInput={true}
+                                onSearch={this.props.searchActions.search}
+                                isLoading={this.props.results.status === LoadStatus.LOADING}
+                                optionComponent={SearchOption}
+                            />
+                        </PanelWidget>
+                    </PanelLayout.MiddleTop>
+                    <PanelLayout.MiddleBottom>
+                        <PanelWidgetVerticalPadding>
+                            {<SearchResults results={this.unwrapResults()} />}
+                        </PanelWidgetVerticalPadding>
+                    </PanelLayout.MiddleBottom>
+                    <PanelLayout.RightTop>
+                        <PanelWidget>
+                            <AdvancedSearch />
+                        </PanelWidget>
+                    </PanelLayout.RightTop>
+                </PanelLayout>
             </Container>
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentDidMount() {
         if (window.location.search) {
-            const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
-
-            if ("authors" in initialForm) {
-                initialForm.authors.map(option => {
-                    option.value = Number.parseInt(option.value, 10);
-                });
-            }
-
-            if ("includeDeleted" in initialForm) {
-                initialForm.includeDeleted = JSON.parse(initialForm.includeDeleted);
-            }
-
-            this.props.searchActions.updateForm(initialForm);
-            void this.props.searchActions.search();
+            this.initializeFromQueryString(window.location.search);
         }
     }
 
+    /**
+     * Initialize the form values from a query string.
+     *
+     * Many of these values can be a bit of a PITA the put together manually, but all form values are persisted there.
+     *
+     * @param queryString The query string to initialize from.
+     */
+    private initializeFromQueryString(queryString: string) {
+        const initialForm = qs.parse(queryString.replace(/^\?/, ""));
+
+        if ("authors" in initialForm) {
+            initialForm.authors.map(option => {
+                option.value = Number.parseInt(option.value, 10);
+            });
+        }
+
+        if ("includeDeleted" in initialForm) {
+            initialForm.includeDeleted = JSON.parse(initialForm.includeDeleted);
+        }
+
+        this.props.searchActions.updateForm(initialForm);
+        void this.props.searchActions.search();
+    }
+
+    /**
+     * Simple form setter for the search bar.
+     */
     private handleSearchChange = (value: string) => {
         this.props.searchActions.updateForm({ query: value });
     };
 
+    /**
+     * Unwrap loaded results and map them into the proper shape.
+     */
     private unwrapResults(): IResult[] {
         const { results } = this.props;
         if (results.data) {
@@ -106,6 +124,11 @@ class SearchForm extends React.Component<IProps> {
         }
     }
 
+    /**
+     * Map a search API response into what the <SearchResults /> component is expecting.
+     *
+     * @param searchResult The API search result to map.
+     */
     private mapResult(searchResult: ISearchResult): IResult {
         return {
             name: searchResult.name,
@@ -116,27 +139,23 @@ class SearchForm extends React.Component<IProps> {
         };
     }
 
-    private loadOptions = (value: string) => {
+    /**
+     * Simple data loading function for the search bar/react-select.
+     */
+    private loadOptions = async (value: string) => {
         const queryObj = {
             name: value,
             expand: ["user", "category"],
         };
         const query = qs.stringify(queryObj);
-        return apiv2.get(`/knowledge/search?${query}`).then(results => {
-            results = results.data.map(result => {
-                return {
-                    label: result.name,
-                    value: result.name,
-                    data: result,
-                };
-            });
-            return results;
+        const response = await apiv2.get(`/knowledge/search?${query}`);
+        return response.data.map(result => {
+            return {
+                label: result.name,
+                value: result.name,
+                data: result,
+            };
         });
-    };
-
-    private onSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        void this.props.searchActions.search();
     };
 }
 

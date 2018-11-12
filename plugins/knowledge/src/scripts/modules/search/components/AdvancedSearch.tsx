@@ -9,8 +9,6 @@ import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import InputTextBlock from "@library/components/forms/InputTextBlock";
 import Checkbox from "@library/components/forms/Checkbox";
-import SelectOne from "@library/components/forms/select/SelectOne";
-import { dummyKnowledgeBaseList } from "@knowledge/modules/search/state/dummyKnowledgeBaseList";
 import Button from "@library/components/forms/Button";
 import { connect } from "react-redux";
 import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
@@ -18,6 +16,8 @@ import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/se
 import DateRange from "@knowledge/modules/search/components/DateRange";
 import MultiUserInput from "@library/users/MultiUserInput";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import ButtonLoader from "@library/components/ButtonLoader";
+import { LoadStatus } from "@library/@types/api";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -34,7 +34,7 @@ export class AdvancedSearch extends React.Component<IProps> {
         const formData = this.props.form;
 
         return (
-            <form className="advancedSearch" onSubmit={this.noop}>
+            <form className="advancedSearch" onSubmit={this.handleSubmit}>
                 <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
                 <InputTextBlock
                     label={t("Title")}
@@ -50,15 +50,6 @@ export class AdvancedSearch extends React.Component<IProps> {
                     start={this.props.form.startDate}
                     end={this.props.form.endDate}
                 />
-                {dummyKnowledgeBaseList &&
-                    dummyKnowledgeBaseList.length > 0 && (
-                        <SelectOne
-                            label={t("Knowledge Base")}
-                            className="inputBlock dateRange-within"
-                            options={dummyKnowledgeBaseList}
-                            onChange={this.noop}
-                        />
-                    )}
                 <Checkbox
                     label={t("Deleted Articles")}
                     onChange={this.handleCheckBoxDeletedArticleChange}
@@ -66,7 +57,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                     className="inputBlock"
                 />
                 <Button type="submit" className="advancedSearch-submit" prefix="submitButton">
-                    {t("Search")}
+                    {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Search")}
                 </Button>
             </form>
         );
@@ -80,27 +71,40 @@ export class AdvancedSearch extends React.Component<IProps> {
     };
 
     /**
-     * Handler for title field.
+     * Simple form setter.
      */
     private handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         this.props.searchActions.updateForm({ title: value });
     };
 
+    /**
+     * Simple form setter.
+     */
     private handleStartDateChange = (date: string) => {
         this.props.searchActions.updateForm({ startDate: date });
     };
 
+    /**
+     * Simple form setter.
+     */
     private handleEndDateChange = (date: string) => {
         this.props.searchActions.updateForm({ endDate: date });
     };
 
+    /**
+     * Simple form setter.
+     */
     private handleUserChange = (options: IComboBoxOption[]) => {
         this.props.searchActions.updateForm({ authors: options });
     };
 
-    private noop = () => {
-        return;
+    /**
+     * Handle the form submission by triggering a search.
+     */
+    private handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        this.props.searchActions.search();
     };
 }
 
