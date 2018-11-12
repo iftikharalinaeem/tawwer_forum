@@ -265,6 +265,9 @@ export function PanelWidget(props: IContainerProps) {
 export function PanelWidgetVerticalPadding(props: IContainerProps) {
     return <div className={classNames("panelWidget", "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
+export function PanelWidgetHorizontalPadding(props: IContainerProps) {
+    return <div className={classNames("panelWidget", "hasNoVerticalPadding", props.className)}>{props.children}</div>;
+}
 
 // The components that make up the Layout itself.
 interface IPanelItemProps {
