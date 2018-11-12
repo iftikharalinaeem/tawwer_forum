@@ -10,6 +10,7 @@ import { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IProps {
     locationData: ICrumb[];
+    icon?: JSX.Element;
 }
 
 /**
@@ -69,6 +70,11 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
             );
         });
 
-        return <span className="breadcrumbs">{crumbs}</span>;
+        return (
+            <span className="locationBreadcrumb">
+                {this.props.icon && <span className="locationBreadcrumb-icon breadcrumb-icon">{this.props.icon}</span>}
+                {crumbs}
+            </span>
+        );
     }
 }

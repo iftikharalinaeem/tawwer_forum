@@ -13,7 +13,7 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
-import PanelLayout from "@knowledge/layouts/PanelLayout";
+import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices } from "@library/components/DeviceChecker";
@@ -99,6 +99,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                 <LocationInput
                                     initialCategoryID={categoryID}
                                     key={categoryID === null ? undefined : categoryID}
+                                    disabled={this.isLoading}
                                 />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.state.name || "Untitled"} />

@@ -26,6 +26,7 @@ interface IProps {
     exitHandler: () => void;
     className?: string;
     parentCategory: IKbCategoryFragment | null;
+    buttonRef: React.RefObject<HTMLButtonElement>;
 }
 
 interface IState {
@@ -61,7 +62,12 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal titleID={this.titleID} size={ModalSizes.SMALL} exitHandler={this.props.exitHandler}>
+            <Modal
+                titleID={this.titleID}
+                size={ModalSizes.SMALL}
+                exitHandler={this.props.exitHandler}
+                elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
+            >
                 <Frame>
                     <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>
                         {t("New Folder")}

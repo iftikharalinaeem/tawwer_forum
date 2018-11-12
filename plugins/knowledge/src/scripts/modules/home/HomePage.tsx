@@ -37,6 +37,9 @@ export default class HomePage extends React.Component {
                 <p>
                     <Link to="/kb/search">{t("Search")}</Link>
                 </p>
+                <p>
+                    <Link to="/kb/drafts">{t("Drafts")}</Link>
+                </p>
             </div>
         );
     }
