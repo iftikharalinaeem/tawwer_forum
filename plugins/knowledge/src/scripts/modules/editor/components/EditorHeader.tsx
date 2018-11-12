@@ -12,7 +12,6 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
-import SelectBox from "@library/components/SelectBox";
 import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
@@ -36,11 +35,7 @@ export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
     };
-
-    private localeTitleID = uniqueIDFromPrefix("editorHeader");
-
     public render() {
-        const label = t("Switch Locale");
         return (
             <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
                 <Container>
@@ -57,7 +52,7 @@ export class EditorHeader extends React.Component<IProps> {
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
-                                        title={label}
+                                        title={this.props.callToAction}
                                         disabled={!this.props.canSubmit}
                                         className={classNames(
                                             "editorHeader-publish",
@@ -70,16 +65,14 @@ export class EditorHeader extends React.Component<IProps> {
                                 </li>
                                 <li className="editorHeader-item">
                                     <LanguagesDropDown
-                                        label={label}
-                                        titleID={this.localeTitleID}
                                         widthOfParent={true}
                                         className="editorHeader-otherLanguages"
-                                        buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         renderLeft={true}
+                                        buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
                                         selected={this.props.selectedLang}
                                     >
-                                        {dummyOtherLanguagesData}
+                                        {dummyOtherLanguagesData.children}
                                     </LanguagesDropDown>
                                 </li>
                                 {this.props.optionsMenu && (

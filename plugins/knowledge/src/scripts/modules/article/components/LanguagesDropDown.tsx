@@ -8,6 +8,7 @@ import * as React from "react";
 import { t } from "@library/application";
 import SelectBox, { ISelectBoxItem } from "@library/components/SelectBox";
 import classNames from "classnames";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface IState {
     id: string;
@@ -25,6 +26,8 @@ export interface ILanguageDropDownProps {
     widthOfParent?: boolean;
     selected: any;
     className?: string;
+    buttonClassName?: string;
+    buttonBaseClass?: ButtonBaseClass;
     renderLeft?: boolean;
 }
 
@@ -54,6 +57,8 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                     widthOfParent={true}
                     className={classNames("otherLanguages-select", this.props.className)}
                     renderLeft={this.props.renderLeft}
+                    buttonClassName={this.props.buttonClassName}
+                    buttonBaseClass={this.props.buttonBaseClass}
                 >
                     {processedChildren}
                 </SelectBox>
