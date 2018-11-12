@@ -92,12 +92,12 @@ export interface IPatchArticleStatusRequestBody {
 export interface IPatchArticleStatusResponseBody extends IArticle {}
 
 // Drafts
-interface IArticleDraftAttrs extends Partial<IArticleRequiredData>, Partial<IArticleDefaultedData> {}
+export interface IArticleDraftContents extends Partial<IArticleRequiredData>, Partial<IArticleDefaultedData> {}
 
 export interface IArticleDraft {
     recordID?: number;
     parentRecordID?: number;
-    attributes: IArticleDraftAttrs;
+    attributes: IArticleDraftContents;
 }
 
 export interface IResponseArticleDraft extends IArticleDraft, IInsertUpdate {

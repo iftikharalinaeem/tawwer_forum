@@ -16,52 +16,25 @@ import classNames from "classnames";
 import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
 import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { Devices } from "@library/components/DeviceChecker";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import EditorMenu from "./EditorMenu";
+import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
+import { connect } from "react-redux";
+import apiv2 from "@library/apiv2";
 
-type LoadableContent = ILoadable<{
-    name: string;
-    body: string;
-}>;
-
-interface IProps {
-    device: Devices;
-    submitHandler: (editorContent: DeltaOperation[], title: string) => void;
-    article: ILoadable<IArticle>;
-    content: LoadableContent;
-    currentCategory: IKbCategoryFragment | null;
+interface IProps extends IInjectableEditorProps, IDeviceProps {
+    actions: EditorPageActions;
     className?: string;
-    isSubmitLoading: boolean;
     titleID?: string;
-    legacyMode?: boolean;
-}
-
-interface IState {
-    name: string;
-    body: DeltaOperation[];
 }
 
 /**
  * Form for the editor page.
  */
-export class EditorForm extends React.Component<IProps, IState> {
+export class EditorForm extends React.Component<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
-
-    public constructor(props: IProps) {
-        super(props);
-        if (this.props.content.status === LoadStatus.SUCCESS && this.props.content.data) {
-            this.state = {
-                name: this.props.content.data.name,
-                body: [],
-            };
-        } else {
-            this.state = {
-                name: "",
-                body: [],
-            };
-        }
-    }
 
     public componentDidMount() {
         if (this.props.content.status === LoadStatus.SUCCESS && this.props.content.data) {
@@ -75,13 +48,12 @@ export class EditorForm extends React.Component<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const categoryID = this.props.currentCategory !== null ? this.props.currentCategory.knowledgeCategoryID : null;
-        const { article } = this.props;
+        const { article, form } = this.props;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
                     canSubmit={this.canSubmit}
-                    isSubmitLoading={this.props.isSubmitLoading}
+                    isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     className="richEditorForm-header"
                     optionsMenu={
                         article.status === LoadStatus.SUCCESS && article.data ? (
@@ -97,18 +69,18 @@ export class EditorForm extends React.Component<IProps, IState> {
                         <PanelLayout.MiddleBottom>
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                                 <LocationInput
-                                    initialCategoryID={categoryID}
-                                    key={categoryID === null ? undefined : categoryID}
+                                    initialCategoryID={form.knowledgeCategoryID}
+                                    key={form.knowledgeCategoryID === null ? undefined : form.knowledgeCategoryID}
                                     disabled={this.isLoading}
                                 />
                                 <div className="sr-only">
-                                    <DocumentTitle title={this.state.name || "Untitled"} />
+                                    <DocumentTitle title={this.props.form.name || "Untitled"} />
                                 </div>
                                 <input
                                     className="richEditorForm-title inputBlock-inputText inputText"
                                     type="text"
                                     placeholder={t("Title")}
-                                    value={this.state.name || ""}
+                                    value={this.props.form.name || ""}
                                     onChange={this.titleChangeHandler}
                                     disabled={this.isLoading}
                                 />
@@ -120,7 +92,7 @@ export class EditorForm extends React.Component<IProps, IState> {
                                     className="FormWrapper inheritHeight richEditorForm-editor"
                                     isLoading={this.isLoading}
                                     device={this.props.device}
-                                    legacyMode={!!this.props.legacyMode}
+                                    legacyMode={true}
                                 />
                             </div>
                         </PanelLayout.MiddleBottom>
@@ -131,7 +103,8 @@ export class EditorForm extends React.Component<IProps, IState> {
     }
 
     private get isLoading(): boolean {
-        return this.props.content.status === LoadStatus.LOADING;
+        const { article, revision, draft } = this.props;
+        return [article.status, revision.status, draft.status].includes[LoadStatus.LOADING];
     }
 
     /**
@@ -144,10 +117,14 @@ export class EditorForm extends React.Component<IProps, IState> {
         const minTitleLength = 1;
         const minBodyLength = 1;
 
-        const title = this.state.name || "";
+        const title = this.props.form.name || "";
         const body = this.editorRef.current.getEditorText().trim();
 
-        return title.length >= minTitleLength && body.length >= minBodyLength && this.props.currentCategory !== null;
+        return (
+            title.length >= minTitleLength &&
+            body.length >= minBodyLength &&
+            this.props.form.knowledgeCategoryID !== null
+        );
     }
 
     /**
@@ -173,4 +150,18 @@ export class EditorForm extends React.Component<IProps, IState> {
     };
 }
 
-export default withDevice<IProps>(EditorForm);
+/**
+ * Map in action dispatchable action creators from the store.
+ */
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: new EditorPageActions(dispatch, apiv2),
+    };
+}
+
+const withRedux = connect(
+    EditorPageModel.getInjectableProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(withDevice<IProps>(EditorForm));

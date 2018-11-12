@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
-import EditorForm from "@knowledge/modules/editor/components/EditorForm";
+import EditorForm from "@knowledge/modules/editor/EditorForm";
 import { LoadStatus } from "@library/@types/api";
 import { Format, IPatchArticleRequestBody } from "@knowledge/@types/api";
 import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
@@ -58,17 +58,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                     permission="articles.add"
                     fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
                 >
-                    <EditorForm
-                        key={this.props.article.status}
-                        content={
-                            this.props.revision.status !== LoadStatus.PENDING ? this.props.revision : this.props.article
-                        }
-                        article={this.props.article}
-                        submitHandler={this.formSubmit}
-                        currentCategory={this.props.locationCategory}
-                        isSubmitLoading={this.isSubmitLoading}
-                        titleID={this.titleID}
-                    />
+                    <EditorForm titleID={this.titleID} />
                 </Permission>
             </Modal>
         );
@@ -85,7 +75,7 @@ export class EditorPage extends React.Component<IProps, IState> {
 
         if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
-                void actions.createArticleForEdit(history);
+                void actions.initializeAddPage(history);
             } else {
                 const articleID = parseInt(match.params.id, 10);
                 if (queryParams.revisionID) {

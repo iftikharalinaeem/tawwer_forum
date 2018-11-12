@@ -8,24 +8,37 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import { IArticle, IRevision, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IArticle, IRevision, IKbCategoryFragment, Format, IArticleDraft } from "@knowledge/@types/api";
 import ArticleActions from "../article/ArticleActions";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "../article/ArticleModel";
 import CategoryModel from "../categories/CategoryModel";
+import { number } from "prop-types";
+
+export interface IEditorPageForm {
+    name: string;
+    body: any[];
+    format: Format;
+    knowledgeCategoryID: number | null;
+}
 
 export interface IEditorPageState {
     article: ILoadable<IArticle>;
+    draftID: number | null;
+    draftStatus: ILoadable<IArticleDraft>;
     revisionID: number | null;
     revisionStatus: ILoadable<{}>;
     submit: ILoadable<{}>;
+    form: IEditorPageForm;
 }
 
 export interface IInjectableEditorProps {
     article: ILoadable<IArticle>;
     revision: ILoadable<IRevision>;
+    draft: ILoadable<IArticleDraft>;
     submit: ILoadable<{}>;
     locationCategory: IKbCategoryFragment | null;
+    form: IEditorPageForm;
 }
 
 /**
@@ -56,7 +69,15 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                         ? ArticleModel.selectRevision(state, stateSlice.revisionID) || undefined
                         : undefined,
             },
+            draft: {
+                ...stateSlice.revisionStatus,
+                data:
+                    stateSlice.draftID !== null
+                        ? ArticleModel.selectDraft(state, stateSlice.draftID) || undefined
+                        : undefined,
+            },
             locationCategory,
+            form: stateSlice.form,
         };
     }
 
@@ -80,12 +101,22 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         article: {
             status: LoadStatus.PENDING,
         },
+        draftID: null,
+        draftStatus: {
+            status: LoadStatus.PENDING,
+        },
         revisionID: null,
         revisionStatus: {
             status: LoadStatus.PENDING,
         },
         submit: {
             status: LoadStatus.PENDING,
+        },
+        form: {
+            name: "",
+            body: [],
+            format: Format.RICH,
+            knowledgeCategoryID: null,
         },
     };
 
@@ -122,6 +153,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     draft.submit.status = LoadStatus.ERROR;
                     draft.submit.error = action.payload;
                     break;
+                // Simple Setters
                 case EditorPageActions.SET_ACTIVE_REVISION:
                     draft.revisionID = action.payload.revisionID;
                     break;

@@ -13,13 +13,12 @@ import {
     IPatchArticleResponseBody,
     IGetArticleRevisionsResponseBody,
     IGetArticleRevisionsRequestBody,
-    IGetRevisionResponseBody,
 } from "@knowledge/@types/api";
 import { History } from "history";
-import * as route from "./route";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
+import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -53,6 +52,7 @@ export default class EditorPageActions extends ReduxActions {
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
+        | ReturnType<typeof EditorPageActions.setActiveDraftAC>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
     /**
@@ -119,6 +119,21 @@ export default class EditorPageActions extends ReduxActions {
      */
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
 
+    // Form
+    public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
+    private static updateFormAC(formData: Partial<IEditorPageForm>) {
+        return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, formData);
+    }
+    public updateForm(formData: Partial<IEditorPageForm>) {
+        this.dispatch(EditorPageActions.updateFormAC, formData);
+    }
+
+    // Drafts
+    public static readonly SET_ACTIVE_DRAFT = "@@articleEditor/SET_ACTIVE_DRAFT";
+    private static setActiveDraftAC(draftID: number) {
+        return EditorPageActions.createAction(EditorPageActions.SET_ACTIVE_DRAFT, { draftID });
+    }
+
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
 
@@ -130,33 +145,41 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param history - The history object for redirecting.
      */
-    public async createArticleForEdit(history: History) {
+    public async initializeAddPage(history: History) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : null;
+        const draftID = "draftID" in queryParams ? queryParams.draftID : null;
 
-        // We don't have an article so go create one.
-        const response = await this.postArticle({
-            knowledgeCategoryID: initialCategoryID,
-        });
-
-        if (response) {
-            const article = response.data;
-
-            // Initialize the category picker if we have a category ID.
-            if (initialCategoryID !== null) {
-                this.locationPickerActions.initLocationPickerFromArticle(article);
+        if (draftID !== null) {
+            this.dispatch(EditorPageActions.setActiveDraftAC(draftID));
+            const draft = await this.articleActions.getDraft({ draftID });
+            if (draft) {
+                this.locationPickerActions.initLocationPickerFromArticle(draft.data.attributes);
             }
-
-            // Redirect
-            const replacementUrl = route.makeEditUrl(article);
-            const newLocation = {
-                ...history.location,
-                pathname: replacementUrl,
-                search: "",
-            };
-
-            history.replace(newLocation);
+        } else {
+            if (initialCategoryID !== null) {
+                this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
+            }
         }
+
+        // // We don't have an article so go create one.
+        // const response = await this.postArticle({
+        //     knowledgeCategoryID: initialCategoryID,
+        // });
+
+        // if (response) {
+        //     const article = response.data;
+
+        //     // Redirect
+        //     const replacementUrl = route.makeEditUrl(article);
+        //     const newLocation = {
+        //         ...history.location,
+        //         pathname: replacementUrl,
+        //         search: "",
+        //     };
+
+        //     history.replace(newLocation);
+        // }
     }
 
     /**

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IRevision, IRevisionFragment } from "@knowledge/@types/api";
+import { IArticle, IArticleFragment, IRevision, IRevisionFragment, IArticleDraft } from "@knowledge/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
@@ -22,6 +22,9 @@ export interface IArticleState {
     };
     revisionFragmentsByID: {
         [key: number]: IRevisionFragment;
+    };
+    draftsByID: {
+        [key: number]: IArticleDraft;
     };
 }
 
@@ -63,6 +66,17 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     }
 
     /**
+     * Select an article draft out of the stored drafts.
+     *
+     * @param state A full state instance.
+     * @param draftID The ID of the draft to select.
+     */
+    public static selectDraft(state: IStoreState, draftID: number): IArticleDraft | null {
+        const stateSlice = this.stateSlice(state);
+        return stateSlice.draftsByID[draftID] || null;
+    }
+
+    /**
      * Get the slice of state that this model works with.
      *
      * @param state A full state instance.
@@ -82,6 +96,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         articleFragmentsByID: {},
         revisionsByID: {},
         revisionFragmentsByID: {},
+        draftsByID: {},
     };
 
     public reducer = (
