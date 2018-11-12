@@ -155,14 +155,18 @@ class KnowledgeApiController extends AbstractApiController {
             $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
             $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
             $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-            $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp(), $range['exclude']);
+            $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
         }
         $sphinxQuery = '';
+
         if (isset($query['name']) && !empty(trim($query['name']))) {
             $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
         }
         if (isset($query['body']) && !empty(trim($query['body']))) {
-            $sphinxQuery .= '@bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
+            $sphinxQuery .= ' @bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
+        }
+        if (isset($query['all']) && !empty(trim($query['all']))) {
+            $sphinxQuery .= '@(name,bodyRendered) (' . $sphinx->escapeString($query['all']) . ')*';
         }
         return $sphinx->query($sphinxQuery, $this->sphinxIndexName('KnowledgeArticle'));
     }
@@ -271,6 +275,7 @@ class KnowledgeApiController extends AbstractApiController {
             "statuses:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
+            "all:s?" => "Keywords to search against article name or body.",
         ];
     }
 
