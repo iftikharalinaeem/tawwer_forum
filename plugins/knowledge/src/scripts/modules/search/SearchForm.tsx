@@ -136,7 +136,13 @@ class SearchForm extends React.Component<IProps> {
         return {
             name: searchResult.name,
             excerpt: searchResult.body,
-            meta: <SearchResultMeta updateUser={searchResult.updateUser!} dateUpdated={searchResult.dateUpdated} />,
+            meta: (
+                <SearchResultMeta
+                    updateUser={searchResult.updateUser!}
+                    dateUpdated={searchResult.dateUpdated}
+                    crumbs={searchResult.knowledgeCategory!.breadcrumbs}
+                />
+            ),
             url: searchResult.url,
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
