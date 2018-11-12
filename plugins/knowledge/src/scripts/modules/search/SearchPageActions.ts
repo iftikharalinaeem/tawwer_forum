@@ -71,7 +71,7 @@ export default class SearchPageActions extends ReduxActions {
         }
 
         // Convert start/endDate into format for our API.
-        let dateUpdated: string | undefined = undefined;
+        let dateUpdated: string | undefined;
         if (form.startDate && form.endDate) {
             dateUpdated = `[${form.startDate},${form.endDate}]`;
         } else if (form.startDate) {

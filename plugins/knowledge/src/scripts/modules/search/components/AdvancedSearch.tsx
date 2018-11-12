@@ -104,7 +104,7 @@ export class AdvancedSearch extends React.Component<IProps> {
      */
     private handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        this.props.searchActions.search();
+        return this.props.searchActions.search();
     };
 }
 
