@@ -8,7 +8,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import DeviceContext from "@knowledge/../../../../library/src/scripts/contexts/DeviceContext";
+import DeviceContext from "@library/contexts/DeviceContext";
 import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
