@@ -15,8 +15,8 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { withDevice } from "@library/contexts/DeviceContext";
 import Container from "@library/components/layouts/components/Container";
-import { dummyOtherLanguagesData } from "@knowledge/state/dummyOtherLanguages";
 import LanguagesDropDown from "@library/components/LanguagesDropDown";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;

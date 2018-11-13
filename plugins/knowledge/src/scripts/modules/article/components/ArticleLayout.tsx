@@ -22,8 +22,8 @@ import AttachmentList from "@knowledge/modules/article/components/AttachmentList
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/VanillaHeader";
-import { dummyOtherLanguagesData } from "@knowledge/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps {
     article: IArticle;
