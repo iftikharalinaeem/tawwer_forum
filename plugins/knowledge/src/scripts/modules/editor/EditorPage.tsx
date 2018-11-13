@@ -39,7 +39,7 @@ interface IState {
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.Component<IProps, IState> {
+export class EditorPage extends React.PureComponent<IProps, IState> {
     private id = uniqueIDFromPrefix("editorPage");
 
     public state = {

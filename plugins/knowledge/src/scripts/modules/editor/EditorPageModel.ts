@@ -13,11 +13,11 @@ import ArticleActions from "../article/ArticleActions";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "../article/ArticleModel";
 import CategoryModel from "../categories/CategoryModel";
-import { number } from "prop-types";
+import { DeltaOperation } from "quill/core";
 
 export interface IEditorPageForm {
     name: string;
-    body: any[];
+    body: DeltaOperation[];
     format: Format;
     knowledgeCategoryID: number | null;
 }
@@ -127,51 +127,57 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         state = this.initialState,
         action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IEditorPageState => {
-        return produce(state, draft => {
+        return produce(state, nextState => {
             switch (action.type) {
                 case EditorPageActions.POST_ARTICLE_REQUEST:
-                    draft.article.status = LoadStatus.LOADING;
+                    nextState.article.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.GET_ARTICLE_REQUEST:
-                    draft.article.status = LoadStatus.LOADING;
+                    nextState.article.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.GET_ARTICLE_RESPONSE:
                 case EditorPageActions.POST_ARTICLE_RESPONSE:
-                    draft.article.status = LoadStatus.SUCCESS;
-                    draft.article.data = action.payload.data;
+                    nextState.article.status = LoadStatus.SUCCESS;
+                    nextState.article.data = action.payload.data;
                     break;
                 case EditorPageActions.GET_ARTICLE_ERROR:
                 case EditorPageActions.POST_ARTICLE_ERROR:
-                    draft.article.status = LoadStatus.ERROR;
-                    draft.article.error = action.payload;
+                    nextState.article.status = LoadStatus.ERROR;
+                    nextState.article.error = action.payload;
                     break;
                 // Patching the article
                 case EditorPageActions.PATCH_ARTICLE_REQUEST:
-                    draft.submit.status = LoadStatus.LOADING;
+                    nextState.submit.status = LoadStatus.LOADING;
                     break;
                 case EditorPageActions.PATCH_ARTICLE_ERROR:
-                    draft.submit.status = LoadStatus.ERROR;
-                    draft.submit.error = action.payload;
+                    nextState.submit.status = LoadStatus.ERROR;
+                    nextState.submit.error = action.payload;
                     break;
                 // Simple Setters
                 case EditorPageActions.SET_ACTIVE_REVISION:
-                    draft.revisionID = action.payload.revisionID;
+                    nextState.revisionID = action.payload.revisionID;
                     break;
                 // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
                 case ArticleActions.GET_ARTICLE_RESPONSE:
-                    draft.submit.status = LoadStatus.SUCCESS;
+                    nextState.submit.status = LoadStatus.SUCCESS;
+                    break;
+                case EditorPageActions.UPDATE_FORM:
+                    nextState.form = {
+                        ...nextState.form,
+                        ...action.payload,
+                    };
                     break;
                 case EditorPageActions.RESET:
                     return this.initialState;
             }
 
-            if (action.meta && action.meta.revisionID && action.meta.revisionID === draft.revisionID) {
+            if (action.meta && action.meta.revisionID && action.meta.revisionID === nextState.revisionID) {
                 switch (action.type) {
                     case ArticleActions.GET_REVISION_REQUEST:
-                        draft.revisionStatus.status = LoadStatus.LOADING;
+                        nextState.revisionStatus.status = LoadStatus.LOADING;
                         break;
                     case ArticleActions.GET_REVISION_RESPONSE:
-                        draft.revisionStatus.status = LoadStatus.SUCCESS;
+                        nextState.revisionStatus.status = LoadStatus.SUCCESS;
                         break;
                     case ArticleActions.GET_REVISION_ERROR:
                         break;

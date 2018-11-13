@@ -23,6 +23,7 @@ interface IProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
     initialCategoryID: number | null;
     disabled?: boolean;
+    onChange?: (categoryID: number) => void;
 }
 
 interface IState {
@@ -33,7 +34,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Creates a location picker in a modal when activated.
  */
-export class LocationInput extends React.Component<IProps, IState> {
+export class LocationInput extends React.PureComponent<IProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
 
@@ -85,7 +86,7 @@ export class LocationInput extends React.Component<IProps, IState> {
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >
                         <LocationPicker
-                            onChoose={this.hideLocationPicker}
+                            onChoose={this.handleChoose}
                             onCloseClick={this.hideLocationPicker}
                             {...passThrough}
                         />
@@ -94,6 +95,11 @@ export class LocationInput extends React.Component<IProps, IState> {
             </React.Fragment>
         );
     }
+
+    private handleChoose = () => {
+        this.props.onChange && this.props.onChange(this.value!);
+        this.hideLocationPicker();
+    };
 
     public get value(): number {
         return this.props.chosenCategoryID;

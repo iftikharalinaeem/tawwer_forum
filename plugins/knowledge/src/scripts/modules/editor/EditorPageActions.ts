@@ -52,6 +52,7 @@ export default class EditorPageActions extends ReduxActions {
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
+        | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setActiveDraftAC>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
@@ -125,7 +126,7 @@ export default class EditorPageActions extends ReduxActions {
         return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, formData);
     }
     public updateForm(formData: Partial<IEditorPageForm>) {
-        this.dispatch(EditorPageActions.updateFormAC, formData);
+        this.dispatch(EditorPageActions.updateFormAC(formData));
     }
 
     // Drafts
@@ -180,6 +181,10 @@ export default class EditorPageActions extends ReduxActions {
 
         //     history.replace(newLocation);
         // }
+    }
+
+    public async publish() {
+        console.log("Publishing");
     }
 
     /**

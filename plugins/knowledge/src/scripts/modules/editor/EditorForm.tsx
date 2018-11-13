@@ -36,14 +36,6 @@ interface IProps extends IInjectableEditorProps, IDeviceProps {
 export class EditorForm extends React.Component<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
-    public componentDidMount() {
-        if (this.props.content.status === LoadStatus.SUCCESS && this.props.content.data) {
-            if (this.props.content.data.body) {
-                this.editorRef.current!.setEditorContent(JSON.parse(this.props.content.data.body));
-            }
-        }
-    }
-
     /**
      * @inheritdoc
      */
@@ -92,7 +84,7 @@ export class EditorForm extends React.Component<IProps> {
                                     className="FormWrapper inheritHeight richEditorForm-editor"
                                     isLoading={this.isLoading}
                                     device={this.props.device}
-                                    legacyMode={true}
+                                    legacyMode={false}
                                 />
                             </div>
                         </PanelLayout.MiddleBottom>
@@ -102,9 +94,28 @@ export class EditorForm extends React.Component<IProps> {
         );
     }
 
+    public componentDidMount() {
+        this.overrideEditorContents();
+    }
+
+    public componentDidUpdate(prevProps: IProps) {
+        // Force override the editor contents if we change from loading to not loading.
+        if (this.propsAreLoading(prevProps) && !this.propsAreLoading(this.props)) {
+            this.overrideEditorContents();
+        }
+    }
+
     private get isLoading(): boolean {
-        const { article, revision, draft } = this.props;
+        return this.propsAreLoading(this.props);
+    }
+
+    private propsAreLoading(props: IProps): boolean {
+        const { article, revision, draft } = props;
         return [article.status, revision.status, draft.status].includes[LoadStatus.LOADING];
+    }
+
+    private overrideEditorContents() {
+        this.editorRef.current!.setEditorContent(this.props.form.body);
     }
 
     /**
@@ -131,14 +142,16 @@ export class EditorForm extends React.Component<IProps> {
      * Change handler for the editor.
      */
     private editorChangeHandler = (content: DeltaOperation[]) => {
-        this.setState({ body: content });
+        // this.setState({ body: content });
+        this.props.actions.updateForm({ body: content });
     };
 
     /**
      * Change handler for the title
      */
     private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.setState({ name: event.target.value });
+        this.props.actions.updateForm({ name: event.target.value });
+        // this.setState({ name: event.target.value });
     };
 
     /**
@@ -146,7 +159,8 @@ export class EditorForm extends React.Component<IProps> {
      */
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        this.props.submitHandler(this.state.body, this.state.name);
+        this.props.actions.publish();
+        // this.props.actions.this.props.submitHandler(this.state.body, this.state.name);
     };
 }
 
