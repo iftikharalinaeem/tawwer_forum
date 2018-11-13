@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import Container from "@knowledge/layouts/components/Container";
+import Container from "@library/components/layouts/components/Container";
 import { Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
+import { withDevice } from "@library/contexts/DeviceContext";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { t } from "@library/application";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { PageTitle } from "@knowledge/modules/common/PageTitle";

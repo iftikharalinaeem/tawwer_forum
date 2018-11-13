@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import Container from "@knowledge/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
+import { withDevice } from "@library/contexts/DeviceContext";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { t } from "@library/application";
 import { RouteComponentProps, withRouter } from "react-router";

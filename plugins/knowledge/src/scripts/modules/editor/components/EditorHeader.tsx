@@ -6,18 +6,17 @@
 
 import React from "react";
 import { t } from "@library/application";
-import { PanelArea } from "@knowledge/layouts/PanelLayout";
-import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/navigation/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
-import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import Container from "@knowledge/layouts/components/Container";
-import LanguagesDropDown from "@knowledge/modules/article/components/LanguagesDropDown";
+import { withDevice } from "@library/contexts/DeviceContext";
+import Container from "@library/components/layouts/components/Container";
+import { dummyOtherLanguagesData } from "@knowledge/state/dummyOtherLanguages";
+import LanguagesDropDown from "@library/components/LanguagesDropDown";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;

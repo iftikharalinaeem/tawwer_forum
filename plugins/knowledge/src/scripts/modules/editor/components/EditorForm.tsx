@@ -13,11 +13,11 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import Container from "@knowledge/layouts/components/Container";
+import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
+import Container from "@library/components/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import EditorMenu from "./EditorMenu";
 
 type LoadableContent = ILoadable<{

@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import { PanelWidget } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import LanguagesDropDown, { ILanguageProps } from "./LanguagesDropDown";
+import LanguagesDropDown, { ILanguageProps } from "@library/components/LanguagesDropDown";
 
 export interface IOtherLangaugesProps {
     id?: string;

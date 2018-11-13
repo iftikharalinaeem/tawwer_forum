@@ -5,10 +5,10 @@
  */
 
 import * as React from "react";
-import Container from "@knowledge/layouts/components/Container";
+import Container from "@library/components/layouts/components/Container";
 import { Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
+import { withDevice } from "@library/contexts/DeviceContext";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { t } from "@library/application";
 import AdvancedSearch from "@knowledge/modules/search/components/AdvancedSearch";
 import SearchBar from "@library/components/forms/select/SearchBar";
@@ -24,8 +24,8 @@ import { LoadStatus } from "@library/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { ISearchResult } from "@knowledge/@types/api";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
-import SearchOption from "@knowledge/modules/search/components/SearchOption";
 import DocumentTitle from "@library/components/DocumentTitle";
+import SearchOption from "@library/components/search/SearchOption";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;

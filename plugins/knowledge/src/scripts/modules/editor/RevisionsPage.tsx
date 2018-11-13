@@ -8,7 +8,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import PageLoader from "@library/components/PageLoader";
 import DocumentTitle from "@library/components/DocumentTitle";

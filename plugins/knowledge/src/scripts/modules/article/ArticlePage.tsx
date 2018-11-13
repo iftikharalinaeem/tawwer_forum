@@ -8,7 +8,7 @@ import React from "react";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
