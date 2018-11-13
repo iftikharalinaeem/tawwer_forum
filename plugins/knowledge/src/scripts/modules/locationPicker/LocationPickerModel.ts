@@ -12,6 +12,7 @@ import { IKbCategory, IKbCategoryFragment, IKbNavigationItem } from "@knowledge/
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import { createSelector } from "reselect";
 
 export interface ILocationPickerState {
     navigatedCategoryID: number; // What page the user is on in the picker.
@@ -39,7 +40,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
 
         // Category ID's less than 0 (eg. -1) represents the true root of the forum.
         return {
-            pageContents: CategoryModel.selectMixedRecordTree(state, navigatedCategoryID).children!,
+            pageContents: LocationPickerModel.selectPageContents(state),
             locationBreadcrumb:
                 chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
             navigatedCategory:
@@ -51,6 +52,18 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
             ...state.knowledge.locationPicker,
         };
     }
+
+    private static selectState = (state: IStoreState) => state;
+    private static stateSlice = (state: IStoreState) => state.knowledge.locationPicker;
+    private static selectNavigateCategoryID = (state: IStoreState) =>
+        LocationPickerModel.stateSlice(state).navigatedCategoryID;
+    private static selectPageContents = createSelector(
+        LocationPickerModel.selectState,
+        LocationPickerModel.selectNavigateCategoryID,
+        (state, navID) => {
+            return CategoryModel.selectMixedRecordTree(state, navID).children!;
+        },
+    );
 
     public initialState: ILocationPickerState = {
         selectedCategoryID: -1,

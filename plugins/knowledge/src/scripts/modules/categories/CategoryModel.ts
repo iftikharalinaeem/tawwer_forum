@@ -9,6 +9,7 @@ import { IKbCategoryFragment, IKbCategoryMultiTypeFragment, IKbNavigationCategor
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import { createSelector } from "reselect";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {

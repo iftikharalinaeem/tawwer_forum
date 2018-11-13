@@ -28,7 +28,7 @@ interface IOwnProps
             id?: string;
         }> {}
 
-interface IProps extends IOwnProps, IInjectableEditorProps, IDeviceProps {
+interface IProps extends IOwnProps {
     actions: EditorPageActions;
 }
 
@@ -39,7 +39,7 @@ interface IState {
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.PureComponent<IProps, IState> {
+export default class EditorPage extends React.PureComponent<IProps, IState> {
     private id = uniqueIDFromPrefix("editorPage");
 
     public state = {
@@ -70,22 +70,21 @@ export class EditorPage extends React.PureComponent<IProps, IState> {
      * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        const { article, match, actions, history } = this.props;
-        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-
-        if (article.status === LoadStatus.PENDING) {
-            if (match.params.id === undefined) {
-                void actions.initializeAddPage(history);
-            } else {
-                const articleID = parseInt(match.params.id, 10);
-                if (queryParams.revisionID) {
-                    const revisionID = parseInt(queryParams.revisionID, 10);
-                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
-                } else {
-                    void actions.fetchArticleForEdit(articleID);
-                }
-            }
-        }
+        // const { article, match, actions, history } = this.props;
+        // const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        // if (article.status === LoadStatus.PENDING) {
+        //     if (match.params.id === undefined) {
+        //         void actions.initializeAddPage(history);
+        //     } else {
+        //         const articleID = parseInt(match.params.id, 10);
+        //         if (queryParams.revisionID) {
+        //             const revisionID = parseInt(queryParams.revisionID, 10);
+        //             void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
+        //         } else {
+        //             void actions.fetchArticleForEdit(articleID);
+        //         }
+        //     }
+        // }
     }
 
     /**
@@ -107,30 +106,23 @@ export class EditorPage extends React.PureComponent<IProps, IState> {
         });
     }
 
-    private get isSubmitLoading(): boolean {
-        const { submit } = this.props;
-        return submit.status === LoadStatus.LOADING;
-    }
-
     /**
      * Handle the form submission for a revision.
      */
     private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { article, history, actions, locationCategory } = this.props;
-
-        if (article.status === LoadStatus.SUCCESS && article.data) {
-            const articleRequest: IPatchArticleRequestBody = {
-                articleID: article.data.articleID,
-                name: title,
-                body: JSON.stringify(content),
-                format: Format.RICH,
-            };
-
-            if (locationCategory !== null) {
-                articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
-            }
-            void actions.updateArticle(articleRequest, history);
-        }
+        // const { article, history, actions, locationCategory } = this.props;
+        // if (article.status === LoadStatus.SUCCESS && article.data) {
+        //     const articleRequest: IPatchArticleRequestBody = {
+        //         articleID: article.data.articleID,
+        //         name: title,
+        //         body: JSON.stringify(content),
+        //         format: Format.RICH,
+        //     };
+        //     if (locationCategory !== null) {
+        //         articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
+        //     }
+        //     void actions.updateArticle(articleRequest, history);
+        // }
     };
 
     private get titleID() {
@@ -148,19 +140,3 @@ export class EditorPage extends React.PureComponent<IProps, IState> {
         }
     };
 }
-
-/**
- * Map in action dispatchable action creators from the store.
- */
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: new EditorPageActions(dispatch, apiv2),
-    };
-}
-
-const withRedux = connect(
-    EditorPageModel.getInjectableProps,
-    mapDispatchToProps,
-);
-
-export default withDevice(withRouter(withRedux(EditorPage)));

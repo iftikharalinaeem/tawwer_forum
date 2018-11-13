@@ -23,6 +23,7 @@ import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
+import debounce from "lodash/debounce";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps {
     actions: EditorPageActions;
@@ -33,7 +34,7 @@ interface IProps extends IInjectableEditorProps, IDeviceProps {
 /**
  * Form for the editor page.
  */
-export class EditorForm extends React.Component<IProps> {
+export class EditorForm extends React.PureComponent<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
     /**
@@ -99,6 +100,7 @@ export class EditorForm extends React.Component<IProps> {
     }
 
     public componentDidUpdate(prevProps: IProps) {
+        console.log(prevProps, this.props);
         // Force override the editor contents if we change from loading to not loading.
         if (this.propsAreLoading(prevProps) && !this.propsAreLoading(this.props)) {
             this.overrideEditorContents();
@@ -141,17 +143,15 @@ export class EditorForm extends React.Component<IProps> {
     /**
      * Change handler for the editor.
      */
-    private editorChangeHandler = (content: DeltaOperation[]) => {
-        // this.setState({ body: content });
+    private editorChangeHandler = debounce((content: DeltaOperation[]) => {
         this.props.actions.updateForm({ body: content });
-    };
+    }, 1000 / 60);
 
     /**
      * Change handler for the title
      */
     private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.props.actions.updateForm({ name: event.target.value });
-        // this.setState({ name: event.target.value });
     };
 
     /**
@@ -160,7 +160,6 @@ export class EditorForm extends React.Component<IProps> {
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         this.props.actions.publish();
-        // this.props.actions.this.props.submitHandler(this.state.body, this.state.name);
     };
 }
 

@@ -14,6 +14,7 @@ import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "../article/ArticleModel";
 import CategoryModel from "../categories/CategoryModel";
 import { DeltaOperation } from "quill/core";
+import { createSelector } from "reselect";
 
 export interface IEditorPageForm {
     name: string;
@@ -27,7 +28,7 @@ export interface IEditorPageState {
     draftID: number | null;
     draftStatus: ILoadable<IArticleDraft>;
     revisionID: number | null;
-    revisionStatus: ILoadable<{}>;
+    revisionStatus: ILoadable<IRevision>;
     submit: ILoadable<{}>;
     form: IEditorPageForm;
 }
@@ -62,24 +63,50 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return {
             article: stateSlice.article,
             submit: stateSlice.submit,
-            revision: {
-                ...stateSlice.revisionStatus,
-                data:
-                    stateSlice.revisionID !== null
-                        ? ArticleModel.selectRevision(state, stateSlice.revisionID) || undefined
-                        : undefined,
-            },
-            draft: {
-                ...stateSlice.revisionStatus,
-                data:
-                    stateSlice.draftID !== null
-                        ? ArticleModel.selectDraft(state, stateSlice.draftID) || undefined
-                        : undefined,
-            },
+            revision: EditorPageModel.selectActiveRevision(state),
+            draft: EditorPageModel.selectActiveDraft(state),
             locationCategory,
             form: stateSlice.form,
         };
     }
+
+    private static selectRevisionID = (state: IStoreState) => EditorPageModel.getStateSlice(state).revisionID;
+    private static selectRevisionStatus = (state: IStoreState) => EditorPageModel.getStateSlice(state).revisionStatus;
+    private static selectActiveRevision = createSelector(
+        (state: IStoreState) => state,
+        EditorPageModel.selectRevisionID,
+        EditorPageModel.selectRevisionStatus,
+        (state, revID, status) => {
+            if (revID === null) {
+                return status;
+            } else {
+                const rev = ArticleModel.selectRevision(state, revID);
+                return {
+                    ...status,
+                    data: rev ? rev : undefined,
+                };
+            }
+        },
+    );
+
+    private static selectDraftID = (state: IStoreState) => EditorPageModel.getStateSlice(state).draftID;
+    private static selectDraftStatus = (state: IStoreState) => EditorPageModel.getStateSlice(state).draftStatus;
+    private static selectActiveDraft = createSelector(
+        (state: IStoreState) => state,
+        EditorPageModel.selectDraftID,
+        EditorPageModel.selectDraftStatus,
+        (state, draftID, status) => {
+            if (draftID === null) {
+                return status;
+            } else {
+                const rev = ArticleModel.selectDraft(state, draftID);
+                return {
+                    ...status,
+                    data: rev ? rev : undefined,
+                };
+            }
+        },
+    );
 
     /**
      * Get the slice of state that this model works with.
