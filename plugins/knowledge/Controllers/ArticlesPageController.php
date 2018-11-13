@@ -10,7 +10,6 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;

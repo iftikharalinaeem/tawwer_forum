@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
+use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
@@ -96,7 +97,8 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      * @inheritdoc
      */
     public function handle(\Throwable $e): Data {
-        if ($e instanceof NotFoundException) {
+        if ($e instanceof NotFoundException
+        || $e instanceof PermissionException) {
             return $this->errorPage($e);
         }
         return new Data();
