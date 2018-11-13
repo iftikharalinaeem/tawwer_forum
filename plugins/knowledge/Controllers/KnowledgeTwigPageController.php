@@ -223,4 +223,10 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
             'meta' => $this->meta->getPageMeta(),
         ];
     }
+    /**
+     * Gather the data array to render a page with.
+     *
+     * @return array
+     */
+    abstract protected function getViewData(): array;
 }
