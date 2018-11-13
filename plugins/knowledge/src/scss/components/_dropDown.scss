@@ -34,7 +34,21 @@ $dropDown-item_minHeight                       : 45px;
     z-index: 1;
 
     &.isParentWidth {
+        min-width: initial;
         width: 100%;
+    }
+
+    &.isOwnWidth {
+        width: initial;
+    }
+
+    &.isRightAligned {
+        right: 0;
+        top: 0;
+    }
+
+    &:empty {
+        display: none;
     }
 }
 

@@ -14,6 +14,7 @@ import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { IArticleState } from "@knowledge/modules/article/ArticleModel";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
 import { IUsersStoreState } from "@library/users/UsersModel";
+import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 
 type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
@@ -31,6 +32,7 @@ export interface IStoreState extends IUsersStoreState {
         categories: IKbCategoriesState;
         categoriesPage: ICategoriesPageState;
         locationPicker: ILocationPickerState;
+        searchPage: ISearchPageState;
     };
 }
 

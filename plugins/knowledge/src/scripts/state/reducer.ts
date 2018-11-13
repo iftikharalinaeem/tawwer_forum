@@ -13,6 +13,7 @@ import CategoriesPageReducer from "@knowledge/modules/categories/CategoriesPageR
 import ArticleMenuModel from "@knowledge/modules/article/ArticleMenuModel";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
+import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 
 const knowledgeReducer = combineReducers({
     articles: new ArticleModel().reducer,
@@ -23,6 +24,7 @@ const knowledgeReducer = combineReducers({
     categories: new CategoryModel().reducer,
     categoriesPage: new CategoriesPageReducer().reducer,
     locationPicker: new LocationPickerModel().reducer,
+    searchPage: new SearchPageModel().reducer,
 });
 
 export default knowledgeReducer;
