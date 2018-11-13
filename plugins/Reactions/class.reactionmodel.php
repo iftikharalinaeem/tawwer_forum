@@ -982,23 +982,16 @@ class ReactionModel extends Gdn_Model {
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
         $lockKey = 'Reactions.' . $iD . '.' . $userID;
-        $cacheEnabled = Gdn::cache()->activeEnabled();
-
-        if ($cacheEnabled) {
-            $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
-        } else {
-            $haveLock = true;
-        }
+        $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
 
         if ($haveLock) {
             $inserted = $this->toggleUserTag($data, $row, $model, $force);
+            $this->releaseCacheLock($lockKey);
         } else {
             // Fail silently because we don't have a lock, so we shouldn't execute the trailing code.
             return;
         }
         
-        $this->releaseCacheLock($lockKey);
-
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 
         // Now decide whether we need to log or delete the record.
