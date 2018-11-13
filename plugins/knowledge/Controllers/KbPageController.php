@@ -20,7 +20,7 @@ class KbPageController extends KnowledgeTwigPageController {
      *
      * @return array
      */
-    protected function getViewData() {
+    protected function getViewData(): array {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();
