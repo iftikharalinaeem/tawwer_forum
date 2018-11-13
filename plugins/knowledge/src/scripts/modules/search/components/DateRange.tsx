@@ -4,75 +4,60 @@
  * @license Proprietary
  */
 import * as React from "react";
-import { t } from "@library/application";
-import InputTextBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputTextBlock";
-import SelectOne from "@library/components/forms/select/SelectOne";
-import { help } from "@library/components/icons/common";
-import { ISearchWithin, dateWithin } from "../state/dateWithin";
 import classNames from "classnames";
+import InputBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputBlock";
+import { t } from "@library/application";
+import DateInput from "@library/components/forms/DateInput";
 
 interface IProps {
-    within: ISearchWithin;
-    setWithin: (within: ISearchWithin) => void;
-    of: string;
-    setOf: (of: string) => void;
+    start: string | undefined;
+    end: string | undefined;
+    onStartChange: (value: string) => void;
+    onEndChange: (value: string) => void;
     className?: string;
 }
 
-interface IState {
-    showHelp: boolean;
-}
+interface IState {}
 
 /**
  * Implements the DateRange component
  */
-export default class DateRange extends React.PureComponent<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            showHelp: false,
-        };
-    }
-
-    private setOf = e => {
-        this.props.setOf(e.value);
-    };
-
-    private showHelp = e => {
-        this.setState({
-            showHelp: true,
-        });
-    };
-
+export default class DateRange extends React.PureComponent<IProps> {
     public render() {
-        const ofLabelMessage = t("Examples: Monday, today, last week, Mar 26, 3/26/04");
-        const ofLabel = (
-            <React.Fragment>
-                <span className="dateRangeOfLabel-label">{t("of")}</span>
-                <span className="dateRangeOfLabel-help" title={ofLabelMessage} onClick={this.showHelp}>
-                    {help()}
-                    <span className="sr-only">{ofLabelMessage}</span>
-                </span>
-            </React.Fragment>
-        );
+        const endDate = this.props.end ? new Date(this.props.end) : undefined;
+        const startDate = this.props.start ? new Date(this.props.start) : undefined;
+
         return (
-            <div className={classNames("dateRange", this.props.className)}>
+            <div className={classNames("dateRange inputBlock", this.props.className)}>
                 <div className="dateRange-row">
-                    <SelectOne
-                        label={t("Date Within")}
-                        className="dateRange-within dateRange-column"
-                        options={dateWithin}
-                        setData={this.props.setWithin}
-                    />
-                    <InputTextBlock
-                        className="dateRange-of dateRange-column"
+                    <InputBlock
+                        label={t("Date from")}
                         baseClass={InputTextBlockBaseClass.CUSTOM}
-                        label={ofLabel}
-                        labelClassName="dateRangeOfLabel"
-                        onChange={this.setOf}
-                        value={this.props.of}
-                        noteAfterInput={this.state.showHelp ? ofLabelMessage : undefined}
-                    />
+                        className="dateRange-column"
+                    >
+                        <DateInput
+                            alignment="right"
+                            onChange={this.props.onStartChange}
+                            value={this.props.start}
+                            disabledDays={[
+                                {
+                                    after: endDate,
+                                },
+                            ]}
+                        />
+                    </InputBlock>
+                    <InputBlock label={t("To")} baseClass={InputTextBlockBaseClass.CUSTOM} className="dateRange-column">
+                        <DateInput
+                            alignment="right"
+                            onChange={this.props.onEndChange}
+                            value={this.props.end}
+                            disabledDays={[
+                                {
+                                    before: startDate,
+                                },
+                            ]}
+                        />
+                    </InputBlock>
                 </div>
             </div>
         );

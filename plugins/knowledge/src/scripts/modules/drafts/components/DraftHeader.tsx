@@ -5,10 +5,7 @@
  */
 import * as React from "react";
 import { t } from "@library/application";
-import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import { LoadStatus } from "@library/@types/api/core";
-import BackLink from "@library/components/BackLink";
+import BackLink from "@library/components/navigation/BackLink";
 import classNames from "classnames";
 import Container from "@knowledge/layouts/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
