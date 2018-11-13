@@ -7,7 +7,6 @@
 import React from "react";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { IUserFragment } from "@library/@types/api";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import classNames from "classnames";

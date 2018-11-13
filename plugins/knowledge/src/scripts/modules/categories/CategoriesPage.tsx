@@ -18,7 +18,7 @@ import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPa
 import apiv2 from "@library/apiv2";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import { connect } from "react-redux";
-import NotFoundPage from "@library/components/NotFoundPage";
+import NotFoundPage from "@library/components/navigation/NotFoundPage";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { VanillaHeader } from "@library/components/VanillaHeader";

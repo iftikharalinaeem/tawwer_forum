@@ -30,7 +30,7 @@ export default class SearchResults extends React.Component<IProps> {
                 return <SearchResult {...result} key={i} />;
             });
         } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
-            content = <Paragraph className="searchResults-noResults">{t("No results.")}</Paragraph>;
+            content = <Paragraph className="searchResults-noResults">{t("No results found.")}</Paragraph>;
         } else {
             content = (
                 <Paragraph className="searchResults-noResults isEmpty">

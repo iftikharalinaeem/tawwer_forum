@@ -9,7 +9,6 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { Link, Redirect } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
-import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import DraftActions from "@knowledge/modules/drafts/components/DraftActions";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";

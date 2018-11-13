@@ -290,7 +290,8 @@ class KnowledgeApiController extends AbstractApiController {
     private function normalizeOutput(array $row, array $users, array $categories): array {
         $row["recordID"] = $row["articleID"];
         $row["recordType"] = "article";
-        $row["body"] = strip_tags($row["bodyRendered"]);
+        // Replace this with more sophisticated processing when an article is saved.
+        $row["body"] = htmlspecialchars_decode(strip_tags($row["bodyRendered"]), ENT_QUOTES);
         $row["url"] = $this->articleModel->url($row);
         if (isset($users[$row['updateuserid']])) {
             $row["updateUser"] = $users[$row['updateuserid']];

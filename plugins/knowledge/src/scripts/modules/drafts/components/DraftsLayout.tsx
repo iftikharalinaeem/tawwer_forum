@@ -6,14 +6,10 @@
 
 import * as React from "react";
 import Container from "@knowledge/layouts/components/Container";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import { Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { IResult } from "@knowledge/modules/common/SearchResult";
-import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
-import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
 import { t } from "@library/application";
-import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { PageTitle } from "@knowledge/modules/common/PageTitle";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
