@@ -181,7 +181,7 @@ export default class EditorPageActions extends ReduxActions {
 
         const parentRecordID = form.knowledgeCategoryID !== null ? form.knowledgeCategoryID : undefined;
         const recordID = article.data ? article.data.articleID : undefined;
-        let draft = this.getDraft();
+        const draft = this.getDraft();
 
         if (draft !== null) {
             await this.articleActions.patchDraft({
@@ -275,7 +275,7 @@ export default class EditorPageActions extends ReduxActions {
             if (latestDraft) {
                 const { draftID } = latestDraft;
                 this.setInitialDraft(draftID, true);
-                this.articleActions.getDraft({ draftID });
+                await this.articleActions.getDraft({ draftID });
             }
         }
 

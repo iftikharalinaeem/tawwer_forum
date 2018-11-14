@@ -186,7 +186,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
     private updateDraft = throttle(
         () => {
             this.setState({ isDirty: false });
-            this.props.actions.syncDraft();
+            void this.props.actions.syncDraft();
         },
         10000,
         {
@@ -207,7 +207,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        this.props.actions.publish(this.props.history);
+        void this.props.actions.publish(this.props.history);
     };
 }
 
