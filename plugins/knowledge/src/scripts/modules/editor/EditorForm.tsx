@@ -8,7 +8,7 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IKbCategoryFragment, IArticle } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IArticle, IResponseArticleDraft } from "@knowledge/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -18,24 +18,36 @@ import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
-import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel, { IInjectableEditorProps, IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
 import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 
-interface IProps extends IInjectableEditorProps, IDeviceProps {
+interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
     className?: string;
     titleID?: string;
 }
 
+interface IState {
+    isDirty: boolean;
+}
+
 /**
  * Form for the editor page.
  */
-export class EditorForm extends React.PureComponent<IProps> {
+export class EditorForm extends React.PureComponent<IProps, IState> {
     private editorRef: React.RefObject<Editor> = React.createRef();
+
+    private ignoreEditorUpdates = false;
+
+    public state: IState = {
+        isDirty: false,
+    };
 
     /**
      * @inheritdoc
@@ -48,6 +60,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     className="richEditorForm-header"
+                    savedDraft={this.draft}
                     optionsMenu={
                         article.status === LoadStatus.SUCCESS && article.data ? (
                             <EditorMenu article={article.data} />
@@ -65,6 +78,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     initialCategoryID={form.knowledgeCategoryID}
                                     key={form.knowledgeCategoryID === null ? undefined : form.knowledgeCategoryID}
                                     disabled={this.isLoading}
+                                    onChange={this.locationPickerChangeHandler}
                                 />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
@@ -100,7 +114,6 @@ export class EditorForm extends React.PureComponent<IProps> {
     }
 
     public componentDidUpdate(prevProps: IProps) {
-        console.log(prevProps, this.props);
         // Force override the editor contents if we change from loading to not loading.
         if (this.propsAreLoading(prevProps) && !this.propsAreLoading(this.props)) {
             this.overrideEditorContents();
@@ -111,13 +124,23 @@ export class EditorForm extends React.PureComponent<IProps> {
         return this.propsAreLoading(this.props);
     }
 
+    private get draft(): ILoadable<IResponseArticleDraft> {
+        if (this.props.savedDraft.data || this.props.initialDraft.status === LoadStatus.LOADING) {
+            return this.props.savedDraft;
+        } else {
+            return this.props.initialDraft;
+        }
+    }
+
     private propsAreLoading(props: IProps): boolean {
-        const { article, revision, draft } = props;
-        return [article.status, revision.status, draft.status].includes[LoadStatus.LOADING];
+        const { article, revision, initialDraft } = props;
+        return [article.status, revision.status, initialDraft.status].includes(LoadStatus.LOADING);
     }
 
     private overrideEditorContents() {
+        this.ignoreEditorUpdates = true;
         this.editorRef.current!.setEditorContent(this.props.form.body);
+        this.ignoreEditorUpdates = false;
     }
 
     /**
@@ -140,18 +163,43 @@ export class EditorForm extends React.PureComponent<IProps> {
         );
     }
 
+    private handleFormChange(form: Partial<IEditorPageForm>) {
+        if (this.ignoreEditorUpdates) {
+            return;
+        }
+        this.props.actions.updateForm(form);
+        this.updateDraft();
+    }
+
+    private locationPickerChangeHandler = (categoryID: number) => {
+        this.handleFormChange({ knowledgeCategoryID: categoryID });
+    };
+
     /**
      * Change handler for the editor.
      */
     private editorChangeHandler = debounce((content: DeltaOperation[]) => {
-        this.props.actions.updateForm({ body: content });
+        this.handleFormChange({ body: content });
+        this.updateDraft();
     }, 1000 / 60);
+
+    private updateDraft = throttle(
+        () => {
+            this.setState({ isDirty: false });
+            this.props.actions.syncDraft();
+        },
+        10000,
+        {
+            leading: false,
+            trailing: true,
+        },
+    );
 
     /**
      * Change handler for the title
      */
     private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.actions.updateForm({ name: event.target.value });
+        this.handleFormChange({ name: event.target.value });
     };
 
     /**
@@ -159,7 +207,7 @@ export class EditorForm extends React.PureComponent<IProps> {
      */
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        this.props.actions.publish();
+        this.props.actions.publish(this.props.history);
     };
 }
 
@@ -177,4 +225,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice<IProps>(EditorForm));
+export default withRedux(withRouter(withDevice<IProps>(EditorForm)));

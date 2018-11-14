@@ -13,12 +13,16 @@ import {
     IPatchArticleResponseBody,
     IGetArticleRevisionsResponseBody,
     IGetArticleRevisionsRequestBody,
+    IArticleDraft,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
-import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel, { IEditorPageForm, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -108,7 +112,7 @@ export default class EditorPageActions extends ReduxActions {
      * Create a reset action
      */
     private static createResetAction() {
-        return EditorPageActions.createAction(EditorPageActions.RESET);
+        return EditorPageActions.createAction(EditorPageActions.RESET, {});
     }
 
     private static createSetRevision(revisionID: number) {
@@ -130,10 +134,11 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     // Drafts
-    public static readonly SET_ACTIVE_DRAFT = "@@articleEditor/SET_ACTIVE_DRAFT";
+    public static readonly SET_INITIAL_DRAFT = "@@articleEditor/SET_INITIAL_DRAFT";
     private static setActiveDraftAC(draftID: number) {
-        return EditorPageActions.createAction(EditorPageActions.SET_ACTIVE_DRAFT, { draftID });
+        return EditorPageActions.createAction(EditorPageActions.SET_INITIAL_DRAFT, { draftID });
     }
+    public setActiveDraft = this.bindDispatch(EditorPageActions.setActiveDraftAC);
 
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
@@ -148,8 +153,9 @@ export default class EditorPageActions extends ReduxActions {
      */
     public async initializeAddPage(history: History) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : null;
-        const draftID = "draftID" in queryParams ? queryParams.draftID : null;
+        const initialCategoryID =
+            "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
+        const draftID = "draftID" in queryParams ? parseInt(queryParams.draftID, 10) : null;
 
         if (draftID !== null) {
             this.dispatch(EditorPageActions.setActiveDraftAC(draftID));
@@ -158,33 +164,84 @@ export default class EditorPageActions extends ReduxActions {
                 this.locationPickerActions.initLocationPickerFromArticle(draft.data.attributes);
             }
         } else {
+            // Create a new draft.
             if (initialCategoryID !== null) {
                 this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
             }
         }
-
-        // // We don't have an article so go create one.
-        // const response = await this.postArticle({
-        //     knowledgeCategoryID: initialCategoryID,
-        // });
-
-        // if (response) {
-        //     const article = response.data;
-
-        //     // Redirect
-        //     const replacementUrl = route.makeEditUrl(article);
-        //     const newLocation = {
-        //         ...history.location,
-        //         pathname: replacementUrl,
-        //         search: "",
-        //     };
-
-        //     history.replace(newLocation);
-        // }
     }
 
-    public async publish() {
-        console.log("Publishing");
+    public async syncDraft() {
+        const state = this.getState<IStoreState>();
+        const { initialDraft, savedDraft, form, article } = state.knowledge.editorPage;
+        const serializedBody = JSON.stringify(form.body);
+
+        const parentRecordID = form.knowledgeCategoryID !== null ? form.knowledgeCategoryID : undefined;
+        const recordID = article.data ? article.data.articleID : undefined;
+        let draftID = this.getDraftID(state.knowledge.editorPage);
+
+        if (draftID !== null) {
+            await this.articleActions.patchDraft({
+                draftID,
+                recordID,
+                parentRecordID,
+                attributes: {
+                    ...form,
+                    body: serializedBody,
+                },
+            });
+        } else {
+            await this.articleActions.postDraft({
+                recordID,
+                parentRecordID,
+                attributes: {
+                    ...form,
+                    body: serializedBody,
+                },
+            });
+        }
+    }
+
+    private getDraftID(editorState: IEditorPageState): number | null {
+        const { initialDraft, savedDraft } = editorState;
+        let draftID: number | null = null;
+        if (initialDraft.data && initialDraft.status === LoadStatus.SUCCESS) {
+            draftID = initialDraft.data;
+        } else if (savedDraft.data) {
+            draftID = savedDraft.data.draftID;
+        }
+        return draftID;
+    }
+
+    public async cleanupDraft() {
+        const state = this.getState<IStoreState>();
+        const draftID = this.getDraftID(state.knowledge.editorPage);
+        if (draftID) {
+            await this.articleActions.deleteDraft({ draftID });
+        }
+    }
+
+    public async publish(history: History) {
+        const editorState = this.getState<IStoreState>().knowledge.editorPage;
+        // We don't have an article so go create one.
+        const request: IPostArticleRequestBody = {
+            ...editorState.form,
+            body: JSON.stringify(editorState.form.body),
+        };
+        const response = await this.postArticle(request);
+
+        if (response) {
+            const article = response.data;
+
+            // Redirect
+            const newLocation = {
+                ...history.location,
+                pathname: article.url,
+                search: "",
+            };
+
+            history.replace(newLocation);
+        }
     }
 
     /**

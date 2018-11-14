@@ -20,26 +20,21 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
 import qs from "qs";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { IDeviceProps } from "@library/components/DeviceChecker";
+import QueryString from "@library/components/navigation/QueryString";
 
 interface IOwnProps
     extends RouteComponentProps<{
             id?: string;
         }> {}
 
-interface IProps extends IOwnProps {
+interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
-}
-
-interface IState {
-    showFolderPicker: boolean;
 }
 
 /**
  * Page for editing an article.
  */
-export default class EditorPage extends React.PureComponent<IProps, IState> {
+export class EditorPage extends React.PureComponent<IProps> {
     private id = uniqueIDFromPrefix("editorPage");
 
     public state = {
@@ -58,6 +53,7 @@ export default class EditorPage extends React.PureComponent<IProps, IState> {
                     permission="articles.add"
                     fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
                 >
+                    {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
                 </Permission>
             </Modal>
@@ -70,21 +66,21 @@ export default class EditorPage extends React.PureComponent<IProps, IState> {
      * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        // const { article, match, actions, history } = this.props;
-        // const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-        // if (article.status === LoadStatus.PENDING) {
-        //     if (match.params.id === undefined) {
-        //         void actions.initializeAddPage(history);
-        //     } else {
-        //         const articleID = parseInt(match.params.id, 10);
-        //         if (queryParams.revisionID) {
-        //             const revisionID = parseInt(queryParams.revisionID, 10);
-        //             void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
-        //         } else {
-        //             void actions.fetchArticleForEdit(articleID);
-        //         }
-        //     }
-        // }
+        const { article, match, actions, history } = this.props;
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        if (article.status === LoadStatus.PENDING) {
+            if (match.params.id === undefined) {
+                void actions.initializeAddPage(history);
+            } else {
+                const articleID = parseInt(match.params.id, 10);
+                if (queryParams.revisionID) {
+                    const revisionID = parseInt(queryParams.revisionID, 10);
+                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
+                } else {
+                    void actions.fetchArticleForEdit(articleID);
+                }
+            }
+        }
     }
 
     /**
@@ -94,36 +90,14 @@ export default class EditorPage extends React.PureComponent<IProps, IState> {
         this.props.actions.reset();
     }
 
-    public showLocationPicker() {
-        this.setState({
-            showFolderPicker: true,
-        });
+    private renderQueryString(): React.ReactNode {
+        const { initialDraft } = this.props;
+        if (initialDraft.status === LoadStatus.SUCCESS && initialDraft.data) {
+            return <QueryString value={{ draftID: initialDraft.data.draftID }} />;
+        } else {
+            return null;
+        }
     }
-
-    public hideLocationPicker() {
-        this.setState({
-            showFolderPicker: false,
-        });
-    }
-
-    /**
-     * Handle the form submission for a revision.
-     */
-    private formSubmit = (content: DeltaOperation[], title: string) => {
-        // const { article, history, actions, locationCategory } = this.props;
-        // if (article.status === LoadStatus.SUCCESS && article.data) {
-        //     const articleRequest: IPatchArticleRequestBody = {
-        //         articleID: article.data.articleID,
-        //         name: title,
-        //         body: JSON.stringify(content),
-        //         format: Format.RICH,
-        //     };
-        //     if (locationCategory !== null) {
-        //         articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
-        //     }
-        //     void actions.updateArticle(articleRequest, history);
-        // }
-    };
 
     private get titleID() {
         return this.id + "-title";
@@ -140,3 +114,16 @@ export default class EditorPage extends React.PureComponent<IProps, IState> {
         }
     };
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: new EditorPageActions(dispatch, apiv2),
+    };
+}
+
+const withRedux = connect(
+    EditorPageModel.getInjectableProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(EditorPage);

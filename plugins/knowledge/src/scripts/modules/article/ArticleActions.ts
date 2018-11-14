@@ -78,6 +78,11 @@ export default class ArticleActions extends ReduxActions {
     public static readonly ACTION_TYPES:
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.getArticleACs>
+        | ActionsUnion<typeof ArticleActions.getDraftACs>
+        | ActionsUnion<typeof ArticleActions.getDraftsACs>
+        | ActionsUnion<typeof ArticleActions.postDraftACs>
+        | ActionsUnion<typeof ArticleActions.patchDraftACs>
+        | ActionsUnion<typeof ArticleActions.deleteDraftACs>
         | ActionsUnion<typeof ArticleActions.getArticleRevisionsACs>
         | ActionsUnion<typeof ArticleActions.getRevisionACs>;
 
@@ -200,12 +205,12 @@ export default class ArticleActions extends ReduxActions {
     );
 
     public patchDraft(request: IPatchArticleDraftRequest) {
-        const { draftID, ...rest } = request;
+        const { draftID } = request;
         return this.dispatchApi<IPatchArticleDraftResponse>(
             "patch",
             `/articles/drafts/${draftID}`,
             ArticleActions.patchDraftACs,
-            rest,
+            request,
         );
     }
 
@@ -213,9 +218,9 @@ export default class ArticleActions extends ReduxActions {
      * Static action creators for the /articles/drafts endpoint.
      */
     private static readonly deleteDraftACs = ReduxActions.generateApiActionCreators(
-        ArticleActions.PATCH_DRAFT_REQUEST,
-        ArticleActions.PATCH_DRAFT_RESPONSE,
-        ArticleActions.PATCH_DRAFT_ERROR,
+        ArticleActions.DELETE_DRAFT_REQUEST,
+        ArticleActions.DELETE_DRAFT_RESPONSE,
+        ArticleActions.DELETE_DRAFT_ERROR,
         {} as IDeleteArticleDraftResponse,
         {} as IDeleteArticleDraftRequest,
     );

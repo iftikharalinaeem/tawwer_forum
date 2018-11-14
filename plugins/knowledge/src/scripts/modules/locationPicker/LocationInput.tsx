@@ -97,13 +97,9 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
     }
 
     private handleChoose = () => {
-        this.props.onChange && this.props.onChange(this.value!);
+        this.props.onChange && this.props.onChange(this.props.selectedCategoryID!);
         this.hideLocationPicker();
     };
-
-    public get value(): number {
-        return this.props.chosenCategoryID;
-    }
 
     /**
      * Show the location picker modal.

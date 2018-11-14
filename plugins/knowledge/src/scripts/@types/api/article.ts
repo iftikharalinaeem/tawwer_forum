@@ -124,7 +124,7 @@ export type IPostArticleDraftRequest = IArticleDraft;
 export type IPostArticleDraftResponse = IResponseArticleDraft;
 
 // PATCH /articles/drafts/:id
-export interface IPatchArticleDraftRequest {
+export interface IPatchArticleDraftRequest extends Partial<IArticleDraft> {
     draftID: number;
 }
 export type IPatchArticleDraftResponse = IResponseArticleDraft;

@@ -18,10 +18,15 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
+import { LoadStatus, ILoadable } from "@library/@types/api";
+import { IResponseArticleDraft } from "@knowledge/@types/api";
+import Translate from "@library/components/translation/Translate";
+import DateTime from "@library/components/DateTime";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
-    isSubmitLoading: boolean;
+    isSubmitLoading?: boolean;
+    savedDraft?: ILoadable<IResponseArticleDraft>;
     selectedKey?: string;
     className?: string;
     callToAction?: string;
@@ -34,6 +39,10 @@ interface IProps extends IDeviceProps {
 export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
+        savedDraft: {
+            status: LoadStatus.PENDING,
+        },
+        isSubmitLoading: false,
     };
 
     private localeTitleID = uniqueIDFromPrefix("editorHeader");
@@ -68,6 +77,8 @@ export class EditorHeader extends React.Component<IProps> {
                                         className="editorHeader-backLink"
                                     />
                                 </li>
+                                {this.renderDraftIndicator()}
+                                <li className="editorHeader-center" role="presentation" />
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
@@ -105,6 +116,40 @@ export class EditorHeader extends React.Component<IProps> {
                 </Container>
             </nav>
         );
+    }
+
+    private renderDraftIndicator(): React.ReactNode {
+        const { status, data } = this.props.savedDraft!;
+        if (status === LoadStatus.LOADING) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle">{t("Saving Draft...")}</span>
+                </li>
+            );
+        }
+
+        if (data) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle">
+                        <Translate
+                            source="Draft Saved <0/>"
+                            c0={<DateTime mode="relative" timestamp={data.dateUpdated} />}
+                        />
+                    </span>
+                </li>
+            );
+        }
+
+        if (status === LoadStatus.ERROR) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle isError">{t("Error Saving Draft.")}</span>
+                </li>
+            );
+        }
+
+        return null;
     }
 }
 

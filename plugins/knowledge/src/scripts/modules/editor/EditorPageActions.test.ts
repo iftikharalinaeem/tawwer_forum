@@ -5,16 +5,13 @@
  */
 
 import { expect } from "chai";
-import * as sinon from "sinon";
 import { createMemoryHistory } from "history";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import apiv2 from "@library/apiv2";
 import MockAdapter from "axios-mock-adapter";
 import configureStore, { MockStore } from "redux-mock-store";
 import thunk from "redux-thunk";
-import { Format } from "@knowledge/@types/api";
 import { assertStoreHasActions } from "@library/__tests__/customAssertions";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { IPartialStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
