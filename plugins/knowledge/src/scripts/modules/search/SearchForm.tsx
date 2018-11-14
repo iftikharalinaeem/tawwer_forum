@@ -26,6 +26,8 @@ import { ISearchResult } from "@knowledge/@types/api";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
+import ConditionnalDrawer from "@library/components/drawer/ConditionnalDrawer";
+import Drawer from "@library/components/drawer/Drawer";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -58,6 +60,11 @@ class SearchForm extends React.Component<IProps> {
                                     optionComponent={SearchOption}
                                 />
                             </PanelWidget>
+                            {!isFullWidth && (
+                                <Drawer title={t("Advanced Search")}>
+                                    <AdvancedSearch hideTitle={true} />
+                                </Drawer>
+                            )}
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidgetVerticalPadding>
@@ -65,9 +72,11 @@ class SearchForm extends React.Component<IProps> {
                             </PanelWidgetVerticalPadding>
                         </PanelLayout.MiddleBottom>
                         <PanelLayout.RightTop>
-                            <PanelWidget>
-                                <AdvancedSearch />
-                            </PanelWidget>
+                            {isFullWidth && (
+                                <PanelWidget>
+                                    <AdvancedSearch />
+                                </PanelWidget>
+                            )}
                         </PanelLayout.RightTop>
                     </PanelLayout>
                 </Container>

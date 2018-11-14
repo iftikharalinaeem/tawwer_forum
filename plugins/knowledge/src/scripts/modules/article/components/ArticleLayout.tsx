@@ -79,16 +79,17 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                             <AttachmentList attachments={this.articleAttachmentList} />
                         </PanelWidget>
                     </PanelLayout.MiddleBottom>
-                    <PanelLayout.RightTop>
-                        <PanelWidget>
-                            <ArticleTOC items={article.outline} />
-                        </PanelWidget>
-                    </PanelLayout.RightTop>
+                    {article.outline &&
+                        article.outline.length > 0 && (
+                            <PanelLayout.RightTop>
+                                <PanelWidget>
+                                    <ArticleTOC items={article.outline} />
+                                </PanelWidget>
+                            </PanelLayout.RightTop>
+                        )}
                     <PanelLayout.RightBottom>
-                        <PanelWidget>
-                            <OtherLanguages {...dummyOtherLanguagesData} />
-                            <RelatedArticles children={this.articleRelatedArticles} />
-                        </PanelWidget>
+                        <OtherLanguages {...dummyOtherLanguagesData} />
+                        <RelatedArticles children={this.articleRelatedArticles} />
                     </PanelLayout.RightBottom>
                 </PanelLayout>
             </Container>

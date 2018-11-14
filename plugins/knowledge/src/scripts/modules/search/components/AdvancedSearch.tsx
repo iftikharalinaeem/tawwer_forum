@@ -24,7 +24,9 @@ export enum ISearchDomain {
     EVERYWHERE = "everywhere",
 }
 
-export interface IProps extends ISearchFormActionProps, ISearchPageState {}
+export interface IProps extends ISearchFormActionProps, ISearchPageState {
+    hideTitle?: boolean;
+}
 
 /**
  * Implements the search bar component
@@ -35,7 +37,9 @@ export class AdvancedSearch extends React.Component<IProps> {
 
         return (
             <form className="advancedSearch" onSubmit={this.handleSubmit}>
-                <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
+                {!this.props.hideTitle && (
+                    <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
+                )}
                 <InputTextBlock
                     label={t("Title")}
                     inputProps={{
