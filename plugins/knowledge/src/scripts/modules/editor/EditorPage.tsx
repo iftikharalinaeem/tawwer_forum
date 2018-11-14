@@ -20,7 +20,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
 import qs from "qs";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps

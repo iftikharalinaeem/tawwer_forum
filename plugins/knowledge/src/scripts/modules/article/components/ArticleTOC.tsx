@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import { PanelWidget } from "@library/components/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import { IOutlineItem } from "@knowledge/@types/api";

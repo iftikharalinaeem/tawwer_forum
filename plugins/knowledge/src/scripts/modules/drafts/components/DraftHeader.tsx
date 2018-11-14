@@ -7,8 +7,8 @@ import * as React from "react";
 import { t } from "@library/application";
 import BackLink from "@library/components/navigation/BackLink";
 import classNames from "classnames";
-import Container from "@knowledge/layouts/components/Container";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
+import Container from "@library/components/layouts/components/Container";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 
 interface IProps {
     className?: string;

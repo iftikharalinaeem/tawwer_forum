@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import DraftsLayout from "@knowledge/modules/drafts/components/DraftsLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import PageLoader from "@library/components/PageLoader";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { LoadStatus } from "@library/@types/api/core";
 import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";

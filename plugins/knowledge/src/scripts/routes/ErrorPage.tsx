@@ -5,12 +5,12 @@
  */
 
 import React from "react";
-import PanelLayout from "@knowledge/layouts/PanelLayout";
+import PanelLayout from "@library/components/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import Paragraph from "@library/components/Paragraph";
 import PageHeading from "@library/components/PageHeading";
-import Container from "@knowledge/layouts/components/Container";
+import Container from "@library/components/layouts/components/Container";
 import BackLink from "@library/components/navigation/BackLink";
 import { formatUrl, t } from "@library/application";
 import { LoadStatus, ILoadable } from "@library/@types/api";

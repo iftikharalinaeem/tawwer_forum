@@ -6,23 +6,22 @@
 
 import React from "react";
 import { t } from "@library/application";
-import { PanelArea } from "@knowledge/layouts/PanelLayout";
-import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/navigation/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
-import SelectBox from "@library/components/SelectBox";
-import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import Container from "@knowledge/layouts/components/Container";
+import { withDevice } from "@library/contexts/DeviceContext";
+import Container from "@library/components/layouts/components/Container";
+import LanguagesDropDown from "@library/components/LanguagesDropDown";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
     isSubmitLoading: boolean;
-    selectedKey?: string;
+    selectedLang?: string;
     className?: string;
     callToAction?: string;
     optionsMenu?: React.ReactNode;
@@ -35,26 +34,7 @@ export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
     };
-
-    private localeTitleID = uniqueIDFromPrefix("editorHeader");
-
     public render() {
-        let foundIndex = false;
-        const processedChildren = dummyOtherLanguagesData.children.map(language => {
-            // This is all hard coded for now.
-            const selected = language.key === this.props.selectedKey;
-            language.selected = selected;
-            if (selected) {
-                foundIndex = selected;
-            }
-            return language;
-        });
-        if (!foundIndex) {
-            processedChildren[0].selected = true;
-        }
-
-        const label = t("Switch Locale");
-
         return (
             <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
                 <Container>
@@ -71,7 +51,7 @@ export class EditorHeader extends React.Component<IProps> {
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
-                                        title={label}
+                                        title={this.props.callToAction}
                                         disabled={!this.props.canSubmit}
                                         className={classNames(
                                             "editorHeader-publish",
@@ -83,18 +63,16 @@ export class EditorHeader extends React.Component<IProps> {
                                     </Button>
                                 </li>
                                 <li className="editorHeader-item">
-                                    <h3 id={this.localeTitleID} className="sr-only">
-                                        {label}
-                                    </h3>
-                                    <SelectBox
-                                        describedBy={this.localeTitleID}
+                                    <LanguagesDropDown
+                                        widthOfParent={true}
                                         className="editorHeader-otherLanguages"
+                                        renderLeft={true}
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
-                                        renderLeft={true}
+                                        selected={this.props.selectedLang}
                                     >
-                                        {processedChildren}
-                                    </SelectBox>
+                                        {dummyOtherLanguagesData.children}
+                                    </LanguagesDropDown>
                                 </li>
                                 {this.props.optionsMenu && (
                                     <li className="editorHeader-item">{this.props.optionsMenu}</li>

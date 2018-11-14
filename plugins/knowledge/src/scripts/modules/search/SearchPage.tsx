@@ -6,7 +6,7 @@
 
 import React from "react";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import PageLoader from "@library/components/PageLoader";
 import SearchForm from "./SearchForm";
