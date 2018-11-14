@@ -75,7 +75,7 @@ export class EditorHeader extends React.Component<IProps> {
                                 </li>
                                 <li className="editorHeader-item">
                                     <LanguagesDropDown
-                                        widthOfParent={true}
+                                        widthOfParent={false}
                                         className="editorHeader-otherLanguages"
                                         renderLeft={true}
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
