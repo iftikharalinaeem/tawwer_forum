@@ -54,20 +54,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Delete knowledge categories.
-     *
-     * @param array $where
-     * @param int $limit
-     */
-    public function delete(array $where, int $limit = 1) {
-        $this->sql()->delete(
-            $this->getTable(),
-            $where,
-            $limit
-        );
-    }
-
-    /**
      * Given a category ID, get the row and the rows of all its ancestors in order.
      *
      * @param int $categoryID
@@ -146,6 +132,27 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
         $result = \Gdn::request()->url("/kb/categories/".$slug, $withDomain);
+        return $result;
+    }
+
+    /**
+     * Build bredcrumbs array for particular knowledge category
+     *
+     * @param int $knowledgeCategoryID
+     * @return array
+     */
+    public function buildBreadcrumbs(int $knowledgeCategoryID) {
+        $result = [];
+        if ($knowledgeCategoryID) {
+            $categories = $this->selectWithAncestors($knowledgeCategoryID);
+            $index = 1;
+            foreach ($categories as $category) {
+                $result[$index++] = new Breadcrumb(
+                    $category["name"],
+                    $this->url($category)
+                );
+            }
+        }
         return $result;
     }
 }

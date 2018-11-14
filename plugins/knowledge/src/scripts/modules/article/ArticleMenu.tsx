@@ -22,7 +22,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import { LoadStatus } from "@library/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import ProfileLink from "@library/components/ProfileLink";
+import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
@@ -102,6 +102,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     onCancel={this.closeDeleteDialogue}
                     onConfirm={this.handleDeleteDialogueConfirm}
                     isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
+                    elementToFocusOnExit={document.activeElement as HTMLElement}
                 >
                     {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
                 </ModalConfirm>
@@ -170,6 +171,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     onCancel={this.closeRestoreDialogue}
                     onConfirm={this.handleRestoreDialogueConfirm}
                     isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
+                    elementToFocusOnExit={document.activeElement as HTMLElement}
                 >
                     {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
                 </ModalConfirm>

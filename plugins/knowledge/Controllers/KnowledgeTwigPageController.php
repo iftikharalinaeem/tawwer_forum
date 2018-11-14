@@ -8,6 +8,10 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Garden\CustomExceptionHandler;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Knowledge\Models\ReduxErrorAction;
+use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
@@ -21,7 +25,7 @@ use Vanilla\Knowledge\Models\SiteMeta;
  *
  * This controller expects most content to come from api
  */
-abstract class KnowledgeTwigPageController extends PageController {
+abstract class KnowledgeTwigPageController extends PageController implements CustomExceptionHandler {
     use \Garden\TwigTrait;
 
     const API_PAGE_KEY = 'page';
@@ -73,6 +77,50 @@ abstract class KnowledgeTwigPageController extends PageController {
                 '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/rich-editor.min.css',
             ];
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasHandler(\Throwable $e): bool {
+        switch ($e->getCode()) {
+            case 404:
+            case 403:
+                return true;
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handle(\Throwable $e): Data {
+        if ($e instanceof NotFoundException
+        || $e instanceof PermissionException) {
+            return $this->errorPage($e);
+        }
+        return new Data();
+    }
+
+    /**
+     * Render twig-redux error page
+     *
+     * @param \Throwable $e
+     * @return Data Return Garden\Web\Data object to global dispatcher.
+     */
+    protected function errorPage(\Throwable $e): Data {
+        $status = $e->getCode();
+        $reduxAction = new ReduxErrorAction(ActionConstants::PAGE_ERROR, new Data($e));
+        $this->addReduxAction($reduxAction);
+        $this->setPageTitle($e->getMessage());
+        $this->meta->setTag('robots', ['name' => 'robots', 'content' => 'noindex']);
+        $data = $this->getViewData();
+        $data[self::API_PAGE_KEY]['status'] = $e->getCode();
+        $data[self::API_PAGE_KEY]['message'] = $e->getMessage();
+        $data['template'] = 'seo/pages/error.twig';
+        return new Data($this->twigInit()->render('default-master.twig', $data), $status);
     }
 
     /**
@@ -177,4 +225,10 @@ abstract class KnowledgeTwigPageController extends PageController {
             'meta' => $this->meta->getPageMeta(),
         ];
     }
+    /**
+     * Gather the data array to render a page with.
+     *
+     * @return array
+     */
+    abstract protected function getViewData(): array;
 }

@@ -8,15 +8,17 @@ import React from "react";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { IUserFragment } from "@library/@types/api";
+import BreadCrumbString, { ICrumbString } from "@library/components/BreadCrumbString";
 
 interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
+    crumbs?: ICrumbString[];
 }
 
 export class SearchResultMeta extends React.Component<IProps> {
     public render() {
-        const { dateUpdated, updateUser } = this.props;
+        const { dateUpdated, updateUser, crumbs } = this.props;
 
         return (
             <React.Fragment>
@@ -26,6 +28,7 @@ export class SearchResultMeta extends React.Component<IProps> {
                 <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
+                {crumbs && crumbs.length > 0 && <BreadCrumbString className="meta" crumbs={crumbs} />}
             </React.Fragment>
         );
     }

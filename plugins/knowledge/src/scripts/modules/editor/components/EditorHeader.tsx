@@ -7,9 +7,9 @@
 import React from "react";
 import { t } from "@library/application";
 import { PanelArea } from "@knowledge/layouts/PanelLayout";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import BackLink from "@library/components/BackLink";
+import BackLink from "@library/components/navigation/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import SelectBox from "@library/components/SelectBox";
@@ -17,6 +17,7 @@ import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLangua
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
+import Container from "@knowledge/layouts/components/Container";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
@@ -55,10 +56,10 @@ export class EditorHeader extends React.Component<IProps> {
         const label = t("Switch Locale");
 
         return (
-            <div className={classNames("editorHeader", this.props.className)}>
-                <div className="container">
+            <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
+                <Container>
                     <PanelArea>
-                        <PanelWidget>
+                        <PanelWidgetHorizontalPadding>
                             <ul className="editorHeader-items">
                                 <li className="editorHeader-item isPullLeft">
                                     <BackLink
@@ -72,7 +73,11 @@ export class EditorHeader extends React.Component<IProps> {
                                         type="submit"
                                         title={label}
                                         disabled={!this.props.canSubmit}
-                                        className={classNames("editorHeader-publish", "buttonPrimary")}
+                                        className={classNames(
+                                            "editorHeader-publish",
+                                            "buttonNoHorizontalPadding",
+                                            "buttonNoBorder",
+                                        )}
                                     >
                                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                                     </Button>
@@ -84,7 +89,7 @@ export class EditorHeader extends React.Component<IProps> {
                                     <SelectBox
                                         describedBy={this.localeTitleID}
                                         className="editorHeader-otherLanguages"
-                                        buttonClassName="buttonNoBorder buttonNoMinWidth"
+                                        buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
                                         renderLeft={true}
                                     >
@@ -95,10 +100,10 @@ export class EditorHeader extends React.Component<IProps> {
                                     <li className="editorHeader-item">{this.props.optionsMenu}</li>
                                 )}
                             </ul>
-                        </PanelWidget>
+                        </PanelWidgetHorizontalPadding>
                     </PanelArea>
-                </div>
-            </div>
+                </Container>
+            </nav>
         );
     }
 }

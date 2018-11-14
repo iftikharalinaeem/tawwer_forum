@@ -40,7 +40,10 @@ $buttonLoader-thickness: 3px;
 
     &.buttonNoBorder {
         border: 0;
-        min-width: $formElement-height;
+        height: $formElement-height;
+    }
+
+    &.buttonNoHorizontalPadding {
         padding: {
             left: 0;
             right: 0;
@@ -84,17 +87,23 @@ $buttonLoader-thickness: 3px;
     }
 }
 
+.buttonNoBorder,
 .buttonAsText {
-    color: $global-color_primary;
+
     line-height: $global-condensed_lineHeight;
     padding: 0;
     text-align: left;
     overflow: hidden;
+    min-width: 0;
 
     &:hover,
     &:focus {
         color: $state-active_color;
     }
+}
+
+.buttonAsText {
+    color: inherit;
 }
 
 

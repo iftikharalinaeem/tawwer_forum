@@ -1,0 +1,63 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+
+.draftPreview {
+    cursor: pointer;
+    padding: $global-gutter_halfSize;
+    border-bottom: solid $formElement_borderColor $formElement_borderWidth;
+
+    &:hover {
+        background-color: $global-color_active_primaryBg;
+    }
+}
+
+.draftPreview-header {
+    display: flex;
+    align-items: flex-start;
+}
+
+.draftPreview-title {
+    font-size: $global-large_fontSize;
+}
+
+.draftPreview-link {
+    color: inherit;
+    @include allLinkStates {
+        text-decoration: none;
+    }
+}
+
+.draftPreview-actions {
+    width: $icon-default_size;
+    height: $icon-default_size;
+    margin-left: auto;
+}
+
+.draftPreview-actionsToggle,
+.draftPreview-excerpt {
+    line-height: $global-excerpt_lineHeight;
+    font-size: $global-medium_fontSize;
+    padding: 0;
+}
+
+.draftPreview-actionsToggle {
+    &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
+.draftPreview-metas,
+.draftPreview-excerpt {
+    margin-top: $metaText_margin;
+}
+

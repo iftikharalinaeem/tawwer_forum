@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$dropDown_width                                : 200px;
+$dropDown_width                                : 250px;
 $dropDown_borderRadius                         : 1px;
 $dropdown_bg                                   : $global-color_bg;
 
@@ -34,7 +34,21 @@ $dropDown-item_minHeight                       : 45px;
     z-index: 1;
 
     &.isParentWidth {
+        min-width: initial;
         width: 100%;
+    }
+
+    &.isOwnWidth {
+        width: initial;
+    }
+
+    &.isRightAligned {
+        right: 0;
+        top: 0;
+    }
+
+    &:empty {
+        display: none;
     }
 }
 

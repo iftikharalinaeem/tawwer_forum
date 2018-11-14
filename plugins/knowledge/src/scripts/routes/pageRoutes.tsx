@@ -17,6 +17,7 @@ export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 
 export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
 export const SEARCH_ROUTE = "/kb/search";
+export const DRAFTS_ROUTE = "/kb/drafts";
 
 /** A loadable version of the Editor Page */
 const EditorPage = Loadable({
@@ -54,6 +55,12 @@ const SearchPage = Loadable({
     loader: () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
 });
 
+/** A loadable version of the search page. */
+const DraftsPage = Loadable({
+    loading: FullPageLoader,
+    loader: () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
+});
+
 const NotFound = () => {
     return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
 };
@@ -76,6 +83,7 @@ export function getPageRoutes() {
         <Route exact path={EDIT_ROUTE} component={EditorPage} key={"editorPage"} />,
         <Route exact path={REVISIONS_ROUTE} component={RevisionsPage} key={REVISIONS_ROUTE} />,
         <Route exact path={SEARCH_ROUTE} component={SearchPage} key={SEARCH_ROUTE} />,
+        <Route exact path={DRAFTS_ROUTE} component={DraftsPage} key={DRAFTS_ROUTE} />,
         <Route component={NotFound} key={"not found"} />,
     ];
 }

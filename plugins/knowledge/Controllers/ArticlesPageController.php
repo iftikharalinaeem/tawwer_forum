@@ -10,7 +10,6 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Controllers\Api\ArticleRevisionsApiController;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
@@ -61,32 +60,20 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      */
     public function index(string $path) {
         $this->action = self::ACTION_VIEW;
-        $status = 200;
 
-        try {
-            $this->articleId = $id = $this->detectArticleId($path);
-            $article = $this->articlesApi->get($id, ["expand" => "all"]);
-            $this->data[self::API_PAGE_KEY] = $article;
-            $this->setPageTitle($article['articleRevision']['name'] ?? "");
-            $this->setCategoryID($article["knowledgeCategoryID"]);
+        $this->articleId = $id = $this->detectArticleId($path);
+        $article = $this->articlesApi->get($id, ["expand" => "all"]);
+        $this->data[self::API_PAGE_KEY] = $article;
+        $this->setPageTitle($article['articleRevision']['name'] ?? "");
+        $this->setCategoryID($article["knowledgeCategoryID"]);
 
-            // Put together pre-loaded redux actions.
-            $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
-        } catch (NotFoundException $e) {
-            $status = $e->getCode();
-            $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
-            $this->setPageTitle(t("Article not found"));
-        } catch (PermissionException $e) {
-            $status = $e->getCode();
-            $this->addReduxAction(new ReduxErrorAction(ActionConstants::GET_ARTICLE_ERROR, new Data($e)));
-            $this->setPageTitle(t("Permission Denied"));
-        }
-
+        // Put together pre-loaded redux actions.
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
         $data['template'] = 'seo/pages/article.twig';
 
-        return new Data($this->twigInit()->render('default-master.twig', $data), $status);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
 
@@ -193,7 +180,7 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      *
      * @return array
      */
-    private function getViewData(): array {
+    protected function getViewData(): array {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();

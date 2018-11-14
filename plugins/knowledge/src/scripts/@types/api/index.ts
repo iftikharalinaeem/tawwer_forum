@@ -8,3 +8,4 @@ export * from "@knowledge/@types/api/article";
 export * from "@knowledge/@types/api/articleRevision";
 export * from "@knowledge/@types/api/kbCategory";
 export * from "@knowledge/@types/api/kbNavigation";
+export * from "@knowledge/@types/api/search";

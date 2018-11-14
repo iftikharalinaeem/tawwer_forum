@@ -31,6 +31,15 @@
             padding-right: 0;
         }
     }
+
+    &[type="date"] {
+        appearance: none;
+        
+        &::-webkit-calendar-picker-indicator {
+            -webkit-appearance: none;
+            display: none;
+        }
+    }
 }
 
 .inputText-inlineLabel {
