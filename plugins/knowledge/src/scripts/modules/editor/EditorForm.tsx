@@ -120,10 +120,16 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
         }
     }
 
+    /**
+     * Determine if the form is loading data or not.
+     */
     private get isLoading(): boolean {
         return this.propsAreLoading(this.props);
     }
 
+    /**
+     * Get the primary draft for the form.
+     */
     private get draft(): ILoadable<IResponseArticleDraft> {
         if (this.props.savedDraft.data || this.props.initialDraft.status === LoadStatus.LOADING) {
             return this.props.savedDraft;
@@ -132,11 +138,19 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
         }
     }
 
+    /**
+     * Determine from a set of props if the component should display as loading or now.
+     */
     private propsAreLoading(props: IProps): boolean {
         const { article, revision, initialDraft } = props;
         return [article.status, revision.status, initialDraft.status].includes(LoadStatus.LOADING);
     }
 
+    /**
+     * Override the contents of the editor with the internal value.
+     *
+     * Editor is not a fully controlled component which necessitates this workaround.
+     */
     private overrideEditorContents() {
         this.ignoreEditorUpdates = true;
         this.editorRef.current!.setEditorContent(this.props.form.body);
@@ -163,6 +177,9 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /**
+     * Handle changes in the form. Updates the draft.
+     */
     private handleFormChange(form: Partial<IEditorPageForm>) {
         if (this.ignoreEditorUpdates) {
             return;
@@ -171,6 +188,9 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
         this.updateDraft();
     }
 
+    /**
+     * Handle changes in the location picker.
+     */
     private locationPickerChangeHandler = (categoryID: number) => {
         this.handleFormChange({ knowledgeCategoryID: categoryID });
     };
@@ -183,6 +203,11 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
         this.updateDraft();
     }, 1000 / 60);
 
+    /**
+     * Update the draft from the contents of the form.
+     *
+     * This it throttled to happen at most and every 10 seconds.
+     */
     private updateDraft = throttle(
         () => {
             this.setState({ isDirty: false });

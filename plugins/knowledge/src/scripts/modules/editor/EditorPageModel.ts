@@ -180,6 +180,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         });
     };
 
+    /**
+     * Simple non-specific reducer for the page.
+     */
     private reduceCommon = (
         nextState: IEditorPageState,
         action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,

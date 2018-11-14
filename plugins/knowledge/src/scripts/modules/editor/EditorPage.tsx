@@ -88,6 +88,9 @@ export class EditorPage extends React.PureComponent<IProps> {
         this.props.actions.reset();
     }
 
+    /**
+     * Render a query string component from the form value.
+     */
     private renderQueryString(): React.ReactNode {
         const { initialDraft } = this.props;
         if (initialDraft.status === LoadStatus.SUCCESS && initialDraft.data) {

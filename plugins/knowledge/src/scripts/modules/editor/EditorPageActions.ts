@@ -124,7 +124,7 @@ export default class EditorPageActions extends ReduxActions {
      */
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
 
-    // Form
+    // Form handling
     public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
     private static updateFormAC(formData: Partial<IEditorPageForm>) {
         return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, formData);
@@ -150,9 +150,12 @@ export default class EditorPageActions extends ReduxActions {
     private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
 
     /**
-     * Create an article and redirect to the edit page for it.
+     * Initialize the add page.
      *
-     * @param history - The history object for redirecting.
+     * - Can pull a category ID form a query parameter and intitialize the location.
+     * - Can pull a draft ID from a query parameter and intitialize from a draft.
+     *
+     * @param history - The history for parsing the query string.
      */
     public async initializeAddPage(history: History) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
@@ -167,13 +170,15 @@ export default class EditorPageActions extends ReduxActions {
                 this.locationPickerActions.initLocationPickerFromArticle(draft.data.attributes);
             }
         } else {
-            // Create a new draft.
             if (initialCategoryID !== null) {
                 this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
             }
         }
     }
 
+    /**
+     * Synchronize the current editor draft state to the server.
+     */
     public async syncDraft() {
         const state = this.getState<IStoreState>();
         const { form, article } = state.knowledge.editorPage;
@@ -205,6 +210,9 @@ export default class EditorPageActions extends ReduxActions {
         }
     }
 
+    /**
+     * Get the currently active draft.
+     */
     private getDraft(): IResponseArticleDraft | null {
         const { initialDraft, savedDraft } = this.getState<IStoreState>().knowledge.editorPage;
         let draft: IResponseArticleDraft | null = null;
@@ -216,6 +224,15 @@ export default class EditorPageActions extends ReduxActions {
         return draft;
     }
 
+    /**
+     * Publish the current article/revision to the server.
+     *
+     * - Cleans up an active draft.
+     * - Patches/Posts and article.
+     * - Redirects to the url of the new article.
+     *
+     * @param history History object for redirecting.
+     */
     public async publish(history: History) {
         const editorState = this.getState<IStoreState>().knowledge.editorPage;
         // We don't have an article so go create one.
@@ -334,18 +351,6 @@ export default class EditorPageActions extends ReduxActions {
 
         // Redirect to the new url.
         history.push(link.pathname);
-    }
-
-    public setDraftAsContent() {
-        const draft = this.getDraft();
-        if (draft) {
-            const { name, body, knowledgeCategoryID } = draft.attributes;
-            this.updateForm({
-                name,
-                knowledgeCategoryID,
-                body: body ? JSON.parse(body) : undefined,
-            });
-        }
     }
 
     /**
