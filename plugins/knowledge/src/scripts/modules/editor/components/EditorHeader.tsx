@@ -11,15 +11,20 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/navigation/BackLink";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { withDevice } from "@library/contexts/DeviceContext";
-import Container from "@library/components/layouts/components/Container";
+import { LoadStatus, ILoadable } from "@library/@types/api";
+import { IResponseArticleDraft } from "@knowledge/@types/api";
+import Translate from "@library/components/translation/Translate";
+import DateTime from "@library/components/DateTime";
 import LanguagesDropDown from "@library/components/LanguagesDropDown";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import Container from "@library/components/layouts/components/Container";
+import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
+    savedDraft?: ILoadable<IResponseArticleDraft>;
+    selectedKey?: string;
     isSubmitLoading: boolean;
     selectedLang?: string;
     className?: string;
@@ -33,6 +38,10 @@ interface IProps extends IDeviceProps {
 export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
+        savedDraft: {
+            status: LoadStatus.PENDING,
+        },
+        isSubmitLoading: false,
     };
     public render() {
         return (
@@ -48,6 +57,8 @@ export class EditorHeader extends React.Component<IProps> {
                                         className="editorHeader-backLink"
                                     />
                                 </li>
+                                {this.renderDraftIndicator()}
+                                <li className="editorHeader-center" role="presentation" />
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
@@ -64,7 +75,7 @@ export class EditorHeader extends React.Component<IProps> {
                                 </li>
                                 <li className="editorHeader-item">
                                     <LanguagesDropDown
-                                        widthOfParent={true}
+                                        widthOfParent={false}
                                         className="editorHeader-otherLanguages"
                                         renderLeft={true}
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
@@ -83,6 +94,40 @@ export class EditorHeader extends React.Component<IProps> {
                 </Container>
             </nav>
         );
+    }
+
+    private renderDraftIndicator(): React.ReactNode {
+        const { status, data } = this.props.savedDraft!;
+        if (status === LoadStatus.LOADING) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle">{t("Saving Draft...")}</span>
+                </li>
+            );
+        }
+
+        if (data) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle">
+                        <Translate
+                            source="Draft Saved <0/>"
+                            c0={<DateTime mode="relative" timestamp={data.dateUpdated} />}
+                        />
+                    </span>
+                </li>
+            );
+        }
+
+        if (status === LoadStatus.ERROR) {
+            return (
+                <li className="editorHeader-item">
+                    <span className="editorHeader-saveDraft metaStyle isError">{t("Error Saving Draft.")}</span>
+                </li>
+            );
+        }
+
+        return null;
     }
 }
 

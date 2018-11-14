@@ -23,6 +23,15 @@
   }
 }
 
+.editorHeader-saveDraft {
+  white-space: nowrap;
+  line-height: $icon-default_size;
+}
+
+.editorHeader-center {
+  flex: 1;
+}
+
 .editorHeader-publish {
   color: $global-color_primary;
   font-weight: $global-fontWeight_semiBold;

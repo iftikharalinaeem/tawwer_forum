@@ -10,7 +10,7 @@ import { t } from "@library/application";
 import { Link, Redirect } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
-import DraftActions from "@knowledge/modules/drafts/components/DraftActions";
+import DraftActions from "@knowledge/modules/drafts/components/DraftMenu";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
 
 export interface IDraftPreview {

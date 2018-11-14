@@ -24,7 +24,7 @@ interface IState {
 /**
  * Implements actions to take on draft
  */
-export default class DraftActions extends React.Component<IProps, IState> {
+export default class DraftMenu extends React.Component<IProps, IState> {
     private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public constructor(props) {
