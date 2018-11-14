@@ -38,6 +38,8 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
 
+    private ignoreChange = false;
+
     public state: IState = {
         showLocationPicker: false,
     };
@@ -50,9 +52,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             : LocationInput.SELECT_MESSAGE;
 
         const buttonContents = locationBreadcrumb ? (
-            <React.Fragment>
-                <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
-            </React.Fragment>
+            <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
         ) : (
             <React.Fragment>
                 {plusCircle("pageLocation-icon")}
@@ -73,8 +73,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         buttonRef={this.changeLocationButton}
                         disabled={!!this.props.disabled}
                     >
-                        {!this.props.disabled && buttonContents}
-                        {this.props.disabled && <ButtonLoader />}
+                        {buttonContents}
                     </Button>
                 </div>
                 {this.state.showLocationPicker && (
@@ -94,6 +93,14 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                 )}
             </React.Fragment>
         );
+    }
+
+    public componentDidMount() {
+        if (this.props.initialCategoryID !== null) {
+            this.ignoreChange = true;
+            this.props.actions.initLocationPickerFromCategoryID(this.props.initialCategoryID);
+            this.ignoreChange = false;
+        }
     }
 
     private handleChoose = () => {

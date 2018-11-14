@@ -38,6 +38,7 @@ export interface IEditorPageState {
     initialDraft: ILoadable<number>; // The draft ID. Actual draft will live in normalized drafts resource.
     savedDraft: ILoadable<IResponseArticleDraft>;
     article: ILoadable<IArticle>;
+    needsDraftConfirmation: boolean;
 }
 
 export interface IInjectableEditorProps {
@@ -48,6 +49,7 @@ export interface IInjectableEditorProps {
     revision: ILoadable<IRevision>;
     initialDraft: ILoadable<IResponseArticleDraft>;
     savedDraft: ILoadable<IResponseArticleDraft>;
+    needsDraftConfirmation: boolean;
 }
 
 /**
@@ -76,6 +78,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             savedDraft: stateSlice.savedDraft,
             locationCategory,
             form: stateSlice.form,
+            needsDraftConfirmation: stateSlice.needsDraftConfirmation,
         };
     }
 
@@ -156,6 +159,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             format: Format.RICH,
             knowledgeCategoryID: null,
         },
+        needsDraftConfirmation: false,
     };
 
     /**
@@ -225,22 +229,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     ): IEditorPageState => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_INITIAL_DRAFT) {
-            nextState.initialDraft.data = action.payload.draftID;
+            nextState.initialDraft.data = action.payload.draftID ? action.payload.draftID : undefined;
+            nextState.needsDraftConfirmation = action.payload.needsInitialConfirmation;
         }
-
-        /**
-         * Fill the form with data from a draft.
-         *
-         * @param draft The draft to fill the form with.
-         */
-        const updateStateFromDraft = (draft: IResponseArticleDraft) => {
-            const { name, body, knowledgeCategoryID } = draft.attributes;
-            nextState.form.name = name ? name : nextState.form.name;
-            nextState.form.body = body ? JSON.parse(body) : nextState.form.body;
-            nextState.form.knowledgeCategoryID = knowledgeCategoryID
-                ? knowledgeCategoryID
-                : nextState.form.knowledgeCategoryID;
-        };
 
         // Initial draft handling data handling.
         if (action.meta && action.meta.draftID !== null && action.meta.draftID === nextState.initialDraft.data) {
@@ -250,7 +241,6 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     break;
                 case ArticleActions.GET_DRAFT_RESPONSE:
                     nextState.initialDraft.status = LoadStatus.SUCCESS;
-                    updateStateFromDraft(action.payload.data);
                     break;
             }
         }

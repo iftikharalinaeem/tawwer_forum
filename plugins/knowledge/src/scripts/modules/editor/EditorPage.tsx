@@ -5,14 +5,12 @@
  */
 
 import React from "react";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
-import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/EditorForm";
 import { LoadStatus } from "@library/@types/api";
-import { Format, IPatchArticleRequestBody } from "@knowledge/@types/api";
 import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";

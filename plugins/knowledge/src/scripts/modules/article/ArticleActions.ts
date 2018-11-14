@@ -27,6 +27,7 @@ import {
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
+import { IApiResponse } from "@library/@types/api";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -276,20 +277,18 @@ export default class ArticleActions extends ReduxActions {
     };
 
     public fetchRevisionByID = (options: IGetRevisionRequestBody) => {
-        return this.dispatch((c, getState) => {
-            const existingRevision = ArticleModel.selectRevision(getState(), options.revisionID);
-            if (existingRevision) {
-                return this.dispatch(
-                    ArticleActions.getRevisionACs.response({ data: existingRevision, status: 200 }, options),
-                );
-            } else {
-                return this.dispatchApi<IGetRevisionResponseBody>(
-                    "get",
-                    `/article-revisions/${options.revisionID}`,
-                    ArticleActions.getRevisionACs,
-                    options,
-                );
-            }
-        });
+        const existingRevision = ArticleModel.selectRevision(this.getState(), options.revisionID);
+        if (existingRevision) {
+            const revResponse: IApiResponse<IGetRevisionResponseBody> = { data: existingRevision, status: 200 };
+            this.dispatch(ArticleActions.getRevisionACs.response(revResponse, options));
+            return Promise.resolve(revResponse);
+        } else {
+            return this.dispatchApi<IGetRevisionResponseBody>(
+                "get",
+                `/article-revisions/${options.revisionID}`,
+                ArticleActions.getRevisionACs,
+                options,
+            );
+        }
     };
 }

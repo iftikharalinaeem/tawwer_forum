@@ -76,7 +76,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                                 <LocationInput
                                     initialCategoryID={form.knowledgeCategoryID}
-                                    key={form.knowledgeCategoryID === null ? undefined : form.knowledgeCategoryID}
+                                    key={form.knowledgeCategoryID || undefined}
                                     disabled={this.isLoading}
                                     onChange={this.locationPickerChangeHandler}
                                 />

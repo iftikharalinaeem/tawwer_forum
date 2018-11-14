@@ -69,12 +69,15 @@ export interface IArticleFragment {
 // Request/Response interfaces
 
 // POST /articles
-export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
+export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {
+    draftID?: number;
+}
 export interface IPostArticleResponseBody extends IArticle {}
 
 // PATCH /articles/:id
 export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
     articleID: number;
+    draftID?: number;
 }
 export interface IPatchArticleResponseBody extends IArticle {}
 
