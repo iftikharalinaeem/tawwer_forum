@@ -6,7 +6,6 @@
 
 $dropDown_width                                : 250px;
 $dropDown_borderRadius                         : 1px;
-$dropdown_bg                                   : $global-color_bg;
 
 $dropDown-metas_verticalPadding                : 6px;
 $dropDown-metas_horizontalPadding              : 18px;
@@ -24,7 +23,8 @@ $dropDown-item_minHeight                       : 45px;
     @include shadow-dropDown;
     position: absolute;
     min-width: $dropDown_width;
-    background-color: $dropdown_bg;
+    background-color: $global-color_bg;
+    color: $global-color_fg;
     border: {
         radius: $global_borderRadius;
         style: solid;
@@ -49,6 +49,10 @@ $dropDown-item_minHeight                       : 45px;
 
     &:empty {
         display: none;
+    }
+
+    .frame {
+        box-shadow: none;
     }
 }
 

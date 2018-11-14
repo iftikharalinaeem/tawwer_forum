@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import { PanelWidget } from "@library/components/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import classNames from "classnames";
 

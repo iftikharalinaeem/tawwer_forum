@@ -19,6 +19,8 @@ import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
 import qs from "qs";
 import QueryString from "@library/components/navigation/QueryString";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{

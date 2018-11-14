@@ -7,22 +7,23 @@ import * as React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { Devices } from "@library/components/DeviceChecker";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import Container from "@knowledge/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
+import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
-import { dummyOtherLanguagesData } from "../../categories/state/dummyOtherLanguages";
 import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
+import VanillaHeader from "@library/components/VanillaHeader";
+import Container from "@library/components/layouts/components/Container";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps {
     article: IArticle;
@@ -42,6 +43,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
 
         return (
             <Container>
+                <VanillaHeader />
                 <PanelLayout device={this.props.device}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
@@ -84,9 +86,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
                     </PanelLayout.RightTop>
                     <PanelLayout.RightBottom>
                         <PanelWidget>
-                            <OtherLanguages selectedKey={dummyOtherLanguagesData.selected}>
-                                {dummyOtherLanguagesData.children as any}
-                            </OtherLanguages>
+                            <OtherLanguages {...dummyOtherLanguagesData} />
                             <RelatedArticles children={this.articleRelatedArticles} />
                         </PanelWidget>
                     </PanelLayout.RightBottom>

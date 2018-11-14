@@ -13,11 +13,8 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
-import PanelLayout, { PanelWidget } from "@knowledge/layouts/PanelLayout";
-import Container from "@knowledge/layouts/components/Container";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
 import EditorPageModel, { IInjectableEditorProps, IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
@@ -26,6 +23,9 @@ import apiv2 from "@library/apiv2";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout from "@library/components/layouts/PanelLayout";
+import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
