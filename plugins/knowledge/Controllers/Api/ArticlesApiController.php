@@ -116,6 +116,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "name?",
                     "locale?",
                     "sort?",
+                    "draftID?" => [
+                        "type" => "integer",
+                        "description" => "Unique ID of a draft to remove upon updating an article.",
+                    ]
                 ])->add($this->fullSchema()),
                 "ArticlePost"
             );
@@ -791,7 +795,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $in = $this->articlePostSchema("in")->setDescription("Update an existing article.");
         $out = $this->articleSchema("out");
 
-        $article = $this->articleByID($id);
         $body = $in->validate($body, true);
         $this->save($body, $id);
         $row = $this->articleByID($id, true);
@@ -960,6 +963,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["outline"] = json_encode($outline);
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
             $this->articleRevisionModel->publish($articleRevisionID);
+        }
+
+        if (array_key_exists("draftID", $fields)) {
+            $this->draftModel->delete([
+                "draftID" => $fields["draftID"],
+                "recordType" => "article",
+            ]);
         }
 
         return $articleID;
