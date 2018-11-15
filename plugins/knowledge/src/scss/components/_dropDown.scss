@@ -19,7 +19,7 @@ $dropDown_minHeight                            : 600px;
 .dropDown {
     position: relative;
     .framePanel {
-        height: $dropDown_minHeight;
+        max-height: $dropDown_minHeight;
     }
 }
 
