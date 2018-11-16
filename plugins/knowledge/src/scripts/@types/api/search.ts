@@ -30,6 +30,7 @@ export interface ISearchResult {
 export interface ISearchRequestBody {
     body?: string;
     name?: string;
+    all?: string;
     dateUpdated?: string;
     // Filter by date when the article was updated.
     // This filter receive a string that can take two forms.
