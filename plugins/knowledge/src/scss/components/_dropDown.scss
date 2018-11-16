@@ -14,9 +14,13 @@ $dropDown-item_verticalPadding                 : 6px;
 $dropDown-item_horizontalPadding               : 36px;
 
 $dropDown-item_minHeight                       : 45px;
+$dropDown_minHeight                            : 600px;
 
 .dropDown {
     position: relative;
+    .framePanel {
+        max-height: $dropDown_minHeight;
+    }
 }
 
 .dropDown-contents {

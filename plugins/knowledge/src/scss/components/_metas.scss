@@ -6,7 +6,7 @@
 
 $metas_verticalMargin         : $utility-baseUnit * 2;
 $metas_color                  : $metaText_color !default;
-$meta_spacing                 : $global-gutter_halfSize;
+$meta_spacing                 : $global-gutter_quarterSize;
 
 .metas {
     display: inline-block;
