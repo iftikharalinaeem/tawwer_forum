@@ -67,18 +67,11 @@ export class EditorPage extends React.PureComponent<IProps> {
      */
     public componentDidMount() {
         const { article, match, actions, history } = this.props;
-        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
                 void actions.initializeAddPage(history);
             } else {
-                const articleID = parseInt(match.params.id, 10);
-                if (queryParams.revisionID) {
-                    const revisionID = parseInt(queryParams.revisionID, 10);
-                    void actions.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
-                } else {
-                    void actions.fetchArticleForEdit(history, articleID);
-                }
+                void actions.initializeEditPage(history, parseInt(match.params.id, 10));
             }
         }
     }

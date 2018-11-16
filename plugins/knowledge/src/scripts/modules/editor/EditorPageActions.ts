@@ -16,7 +16,6 @@ import {
     IResponseArticleDraft,
 } from "@knowledge/@types/api";
 import { History } from "history";
-import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
 import { IEditorPageForm, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
@@ -147,9 +146,6 @@ export default class EditorPageActions extends ReduxActions {
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
 
-    /** Location picker page actions instance. */
-    private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
-
     /**
      * Initialize the add page.
      *
@@ -164,7 +160,7 @@ export default class EditorPageActions extends ReduxActions {
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
         if (!draftLoaded && initialCategoryID !== null) {
-            this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
+            this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
         }
     }
 
@@ -182,6 +178,17 @@ export default class EditorPageActions extends ReduxActions {
             }
         }
         return draftLoaded;
+    }
+
+    public async initializeEditPage(history: History, articleID: number) {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        if (queryParams.revisionID) {
+            const revisionID = parseInt(queryParams.revisionID, 10);
+            await this.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
+        } else {
+            await this.fetchArticleForEdit(history, articleID);
+        }
     }
 
     private pushDraftToForm(draft: IResponseArticleDraft) {
@@ -265,7 +272,7 @@ export default class EditorPageActions extends ReduxActions {
      * @param articleID - The ID of the article to fetch.
      * @param forRevision - Whether or not we're fetching with a revision.
      */
-    public async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
+    private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
         // We don't have an article, but we have ID for one. Go get it.
         const [articleResponse, draftLoaded] = await Promise.all([
             this.getEditableArticleByID(articleID),
@@ -294,7 +301,7 @@ export default class EditorPageActions extends ReduxActions {
      * @param articleID - The ID of the article to fetch.
      * @param revision - Start from a particular revision.
      */
-    public async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
+    private async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
         const [article, revision] = await Promise.all([
             this.fetchArticleForEdit(history, articleID, true),
@@ -317,7 +324,7 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param body - The body of the submit request.
      */
-    public async updateArticle(article: IPatchArticleRequestBody, history: History) {
+    private async updateArticle(article: IPatchArticleRequestBody, history: History) {
         const articleResult = await this.patchArticle(article);
         // Our API request has failed
         if (!articleResult) {
