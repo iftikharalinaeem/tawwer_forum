@@ -185,12 +185,15 @@ export default class ArticleActions extends ReduxActions {
         {} as IPostArticleDraftRequest,
     );
 
-    public postDraft(request: IPostArticleDraftRequest) {
+    public postDraft(request: IPostArticleDraftRequest, tempID: string) {
         return this.dispatchApi<IPostArticleDraftResponse>(
             "post",
             "/articles/drafts",
             ArticleActions.postDraftACs,
             request,
+            {
+                tempID,
+            },
         );
     }
 

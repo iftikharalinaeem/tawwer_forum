@@ -75,9 +75,9 @@ export class EditorPage extends React.PureComponent<IProps> {
                 const articleID = parseInt(match.params.id, 10);
                 if (queryParams.revisionID) {
                     const revisionID = parseInt(queryParams.revisionID, 10);
-                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
+                    void actions.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
                 } else {
-                    void actions.fetchArticleForEdit(articleID);
+                    void actions.fetchArticleForEdit(history, articleID);
                 }
             }
         }
@@ -94,9 +94,9 @@ export class EditorPage extends React.PureComponent<IProps> {
      * Render a query string component from the form value.
      */
     private renderQueryString(): React.ReactNode {
-        const { initialDraft } = this.props;
-        if (initialDraft.status === LoadStatus.SUCCESS && initialDraft.data) {
-            return <QueryString value={{ draftID: initialDraft.data.draftID }} />;
+        const { draft } = this.props;
+        if (draft.status === LoadStatus.SUCCESS && draft.data) {
+            return <QueryString value={{ draftID: draft.data.draftID }} />;
         } else {
             return null;
         }

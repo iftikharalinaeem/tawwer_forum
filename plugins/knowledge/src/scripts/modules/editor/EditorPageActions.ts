@@ -22,7 +22,7 @@ import ArticleActions from "../article/ArticleActions";
 import { IEditorPageForm, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import uniqueId from "lodash/uniqueId";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -126,19 +126,20 @@ export default class EditorPageActions extends ReduxActions {
 
     // Form handling
     public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
-    private static updateFormAC(formData: Partial<IEditorPageForm>) {
-        return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, formData);
+    private static updateFormAC(formData: Partial<IEditorPageForm>, forceRefresh: boolean = false) {
+        return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, {
+            formData,
+            forceRefresh,
+        });
     }
-    public updateForm(formData: Partial<IEditorPageForm>) {
-        this.dispatch(EditorPageActions.updateFormAC(formData));
-    }
+    public updateForm = this.bindDispatch(EditorPageActions.updateFormAC);
 
     // Drafts
     public static readonly SET_INITIAL_DRAFT = "@@articleEditor/SET_INITIAL_DRAFT";
-    private static setInitialDraftAC(draftID: number | null, needsInitialConfirmation: boolean) {
+    private static setInitialDraftAC(draftID?: number, tempID?: string) {
         return EditorPageActions.createAction(EditorPageActions.SET_INITIAL_DRAFT, {
             draftID,
-            needsInitialConfirmation,
+            tempID,
         });
     }
     public setInitialDraft = this.bindDispatch(EditorPageActions.setInitialDraftAC);
@@ -161,19 +162,31 @@ export default class EditorPageActions extends ReduxActions {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const initialCategoryID =
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
+        const draftLoaded = await this.initializeDraftFromUrl(history);
+        if (!draftLoaded && initialCategoryID !== null) {
+            this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
+        }
+    }
+
+    private async initializeDraftFromUrl(history: History): Promise<boolean> {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const draftID = "draftID" in queryParams ? parseInt(queryParams.draftID, 10) : null;
 
+        let draftLoaded = false;
         if (draftID !== null) {
-            this.dispatch(EditorPageActions.setInitialDraftAC(draftID, false));
-            const draft = await this.articleActions.getDraft({ draftID });
-            if (draft) {
-                this.locationPickerActions.initLocationPickerFromArticle(draft.data.attributes);
-            }
-        } else {
-            if (initialCategoryID !== null) {
-                this.locationPickerActions.initLocationPickerFromArticle({ knowledgeCategoryID: initialCategoryID });
+            this.dispatch(EditorPageActions.setInitialDraftAC(draftID));
+            const draftResponse = await this.articleActions.getDraft({ draftID });
+            if (draftResponse) {
+                this.pushDraftToForm(draftResponse.data);
+                draftLoaded = true;
             }
         }
+        return draftLoaded;
+    }
+
+    private pushDraftToForm(draft: IResponseArticleDraft) {
+        const { body, knowledgeCategoryID, name } = draft.attributes;
+        this.updateForm({ body, knowledgeCategoryID, name }, true);
     }
 
     /**
@@ -181,47 +194,27 @@ export default class EditorPageActions extends ReduxActions {
      */
     public async syncDraft() {
         const state = this.getState<IStoreState>();
-        const { form, article } = state.knowledge.editorPage;
-        const serializedBody = JSON.stringify(form.body);
+        const { form, article, draft } = state.knowledge.editorPage;
 
-        const parentRecordID = form.knowledgeCategoryID !== null ? form.knowledgeCategoryID : undefined;
         const recordID = article.data ? article.data.articleID : undefined;
-        const draft = this.getDraft();
 
-        if (draft !== null) {
+        if (draft.data !== undefined && draft.data.draftID !== undefined) {
             await this.articleActions.patchDraft({
-                draftID: draft.draftID,
+                draftID: draft.data.draftID,
                 recordID,
-                parentRecordID,
-                attributes: {
-                    ...form,
-                    body: serializedBody,
-                },
+                attributes: form,
             });
         } else {
-            await this.articleActions.postDraft({
-                recordID,
-                parentRecordID,
-                attributes: {
-                    ...form,
-                    body: serializedBody,
+            const tempID = uniqueId();
+            this.setInitialDraft(undefined, tempID);
+            await this.articleActions.postDraft(
+                {
+                    recordID,
+                    attributes: form,
                 },
-            });
+                tempID,
+            );
         }
-    }
-
-    /**
-     * Get the currently active draft.
-     */
-    private getDraft(): IResponseArticleDraft | null {
-        const { initialDraft, savedDraft } = this.getState<IStoreState>().knowledge.editorPage;
-        let draft: IResponseArticleDraft | null = null;
-        if (initialDraft.data && initialDraft.status === LoadStatus.SUCCESS) {
-            draft = ArticleModel.selectDraft(this.getState(), initialDraft.data);
-        } else if (savedDraft.data) {
-            draft = savedDraft.data;
-        }
-        return draft;
     }
 
     /**
@@ -236,11 +229,11 @@ export default class EditorPageActions extends ReduxActions {
     public async publish(history: History) {
         const editorState = this.getState<IStoreState>().knowledge.editorPage;
         // We don't have an article so go create one.
-        const draft = this.getDraft();
+        const draft = editorState.draft;
         const request: IPostArticleRequestBody = {
             ...editorState.form,
             body: JSON.stringify(editorState.form.body),
-            draftID: draft ? draft.draftID : undefined,
+            draftID: draft.data ? draft.data.draftID : undefined,
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
@@ -270,30 +263,24 @@ export default class EditorPageActions extends ReduxActions {
      * Fetch an existing article for editing.
      *
      * @param articleID - The ID of the article to fetch.
-     * @param revision - Start from a particular revision.
+     * @param forRevision - Whether or not we're fetching with a revision.
      */
-    public async fetchArticleForEdit(articleID: number, fillForm: boolean = true) {
+    public async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
         // We don't have an article, but we have ID for one. Go get it.
-        const [articleResponse, draftsResponse] = await Promise.all([
+        const [articleResponse, draftLoaded] = await Promise.all([
             this.getEditableArticleByID(articleID),
-            this.articleActions.getDrafts({ articleID }),
+            forRevision ? Promise.resolve(false) : this.initializeDraftFromUrl(history),
         ]);
 
-        if (articleResponse && articleResponse.data && fillForm) {
-            this.updateForm({
-                name: articleResponse.data.name,
-                body: JSON.parse(articleResponse.data.body),
-                knowledgeCategoryID: articleResponse.data.knowledgeCategoryID,
-            });
-        }
-
-        if (draftsResponse) {
-            const latestDraft = draftsResponse.data.length > 0 ? draftsResponse.data[0] : null;
-            if (latestDraft) {
-                const { draftID } = latestDraft;
-                this.setInitialDraft(draftID, true);
-                await this.articleActions.getDraft({ draftID });
-            }
+        if (!draftLoaded && !forRevision && articleResponse && articleResponse.data) {
+            this.updateForm(
+                {
+                    name: articleResponse.data.name,
+                    body: JSON.parse(articleResponse.data.body),
+                    knowledgeCategoryID: articleResponse.data.knowledgeCategoryID,
+                },
+                true,
+            );
         }
 
         return articleResponse;
@@ -307,10 +294,10 @@ export default class EditorPageActions extends ReduxActions {
      * @param articleID - The ID of the article to fetch.
      * @param revision - Start from a particular revision.
      */
-    public async fetchArticleAndRevisionForEdit(articleID: number, revisionID: number) {
+    public async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
         const [article, revision] = await Promise.all([
-            this.fetchArticleForEdit(articleID, false),
+            this.fetchArticleForEdit(history, articleID, true),
             this.articleActions.fetchRevisionByID({ revisionID }),
         ]);
 
@@ -321,7 +308,7 @@ export default class EditorPageActions extends ReduxActions {
                 knowledgeCategoryID: article.data.knowledgeCategoryID,
             };
 
-            this.updateForm(formData);
+            this.updateForm(formData, true);
         }
     }
 

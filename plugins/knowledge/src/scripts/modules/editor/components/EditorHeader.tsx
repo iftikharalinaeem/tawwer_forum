@@ -23,7 +23,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IDeviceProps {
     canSubmit: boolean;
-    savedDraft?: ILoadable<IResponseArticleDraft>;
+    draft?: ILoadable<IResponseArticleDraft>;
     selectedKey?: string;
     isSubmitLoading: boolean;
     selectedLang?: string;
@@ -38,7 +38,7 @@ interface IProps extends IDeviceProps {
 export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
-        savedDraft: {
+        draft: {
             status: LoadStatus.PENDING,
         },
         isSubmitLoading: false,
@@ -97,7 +97,7 @@ export class EditorHeader extends React.Component<IProps> {
     }
 
     private renderDraftIndicator(): React.ReactNode {
-        const { status, data } = this.props.savedDraft!;
+        const { status, data } = this.props.draft!;
         if (status === LoadStatus.LOADING) {
             return (
                 <li className="editorHeader-item">

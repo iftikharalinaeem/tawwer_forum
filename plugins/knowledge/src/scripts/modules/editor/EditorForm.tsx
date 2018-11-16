@@ -26,6 +26,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { uniqueId } from "lodash";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -43,8 +44,6 @@ interface IState {
 export class EditorForm extends React.PureComponent<IProps, IState> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
-    private ignoreEditorUpdates = false;
-
     public state: IState = {
         isDirty: false,
     };
@@ -53,14 +52,15 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const { article, form } = this.props;
+        const { article, draft, form, formNeedsRefresh } = this.props;
+        const debug = draft.status;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     className="richEditorForm-header"
-                    savedDraft={this.draft}
+                    draft={draft}
                     optionsMenu={
                         article.status === LoadStatus.SUCCESS && article.data ? (
                             <EditorMenu article={article.data} />
@@ -100,6 +100,8 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                                     isLoading={this.isLoading}
                                     device={this.props.device}
                                     legacyMode={false}
+                                    key={formNeedsRefresh ? "1" : "0"}
+                                    initialValue={form.body}
                                 />
                             </div>
                         </PanelLayout.MiddleBottom>
@@ -107,17 +109,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                 </Container>
             </form>
         );
-    }
-
-    public componentDidMount() {
-        this.overrideEditorContents();
-    }
-
-    public componentDidUpdate(prevProps: IProps) {
-        // Force override the editor contents if we change from loading to not loading.
-        if (this.propsAreLoading(prevProps) && !this.propsAreLoading(this.props)) {
-            this.overrideEditorContents();
-        }
     }
 
     /**
@@ -128,33 +119,11 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
     }
 
     /**
-     * Get the primary draft for the form.
-     */
-    private get draft(): ILoadable<IResponseArticleDraft> {
-        if (this.props.savedDraft.data || this.props.initialDraft.status === LoadStatus.LOADING) {
-            return this.props.savedDraft;
-        } else {
-            return this.props.initialDraft;
-        }
-    }
-
-    /**
      * Determine from a set of props if the component should display as loading or now.
      */
     private propsAreLoading(props: IProps): boolean {
-        const { article, revision, initialDraft } = props;
-        return [article.status, revision.status, initialDraft.status].includes(LoadStatus.LOADING);
-    }
-
-    /**
-     * Override the contents of the editor with the internal value.
-     *
-     * Editor is not a fully controlled component which necessitates this workaround.
-     */
-    private overrideEditorContents() {
-        this.ignoreEditorUpdates = true;
-        this.editorRef.current!.setEditorContent(this.props.form.body);
-        this.ignoreEditorUpdates = false;
+        const { article, revision, draft } = props;
+        return [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
     }
 
     /**
@@ -181,9 +150,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * Handle changes in the form. Updates the draft.
      */
     private handleFormChange(form: Partial<IEditorPageForm>) {
-        if (this.ignoreEditorUpdates) {
-            return;
-        }
         this.props.actions.updateForm(form);
         this.updateDraft();
     }
