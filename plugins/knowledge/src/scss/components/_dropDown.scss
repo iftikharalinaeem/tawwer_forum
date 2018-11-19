@@ -12,9 +12,13 @@ $dropDown-metas_horizontalPadding              : 18px;
 
 $dropDown-item_verticalPadding                 : 6px;
 $dropDown-item_horizontalPadding               : 36px;
+$dropDown-item_minHeight                       : 30px;
 
-$dropDown-item_minHeight                       : 45px;
 $dropDown_minHeight                            : 600px;
+
+$dropDown-sectionTitle_verticalPadding         : 6px;
+
+$dropDown-spacer_margin                        : 6px;
 
 .dropDown {
     position: relative;
@@ -124,4 +128,22 @@ $dropDown_minHeight                            : 600px;
 .dropDown-separator {
     height: $global-separator_width;
     background-color: $global-separator_color;
+    margin: {
+        top: $dropDown-spacer_margin;
+        bottom: $dropDown-spacer_margin;
+    }
+}
+
+.dropDown-sectionHeading {
+    color: $metaText_color;
+    font-size: $global-small_fontSize;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: $global-fontWeight_semiBold;
+    padding: {
+        top: $dropDown-sectionTitle_verticalPadding;
+        right: $dropDown-item_horizontalPadding;
+        bottom: $dropDown-sectionTitle_verticalPadding;
+        left: $dropDown-item_horizontalPadding;
+    }
 }
