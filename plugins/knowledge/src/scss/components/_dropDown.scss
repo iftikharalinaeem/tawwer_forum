@@ -66,10 +66,6 @@ $dropDown-spacer_margin                        : 6px;
 
 .dropDownItems {
     font-size: $global-medium_fontSize;
-    padding: {
-        top: $dropDown-spacer_margin;
-        bottom: $dropDown-spacer_margin;
-    }
 }
 
 .dropDown-metasItem {
@@ -177,4 +173,14 @@ $dropDown-spacer_margin                        : 6px;
     font-size: $global-small_fontSize;
     padding-left: 1em;
     margin-left: auto;
+}
+
+
+.dropDownItem-verticalPadding {
+    padding: {
+        top: $dropDown-spacer_margin;
+        right: 0;
+        bottom: $dropDown-spacer_margin;
+        left: 0;
+    }
 }
