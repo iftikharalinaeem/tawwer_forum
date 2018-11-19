@@ -23,6 +23,7 @@ import { IEditorPageForm, IEditorPageState } from "@knowledge/modules/editor/Edi
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
+import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -240,13 +241,16 @@ export default class EditorPageActions extends ReduxActions {
             const article = response.data;
 
             // Redirect
-            const newLocation = {
+            const editLocation = {
                 ...history.location,
-                pathname: article.url,
+                pathname: makeEditUrl(article),
                 search: "",
             };
 
-            history.replace(newLocation);
+            history.replace(editLocation);
+            history.push({
+                pathname: article.url,
+            });
         }
     }
 
@@ -320,20 +324,14 @@ export default class EditorPageActions extends ReduxActions {
             return;
         }
 
-        const { articleID } = article;
-        const newArticle = await this.articleActions.fetchByID({ articleID });
-        // Our API request failed.
-        if (!newArticle) {
-            return;
-        }
-        const { url } = newArticle.data;
-
-        // Make the URL relative to the root of the site.
-        const link = document.createElement("a");
-        link.href = url;
+        const { url } = articleResult.data;
 
         // Redirect to the new url.
-        history.push(link.pathname);
+        history.replace({
+            ...history.location,
+            search: "",
+        });
+        history.push(url);
     }
 
     /**

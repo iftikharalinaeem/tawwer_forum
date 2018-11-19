@@ -143,7 +143,5 @@ describe("EditorPageModel", () => {
             expect(state.draft.data!.draftID).eq(DRAFT_ID);
             expect(state.draft.data!.tempID).eq(undefined);
         });
-        // it("can handle normalized draft saving");
-        // it("can handle normalized revision saving");
     });
 });

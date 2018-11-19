@@ -14,6 +14,7 @@ import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
 import { actions } from "@rich-editor/state/instance/instanceActions";
+import { LoadStatus } from "@library/@types/api";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -47,6 +48,17 @@ describe("EditorPageActions", () => {
             name: "foo",
             body: "Hello Draft.",
         },
+    };
+
+    const dummyArticle = {
+        articleID: 1,
+        knowledgeCategoryID: 4,
+        sort: null,
+        name: "Example Article",
+        body: '[{"insert":"Hello Article."}]',
+        format: "rich",
+        locale: "en",
+        url: "/kb/articles/1-example-article",
     };
 
     const dummyEditArticle = {
@@ -276,6 +288,115 @@ describe("EditorPageActions", () => {
             const initAction = mockStore.getAction(EditorPageActions.SET_INITIAL_DRAFT);
             expect(initAction!.payload.tempID).eq(tempID);
         });
+
+        it("can update an existing draft", async () => {
+            const draftID = 10;
+            const initialForm: IEditorPageForm = {
+                name: "Test form name",
+                body: [{ insert: "Test form body" }],
+                knowledgeCategoryID: null,
+            };
+
+            const initialState: DeepPartial<IStoreState> = {
+                knowledge: {
+                    editorPage: {
+                        ...EditorPageModel.INITIAL_STATE,
+                        form: initialForm,
+                        draft: {
+                            data: {
+                                draftID,
+                            },
+                            status: LoadStatus.SUCCESS,
+                        },
+                    },
+                },
+            };
+
+            mockApi.onPatch(`/api/v2/articles/drafts/${draftID}`).replyOnce(200, dummyDraft);
+
+            initWithState(initialState);
+            void (await editorPageActions.syncDraft());
+
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_DRAFT_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_DRAFT_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.SET_INITIAL_DRAFT)).eq(false);
+        });
     });
-    describe("publish()", () => {});
+
+    describe("publish()", () => {
+        it("can post new article", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/add?draftID=1"); // draft ID only used for testing location query string.
+
+            const initialForm: IEditorPageForm = {
+                name: "Test form name",
+                body: [{ insert: "Test form body" }],
+                knowledgeCategoryID: 1,
+            };
+
+            const initialState: DeepPartial<IStoreState> = {
+                knowledge: {
+                    editorPage: {
+                        ...EditorPageModel.INITIAL_STATE,
+                        form: initialForm,
+                    },
+                },
+            };
+
+            mockApi.onPost(`/api/v2/articles`).replyOnce(201, dummyArticle);
+
+            initWithState(initialState);
+            void (await editorPageActions.publish(history));
+
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_REQUEST)).eq(false);
+
+            expect(history.location.pathname).eq(dummyArticle.url);
+
+            // Verify query string was removed from previous edit page. Don't want an outdated draft loading.
+            const lastPage = history.entries[history.entries.length - 2];
+            expect(lastPage.search).eq("");
+            expect(lastPage.pathname).eq(`/kb/articles/${dummyArticle.articleID}/editor`);
+        });
+
+        it("can update existing article", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/1/editor?draftID=1"); // draft ID only used for testing location query string.
+
+            const initialForm: IEditorPageForm = {
+                name: "Test form name",
+                body: [{ insert: "Test form body" }],
+                knowledgeCategoryID: 1,
+            };
+
+            const initialState: DeepPartial<IStoreState> = {
+                knowledge: {
+                    editorPage: {
+                        ...EditorPageModel.INITIAL_STATE,
+                        article: {
+                            status: LoadStatus.SUCCESS,
+                            data: dummyArticle as any,
+                        },
+                        form: initialForm,
+                    },
+                },
+            };
+
+            mockApi.onPatch(`/api/v2/articles/${dummyArticle.articleID}`).replyOnce(200, dummyArticle);
+
+            initWithState(initialState);
+            void (await editorPageActions.publish(history));
+
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_REQUEST)).eq(false);
+
+            expect(history.location.pathname).eq(dummyArticle.url);
+
+            // Verify query string was removed from previous edit page. Don't want an outdated draft loading.
+            const lastPage = history.entries[history.entries.length - 2];
+            expect(lastPage.search).eq("");
+        });
+    });
 });
