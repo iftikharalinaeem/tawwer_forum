@@ -7,21 +7,20 @@
 $metas_verticalMargin         : $utility-baseUnit * 2;
 $metas_color                  : $metaText_color !default;
 $meta_spacing                 : $global-gutter_quarterSize;
+$meta_lineHeight              : $global-base_lineHeight;
 
 .metas {
-    display: inline-block;
-    //flex-wrap: wrap;
-    //justify-content: flex-start;
-    //align-items: center;
+    display: block;
+    line-height: $meta_lineHeight;
     color: $metas_color;
     width: calc(100% + #{$meta_spacing * 2});
+    overflow: hidden;
 
     margin: {
         left: -#{$meta_spacing};
         right: $meta_spacing;
     }
 
-    overflow: hidden;
 
     &.isFlexed {
         display: flex;
