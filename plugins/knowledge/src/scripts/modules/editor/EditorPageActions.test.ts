@@ -8,19 +8,14 @@ import { createMemoryHistory } from "history";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import apiv2 from "@library/apiv2";
 import MockAdapter from "axios-mock-adapter";
-import configureStore, { MockStore } from "redux-mock-store";
-import thunk from "redux-thunk";
-import { Format } from "@knowledge/@types/api";
-import { assertStoreHasActions } from "@library/__tests__/customAssertions";
+import { createMockStore, mockStore } from "redux-test-utils";
 import { IPartialStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
 describe("EditorPageActions", () => {
-    let mockStore: MockStore;
+    let mockStore: mockStore<any>;
     let mockApi: MockAdapter;
     let editorPageActions: EditorPageActions;
     const initWithState = (state: IPartialStoreState) => {
-        const middlewares = [thunk];
-        mockStore = configureStore(middlewares)(state);
+        mockStore = createMockStore(state);
         editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
     };
     before(() => {
@@ -28,11 +23,11 @@ describe("EditorPageActions", () => {
         initWithState({});
     });
     afterEach(() => {
-        mockStore.clearActions();
+        initWithState({});
         mockApi.reset();
     });
 
-    describe("initializeAddPage()", () => {
+    describe.only("initializeAddPage()", () => {
         it("initialize the with no params", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/add");
@@ -44,17 +39,17 @@ describe("EditorPageActions", () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/add?knowledgeCategoryID=1");
             void (await editorPageActions.initializeAddPage(history));
-            expect(mockStore.getActions()).deep.equals([
-                {
+            expect(
+                mockStore.isActionDispatched({
                     payload: {
                         forceRefresh: true,
                         formData: {
                             knowledgeCategoryID: 1,
                         },
                     },
-                    type: "@articleEditor/UPDATE_FORM",
-                },
-            ]);
+                    type: EditorPageActions.UPDATE_FORM,
+                }),
+            );
         });
         it("initialize the with a draftID", async () => {
             const dummyDraft = {
