@@ -10,7 +10,10 @@ import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import apiv2 from "@library/apiv2";
 import MockAdapter from "axios-mock-adapter";
 import { createMockStore, mockStore as MockStore } from "redux-test-utils";
-import { IPartialStoreState } from "@knowledge/state/model";
+import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
+import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import { DeepPartial } from "redux";
+import { actions } from "@rich-editor/state/instance/instanceActions";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -115,7 +118,7 @@ describe("EditorPageActions", () => {
         });
     });
 
-    describe.only("initializeEditPage()", () => {
+    describe("initializeEditPage()", () => {
         const testSimpleInitialization = async (fromUrl = "/kb/articles/1/editor") => {
             const history = createMemoryHistory();
             history.push(fromUrl);
@@ -241,4 +244,38 @@ describe("EditorPageActions", () => {
             assertDraftLoaded(dummyDraft);
         });
     });
+
+    describe("syncDraft()", () => {
+        it("can create a new draft", async () => {
+            const initialForm: IEditorPageForm = {
+                name: "Test form name",
+                body: [{ insert: "Test form body" }],
+                knowledgeCategoryID: null,
+            };
+
+            const initialState: DeepPartial<IStoreState> = {
+                knowledge: {
+                    editorPage: {
+                        ...EditorPageModel.INITIAL_STATE,
+                        form: initialForm,
+                    },
+                },
+            };
+
+            mockApi.onPost("/api/v2/articles/drafts").replyOnce(201, dummyDraft);
+
+            const tempID = "TEMP TEMP FOO";
+
+            initWithState(initialState);
+            void (await editorPageActions.syncDraft(tempID));
+
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.SET_INITIAL_DRAFT)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_RESPONSE)).eq(true);
+
+            const initAction = mockStore.getAction(EditorPageActions.SET_INITIAL_DRAFT);
+            expect(initAction!.payload.tempID).eq(tempID);
+        });
+    });
+    describe("publish()", () => {});
 });

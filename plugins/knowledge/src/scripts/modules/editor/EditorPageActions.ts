@@ -109,7 +109,7 @@ export default class EditorPageActions extends ReduxActions {
 
     // Form handling
     public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
-    private static updateFormAC(formData: Partial<IEditorPageForm>, forceRefresh: boolean = false) {
+    public static updateFormAC(formData: Partial<IEditorPageForm>, forceRefresh: boolean = false) {
         return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, {
             formData,
             forceRefresh,
@@ -119,7 +119,7 @@ export default class EditorPageActions extends ReduxActions {
 
     // Drafts
     public static readonly SET_INITIAL_DRAFT = "@@articleEditor/SET_INITIAL_DRAFT";
-    private static setInitialDraftAC(draftID?: number, tempID?: string) {
+    public static setInitialDraftAC(draftID?: number, tempID?: string) {
         return EditorPageActions.createAction(EditorPageActions.SET_INITIAL_DRAFT, {
             draftID,
             tempID,
@@ -182,7 +182,7 @@ export default class EditorPageActions extends ReduxActions {
     /**
      * Synchronize the current editor draft state to the server.
      */
-    public async syncDraft() {
+    public async syncDraft(newDraftID: string = uniqueId()) {
         const state = this.getState<IStoreState>();
         const { form, article, draft } = state.knowledge.editorPage;
 
@@ -195,7 +195,7 @@ export default class EditorPageActions extends ReduxActions {
                 attributes: form,
             });
         } else {
-            const tempID = uniqueId();
+            const tempID = newDraftID;
             this.setInitialDraft(undefined, tempID);
             await this.articleActions.postDraft(
                 {

@@ -37,7 +37,6 @@ export interface IEditorPageState {
 
 export interface IInjectableEditorProps {
     submit: ILoadable<{}>;
-    locationCategory: IKbCategoryFragment | null;
     form: IEditorPageForm;
     article: ILoadable<IArticle>;
     revision: ILoadable<IRevision>;
@@ -55,22 +54,15 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state tree.
      */
     public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const stateSlice = EditorPageModel.getStateSlice(state);
-
-        let locationCategory: IKbCategoryFragment | null = null;
-        const { editorPage, locationPicker } = state.knowledge;
-        if (editorPage.article.status === LoadStatus.SUCCESS) {
-            locationCategory = CategoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
-        }
+        const { article, submit, form, formNeedsRefresh } = EditorPageModel.getStateSlice(state);
 
         return {
-            article: stateSlice.article,
-            submit: stateSlice.submit,
+            article,
+            submit,
+            form,
+            formNeedsRefresh,
             revision: EditorPageModel.selectActiveRevision(state),
             draft: EditorPageModel.selectDraft(state),
-            locationCategory,
-            form: stateSlice.form,
-            formNeedsRefresh: stateSlice.formNeedsRefresh,
         };
     }
 
@@ -119,24 +111,26 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @throws An error if the state wasn't initialized properly.
      */
     private static getStateSlice(state: IStoreState): IEditorPageState {
-        if (!state.knowledge || !state.knowledge.revisionsPage) {
+        if (!state.knowledge || !state.knowledge.editorPage) {
             throw new Error(
-                "The revision page model has not been wired up properly. Expected to find 'state.knowledge.revisionsPage'.",
+                "The revision page model has not been wired up properly. Expected to find 'state.knowledge.editorPage'.",
             );
         }
 
         return state.knowledge.editorPage;
     }
 
-    public initialState: IEditorPageState = {
+    public static readonly INITIAL_STATE = {
         article: {
             status: LoadStatus.PENDING,
         },
         draft: {
             status: LoadStatus.PENDING,
+            error: undefined,
         },
         revision: {
             status: LoadStatus.PENDING,
+            error: undefined,
         },
         submit: {
             status: LoadStatus.PENDING,
@@ -148,6 +142,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
         formNeedsRefresh: false,
     };
+    public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
 
     /**
      * Reducer implementation for the editor page.

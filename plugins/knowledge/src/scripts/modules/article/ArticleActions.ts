@@ -177,12 +177,12 @@ export default class ArticleActions extends ReduxActions {
     }
 
     // POST /articles/drafts
-    private static readonly postDraftACs = ReduxActions.generateApiActionCreators(
+    public static readonly postDraftACs = ReduxActions.generateApiActionCreators(
         ArticleActions.POST_DRAFT_REQUEST,
         ArticleActions.POST_DRAFT_RESPONSE,
         ArticleActions.POST_DRAFT_ERROR,
         {} as IPostArticleDraftResponse,
-        {} as IPostArticleDraftRequest,
+        {} as IPostArticleDraftRequest & { tempID?: string },
     );
 
     public postDraft(request: IPostArticleDraftRequest, tempID: string) {
