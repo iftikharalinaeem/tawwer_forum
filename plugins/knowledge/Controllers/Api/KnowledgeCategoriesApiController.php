@@ -59,7 +59,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 $this->knowledgeCategoryModel->updateCounts($row['parentID']);
             }
         } else {
-            throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.");
+            throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
         }
     }
 
