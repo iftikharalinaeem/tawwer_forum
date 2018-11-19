@@ -159,7 +159,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /**
      * Recalculate and update articleCount, articleCountRecursive and childCategoryCount columns
      *
-     * @param int $knowledgeCategoryID
+     * @param int $knowledgeCategoryID Categori id to recalculate
+     * @param bool $updateParents Flag for recursive or non-recursive mode to update all parents
+     *
      * @return bool Return tru when record updated succesfully
      */
     public function updateCounts(int $knowledgeCategoryID, bool $updateParents = true): bool {

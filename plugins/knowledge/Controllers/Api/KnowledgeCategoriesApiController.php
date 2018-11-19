@@ -55,7 +55,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $row = $this->knowledgeCategoryByID($id);
         if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
             $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-            if (!empty($row['parentID']) && $row['parentID'] !== -1) {
+            if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
                 $this->knowledgeCategoryModel->updateCounts($row['parentID']);
             }
         } else {
@@ -309,7 +309,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $previousState = $this->knowledgeCategoryByID($id);
 
         $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
-        if (!empty($body['parentID']) && $body['parentID'] != $previousState['parentID']) {
+        if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
             $this->knowledgeCategoryModel->updateCounts($id);
         }
         $row = $this->knowledgeCategoryByID($id);
