@@ -55,6 +55,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $row = $this->knowledgeCategoryByID($id);
         if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
             $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+            if (!empty($row['parentID']) && $row['parentID'] !== -1) {
+                $this->knowledgeCategoryModel->updateCounts($row['parentID']);
+            }
         } else {
             throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.");
         }
@@ -303,9 +306,12 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
 
-        $this->knowledgeCategoryByID($id);
+        $previousState = $this->knowledgeCategoryByID($id);
 
         $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
+        if (!empty($body['parentID']) && $body['parentID'] != $previousState['parentID']) {
+            $this->knowledgeCategoryModel->updateCounts($id);
+        }
         $row = $this->knowledgeCategoryByID($id);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
@@ -334,6 +340,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
+        if (!empty($body['parentID']) && $body['parentID'] != -1) {
+            $this->knowledgeCategoryModel->updateCounts($body['parentID']);
+        }
         $row = $this->knowledgeCategoryByID($knowledgeCategoryID);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
