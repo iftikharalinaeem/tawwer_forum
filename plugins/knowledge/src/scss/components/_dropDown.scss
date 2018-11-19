@@ -11,7 +11,7 @@ $dropDown-metas_verticalPadding                : 6px;
 $dropDown-metas_horizontalPadding              : 18px;
 
 $dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 36px;
+$dropDown-item_horizontalPadding               : 18px;
 $dropDown-item_minHeight                       : 30px;
 
 $dropDown_minHeight                            : 600px;
@@ -92,7 +92,14 @@ $dropDown-spacer_margin                        : 6px;
 }
 
 .dropDown-item {
-    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.dropDown-section {
+    display: block;
 }
 
 .dropDown-toggleButtonIcon {
@@ -117,6 +124,7 @@ $dropDown-spacer_margin                        : 6px;
         left: $dropDown-item_horizontalPadding;
     }
     color: inherit;
+    user-select: none;
 
     &:hover,
     &:focus {
@@ -146,4 +154,15 @@ $dropDown-spacer_margin                        : 6px;
         bottom: $dropDown-sectionTitle_verticalPadding;
         left: $dropDown-item_horizontalPadding;
     }
+}
+
+.dropDown-sectionContents {
+    display: block;
+}
+
+
+.dropDownItem-count {
+    font-size: $global-small_fontSize;
+    padding-left: 1em;
+    margin-left: auto;
 }
