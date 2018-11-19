@@ -933,11 +933,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         if ($articleID !== null) {
-            $prevState = $this->articleModel->get(['articleID' => $articleID]);
+            $prevState = $this->articleModel->get(['articleID' => $articleID])[0];
             $this->articleModel->update($article, ["articleID" => $articleID]);
-            if (isset($article['knowledgeCategoryID']) && ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID'])) {
-                if (!empty($prevState['knowledgeCategoryID'])) {
-                    $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
+            if (isset($article['knowledgeCategoryID'])) {
+                if ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']) {
+                    if (!empty($prevState['knowledgeCategoryID'])) {
+                        $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
+                    }
                 }
             }
         } else {
