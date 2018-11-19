@@ -42,23 +42,30 @@ describe("EditorPageActions", () => {
         draftID: 1,
         attributes: {
             name: "foo",
-            body: "Hello world.",
+            body: "Hello Draft.",
         },
     };
 
     const dummyEditArticle = {
         articleID: 1,
-        knowledgeCategoryID: 1,
+        knowledgeCategoryID: 4,
         sort: null,
         name: "Example Article",
-        body: '[{"insert":"Hello world."}]',
+        body: '[{"insert":"Hello Article."}]',
         format: "rich",
         locale: "en",
     };
 
+    const dummyRevision = {
+        articleRevisionID: 6,
+        articleID: 1,
+        name: "Example Revision",
+        body: '[{"insert":"Hello Revision"}]',
+    };
+
     const initWithState = (state: IPartialStoreState) => {
         mockStore = createMockStore(state);
-        editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2);
+        editorPageActions = new EditorPageActions(mockStore.dispatch, apiv2, () => state);
     };
 
     describe("initializeAddPage()", () => {
@@ -109,9 +116,9 @@ describe("EditorPageActions", () => {
     });
 
     describe.only("initializeEditPage()", () => {
-        it("initializes with no params", async () => {
+        const testSimpleInitialization = async (fromUrl = "/kb/articles/1/editor") => {
             const history = createMemoryHistory();
-            history.push("/kb/articles/1/editor");
+            history.push(fromUrl);
             mockApi.onGet("/api/v2/articles/1/edit").replyOnce(200, dummyEditArticle);
 
             void (await editorPageActions.initializeEditPage(history, 1));
@@ -130,14 +137,108 @@ describe("EditorPageActions", () => {
                 knowledgeCategoryID,
                 name,
             });
+        };
+
+        it("initializes with no params", async () => {
+            await testSimpleInitialization();
         });
 
-        it("initializes with a draft ID", async () => {});
+        it("initializes with a draft ID", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/1/editor?draftID=1");
+            mockApi
+                .onGet("/api/v2/articles/1/edit")
+                .replyOnce(200, dummyEditArticle)
+                .onGet("/api/v2/articles/drafts/1")
+                .replyOnce(200, dummyDraft);
 
-        it("initializes with a revision ID", async () => {});
+            void (await editorPageActions.initializeEditPage(history, 1));
 
-        it("ignores a category ID", async () => {});
+            expect(
+                mockStore.isActionTypeDispatched(EditorPageActions.GET_ARTICLE_REQUEST),
+                "Has an article request",
+            ).eq(true);
+            expect(
+                mockStore.isActionTypeDispatched(EditorPageActions.GET_ARTICLE_RESPONSE),
+                "Has an article response",
+            ).eq(true);
 
-        it("initializes with draft and revision IDs", async () => {});
+            // Loads only the draft. Doesn't actually use any of the article if we have a draft to load from.
+            assertDraftLoaded(dummyDraft);
+        });
+
+        const assertArticleAndRevisionLoaded = () => {
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.SET_ACTIVE_REVISION)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.GET_REVISION_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.GET_ARTICLE_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.GET_ARTICLE_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(EditorPageActions.UPDATE_FORM), "Updates the form").eq(true);
+
+            const updateForm = mockStore.getAction(EditorPageActions.UPDATE_FORM)!;
+            const { knowledgeCategoryID } = dummyEditArticle;
+            const { name } = dummyRevision;
+            const body = JSON.parse(dummyRevision.body);
+
+            expect(updateForm.payload.forceRefresh).eq(true);
+            expect(updateForm.payload.formData).deep.eq({
+                body,
+                knowledgeCategoryID,
+                name,
+            });
+        };
+
+        it("initializes with a revision ID", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/1/editor?revisionID=6");
+            mockApi
+                .onGet("/api/v2/articles/1/edit")
+                .replyOnce(200, dummyEditArticle)
+                .onGet("/api/v2/article-revisions/6")
+                .replyOnce(200, dummyRevision);
+
+            initWithState({ knowledge: { articles: { revisionsByID: {} } } });
+
+            void (await editorPageActions.initializeEditPage(history, 1));
+
+            expect(mockStore.isActionTypeDispatched(ArticleActions.GET_REVISION_REQUEST)).eq(true);
+            assertArticleAndRevisionLoaded();
+        });
+
+        it("initializes with a revision ID from a cached revision", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/1/editor?revisionID=6");
+            mockApi.onGet("/api/v2/articles/1/edit").replyOnce(200, dummyEditArticle);
+
+            initWithState({
+                knowledge: {
+                    articles: {
+                        revisionsByID: {
+                            6: dummyRevision,
+                        },
+                    },
+                },
+            });
+
+            void (await editorPageActions.initializeEditPage(history, 1));
+
+            expect(mockStore.isActionTypeDispatched(ArticleActions.GET_REVISION_REQUEST)).eq(false);
+            assertArticleAndRevisionLoaded();
+        });
+
+        it("ignores a category ID", async () => {
+            await testSimpleInitialization("/kb/articles/1/editor?knowledgeCategoryID=532");
+        });
+
+        it("ignores the article and revision when loading a draft", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/1/editor?revisionID=6&draftID=1");
+            mockApi.onGet("/api/v2/articles/drafts/1").replyOnce(200, dummyDraft);
+
+            void (await editorPageActions.initializeEditPage(history, 1));
+
+            expect(mockStore.isActionTypeDispatched(ArticleActions.GET_ARTICLE_REQUEST)).eq(false);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.GET_REVISION_REQUEST)).eq(false);
+            assertDraftLoaded(dummyDraft);
+        });
     });
 });

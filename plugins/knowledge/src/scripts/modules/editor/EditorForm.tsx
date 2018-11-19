@@ -202,18 +202,9 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
     };
 }
 
-/**
- * Map in action dispatchable action creators from the store.
- */
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: new EditorPageActions(dispatch, apiv2),
-    };
-}
-
 const withRedux = connect(
     EditorPageModel.getInjectableProps,
-    mapDispatchToProps,
+    dispatch => ({ actions: new EditorPageActions(dispatch, apiv2) }),
 );
 
 export default withRedux(withRouter(withDevice<IProps>(EditorForm)));

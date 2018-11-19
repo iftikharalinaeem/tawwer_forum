@@ -280,7 +280,8 @@ export default class ArticleActions extends ReduxActions {
     };
 
     public fetchRevisionByID = (options: IGetRevisionRequestBody) => {
-        const existingRevision = ArticleModel.selectRevision(this.getState(), options.revisionID);
+        const { revisionID, ...rest } = options;
+        const existingRevision = ArticleModel.selectRevision(this.getState(), revisionID);
         if (existingRevision) {
             const revResponse: IApiResponse<IGetRevisionResponseBody> = { data: existingRevision, status: 200 };
             this.dispatch(ArticleActions.getRevisionACs.response(revResponse, options));
@@ -290,7 +291,8 @@ export default class ArticleActions extends ReduxActions {
                 "get",
                 `/article-revisions/${options.revisionID}`,
                 ArticleActions.getRevisionACs,
-                options,
+                rest,
+                { revisionID },
             );
         }
     };

@@ -35,13 +35,9 @@ export default class EditorPageActions extends ReduxActions {
     public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
     public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
-    public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_ARTICLE_REQUEST";
-    public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
-    public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_ARTICLE_ERROR";
-
-    public static readonly GET_REVISION_REQUEST = "@@articleEditor/GET_REVISION_REQUEST";
-    public static readonly GET_REVISION_RESPONSE = "@@articleEditor/GET_REVISION_RESPONSE";
-    public static readonly GET_REVISION_ERROR = "@@articleEditor/GET_REVISION_ERROR";
+    public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
+    public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
+    public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_EDIT_ARTICLE_ERROR";
 
     // Frontend only actions
     public static readonly RESET = "@@articleEditor/RESET";
@@ -52,7 +48,6 @@ export default class EditorPageActions extends ReduxActions {
      */
     public static ACTION_TYPES:
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
-        | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
@@ -97,18 +92,6 @@ export default class EditorPageActions extends ReduxActions {
     );
 
     /**
-     * Action creators for GET /article-revisions/:id
-     */
-    private static getRevisionACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.GET_REVISION_REQUEST,
-        EditorPageActions.GET_REVISION_RESPONSE,
-        EditorPageActions.GET_REVISION_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IGetArticleRevisionsResponseBody,
-        {} as IGetArticleRevisionsRequestBody,
-    );
-
-    /**
      * Create a reset action
      */
     private static createResetAction() {
@@ -145,7 +128,7 @@ export default class EditorPageActions extends ReduxActions {
     public setInitialDraft = this.bindDispatch(EditorPageActions.setInitialDraftAC);
 
     /** Article page actions instance. */
-    private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
+    private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
 
     /**
      * Initialize the add page.
@@ -303,6 +286,11 @@ export default class EditorPageActions extends ReduxActions {
      * @param revision - Start from a particular revision.
      */
     private async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
+        const draftLoaded = await this.initializeDraftFromUrl(history);
+        if (draftLoaded) {
+            return;
+        }
+
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
         const [article, revision] = await Promise.all([
             this.fetchArticleForEdit(history, articleID, true),
