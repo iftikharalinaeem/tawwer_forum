@@ -935,7 +935,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($articleID !== null) {
             $prevState = $this->articleModel->get(['articleID' => $articleID]);
             $this->articleModel->update($article, ["articleID" => $articleID]);
-            if ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']) {
+            if (isset($article['knowledgeCategoryID']) && ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID'])) {
                 if (!empty($prevState['knowledgeCategoryID'])) {
                     $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
                 }
