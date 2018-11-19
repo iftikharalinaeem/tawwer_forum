@@ -14,6 +14,7 @@ import {
     IGetArticleRevisionsResponseBody,
     IGetArticleRevisionsRequestBody,
     IResponseArticleDraft,
+    Format,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import qs from "qs";
@@ -192,8 +193,7 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     private pushDraftToForm(draft: IResponseArticleDraft) {
-        const { body, knowledgeCategoryID, name } = draft.attributes;
-        this.updateForm({ body, knowledgeCategoryID, name }, true);
+        this.updateForm(draft.attributes, true);
     }
 
     /**
@@ -241,6 +241,7 @@ export default class EditorPageActions extends ReduxActions {
             ...editorState.form,
             body: JSON.stringify(editorState.form.body),
             draftID: draft.data ? draft.data.draftID : undefined,
+            format: Format.RICH,
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {

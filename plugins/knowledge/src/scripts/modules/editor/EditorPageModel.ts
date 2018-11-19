@@ -8,14 +8,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import {
-    IArticle,
-    IRevision,
-    IKbCategoryFragment,
-    Format,
-    IResponseArticleDraft,
-    IArticleDraft,
-} from "@knowledge/@types/api";
+import { IArticle, IRevision, IKbCategoryFragment, IResponseArticleDraft, IArticleDraft } from "@knowledge/@types/api";
 import ArticleActions from "../article/ArticleActions";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "../article/ArticleModel";
@@ -27,7 +20,6 @@ import reduceReducers from "reduce-reducers";
 export interface IEditorPageForm {
     name: string;
     body: DeltaOperation[];
-    format: Format;
     knowledgeCategoryID: number | null;
 }
 
@@ -152,7 +144,6 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         form: {
             name: "",
             body: [],
-            format: Format.RICH,
             knowledgeCategoryID: null,
         },
         formNeedsRefresh: false,
