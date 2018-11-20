@@ -27,6 +27,9 @@ import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
+import { AxiosResponse } from "axios";
+import { ISearchOptionData } from "library/src/scripts/components/search/SearchOption";
+import { ICrumb } from "library/src/scripts/components/Breadcrumbs";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState {
     placeholder?: string;
@@ -165,12 +168,17 @@ class SearchForm extends React.Component<IProps> {
             expand: ["user", "category"],
         };
         const query = qs.stringify(queryObj);
-        const response = await apiv2.get(`/knowledge/search?${query}`);
+        const response: AxiosResponse<ISearchResult[]> = await apiv2.get(`/knowledge/search?${query}`);
         return response.data.map(result => {
+            const data: ISearchOptionData = {
+                crumbs: result.knowledgeCategory!.breadcrumbs,
+                name: result.name,
+                dateUpdated: result.dateUpdated,
+            };
             return {
                 label: result.name,
                 value: result.name,
-                data: result,
+                data,
             };
         });
     };
