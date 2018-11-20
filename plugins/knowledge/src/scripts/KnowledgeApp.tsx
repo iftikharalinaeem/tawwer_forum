@@ -17,6 +17,9 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { LinkContext } from "@library/components/navigation/SmartLink";
 import { formatUrl } from "@library/application";
+import ApiContext from "@library/contexts/ApiContext";
+import apiV2 from "@library/apiv2";
+import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 
 /*
  * Top level application component for knowledge.
@@ -35,18 +38,20 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <LinkContext.Provider value={formatUrl("/kb", true)}>
-                    <React.Fragment>
-                        <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                        <DeviceContext.Provider
-                            value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
-                        >
-                            <BrowserRouter>
-                                <Route component={KnowledgeRoutes} />
-                            </BrowserRouter>
-                        </DeviceContext.Provider>
-                    </React.Fragment>
-                </LinkContext.Provider>
+                <ApiContext.Provider value={{ api: apiV2, searchOptionProvider: SearchPageModel.searchAutocomplete }}>
+                    <LinkContext.Provider value={formatUrl("/kb", true)}>
+                        <React.Fragment>
+                            <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                            <DeviceContext.Provider
+                                value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
+                            >
+                                <BrowserRouter>
+                                    <Route component={KnowledgeRoutes} />
+                                </BrowserRouter>
+                            </DeviceContext.Provider>
+                        </React.Fragment>
+                    </LinkContext.Provider>
+                </ApiContext.Provider>
             </Provider>
         );
     }
