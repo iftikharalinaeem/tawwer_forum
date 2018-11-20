@@ -57,6 +57,7 @@ class SearchForm extends React.Component<IProps> {
                                     onSearch={this.props.searchActions.search}
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
+                                    triggerSearchOnAllUpdates={true}
                                 />
                             </PanelWidget>
                             {isMobile && (
