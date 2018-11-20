@@ -143,15 +143,18 @@ export default class ArticleActions extends ReduxActions {
         ArticleActions.GET_DRAFTS_RESPONSE,
         ArticleActions.GET_DRAFTS_ERROR,
         {} as IGetArticleDraftsResponse,
-        {} as IGetArticleDraftsRequest,
+        {} as IGetArticleDraftsRequest & { identifier: string },
     );
 
-    public getDrafts(request: IGetArticleDraftsRequest) {
+    public getDrafts(request: IGetArticleDraftsRequest, identifier: string) {
         return this.dispatchApi<IGetArticleDraftsResponse>(
             "get",
             `/articles/drafts`,
             ArticleActions.getDraftsACs,
             request,
+            {
+                identifier,
+            },
         );
     }
 

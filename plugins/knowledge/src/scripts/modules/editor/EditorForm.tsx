@@ -100,7 +100,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                                     isLoading={this.isLoading}
                                     device={this.props.device}
                                     legacyMode={false}
-                                    key={formNeedsRefresh ? "1" : "0"}
+                                    key={formNeedsRefresh ? "11" : "10"}
                                     initialValue={form.body}
                                 />
                             </div>

@@ -14,11 +14,13 @@ import ArticleMenuModel from "@knowledge/modules/article/ArticleMenuModel";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 
 const knowledgeReducer = combineReducers({
     articles: new ArticleModel().reducer,
     articleMenu: new ArticleMenuModel().reducer,
     articlePage: new ArticlePageModel().reducer,
+    draftsPage: new DraftsPageModel().reducer,
     editorPage: new EditorPageModel().reducer,
     revisionsPage: new RevisionsPageModel().reducer,
     categories: new CategoryModel().reducer,

@@ -12,17 +12,10 @@ import Paragraph from "@library/components/Paragraph";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import DraftActions from "@knowledge/modules/drafts/components/DraftMenu";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { makeDraftUrl } from "@knowledge/modules/editor/route";
 
-export interface IDraftPreview {
-    id: number;
-    name: string | null;
-    body: string | null;
-    dateUpdated: string;
-    url: string;
-    location?: IKbCategoryFragment[];
-}
-
-interface IProps extends IDraftPreview {
+interface IProps extends IResponseArticleDraft {
     headingLevel?: 2 | 3 | 4 | 5 | 6;
     className?: string;
 }
@@ -47,9 +40,12 @@ export default class DraftPreview extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { name, body, dateUpdated, url, location, headingLevel, className } = this.props;
+        const { dateUpdated, draftID, headingLevel, className } = this.props;
+        const { body, name } = this.props.attributes;
         const HeadingTag = `h${headingLevel}`;
         const hasMeta = dateUpdated || location;
+        const url = makeDraftUrl(this.props);
+
         // We can't nest links, so we need to simulate a click on the <li> element
         if (this.state.doRedirect) {
             return <Redirect to={url} />;
@@ -68,7 +64,7 @@ export default class DraftPreview extends React.Component<IProps, IState> {
                         <Paragraph className="draftPreview-excerpt">
                             {!!body ? body : <em>{t("(No Body)")}</em>}
                         </Paragraph>
-                        <DraftPreviewMeta dateUpdated={dateUpdated} location={location!} />
+                        <DraftPreviewMeta dateUpdated={dateUpdated} />
                     </article>
                 </li>
             );
@@ -76,7 +72,7 @@ export default class DraftPreview extends React.Component<IProps, IState> {
     }
 
     private deleteArticle() {
-        alert(`To do - delete draft no: ${this.props.id}`);
+        alert(`To do - delete draft no: ${this.props.draftID}`);
     }
     private doRedirect = e => {
         e.stopPropagation();
