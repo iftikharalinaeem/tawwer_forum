@@ -52,7 +52,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
         const debug = draft.status;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
@@ -66,6 +66,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                             <EditorMenu article={article.data} />
                         ) : null
                     }
+                    saveDraft={saveDraft}
                 />
                 <Container className="richEditorForm-body">
                     <h1 id={this.props.titleID} className="sr-only">

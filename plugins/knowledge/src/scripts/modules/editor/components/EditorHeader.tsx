@@ -22,14 +22,15 @@ import Container from "@library/components/layouts/components/Container";
 import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IDeviceProps {
-    canSubmit: boolean;
-    draft?: ILoadable<IResponseArticleDraft>;
-    selectedKey?: string;
-    isSubmitLoading: boolean;
-    selectedLang?: string;
-    className?: string;
     callToAction?: string;
+    canSubmit: boolean;
+    className?: string;
+    draft?: ILoadable<IResponseArticleDraft>;
+    isSubmitLoading: boolean;
     optionsMenu?: React.ReactNode;
+    saveDraft: ILoadable<{}>;
+    selectedLang?: string;
+    selectedKey?: string;
 }
 
 /**
@@ -39,6 +40,9 @@ export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
         draft: {
+            status: LoadStatus.PENDING,
+        },
+        saveDraft: {
             status: LoadStatus.PENDING,
         },
         isSubmitLoading: false,
@@ -97,7 +101,8 @@ export class EditorHeader extends React.Component<IProps> {
     }
 
     private renderDraftIndicator(): React.ReactNode {
-        const { status, data } = this.props.draft!;
+        const { status } = this.props.saveDraft!;
+        const { data } = this.props.draft!;
         if (status === LoadStatus.LOADING) {
             return (
                 <li className="editorHeader-item">
