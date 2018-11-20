@@ -17,7 +17,6 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
-import qs from "qs";
 import QueryString from "@library/components/navigation/QueryString";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
@@ -87,8 +86,8 @@ export class EditorPage extends React.PureComponent<IProps> {
      * Render a query string component from the form value.
      */
     private renderQueryString(): React.ReactNode {
-        const { draft } = this.props;
-        if (draft.status === LoadStatus.SUCCESS && draft.data) {
+        const { draft, saveDraft } = this.props;
+        if (saveDraft.status === LoadStatus.SUCCESS && draft.data) {
             return <QueryString value={{ draftID: draft.data.draftID }} />;
         } else {
             return null;

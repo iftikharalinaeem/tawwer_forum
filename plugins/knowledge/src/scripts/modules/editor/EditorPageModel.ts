@@ -24,24 +24,26 @@ export interface IEditorPageForm {
 }
 
 export interface IEditorPageState {
-    submit: ILoadable<{}>;
-    form: IEditorPageForm;
-    revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
+    article: ILoadable<IArticle>;
     draft: ILoadable<{
         tempID?: string;
         draftID?: number;
     }>; // The draft ID. Actual draft will live in normalized drafts resource.
-    article: ILoadable<IArticle>;
+    form: IEditorPageForm;
     formNeedsRefresh: boolean;
+    revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
+    saveDraft: ILoadable<{}>;
+    submit: ILoadable<{}>;
 }
 
 export interface IInjectableEditorProps {
-    submit: ILoadable<{}>;
-    form: IEditorPageForm;
     article: ILoadable<IArticle>;
-    revision: ILoadable<IRevision>;
     draft: ILoadable<IResponseArticleDraft>;
+    form: IEditorPageForm;
     formNeedsRefresh: boolean;
+    revision: ILoadable<IRevision>;
+    saveDraft: ILoadable<{}>;
+    submit: ILoadable<{}>;
 }
 
 /**
@@ -54,10 +56,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state tree.
      */
     public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const { article, submit, form, formNeedsRefresh } = EditorPageModel.getStateSlice(state);
+        const { article, saveDraft, submit, form, formNeedsRefresh } = EditorPageModel.getStateSlice(state);
 
         return {
             article,
+            saveDraft,
             submit,
             form,
             formNeedsRefresh,
@@ -128,19 +131,22 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             status: LoadStatus.PENDING,
             error: undefined,
         },
-        revision: {
-            status: LoadStatus.PENDING,
-            error: undefined,
-        },
-        submit: {
-            status: LoadStatus.PENDING,
-        },
         form: {
             name: "",
             body: [],
             knowledgeCategoryID: null,
         },
         formNeedsRefresh: false,
+        revision: {
+            status: LoadStatus.PENDING,
+            error: undefined,
+        },
+        saveDraft: {
+            status: LoadStatus.PENDING,
+        },
+        submit: {
+            status: LoadStatus.PENDING,
+        },
     };
     public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
 
@@ -197,10 +203,10 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             switch (action.type) {
                 // Posting a new draft.
                 case ArticleActions.POST_DRAFT_REQUEST:
-                    nextState.draft.status = LoadStatus.LOADING;
+                    nextState.saveDraft.status = LoadStatus.LOADING;
                     break;
                 case ArticleActions.POST_DRAFT_RESPONSE:
-                    nextState.draft.status = LoadStatus.SUCCESS;
+                    nextState.saveDraft.status = LoadStatus.SUCCESS;
                     nextState.draft.data = { draftID: action.payload.data.draftID };
                     break;
             }
@@ -227,12 +233,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         ) {
             switch (action.type) {
                 case ArticleActions.GET_DRAFT_REQUEST:
-                case ArticleActions.PATCH_DRAFT_REQUEST:
                     nextState.draft.status = LoadStatus.LOADING;
                     break;
+                case ArticleActions.PATCH_DRAFT_REQUEST:
+                    nextState.saveDraft.status = LoadStatus.LOADING;
+                    break;
                 case ArticleActions.GET_DRAFT_RESPONSE:
-                case ArticleActions.PATCH_DRAFT_RESPONSE:
                     nextState.draft.status = LoadStatus.SUCCESS;
+                    break;
+                case ArticleActions.PATCH_DRAFT_RESPONSE:
+                    nextState.saveDraft.status = LoadStatus.SUCCESS;
                     break;
             }
         }
