@@ -62,7 +62,7 @@ export default class DraftPreview extends React.Component<IProps, IState> {
                             <DraftActions className="draftPreview-menu" deleteFunction={this.deleteArticle} url={url} />
                         </div>
                         <Paragraph className="draftPreview-excerpt">
-                            {!!body ? body : <em>{t("(No Body)")}</em>}
+                            {!!body ? <em>{t("(Temporary Placeholder)")}</em> : <em>{t("(No Body)")}</em>}
                         </Paragraph>
                         <DraftPreviewMeta dateUpdated={dateUpdated} />
                     </article>
