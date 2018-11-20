@@ -75,9 +75,9 @@ export default class SearchPageActions extends ReduxActions {
         if (form.startDate && form.endDate) {
             dateUpdated = `[${form.startDate},${form.endDate}]`;
         } else if (form.startDate) {
-            dateUpdated = `>${form.startDate}`;
+            dateUpdated = `>=${form.startDate}`;
         } else if (form.endDate) {
-            dateUpdated = `<${form.endDate}`;
+            dateUpdated = `<=${form.endDate}`;
         }
 
         // Put together the search query.
