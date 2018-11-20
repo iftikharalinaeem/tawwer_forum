@@ -154,3 +154,8 @@ fieldset {
 .js-focus-visible .focus-visible {
   outline: none;
 }
+
+abbr,
+abbr[title] {
+    text-decoration: none;
+}
