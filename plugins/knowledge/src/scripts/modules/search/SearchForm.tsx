@@ -51,7 +51,7 @@ class SearchForm extends React.Component<IProps> {
                                 <SearchBar
                                     placeholder={this.props.placeholder || t("Help")}
                                     onChange={this.handleSearchChange}
-                                    loadOptions={this.props.searchOptionProvider}
+                                    loadOptions={this.props.searchOptionProvider.autocomplete}
                                     value={this.props.form.query}
                                     isBigInput={true}
                                     onSearch={this.props.searchActions.search}

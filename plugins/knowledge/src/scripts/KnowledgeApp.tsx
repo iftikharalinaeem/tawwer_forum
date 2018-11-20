@@ -20,6 +20,7 @@ import { formatUrl } from "@library/application";
 import ApiContext from "@library/contexts/ApiContext";
 import apiV2 from "@library/apiv2";
 import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 
 /*
  * Top level application component for knowledge.
@@ -38,7 +39,7 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ApiContext.Provider value={{ api: apiV2, searchOptionProvider: SearchPageModel.searchAutocomplete }}>
+                <ApiContext.Provider value={{ api: apiV2, searchOptionProvider: new KnowledgeSearchProvider() }}>
                     <LinkContext.Provider value={formatUrl("/kb", true)}>
                         <React.Fragment>
                             <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
