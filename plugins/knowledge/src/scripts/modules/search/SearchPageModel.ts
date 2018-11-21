@@ -12,6 +12,11 @@ import produce from "immer";
 import { IStoreState } from "@knowledge/state/model";
 import { ISearchResponseBody } from "@knowledge/@types/api";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import { AxiosResponse } from "axios";
+import { ISearchOptionData } from "library/src/scripts/components/search/SearchOption";
+import { ISearchResult } from "plugins/knowledge/src/scripts/@types/api/search";
+import qs from "qs";
+import apiv2 from "@library/apiv2";
 
 export enum SearchDomain {
     ARTICLES = "articles",
