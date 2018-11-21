@@ -135,7 +135,7 @@ describe("EditorPageModel", () => {
                 state,
                 ArticleActions.postDraftACs.request({ tempID: TEMP_ID, attributes: draftContents }),
             );
-            expect(state.draft.status).eq(LoadStatus.LOADING);
+            expect(state.saveDraft.status).eq(LoadStatus.LOADING);
 
             // Handle response
             state = model.reducer(
@@ -145,7 +145,7 @@ describe("EditorPageModel", () => {
                     attributes: draftContents,
                 }),
             );
-            expect(state.draft.status).eq(LoadStatus.SUCCESS);
+            expect(state.saveDraft.status).eq(LoadStatus.SUCCESS);
             expect(state.draft.data!.draftID).eq(DRAFT_ID);
             expect(state.draft.data!.tempID).eq(undefined);
         });
