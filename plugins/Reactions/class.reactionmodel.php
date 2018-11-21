@@ -20,6 +20,9 @@ class ReactionModel extends Gdn_Model {
 
     const FORCE_REMOVE = 'remove';
 
+    /** Cache grace. */
+    const CACHE_GRACE = 60;
+
     /** @var null  */
     public static $ReactionTypes = null;
 
@@ -977,8 +980,18 @@ class ReactionModel extends Gdn_Model {
         // Allow addons to validate or modify data before save.
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
-        $inserted = $this->toggleUserTag($data, $row, $model, $force);
+        // Create unique key based on the RecordID and UserID to limit requests on a record.
+        $lockKey = 'Reactions.' . $iD . '.' . $userID;
+        $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
 
+        if ($haveLock) {
+            $inserted = $this->toggleUserTag($data, $row, $model, $force);
+            $this->releaseCacheLock($lockKey);
+        } else {
+            // Fail silently because we don't have a lock, so we shouldn't execute the trailing code.
+            return;
+        }
+        
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 
         // Now decide whether we need to log or delete the record.
@@ -1130,7 +1143,6 @@ class ReactionModel extends Gdn_Model {
                             $row[$name] = $value;
                         }
                     }
-
                     self::$ReactionTypes[strtolower($row['UrlCode'])] = $row;
                 }
                 Gdn::cache()->store('ReactionTypes', self::$ReactionTypes);
@@ -1138,7 +1150,6 @@ class ReactionModel extends Gdn_Model {
                 self::$ReactionTypes = $reactionTypes;
             }
         }
-
         if ($urlCode) {
             return val(strtolower($urlCode), self::$ReactionTypes, NULL);
         }
