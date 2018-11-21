@@ -59,7 +59,7 @@ export default class DraftMenu extends React.Component<IProps, IState> {
                         onConfirm={this.props.deleteFunction}
                         elementToFocusOnExit={this.toggleButtonRef.current! as HTMLElement}
                     >
-                        {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
+                        {t("This is a destructive action. You will not be able to restore your draft.")}
                     </ModalConfirm>
                 )}
             </React.Fragment>
