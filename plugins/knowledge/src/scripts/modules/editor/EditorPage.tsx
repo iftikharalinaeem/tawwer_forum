@@ -17,7 +17,6 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
-import qs from "qs";
 import QueryString from "@library/components/navigation/QueryString";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
@@ -67,18 +66,11 @@ export class EditorPage extends React.PureComponent<IProps> {
      */
     public componentDidMount() {
         const { article, match, actions, history } = this.props;
-        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
                 void actions.initializeAddPage(history);
             } else {
-                const articleID = parseInt(match.params.id, 10);
-                if (queryParams.revisionID) {
-                    const revisionID = parseInt(queryParams.revisionID, 10);
-                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
-                } else {
-                    void actions.fetchArticleForEdit(articleID);
-                }
+                void actions.initializeEditPage(history, parseInt(match.params.id, 10));
             }
         }
     }
@@ -94,9 +86,9 @@ export class EditorPage extends React.PureComponent<IProps> {
      * Render a query string component from the form value.
      */
     private renderQueryString(): React.ReactNode {
-        const { initialDraft } = this.props;
-        if (initialDraft.status === LoadStatus.SUCCESS && initialDraft.data) {
-            return <QueryString value={{ draftID: initialDraft.data.draftID }} />;
+        const { draft, saveDraft } = this.props;
+        if (saveDraft.status === LoadStatus.SUCCESS && draft.data) {
+            return <QueryString value={{ draftID: draft.data.draftID }} />;
         } else {
             return null;
         }

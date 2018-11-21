@@ -9,14 +9,11 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
 import DraftPreview from "@knowledge/modules/drafts/components/DraftPreview";
-import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import Button from "@library/components/forms/Button";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps {
     className?: string;
-    data: IDraftPreview[];
-    hasMoreResults: boolean;
-    loadMoreResults?: () => void;
+    data: IResponseArticleDraft[];
 }
 
 /**
@@ -24,8 +21,8 @@ interface IProps {
  */
 export default class DraftsList extends React.Component<IProps> {
     public render() {
-        const { hasMoreResults, data, className } = this.props;
-        const Tag = hasMoreResults ? `ul` : `div`;
+        const { data, className } = this.props;
+        const Tag = data.length > 0 ? `ul` : `div`;
         let content;
 
         if (data.length > 0) {
@@ -39,11 +36,6 @@ export default class DraftsList extends React.Component<IProps> {
         return (
             <div className="draftList">
                 <Tag className={classNames("draftList-list", className)}>{content}</Tag>
-                {hasMoreResults && (
-                    <Button className="draftList-loadMore" onClick={this.props.loadMoreResults}>
-                        {t("Next")}
-                    </Button>
-                )}
             </div>
         );
     }

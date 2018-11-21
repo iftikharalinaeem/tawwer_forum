@@ -12,37 +12,29 @@ import PageLoader from "@library/components/PageLoader";
 import { withDevice } from "@library/contexts/DeviceContext";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { LoadStatus } from "@library/@types/api/core";
-import { IDraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
-import { dummyDraftListData } from "./state/dummyDrafts";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Modal from "@library/components/modal/Modal";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { RouteComponentProps } from "react-router-dom";
+import { connect } from "react-redux";
+import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
+import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
+import apiv2 from "@library/apiv2";
 
 interface IOwnProps
     extends RouteComponentProps<{
             id?: string;
         }> {}
 
-interface IProps extends IOwnProps, IDeviceProps {}
-
-interface IState {
-    data: IDraftPreview[];
-    hasMoreResults: boolean;
+interface IProps extends IOwnProps, IInjectableDraftsPageProps, IDeviceProps {
+    actions: DraftsPageActions;
 }
 
 /**
  * Page component for drafts page
  */
-export class DraftsPage extends React.Component<IProps, IState> {
+export class DraftsPage extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("draftsPage");
-    public constructor(props) {
-        super(props);
-        this.state = {
-            data: dummyDraftListData,
-            hasMoreResults: true,
-        };
-    }
 
     public render() {
         return (
@@ -54,32 +46,16 @@ export class DraftsPage extends React.Component<IProps, IState> {
             >
                 <PageLoader status={LoadStatus.SUCCESS}>
                     <DocumentTitle title={t("Drafts")}>
-                        <DraftsLayout
-                            {...this.props}
-                            data={this.state.data}
-                            loadMoreResults={this.loadMoreResults}
-                            hasMoreResults={this.state.hasMoreResults}
-                        />
+                        <DraftsLayout {...this.props} data={this.props.userDrafts.data || []} />
                     </DocumentTitle>
                 </PageLoader>
             </Modal>
         );
     }
 
-    // Temporary function to simulate loading data from API
-    private loadMoreResults = () => {
-        const newData = [...this.state.data, ...dummyDraftListData];
-        this.setState({
-            data: newData,
-            hasMoreResults: this.hasMoreResults(newData),
-        });
-        this.forceUpdate();
-    };
-
-    // Temporary function to simulate checking if we have more data
-    private hasMoreResults = (data: any[]) => {
-        return data.length <= 15;
-    };
+    public componentDidMount() {
+        void this.props.actions.getCurrentUserDrafts();
+    }
 
     private get titleID() {
         return this.id + "-title";
@@ -97,4 +73,15 @@ export class DraftsPage extends React.Component<IProps, IState> {
     };
 }
 
-export default withDevice(DraftsPage);
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: new DraftsPageActions(dispatch, apiv2),
+    };
+}
+
+const withRedux = connect(
+    DraftsPageModel.mapStateToProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(withDevice(DraftsPage));

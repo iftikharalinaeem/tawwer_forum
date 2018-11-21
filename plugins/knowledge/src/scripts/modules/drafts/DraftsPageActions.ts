@@ -5,7 +5,36 @@
  */
 
 import ReduxActions from "@library/state/ReduxActions";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { IStoreState } from "@knowledge/state/model";
 
 export default class DraftsPageActions extends ReduxActions {
-    public static readonly GET_DRAFTS_REQUEST = "@@articleDrafts/GET_DRAFTS_REQUEST";
+    public static readonly IDENTIFIER = "@@articleDrafts/IDENTIFIER";
+
+    public static readonly RESET = "@@articleDrafts/RESET";
+
+    public static ACTION_TYPES: ReturnType<typeof DraftsPageActions.resetAC>;
+
+    private articleActions = new ArticleActions(this.dispatch, this.api, this.getState);
+
+    /**
+     * Get drafts created by a specific user.
+     */
+    public async getCurrentUserDrafts() {
+        const state = this.getState<IStoreState>();
+        const currentUserID = state.users.current.data!.userID;
+        return this.articleActions.getDrafts({ insertUserID: currentUserID }, DraftsPageActions.IDENTIFIER);
+    }
+
+    /**
+     * Create a reset action
+     */
+    private static resetAC() {
+        return DraftsPageActions.createAction(DraftsPageActions.RESET, {});
+    }
+
+    /**
+     * Reset the page state.
+     */
+    public reset = this.bindDispatch(DraftsPageActions.resetAC);
 }
