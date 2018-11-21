@@ -63,9 +63,6 @@ notifications:
     template:
       - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
 
-# Run build in a Docker container.  Reduces time between commit and start of build.
-sudo: false
-
 notifications:
   hipchat:
     rooms:
