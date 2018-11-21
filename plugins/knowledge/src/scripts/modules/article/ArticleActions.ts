@@ -234,7 +234,7 @@ export default class ArticleActions extends ReduxActions {
 
     public deleteDraft(request: IDeleteArticleDraftRequest) {
         return this.dispatchApi<IDeleteArticleDraftResponse>(
-            "patch",
+            "delete",
             `/articles/drafts/${request.draftID}`,
             ArticleActions.deleteDraftACs,
             request,

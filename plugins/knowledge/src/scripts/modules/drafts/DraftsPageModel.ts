@@ -14,10 +14,12 @@ import { IStoreState } from "@knowledge/state/model";
 
 export interface IDraftsPageState {
     userDrafts: ILoadable<number[]>;
+    deleteDraft: ILoadable<never>;
 }
 
 export interface IInjectableDraftsPageProps {
     userDrafts: ILoadable<IResponseArticleDraft[]>;
+    deleteDraft: ILoadable<never>;
 }
 
 /**
@@ -25,13 +27,16 @@ export interface IInjectableDraftsPageProps {
  */
 export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
     public initialState: IDraftsPageState = {
+        deleteDraft: {
+            status: LoadStatus.PENDING,
+        },
         userDrafts: {
             status: LoadStatus.PENDING,
         },
     };
 
     public static mapStateToProps(state: IStoreState): IInjectableDraftsPageProps {
-        const { userDrafts } = state.knowledge.draftsPage;
+        const { deleteDraft, userDrafts } = state.knowledge.draftsPage;
         const currentUserDrafts: ILoadable<IResponseArticleDraft[]> = {
             status: userDrafts.status,
         };
@@ -41,6 +46,7 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
             : undefined;
 
         return {
+            deleteDraft,
             userDrafts: currentUserDrafts,
         };
     }
@@ -69,6 +75,14 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
                         nextState.userDrafts.status = LoadStatus.SUCCESS;
                         break;
                 }
+            }
+            switch (action.type) {
+                case ArticleActions.DELETE_DRAFT_REQUEST:
+                    nextState.deleteDraft.status = LoadStatus.LOADING;
+                    break;
+                case ArticleActions.DELETE_DRAFT_RESPONSE:
+                    nextState.deleteDraft.status = LoadStatus.SUCCESS;
+                    break;
             }
             return nextState;
         });
