@@ -57,7 +57,7 @@ const SearchPage = Loadable({
 
 /** A loadable version of the search page. */
 const DraftsPage = Loadable({
-    loading: FullPageLoader,
+    loading: ModalLoader,
     loader: () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
 });
 

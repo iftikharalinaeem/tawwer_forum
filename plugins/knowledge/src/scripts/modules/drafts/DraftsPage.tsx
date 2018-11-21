@@ -44,7 +44,7 @@ export class DraftsPage extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
-                <PageLoader status={LoadStatus.SUCCESS}>
+                <PageLoader status={this.props.userDrafts.status}>
                     <DocumentTitle title={t("Drafts")}>
                         <DraftsLayout {...this.props} data={this.props.userDrafts.data || []} />
                     </DocumentTitle>

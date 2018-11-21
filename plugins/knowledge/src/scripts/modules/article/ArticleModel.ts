@@ -138,6 +138,12 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     for (const currentDraft of drafts) {
                         nextState.draftsByID[currentDraft.draftID] = currentDraft;
                     }
+                    break;
+                case ArticleActions.DELETE_DRAFT_RESPONSE:
+                    if (nextState.draftsByID[action.meta.draftID]) {
+                        delete nextState.draftsByID[action.meta.draftID];
+                    }
+                    break;
             }
         });
     };
