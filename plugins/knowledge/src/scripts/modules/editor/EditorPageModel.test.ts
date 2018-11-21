@@ -57,6 +57,9 @@ describe("EditorPageModel", () => {
                 submit: {
                     status: LoadStatus.PENDING,
                 },
+                saveDraft: {
+                    status: LoadStatus.PENDING,
+                },
                 form: {
                     name: "test",
                     body: [{ insert: "foo bar" }],
@@ -92,6 +95,9 @@ describe("EditorPageModel", () => {
                     status: LoadStatus.SUCCESS,
                     error: undefined,
                     data: revision as any,
+                },
+                saveDraft: {
+                    status: LoadStatus.PENDING,
                 },
                 submit: {
                     status: LoadStatus.PENDING,

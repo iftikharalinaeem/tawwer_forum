@@ -28,7 +28,7 @@ interface IProps extends IDeviceProps {
     draft?: ILoadable<IResponseArticleDraft>;
     isSubmitLoading: boolean;
     optionsMenu?: React.ReactNode;
-    saveDraft: ILoadable<{}>;
+    saveDraft?: ILoadable<{}>;
     selectedLang?: string;
     selectedKey?: string;
 }
