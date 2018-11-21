@@ -36,10 +36,6 @@ interface IProps extends IOwnProps, IInjectableDraftsPageProps, IDeviceProps {
 export class DraftsPage extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("draftsPage");
 
-    public componentDidMount() {
-        this.props.actions.getCurrentUserDrafts();
-    }
-
     public render() {
         return (
             <Modal
@@ -55,6 +51,10 @@ export class DraftsPage extends React.Component<IProps> {
                 </PageLoader>
             </Modal>
         );
+    }
+
+    public componentDidMount() {
+        void this.props.actions.getCurrentUserDrafts();
     }
 
     private get titleID() {
