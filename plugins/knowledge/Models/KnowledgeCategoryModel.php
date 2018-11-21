@@ -166,10 +166,10 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      */
     public function updateCounts(int $knowledgeCategoryID, bool $updateParents = true): bool {
         $count = $this->sql()
-            ->select('c.knowledgeCategoryID,
-                      COUNT(a.articleID) AS articleCount,
-                      COUNT(children.knowledgeCategoryID) AS childrenCount,
-                      SUM(children.articleCountRecursive) AS countRecursive')
+            ->select('c.knowledgeCategoryID')
+            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
+            ->select('DISTINCT children.knowledgeCategoryID', 'COUNT', 'childrenCount')
+            ->select('children.articleCountRecursive', 'SUM', 'countRecursive')
             ->from('knowledgeCategory c')
             ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID')
             ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
