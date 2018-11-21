@@ -191,7 +191,7 @@ trait ArticlesApiSchemes {
             "recordID?",
             "parentRecordID?",
             "attributes",
-            "body?",
+            "body" => $this->getArticleDraftBodySchema(),
         ])->add($this->fullDraftSchema());
         return $result;
     }
@@ -238,7 +238,6 @@ trait ArticlesApiSchemes {
                 "description" => "When the draft was last updated",
                 "type" => "datetime",
             ],
-            "body" => $this->getArticleDraftBodySchema(),
         ]);
         return $result;
     }

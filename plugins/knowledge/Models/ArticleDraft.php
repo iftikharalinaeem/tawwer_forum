@@ -100,13 +100,10 @@ class ArticleDraft {
      */
     public static function prepareDraftFields(array $body): array {
         if ($bodyContent = ($body['body']['bodyContent'] ?? false)) {
-            if ($attributes = json_decode($body['attributes'], true)) {
-                if ($body['body']['bodyFormat'] === self::BODY_TYPE_RICH) {
-                    $bodyContent = self::getPlainText($bodyContent);
-                }
-                $attributes['excerpt'] = self::getExcerpt($bodyContent);
-                $body['attributes'] = json_encode($attributes);
+            if ($body['body']['bodyFormat'] === self::BODY_TYPE_RICH) {
+                $bodyContent = self::getPlainText($bodyContent);
             }
+            $body['attributes']['excerpt'] = self::getExcerpt($bodyContent);
         }
         return $body;
     }

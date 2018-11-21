@@ -199,14 +199,21 @@ export default class EditorPageActions extends ReduxActions {
                 },
             });
         } else {
-            await this.articleActions.postDraft({
+            const request = {
                 recordID,
                 parentRecordID,
                 attributes: {
                     ...form,
                     body: serializedBody,
                 },
-            });
+                body: {
+                    bodyContent: serializedBody,
+                    bodyFormat: 'rich',
+                },
+            };
+
+            // console.log(request);
+            await this.articleActions.postDraft(request);
         }
     }
 
