@@ -460,6 +460,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body, true);
         $body["recordType"] = "article";
+        $body = ArticleDraft::prepareDraftFields($body);
 
         $draft = $this->draftByID($draftID);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {

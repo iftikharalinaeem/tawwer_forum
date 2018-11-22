@@ -191,7 +191,7 @@ trait ArticlesApiSchemes {
             "recordID?",
             "parentRecordID?",
             "attributes",
-            "body" => $this->getArticleDraftBodySchema(),
+            "body?" => $this->getArticleDraftBodySchema(),
         ])->add($this->fullDraftSchema());
         return $result;
     }
