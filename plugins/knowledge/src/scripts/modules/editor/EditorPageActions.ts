@@ -197,6 +197,10 @@ export default class EditorPageActions extends ReduxActions {
                     ...form,
                     body: serializedBody,
                 },
+                body: {
+                    bodyContent: serializedBody,
+                    bodyFormat: 'rich',
+                },
             });
         } else {
             const request = {
