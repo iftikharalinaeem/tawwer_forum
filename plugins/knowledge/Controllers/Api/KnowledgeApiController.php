@@ -173,7 +173,7 @@ class KnowledgeApiController extends AbstractApiController {
             return $sphinxRes;
         } else {
             $errorMessage = $sphinx->getLastError();
-            if (empty($message)) {
+            if (empty($errorMessage)) {
                 $errorMessage = $sphinx->getLastWarning();
             }
             throw new ClientException($errorMessage);
