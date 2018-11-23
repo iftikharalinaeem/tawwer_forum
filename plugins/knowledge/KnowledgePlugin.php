@@ -98,5 +98,15 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("articleCountRecursive", "int", "0")
             ->column("childCategoryCount", "int", "0")
             ->set();
+
+        $this->database->structure()
+            ->table("knowledgeBase")
+            ->primaryKey("knowledgeBaseID")
+            ->column("name", "varchar(255)")
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int")
+            ->column("dateUpdated", "datetime")
+            ->set();
     }
 }
