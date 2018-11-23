@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\SphinxTrait;
+use Garden\Web\Exception\ClientException;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
@@ -166,9 +167,17 @@ class KnowledgeApiController extends AbstractApiController {
             $sphinxQuery .= ' @bodyRendered (' . $sphinx->escapeString($query['body']) . ')*';
         }
         if (isset($query['all']) && !empty(trim($query['all']))) {
-            $sphinxQuery .= '@(name,bodyRendered) (' . $sphinx->escapeString($query['all']) . ')*';
+            $sphinxQuery .= ' @(name,bodyRendered) (' . $sphinx->escapeString($query['all']) . ')*';
         }
-        return $sphinx->query($sphinxQuery, $this->sphinxIndexName('KnowledgeArticle'));
+        if ($sphinxRes = $sphinx->query($sphinxQuery, $this->sphinxIndexName('KnowledgeArticle'))) {
+            return $sphinxRes;
+        } else {
+            $errorMessage = $sphinx->getLastError();
+            if (empty($message)) {
+                $errorMessage = $sphinx->getLastWarning();
+            }
+            throw new ClientException($errorMessage);
+        }
     }
 
     /**
