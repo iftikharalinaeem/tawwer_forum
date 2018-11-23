@@ -22,7 +22,7 @@ class KnowledgeBasdeModel extends \Vanilla\Models\PipelineModel {
      * @param Gdn_Session $session
      */
     public function __construct(Gdn_Session $session) {
-        parent::__construct("knowledgeCategory");
+        parent::__construct("knowledgeBase");
         $this->session = $session;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
