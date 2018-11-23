@@ -22,6 +22,7 @@ use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * API controller for managing the articles resource.
@@ -49,6 +50,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
+    /** @var KnowledgeCategoryModel */
+    private $knowledgeCategoryModel;
+
     /** @var DraftModel */
     private $draftModel;
 
@@ -65,17 +69,20 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param UserModel $userModel
      * @param DraftModel $draftModel
+     * @param KnowledgeCategoryModel $knowledgeCategoryModel
      */
     public function __construct(
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
         UserModel $userModel,
-        DraftModel $draftModel
+        DraftModel $draftModel,
+        KnowledgeCategoryModel $knowledgeCategoryModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
         $this->draftModel = $draftModel;
         $this->userModel = $userModel;
+        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
     /**
@@ -926,10 +933,22 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         if ($articleID !== null) {
+            $prevState = $this->articleModel->getID($articleID);
             $this->articleModel->update($article, ["articleID" => $articleID]);
+            if (isset($article['knowledgeCategoryID'])) {
+                if ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']) {
+                    if (!empty($prevState['knowledgeCategoryID'])) {
+                        $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
+                    }
+                }
+            }
         } else {
             $articleID = $this->articleModel->insert($fields);
         }
+        if (!empty($article['knowledgeCategoryID'])) {
+            $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
+        }
+
 
         if (!empty($revision)) {
             // Grab the current revision, if available, to load as initial defaults.
