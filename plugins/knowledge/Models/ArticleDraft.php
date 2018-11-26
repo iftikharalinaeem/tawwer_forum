@@ -132,9 +132,10 @@ class ArticleDraft {
     }
 
     /**
-     * Prepare article data to ba saved as a draft
+     * Prepare article draft data to be output according to article draft schema
      *
-     * @param array $body Incoming request validated arguments array.
+     * @param array $drafts Data from contentDraft records.
+     * @param bool $singleMode Single or multi line mode
      *
      * @return array
      */
