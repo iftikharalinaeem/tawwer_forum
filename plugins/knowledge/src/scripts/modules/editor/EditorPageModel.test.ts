@@ -10,7 +10,7 @@ import { LoadStatus } from "@library/@types/api";
 import EditorPageModel, { IInjectableEditorProps, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IArticleDraftContents } from "@knowledge/@types/api";
+import { IArticleDraftAttrs, Format } from "@knowledge/@types/api";
 
 describe("EditorPageModel", () => {
     describe("getInjectableProps()", () => {
@@ -33,9 +33,8 @@ describe("EditorPageModel", () => {
 
             const draft = {
                 draftID: 1,
-                attributes: {
-                    body: [{ insert: "Hello draft" }] as any,
-                },
+                attributes: {},
+                body: [{ insert: "Hello draft" }] as any,
             };
 
             const mixedState: IEditorPageState = {
@@ -119,8 +118,7 @@ describe("EditorPageModel", () => {
             const TEMP_ID = "some id";
             const DRAFT_ID = 12;
             const model = new EditorPageModel();
-            const draftContents: IArticleDraftContents = {
-                body: [],
+            const draftAttrs: IArticleDraftAttrs = {
                 name: "",
                 knowledgeCategoryID: 4,
             };
@@ -133,7 +131,12 @@ describe("EditorPageModel", () => {
             // That loading status is tracked on temp id.
             state = model.reducer(
                 state,
-                ArticleActions.postDraftACs.request({ tempID: TEMP_ID, attributes: draftContents }),
+                ArticleActions.postDraftACs.request({
+                    tempID: TEMP_ID,
+                    attributes: draftAttrs,
+                    body: "[]",
+                    format: Format.RICH,
+                }),
             );
             expect(state.saveDraft.status).eq(LoadStatus.LOADING);
 
@@ -142,7 +145,9 @@ describe("EditorPageModel", () => {
                 state,
                 ArticleActions.postDraftACs.response({ data: { draftID: DRAFT_ID } } as any, {
                     tempID: TEMP_ID,
-                    attributes: draftContents,
+                    attributes: draftAttrs,
+                    body: "[]",
+                    format: Format.RICH,
                 }),
             );
             expect(state.saveDraft.status).eq(LoadStatus.SUCCESS);

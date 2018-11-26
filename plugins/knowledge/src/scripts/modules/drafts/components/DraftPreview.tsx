@@ -29,8 +29,8 @@ export class DraftPreview extends React.Component<IProps> {
     };
 
     public render() {
-        const { dateUpdated, draftID, headingLevel, className } = this.props;
-        const { body, name } = this.props.attributes;
+        const { dateUpdated, draftID, headingLevel, className, excerpt } = this.props;
+        const { name } = this.props.attributes;
         const HeadingTag = `h${headingLevel}`;
         const url = makeDraftUrl(this.props);
 
@@ -46,7 +46,7 @@ export class DraftPreview extends React.Component<IProps> {
                         <DraftMenu className="draftPreview-menu" draftID={draftID} url={url} />
                     </div>
                     <Paragraph className="draftPreview-excerpt">
-                        {!!body ? <em>{t("(Temporary Placeholder)")}</em> : <em>{t("(No Body)")}</em>}
+                        {excerpt ? <em>{excerpt}</em> : <em>{t("(No Body)")}</em>}
                     </Paragraph>
                     <DraftPreviewMeta dateUpdated={dateUpdated} />
                 </article>

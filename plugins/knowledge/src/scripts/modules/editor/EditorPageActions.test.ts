@@ -13,8 +13,8 @@ import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
-import { actions } from "@rich-editor/state/instance/instanceActions";
 import { LoadStatus } from "@library/@types/api";
+import { Format } from "@knowledge/@types/api";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -39,15 +39,20 @@ describe("EditorPageActions", () => {
 
         const updateForm = mockStore.getAction(EditorPageActions.UPDATE_FORM)!;
         expect(updateForm.payload.forceRefresh).eq(true);
-        expect(updateForm.payload.formData).deep.eq(draft.attributes);
+        expect(updateForm.payload.formData).deep.eq({
+            ...draft.attributes,
+            body: JSON.parse(draft.body),
+        });
     };
 
     const dummyDraft = {
         draftID: 1,
         attributes: {
             name: "foo",
-            body: "Hello Draft.",
+            knowledgeCategoryID: 1,
         },
+        body: `[{"insert": "Hello Draft."}]`,
+        format: Format.RICH,
     };
 
     const dummyArticle = {

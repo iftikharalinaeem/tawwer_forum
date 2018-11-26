@@ -73,10 +73,11 @@ class ArticleDraftsTest extends AbstractResourceTest {
         $record = [
             "attributes" => [
                 "name" => self::class,
-                "body" => "**Hello world**.",
-                "format" => "markdown",
                 "knowledgeCategoryID" => 1,
             ],
+            "body" => "**Hello world**.",
+            "format" => "markdown",
+            "excerpt" => "**Hello world**.",
         ];
         return $record;
     }
