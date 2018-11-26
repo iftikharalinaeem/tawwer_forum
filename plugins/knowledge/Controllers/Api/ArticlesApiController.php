@@ -57,22 +57,21 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param UserModel $userModel
      * @param DraftModel $draftModel
-     * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param Parser $parser
+     * @param KnowledgeCategoryModel $knowledgeCategoryModel
      */
     public function __construct(
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
         UserModel $userModel,
         DraftModel $draftModel,
-        Parser $parser
-        DraftModel $draftModel,
+        Parser $parser,
         KnowledgeCategoryModel $knowledgeCategoryModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
-        $this->draftModel = $draftModel;
         $this->userModel = $userModel;
+        $this->draftModel = $draftModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->parser = $parser;
     }
