@@ -158,6 +158,29 @@ trait ArticlesApiSchemes {
         }
         return $this->schema($this->articleSimpleSchema, $type);
     }
+    /**
+     * Get the post article draft body schema.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function getArticleDraftBodySchema() {
+        if ($this->articleDraftBodySchema === null) {
+            $this->articleDraftBodySchema = $this->schema([
+                "bodyContent:s" => "Content of article",
+                "bodyFormat:s" => [
+                    "description" => 'Body content format: rich, text, html.',
+                    "default" => ArticleDraft::BODY_TYPE_RICH,
+                    "enum" => [
+                        ArticleDraft::BODY_TYPE_RICH,
+                        ArticleDraft::BODY_TYPE_HTML,
+                        ArticleDraft::BODY_TYPE_TEXT,
+                        ArticleDraft::BODY_TYPE_MD,
+                    ]
+                ]
+            ], 'ArticleDraftBody');
+        }
+        return $this->articleDraftBodySchema;
+    }
 
     /**
      * Get post/patch fields for a draft.
