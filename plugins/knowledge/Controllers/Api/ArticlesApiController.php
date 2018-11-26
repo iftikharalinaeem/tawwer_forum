@@ -628,11 +628,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
 
             if ($revision["format"] === "rich") {
-                $plainText = ArticleDraft::getPlainText($revision["body"]);
+                $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
                 $revision["plainText"] = $plainText;
-                $excerpt = ArticleDraft::getExcerpt($plainText);
+                $excerpt = (new ArticleDraft($this->parser))->getExcerpt($plainText);
                 $revision["excerpt"] = $excerpt;
-                $outline = ArticleDraft::getOutline($revision["body"]);
+                $outline = (new ArticleDraft($this->parser))->getOutline($revision["body"]);
                 $revision["outline"] = json_encode($outline);
             }
 
