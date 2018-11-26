@@ -5,20 +5,24 @@
  * @license Proprietary
  */
 
+namespace Vanilla\Knowledge;
+
+use Vanilla\Knowledge\Controllers\KbPageRoutes;
+
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
  */
-class KnowledgePlugin extends Gdn_Plugin {
+class KnowledgePlugin extends \Gdn_Plugin {
 
-    /** @var Gdn_Database */
+    /** @var \Gdn_Database */
     private $database;
 
     /**
      * KnowledgePlugin constructor.
      *
-     * @param Gdn_Database $database
+     * @param \Gdn_Database $database
      */
-    public function __construct(Gdn_Database $database) {
+    public function __construct(\Gdn_Database $database) {
         parent::__construct();
         $this->database = $database;
     }
@@ -30,11 +34,8 @@ class KnowledgePlugin extends Gdn_Plugin {
      */
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(\Garden\Web\Dispatcher::class)
-            ->addCall('addRoute', ['route' => new \Garden\Container\Reference("@kb-page"), 'kb-page']);
-        $container->rule('@kb-page')
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/kb/', '*\\Knowledge\\Controllers\\%sPageController'])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8']);
+            ->addCall('addRoute', ['route' => new \Garden\Container\Reference(KbPageRoutes::class), 'kb-page'])
+        ;
     }
 
     /**
@@ -62,9 +63,10 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
-            ->column("status", ["enum", \Vanilla\Knowledge\Models\ArticleModel::getAllStatuses()
-            ], ['Null'=>false, 'Default' => \Vanilla\Knowledge\Models\ArticleModel::STATUS_PUBLISHED])
-            ->set();
+            ->column("status", ["enum", Models\ArticleModel::getAllStatuses(),
+            ], ['Null' => false, 'Default' => Models\ArticleModel::STATUS_PUBLISHED])
+            ->set()
+        ;
 
         $this->database->structure()
             ->table("articleRevision")
@@ -79,7 +81,8 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("locale", "varchar(10)", true)
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
-            ->set();
+            ->set()
+        ;
 
         $this->database->structure()
             ->table("knowledgeCategory")
@@ -97,6 +100,7 @@ class KnowledgePlugin extends Gdn_Plugin {
             ->column("articleCount", "int", "0")
             ->column("articleCountRecursive", "int", "0")
             ->column("childCategoryCount", "int", "0")
-            ->set();
+            ->set()
+        ;
     }
 }
