@@ -15,7 +15,7 @@ use Interop\Container\ContainerInterface;
  * Resource route for matching page routes for the /kb directory.
  */
 class KbPageRoutes extends ResourceRoute {
-    const BASE_PATH = '/kb';
+    const BASE_PATH = '/kb/';
     const PATTERN = '*\\Knowledge\\Controllers\\%sPageController';
 
     /**
