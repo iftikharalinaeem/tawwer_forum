@@ -10,11 +10,14 @@ $dropDown_borderRadius                         : 1px;
 $dropDown-metas_verticalPadding                : 6px;
 $dropDown-metas_horizontalPadding              : 18px;
 
-$dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 36px;
+$dropDown-item_verticalPadding                 : 4px;
+$dropDown-item_minHeight                       : 30px;
 
-$dropDown-item_minHeight                       : 45px;
 $dropDown_minHeight                            : 600px;
+
+$dropDown-sectionTitle_verticalPadding         : 6px;
+
+$dropDown-spacer_margin                        : 6px;
 
 .dropDown {
     position: relative;
@@ -65,18 +68,21 @@ $dropDown_minHeight                            : 600px;
 }
 
 .dropDown-metasItem {
-    font-size: $metaText_fontSize;
-    color: $metaText_color;
-    padding: {
-        top: $dropDown-metas_verticalPadding * 2.5;
-        right: $dropDown-metas_horizontalPadding;
-        bottom: $dropDown-metas_verticalPadding * 2;
-        left: $dropDown-metas_horizontalPadding;
-    }
-
-    + .dropDown-metasItem {
+    &.dropDown-item {
+        display: block;
+        font-size: $metaText_fontSize;
+        color: $metaText_color;
         padding: {
-            top: $dropDown-metas_verticalPadding;
+            top: $dropDown-metas_verticalPadding * 2;
+            right: $dropDown-metas_horizontalPadding;
+            bottom: $dropDown-metas_verticalPadding * 2;
+            left: $dropDown-metas_horizontalPadding;
+        }
+
+        + .dropDown-metasItem {
+            padding: {
+                top: $dropDown-metas_verticalPadding;
+            }
         }
     }
 }
@@ -88,7 +94,14 @@ $dropDown_minHeight                            : 600px;
 }
 
 .dropDown-item {
-    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.dropDown-section {
+    display: block;
 }
 
 .dropDown-toggleButtonIcon {
@@ -106,6 +119,7 @@ $dropDown_minHeight                            : 600px;
     width: 100%;
     text-align: left;
     min-height: $dropDown-item_minHeight;
+    line-height: $global-condensed_lineHeight;
     padding: {
         top: $dropDown-item_verticalPadding;
         right: $dropDown-item_horizontalPadding;
@@ -113,6 +127,7 @@ $dropDown_minHeight                            : 600px;
         left: $dropDown-item_horizontalPadding;
     }
     color: inherit;
+    user-select: none;
 
     &:hover,
     &:focus {
@@ -120,8 +135,51 @@ $dropDown_minHeight                            : 600px;
     }
 }
 
+.dropDownItem-text {
+    display: block;
+}
+
 
 .dropDown-separator {
     height: $global-separator_width;
     background-color: $global-separator_color;
+    margin: {
+        top: $dropDown-spacer_margin;
+        bottom: $dropDown-spacer_margin;
+    }
+}
+
+.dropDown-sectionHeading {
+    color: $metaText_color;
+    font-size: $global-small_fontSize;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: $global-fontWeight_semiBold;
+    padding: {
+        top: $dropDown-sectionTitle_verticalPadding;
+        right: $dropDown-item_horizontalPadding;
+        bottom: $dropDown-sectionTitle_verticalPadding;
+        left: $dropDown-item_horizontalPadding;
+    }
+}
+
+.dropDown-sectionContents {
+    display: block;
+}
+
+
+.dropDownItem-count {
+    font-size: $global-small_fontSize;
+    padding-left: 1em;
+    margin-left: auto;
+}
+
+
+.dropDownItem-verticalPadding {
+    padding: {
+        top: $dropDown-spacer_margin;
+        right: 0;
+        bottom: $dropDown-spacer_margin;
+        left: 0;
+    }
 }

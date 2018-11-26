@@ -7,81 +7,57 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { Link, Redirect } from "react-router-dom";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
-import DraftActions from "@knowledge/modules/drafts/components/DraftMenu";
+import DraftMenu from "@knowledge/modules/drafts/components/DraftMenu";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { makeDraftUrl } from "@knowledge/modules/editor/route";
 
-export interface IDraftPreview {
-    id: number;
-    name: string | null;
-    body: string | null;
-    dateUpdated: string;
-    url: string;
-    location?: IKbCategoryFragment[];
-}
-
-interface IProps extends IDraftPreview {
+interface IProps extends IResponseArticleDraft, RouteComponentProps<any> {
     headingLevel?: 2 | 3 | 4 | 5 | 6;
     className?: string;
-}
-
-interface IState {
-    doRedirect: boolean;
 }
 
 /**
  * Implements draft preview
  */
-export default class DraftPreview extends React.Component<IProps, IState> {
-    public static defaultProps = {
+export class DraftPreview extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
         headingLevel: 2,
     };
 
-    public constructor(props) {
-        super(props);
-        this.state = {
-            doRedirect: false,
-        };
-    }
-
     public render() {
-        const { name, body, dateUpdated, url, location, headingLevel, className } = this.props;
+        const { dateUpdated, draftID, headingLevel, className } = this.props;
+        const { body, name } = this.props.attributes;
         const HeadingTag = `h${headingLevel}`;
-        const hasMeta = dateUpdated || location;
-        // We can't nest links, so we need to simulate a click on the <li> element
-        if (this.state.doRedirect) {
-            return <Redirect to={url} />;
-        } else {
-            return (
-                <li className={classNames("draftPreview", className)} onClick={this.doRedirect}>
-                    <article className="draftPreview-item">
-                        <div className="draftPreview-header">
-                            <HeadingTag className="draftPreview-title" level={this.props.headingLevel}>
-                                <Link to={url} className="draftPreview-link">
-                                    {!!name ? name : <em>{t("(Untitled)")}</em>}
-                                </Link>
-                            </HeadingTag>
-                            <DraftActions className="draftPreview-menu" deleteFunction={this.deleteArticle} url={url} />
-                        </div>
-                        <Paragraph className="draftPreview-excerpt">
-                            {!!body ? body : <em>{t("(No Body)")}</em>}
-                        </Paragraph>
-                        <DraftPreviewMeta dateUpdated={dateUpdated} location={location!} />
-                    </article>
-                </li>
-            );
-        }
+        const url = makeDraftUrl(this.props);
+
+        return (
+            <li className={classNames("draftPreview", className)} onClick={this.handleClick}>
+                <article className="draftPreview-item">
+                    <div className="draftPreview-header">
+                        <HeadingTag className="draftPreview-title" level={this.props.headingLevel}>
+                            <Link to={url} className="draftPreview-link">
+                                {!!name ? name : <em>{t("(Untitled)")}</em>}
+                            </Link>
+                        </HeadingTag>
+                        <DraftMenu className="draftPreview-menu" draftID={draftID} url={url} />
+                    </div>
+                    <Paragraph className="draftPreview-excerpt">
+                        {!!body ? <em>{t("(Temporary Placeholder)")}</em> : <em>{t("(No Body)")}</em>}
+                    </Paragraph>
+                    <DraftPreviewMeta dateUpdated={dateUpdated} />
+                </article>
+            </li>
+        );
     }
 
-    private deleteArticle() {
-        alert(`To do - delete draft no: ${this.props.id}`);
-    }
-    private doRedirect = e => {
-        e.stopPropagation();
-        this.setState({
-            doRedirect: true,
-        });
+    private handleClick = (event: React.MouseEvent) => {
+        event.preventDefault();
+        this.props.history.push(makeDraftUrl(this.props));
     };
 }
+
+export default withRouter(DraftPreview);

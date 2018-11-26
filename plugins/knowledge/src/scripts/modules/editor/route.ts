@@ -6,6 +6,7 @@
 
 import { formatUrl } from "@library/application";
 import { IArticleFragment, IRevisionFragment, IArticle, IRevision } from "@knowledge/@types/api";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 // Route constants
 export const EDIT_ROUTE = "/kb/articles/:id(\\d+)/editor";
@@ -37,5 +38,16 @@ export function makeRevisionsUrl(articleOrRevison: IArticleFragment | IArticle |
         return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`);
     } else {
         return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions`);
+    }
+}
+
+/**
+ * Get the route for a particular draft.
+ */
+export function makeDraftUrl(draft: IResponseArticleDraft) {
+    if (draft.recordType === "article" && draft.recordID !== null) {
+        return formatUrl(`/kb/articles/${draft.recordID}/editor?draftID=${draft.draftID}`);
+    } else {
+        return formatUrl(`/kb/articles/add?draftID=${draft.draftID}`);
     }
 }

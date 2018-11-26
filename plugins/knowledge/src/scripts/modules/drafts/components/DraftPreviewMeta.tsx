@@ -13,7 +13,6 @@ import classNames from "classnames";
 
 interface IProps {
     dateUpdated: string;
-    location: IKbCategoryFragment[];
     className?: string;
 }
 
@@ -22,17 +21,12 @@ interface IProps {
  */
 export class DraftPreviewMeta extends React.Component<IProps> {
     public render() {
-        const { dateUpdated, location } = this.props;
+        const { dateUpdated } = this.props;
         return (
             <div className={classNames("metas", "draftPreview-metas", this.props.className)}>
                 {dateUpdated && (
                     <span className="meta">
                         <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
-                    </span>
-                )}
-                {location && (
-                    <span className="meta">
-                        <LocationBreadcrumbs locationData={location} />
                     </span>
                 )}
             </div>

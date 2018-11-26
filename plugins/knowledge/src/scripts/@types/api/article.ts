@@ -5,6 +5,7 @@
  */
 
 import { IUserFragment } from "@library/@types/api";
+import { Omit } from "@library/@types/utils";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -95,7 +96,11 @@ export interface IPatchArticleStatusRequestBody {
 export interface IPatchArticleStatusResponseBody extends IArticle {}
 
 // Drafts
-export interface IArticleDraftContents extends Partial<IArticleRequiredData>, Partial<IArticleDefaultedData> {}
+export interface IArticleDraftContents
+    extends Partial<IArticleRequiredData>,
+        Omit<Partial<IArticleDefaultedData>, "body"> {
+    body: any[];
+}
 
 export interface IArticleDraftBodyContents { bodyContent: string; bodyFormat: string;}
 

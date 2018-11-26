@@ -15,18 +15,15 @@ import { IArticleState } from "@knowledge/modules/article/ArticleModel";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
 import { IUsersStoreState } from "@library/users/UsersModel";
 import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
-
-type RecursivePartial<T> = {
-    [P in keyof T]?: T[P] extends Array<infer U>
-        ? Array<RecursivePartial<U>>
-        : T[P] extends object ? RecursivePartial<T[P]> : T[P]
-};
+import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
+import { DeepPartial } from "redux";
 
 export interface IStoreState extends IUsersStoreState {
     knowledge: {
         articles: IArticleState;
         articleMenu: IArticleMenuState;
         articlePage: IArticlePageState;
+        draftsPage: IDraftsPageState;
         revisionsPage: IRevisionsPageState;
         editorPage: IEditorPageState;
         categories: IKbCategoriesState;
@@ -36,4 +33,4 @@ export interface IStoreState extends IUsersStoreState {
     };
 }
 
-export type IPartialStoreState = RecursivePartial<IStoreState>;
+export type IPartialStoreState = DeepPartial<IStoreState>;
