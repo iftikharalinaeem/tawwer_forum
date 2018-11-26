@@ -102,13 +102,10 @@ export interface IArticleDraftContents
     body: any[];
 }
 
-export interface IArticleDraftBodyContents { bodyContent: string; bodyFormat: string;}
-
 export interface IArticleDraft {
     recordID?: number;
     parentRecordID?: number;
     attributes: IArticleDraftContents;
-    body: IArticleDraftBodyContents;
 }
 
 export interface IResponseArticleDraft extends IArticleDraft, IInsertUpdate {
