@@ -42,7 +42,7 @@ class DraftsLayout extends React.Component<IProps> {
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidgetVerticalPadding>
-                                {<DraftList data={this.props.data} />}
+                                <DraftList data={this.props.data} />
                             </PanelWidgetVerticalPadding>
                         </PanelLayout.MiddleBottom>
                         {isFullWidth && <PanelLayout.RightTop>{<PanelEmptyColumn />}</PanelLayout.RightTop>}

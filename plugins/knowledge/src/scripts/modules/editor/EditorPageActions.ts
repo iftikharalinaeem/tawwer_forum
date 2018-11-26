@@ -11,15 +11,13 @@ import {
     IGetArticleResponseBody,
     IPatchArticleRequestBody,
     IPatchArticleResponseBody,
-    IGetArticleRevisionsResponseBody,
-    IGetArticleRevisionsRequestBody,
     IResponseArticleDraft,
     Format,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
-import { IEditorPageForm, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
@@ -177,7 +175,9 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     private pushDraftToForm(draft: IResponseArticleDraft) {
-        this.updateForm(draft.attributes, true);
+        const { name, knowledgeCategoryID } = draft.attributes;
+        const body = JSON.parse(draft.body);
+        this.updateForm({ name, knowledgeCategoryID, body }, true);
     }
 
     /**
@@ -189,11 +189,18 @@ export default class EditorPageActions extends ReduxActions {
 
         const recordID = article.data ? article.data.articleID : undefined;
 
+        const { body, ...attrs } = form;
+        const contents = {
+            body: JSON.stringify(body),
+            format: Format.RICH,
+        };
+
         if (draft.data !== undefined && draft.data.draftID !== undefined) {
             await this.articleActions.patchDraft({
                 draftID: draft.data.draftID,
                 recordID,
-                attributes: form,
+                attributes: attrs,
+                ...contents,
             });
         } else {
             const tempID = newDraftID;
@@ -201,7 +208,8 @@ export default class EditorPageActions extends ReduxActions {
             await this.articleActions.postDraft(
                 {
                     recordID,
-                    attributes: form,
+                    attributes: attrs,
+                    ...contents,
                 },
                 tempID,
             );

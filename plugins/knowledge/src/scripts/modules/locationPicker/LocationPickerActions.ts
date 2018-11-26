@@ -4,16 +4,8 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import {
-    IKbCategoryFragment,
-    IKbNavigationResponse,
-    IKbNavigationRequest,
-    IArticle,
-    IArticleDraftContents,
-} from "@knowledge/@types/api";
+import ReduxActions from "@library/state/ReduxActions";
 import apiv2 from "@library/apiv2";
-import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface ILPActionsProps {
