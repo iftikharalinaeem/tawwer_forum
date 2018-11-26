@@ -224,6 +224,7 @@ trait ArticlesApiSchemes {
             "format" => [
                 "description" => 'Body content format: rich, text, html.',
                 "default" => ArticleDraft::BODY_TYPE_RICH,
+                "type" => "string",
                 "enum" => [
                     ArticleDraft::BODY_TYPE_RICH,
                     ArticleDraft::BODY_TYPE_HTML,
