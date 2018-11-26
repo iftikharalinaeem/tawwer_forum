@@ -200,6 +200,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema($this->fullDraftSchema(), "out");
 
         $draft = $this->draftByID($draftID);
+        $draft = (new ArticleDraft($this->parser))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
         return $result;
     }
@@ -351,7 +352,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
         $rows = $this->draftModel->get($where);
-
+        $rows = (new ArticleDraft($this->parser))->normalizeDraftFields($rows, false);
         $result = $out->validate($rows);
         return $result;
     }
@@ -467,12 +468,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function patch_drafts(int $draftID, array $body): array {
         $this->permission("articles.add");
 
+
         $this->schema(["draftID" => "Target article draft ID."], "in");
         $in = $this->schema($this->draftPostSchema(), "in")
             ->setDescription("Update an article draft.");
         $out = $this->schema($this->fullDraftSchema(), "out");
 
         $body = $in->validate($body, true);
+
         $body["recordType"] = "article";
         $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
 
@@ -483,6 +486,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
         $row = $this->draftByID($draftID);
+        $row = (new ArticleDraft($this->parser))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -571,6 +575,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $draftID = $this->draftModel->insert($body);
         $row = $this->draftByID($draftID);
+        $row = (new ArticleDraft($this->parser))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }

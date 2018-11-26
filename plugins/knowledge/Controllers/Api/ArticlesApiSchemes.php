@@ -174,6 +174,7 @@ trait ArticlesApiSchemes {
                         ArticleDraft::BODY_TYPE_RICH,
                         ArticleDraft::BODY_TYPE_HTML,
                         ArticleDraft::BODY_TYPE_TEXT,
+                        ArticleDraft::BODY_TYPE_MD,
                     ]
                 ]
             ], 'ArticleDraftBody');
@@ -191,7 +192,8 @@ trait ArticlesApiSchemes {
             "recordID?",
             "parentRecordID?",
             "attributes",
-            "body?" => $this->getArticleDraftBodySchema(),
+            "body",
+            "format"
         ])->add($this->fullDraftSchema());
         return $result;
     }
@@ -237,6 +239,24 @@ trait ArticlesApiSchemes {
             "dateUpdated" => [
                 "description" => "When the draft was last updated",
                 "type" => "datetime",
+            ],
+            "body" => [
+                "description" => "Content of article",
+                "type" => "string",
+            ],
+            "format" => [
+                "description" => 'Body content format: rich, text, html.',
+                "default" => ArticleDraft::BODY_TYPE_RICH,
+                "enum" => [
+                    ArticleDraft::BODY_TYPE_RICH,
+                    ArticleDraft::BODY_TYPE_HTML,
+                    ArticleDraft::BODY_TYPE_TEXT,
+                    ArticleDraft::BODY_TYPE_MD,
+                ]
+            ],
+            "excerpt" => [
+                "description" => "Excerpt of article",
+                "type" => "string",
             ],
         ]);
         return $result;

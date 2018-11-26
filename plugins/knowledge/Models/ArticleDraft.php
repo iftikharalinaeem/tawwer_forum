@@ -21,6 +21,7 @@ class ArticleDraft {
     const BODY_TYPE_RICH = 'rich';
     const BODY_TYPE_HTML = 'html';
     const BODY_TYPE_TEXT = 'text';
+    const BODY_TYPE_MD = 'markdown';
 
     /* @var Parser */
     protected $parser;
@@ -118,12 +119,39 @@ class ArticleDraft {
      * @return array
      */
     public function prepareDraftFields(array $body): array {
-        if ($bodyContent = ($body['body']['bodyContent'] ?? false)) {
-            if ($body['body']['bodyFormat'] === self::BODY_TYPE_RICH) {
+        if ($bodyContent = ($body['body'] ?? false)) {
+            $body['attributes']['body'] = $bodyContent;
+            $body['attributes']['format'] = $body['format'] ?? self::BODY_TYPE_RICH;
+            if ($body['format'] === self::BODY_TYPE_RICH) {
                 $bodyContent = $this->getPlainText($bodyContent, self::EXCERPT_MAX_LENGTH);
             }
             $body['attributes']['excerpt'] = self::getExcerpt($bodyContent);
         }
+
         return $body;
+    }
+
+    /**
+     * Prepare article data to ba saved as a draft
+     *
+     * @param array $body Incoming request validated arguments array.
+     *
+     * @return array
+     */
+    public function normalizeDraftFields(array $drafts, bool $singleMode = true): array {
+        $res = [];
+        if ($singleMode) {
+            $drafts = [$drafts];
+        }
+        foreach ($drafts as $draftRow) {
+            $draftRow['body'] = $draftRow['attributes']['body'] ?? '[]';
+            $draftRow['excerpt'] = $draftRow['attributes']['excerpt'] ?? '';
+            $draftRow['format'] = $draftRow['attributes']['format'] ?? self::BODY_TYPE_RICH;
+            unset($draftRow['attributes']['body']);
+            unset($draftRow['attributes']['format']);
+            unset($draftRow['attributes']['excerpt']);
+            $res[] = $draftRow;
+        }
+        return $singleMode ? $res[0] : $res;
     }
 }
