@@ -20,6 +20,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * API controller for managing the articles resource.
@@ -42,6 +43,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var Parser */
+    private $parser;
+
     /**
      * ArticlesApiController constructor.
      *
@@ -54,12 +58,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
         UserModel $userModel,
-        DraftModel $draftModel
+        DraftModel $draftModel,
+        Parser $parser
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
         $this->draftModel = $draftModel;
         $this->userModel = $userModel;
+        $this->parser = $parser;
     }
 
     /**
@@ -460,7 +466,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body, true);
         $body["recordType"] = "article";
-        $body = ArticleDraft::prepareDraftFields($body);
+        $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
 
         $draft = $this->draftByID($draftID);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
@@ -552,7 +558,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body);
         $body["recordType"] = "article";
-        $body = ArticleDraft::prepareDraftFields($body);
+
+        $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
 
         $draftID = $this->draftModel->insert($body);
         $row = $this->draftByID($draftID);

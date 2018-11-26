@@ -22,13 +22,25 @@ class ArticleDraft {
     const BODY_TYPE_HTML = 'html';
     const BODY_TYPE_TEXT = 'text';
 
+    /* @var Parser */
+    protected $parser;
+
+    /**
+     * ArticleDraft constructor.
+     *
+     * @param Parser $parser Blot parser
+     */
+    public function __construct(Parser $parser) {
+        $this->parser = $parser;
+    }
+
     /**
      * Generate outline array from article body
      *
      * @param string $body
      * @return array
      */
-    public static function getOutline(string $body): array {
+    public function getOutline(string $body): array {
         $outline = [];
         $body = json_decode($body, true);
         if (is_array($body) && count($body) > 0) {
@@ -55,18 +67,25 @@ class ArticleDraft {
      * Generate plain text from article body in rich format
      *
      * @param string $body
+     * @param int $maxLength Max text length required for excerpt.
+     *     It does not limit the exact $maxLength number of characters,
+     *     but prevent extra calculations and break the loop when enough text generated.
+     *
      * @return string
      */
-    public static function getPlainText(string $body): string {
+    public function getPlainText(string $body, int $maxLength = 0): string {
         $text = '';
         $body = json_decode($body, true);
         if (is_array($body) && count($body) > 0) {
-            $parser = (new Parser());
+            $parser = $this->parser;
             $blotGroups = $parser->parse($body);
 
             /** @var BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
                 $text .= $blotGroup->getUnsafeText();
+                if ($maxLength > 0 && mb_strlen($text) > self::EXCERPT_MAX_LENGTH) {
+                    break;
+                }
             }
         }
         return $text;
@@ -98,10 +117,10 @@ class ArticleDraft {
      *
      * @return array
      */
-    public static function prepareDraftFields(array $body): array {
+    public function prepareDraftFields(array $body): array {
         if ($bodyContent = ($body['body']['bodyContent'] ?? false)) {
             if ($body['body']['bodyFormat'] === self::BODY_TYPE_RICH) {
-                $bodyContent = self::getPlainText($bodyContent);
+                $bodyContent = $this->getPlainText($bodyContent, self::EXCERPT_MAX_LENGTH);
             }
             $body['attributes']['excerpt'] = self::getExcerpt($bodyContent);
         }
