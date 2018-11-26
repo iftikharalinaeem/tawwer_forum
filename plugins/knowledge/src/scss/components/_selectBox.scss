@@ -5,6 +5,8 @@
  */
 
 $selectBox-check_width: 18px;
+$selextBox-inModal_fontSize: 18px;
+$selextBox-inModal_minHeight: 44px;
 
 .selectBox-toggle {
     display: flex;
@@ -36,6 +38,12 @@ $selectBox-check_width: 18px;
 
     &[disabled] {
         opacity: 1;
+    }
+
+    &.isInModal {
+        font-size: $selextBox-inModal_fontSize;
+        min-height: $selextBox-inModal_minHeight;
+        font-weight: $global-fontWeight_semiBold;
     }
 }
 
@@ -81,3 +89,5 @@ $selectBox-check_width: 18px;
 .selectBox-itemLabel {
     width: 100%;
 }
+
+
