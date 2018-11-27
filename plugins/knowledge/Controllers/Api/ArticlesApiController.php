@@ -634,10 +634,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             if ($revision["format"] === "rich") {
                 $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
                 $revision["plainText"] = $plainText;
-                $excerpt = (new ArticleDraft($this->parser))->getExcerpt($plainText);
-                $revision["excerpt"] = $excerpt;
-                $outline = (new ArticleDraft($this->parser))->getOutline($revision["body"]);
-                $revision["outline"] = json_encode($outline);
+                $revision["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                $revision["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
             }
 
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
