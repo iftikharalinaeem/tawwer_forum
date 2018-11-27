@@ -37,12 +37,12 @@ interface IState {
  * Page component for an article.
  */
 export class ArticlePage extends React.Component<IProps, IState> {
+    private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     /**
      * Render not found or the article.
      */
     public render() {
         const { loadable } = this.props;
-
         return (
             <>
                 <ErrorPage loadable={loadable} />
@@ -51,9 +51,11 @@ export class ArticlePage extends React.Component<IProps, IState> {
                         loadable.data && (
                             <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
                                 <ArticleLayout
+                                    pageTitle={loadable.data.article.seoName || loadable.data.article.name}
                                     article={loadable.data.article}
                                     breadcrumbData={loadable.data.breadcrumbs}
                                     messages={this.renderMessages()}
+                                    mobileDropDownContent={this.mobileDropDownContent}
                                 />
                             </DocumentTitle>
                         )}

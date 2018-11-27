@@ -26,10 +26,12 @@ import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps {
+    pageTitle: string;
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
+    mobileDropDownContent: React.RefObject<HTMLDivElement>;
 }
 
 interface IState {}
@@ -39,11 +41,11 @@ interface IState {}
  */
 export class ArticleLayout extends React.Component<IProps, IState> {
     public render() {
-        const { article, messages } = this.props;
+        const { article, messages, pageTitle } = this.props;
 
         return (
             <Container>
-                <VanillaHeader />
+                <VanillaHeader pageTitle={pageTitle} mobileDropDownContent={this.props.mobileDropDownContent} />
                 <PanelLayout device={this.props.device}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
