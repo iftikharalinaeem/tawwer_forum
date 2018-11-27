@@ -9,13 +9,13 @@ import { Link } from "react-router-dom";
 import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
 import DocumentTitle from "@library/components/DocumentTitle";
-import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 
 export default class HomePage extends React.Component {
     public render() {
         return (
             <div className="container">
-                <VanillaHomeHeader />
+                <VanillaHeader />
                 <DocumentTitle title={t("Home")} />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
