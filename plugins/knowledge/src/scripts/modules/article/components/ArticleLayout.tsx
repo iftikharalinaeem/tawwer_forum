@@ -26,11 +26,12 @@ import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
-interface IProps extends IMobileDropDownProps {
+interface IProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
+    title: string;
 }
 
 interface IState {}
@@ -39,12 +40,13 @@ interface IState {}
  * Implements the article's layout
  */
 export class ArticleLayout extends React.Component<IProps, IState> {
+    private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
-        const { article, messages, pageTitle } = this.props;
+        const { article, messages } = this.props;
 
         return (
             <Container>
-                <VanillaHeader pageTitle={pageTitle!} mobileDropDownContent={this.props.mobileDropDownContent!} />
+                <VanillaHeader title={this.props.title} mobileDropDownContent={this.mobileDropDownContent!} />
                 <PanelLayout device={this.props.device}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
