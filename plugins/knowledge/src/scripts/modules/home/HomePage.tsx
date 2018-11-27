@@ -10,7 +10,6 @@ import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
 import DocumentTitle from "@library/components/DocumentTitle";
 import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
-import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
 export default class HomePage extends React.Component {
     public render() {

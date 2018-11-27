@@ -21,7 +21,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
-import { dummyNavData } from "plugins/knowledge/src/scripts/modules/categories/state/dummyNavData";
+import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
