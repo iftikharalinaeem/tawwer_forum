@@ -24,9 +24,6 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
-import { IDeviceProps } from "library/src/scripts/components/DeviceChecker";
-import RenderToMobileDropDown from "library/src/scripts/components/headers/pieces/RenderToMobileDropDown";
 
 interface IProps {
     article: IArticle;
@@ -34,6 +31,7 @@ interface IProps {
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
     title?: string;
+    bottomLeftContent: React.ReactNode;
 }
 
 /**
@@ -43,12 +41,11 @@ export class ArticleLayout extends React.Component<IProps> {
     private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { article, messages } = this.props;
-        const isMobile = this.props.device === Devices.MOBILE;
-        const bottomLeftContent = <SiteNav>{dummyNavData}</SiteNav>;
+
         return (
             <React.Fragment>
                 <Container>
-                    <VanillaHeader title={this.props.title!} mobileDropDownContent={this.mobileDropDownContent!} />
+                    <VanillaHeader title={this.props.title!} mobileDropDownContent={this.props.bottomLeftContent} />
                     <PanelLayout device={this.props.device}>
                         {this.props.breadcrumbData.length > 1 && (
                             <PanelLayout.Breadcrumbs>
@@ -58,7 +55,7 @@ export class ArticleLayout extends React.Component<IProps> {
                             </PanelLayout.Breadcrumbs>
                         )}
                         <PanelLayout.LeftBottom>
-                            <PanelWidget>{bottomLeftContent}</PanelWidget>
+                            <PanelWidget>{this.props.bottomLeftContent}</PanelWidget>
                         </PanelLayout.LeftBottom>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
@@ -96,11 +93,6 @@ export class ArticleLayout extends React.Component<IProps> {
                         </PanelLayout.RightBottom>
                     </PanelLayout>
                 </Container>
-                {isMobile && (
-                    <RenderToMobileDropDown contentRef={this.mobileDropDownContent}>
-                        {bottomLeftContent}
-                    </RenderToMobileDropDown>
-                )}
             </React.Fragment>
         );
     }
