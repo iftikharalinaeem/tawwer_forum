@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 import * as React from "react";
-import SiteNav from "@library/components/siteNav/SiteNav";
 import { Devices } from "@library/components/DeviceChecker";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
@@ -16,7 +15,6 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
-import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
@@ -38,14 +36,13 @@ interface IProps {
  * Implements the article's layout
  */
 export class ArticleLayout extends React.Component<IProps> {
-    private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { article, messages } = this.props;
 
         return (
             <React.Fragment>
                 <Container>
-                    <VanillaHeader title={this.props.title!} mobileDropDownContent={this.props.bottomLeftContent} />
+                    <VanillaHeader title={article.name} mobileDropDownContent={this.props.bottomLeftContent} />
                     <PanelLayout device={this.props.device}>
                         {this.props.breadcrumbData.length > 1 && (
                             <PanelLayout.Breadcrumbs>
@@ -61,7 +58,13 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <PageTitle
                                     title={article.name}
-                                    actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                                    actions={
+                                        <ArticleMenu
+                                            article={article}
+                                            buttonClassName="pageTitle-menu"
+                                            device={this.props.device}
+                                        />
+                                    }
                                     meta={
                                         <ArticleMeta
                                             updateUser={article.updateUser!}

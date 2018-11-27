@@ -26,10 +26,12 @@ import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
+import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
     buttonClassName?: string;
+    device?: Devices;
 }
 
 interface IState {
@@ -63,6 +65,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
+                    openAsModal={this.props.device === Devices.MOBILE}
                 >
                     <Frame>
                         <FrameBody className="dropDownItem-verticalPadding">
