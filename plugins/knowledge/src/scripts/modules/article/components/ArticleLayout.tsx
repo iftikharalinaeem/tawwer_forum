@@ -24,14 +24,13 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
-interface IProps {
-    pageTitle: string;
+interface IProps extends IMobileDropDownProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    mobileDropDownContent: React.RefObject<HTMLDivElement>;
 }
 
 interface IState {}
@@ -45,7 +44,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
 
         return (
             <Container>
-                <VanillaHeader pageTitle={pageTitle} mobileDropDownContent={this.props.mobileDropDownContent} />
+                <VanillaHeader pageTitle={pageTitle!} mobileDropDownContent={this.props.mobileDropDownContent!} />
                 <PanelLayout device={this.props.device}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
