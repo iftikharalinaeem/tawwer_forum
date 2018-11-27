@@ -57,7 +57,6 @@
 @import "components/dropDown";
 @import "components/word";
 @import "components/folderContents";
-@import "components/selectBox";
 @import "components/editorHeader";
 @import "components/pageLocation";
 @import "components/revisionsList";
@@ -88,5 +87,6 @@
 @import "~library-scss/components/tabs";
 @import "~library-scss/components/tabButtonList";
 @import "~library-scss/components/tabPanel";
+@import "~library-scss/components/selectBox";
 
 @import "browserSpecific/browserSpecific";
