@@ -41,7 +41,7 @@ class ArticleDraft {
      * @param string $body
      * @return array
      */
-    public function getOutline(string $body): array {
+    public static function getOutline(string $body): array {
         $outline = [];
         $body = json_decode($body, true);
         if (is_array($body) && count($body) > 0) {
