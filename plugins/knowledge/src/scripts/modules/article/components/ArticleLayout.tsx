@@ -25,13 +25,15 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
+import { IDeviceProps } from "library/src/scripts/components/DeviceChecker";
+import RenderToMobileDropDown from "library/src/scripts/components/headers/pieces/RenderToMobileDropDown";
 
 interface IProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    title: string;
+    title?: string;
 }
 
 /**
@@ -41,59 +43,65 @@ export class ArticleLayout extends React.Component<IProps> {
     private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { article, messages } = this.props;
-
+        const isMobile = this.props.device === Devices.MOBILE;
+        const bottomLeftContent = <SiteNav>{dummyNavData}</SiteNav>;
         return (
-            <Container>
-                <VanillaHeader title={this.props.title} mobileDropDownContent={this.mobileDropDownContent!} />
-                <PanelLayout device={this.props.device} mobileDropDownContent={this.mobileDropDownContent!}>
-                    {this.props.breadcrumbData.length > 1 && (
-                        <PanelLayout.Breadcrumbs>
-                            <PanelWidget>
-                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                            </PanelWidget>
-                        </PanelLayout.Breadcrumbs>
-                    )}
-                    <PanelLayout.LeftBottom>
-                        <PanelWidget>
-                            <SiteNav>{dummyNavData}</SiteNav>
-                        </PanelWidget>
-                    </PanelLayout.LeftBottom>
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <PageTitle
-                                title={article.name}
-                                actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                                meta={
-                                    <ArticleMeta
-                                        updateUser={article.updateUser!}
-                                        dateUpdated={article.dateUpdated}
-                                        permaLink={article.url}
-                                    />
-                                }
-                            />
-                            {messages && <div className="messages">{messages}</div>}
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidget>
-                            <UserContent content={article.body} />
-                            <AttachmentList attachments={this.articleAttachmentList} />
-                        </PanelWidget>
-                    </PanelLayout.MiddleBottom>
-                    {article.outline &&
-                        article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
+            <React.Fragment>
+                <Container>
+                    <VanillaHeader title={this.props.title!} mobileDropDownContent={this.mobileDropDownContent!} />
+                    <PanelLayout device={this.props.device}>
+                        {this.props.breadcrumbData.length > 1 && (
+                            <PanelLayout.Breadcrumbs>
                                 <PanelWidget>
-                                    <ArticleTOC items={article.outline} />
+                                    <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
                                 </PanelWidget>
-                            </PanelLayout.RightTop>
+                            </PanelLayout.Breadcrumbs>
                         )}
-                    <PanelLayout.RightBottom>
-                        <OtherLanguages {...dummyOtherLanguagesData} />
-                        <RelatedArticles children={this.articleRelatedArticles} />
-                    </PanelLayout.RightBottom>
-                </PanelLayout>
-            </Container>
+                        <PanelLayout.LeftBottom>
+                            <PanelWidget>{bottomLeftContent}</PanelWidget>
+                        </PanelLayout.LeftBottom>
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>
+                                <PageTitle
+                                    title={article.name}
+                                    actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
+                                    meta={
+                                        <ArticleMeta
+                                            updateUser={article.updateUser!}
+                                            dateUpdated={article.dateUpdated}
+                                            permaLink={article.url}
+                                        />
+                                    }
+                                />
+                                {messages && <div className="messages">{messages}</div>}
+                            </PanelWidget>
+                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidget>
+                                <UserContent content={article.body} />
+                                <AttachmentList attachments={this.articleAttachmentList} />
+                            </PanelWidget>
+                        </PanelLayout.MiddleBottom>
+                        {article.outline &&
+                            article.outline.length > 0 && (
+                                <PanelLayout.RightTop>
+                                    <PanelWidget>
+                                        <ArticleTOC items={article.outline} />
+                                    </PanelWidget>
+                                </PanelLayout.RightTop>
+                            )}
+                        <PanelLayout.RightBottom>
+                            <OtherLanguages {...dummyOtherLanguagesData} />
+                            <RelatedArticles children={this.articleRelatedArticles} />
+                        </PanelLayout.RightBottom>
+                    </PanelLayout>
+                </Container>
+                {isMobile && (
+                    <RenderToMobileDropDown contentRef={this.mobileDropDownContent}>
+                        {bottomLeftContent}
+                    </RenderToMobileDropDown>
+                )}
+            </React.Fragment>
         );
     }
 
