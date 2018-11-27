@@ -249,7 +249,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function index(array $query = []) {
         $this->permission("knowledge.kb.view");
-
         $in = $this->schema([
             "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
             "knowledgeCategoryID" => [
@@ -300,8 +299,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
-            if ($includeExcerpts) {
-                $row["excerpt"] = $row["body"] ? sliceString(Gdn_Format::plainText($row["body"], "Html"), ArticleDraft::EXCERPT_MAX_LENGTH) : null;
+            if (!$includeExcerpts) {
+                unset($row["excerpt"]);
             }
         }
         $this->userModel->expandUsers(
@@ -635,10 +634,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             if ($revision["format"] === "rich") {
                 $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
                 $revision["plainText"] = $plainText;
-                $excerpt = (new ArticleDraft($this->parser))->getExcerpt($plainText);
-                $revision["excerpt"] = $excerpt;
-                $outline = (new ArticleDraft($this->parser))->getOutline($revision["body"]);
-                $revision["outline"] = json_encode($outline);
+                $revision["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                $revision["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
             }
 
             $articleRevisionID = $this->articleRevisionModel->insert($revision);

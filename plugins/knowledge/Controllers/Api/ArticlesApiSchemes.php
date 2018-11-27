@@ -107,6 +107,7 @@ trait ArticlesApiSchemes {
                 "name",
                 "body",
                 "outline",
+                "excerpt",
                 "seoName",
                 "seoDescription",
                 "slug",
