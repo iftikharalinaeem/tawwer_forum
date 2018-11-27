@@ -21,7 +21,7 @@ import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
-import VanillaHeader from "@library/components/VanillaHeader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 

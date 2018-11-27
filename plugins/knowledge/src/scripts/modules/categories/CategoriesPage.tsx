@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 import NotFoundPage from "@library/components/navigation/NotFoundPage";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
-import VanillaHeader from "@library/components/VanillaHeader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];

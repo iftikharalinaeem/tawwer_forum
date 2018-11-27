@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
 import DocumentTitle from "@library/components/DocumentTitle";
-import VanillaHeader from "@library/components/VanillaHeader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 
 export default class HomePage extends React.Component {
     public render() {
