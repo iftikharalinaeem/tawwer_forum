@@ -34,12 +34,10 @@ interface IProps {
     title: string;
 }
 
-interface IState {}
-
 /**
  * Implements the article's layout
  */
-export class ArticleLayout extends React.Component<IProps, IState> {
+export class ArticleLayout extends React.Component<IProps> {
     private mobileDropDownContent: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { article, messages } = this.props;
@@ -47,7 +45,7 @@ export class ArticleLayout extends React.Component<IProps, IState> {
         return (
             <Container>
                 <VanillaHeader title={this.props.title} mobileDropDownContent={this.mobileDropDownContent!} />
-                <PanelLayout device={this.props.device}>
+                <PanelLayout device={this.props.device} mobileDropDownContent={this.mobileDropDownContent!}>
                     {this.props.breadcrumbData.length > 1 && (
                         <PanelLayout.Breadcrumbs>
                             <PanelWidget>
