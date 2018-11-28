@@ -21,6 +21,8 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
+import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -42,7 +44,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { loadable } = this.props;
-
         return (
             <>
                 <ErrorPage loadable={loadable} />
@@ -51,6 +52,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                         loadable.data && (
                             <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
                                 <ArticleLayout
+                                    title={loadable.data.article.seoName || loadable.data.article.name}
                                     article={loadable.data.article}
                                     breadcrumbData={loadable.data.breadcrumbs}
                                     messages={this.renderMessages()}
@@ -146,4 +148,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(ArticlePage));
+export default withRedux(withDevice<IProps>(ArticlePage));

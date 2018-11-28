@@ -11,7 +11,6 @@ $dropDown-metas_verticalPadding                : 6px;
 $dropDown-metas_horizontalPadding              : 18px;
 
 $dropDown-item_verticalPadding                 : 4px;
-$dropDown-item_minHeight                       : 30px;
 
 $dropDown_minHeight                            : 600px;
 
@@ -147,6 +146,12 @@ $dropDown-spacer_margin                        : 6px;
     &:hover,
     &:focus {
         background-color: $global-color_active_primaryBg;
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $dropDown-item_mobile_fontSize;
+        font-weight: $global-fontWeight_semiBold;
+        min-height: $dropDown-item_mobile_minHeight;
     }
 }
 
