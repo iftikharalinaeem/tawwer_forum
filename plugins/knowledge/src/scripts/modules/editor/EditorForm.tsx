@@ -26,7 +26,6 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
-import { uniqueId } from "lodash";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -101,7 +100,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                                     isLoading={this.isLoading}
                                     device={this.props.device}
                                     legacyMode={false}
-                                    key={formNeedsRefresh ? "11" : "10"}
+                                    reinitialize={formNeedsRefresh}
                                     initialValue={form.body}
                                 />
                             </div>
