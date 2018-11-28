@@ -5,13 +5,14 @@
  */
 
 import React from "react";
-import { Route } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 import Loadable from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
 import { ADD_ROUTE, EDIT_ROUTE, REVISIONS_ROUTE } from "@knowledge/modules/editor/route";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import { ModalLoader } from "@library/components/modal";
+import { exact } from "prop-types";
 
 export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
 
@@ -76,7 +77,7 @@ const NotFound = () => {
  */
 export function getPageRoutes() {
     return [
-        <Route exact path="/kb" component={HomePage} key={"/kb"} />,
+        <Redirect exact path="/kb" to={SEARCH_ROUTE} key={SEARCH_ROUTE} />,
         <Route exact path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
         <Route exact path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
         <Route exact path={ADD_ROUTE} component={EditorPage} key={"editorPage"} />,
