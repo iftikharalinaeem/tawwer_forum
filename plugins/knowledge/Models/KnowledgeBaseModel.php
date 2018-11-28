@@ -12,7 +12,7 @@ use Gdn_Session;
 /**
  * A model for managing knowledge categories.
  */
-class KnowledgeBasdeModel extends \Vanilla\Models\PipelineModel {
+class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
@@ -35,17 +35,4 @@ class KnowledgeBasdeModel extends \Vanilla\Models\PipelineModel {
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
     }
-
-    /**
-     * Configure a Garden Schema instance for write operations by the model.
-     *
-     * @param Schema $schema Schema representing the resource's database table.
-     * @return Schema Currently configured write schema.
-     */
-    protected function configureWriteSchema(Schema $schema): Schema {
-        $schema = parent::configureWriteSchema($schema);
-        $schema->addValidator("parentID", [$this, "validateParentID"]);
-        return $schema;
-    }
-
 }
