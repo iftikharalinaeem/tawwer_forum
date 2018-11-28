@@ -44,7 +44,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { loadable } = this.props;
-        const panelContent = <SiteNav>{dummyNavData}</SiteNav>;
         return (
             <>
                 <ErrorPage loadable={loadable} />
@@ -57,7 +56,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
                                     article={loadable.data.article}
                                     breadcrumbData={loadable.data.breadcrumbs}
                                     messages={this.renderMessages()}
-                                    bottomLeftContent={panelContent}
                                 />
                             </DocumentTitle>
                         )}

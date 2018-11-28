@@ -22,6 +22,8 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
 
 interface IProps {
     article: IArticle;
@@ -29,7 +31,6 @@ interface IProps {
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
     title?: string;
-    bottomLeftContent: React.ReactNode;
 }
 
 /**
@@ -39,10 +40,13 @@ export class ArticleLayout extends React.Component<IProps> {
     public render() {
         const { article, messages } = this.props;
 
+        const mobileNav = <SiteNav expand={true}>{dummyNavData}</SiteNav>;
+        const nav = <SiteNav expand={true}>{dummyNavData}</SiteNav>;
+
         return (
             <React.Fragment>
                 <Container>
-                    <VanillaHeader title={article.name} mobileDropDownContent={this.props.bottomLeftContent} />
+                    <VanillaHeader title={article.name} mobileDropDownContent={mobileNav} />
                     <PanelLayout device={this.props.device}>
                         {this.props.breadcrumbData.length > 1 && (
                             <PanelLayout.Breadcrumbs>
@@ -52,7 +56,7 @@ export class ArticleLayout extends React.Component<IProps> {
                             </PanelLayout.Breadcrumbs>
                         )}
                         <PanelLayout.LeftBottom>
-                            <PanelWidget>{this.props.bottomLeftContent}</PanelWidget>
+                            <PanelWidget>{nav}</PanelWidget>
                         </PanelLayout.LeftBottom>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
