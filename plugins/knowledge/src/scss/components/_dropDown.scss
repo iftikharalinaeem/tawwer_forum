@@ -67,6 +67,7 @@ $dropDown-spacer_margin                        : 6px;
 }
 
 .likeDropDownContent {
+    @include shadow-dropDown;
     background-color: $global-color_bg;
     color: $global-color_fg;
     border: {
