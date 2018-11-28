@@ -24,6 +24,7 @@ import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
+import { isMobileDevice } from "react-select/lib/utils";
 
 interface IProps {
     article: IArticle;
@@ -48,13 +49,14 @@ export class ArticleLayout extends React.Component<IProps> {
                 <Container>
                     <VanillaHeader title={article.name} mobileDropDownContent={mobileNav} />
                     <PanelLayout device={this.props.device}>
-                        {this.props.breadcrumbData.length > 1 && (
-                            <PanelLayout.Breadcrumbs>
-                                <PanelWidget>
-                                    <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                                </PanelWidget>
-                            </PanelLayout.Breadcrumbs>
-                        )}
+                        {this.props.breadcrumbData.length > 1 &&
+                            this.props.device !== Devices.MOBILE && (
+                                <PanelLayout.Breadcrumbs>
+                                    <PanelWidget>
+                                        <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                                    </PanelWidget>
+                                </PanelLayout.Breadcrumbs>
+                            )}
                         <PanelLayout.LeftBottom>
                             <PanelWidget>{nav}</PanelWidget>
                         </PanelLayout.LeftBottom>

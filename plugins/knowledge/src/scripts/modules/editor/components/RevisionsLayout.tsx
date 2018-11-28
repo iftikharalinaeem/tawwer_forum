@@ -42,9 +42,11 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                     <PanelLayout device={this.props.device}>
                         <PanelLayout.LeftTop />
                         <PanelLayout.MiddleTop>
-                            <PanelWidget>
-                                <Breadcrumbs children={this.props.crumbs} />
-                            </PanelWidget>
+                            {this.props.device !== Devices.MOBILE && (
+                                <PanelWidget>
+                                    <Breadcrumbs children={this.props.crumbs} />
+                                </PanelWidget>
+                            )}
                             <PanelWidget>{this.props.bodyHeading}</PanelWidget>
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>

@@ -49,11 +49,13 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
-                        <PanelWidget>
-                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                        </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
+                    {this.props.device !== Devices.MOBILE && (
+                        <PanelLayout.Breadcrumbs>
+                            <PanelWidget>
+                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                            </PanelWidget>
+                        </PanelLayout.Breadcrumbs>
+                    )}
                     {isFullWidth && <PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
