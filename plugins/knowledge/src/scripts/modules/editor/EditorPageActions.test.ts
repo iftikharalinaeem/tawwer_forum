@@ -348,7 +348,11 @@ describe("EditorPageActions", () => {
                 },
             };
 
-            mockApi.onPost(`/api/v2/articles`).replyOnce(201, dummyArticle);
+            mockApi
+                .onPost(`/api/v2/articles`)
+                .replyOnce(201, dummyArticle)
+                .onGet(`/api/v2/articles/${dummyArticle.articleID}?expand=all`)
+                .replyOnce(200, dummyArticle);
 
             initWithState(initialState);
             void (await editorPageActions.publish(history));
@@ -388,7 +392,11 @@ describe("EditorPageActions", () => {
                 },
             };
 
-            mockApi.onPatch(`/api/v2/articles/${dummyArticle.articleID}`).replyOnce(200, dummyArticle);
+            mockApi
+                .onPatch(`/api/v2/articles/${dummyArticle.articleID}`)
+                .replyOnce(200, dummyArticle)
+                .onGet(`/api/v2/articles/${dummyArticle.articleID}?expand=all`)
+                .replyOnce(200, dummyArticle);
 
             initWithState(initialState);
             void (await editorPageActions.publish(history));
