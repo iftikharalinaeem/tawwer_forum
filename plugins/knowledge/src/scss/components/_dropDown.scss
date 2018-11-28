@@ -61,6 +61,21 @@ $dropDown-spacer_margin                        : 6px;
     .frame {
         box-shadow: none;
     }
+
+    &.noMinWidth {
+        min-width: 0;
+    }
+}
+
+.likeDropDownContent {
+    background-color: $global-color_bg;
+    color: $global-color_fg;
+    border: {
+        radius: $global_borderRadius;
+        style: solid;
+        width: 1px;
+        color: $global-border_color;
+    }
 }
 
 .dropDownItems {

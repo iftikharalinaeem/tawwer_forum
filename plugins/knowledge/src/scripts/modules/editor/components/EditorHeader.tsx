@@ -20,6 +20,7 @@ import LanguagesDropDown from "@library/components/LanguagesDropDown";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -85,6 +86,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
                                         selected={this.props.selectedLang}
+                                        openAsModal={this.props.device === Devices.MOBILE}
                                     >
                                         {dummyOtherLanguagesData.children}
                                     </LanguagesDropDown>
