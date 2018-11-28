@@ -11,6 +11,8 @@ import { IArticle, ArticleStatus } from "@knowledge/@types/api";
 import { DropDownItemLink, DropDownItemButton, DropDownItemSeparator } from "@library/components/dropdown";
 import { makeRevisionsUrl } from "@knowledge/modules/editor/route";
 import Permission from "@library/users/Permission";
+import FrameBody from "@library/components/frame/FrameBody";
+import Frame from "@library/components/frame/Frame";
 
 interface IProps {
     article: IArticle;
@@ -32,14 +34,17 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
                 >
-                    <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
-                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
-                    <DropDownItemSeparator />
-                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
-                    {this.props.article.status === ArticleStatus.PUBLISHED && (
-                        <DropDownItemLink name={t("View Article")} to={this.props.article.url} />
-                    )}
+                    <Frame>
+                        <FrameBody className="dropDownItem-verticalPadding">
+                            <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
+                            <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
+                            <DropDownItemSeparator />
+                            <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
+                            {this.props.article.status === ArticleStatus.PUBLISHED && (
+                                <DropDownItemLink name={t("View Article")} to={this.props.article.url} />
+                            )}
+                        </FrameBody>
+                    </Frame>
                 </DropDown>
             </Permission>
         );
