@@ -44,7 +44,30 @@ class KnowledgeBasesApiController extends AbstractApiController {
         return [__CLASS__ => __METHOD__];
     }
 
+//    public function index(): array {
+//        $this->permission("knowledge.kb.view");
+//
+//
+//        return [__CLASS__ => __METHOD__];
+//    }
 
+    public function post(array $body): array {
+        $this->permission("garden.setttings.manage");
 
+        $in = $this->schema($this->knowledgeBasePostSchema())
+            ->setDescription("Create a new knowledge category.")
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
+        $out = $this->schema($this->fullSchema(), "out");
 
+        $body = $in->validate($body);
+
+        $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
+        if (!empty($body['parentID']) && $body['parentID'] != -1) {
+            $this->knowledgeCategoryModel->updateCounts($body['parentID']);
+        }
+        $row = $this->knowledgeCategoryByID($knowledgeCategoryID);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
 }

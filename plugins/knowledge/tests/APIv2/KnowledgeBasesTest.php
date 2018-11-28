@@ -7,7 +7,7 @@
 namespace VanillaTests\APIv2;
 
 /**
- * Test the /api/v2/knowledge-categories endpoint.
+ * Test the /api/v2/knowledge-bases endpoint.
  */
 class KnowledgeBasesTest extends AbstractResourceTest {
 
