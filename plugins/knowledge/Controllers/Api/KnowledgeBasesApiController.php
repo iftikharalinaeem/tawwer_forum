@@ -16,7 +16,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 /**
  * Endpoint for the knowledge category resource.
  */
-class KnowledgeBaseApiController extends AbstractApiController {
+class KnowledgeBasesApiController extends AbstractApiController {
 
     /** @var KnowledgeCategoryModel */
     private $knowledgeBaseModel;

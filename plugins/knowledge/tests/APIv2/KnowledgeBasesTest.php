@@ -9,10 +9,10 @@ namespace VanillaTests\APIv2;
 /**
  * Test the /api/v2/knowledge-categories endpoint.
  */
-class KnowledgeBaseTest extends AbstractResourceTest {
+class KnowledgeBasesTest extends AbstractResourceTest {
 
     /** @var string The resource route. */
-    protected $baseUrl = "/knowledge-base";
+    protected $baseUrl = "/knowledge-bases";
 
 
 
