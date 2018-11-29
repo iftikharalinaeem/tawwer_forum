@@ -6,7 +6,7 @@
 
 import React from "react";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { LoadStatus } from "@library/@types/api";
 import PageLoader from "@library/components/PageLoader";
@@ -18,9 +18,10 @@ import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPa
 import apiv2 from "@library/apiv2";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import { connect } from "react-redux";
-import NotFoundPage from "@library/components/NotFoundPage";
+import NotFoundPage from "@library/components/navigation/NotFoundPage";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
@@ -51,6 +52,7 @@ export class CategoriesPage extends React.Component<IProps> {
 
         return (
             <PageLoader {...categoriesPageState.articles}>
+                <VanillaHeader />
                 {categoriesPageState.articles.status === LoadStatus.SUCCESS &&
                     categoriesPageState.articles.data && (
                         <DocumentTitle title={category.name}>

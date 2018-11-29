@@ -8,7 +8,7 @@ import * as React from "react";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
-import { newFolder } from "@library/components/Icons";
+import { newFolder } from "@library/components/icons/common";
 import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
 import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
@@ -27,6 +27,7 @@ interface IState {
  * Component for choosing a location for a new article.
  */
 export default class LocationPicker extends React.Component<IProps, IState> {
+    private newFolderButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public state = {
         showNewCategoryModal: false,
     };
@@ -62,6 +63,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             baseClass={ButtonBaseClass.STANDARD}
+                            buttonRef={this.newFolderButtonRef}
                         >
                             {newFolder()}
                         </Button>
@@ -74,6 +76,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                     <NewCategoryForm
                         exitHandler={this.hideNewFolderModal}
                         parentCategory={this.props.navigatedCategory}
+                        buttonRef={this.newFolderButtonRef}
                     />
                 )}
             </React.Fragment>
@@ -99,7 +102,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
     /**
      * Display the modal for creating a new category.
      */
-    private showNewCategoryModal = () => {
+    private showNewCategoryModal = e => {
         this.setState({
             showNewCategoryModal: true,
         });
@@ -124,4 +127,8 @@ export default class LocationPicker extends React.Component<IProps, IState> {
             this.props.onChoose();
         }
     };
+
+    public componentDidMount() {
+        this.forceUpdate();
+    }
 }

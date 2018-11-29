@@ -16,6 +16,8 @@ import { onReady } from "@library/application";
 import { registerReducer } from "@library/state/reducerRegistry";
 import { debug } from "@library/utility";
 import { getMeta } from "@library/application";
+import NotificationsModel from "@library/notifications/NotificationsModel";
+import ConversationsModel from "@library/conversations/ConversationsModel";
 
 // Knowledge Modules
 import rootReducer from "@knowledge/state/reducer";
@@ -27,6 +29,8 @@ debug(getMeta("context.debug"));
 onReady(() => {
     initAllUserContent();
     registerReducer("knowledge", rootReducer);
+    registerReducer("notifications", new NotificationsModel().reducer);
+    registerReducer("conversations", new ConversationsModel().reducer);
     const app = document.querySelector("#app");
     ReactDOM.render(<KnowledgeApp />, app);
 });

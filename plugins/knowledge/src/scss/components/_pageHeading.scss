@@ -57,7 +57,7 @@ $pageHeading-dropdown_width                    : 150px !default;
 }
 
 .pageHeading-backLink {
-    @include absolute-topLeft(($global-title_fontSize * $global-heading_lineHeightRatio) * $global-condensed_lineHeight / 2);
+    @include absolute-topLeft($global-condensed_lineHeight * 1.5em);
     overflow: visible;
     width: $icon-default_size;
     height: $icon-default_size;
@@ -67,7 +67,6 @@ $pageHeading-dropdown_width                    : 150px !default;
     transform: translateY(-50%);
 
     margin: {
-        top: 0;
         left: -#{$icon-default_size + $utility-baseUnit * 2};
     }
 }

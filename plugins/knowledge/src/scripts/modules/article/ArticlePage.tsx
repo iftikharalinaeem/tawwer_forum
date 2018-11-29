@@ -8,19 +8,21 @@ import React from "react";
 import { match } from "react-router";
 import { connect } from "react-redux";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { LoadStatus, ILoadable } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api";
+import { withDevice } from "@library/contexts/DeviceContext";
 import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import PageLoader from "@library/components/PageLoader";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
+import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
+import SiteNav from "@library/components/siteNav/SiteNav";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -42,7 +44,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
      */
     public render() {
         const { loadable } = this.props;
-
         return (
             <>
                 <ErrorPage loadable={loadable} />
@@ -51,6 +52,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                         loadable.data && (
                             <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
                                 <ArticleLayout
+                                    title={loadable.data.article.seoName || loadable.data.article.name}
                                     article={loadable.data.article}
                                     breadcrumbData={loadable.data.breadcrumbs}
                                     messages={this.renderMessages()}
@@ -146,4 +148,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(ArticlePage));
+export default withRedux(withDevice<IProps>(ArticlePage));

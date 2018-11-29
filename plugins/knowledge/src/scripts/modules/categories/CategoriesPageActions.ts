@@ -45,7 +45,7 @@ export default class CategoriesPageActions extends ReduxActions {
     public getArticles(id: number) {
         return this.dispatchApi(
             "get",
-            `/articles/excerpts?knowledgeCategoryID=${id}`,
+            `/articles?knowledgeCategoryID=${id}&expand=excerpt`,
             CategoriesPageActions.getArticlesACs,
             {},
         );

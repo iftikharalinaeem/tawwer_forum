@@ -4,10 +4,8 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { IKbCategoryFragment, IKbNavigationResponse, IKbNavigationRequest, IArticle } from "@knowledge/@types/api";
+import ReduxActions from "@library/state/ReduxActions";
 import apiv2 from "@library/apiv2";
-import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface ILPActionsProps {
@@ -86,15 +84,17 @@ export default class LocationPickerActions extends ReduxActions {
      *
      * @param article The article to init from.
      */
-    public initLocationPickerFromArticle(article: IArticle) {
-        if (article.knowledgeCategoryID !== null) {
+    public initLocationPickerFromArticle(article: { knowledgeCategoryID?: number | null }) {
+        if (article.knowledgeCategoryID != null) {
             const { knowledgeCategoryID } = article;
-            this.dispatch((a, getState: () => IStoreState) => {
-                const category = CategoryModel.selectKbCategoryFragment(getState(), knowledgeCategoryID);
-                if (category) {
-                    this.init(knowledgeCategoryID, category.parentID);
-                }
-            });
+            this.initLocationPickerFromCategoryID(knowledgeCategoryID);
+        }
+    }
+
+    public initLocationPickerFromCategoryID(categoryID: number) {
+        const category = CategoryModel.selectKbCategoryFragment(this.getState(), categoryID);
+        if (category) {
+            this.init(category.knowledgeCategoryID, category.parentID);
         }
     }
 

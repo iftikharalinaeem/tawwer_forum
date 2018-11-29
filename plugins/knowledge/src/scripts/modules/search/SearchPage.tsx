@@ -5,21 +5,13 @@
  */
 
 import React from "react";
-import { t } from "@library/application";
-import { ModalLink } from "@library/components/modal";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import PageLoader from "@library/components/PageLoader";
-import { ICrumb } from "@library/components/Breadcrumbs";
-import { IStoreState } from "@knowledge/state/model";
-import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
-import SearchLayout, { ISearchState } from "./components/SearchLayout";
-import { IResult } from "@knowledge/modules/common/SearchResult";
+import SearchForm from "./SearchForm";
 
-interface IProps extends IDeviceProps, ISearchState {}
+interface IProps extends IDeviceProps {}
 
 /**
  * Page component for search Page
@@ -28,9 +20,7 @@ export class SearchPage extends React.Component<IProps> {
     public render() {
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
-                <DocumentTitle title={t("Search Results")}>
-                    <SearchLayout {...this.props} />
-                </DocumentTitle>
+                <SearchForm />
             </PageLoader>
         );
     }

@@ -69,11 +69,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "allowNull" => true,
                 "type" => "string"
             ],
-            "displayType?" => [
-                "allowNull" => true,
-                "enum" => ["help", "guide", "search"],
-                "type" => "string",
-            ],
             "url?" => ["type" => "string"],
             "parentID?" => ["type" => "integer"],
             "recordID" => ["type" => "integer"],

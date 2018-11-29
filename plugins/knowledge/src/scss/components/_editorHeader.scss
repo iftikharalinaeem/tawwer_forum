@@ -9,10 +9,6 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
-  padding: {
-    right: $global-gutter_halfSize;
-    left: $global-gutter_halfSize;
-  }
 }
 
 .editorHeader-item {
@@ -25,4 +21,22 @@
     margin-left: 0;
     margin-right: auto;
   }
+}
+
+.editorHeader-saveDraft {
+  white-space: nowrap;
+  line-height: $icon-default_size;
+}
+
+.editorHeader-center {
+  flex: 1;
+}
+
+.editorHeader-publish {
+  color: $global-color_primary;
+  font-weight: $global-fontWeight_semiBold;
+}
+
+.editorHeader-otherLanguagesToggle {
+  font-weight: $global-fontWeight_semiBold;
 }

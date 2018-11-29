@@ -38,3 +38,54 @@
     width: $icon-small_size;
     height: $icon-small_size;
 }
+
+.icon-chevronLeftCompact {
+    height: $icon-small_size;
+    width: 14.15px;
+    margin-right: $utility-baseUnit;
+    opacity: .8;
+}
+
+
+.icon-search {
+    width: 18px;
+    height: 24px;
+}
+
+.icon-notifications {
+    width: 18px;
+    height: 24px;
+}
+
+.icon-messages {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-fake {
+    font-family: arial, sans-serif;
+}
+
+.icon-compose {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-settings {
+    width: 18px;
+    height: 20px;
+}
+
+.icon-user {
+    width: 20px;
+}
+
+.icon-noUserPhoto {
+    width: 100%;
+    height: auto;
+}
+
+.icon-chevronUp {
+    width: 51px;
+    height: 17px;
+}

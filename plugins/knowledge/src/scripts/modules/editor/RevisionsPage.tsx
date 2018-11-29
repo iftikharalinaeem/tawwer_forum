@@ -8,7 +8,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import PageLoader from "@library/components/PageLoader";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -46,7 +46,12 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         return (
-            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.props.history.goBack} label={t("Article Revisions")}>
+            <Modal
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.props.history.goBack}
+                label={t("Article Revisions")}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
                 <PageLoader status={this.props.revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>

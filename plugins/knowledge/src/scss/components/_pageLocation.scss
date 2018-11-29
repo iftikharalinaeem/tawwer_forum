@@ -4,31 +4,57 @@
  * @license Proprietary
  */
 
-$pageLocation_spacer: $utility-baseUnit * 2;
+$pageLocation_spacer: $utility-baseUnit * 2.5;
+$pageLocation-placeholderIcon_size: 14px;
+$pageLocation-picker_color: mixContentBgAndFg(17%);
+$pageLocation-picker_verticalPadding: 8px;
+$pageLocation-icon_opacity: .8;
 
 .pageLocation {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: $global-spacer;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: $global-gutter_size;
+    margin-bottom: $global-spacer;
+    min-height: $formElement_height;
 }
 
 .pageLocation-picker {
-  border: solid $formElement_borderColor $formElement_borderWidth;
-  border-radius: $global-borderRadius;
-  user-select: none;
-  margin-left: 1ex;
-  font-size: $global-small_fontSize;
-  color: $metaText_color;
-  padding: {
-    top: $utility-baseUnit;
-    bottom: $utility-baseUnit;
-    left: $pageLocation_spacer;
-    right: $pageLocation_spacer;
-  }
+    @include shadow-embed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: $global-fontWeight_semiBold;
+    border: solid $global-border_color $formElement_borderWidth;
+    border-radius: $formElement_height / 2;
+    user-select: none;
+
+    font-size: $global-small_fontSize;
+    color: $pageLocation-picker_color;
+    padding: {
+        top: $pageLocation-picker_verticalPadding;
+        right: $pageLocation_spacer;
+        bottom: $pageLocation-picker_verticalPadding;
+        left: $pageLocation_spacer;
+    }
+
+    &:active,
+    &:hover,
+    &:focus {
+        border-color: $global-color_primary;
+        color: $global-color_primary;
+    }
 }
 
 .locationBreadcrumb-separator {
-  margin: 0 .4em;
+    margin: 0 .4em;
+}
+
+.pageLocation-icon {
+    height: $pageLocation-placeholderIcon_size;
+    width: $pageLocation-placeholderIcon_size;
+    flex-basis: $pageLocation-placeholderIcon_size;
+    margin-right: .6em;
+    opacity: $pageLocation-icon_opacity;
 }

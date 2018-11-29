@@ -5,21 +5,20 @@
  */
 
 import * as React from "react";
-import Container from "@knowledge/layouts/components/Container";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@knowledge/layouts/PanelLayout";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { IArticleFragment, IKbCategoryFragment, KbCategoryDisplayType } from "@knowledge/@types/api";
+import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
 import { dummyArticles } from "@knowledge/modules/categories/state/dummyArticles";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import { t } from "@library/application";
 import SearchBar, { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-import { dummySearchResults } from "@knowledge/modules/search/state/dummySearchResults";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { compose } from "@library/components/Icons";
+import { compose } from "@library/components/icons/common";
 import LinkAsButton from "@library/components/LinkAsButton";
 
 interface IProps extends IDeviceProps {
@@ -34,10 +33,6 @@ interface IState {
 }
 
 export class CategoriesLayout extends React.Component<IProps, IState> {
-    public defaultProps = {
-        query: "",
-    };
-
     public constructor(props) {
         super(props);
         this.state = {
@@ -47,7 +42,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
 
     public render() {
         const { category, device } = this.props;
-        const options = this.loadSearchSuggestions();
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
@@ -65,9 +59,8 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         <PanelWidget>
                             <SearchBar
                                 placeholder={t("Search")}
-                                options={options}
-                                setQuery={this.setQuery}
-                                query={this.state.query || ""}
+                                onChange={this.setQuery}
+                                value={this.state.query || ""}
                             >
                                 {category.name}
                                 <LinkAsButton
@@ -106,20 +99,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         });
     };
 
-    /**
-     * Load dummy data
-     */
-    public loadSearchSuggestions = () => {
-        const data = dummySearchResults.map((result, index) => {
-            return {
-                label: result.name,
-                value: index.toString(),
-                ...result,
-            };
-        });
-        return data || [];
-    };
-
     private getSearchResults(): IResult[] {
         const { articles } = this.props;
         return articles
@@ -136,8 +115,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             name: "Article",
                             knowledgeCategoryID: 1,
                             parentID: 1,
-                            displayType: KbCategoryDisplayType.HELP,
-                            isSection: false,
                             url: "#",
                             dateUpdated: "2018-10-22T16:56:37.423Z",
                             location: [t("Help & Training"), t("Getting Started")],
@@ -146,8 +123,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             name: "Location",
                             knowledgeCategoryID: 1,
                             parentID: 1,
-                            displayType: KbCategoryDisplayType.HELP,
-                            isSection: false,
                             url: "#",
                             dateUpdated: "2018-10-22T16:56:37.423Z",
                             location: [t("Help & Training"), t("Getting Started")],
@@ -156,8 +131,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             name: "Breadcrumb",
                             knowledgeCategoryID: 1,
                             parentID: 1,
-                            displayType: KbCategoryDisplayType.HELP,
-                            isSection: false,
                             url: "#",
                             dateUpdated: "2018-10-22T16:56:37.423Z",
                             location: [t("Help & Training"), t("Getting Started")],

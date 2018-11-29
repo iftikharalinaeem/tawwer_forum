@@ -49,6 +49,28 @@ class CategoriesPageController extends KnowledgeTwigPageController {
     private $categoryId;
 
     /**
+     * @inheritdoc
+     */
+    public function hasHandler(\Throwable $e): bool {
+        if (parent::hasHandler($e)) {
+            return true;
+        } elseif (($e instanceof ClientException) && $e->getCode() === 400) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handle(\Throwable $e): Data {
+        if (($e instanceof ClientException) && $e->getCode() === 400) {
+            return $this->errorPage($e);
+        }
+        return parent::handle($e);
+    }
+
+    /**
      * Render out the /kb/categories/{id}-title-slug :path page.
      *
      * @param string $path URI slug page action string.
@@ -60,7 +82,10 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         $category = $this->categoriesApi->get($id);
         $this->setCategoryID($id);
         $this->data[self::CATEGORY_API_RESPONSE] = $category;
-        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index_excerpts(['KnowledgeCategoryID'=>$id]);
+        $this->data[self::API_PAGE_KEY] = $this->articlesApi->index([
+            "expand" => "excerpt",
+            "knowledgeCategoryID" => $id,
+        ]);
 
         // Title
         $this->setPageTitle($category['name']);
@@ -100,7 +125,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
      *
      * @return array
      */
-    private function getViewData() : array {
+    protected function getViewData() : array {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();

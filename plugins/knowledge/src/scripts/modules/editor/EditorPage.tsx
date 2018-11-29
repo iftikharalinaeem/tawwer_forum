@@ -5,21 +5,21 @@
  */
 
 import React from "react";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
-import { DeltaOperation } from "quill/core";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/components/modal/Modal";
-import EditorForm from "@knowledge/modules/editor/components/EditorForm";
+import EditorForm from "@knowledge/modules/editor/EditorForm";
 import { LoadStatus } from "@library/@types/api";
-import { Format, IPatchArticleRequestBody } from "@knowledge/@types/api";
 import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
-import qs from "qs";
+import QueryString from "@library/components/navigation/QueryString";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -30,14 +30,10 @@ interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
 }
 
-interface IState {
-    showFolderPicker: boolean;
-}
-
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.Component<IProps, IState> {
+export class EditorPage extends React.PureComponent<IProps> {
     private id = uniqueIDFromPrefix("editorPage");
 
     public state = {
@@ -46,22 +42,18 @@ export class EditorPage extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <Modal titleID={this.titleID} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+            <Modal
+                titleID={this.titleID}
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.navigateToBacklink}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
                 <Permission
                     permission="articles.add"
                     fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
                 >
-                    <EditorForm
-                        key={this.props.article.status}
-                        content={
-                            this.props.revision.status !== LoadStatus.PENDING ? this.props.revision : this.props.article
-                        }
-                        article={this.props.article}
-                        submitHandler={this.formSubmit}
-                        currentCategory={this.props.locationCategory}
-                        isSubmitLoading={this.isSubmitLoading}
-                        titleID={this.titleID}
-                    />
+                    {this.renderQueryString()}
+                    <EditorForm titleID={this.titleID} />
                 </Permission>
             </Modal>
         );
@@ -74,19 +66,11 @@ export class EditorPage extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         const { article, match, actions, history } = this.props;
-        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-
         if (article.status === LoadStatus.PENDING) {
             if (match.params.id === undefined) {
-                void actions.createArticleForEdit(history);
+                void actions.initializeAddPage(history);
             } else {
-                const articleID = parseInt(match.params.id, 10);
-                if (queryParams.revisionID) {
-                    const revisionID = parseInt(queryParams.revisionID, 10);
-                    void actions.fetchArticleAndRevisionForEdit(articleID, revisionID);
-                } else {
-                    void actions.fetchArticleForEdit(articleID);
-                }
+                void actions.initializeEditPage(history, parseInt(match.params.id, 10));
             }
         }
     }
@@ -98,43 +82,17 @@ export class EditorPage extends React.Component<IProps, IState> {
         this.props.actions.reset();
     }
 
-    public showLocationPicker() {
-        this.setState({
-            showFolderPicker: true,
-        });
-    }
-
-    public hideLocationPicker() {
-        this.setState({
-            showFolderPicker: false,
-        });
-    }
-
-    private get isSubmitLoading(): boolean {
-        const { submit } = this.props;
-        return submit.status === LoadStatus.LOADING;
-    }
-
     /**
-     * Handle the form submission for a revision.
+     * Render a query string component from the form value.
      */
-    private formSubmit = (content: DeltaOperation[], title: string) => {
-        const { article, history, actions, locationCategory } = this.props;
-
-        if (article.status === LoadStatus.SUCCESS && article.data) {
-            const articleRequest: IPatchArticleRequestBody = {
-                articleID: article.data.articleID,
-                name: title,
-                body: JSON.stringify(content),
-                format: Format.RICH,
-            };
-
-            if (locationCategory !== null) {
-                articleRequest.knowledgeCategoryID = locationCategory.knowledgeCategoryID;
-            }
-            void actions.updateArticle(articleRequest, history);
+    private renderQueryString(): React.ReactNode {
+        const { draft, saveDraft } = this.props;
+        if (saveDraft.status === LoadStatus.SUCCESS && draft.data) {
+            return <QueryString value={{ draftID: draft.data.draftID }} />;
+        } else {
+            return null;
         }
-    };
+    }
 
     private get titleID() {
         return this.id + "-title";
@@ -152,9 +110,6 @@ export class EditorPage extends React.Component<IProps, IState> {
     };
 }
 
-/**
- * Map in action dispatchable action creators from the store.
- */
 function mapDispatchToProps(dispatch) {
     return {
         actions: new EditorPageActions(dispatch, apiv2),
@@ -166,4 +121,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRouter(withRedux(EditorPage));
+export default withRedux(EditorPage);

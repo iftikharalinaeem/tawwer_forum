@@ -5,6 +5,7 @@
  */
 
 import { IUserFragment } from "@library/@types/api";
+import { Omit } from "@library/@types/utils";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -14,6 +15,18 @@ export enum ArticleStatus {
     DELETED = "deleted",
     UNDELETED = "undeleted",
     PUBLISHED = "published",
+}
+
+interface IInsertUpdate {
+    insertUserID: number;
+    updateUserID: number;
+    dateInserted: string;
+    dateUpdated: string;
+}
+
+interface IExpandedInsertUpdate extends IInsertUpdate {
+    insertUser?: IUserFragment;
+    updateUser?: IUserFragment;
 }
 
 interface IArticleDefaultedData {
@@ -34,14 +47,8 @@ export interface IOutlineItem {
     text: string; // The text content of the heading.
 }
 
-interface IArticleServerManagedData {
+interface IArticleServerManagedData extends IExpandedInsertUpdate {
     articleID: number;
-    insertUserID: number;
-    updateUserID: number;
-    insertUser?: IUserFragment;
-    updateUser?: IUserFragment;
-    dateInserted: string;
-    dateUpdated: string;
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
@@ -51,30 +58,6 @@ interface IArticleServerManagedData {
 // The record
 export interface IArticle extends IArticleRequiredData, IArticleDefaultedData, IArticleServerManagedData {}
 
-// Request/Response interfaces
-export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {}
-
-export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
-    articleID: number;
-}
-
-export interface IPostArticleResponseBody extends IArticle {}
-
-export interface IPatchArticleResponseBody extends IArticle {}
-
-export interface IGetArticleRequestBody {
-    articleID: number;
-}
-
-export interface IGetArticleResponseBody extends IArticle {}
-
-export interface IPatchArticleStatusRequestBody {
-    articleID: number;
-    status: ArticleStatus;
-}
-
-export interface IPatchArticleStatusResponseBody extends IArticle {}
-
 export interface IArticleFragment {
     articleID: number;
     name: string; //The title of the article
@@ -83,3 +66,80 @@ export interface IArticleFragment {
     url: string; // Full URL to the resource
     excerpt: string; // Excerpt of the article's content.
 }
+
+// Request/Response interfaces
+
+// POST /articles
+export interface IPostArticleRequestBody extends IArticleRequiredData, Partial<IArticleDefaultedData> {
+    draftID?: number;
+}
+export interface IPostArticleResponseBody extends IArticle {}
+
+// PATCH /articles/:id
+export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
+    articleID: number;
+    draftID?: number;
+}
+export interface IPatchArticleResponseBody extends IArticle {}
+
+// GET /articles/:id
+export interface IGetArticleRequestBody {
+    articleID: number;
+}
+export interface IGetArticleResponseBody extends IArticle {}
+
+// PATCH /articles/:id/status
+export interface IPatchArticleStatusRequestBody {
+    articleID: number;
+    status: ArticleStatus;
+}
+export interface IPatchArticleStatusResponseBody extends IArticle {}
+
+// Drafts
+export interface IArticleDraftAttrs
+    extends Partial<IArticleRequiredData>,
+        Omit<Partial<IArticleDefaultedData>, "body"> {}
+
+export interface IArticleDraft {
+    recordID?: number;
+    parentRecordID?: number;
+    attributes: IArticleDraftAttrs;
+    body: string;
+    format: string;
+}
+
+export interface IResponseArticleDraft extends IArticleDraft, IInsertUpdate {
+    draftID: number;
+    recordType: "article";
+    excerpt: string;
+}
+
+// GET /articles/drafts
+export interface IGetArticleDraftsRequest {
+    articleID?: number;
+    insertUserID?: number;
+}
+export type IGetArticleDraftsResponse = IResponseArticleDraft[];
+
+// GET /articles/drafts/:id
+
+export interface IGetArticleDraftRequest {
+    draftID?: number;
+}
+export type IGetArticleDraftResponse = IResponseArticleDraft;
+
+// POST /articles/drafts
+export type IPostArticleDraftRequest = IArticleDraft;
+export type IPostArticleDraftResponse = IResponseArticleDraft;
+
+// PATCH /articles/drafts/:id
+export interface IPatchArticleDraftRequest extends Partial<IArticleDraft> {
+    draftID: number;
+}
+export type IPatchArticleDraftResponse = IResponseArticleDraft;
+
+// DELETE /articles/drafts/:id
+export interface IDeleteArticleDraftRequest {
+    draftID: number;
+}
+export interface IDeleteArticleDraftResponse {}

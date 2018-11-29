@@ -1,26 +1,25 @@
 <?php
 /**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Container\Container;
 use Vanilla\Knowledge\Models\Breadcrumb;
 
 /**
- * Knowledge base controller for article view.
+ * Knowledge base controller for search page.
  */
-class KbPageController extends KnowledgeTwigPageController {
+class SearchPageController extends KnowledgeTwigPageController {
 
     /**
      * Gather the data array to render a page with.
      *
      * @return array
      */
-    private function getViewData() {
+    protected function getViewData(): array {
         $this->setSeoMetaData();
         $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $data = $this->getWebViewResources();
@@ -31,20 +30,6 @@ class KbPageController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->setPageTitle(\Gdn::translate('Home'));
-
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getViewData();
-        $data['page']['classes'][] = 'isLoading';
-        $data['template'] = 'seo/pages/home.twig';
-
-        return $this->twigInit()->render('default-master.twig', $data);
-    }
-
-    /**
-     * Render out the /kb/search page.
-     */
-    public function get_search() : string {
         $this->setPageTitle(\Gdn::translate('Search'));
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
@@ -65,7 +50,6 @@ class KbPageController extends KnowledgeTwigPageController {
         $this->meta
             ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
         $this->meta
-            ->setSeo('title', $this->data['title'] ?? 'Knowledge')
             ->setSeo('description', $this->data['description'] ?? 'Knowledge Base')
             ->setSeo('locale', \Gdn::locale()->current())
             ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
@@ -76,11 +60,11 @@ class KbPageController extends KnowledgeTwigPageController {
      * @inheritdoc
      */
     public function getCanonicalLink() : string {
-        return \Gdn::request()->url('/kb/', true);
+        return \Gdn::request()->url('/kb/search', true);
     }
 
     /**
-     * Get Breadcrubs data array
+     * Get Breadcrumbs data array
      *
      * @return array
      */
@@ -88,6 +72,7 @@ class KbPageController extends KnowledgeTwigPageController {
         return [
             new Breadcrumb('Home', \Gdn::request()->url('/', true)),
             new Breadcrumb('Knowledge', $this->getCanonicalLink()),
+            new Breadcrumb('Search', $this->getCanonicalLink()),
         ];
     }
 }

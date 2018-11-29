@@ -11,15 +11,17 @@ import {
     IGetArticleResponseBody,
     IPatchArticleRequestBody,
     IPatchArticleResponseBody,
-    IGetArticleRevisionsResponseBody,
-    IGetArticleRevisionsRequestBody,
-    IGetRevisionResponseBody,
+    IResponseArticleDraft,
+    Format,
 } from "@knowledge/@types/api";
 import { History } from "history";
-import * as route from "./route";
-import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import qs from "qs";
 import ArticleActions from "../article/ArticleActions";
+import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import uniqueId from "lodash/uniqueId";
+import { makeEditUrl } from "@knowledge/modules/editor/route";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -32,13 +34,9 @@ export default class EditorPageActions extends ReduxActions {
     public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
     public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
-    public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_ARTICLE_REQUEST";
-    public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
-    public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_ARTICLE_ERROR";
-
-    public static readonly GET_REVISION_REQUEST = "@@articleEditor/GET_REVISION_REQUEST";
-    public static readonly GET_REVISION_RESPONSE = "@@articleEditor/GET_REVISION_RESPONSE";
-    public static readonly GET_REVISION_ERROR = "@@articleEditor/GET_REVISION_ERROR";
+    public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
+    public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
+    public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_EDIT_ARTICLE_ERROR";
 
     // Frontend only actions
     public static readonly RESET = "@@articleEditor/RESET";
@@ -49,10 +47,11 @@ export default class EditorPageActions extends ReduxActions {
      */
     public static ACTION_TYPES:
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
-        | ActionsUnion<typeof EditorPageActions.getRevisionACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
+        | ReturnType<typeof EditorPageActions.updateFormAC>
+        | ReturnType<typeof EditorPageActions.setInitialDraftAC>
         | ReturnType<typeof EditorPageActions.createResetAction>;
 
     /**
@@ -92,22 +91,10 @@ export default class EditorPageActions extends ReduxActions {
     );
 
     /**
-     * Action creators for GET /article-revisions/:id
-     */
-    private static getRevisionACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.GET_REVISION_REQUEST,
-        EditorPageActions.GET_REVISION_RESPONSE,
-        EditorPageActions.GET_REVISION_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IGetArticleRevisionsResponseBody,
-        {} as IGetArticleRevisionsRequestBody,
-    );
-
-    /**
      * Create a reset action
      */
     private static createResetAction() {
-        return EditorPageActions.createAction(EditorPageActions.RESET);
+        return EditorPageActions.createAction(EditorPageActions.RESET, {});
     }
 
     private static createSetRevision(revisionID: number) {
@@ -119,59 +106,193 @@ export default class EditorPageActions extends ReduxActions {
      */
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
 
-    /** Article page actions instance. */
-    private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api);
+    // Form handling
+    public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
+    public static updateFormAC(formData: Partial<IEditorPageForm>, forceRefresh: boolean = false) {
+        return EditorPageActions.createAction(EditorPageActions.UPDATE_FORM, {
+            formData,
+            forceRefresh,
+        });
+    }
+    public updateForm = this.bindDispatch(EditorPageActions.updateFormAC);
 
-    /** Location picker page actions instance. */
-    private locationPickerActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
+    // Drafts
+    public static readonly SET_INITIAL_DRAFT = "@@articleEditor/SET_INITIAL_DRAFT";
+    public static setInitialDraftAC(draftID?: number, tempID?: string) {
+        return EditorPageActions.createAction(EditorPageActions.SET_INITIAL_DRAFT, {
+            draftID,
+            tempID,
+        });
+    }
+    public setInitialDraft = this.bindDispatch(EditorPageActions.setInitialDraftAC);
+
+    /** Article page actions instance. */
+    private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
 
     /**
-     * Create an article and redirect to the edit page for it.
+     * Initialize the add page.
      *
-     * @param history - The history object for redirecting.
+     * - Can pull a category ID form a query parameter and intitialize the location.
+     * - Can pull a draft ID from a query parameter and intitialize from a draft.
+     *
+     * @param history - The history for parsing the query string.
      */
-    public async createArticleForEdit(history: History) {
+    public async initializeAddPage(history: History) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
-        const initialCategoryID = "knowledgeCategoryID" in queryParams ? queryParams.knowledgeCategoryID : null;
-
-        // We don't have an article so go create one.
-        const response = await this.postArticle({
-            knowledgeCategoryID: initialCategoryID,
-        });
-
-        if (response) {
-            const article = response.data;
-
-            // Initialize the category picker if we have a category ID.
-            if (initialCategoryID !== null) {
-                this.locationPickerActions.initLocationPickerFromArticle(article);
-            }
-
-            // Redirect
-            const replacementUrl = route.makeEditUrl(article);
-            const newLocation = {
-                ...history.location,
-                pathname: replacementUrl,
-                search: "",
-            };
-
-            history.replace(newLocation);
+        const initialCategoryID =
+            "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
+        const draftLoaded = await this.initializeDraftFromUrl(history);
+        if (!draftLoaded && initialCategoryID !== null) {
+            this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
         }
+    }
+
+    private async initializeDraftFromUrl(history: History): Promise<boolean> {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        const draftID = "draftID" in queryParams ? parseInt(queryParams.draftID, 10) : null;
+
+        let draftLoaded = false;
+        if (draftID !== null) {
+            this.dispatch(EditorPageActions.setInitialDraftAC(draftID));
+            const draftResponse = await this.articleActions.getDraft({ draftID });
+            if (draftResponse) {
+                this.pushDraftToForm(draftResponse.data);
+                draftLoaded = true;
+            }
+        }
+        return draftLoaded;
+    }
+
+    public async initializeEditPage(history: History, articleID: number) {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        if (queryParams.revisionID) {
+            const revisionID = parseInt(queryParams.revisionID, 10);
+            await this.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
+        } else {
+            await this.fetchArticleForEdit(history, articleID);
+        }
+    }
+
+    private pushDraftToForm(draft: IResponseArticleDraft) {
+        const { name, knowledgeCategoryID } = draft.attributes;
+        const body = JSON.parse(draft.body);
+        this.updateForm({ name, knowledgeCategoryID, body }, true);
+    }
+
+    /**
+     * Synchronize the current editor draft state to the server.
+     */
+    public async syncDraft(newDraftID: string = uniqueId()) {
+        const state = this.getState<IStoreState>();
+        const { form, article, draft } = state.knowledge.editorPage;
+
+        const recordID = article.data ? article.data.articleID : undefined;
+
+        const { body, ...attrs } = form;
+        const contents = {
+            body: JSON.stringify(body),
+            format: Format.RICH,
+        };
+
+        if (draft.data !== undefined && draft.data.draftID !== undefined) {
+            await this.articleActions.patchDraft({
+                draftID: draft.data.draftID,
+                recordID,
+                attributes: attrs,
+                ...contents,
+            });
+        } else {
+            const tempID = newDraftID;
+            this.setInitialDraft(undefined, tempID);
+            await this.articleActions.postDraft(
+                {
+                    recordID,
+                    attributes: attrs,
+                    ...contents,
+                },
+                tempID,
+            );
+        }
+    }
+
+    /**
+     * Publish the current article/revision to the server.
+     *
+     * - Cleans up an active draft.
+     * - Patches/Posts and article.
+     * - Redirects to the url of the new article.
+     *
+     * @param history History object for redirecting.
+     */
+    public async publish(history: History) {
+        const editorState = this.getState<IStoreState>().knowledge.editorPage;
+        // We don't have an article so go create one.
+        const draft = editorState.draft;
+        const request: IPostArticleRequestBody = {
+            ...editorState.form,
+            body: JSON.stringify(editorState.form.body),
+            draftID: draft.data ? draft.data.draftID : undefined,
+            format: Format.RICH,
+        };
+
+        if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+            const patchRequest: IPatchArticleRequestBody = {
+                ...request,
+                articleID: editorState.article.data.articleID,
+            };
+            return this.updateArticle(patchRequest, history);
+        }
+
+        const response = await this.postArticle(request);
+        if (!response) {
+            return;
+        }
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        if (!fullArticleResponse) {
+            return;
+        }
+
+        const article = fullArticleResponse.data;
+
+        // Redirect
+        const editLocation = {
+            ...history.location,
+            pathname: makeEditUrl(article),
+            search: "",
+        };
+
+        history.replace(editLocation);
+        history.push({
+            pathname: article.url,
+        });
     }
 
     /**
      * Fetch an existing article for editing.
      *
      * @param articleID - The ID of the article to fetch.
-     * @param revision - Start from a particular revision.
+     * @param forRevision - Whether or not we're fetching with a revision.
      */
-    public async fetchArticleForEdit(articleID: number) {
+    private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
         // We don't have an article, but we have ID for one. Go get it.
-        const response = await this.getEditableArticleByID(articleID);
+        const [articleResponse, draftLoaded] = await Promise.all([
+            this.getEditableArticleByID(articleID),
+            forRevision ? Promise.resolve(false) : this.initializeDraftFromUrl(history),
+        ]);
 
-        if (response && response.data) {
-            this.locationPickerActions.initLocationPickerFromArticle(response.data);
+        if (!draftLoaded && !forRevision && articleResponse && articleResponse.data) {
+            this.updateForm(
+                {
+                    name: articleResponse.data.name,
+                    body: JSON.parse(articleResponse.data.body),
+                    knowledgeCategoryID: articleResponse.data.knowledgeCategoryID,
+                },
+                true,
+            );
         }
+
+        return articleResponse;
     }
 
     /**
@@ -182,12 +303,27 @@ export default class EditorPageActions extends ReduxActions {
      * @param articleID - The ID of the article to fetch.
      * @param revision - Start from a particular revision.
      */
-    public async fetchArticleAndRevisionForEdit(articleID: number, revisionID: number) {
+    private async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
+        const draftLoaded = await this.initializeDraftFromUrl(history);
+        if (draftLoaded) {
+            return;
+        }
+
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
-        return Promise.all([
-            this.fetchArticleForEdit(articleID),
+        const [article, revision] = await Promise.all([
+            this.fetchArticleForEdit(history, articleID, true),
             this.articleActions.fetchRevisionByID({ revisionID }),
         ]);
+
+        if (revision && article) {
+            const formData: Partial<IEditorPageForm> = {
+                name: revision.data.name,
+                body: JSON.parse(revision.data.body),
+                knowledgeCategoryID: article.data.knowledgeCategoryID,
+            };
+
+            this.updateForm(formData, true);
+        }
     }
 
     /**
@@ -195,27 +331,24 @@ export default class EditorPageActions extends ReduxActions {
      *
      * @param body - The body of the submit request.
      */
-    public async updateArticle(article: IPatchArticleRequestBody, history: History) {
-        const articleResult = await this.patchArticle(article);
-        // Our API request has failed
-        if (!articleResult) {
+    private async updateArticle(article: IPatchArticleRequestBody, history: History) {
+        const response = await this.patchArticle(article);
+        if (!response) {
+            return;
+        }
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        if (!fullArticleResponse) {
             return;
         }
 
-        const { articleID } = article;
-        const newArticle = await this.articleActions.fetchByID({ articleID });
-        // Our API request failed.
-        if (!newArticle) {
-            return;
-        }
-        const { url } = newArticle.data;
-
-        // Make the URL relative to the root of the site.
-        const link = document.createElement("a");
-        link.href = url;
+        const { url } = fullArticleResponse.data;
 
         // Redirect to the new url.
-        history.push(link.pathname);
+        history.replace({
+            ...history.location,
+            search: "",
+        });
+        history.push(url);
     }
 
     /**

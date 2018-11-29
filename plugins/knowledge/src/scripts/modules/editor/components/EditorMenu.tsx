@@ -8,23 +8,14 @@ import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import {
-    DropDownItemLink,
-    DropDownItemButton,
-    DropDownItemMetas,
-    DropDownItemSeparator,
-} from "@library/components/dropdown";
+import { DropDownItemLink, DropDownItemButton, DropDownItemSeparator } from "@library/components/dropdown";
 import { makeRevisionsUrl } from "@knowledge/modules/editor/route";
-import Translate from "@library/components/translation/Translate";
-import DateTime from "@library/components/DateTime";
-import ProfileLink from "@library/components/ProfileLink";
 import Permission from "@library/users/Permission";
 
 interface IProps {
     article: IArticle;
     buttonClassName?: string;
 }
-
 /**
  * Generates drop down menu for Article page
  */
@@ -35,7 +26,12 @@ export default class EditorMenu extends React.PureComponent<IProps> {
 
         return (
             <Permission permission="articles.add">
-                <DropDown id={this.domID} name={t("Article Options")} buttonClassName={this.props.buttonClassName}>
+                <DropDown
+                    id={this.domID}
+                    name={t("Article Options")}
+                    buttonClassName={this.props.buttonClassName}
+                    renderLeft={true}
+                >
                     <DropDownItemSeparator />
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />

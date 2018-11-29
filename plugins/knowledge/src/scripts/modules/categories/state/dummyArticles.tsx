@@ -4,10 +4,10 @@
  * @license Proprietary
  */
 
-import { AttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { dummyMetaData } from "@knowledge/modules/categories/state/dummyMetaData";
 import { t } from "@library/application";
+import { AttachmentType } from "@library/components/attachments";
 
 export const dummyArticles: IResult[] = [
     {
@@ -55,7 +55,6 @@ export const dummyArticles: IResult[] = [
                 type: AttachmentType.WORD,
             },
         ],
-        dateUpdated: "2018-10-22T16:56:37.423Z",
         location: [t("Help & Training"), t("Getting Started")],
     },
     {
@@ -65,7 +64,6 @@ export const dummyArticles: IResult[] = [
         excerpt: "Standard with your order.",
         image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
         attachments: [],
-        dateUpdated: "2018-10-22T16:56:37.423Z",
         location: [t("Help & Training"), t("Getting Started")],
     },
     {
@@ -80,7 +78,6 @@ export const dummyArticles: IResult[] = [
             },
         ],
         image: "https://library.vanillaforums.com/wp-content/uploads/2018/09/Case-study-headers-2018-1.png",
-        dateUpdated: "2018-10-22T16:56:37.423Z",
         location: [t("Help & Training"), t("Getting Started")],
     },
     {
@@ -108,7 +105,6 @@ export const dummyArticles: IResult[] = [
                 type: AttachmentType.EXCEL,
             },
         ],
-        dateUpdated: "2018-10-22T16:56:37.423Z",
         location: [t("Help & Training"), t("Getting Started")],
     },
 ];

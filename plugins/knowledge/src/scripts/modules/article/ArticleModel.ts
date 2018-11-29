@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IRevision, IRevisionFragment } from "@knowledge/@types/api";
+import { IArticle, IArticleFragment, IRevision, IRevisionFragment, IResponseArticleDraft } from "@knowledge/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
@@ -22,6 +22,9 @@ export interface IArticleState {
     };
     revisionFragmentsByID: {
         [key: number]: IRevisionFragment;
+    };
+    draftsByID: {
+        [key: number]: IResponseArticleDraft;
     };
 }
 
@@ -63,6 +66,17 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     }
 
     /**
+     * Select an article draft out of the stored drafts.
+     *
+     * @param state A full state instance.
+     * @param draftID The ID of the draft to select.
+     */
+    public static selectDraft(state: IStoreState, draftID: number): IResponseArticleDraft | null {
+        const stateSlice = this.stateSlice(state);
+        return stateSlice.draftsByID[draftID] || null;
+    }
+
+    /**
      * Get the slice of state that this model works with.
      *
      * @param state A full state instance.
@@ -82,16 +96,17 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         articleFragmentsByID: {},
         revisionsByID: {},
         revisionFragmentsByID: {},
+        draftsByID: {},
     };
 
     public reducer = (
         state: IArticleState = this.initialState,
         action: typeof ArticleActions.ACTION_TYPES,
     ): IArticleState => {
-        return produce(state, draft => {
+        return produce(state, nextState => {
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                    const { articlesByID } = draft;
+                    const { articlesByID } = nextState;
                     const articleToUpdate = articlesByID[action.payload.data.articleID];
                     if (articleToUpdate) {
                         articleToUpdate.status = action.payload.data.status;
@@ -99,18 +114,36 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     break;
                 case ArticleActions.GET_ARTICLE_RESPONSE: {
                     const { articleID } = action.payload.data;
-                    draft.articlesByID[articleID] = action.payload.data;
+                    nextState.articlesByID[articleID] = action.payload.data;
                     break;
                 }
                 case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                     const revisions = action.payload.data;
                     revisions.forEach(rev => {
-                        draft.revisionFragmentsByID[rev.articleRevisionID] = rev;
+                        nextState.revisionFragmentsByID[rev.articleRevisionID] = rev;
                     });
                     break;
                 case ArticleActions.GET_REVISION_RESPONSE:
                     const revision = action.payload.data;
-                    draft.revisionsByID[revision.articleRevisionID] = revision;
+                    nextState.revisionsByID[revision.articleRevisionID] = revision;
+                    break;
+                case ArticleActions.PATCH_DRAFT_RESPONSE:
+                case ArticleActions.POST_DRAFT_RESPONSE:
+                case ArticleActions.GET_DRAFT_RESPONSE:
+                    const draft = action.payload.data;
+                    nextState.draftsByID[draft.draftID] = draft;
+                    break;
+                case ArticleActions.GET_DRAFTS_RESPONSE:
+                    const drafts = action.payload.data;
+                    for (const currentDraft of drafts) {
+                        nextState.draftsByID[currentDraft.draftID] = currentDraft;
+                    }
+                    break;
+                case ArticleActions.DELETE_DRAFT_RESPONSE:
+                    if (nextState.draftsByID[action.meta.draftID]) {
+                        delete nextState.draftsByID[action.meta.draftID];
+                    }
+                    break;
             }
         });
     };

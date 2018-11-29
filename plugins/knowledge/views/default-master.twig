@@ -38,12 +38,9 @@
     </head>
     <body class="{{ page.classes|join(' ') }}">
         <div id="page" class="page">
-            <div id="headerContainer">
-                {{ include('partials/header.twig') }}
-            </div>
+            <div id="vanillaHeader"></div>
             <div id="app" class="page-minHeight">
             {%- if template -%}
-
                 <noscript>
 
                     <h1>

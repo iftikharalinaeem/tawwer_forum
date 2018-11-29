@@ -5,15 +5,11 @@
 
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import {
-    IKbCategoryFragment,
-    IKbCategoryMultiTypeFragment,
-    IKbNavigationCategory,
-    KbCategoryDisplayType,
-} from "@knowledge/@types/api";
+import { IKbCategoryFragment, IKbCategoryMultiTypeFragment, IKbNavigationCategory } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import { createSelector } from "reselect";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {

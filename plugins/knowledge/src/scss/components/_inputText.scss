@@ -25,17 +25,19 @@
         @include textInputSizing($formElement_largeInput_height, $formElement_largeInput_fontSize, $utility-baseUnit);
     }
 
-    &.isGiant {
-        font-weight: $global-fontWeight_bold;
-        min-height: $formElement-giantInput_height;
-        @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
-    }
-
     &.isClearable {
         &,
-        &.isLarge,
-        &.isGiant {
+        &.isLarge {
             padding-right: 0;
+        }
+    }
+
+    &[type="date"] {
+        appearance: none;
+        
+        &::-webkit-calendar-picker-indicator {
+            -webkit-appearance: none;
+            display: none;
         }
     }
 }
