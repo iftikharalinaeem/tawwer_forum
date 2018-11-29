@@ -8,6 +8,7 @@ import classNames from "classnames";
 import InputBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputBlock";
 import { t } from "@library/application";
 import DateInput from "@library/components/forms/DateInput";
+import moment from "moment";
 
 interface IProps {
     start: string | undefined;
@@ -24,8 +25,8 @@ interface IState {}
  */
 export default class DateRange extends React.PureComponent<IProps> {
     public render() {
-        const endDate = this.props.end ? new Date(this.props.end) : undefined;
-        const startDate = this.props.start ? new Date(this.props.start) : undefined;
+        const endDate = this.props.end ? moment(this.props.end).toDate() : undefined;
+        const startDate = this.props.start ? moment(this.props.start).toDate() : undefined;
 
         return (
             <div className={classNames("dateRange inputBlock", this.props.className)}>
