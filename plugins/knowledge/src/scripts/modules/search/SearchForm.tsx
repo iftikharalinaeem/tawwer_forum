@@ -27,10 +27,12 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
     placeholder?: string;
     device: Devices;
+    searchBarRef?: React.RefObject<SearchBar>;
 }
 
 class SearchForm extends React.Component<IProps> {
@@ -42,6 +44,7 @@ class SearchForm extends React.Component<IProps> {
 
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+                <VanillaHeader title={t("Search")} />
                 <Container>
                     <QueryString value={this.props.form} />
                     <PanelLayout device={this.props.device}>
