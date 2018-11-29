@@ -5,6 +5,7 @@
  */
 
 import { IUserFragment } from "@library/@types/api";
+import { Omit } from "@library/@types/utils";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -95,17 +96,22 @@ export interface IPatchArticleStatusRequestBody {
 export interface IPatchArticleStatusResponseBody extends IArticle {}
 
 // Drafts
-export interface IArticleDraftContents extends Partial<IArticleRequiredData>, Partial<IArticleDefaultedData> {}
+export interface IArticleDraftAttrs
+    extends Partial<IArticleRequiredData>,
+        Omit<Partial<IArticleDefaultedData>, "body"> {}
 
 export interface IArticleDraft {
     recordID?: number;
     parentRecordID?: number;
-    attributes: IArticleDraftContents;
+    attributes: IArticleDraftAttrs;
+    body: string;
+    format: string;
 }
 
 export interface IResponseArticleDraft extends IArticleDraft, IInsertUpdate {
     draftID: number;
     recordType: "article";
+    excerpt: string;
 }
 
 // GET /articles/drafts

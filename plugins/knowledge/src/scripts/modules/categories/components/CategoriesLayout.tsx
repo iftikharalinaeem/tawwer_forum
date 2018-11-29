@@ -33,10 +33,6 @@ interface IState {
 }
 
 export class CategoriesLayout extends React.Component<IProps, IState> {
-    public defaultProps = {
-        query: "",
-    };
-
     public constructor(props) {
         super(props);
         this.state = {

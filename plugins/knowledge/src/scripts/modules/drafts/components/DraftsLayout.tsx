@@ -13,14 +13,12 @@ import { t } from "@library/application";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { PageTitle } from "@knowledge/modules/common/PageTitle";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
-import { IDraftPreview } from "./DraftPreview";
 import DraftHeader from "@knowledge/modules/drafts/components/DraftHeader";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps {
     device: Devices;
-    data: IDraftPreview[];
-    hasMoreResults: boolean;
-    loadMoreResults?: () => void;
+    data: IResponseArticleDraft[];
 }
 
 /*
@@ -44,13 +42,7 @@ class DraftsLayout extends React.Component<IProps> {
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
                             <PanelWidgetVerticalPadding>
-                                {
-                                    <DraftList
-                                        data={this.props.data}
-                                        hasMoreResults={this.props.hasMoreResults}
-                                        loadMoreResults={this.props.loadMoreResults}
-                                    />
-                                }
+                                <DraftList data={this.props.data} />
                             </PanelWidgetVerticalPadding>
                         </PanelLayout.MiddleBottom>
                         {isFullWidth && <PanelLayout.RightTop>{<PanelEmptyColumn />}</PanelLayout.RightTop>}

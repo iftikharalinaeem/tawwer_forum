@@ -18,7 +18,6 @@ import { connect } from "react-redux";
 import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import QueryString from "@library/components/navigation/QueryString";
-import apiv2 from "@library/apiv2";
 import qs from "qs";
 import { LoadStatus } from "@library/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
@@ -27,8 +26,9 @@ import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
+import { withApi, IApiProps } from "@library/contexts/ApiContext";
 
-interface IProps extends ISearchFormActionProps, ISearchPageState {
+interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
     placeholder?: string;
     device: Devices;
 }
@@ -51,12 +51,13 @@ class SearchForm extends React.Component<IProps> {
                                 <SearchBar
                                     placeholder={this.props.placeholder || t("Help")}
                                     onChange={this.handleSearchChange}
-                                    loadOptions={this.loadOptions}
+                                    loadOptions={this.props.searchOptionProvider.autocomplete}
                                     value={this.props.form.query}
                                     isBigInput={true}
                                     onSearch={this.props.searchActions.search}
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
+                                    triggerSearchOnAllUpdates={true}
                                 />
                             </PanelWidget>
                             {isMobile && (
@@ -155,25 +156,6 @@ class SearchForm extends React.Component<IProps> {
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
     }
-
-    /**
-     * Simple data loading function for the search bar/react-select.
-     */
-    private loadOptions = async (value: string) => {
-        const queryObj = {
-            name: value,
-            expand: ["user", "category"],
-        };
-        const query = qs.stringify(queryObj);
-        const response = await apiv2.get(`/knowledge/search?${query}`);
-        return response.data.map(result => {
-            return {
-                label: result.name,
-                value: result.name,
-                data: result,
-            };
-        });
-    };
 }
 
 const withRedux = connect(
@@ -181,4 +163,4 @@ const withRedux = connect(
     SearchPageActions.mapDispatchToProps,
 );
 
-export default withRedux(withDevice<IProps>(SearchForm));
+export default withRedux(withApi(withDevice<IProps>(SearchForm)));

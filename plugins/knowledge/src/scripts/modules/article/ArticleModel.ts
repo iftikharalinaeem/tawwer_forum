@@ -127,10 +127,22 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     const revision = action.payload.data;
                     nextState.revisionsByID[revision.articleRevisionID] = revision;
                     break;
+                case ArticleActions.PATCH_DRAFT_RESPONSE:
                 case ArticleActions.POST_DRAFT_RESPONSE:
                 case ArticleActions.GET_DRAFT_RESPONSE:
                     const draft = action.payload.data;
                     nextState.draftsByID[draft.draftID] = draft;
+                    break;
+                case ArticleActions.GET_DRAFTS_RESPONSE:
+                    const drafts = action.payload.data;
+                    for (const currentDraft of drafts) {
+                        nextState.draftsByID[currentDraft.draftID] = currentDraft;
+                    }
+                    break;
+                case ArticleActions.DELETE_DRAFT_RESPONSE:
+                    if (nextState.draftsByID[action.meta.draftID]) {
+                        delete nextState.draftsByID[action.meta.draftID];
+                    }
                     break;
             }
         });

@@ -155,4 +155,53 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
         return $result;
     }
+
+    /**
+     * Recalculate and update articleCount, articleCountRecursive and childCategoryCount columns
+     *
+     * @param int $knowledgeCategoryID Categori id to recalculate
+     * @param bool $updateParents Flag for recursive or non-recursive mode to update all parents
+     *
+     * @return bool Return tru when record updated succesfully
+     */
+    public function updateCounts(int $knowledgeCategoryID, bool $updateParents = true): bool {
+        $count = $this->sql()
+            ->select('c.knowledgeCategoryID')
+            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
+            ->select('DISTINCT children.knowledgeCategoryID', 'COUNT', 'childrenCount')
+            ->select('children.articleCountRecursive', 'SUM', 'countRecursive')
+            ->from('knowledgeCategory c')
+            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID')
+            ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
+            ->where('c.knowledgeCategoryID', $knowledgeCategoryID)
+            ->groupBy('c.knowledgeCategoryID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+        if (is_array($count)) {
+            $res = $this->update(
+                [
+                    'articleCount' => $count['articleCount'],
+                    'articleCountRecursive' => ($count['articleCount'] + $count['countRecursive']),
+                    'childCategoryCount' => $count['childrenCount'],
+                ],
+                [
+                    'knowledgeCategoryID' => $knowledgeCategoryID
+                ]
+            );
+            if ($res && $updateParents) {
+                $categories = $this->selectWithAncestors($knowledgeCategoryID);
+                $ids = array_column($categories, 'knowledgeCategoryID');
+                $categories = array_combine($ids, $categories);
+                $cat = $categories[$knowledgeCategoryID];
+                while ($parent = ($categories[$cat['parentID']] ?? false)) {
+                    $res = $this->updateCounts($parent['knowledgeCategoryID'], false);
+                    $cat = $parent;
+                }
+                return $res;
+            } else {
+                return $res;
+            }
+        } else {
+            return false;
+        }
+    }
 }

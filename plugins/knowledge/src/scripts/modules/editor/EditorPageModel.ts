@@ -8,18 +8,10 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import produce from "immer";
-import {
-    IArticle,
-    IRevision,
-    IKbCategoryFragment,
-    Format,
-    IResponseArticleDraft,
-    IArticleDraft,
-} from "@knowledge/@types/api";
+import { IArticle, IRevision, IResponseArticleDraft } from "@knowledge/@types/api";
 import ArticleActions from "../article/ArticleActions";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "../article/ArticleModel";
-import CategoryModel from "../categories/CategoryModel";
 import { DeltaOperation } from "quill/core";
 import { createSelector } from "reselect";
 import reduceReducers from "reduce-reducers";
@@ -27,29 +19,30 @@ import reduceReducers from "reduce-reducers";
 export interface IEditorPageForm {
     name: string;
     body: DeltaOperation[];
-    format: Format;
     knowledgeCategoryID: number | null;
 }
 
 export interface IEditorPageState {
-    submit: ILoadable<{}>;
-    form: IEditorPageForm;
-    revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
-    initialDraft: ILoadable<number>; // The draft ID. Actual draft will live in normalized drafts resource.
-    savedDraft: ILoadable<IResponseArticleDraft>;
     article: ILoadable<IArticle>;
-    needsDraftConfirmation: boolean;
+    draft: ILoadable<{
+        tempID?: string;
+        draftID?: number;
+    }>; // The draft ID. Actual draft will live in normalized drafts resource.
+    form: IEditorPageForm;
+    formNeedsRefresh: boolean;
+    revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
+    saveDraft: ILoadable<{}>;
+    submit: ILoadable<{}>;
 }
 
 export interface IInjectableEditorProps {
-    submit: ILoadable<{}>;
-    locationCategory: IKbCategoryFragment | null;
-    form: IEditorPageForm;
     article: ILoadable<IArticle>;
+    draft: ILoadable<IResponseArticleDraft>;
+    form: IEditorPageForm;
+    formNeedsRefresh: boolean;
     revision: ILoadable<IRevision>;
-    initialDraft: ILoadable<IResponseArticleDraft>;
-    savedDraft: ILoadable<IResponseArticleDraft>;
-    needsDraftConfirmation: boolean;
+    saveDraft: ILoadable<{}>;
+    submit: ILoadable<{}>;
 }
 
 /**
@@ -62,23 +55,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state tree.
      */
     public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const stateSlice = EditorPageModel.getStateSlice(state);
-
-        let locationCategory: IKbCategoryFragment | null = null;
-        const { editorPage, locationPicker } = state.knowledge;
-        if (editorPage.article.status === LoadStatus.SUCCESS) {
-            locationCategory = CategoryModel.selectKbCategoryFragment(state, locationPicker.chosenCategoryID);
-        }
+        const { article, saveDraft, submit, form, formNeedsRefresh } = EditorPageModel.getStateSlice(state);
 
         return {
-            article: stateSlice.article,
-            submit: stateSlice.submit,
+            article,
+            saveDraft,
+            submit,
+            form,
+            formNeedsRefresh,
             revision: EditorPageModel.selectActiveRevision(state),
-            initialDraft: EditorPageModel.selectInitialDraft(state),
-            savedDraft: stateSlice.savedDraft,
-            locationCategory,
-            form: stateSlice.form,
-            needsDraftConfirmation: stateSlice.needsDraftConfirmation,
+            draft: EditorPageModel.selectDraft(state),
         };
     }
 
@@ -101,17 +87,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
     );
 
-    private static selectInitialDraftLoadable = (state: IStoreState) =>
-        EditorPageModel.getStateSlice(state).initialDraft;
-    private static selectInitialDraft = createSelector(
+    private static selectDraftLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).draft;
+    private static selectDraft = createSelector(
         (state: IStoreState) => state,
-        EditorPageModel.selectInitialDraftLoadable,
+        EditorPageModel.selectDraftLoadable,
         (state, draftLoadable) => {
             const { status, error, data } = draftLoadable;
-            if (data == null) {
+            if (!data || !data.draftID) {
                 return { status, error };
             } else {
-                const rev = ArticleModel.selectDraft(state, data);
+                const rev = ArticleModel.selectDraft(state, data.draftID);
                 return {
                     status,
                     error,
@@ -128,39 +113,41 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @throws An error if the state wasn't initialized properly.
      */
     private static getStateSlice(state: IStoreState): IEditorPageState {
-        if (!state.knowledge || !state.knowledge.revisionsPage) {
+        if (!state.knowledge || !state.knowledge.editorPage) {
             throw new Error(
-                "The revision page model has not been wired up properly. Expected to find 'state.knowledge.revisionsPage'.",
+                "The revision page model has not been wired up properly. Expected to find 'state.knowledge.editorPage'.",
             );
         }
 
         return state.knowledge.editorPage;
     }
 
-    public initialState: IEditorPageState = {
+    public static readonly INITIAL_STATE = {
         article: {
             status: LoadStatus.PENDING,
         },
-        initialDraft: {
+        draft: {
             status: LoadStatus.PENDING,
+            error: undefined,
         },
-        savedDraft: {
-            status: LoadStatus.PENDING,
+        form: {
+            name: "",
+            body: [],
+            knowledgeCategoryID: null,
         },
+        formNeedsRefresh: false,
         revision: {
+            status: LoadStatus.PENDING,
+            error: undefined,
+        },
+        saveDraft: {
             status: LoadStatus.PENDING,
         },
         submit: {
             status: LoadStatus.PENDING,
         },
-        form: {
-            name: "",
-            body: [],
-            format: Format.RICH,
-            knowledgeCategoryID: null,
-        },
-        needsDraftConfirmation: false,
     };
+    public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
 
     /**
      * Reducer implementation for the editor page.
@@ -191,8 +178,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case EditorPageActions.UPDATE_FORM:
                 nextState.form = {
                     ...nextState.form,
-                    ...action.payload,
+                    ...action.payload.formData,
                 };
+                nextState.formNeedsRefresh = action.payload.forceRefresh;
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;
@@ -205,22 +193,22 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         nextState: IEditorPageState,
         action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IEditorPageState => {
-        switch (action.type) {
-            // Posting a new draft.
-            case ArticleActions.POST_DRAFT_REQUEST:
-            case ArticleActions.PATCH_DRAFT_REQUEST:
-                nextState.savedDraft.status = LoadStatus.LOADING;
-                break;
-            case ArticleActions.POST_DRAFT_RESPONSE:
-            case ArticleActions.PATCH_DRAFT_RESPONSE:
-                nextState.savedDraft.status = LoadStatus.SUCCESS;
-                nextState.savedDraft.data = action.payload.data;
-                break;
-            case ArticleActions.POST_DRAFT_ERROR:
-            case ArticleActions.PATCH_DRAFT_ERROR:
-                nextState.savedDraft.status = LoadStatus.ERROR;
-                nextState.savedDraft.error = action.payload;
-                break;
+        if (
+            action.meta &&
+            action.meta.tempID &&
+            nextState.draft.data &&
+            action.meta.tempID === nextState.draft.data.tempID
+        ) {
+            switch (action.type) {
+                // Posting a new draft.
+                case ArticleActions.POST_DRAFT_REQUEST:
+                    nextState.saveDraft.status = LoadStatus.LOADING;
+                    break;
+                case ArticleActions.POST_DRAFT_RESPONSE:
+                    nextState.saveDraft.status = LoadStatus.SUCCESS;
+                    nextState.draft.data = { draftID: action.payload.data.draftID };
+                    break;
+            }
         }
 
         return nextState;
@@ -232,18 +220,28 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     ): IEditorPageState => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_INITIAL_DRAFT) {
-            nextState.initialDraft.data = action.payload.draftID ? action.payload.draftID : undefined;
-            nextState.needsDraftConfirmation = action.payload.needsInitialConfirmation;
+            nextState.draft.data = action.payload;
         }
 
         // Initial draft handling data handling.
-        if (action.meta && action.meta.draftID !== null && action.meta.draftID === nextState.initialDraft.data) {
+        if (
+            action.meta &&
+            action.meta.draftID !== null &&
+            nextState.draft.data &&
+            action.meta.draftID === nextState.draft.data.draftID
+        ) {
             switch (action.type) {
                 case ArticleActions.GET_DRAFT_REQUEST:
-                    nextState.initialDraft.status = LoadStatus.LOADING;
+                    nextState.draft.status = LoadStatus.LOADING;
+                    break;
+                case ArticleActions.PATCH_DRAFT_REQUEST:
+                    nextState.saveDraft.status = LoadStatus.LOADING;
                     break;
                 case ArticleActions.GET_DRAFT_RESPONSE:
-                    nextState.initialDraft.status = LoadStatus.SUCCESS;
+                    nextState.draft.status = LoadStatus.SUCCESS;
+                    break;
+                case ArticleActions.PATCH_DRAFT_RESPONSE:
+                    nextState.saveDraft.status = LoadStatus.SUCCESS;
                     break;
             }
         }

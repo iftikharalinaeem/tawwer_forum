@@ -20,16 +20,18 @@ import LanguagesDropDown from "@library/components/LanguagesDropDown";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IDeviceProps {
-    canSubmit: boolean;
-    savedDraft?: ILoadable<IResponseArticleDraft>;
-    selectedKey?: string;
-    isSubmitLoading: boolean;
-    selectedLang?: string;
-    className?: string;
     callToAction?: string;
+    canSubmit: boolean;
+    className?: string;
+    draft?: ILoadable<IResponseArticleDraft>;
+    isSubmitLoading: boolean;
     optionsMenu?: React.ReactNode;
+    saveDraft?: ILoadable<{}>;
+    selectedLang?: string;
+    selectedKey?: string;
 }
 
 /**
@@ -38,7 +40,10 @@ interface IProps extends IDeviceProps {
 export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
-        savedDraft: {
+        draft: {
+            status: LoadStatus.PENDING,
+        },
+        saveDraft: {
             status: LoadStatus.PENDING,
         },
         isSubmitLoading: false,
@@ -81,6 +86,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
                                         buttonBaseClass={ButtonBaseClass.STANDARD}
                                         selected={this.props.selectedLang}
+                                        openAsModal={this.props.device === Devices.MOBILE}
                                     >
                                         {dummyOtherLanguagesData.children}
                                     </LanguagesDropDown>
@@ -97,7 +103,8 @@ export class EditorHeader extends React.Component<IProps> {
     }
 
     private renderDraftIndicator(): React.ReactNode {
-        const { status, data } = this.props.savedDraft!;
+        const { status } = this.props.saveDraft!;
+        const { data } = this.props.draft!;
         if (status === LoadStatus.LOADING) {
             return (
                 <li className="editorHeader-item">

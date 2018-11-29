@@ -143,15 +143,18 @@ export default class ArticleActions extends ReduxActions {
         ArticleActions.GET_DRAFTS_RESPONSE,
         ArticleActions.GET_DRAFTS_ERROR,
         {} as IGetArticleDraftsResponse,
-        {} as IGetArticleDraftsRequest,
+        {} as IGetArticleDraftsRequest & { identifier: string },
     );
 
-    public getDrafts(request: IGetArticleDraftsRequest) {
+    public getDrafts(request: IGetArticleDraftsRequest, identifier: string) {
         return this.dispatchApi<IGetArticleDraftsResponse>(
             "get",
             `/articles/drafts`,
             ArticleActions.getDraftsACs,
             request,
+            {
+                identifier,
+            },
         );
     }
 
@@ -177,20 +180,23 @@ export default class ArticleActions extends ReduxActions {
     }
 
     // POST /articles/drafts
-    private static readonly postDraftACs = ReduxActions.generateApiActionCreators(
+    public static readonly postDraftACs = ReduxActions.generateApiActionCreators(
         ArticleActions.POST_DRAFT_REQUEST,
         ArticleActions.POST_DRAFT_RESPONSE,
         ArticleActions.POST_DRAFT_ERROR,
         {} as IPostArticleDraftResponse,
-        {} as IPostArticleDraftRequest,
+        {} as IPostArticleDraftRequest & { tempID?: string },
     );
 
-    public postDraft(request: IPostArticleDraftRequest) {
+    public postDraft(request: IPostArticleDraftRequest, tempID: string) {
         return this.dispatchApi<IPostArticleDraftResponse>(
             "post",
             "/articles/drafts",
             ArticleActions.postDraftACs,
             request,
+            {
+                tempID,
+            },
         );
     }
 
@@ -228,7 +234,7 @@ export default class ArticleActions extends ReduxActions {
 
     public deleteDraft(request: IDeleteArticleDraftRequest) {
         return this.dispatchApi<IDeleteArticleDraftResponse>(
-            "patch",
+            "delete",
             `/articles/drafts/${request.draftID}`,
             ArticleActions.deleteDraftACs,
             request,
@@ -259,11 +265,13 @@ export default class ArticleActions extends ReduxActions {
      * Get an article by its ID from the API.
      */
     public fetchByID = (options: IGetArticleRequestBody) => {
+        const { articleID, ...rest } = options;
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
             `/articles/${options.articleID}?expand=all`,
             ArticleActions.getArticleACs,
-            options,
+            rest,
+            { articleID },
         );
     };
 
@@ -277,7 +285,8 @@ export default class ArticleActions extends ReduxActions {
     };
 
     public fetchRevisionByID = (options: IGetRevisionRequestBody) => {
-        const existingRevision = ArticleModel.selectRevision(this.getState(), options.revisionID);
+        const { revisionID, ...rest } = options;
+        const existingRevision = ArticleModel.selectRevision(this.getState(), revisionID);
         if (existingRevision) {
             const revResponse: IApiResponse<IGetRevisionResponseBody> = { data: existingRevision, status: 200 };
             this.dispatch(ArticleActions.getRevisionACs.response(revResponse, options));
@@ -287,7 +296,8 @@ export default class ArticleActions extends ReduxActions {
                 "get",
                 `/article-revisions/${options.revisionID}`,
                 ArticleActions.getRevisionACs,
-                options,
+                rest,
+                { revisionID },
             );
         }
     };

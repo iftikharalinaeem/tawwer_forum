@@ -24,10 +24,14 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
+import Frame from "@library/components/frame/Frame";
+import FrameBody from "@library/components/frame/FrameBody";
+import { Devices } from "@library/components/DeviceChecker";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
     buttonClassName?: string;
+    device?: Devices;
 }
 
 interface IState {
@@ -61,29 +65,34 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
+                    openAsModal={this.props.device === Devices.MOBILE}
                 >
-                    <DropDownItemMetas>
-                        <Translate
-                            source="Published on <0/> by <1/>"
-                            c0={<DateTime timestamp={dateInserted} />}
-                            c1={<ProfileLink className="metaStyle" username={insertUser!.name} />}
-                        />
-                    </DropDownItemMetas>
-                    <DropDownItemMetas>
-                        <Translate
-                            source="Updated on <0/> by <1/>"
-                            c0={<DateTime timestamp={dateUpdated} />}
-                            c1={<ProfileLink className="metaStyle" username={updateUser!.name} />}
-                        />
-                    </DropDownItemMetas>
-                    <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
-                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
-                    <DropDownItemLink name={t("Edit article")} to={editUrl} />
-                    <DropDownItemSeparator />
-                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
-                    <DropDownItemSeparator />
-                    {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
+                    <Frame>
+                        <FrameBody className="dropDownItem-verticalPadding">
+                            <DropDownItemMetas>
+                                <Translate
+                                    source="Published on <0/> by <1/>"
+                                    c0={<DateTime timestamp={dateInserted} />}
+                                    c1={<ProfileLink className="metaStyle" username={insertUser!.name} />}
+                                />
+                            </DropDownItemMetas>
+                            <DropDownItemMetas>
+                                <Translate
+                                    source="Updated on <0/> by <1/>"
+                                    c0={<DateTime timestamp={dateUpdated} />}
+                                    c1={<ProfileLink className="metaStyle" username={updateUser!.name} />}
+                                />
+                            </DropDownItemMetas>
+                            <DropDownItemSeparator />
+                            <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
+                            <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
+                            <DropDownItemLink name={t("Edit article")} to={editUrl} />
+                            <DropDownItemSeparator />
+                            <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
+                            <DropDownItemSeparator />
+                            {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
+                        </FrameBody>
+                    </Frame>
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}

@@ -10,11 +10,19 @@ import DropDown from "@library/components/dropdown/DropDown";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
+import { connect } from "react-redux";
+import { DraftsPage } from "@knowledge/modules/drafts/DraftsPage";
+import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import apiv2 from "@library/apiv2";
+import { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
+import { LoadStatus } from "@library/@types/api";
 
-interface IProps {
+interface IProps extends IInjectableDraftsPageProps {
+    actions: ArticleActions;
     className?: string;
+    draftID: number;
     url: string;
-    deleteFunction: () => void;
 }
 
 interface IState {
@@ -24,7 +32,7 @@ interface IState {
 /**
  * Implements actions to take on draft
  */
-export default class DraftMenu extends React.Component<IProps, IState> {
+export class DraftMenu extends React.Component<IProps, IState> {
     private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public constructor(props) {
@@ -56,15 +64,21 @@ export default class DraftMenu extends React.Component<IProps, IState> {
                     <ModalConfirm
                         title={t("Delete Draft")}
                         onCancel={this.closeDeleteDialogue}
-                        onConfirm={this.props.deleteFunction}
+                        onConfirm={this.deleteDraft}
                         elementToFocusOnExit={this.toggleButtonRef.current! as HTMLElement}
+                        isConfirmLoading={this.props.deleteDraft.status === LoadStatus.LOADING}
                     >
-                        {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
+                        {t("This is a destructive action. You will not be able to restore your draft.")}
                     </ModalConfirm>
                 )}
             </React.Fragment>
         );
     }
+
+    private deleteDraft = async () => {
+        await this.props.actions.deleteDraft({ draftID: this.props.draftID });
+        this.closeDeleteDialogue();
+    };
 
     /**
      * Open the delete dialogue.
@@ -88,3 +102,16 @@ export default class DraftMenu extends React.Component<IProps, IState> {
         this.forceUpdate();
     };
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: new ArticleActions(dispatch, apiv2),
+    };
+}
+
+const withRedux = connect(
+    DraftsPageModel.mapStateToProps,
+    mapDispatchToProps,
+);
+
+export default withRedux(DraftMenu);
