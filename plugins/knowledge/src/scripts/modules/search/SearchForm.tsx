@@ -32,19 +32,18 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
     placeholder?: string;
     device: Devices;
-    searchBarRef?: React.RefObject<SearchBar>;
 }
 
 class SearchForm extends React.Component<IProps> {
+    private searchBarRef: React.RefObject<SearchBar> = React.createRef();
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} />
+                <VanillaHeader title={t("Search")} onSearchIconClick={this.focusSearchInput} />
                 <Container>
                     <QueryString value={this.props.form} />
                     <PanelLayout device={this.props.device}>
@@ -61,6 +60,7 @@ class SearchForm extends React.Component<IProps> {
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
                                     triggerSearchOnAllUpdates={true}
+                                    ref={this.searchBarRef}
                                 />
                             </PanelWidget>
                             {isMobile && (
@@ -159,6 +159,10 @@ class SearchForm extends React.Component<IProps> {
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
     }
+
+    private focusSearchInput = () => {
+        this.searchBarRef.current!.focus();
+    };
 }
 
 const withRedux = connect(
