@@ -43,6 +43,8 @@ class KbRootController extends KnowledgeTwigPageController {
 
     /**
      * Render out the /kb/{id}/organize-categories page.
+     *
+     * @param int $id Knowledge base ID
      */
     public function get_organizeCategories(int $id) : string {
         $this->setPageTitle(\Gdn::translate('Organize Categories'));
