@@ -102,7 +102,27 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("articleCount", "int", "0")
             ->column("articleCountRecursive", "int", "0")
             ->column("childCategoryCount", "int", "0")
-            ->set()
-        ;
+            ->set();
+
+        $this->database->structure()
+            ->table("knowledgeBase")
+            ->primaryKey("knowledgeBaseID")
+            ->column("name", "varchar(255)")
+            ->column("description", "text")
+            ->column("urlCode", "varchar(255)")
+            ->column("icon", "varchar(255)")
+            ->column("sourceLocale", "varchar(5)")
+            ->column("type", ["enum", Models\KnowledgeBaseModel::getAllTypes(),
+            ], ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE])
+            ->column("sortArticles", ["enum", Models\KnowledgeBaseModel::getAllSorts(),
+            ], ['Null' => false, 'Default' => Models\KnowledgeBaseModel::ORDER_MANUAL])
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int")
+            ->column("dateUpdated", "datetime")
+            ->column("countArticles", "int", "0")
+            ->column("countCategories", "int", "0")
+            ->column("rootCategory", "int")
+            ->set();
     }
 }

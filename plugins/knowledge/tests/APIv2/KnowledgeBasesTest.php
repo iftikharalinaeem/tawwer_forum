@@ -6,6 +6,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Knowledge\Models\Entities\KnowledgeBaseEntity;
+
 /**
  * Test the /api/v2/knowledge-bases endpoint.
  */
@@ -38,9 +40,19 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      */
     public function record() {
         $record = [
-            "name" => "Test Knowledge Base"
+            "name" => "Test Knowledge Base",
+            "description" => "Test Knowledge Base DESCRIPTION"
         ];
         return $record;
+    }
+
+    public function testKnowledgeBaseEntity() {
+        $kb = new KnowledgeBaseEntity(['name'=>'test']);
+        $kb->name = 'Test Knowledge Baser Name';
+        $this->assertEquals('Test Knowledge Baser Name', $kb->name);
+        $this->expectException(\TypeError::class);
+        $kb->name = ['Test Knowledge Baser Name'];
+        //$this->assertEquals('Test Knowledge Baser Name', $kb->name);
     }
 
 }

@@ -13,6 +13,15 @@ use Gdn_Session;
  * A model for managing knowledge categories.
  */
 class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
+    const TYPE_GUIDE = 'guide';
+    const TYPE_HELP = 'help';
+
+    const ORDER_MANUAL = 'manual';
+    const ORDER_NAME = 'name';
+    const ORDER_DATE_ASC = 'dateInserted';
+    const ORDER_DATE_DESC = 'dateInsertedDesc';
+
+
     /** @var Gdn_Session */
     private $session;
 
@@ -35,4 +44,22 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
     }
+
+    public static function getAllTypes() {
+        return [
+            self::TYPE_GUIDE,
+            self::TYPE_HELP
+        ];
+    }
+
+    public static function getAllSorts() {
+        return [
+            self::ORDER_MANUAL,
+            self::ORDER_NAME,
+            self::ORDER_DATE_ASC,
+            self::ORDER_DATE_DESC,
+        ];
+    }
+
+
 }
