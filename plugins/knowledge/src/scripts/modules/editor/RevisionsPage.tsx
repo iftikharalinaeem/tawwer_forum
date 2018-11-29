@@ -81,7 +81,6 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
             <PageTitle
                 title={selectedRevision.data.name}
-                backUrl={null}
                 meta={
                     <ArticleMeta
                         updateUser={selectedRevision.data.insertUser!}

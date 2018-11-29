@@ -28,6 +28,9 @@ import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
+import LinkAsButton from "@library/components/LinkAsButton";
+import { ButtonBaseClass } from "@library/components/forms/Button";
+import { compose } from "@library/components/icons/header";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
     placeholder?: string;
@@ -61,6 +64,19 @@ class SearchForm extends React.Component<IProps> {
                                     optionComponent={SearchOption}
                                     triggerSearchOnAllUpdates={true}
                                     ref={this.searchBarRef}
+                                    title={
+                                        <>
+                                            {t("Search")}
+                                            <LinkAsButton
+                                                to={`/kb/articles/add`}
+                                                className="searchBar-actionButton"
+                                                baseClass={ButtonBaseClass.ICON}
+                                                title={t("Compose")}
+                                            >
+                                                {compose()}
+                                            </LinkAsButton>
+                                        </>
+                                    }
                                 />
                             </PanelWidget>
                             {isMobile && (

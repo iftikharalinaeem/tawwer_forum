@@ -63,19 +63,22 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                 placeholder={t("Search")}
                                 onChange={this.setQuery}
                                 value={this.state.query || ""}
-                            >
-                                {category.name}
-                                <LinkAsButton
-                                    to={`/kb/articles/add?knowledgeCategoryID=${
-                                        this.props.category.knowledgeCategoryID
-                                    }`}
-                                    className="searchBar-actionButton"
-                                    baseClass={ButtonBaseClass.ICON}
-                                    title={t("Compose")}
-                                >
-                                    {compose()}
-                                </LinkAsButton>
-                            </SearchBar>
+                                title={
+                                    <>
+                                        {category.name}
+                                        <LinkAsButton
+                                            to={`/kb/articles/add?knowledgeCategoryID=${
+                                                this.props.category.knowledgeCategoryID
+                                            }`}
+                                            className="searchBar-actionButton"
+                                            baseClass={ButtonBaseClass.ICON}
+                                            title={t("Compose")}
+                                        >
+                                            {compose()}
+                                        </LinkAsButton>
+                                    </>
+                                }
+                            />
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>

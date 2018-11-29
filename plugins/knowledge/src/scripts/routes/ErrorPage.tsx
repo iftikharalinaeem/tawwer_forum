@@ -9,7 +9,6 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import Paragraph from "@library/components/Paragraph";
-import PageHeading from "@library/components/PageHeading";
 import Container from "@library/components/layouts/components/Container";
 import BackLink from "@library/components/navigation/BackLink";
 import { formatUrl, t } from "@library/application";
@@ -17,6 +16,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 import DocumentTitle from "@library/components/DocumentTitle";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
+import Heading from "@library/components/Heading";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     loadable: ILoadable<any>;
@@ -65,10 +65,9 @@ export class ErrorPage extends React.Component<IProps> {
             <DocumentTitle title={(title as unknown) as string}>
                 <Container>
                     <PanelLayout device={this.props.device}>
-                        <PanelLayout.LeftTop />
                         <PanelLayout.MiddleTop>
                             <div className="errorPage">
-                                <PageHeading backUrl={null}>{title}</PageHeading>
+                                <Heading depth={1}>{title}</Heading>
                                 <Paragraph>{message}</Paragraph>
                                 <div className="errorPage-cta">
                                     {showSignIn ? (
@@ -81,12 +80,15 @@ export class ErrorPage extends React.Component<IProps> {
                                             {t("Sign In")}
                                         </a>
                                     ) : (
-                                        <BackLink url={formatUrl("/kb")} visibleLabel={true} title={t("Home")} />
+                                        <BackLink
+                                            fallbackUrl={formatUrl("/kb")}
+                                            visibleLabel={true}
+                                            title={t("Home")}
+                                        />
                                     )}
                                 </div>
                             </div>
                         </PanelLayout.MiddleTop>
-                        <PanelLayout.RightTop />
                     </PanelLayout>
                 </Container>
             </DocumentTitle>
