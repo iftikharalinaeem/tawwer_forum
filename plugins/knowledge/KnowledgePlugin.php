@@ -122,7 +122,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("dateUpdated", "datetime")
             ->column("countArticles", "int", "0")
             ->column("countCategories", "int", "0")
-            ->column("rootCategory", "int")
+            ->column("rootCategoryID", "int")
             ->set();
     }
 }

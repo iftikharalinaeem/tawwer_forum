@@ -16,11 +16,20 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
 
+    /** @var string The name of the primary key of the resource. */
+    protected $pk = "knowledgeBaseID";
 
+    /** @var bool Whether to check if paging works or not in the index. */
+    protected $testPagingOnIndex = false;
 
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
-        "name",
+        'name',
+        'description',
+        'type',
+        'icon',
+        'sortArticles',
+        'sourceLocale',
     ];
 
 
@@ -40,8 +49,12 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      */
     public function record() {
         $record = [
-            "name" => "Test Knowledge Base",
-            "description" => "Test Knowledge Base DESCRIPTION"
+            'name' => 'Test Knowledge Base',
+            'description' => 'Test Knowledge Base DESCRIPTION',
+            'type' => 'guide',
+            'icon' => '',
+            'sortArticles' => 'manual',
+            'sourceLocale' => '',
         ];
         return $record;
     }
@@ -52,6 +65,11 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $this->assertEquals('Test Knowledge Baser Name', $kb->name);
         $this->expectException(\TypeError::class);
         $kb->name = ['Test Knowledge Baser Name'];
+        $kb->description = 'Knowledge Baser TestDescription';
+        $this->assertEquals('Knowledge Baser TestDescription', $kb->description);
+        $this->expectException(\TypeError::class);
+        $kb->description = 123;
+
         //$this->assertEquals('Test Knowledge Baser Name', $kb->name);
     }
 

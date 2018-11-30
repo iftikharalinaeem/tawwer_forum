@@ -17,6 +17,9 @@ trait KnowledgeBasesApiSchemes {
     /** @var Schema */
     private $knowledgeBasePostSchema;
 
+    /** @var Schema */
+    private $idParamSchema;
+
     /**
      * Get a schema representing all available fields for a knowledge base.
      *
@@ -24,7 +27,7 @@ trait KnowledgeBasesApiSchemes {
      */
     private function fullSchema(): Schema {
         return Schema::parse([
-            "knowledgeCategoryID" => [
+            "knowledgeBaseID" => [
                 "description" => "Unique knowledge base ID.",
                 "type" => "integer",
             ],
@@ -107,11 +110,27 @@ trait KnowledgeBasesApiSchemes {
                     "type?",
                     "sortArticles?",
                 ])->add($this->fullSchema()),
-                "KnowledgeCategoryPost"
+                "KnowledgeBasePost"
             );
         }
 
         return $this->schema($this->knowledgeBasePostSchema, $type);
+    }
+
+    /**
+     * Get an ID-only knowledge base schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function idParamSchema(string $type = "in"): Schema {
+        if ($this->idParamSchema === null) {
+            $this->idParamSchema = $this->schema(
+                Schema::parse(["id:i" => "Knowledge base ID."]),
+                $type
+            );
+        }
+        return $this->schema($this->idParamSchema, $type);
     }
 
 }
