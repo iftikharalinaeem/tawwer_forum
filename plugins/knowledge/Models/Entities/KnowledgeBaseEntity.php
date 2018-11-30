@@ -48,6 +48,8 @@ class KnowledgeBaseEntity extends Entity {
     protected $rootCategoryID = 0;
 
     /**
+     * Get list entity properties
+     *
      * @inheritdoc
      *
      * @return array
