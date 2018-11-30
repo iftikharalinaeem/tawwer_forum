@@ -42,6 +42,22 @@ class KbRootController extends KnowledgeTwigPageController {
     }
 
     /**
+     * Render out the /kb/{id}/organize-categories page.
+     *
+     * @param int $id Knowledge base ID
+     */
+    public function get_organizeCategories(int $id) : string {
+        $this->setPageTitle(\Gdn::translate('Organize Categories'));
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
+        $data['template'] = 'seo/pages/organize-categories.twig';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
      * Initialize page SEO meta data.
      *
      * (temporary solution, need to be extended and/or refactored later)
