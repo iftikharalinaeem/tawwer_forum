@@ -9,6 +9,7 @@ import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import RouteHandler from "@knowledge/routes/RouteHandler";
+import { ModalLoader } from "@library/components/modal";
 import {
     IArticleFragment,
     IArticle,
@@ -47,12 +48,12 @@ function makeEditorUrl(
 // Editor
 const EDITOR_KEY = "EditorPageKey";
 const loadEditor = () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage");
-const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, true, EDITOR_KEY);
+const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, ModalLoader, EDITOR_KEY);
 export const EditorRoute = new RouteHandler(
     loadEditor,
     "/kb/articles/:id(\\d+)/editor",
     makeEditorUrl,
-    true,
+    ModalLoader,
     EDITOR_KEY,
 );
 
@@ -72,7 +73,7 @@ export const RevisionsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/revisions" */ "@knowledge/modules/editor/RevisionsPage"),
     "/kb/articles/:id(\\d+)/revisions/:revisionID(\\d+)?",
     makeRevisionsUrl,
-    true,
+    ModalLoader,
 );
 
 export const ArticleRoute = new RouteHandler(
@@ -103,6 +104,7 @@ export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
     (data?: undefined) => formatUrl("/kb/drafts"),
+    ModalLoader,
 );
 
 const NotFound = () => {

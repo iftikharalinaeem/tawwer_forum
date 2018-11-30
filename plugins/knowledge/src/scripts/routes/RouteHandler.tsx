@@ -7,7 +7,6 @@
 import React from "react";
 import Loadable, { LoadableComponent } from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
-import { ModalLoader } from "@library/components/modal";
 import { Route, NavLinkProps, NavLink } from "react-router-dom";
 import { Omit } from "react-redux";
 
@@ -18,18 +17,18 @@ type LoadFunction = () => Promise<any>;
  */
 export default class RouteHandler<GeneratorProps> {
     public loadable;
-    private key: string;
     public route: React.ReactNode;
+    private key: string;
 
     public constructor(
         componentPromise: LoadFunction,
         public path: string,
         public url: (data: GeneratorProps) => string,
-        asModal = false,
+        loadingComponent: React.ReactNode = FullPageLoader,
         key?: string,
     ) {
         this.loadable = Loadable({
-            loading: asModal ? FullPageLoader : ModalLoader,
+            loading: loadingComponent,
             loader: componentPromise,
         });
         this.key = key || path;
