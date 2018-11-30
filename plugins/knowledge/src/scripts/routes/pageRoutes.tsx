@@ -6,60 +6,106 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import Loadable from "react-loadable";
-import FullPageLoader from "@library/components/FullPageLoader";
-import { ADD_ROUTE, EDIT_ROUTE, REVISIONS_ROUTE } from "@knowledge/modules/editor/route";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
+import RouteHandler from "@knowledge/routes/RouteHandler";
 import { ModalLoader } from "@library/components/modal";
+import {
+    IArticleFragment,
+    IArticle,
+    IRevisionFragment,
+    IRevision,
+    IResponseArticleDraft,
+    IKbCategoryFragment,
+    IKbCategory,
+    IKbCategoryMultiTypeFragment,
+} from "@knowledge/@types/api";
+import { formatUrl } from "@library/application";
 
-export const ARTICLE_ROUTE = "/kb/articles/:id(\\d+)(-[^/]+)?";
+/**
+ * Get the route for editing a particular article ID.
+ *
+ * @param articleID - The articleID.
+ */
+function makeEditorUrl(
+    data?: IArticleFragment | IArticle | IRevisionFragment | IRevision | IResponseArticleDraft | undefined,
+) {
+    if (data === undefined) {
+        return formatUrl("/kb/articles/add");
+    } else if ("articleRevisionID" in data) {
+        return formatUrl(`/kb/articles/${data.articleID}/editor?revisionID=${data.articleRevisionID}`);
+    } else if ("draftID" in data) {
+        if (data.recordType === "article" && data.recordID !== null) {
+            return formatUrl(`/kb/articles/${data.recordID}/editor?draftID=${data.draftID}`);
+        } else {
+            return formatUrl(`/kb/articles/add?draftID=${data.draftID}`);
+        }
+    } else {
+        return formatUrl(`/kb/articles/${data.articleID}/editor`);
+    }
+}
 
-export const CATEGORIES_ROUTE = "/kb/categories/:id(\\d+)(-[^/]+)?";
-export const SEARCH_ROUTE = "/kb/search";
-export const DRAFTS_ROUTE = "/kb/drafts";
+// Editor
+const EDITOR_KEY = "EditorPageKey";
+const loadEditor = () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage");
+const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, ModalLoader, EDITOR_KEY);
+export const EditorRoute = new RouteHandler(
+    loadEditor,
+    "/kb/articles/:id(\\d+)/editor",
+    makeEditorUrl,
+    ModalLoader,
+    EDITOR_KEY,
+);
 
-/** A loadable version of the Editor Page */
-const EditorPage = Loadable({
-    loading: ModalLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage"),
-});
+/**
+ * Get the route for editing a particular article ID.
+ *
+ * @param articleID - The articleID.
+ */
+export function makeRevisionsUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
+    if ("articleRevisionID" in articleOrRevison) {
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`);
+    } else {
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions`);
+    }
+}
+export const RevisionsRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/revisions" */ "@knowledge/modules/editor/RevisionsPage"),
+    "/kb/articles/:id(\\d+)/revisions/:revisionID(\\d+)?",
+    makeRevisionsUrl,
+    ModalLoader,
+);
 
-/** A loadable version of the article revisions page. */
-const RevisionsPage = Loadable({
-    loading: ModalLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/revisions" */ "@knowledge/modules/editor/RevisionsPage"),
-});
+export const ArticleRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/modules/article/ArticlePage"),
+    "/kb/articles/:id(\\d+)(-[^/]+)?",
+    (article: IArticle | IArticleFragment) => article.url,
+);
 
-/** A loadable version of the article page. */
-const ArticlePage = Loadable({
-    loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/modules/article/ArticlePage"),
-});
+export const HomeRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
+    "/kb",
+    () => formatUrl("/kb"),
+);
 
-/** A loadable version of the HomePage component. */
-const HomePage = Loadable({
-    loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
-});
+export const CategoryRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
+    "/kb/categories/:id(\\d+)(-[^/]+)?",
+    (category: IKbCategory | IKbCategoryFragment | IKbCategoryMultiTypeFragment) => category.url,
+);
 
-/** A loadable version of the article page. */
-const CategoriesPage = Loadable({
-    loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
-});
+export const SearchRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
+    "/kb/search",
+    (data?: undefined) => formatUrl("/kb/search"),
+);
 
-/** A loadable version of the search page. */
-const SearchPage = Loadable({
-    loading: FullPageLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
-});
-
-/** A loadable version of the search page. */
-const DraftsPage = Loadable({
-    loading: ModalLoader,
-    loader: () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
-});
+export const DraftsRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
+    "/kb/drafts",
+    (data?: undefined) => formatUrl("/kb/drafts"),
+    ModalLoader,
+);
 
 const NotFound = () => {
     return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
@@ -76,14 +122,14 @@ const NotFound = () => {
  */
 export function getPageRoutes() {
     return [
-        <Route exact path="/kb" component={HomePage} key={"/kb"} />,
-        <Route exact path={ARTICLE_ROUTE} component={ArticlePage} key={ARTICLE_ROUTE} />,
-        <Route exact path={CATEGORIES_ROUTE} component={CategoriesPage} key={CATEGORIES_ROUTE} />,
-        <Route exact path={ADD_ROUTE} component={EditorPage} key={"editorPage"} />,
-        <Route exact path={EDIT_ROUTE} component={EditorPage} key={"editorPage"} />,
-        <Route exact path={REVISIONS_ROUTE} component={RevisionsPage} key={REVISIONS_ROUTE} />,
-        <Route exact path={SEARCH_ROUTE} component={SearchPage} key={SEARCH_ROUTE} />,
-        <Route exact path={DRAFTS_ROUTE} component={DraftsPage} key={DRAFTS_ROUTE} />,
+        EditorAddRoute.route,
+        EditorRoute.route,
+        RevisionsRoute.route,
+        ArticleRoute.route,
+        HomeRoute.route,
+        CategoryRoute.route,
+        SearchRoute.route,
+        DraftsRoute.route,
         <Route component={NotFound} key={"not found"} />,
     ];
 }

@@ -8,9 +8,14 @@ import * as React from "react";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import { DropDownItemLink, DropDownItemButton, DropDownItemSeparator } from "@library/components/dropdown";
-import { makeRevisionsUrl } from "@knowledge/modules/editor/route";
+import {
+    DropDownItemLink,
+    DropDownItemButton,
+    DropDownItemSeparator,
+    DropDownItem,
+} from "@library/components/dropdown";
 import Permission from "@library/users/Permission";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps {
     article: IArticle;
@@ -22,7 +27,6 @@ interface IProps {
 export default class EditorMenu extends React.PureComponent<IProps> {
     public render() {
         const { article } = this.props;
-        const revisionUrl = makeRevisionsUrl(article);
 
         return (
             <Permission permission="articles.add">
@@ -36,7 +40,11 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
                     <DropDownItemSeparator />
-                    <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
+                    <DropDownItem>
+                        <EditorRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                            {t("Revision History")}
+                        </EditorRoute.Link>
+                    </DropDownItem>
                     {this.props.article.status === ArticleStatus.PUBLISHED && (
                         <DropDownItemLink name={t("View Article")} to={this.props.article.url} />
                     )}
