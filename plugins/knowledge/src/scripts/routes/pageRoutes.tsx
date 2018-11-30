@@ -28,7 +28,14 @@ import { formatUrl } from "@library/application";
  * @param articleID - The articleID.
  */
 function makeEditorUrl(
-    data?: IArticleFragment | IArticle | IRevisionFragment | IRevision | IResponseArticleDraft | undefined,
+    data?:
+        | IArticleFragment
+        | IArticle
+        | IRevisionFragment
+        | IRevision
+        | IResponseArticleDraft
+        | IKbCategoryFragment
+        | undefined,
 ) {
     if (data === undefined) {
         return formatUrl("/kb/articles/add");
@@ -40,6 +47,8 @@ function makeEditorUrl(
         } else {
             return formatUrl(`/kb/articles/add?draftID=${data.draftID}`);
         }
+    } else if ("knowledgeCategoryID" in data && "parentID" in data) {
+        return formatUrl(`/kb/articles/add?knowledgeCategoryID=${data.knowledgeCategoryID}`);
     } else {
         return formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
