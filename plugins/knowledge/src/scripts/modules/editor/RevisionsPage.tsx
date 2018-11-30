@@ -20,9 +20,9 @@ import { LoadStatus } from "@library/@types/api";
 import UserContent from "@library/components/UserContent";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import { makeRevisionsUrl, makeEditUrl } from "@knowledge/modules/editor/route";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps
     extends IDeviceProps,
@@ -85,7 +85,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                     <ArticleMeta
                         updateUser={selectedRevision.data.insertUser!}
                         dateUpdated={selectedRevision.data.dateInserted}
-                        permaLink={makeRevisionsUrl(selectedRevision.data)}
+                        permaLink={RevisionsRoute.url(selectedRevision.data)}
                     />
                 }
             />
@@ -108,7 +108,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                             <RevisionsListItem
                                 {...item}
                                 isSelected={item.articleRevisionID === selectedRevisionID}
-                                url={makeRevisionsUrl(item)}
+                                url={EditorRoute.url(item)}
                                 key={item.articleRevisionID}
                             />
                         ))}
@@ -121,7 +121,8 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        void this.initializeFromUrl();
+        // Initialize the page data, then preload the editor page because we are likely to navigate there.
+        void this.initializeFromUrl().then(EditorRoute.preload);
     }
 
     /**
@@ -151,7 +152,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (this.canSubmit) {
-            this.props.history.push(makeEditUrl(this.props.selectedRevision.data!));
+            this.props.history.push(EditorRoute.url(this.props.selectedRevision.data!));
         }
     };
 
