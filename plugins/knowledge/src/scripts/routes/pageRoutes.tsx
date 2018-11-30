@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import RouteHandler from "@knowledge/routes/RouteHandler";
@@ -82,10 +82,10 @@ export const ArticleRoute = new RouteHandler(
     (article: IArticle | IArticleFragment) => article.url,
 );
 
-export const HomeRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
-    "/kb",
-    () => formatUrl("/kb"),
+export const DebugRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/debug" */ "@knowledge/DebugPage"),
+    "/kb/debug",
+    () => formatUrl("/kb/debug"),
 );
 
 export const CategoryRoute = new RouteHandler(
@@ -99,6 +99,7 @@ export const SearchRoute = new RouteHandler(
     "/kb/search",
     (data?: undefined) => formatUrl("/kb/search"),
 );
+const SearchRedirect = () => <Redirect to={SearchRoute.url(undefined)} />;
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
@@ -126,10 +127,11 @@ export function getPageRoutes() {
         EditorRoute.route,
         RevisionsRoute.route,
         ArticleRoute.route,
-        HomeRoute.route,
+        DebugRoute.route,
         CategoryRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
+        <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
         <Route component={NotFound} key={"not found"} />,
     ];
 }

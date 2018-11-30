@@ -107,9 +107,7 @@ class SearchForm extends React.Component<IProps> {
      * @inheritdoc
      */
     public componentDidMount() {
-        if (window.location.search) {
-            this.initializeFromQueryString(window.location.search);
-        }
+        this.initializeFromQueryString(window.location.search);
     }
 
     /**
