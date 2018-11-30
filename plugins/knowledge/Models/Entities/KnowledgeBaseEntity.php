@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -9,13 +8,12 @@ namespace Vanilla\Knowledge\Models\Entities;
 
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
-
 /**
  * A knowledge base entity.
  */
-class KnowledgeBaseEntity {
+class KnowledgeBaseEntity extends Entity {
     const TABLE = 'knowledgeBase';
-    public static $fields = [
+    const FIELDS = [
         'knowledgeBaseID',
         'name',
         'description',
@@ -49,48 +47,44 @@ class KnowledgeBaseEntity {
     protected $countCategories = 0;
     protected $rootCategoryID = 0;
 
-    public function __construct(array $fields = []) {
-        foreach ($fields as $k => $v) {
-            if (in_array($k, self::$fields)) {
-                $this->__set($k, $v);
-            }
-        }
+    /**
+     * @inheritdoc
+     *
+     * @return array
+     */
+    protected function getEntityFields(): array {
+        return self::FIELDS;
     }
 
-    public function __get($propName) {
-        if (property_exists($this, $propName)) {
-            return $this->$propName;
-        } else {
-            throw new \Exception('Call to undefined property '.$propName.' of '.__CLASS__);
-        }
-    }
-
-    public function __set($propName, $value): KnowledgeBaseEntity {
-        $setter = 'set'.ucfirst($propName);
-        if (method_exists($this, $setter)) {
-            return $this->$setter($value);
-        } else {
-            throw new \Exception('Method '.$propName.'() is not supported by '.__CLASS__);
-        }
-    }
-    public function asArray() {
-        $res = [];
-        foreach (self::$fields as $fieldKey) {
-            $res[$fieldKey] = $this->$fieldKey;
-        }
-        return $res;
-    }
-
+    /**
+     * Name setter
+     *
+     * @param string $name
+     * @return KnowledgeBaseEntity
+     */
     protected function setName(string $name): KnowledgeBaseEntity {
         $this->name = $name;
         return $this;
     }
 
+    /**
+     * Description setter
+     *
+     * @param string $description
+     * @return KnowledgeBaseEntity
+     */
     protected function setDescription(string $description): KnowledgeBaseEntity {
         $this->description = $description;
         return $this;
     }
 
+    /**
+     * Type setter
+     *
+     * @param string $type
+     * @return KnowledgeBaseEntity
+     * @throws \Exception Exception is thrown when type is not valid.
+     */
     protected function setType(string $type): KnowledgeBaseEntity {
         if (!in_array($type, KnowledgeBaseModel::getAllTypes())) {
             throw new \Exception('Type "'.$type.'"" is not valid knowledge base type.');
@@ -99,6 +93,13 @@ class KnowledgeBaseEntity {
         return $this;
     }
 
+    /**
+     * SortArticles setter
+     *
+     * @param string $sortArticles
+     * @return KnowledgeBaseEntity
+     * @throws \Exception Exception is thrown when sort option is not valid.
+     */
     protected function setSortArticles(string $sortArticles): KnowledgeBaseEntity {
         if (!in_array($sortArticles, KnowledgeBaseModel::getAllSorts())) {
             throw new \Exception('Order type "'.$sortArticles.'"" is not valid knowledge base sort type.');
@@ -106,5 +107,4 @@ class KnowledgeBaseEntity {
         $this->sortArticles = $sortArticles;
         return $this;
     }
-
 }

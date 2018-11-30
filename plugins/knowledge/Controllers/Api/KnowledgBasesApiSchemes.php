@@ -132,5 +132,4 @@ trait KnowledgeBasesApiSchemes {
         }
         return $this->schema($this->idParamSchema, $type);
     }
-
 }

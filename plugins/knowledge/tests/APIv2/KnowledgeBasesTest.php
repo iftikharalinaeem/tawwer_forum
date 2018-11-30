@@ -41,7 +41,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         parent::setupBeforeClass();
     }
 
-
     /**
      * Grab values for inserting a new knowledge category.
      *
@@ -59,18 +58,33 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         return $record;
     }
 
+    /**
+     * Test KnowledgeBaseEntity
+     */
     public function testKnowledgeBaseEntity() {
         $kb = new KnowledgeBaseEntity(['name'=>'test']);
-        $kb->name = 'Test Knowledge Baser Name';
-        $this->assertEquals('Test Knowledge Baser Name', $kb->name);
+        $kb->name = 'Test Knowledge Base Name';
+        $this->assertEquals('Test Knowledge Base Name', $kb->name);
         $this->expectException(\TypeError::class);
-        $kb->name = ['Test Knowledge Baser Name'];
-        $kb->description = 'Knowledge Baser TestDescription';
-        $this->assertEquals('Knowledge Baser TestDescription', $kb->description);
+        $kb->name = ['Test Knowledge Base Name'];
+        $kb->description = 'Knowledge Base TestDescription';
+        $this->assertEquals('Knowledge Base TestDescription', $kb->description);
         $this->expectException(\TypeError::class);
         $kb->description = 123;
-
-        //$this->assertEquals('Test Knowledge Baser Name', $kb->name);
     }
 
+    /**
+     * Test POST /knowledge-base
+     * if it automatically generates rootCategory
+     */
+    public function testRootCategoryOnPost() {
+        $result = $this->api()->post(
+            $this->baseUrl,
+            $this->record()
+        );
+
+        $this->assertEquals(201, $result->getStatusCode());
+        $body = $result->getBody();
+        $this->assertTrue($body['rootCategoryID'] > 0);
+    }
 }

@@ -91,6 +91,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeCategoryID")
             ->column("name", "varchar(255)")
             ->column("parentID", "int")
+            ->column("knowledgeBaseID", "int", true, "index")
             ->column("sortChildren", ["name", "dateInserted", "dateInsertedDesc", "manual"], true)
             ->column("sort", "int", true)
             ->column("insertUserID", "int")

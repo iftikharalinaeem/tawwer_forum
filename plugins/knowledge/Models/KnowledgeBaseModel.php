@@ -45,14 +45,24 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         $this->addPipelineProcessor($userProcessor);
     }
 
-    public static function getAllTypes() {
+    /**
+     * Get list of all knowledge base types
+     *
+     * @return array
+     */
+    public static function getAllTypes(): array {
         return [
             self::TYPE_GUIDE,
             self::TYPE_HELP
         ];
     }
 
-    public static function getAllSorts() {
+    /**
+     * Gat list of all knowledge base options for article order
+     *
+     * @return array
+     */
+    public static function getAllSorts(): array {
         return [
             self::ORDER_MANUAL,
             self::ORDER_NAME,
@@ -60,6 +70,4 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
             self::ORDER_DATE_DESC,
         ];
     }
-
-
 }

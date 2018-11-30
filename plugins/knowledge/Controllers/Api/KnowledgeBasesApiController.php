@@ -66,6 +66,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
         return $result;
     }
 
+    /**
+     * POST new Knowledge Base
+     *
+     * @param array $body
+     * @return array
+     */
     public function post(array $body): array {
         $this->permission("garden.setttings.manage");
 
@@ -83,7 +89,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a knowledge category for editing.
+     * Get a knowledge base for editing.
      *
      * @param int $id
      * @return array
@@ -149,14 +155,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeBaseByID($id);
-        $rootCategory = $row['rootCategoryID'];
-        if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
-            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-            if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
-                $this->knowledgeCategoryModel->updateCounts($row['parentID']);
-            }
+
+        if ($row["countArticles"] < 1 && $row["countCategories"] <= 1) {
+            $this->knowledgeBaseModel->delete(["knowledgeBaseID" => $row["knowledgeBaseID"]]);
         } else {
-            throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
+            throw new \Garden\Web\Exception\ClientException("Knowledge base is not empty.", 409);
         }
     }
 
