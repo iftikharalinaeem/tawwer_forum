@@ -21,7 +21,7 @@ import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -258,7 +258,7 @@ export default class EditorPageActions extends ReduxActions {
         // Redirect
         const editLocation = {
             ...history.location,
-            pathname: makeEditUrl(article),
+            pathname: EditorRoute.url(article),
             search: "",
         };
 

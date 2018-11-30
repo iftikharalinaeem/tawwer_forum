@@ -10,6 +10,7 @@ import { t } from "@library/application";
 import { ModalLink } from "@library/components/modal";
 import DocumentTitle from "@library/components/DocumentTitle";
 import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
+import { EditorRoute, SearchRoute, DraftsRoute } from "@knowledge/routes/pageRoutes";
 
 export default class HomePage extends React.Component {
     public render() {
@@ -34,13 +35,13 @@ export default class HomePage extends React.Component {
                     <Link to="/kb/categories/2-category-two">{t("Category Two")}</Link>
                 </p>
                 <p>
-                    <Link to="/kb/articles/add">{t("Add article (in 'modal')")}</Link>
+                    <EditorRoute.Link data={undefined}>{t("Create new article")}</EditorRoute.Link>
                 </p>
                 <p>
-                    <Link to="/kb/search">{t("Search")}</Link>
+                    <SearchRoute.Link data={undefined}>{t("Search Page")}</SearchRoute.Link>
                 </p>
                 <p>
-                    <Link to="/kb/drafts">{t("Drafts")}</Link>
+                    <DraftsRoute.Link data={undefined}>{t("Drafts")}</DraftsRoute.Link>
                 </p>
             </div>
         );

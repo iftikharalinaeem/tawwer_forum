@@ -8,13 +8,12 @@ import React from "react";
 import { Editor } from "@rich-editor/components/editor/Editor";
 import { t } from "@library/application";
 import { DeltaOperation } from "quill/core";
-import { IKbCategoryFragment, IArticle, IResponseArticleDraft } from "@knowledge/@types/api";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import DocumentTitle from "@library/components/DocumentTitle";
 import classNames from "classnames";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import { IDeviceProps } from "@library/components/DeviceChecker";
 import EditorPageModel, { IInjectableEditorProps, IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
@@ -52,7 +51,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     public render() {
         const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
-        const debug = draft.status;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
