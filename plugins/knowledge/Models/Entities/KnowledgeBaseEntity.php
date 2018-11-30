@@ -20,7 +20,7 @@ class KnowledgeBaseEntity extends Entity {
         'urlCode',
         'icon',
         'sourceLocale',
-        'type',
+        'viewType',
         'sortArticles',
         'insertUserID',
         'dateInserted',
@@ -37,7 +37,7 @@ class KnowledgeBaseEntity extends Entity {
     protected $urlCode = '';
     protected $icon = '';
     protected $sourceLocale = '';
-    protected $type = KnowledgeBaseModel::TYPE_GUIDE;
+    protected $viewType = KnowledgeBaseModel::TYPE_GUIDE;
     protected $sortArticles = KnowledgeBaseModel::ORDER_MANUAL;
     protected $insertUserID = 0;
     protected $dateInserted = 0;
@@ -68,6 +68,28 @@ class KnowledgeBaseEntity extends Entity {
     }
 
     /**
+     * Icon url setter
+     *
+     * @param string $icon
+     * @return KnowledgeBaseEntity
+     */
+    protected function setIcon(string $icon): KnowledgeBaseEntity {
+        $this->icon = $icon;
+        return $this;
+    }
+    /**
+     * SourceLocale setter
+     *
+     * @param string $locale
+     * @return KnowledgeBaseEntity
+     */
+    protected function setSourceLocale(string $locale): KnowledgeBaseEntity {
+        $this->sourceLocale = $locale;
+        return $this;
+    }
+
+
+    /**
      * Description setter
      *
      * @param string $description
@@ -85,11 +107,11 @@ class KnowledgeBaseEntity extends Entity {
      * @return KnowledgeBaseEntity
      * @throws \Exception Exception is thrown when type is not valid.
      */
-    protected function setType(string $type): KnowledgeBaseEntity {
+    protected function setViewType(string $type): KnowledgeBaseEntity {
         if (!in_array($type, KnowledgeBaseModel::getAllTypes())) {
             throw new \Exception('Type "'.$type.'"" is not valid knowledge base type.');
         }
-        $this->type = $type;
+        $this->viewType = $type;
         return $this;
     }
 

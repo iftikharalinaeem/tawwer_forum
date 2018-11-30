@@ -102,7 +102,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'knowledgeBaseID',
             'name',
             'description',
-            'type',
+            'viewType',
             'icon',
             'sortArticles',
             'sourceLocale',

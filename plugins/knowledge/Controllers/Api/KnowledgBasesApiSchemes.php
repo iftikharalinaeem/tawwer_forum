@@ -83,12 +83,16 @@ trait KnowledgeBasesApiSchemes {
                 "description" => "sourceLocale of knowledge base.",
                 "type" => "string",
             ],
-            "type" => [
+            "viewType" => [
                 "allowNull" => true,
                 "description" => "Sort order for articles of the knowledge base.",
                 "enum" => KnowledgeBaseModel::getAllTypes(),
                 "default" => KnowledgeBaseModel::TYPE_GUIDE,
                 "type" => "string",
+            ],
+            "rootCategoryID:i" => [
+                "description" => "Root knowledge category ID of knowledge base.",
+                "type" => "integer",
             ],
         ]);
     }
@@ -107,7 +111,7 @@ trait KnowledgeBasesApiSchemes {
                     "description",
                     "icon?",
                     "sourceLocale?",
-                    "type?",
+                    "viewType?",
                     "sortArticles?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
