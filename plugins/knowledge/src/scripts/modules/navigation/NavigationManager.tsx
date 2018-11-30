@@ -28,14 +28,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <div>
-                <h2>Hello Nav Manager</h2>
+            <div className="tree">
                 <Tree
                     tree={this.state.treeData}
                     onDragEnd={this.onDragEnd}
                     onCollapse={this.onCollapse}
                     onExpand={this.onExpand}
                     renderItem={this.renderItem}
+                    isDragEnabled={true}
                 />
             </div>
         );
