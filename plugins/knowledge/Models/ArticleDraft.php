@@ -100,13 +100,17 @@ class ArticleDraft {
      * @return string
      */
     public static function getExcerpt(string $body): string {
-        $str = mb_substr($body, 0, self::EXCERPT_MAX_LENGTH);
-        $str = mbereg_replace("\n", ' ', $str);
+
+        $str = mbereg_replace("\n", ' ', $body);
         $str = mbereg_replace("\s{2,}", ' ', $str);
-        if (mb_strlen($str) === self::EXCERPT_MAX_LENGTH) {
-            if ($lastSpace = mb_strrpos($str, ' ')) {
-                $str = mb_substr($str, 0, $lastSpace);
+        if (mb_strlen($str) > self::EXCERPT_MAX_LENGTH) {
+            $str = mb_substr($str, 0, self::EXCERPT_MAX_LENGTH);
+            if (mb_strlen($str) === self::EXCERPT_MAX_LENGTH) {
+                if ($lastSpace = mb_strrpos($str, ' ')) {
+                    $str = mb_substr($str, 0, $lastSpace);
+                }
             }
+            $str .= '…';
         }
         return $str;
     }
