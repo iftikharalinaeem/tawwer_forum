@@ -100,7 +100,6 @@ class ArticleDraft {
      * @return string
      */
     public static function getExcerpt(string $body): string {
-
         $str = mbereg_replace("\n", ' ', $body);
         $str = mbereg_replace("\s{2,}", ' ', $str);
         if (mb_strlen($str) > self::EXCERPT_MAX_LENGTH) {
