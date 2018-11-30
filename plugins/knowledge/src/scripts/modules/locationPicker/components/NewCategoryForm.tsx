@@ -67,6 +67,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 size={ModalSizes.SMALL}
                 exitHandler={this.props.exitHandler}
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
+                className="isCompact"
             >
                 <Frame>
                     <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>

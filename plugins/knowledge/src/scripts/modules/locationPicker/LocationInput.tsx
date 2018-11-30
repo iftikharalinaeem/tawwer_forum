@@ -80,7 +80,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                     <Modal
                         exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
-                        className={classNames(this.props.className)}
+                        className={classNames(this.props.className, "isCompact")}
                         label={t("Choose a location for this page.")}
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >
