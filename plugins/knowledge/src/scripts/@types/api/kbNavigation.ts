@@ -4,17 +4,15 @@
  * @license Proprietary
  */
 
-import { IArticleFragment, IKbCategoryMultiTypeFragment } from "@knowledge/@types/api";
-import { MultiTypeRecord } from "@library/@types/api";
-
-// Base types
-type IKbNavigationArticle = MultiTypeRecord<IArticleFragment, "articleID", "article">;
-
-export interface IKbNavigationCategory extends IKbCategoryMultiTypeFragment {
-    children?: IKbNavigationItem[];
+export interface IKbNavigationItem {
+    name: string;
+    url: string;
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    children?: string[];
+    recordType: "knowledgeCategory" | "article";
 }
-
-export type IKbNavigationItem = IKbNavigationCategory | IKbNavigationArticle;
 
 // API types
 export interface IKbNavigationRequest {
