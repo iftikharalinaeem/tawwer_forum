@@ -20,6 +20,7 @@ import SearchBar, { IComboBoxOption } from "@library/components/forms/select/Sea
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/common";
 import LinkAsButton from "@library/components/LinkAsButton";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IDeviceProps {
     breadcrumbData: ICrumb[];
@@ -49,31 +50,36 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         return (
             <Container>
                 <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
-                        <PanelWidget>
-                            <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                        </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
-                    {isFullWidth && <PanelLayout.LeftTop>{}</PanelLayout.LeftTop>}
+                    {this.props.device !== Devices.MOBILE && (
+                        <PanelLayout.Breadcrumbs>
+                            <PanelWidget>
+                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                            </PanelWidget>
+                        </PanelLayout.Breadcrumbs>
+                    )}
+                    {isFullWidth && <PanelLayout.LeftTop />}
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
                             <SearchBar
                                 placeholder={t("Search")}
                                 onChange={this.setQuery}
                                 value={this.state.query || ""}
-                            >
-                                {category.name}
-                                <LinkAsButton
-                                    to={`/kb/articles/add?knowledgeCategoryID=${
-                                        this.props.category.knowledgeCategoryID
-                                    }`}
-                                    className="searchBar-actionButton"
-                                    baseClass={ButtonBaseClass.ICON}
-                                    title={t("Compose")}
-                                >
-                                    {compose()}
-                                </LinkAsButton>
-                            </SearchBar>
+                                title={category.name}
+                                titleAsComponent={
+                                    <>
+                                        {category.name}
+                                        <LinkAsButton
+                                            to={EditorRoute.url(category)}
+                                            onMouseOver={EditorRoute.preload}
+                                            className="searchBar-actionButton"
+                                            baseClass={ButtonBaseClass.ICON}
+                                            title={t("Compose")}
+                                        >
+                                            {compose()}
+                                        </LinkAsButton>
+                                    </>
+                                }
+                            />
                         </PanelWidget>
                     </PanelLayout.MiddleTop>
                     <PanelLayout.MiddleBottom>

@@ -52,7 +52,7 @@ export class CategoriesPage extends React.Component<IProps> {
 
         return (
             <PageLoader {...categoriesPageState.articles}>
-                <VanillaHeader />
+                <VanillaHeader title={category.name} />
                 {categoriesPageState.articles.status === LoadStatus.SUCCESS &&
                     categoriesPageState.articles.data && (
                         <DocumentTitle title={category.name}>

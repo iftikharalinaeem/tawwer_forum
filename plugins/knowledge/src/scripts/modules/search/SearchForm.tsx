@@ -27,6 +27,10 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
+import LinkAsButton from "@library/components/LinkAsButton";
+import { ButtonBaseClass } from "@library/components/forms/Button";
+import { compose } from "@library/components/icons/header";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
     placeholder?: string;
@@ -34,14 +38,15 @@ interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
 }
 
 class SearchForm extends React.Component<IProps> {
+    private searchBarRef: React.RefObject<SearchBar> = React.createRef();
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+                <VanillaHeader title={t("Search")} onSearchIconClick={this.focusSearchInput} />
                 <Container>
                     <QueryString value={this.props.form} />
                     <PanelLayout device={this.props.device}>
@@ -58,6 +63,21 @@ class SearchForm extends React.Component<IProps> {
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
                                     triggerSearchOnAllUpdates={true}
+                                    ref={this.searchBarRef}
+                                    title={t("Search")}
+                                    titleAsComponent={
+                                        <>
+                                            {t("Search")}
+                                            <LinkAsButton
+                                                to={`/kb/articles/add`}
+                                                className="searchBar-actionButton"
+                                                baseClass={ButtonBaseClass.ICON}
+                                                title={t("Compose")}
+                                            >
+                                                {compose()}
+                                            </LinkAsButton>
+                                        </>
+                                    }
                                 />
                             </PanelWidget>
                             {isMobile && (
@@ -88,9 +108,7 @@ class SearchForm extends React.Component<IProps> {
      * @inheritdoc
      */
     public componentDidMount() {
-        if (window.location.search) {
-            this.initializeFromQueryString(window.location.search);
-        }
+        this.initializeFromQueryString(window.location.search);
     }
 
     /**
@@ -156,6 +174,10 @@ class SearchForm extends React.Component<IProps> {
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
     }
+
+    private focusSearchInput = () => {
+        this.searchBarRef.current!.focus();
+    };
 }
 
 const withRedux = connect(
