@@ -70,9 +70,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 className="isCompact"
             >
                 <Frame>
-                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler}>
-                        {t("New Folder")}
-                    </FrameHeader>
+                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Folder")} />
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock

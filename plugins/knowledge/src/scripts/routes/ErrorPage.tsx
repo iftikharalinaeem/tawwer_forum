@@ -67,7 +67,7 @@ export class ErrorPage extends React.Component<IProps> {
                     <PanelLayout device={this.props.device}>
                         <PanelLayout.MiddleTop>
                             <div className="errorPage">
-                                <Heading depth={1}>{title}</Heading>
+                                <Heading depth={1} title={title} />
                                 <Paragraph>{message}</Paragraph>
                                 <div className="errorPage-cta">
                                     {showSignIn ? (

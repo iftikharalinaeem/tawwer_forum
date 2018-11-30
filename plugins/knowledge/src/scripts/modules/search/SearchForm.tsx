@@ -64,7 +64,8 @@ class SearchForm extends React.Component<IProps> {
                                     optionComponent={SearchOption}
                                     triggerSearchOnAllUpdates={true}
                                     ref={this.searchBarRef}
-                                    title={
+                                    title={t("Search")}
+                                    titleAsComponent={
                                         <>
                                             {t("Search")}
                                             <LinkAsButton

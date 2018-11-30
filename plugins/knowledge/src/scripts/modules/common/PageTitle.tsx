@@ -25,7 +25,7 @@ export default class PageTitle extends React.Component<IProps> {
     public render() {
         return (
             <div className={classNames("pageTitleContainer", this.props.className)}>
-                <PageHeading actions={this.props.actions}>{this.props.title}</PageHeading>
+                <PageHeading actions={this.props.actions} title={this.props.title} />
                 {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
             </div>
         );
