@@ -5,7 +5,7 @@
  */
 
 import { ISearchOptionData } from "@library/components/search/SearchOption";
-import { ISearchOptionProvider } from "@library/contexts/ApiContext";
+import { ISearchOptionProvider } from "@library/contexts/SearchContext";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { AxiosResponse } from "axios";
 import { ISearchResult } from "@knowledge/@types/api";

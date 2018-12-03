@@ -6,7 +6,6 @@
 
 import React from "react";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
 import { LoadStatus } from "@library/@types/api";
 import PageLoader from "@library/components/PageLoader";
 import SearchForm from "./SearchForm";
@@ -26,4 +25,4 @@ export class SearchPage extends React.Component<IProps> {
     }
 }
 
-export default withDevice(SearchPage);
+export default SearchPage;

@@ -26,13 +26,13 @@ import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
-import { withApi, IApiProps } from "@library/contexts/ApiContext";
+import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
 
-interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
+interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
     device: Devices;
 }
@@ -62,7 +62,7 @@ class SearchForm extends React.Component<IProps> {
                                     onSearch={this.props.searchActions.search}
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
-                                    triggerSearchOnAllUpdates={true}
+                                    triggerSearchOnClear={true}
                                     ref={this.searchBarRef}
                                     title={t("Search")}
                                     titleAsComponent={
@@ -109,6 +109,13 @@ class SearchForm extends React.Component<IProps> {
      */
     public componentDidMount() {
         this.initializeFromQueryString(window.location.search);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentWillUnmount() {
+        this.props.searchActions.reset();
     }
 
     /**
@@ -185,4 +192,4 @@ const withRedux = connect(
     SearchPageActions.mapDispatchToProps,
 );
 
-export default withRedux(withApi(withDevice<IProps>(SearchForm)));
+export default withRedux(withSearch(withDevice(SearchForm)));
