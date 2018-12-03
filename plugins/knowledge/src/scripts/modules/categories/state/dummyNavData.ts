@@ -4,11 +4,12 @@
  * @license Proprietary
  */
 
-import { IKbNavigationCategory } from "@knowledge/@types/api";
+import { IKbNavigationItemNested } from "@knowledge/@types/api";
 
-export const dummyNavData: IKbNavigationCategory[] = [
+export const dummyNavData: IKbNavigationItemNested[] = [
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Example Category",
         parentID: -1,
@@ -16,6 +17,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
         children: [
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Test Article - All Formatting & Embeds",
                 parentID: 9,
@@ -23,6 +25,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 children: [
                     {
                         recordType: "knowledgeCategory",
+                        sort: null,
                         recordID: 1,
                         name: "Article 1",
                         parentID: 9,
@@ -30,6 +33,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                     },
                     {
                         recordType: "knowledgeCategory",
+                        sort: null,
                         recordID: 1,
                         name: "Chipmunks",
                         parentID: 9,
@@ -37,6 +41,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         children: [
                             {
                                 recordType: "knowledgeCategory",
+                                sort: null,
                                 recordID: 1,
                                 name: "Armadillos",
                                 parentID: 9,
@@ -44,6 +49,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                             },
                             {
                                 recordType: "knowledgeCategory",
+                                sort: null,
                                 recordID: 1,
                                 name: "CurrentPage",
                                 parentID: 9,
@@ -55,6 +61,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
             },
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
@@ -62,6 +69,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
             },
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
@@ -69,6 +77,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                 children: [
                     {
                         recordType: "knowledgeCategory",
+                        sort: null,
                         recordID: 1,
                         name: "Armadillos",
                         parentID: 9,
@@ -76,6 +85,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                     },
                     {
                         recordType: "knowledgeCategory",
+                        sort: null,
                         recordID: 1,
                         name: "Chipmunks",
                         parentID: 9,
@@ -83,6 +93,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                         children: [
                             {
                                 recordType: "knowledgeCategory",
+                                sort: null,
                                 recordID: 1,
                                 name: "Armadillos",
                                 parentID: 9,
@@ -90,6 +101,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                             },
                             {
                                 recordType: "knowledgeCategory",
+                                sort: null,
                                 recordID: 1,
                                 name: "Chipmunks",
                                 parentID: 9,
@@ -97,6 +109,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                 children: [
                                     {
                                         recordType: "knowledgeCategory",
+                                        sort: null,
                                         recordID: 1,
                                         name: "Armadillos",
                                         parentID: 9,
@@ -104,6 +117,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
                                     },
                                     {
                                         recordType: "knowledgeCategory",
+                                        sort: null,
                                         recordID: 1,
                                         name: "Chipmunks",
                                         parentID: 9,
@@ -119,6 +133,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Pee Mart",
         parentID: 1,
@@ -126,6 +141,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Predator Urine",
         parentID: 2,
@@ -133,6 +149,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Coyote Urine",
         parentID: 3,
@@ -140,6 +157,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Fox Urine",
         parentID: 3,
@@ -147,6 +165,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Bobcat Urine",
         parentID: 3,
@@ -154,6 +173,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "P-Gel",
         parentID: 2,
@@ -161,6 +181,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "P-Cover Granules",
         parentID: 2,
@@ -168,6 +189,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
         children: [
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
@@ -175,6 +197,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
             },
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
@@ -184,6 +207,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Article 2",
         parentID: 2,
@@ -191,6 +215,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Armadillos",
         parentID: 9,
@@ -198,6 +223,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Chipmunks",
         parentID: 9,
@@ -205,6 +231,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Test 3",
         parentID: 2,
@@ -212,6 +239,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Mountain Lion",
         parentID: 8,
@@ -219,6 +247,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Bear",
         parentID: 8,
@@ -226,6 +255,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
         children: [
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Armadillos",
                 parentID: 9,
@@ -233,6 +263,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
             },
             {
                 recordType: "knowledgeCategory",
+                sort: null,
                 recordID: 1,
                 name: "Chipmunks",
                 parentID: 9,
@@ -242,6 +273,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "Wolf",
         parentID: 8,
@@ -249,6 +281,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "P-Wicks",
         parentID: 12,
@@ -256,6 +289,7 @@ export const dummyNavData: IKbNavigationCategory[] = [
     },
     {
         recordType: "knowledgeCategory",
+        sort: null,
         recordID: 1,
         name: "P-Dispensers",
         parentID: 12,

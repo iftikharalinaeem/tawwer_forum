@@ -5,7 +5,7 @@
 
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import { IKbCategoryFragment, IKbCategoryMultiTypeFragment, IKbNavigationCategory } from "@knowledge/@types/api";
+import { IKbNavigationItemNested, IKbCategoryFragment } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -18,12 +18,13 @@ export type IKbCategoriesState = ILoadable<{
 }>;
 
 export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
-    public static readonly ROOT_CATEGORY: IKbNavigationCategory = {
+    public static readonly ROOT_CATEGORY: IKbNavigationItemNested = {
         name: "Root Category",
         recordID: -1,
         recordType: "knowledgeCategory",
         parentID: -1,
         url: "#",
+        sort: null,
     };
 
     /**
@@ -56,7 +57,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
      * @param state - The top level redux state.
      * @param categoryID - The ID of the category to lookup.
      */
-    public static selectMixedRecord(state: IStoreState, categoryID: number): IKbCategoryMultiTypeFragment | null {
+    public static selectMixedRecord(state: IStoreState, categoryID: number): IKbNavigationItemNested | null {
         const record = this.selectKbCategoryFragment(state, categoryID);
         if (record === null) {
             return null;
@@ -67,6 +68,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
             ...rest,
             recordType: "knowledgeCategory",
             recordID: knowledgeCategoryID,
+            sort: null,
         };
     }
 
@@ -93,8 +95,8 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
         state: IStoreState,
         categoryID: number,
         maxDepth: number = 3,
-    ): IKbNavigationCategory {
-        const category: IKbNavigationCategory =
+    ): IKbNavigationItemNested {
+        const category: IKbNavigationItemNested =
             categoryID === -1 || categoryID === null ? this.ROOT_CATEGORY : this.selectMixedRecord(state, categoryID)!;
 
         if (maxDepth > 1) {

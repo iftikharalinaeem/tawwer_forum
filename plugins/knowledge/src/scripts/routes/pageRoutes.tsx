@@ -18,7 +18,7 @@ import {
     IResponseArticleDraft,
     IKbCategoryFragment,
     IKbCategory,
-    IKbCategoryMultiTypeFragment,
+    IKbNavigationItemNested,
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
 
@@ -100,7 +100,7 @@ export const DebugRoute = new RouteHandler(
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
-    (category: IKbCategory | IKbCategoryFragment | IKbCategoryMultiTypeFragment) => category.url,
+    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItemNested) => category.url,
 );
 
 export const SearchRoute = new RouteHandler(

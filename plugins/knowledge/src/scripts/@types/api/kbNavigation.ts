@@ -4,14 +4,21 @@
  * @license Proprietary
  */
 
-export interface IKbNavigationItem {
+interface ICommonNavigation {
     name: string;
     url: string;
     parentID: number;
     recordID: number;
     sort: number | null;
-    children?: string[];
     recordType: "knowledgeCategory" | "article";
+}
+
+export interface IKbNavigationItem extends ICommonNavigation {
+    children?: string[];
+}
+
+export interface IKbNavigationItemNested extends ICommonNavigation {
+    children?: IKbNavigationItemNested[];
 }
 
 // API types
