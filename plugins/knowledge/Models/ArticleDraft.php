@@ -104,10 +104,8 @@ class ArticleDraft {
         $str = mbereg_replace("\s{2,}", ' ', $str);
         if (mb_strlen($str) > self::EXCERPT_MAX_LENGTH) {
             $str = mb_substr($str, 0, self::EXCERPT_MAX_LENGTH);
-            if (mb_strlen($str) === self::EXCERPT_MAX_LENGTH) {
-                if ($lastSpace = mb_strrpos($str, ' ')) {
-                    $str = mb_substr($str, 0, $lastSpace);
-                }
+            if ($lastSpace = mb_strrpos($str, ' ')) {
+                $str = mb_substr($str, 0, $lastSpace);
             }
             $str .= '…';
         }
