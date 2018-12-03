@@ -41,7 +41,7 @@ export default class KnowledgeApp extends React.Component {
         return (
             <Provider store={this.store}>
                 <PagesContext.Provider value={{ pages: this.pages }}>
-                    <SearchContext.Provider value={{ api: apiV2, searchOptionProvider: new KnowledgeSearchProvider() }}>
+                    <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
                         <LinkContext.Provider value={formatUrl("/kb", true)}>
                             <React.Fragment>
                                 <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
