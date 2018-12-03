@@ -38,7 +38,7 @@ export class AdvancedSearch extends React.Component<IProps> {
         return (
             <form className="advancedSearch" onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
-                    <Heading className="advancedSearch-title pageSubTitle">{t("Advanced Search")}</Heading>
+                    <Heading className="advancedSearch-title pageSubTitle" title={t("Advanced Search")} />
                 )}
                 <InputTextBlock
                     label={t("Title")}

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$pageHeading-cta_margin                        : 100px !default;
+$pageHeading-cta_margin                        : 1em !default;
 $pageHeading-dropdown_width                    : 150px !default;
 
 .pageHeading {
@@ -92,4 +92,10 @@ $pageHeading-dropdown_width                    : 150px !default;
 .pageHeading-hamburgerWrapper {
     display: flex;
     align-items: center;
+}
+
+.pageHeading-backLink {
+    height: $vanillaHeader-button_size;
+    width: $vanillaHeader-button_size;
+    flex-basis: $vanillaHeader-button_size;
 }

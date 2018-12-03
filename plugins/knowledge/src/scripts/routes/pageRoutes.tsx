@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import RouteHandler from "@knowledge/routes/RouteHandler";
@@ -28,7 +28,14 @@ import { formatUrl } from "@library/application";
  * @param articleID - The articleID.
  */
 function makeEditorUrl(
-    data?: IArticleFragment | IArticle | IRevisionFragment | IRevision | IResponseArticleDraft | undefined,
+    data?:
+        | IArticleFragment
+        | IArticle
+        | IRevisionFragment
+        | IRevision
+        | IResponseArticleDraft
+        | IKbCategoryFragment
+        | undefined,
 ) {
     if (data === undefined) {
         return formatUrl("/kb/articles/add");
@@ -40,6 +47,8 @@ function makeEditorUrl(
         } else {
             return formatUrl(`/kb/articles/add?draftID=${data.draftID}`);
         }
+    } else if ("knowledgeCategoryID" in data && "parentID" in data) {
+        return formatUrl(`/kb/articles/add?knowledgeCategoryID=${data.knowledgeCategoryID}`);
     } else {
         return formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
@@ -82,10 +91,10 @@ export const ArticleRoute = new RouteHandler(
     (article: IArticle | IArticleFragment) => article.url,
 );
 
-export const HomeRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/modules/home/HomePage"),
-    "/kb",
-    () => formatUrl("/kb"),
+export const DebugRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/debug" */ "@knowledge/DebugPage"),
+    "/kb/debug",
+    () => formatUrl("/kb/debug"),
 );
 
 export const CategoryRoute = new RouteHandler(
@@ -99,18 +108,12 @@ export const SearchRoute = new RouteHandler(
     "/kb/search",
     (data?: undefined) => formatUrl("/kb/search"),
 );
+const SearchRedirect = () => <Redirect to={SearchRoute.url(undefined)} />;
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
     (data?: undefined) => formatUrl("/kb/drafts"),
-    ModalLoader,
-);
-
-export const OrganizeCategoriesRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/kb/organize-categories" */ "@knowledge/pages/OrganizeCategoriesPage"),
-    "/kb/:id/organize-categories",
-    (data: { kbID: number }) => formatUrl(`/kb/${data.kbID}/organize-categories`),
     ModalLoader,
 );
 
@@ -133,11 +136,11 @@ export function getPageRoutes() {
         EditorRoute.route,
         RevisionsRoute.route,
         ArticleRoute.route,
-        HomeRoute.route,
+        DebugRoute.route,
         CategoryRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
-        OrganizeCategoriesRoute.route,
+        <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
         <Route component={NotFound} key={"not found"} />,
     ];
 }
