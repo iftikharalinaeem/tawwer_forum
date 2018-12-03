@@ -147,6 +147,9 @@ class ArticleDraft {
         }
         foreach ($drafts as $draftRow) {
             $draftRow['body'] = $draftRow['attributes']['body'] ?? '[]';
+            if (is_array($draftRow['body'])) {
+                $draftRow['body'] = json_encode($draftRow['body']);
+            }
             $draftRow['excerpt'] = $draftRow['attributes']['excerpt'] ?? '';
             $draftRow['format'] = $draftRow['attributes']['format'] ?? self::BODY_TYPE_RICH;
             unset($draftRow['attributes']['body']);
