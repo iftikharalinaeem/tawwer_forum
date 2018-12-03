@@ -350,7 +350,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
 
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
-        $rows = $this->draftModel->get($where);
+        $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
+        $rows = $this->draftModel->get($where, $options);
         $rows = (new ArticleDraft($this->parser))->normalizeDraftFields($rows, false);
         $result = $out->validate($rows);
         return $result;
