@@ -117,6 +117,13 @@ export const DraftsRoute = new RouteHandler(
     ModalLoader,
 );
 
+export const OrganizeCategoriesRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/organize-categories" */ "@knowledge/pages/OrganizeCategoriesPage"),
+    "/kb/:id/organize-categories",
+    (data: { kbID: number }) => formatUrl(`/kb/${data.kbID}/organize-categories`),
+    ModalLoader,
+);
+
 const NotFound = () => {
     return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
 };
@@ -140,6 +147,7 @@ export function getPageRoutes() {
         CategoryRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
+        OrganizeCategoriesRoute.route,
         <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
         <Route component={NotFound} key={"not found"} />,
     ];
