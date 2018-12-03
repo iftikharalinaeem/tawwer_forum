@@ -52,7 +52,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
      * @param DashboardNavModule $sender
      */
     public function dashboardNavModule_init_handler($sender) {
-        $sender->addLinkIf('GardenSettingsManage', t('Event Log'), '/settings/eventlog', 'site-settings.event-log');
+        $sender->addLinkIf('Garden.Settings.Manage', t('Event Log'), '/settings/eventlog', 'site-settings.event-log');
     }
 
     /**
