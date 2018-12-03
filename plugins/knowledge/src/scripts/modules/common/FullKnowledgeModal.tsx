@@ -14,6 +14,7 @@ interface IProps
         }> {
     children: React.ReactNode;
     titleID: string;
+    className?: string;
 }
 
 export class FullKnowledgeModal extends React.Component<IProps> {
@@ -24,6 +25,7 @@ export class FullKnowledgeModal extends React.Component<IProps> {
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
+                className={this.props.className}
             >
                 {this.props.children}
             </Modal>

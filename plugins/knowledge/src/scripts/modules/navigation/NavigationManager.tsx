@@ -14,6 +14,7 @@ import Tree, {
     moveItemOnTree,
     IRenderItemParams,
 } from "@atlaskit/tree";
+import * as treeIcons from "@library/components/icons/tree";
 
 interface IProps {}
 
@@ -41,11 +42,29 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         );
     }
 
+    public getIcon = item => {
+        if (item.children && item.children.length > 0) {
+            return item.isExpanded ? treeIcons.folderOpen() : treeIcons.folderClosed();
+        }
+        return treeIcons.article();
+    };
+
     private renderItem = (params: IRenderItemParams<IKbNavigationItem>) => {
-        const { provided, item } = params;
+        const { provided, item, snapshot } = params;
+        const { isDraggin, draggingOver, dropAnimation, IsDropAnimating } = snapshot;
+        const name = item.data!.name;
+        console.log("provided: ", provided);
+        console.log("params: ", params);
+        console.log("isDraggin: ", isDraggin);
+        console.log("draggingOver: ", draggingOver);
+        console.log("dropAnimation: ", dropAnimation);
+        console.log("dropAnimation: ", dropAnimation);
+        console.log("IsDropAnimating: ", IsDropAnimating);
+
         return (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                {item.data!.name}
+                {this.getIcon(item)}
+                {name}
             </div>
         );
     };
@@ -66,8 +85,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     private onDragEnd = (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
         const { treeData } = this.state;
-        console.log(treeData);
-        console.log(source, destination);
 
         if (!destination) {
             return;
