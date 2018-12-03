@@ -306,7 +306,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     }
 
     /**
-     * Get a navigation-friendly record hierarchy of categories and articles in flat mode.
+     * Update the navigation structure of a knowledge base, using the flat format.
      *
      * @param array $body Request body.
      * @return array Navigation items, arranged in a one-dimensional array.
@@ -328,7 +328,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "sort",
             ])->add(Schema::parse($this->getFragmentSchema()))
         ]);
-        $in = $this->schema($patchSchema, "in")->setDescription("Get a navigation-friendly category hierarchy flat mode.");
+        $in = $this->schema($patchSchema, "in")->setDescription("Update the navigation structure of a knowledge base, using the flat format.");
         $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
 
         // Prep the input.
