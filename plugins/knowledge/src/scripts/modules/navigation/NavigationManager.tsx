@@ -15,6 +15,9 @@ import Tree, {
     IRenderItemParams,
 } from "@atlaskit/tree";
 import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
+import classNames from "classNames";
+import { t } from "@library/application";
+import get from "lodash/get";
 
 interface IProps {}
 
@@ -46,16 +49,31 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const name = item.data!.name;
         const hasChildren = item.children && item.children.length > 0;
+        // console.log("item: ", item);
+        // console.log("provided.draggableProps: ", provided.draggableProps);
+        // console.log("provided: ", provided);
+
+        const marginLeft = get(provided, "draggableProps.style.paddingLeft", false);
+
         return (
-            <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                <NavigationManagerItemIcon
-                    expanded={!!item.isExpanded}
-                    expandItem={this.expandItem}
-                    collapseItem={this.collapseItem}
-                    itemId={item.id}
-                    hasChildren={hasChildren}
-                />
-                <span className="NavigationManager-itemLabel">{name}</span>
+            <div
+                className={classNames("tree-item", { isDragging: snapshot.isDragging })}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                aria-roledescription={t(provided.dragHandleProps!["aria-roledescription"])}
+            >
+                <div className={classNames("navigationManager-draggable")}>
+                    <NavigationManagerItemIcon
+                        expanded={!!item.isExpanded}
+                        expandItem={this.expandItem}
+                        collapseItem={this.collapseItem}
+                        itemId={item.id}
+                        hasChildren={hasChildren}
+                        className="tree-itemIcon"
+                    />
+                    <span className="navigationManager-itemLabel">{name}</span>
+                </div>
             </div>
         );
     };

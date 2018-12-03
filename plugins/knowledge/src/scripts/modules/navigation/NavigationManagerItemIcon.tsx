@@ -8,6 +8,7 @@ import React from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { folderClosed, folderOpen, article } from "@library/components/icons/tree";
 import classNames from "classNames";
+import { downTriangle, rightTriangle } from "@library/components/icons/common";
 
 interface IProps {
     expanded: boolean;
@@ -29,7 +30,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     disabled={!!this.props.disabled}
                     baseClass={ButtonBaseClass.ICON}
                 >
-                    {this.props.expanded ? folderOpen() : folderClosed()}
+                    {this.icon()}
                 </Button>
             );
         } else {
@@ -40,5 +41,23 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
     private handleClick = e => {
         const { expanded, expandItem, collapseItem, itemId } = this.props;
         expanded ? collapseItem(itemId) : expandItem(itemId);
+    };
+
+    private icon = () => {
+        if (this.props.expanded) {
+            return (
+                <>
+                    {downTriangle()}
+                    {folderOpen()}
+                </>
+            );
+        } else {
+            return (
+                <>
+                    {rightTriangle()}
+                    {folderClosed()}
+                </>
+            );
+        }
     };
 }
