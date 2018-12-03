@@ -14,7 +14,7 @@ import Tree, {
     moveItemOnTree,
     IRenderItemParams,
 } from "@atlaskit/tree";
-import * as treeIcons from "@library/components/icons/tree";
+import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 
 interface IProps {}
 
@@ -33,8 +33,8 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 <Tree
                     tree={this.state.treeData}
                     onDragEnd={this.onDragEnd}
-                    onCollapse={this.onCollapse}
-                    onExpand={this.onExpand}
+                    onCollapse={this.collapseItem}
+                    onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={true}
                 />
@@ -42,41 +42,32 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         );
     }
 
-    public getIcon = item => {
-        if (item.children && item.children.length > 0) {
-            return item.isExpanded ? treeIcons.folderOpen() : treeIcons.folderClosed();
-        }
-        return treeIcons.article();
-    };
-
     private renderItem = (params: IRenderItemParams<IKbNavigationItem>) => {
         const { provided, item, snapshot } = params;
-        const { isDraggin, draggingOver, dropAnimation, IsDropAnimating } = snapshot;
         const name = item.data!.name;
-        console.log("provided: ", provided);
-        console.log("params: ", params);
-        console.log("isDraggin: ", isDraggin);
-        console.log("draggingOver: ", draggingOver);
-        console.log("dropAnimation: ", dropAnimation);
-        console.log("dropAnimation: ", dropAnimation);
-        console.log("IsDropAnimating: ", IsDropAnimating);
-
+        const hasChildren = item.children && item.children.length > 0;
         return (
             <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                {this.getIcon(item)}
-                {name}
+                <NavigationManagerItemIcon
+                    expanded={!!item.isExpanded}
+                    expandItem={this.expandItem}
+                    collapseItem={this.collapseItem}
+                    itemId={item.id}
+                    hasChildren={hasChildren}
+                />
+                <span className="NavigationManager-itemLabel">{name}</span>
             </div>
         );
     };
 
-    private onExpand = (itemId: string) => {
+    private expandItem = (itemId: string) => {
         const { treeData } = this.state;
         this.setState({
             treeData: mutateTree(treeData, itemId, { isExpanded: true }),
         });
     };
 
-    private onCollapse = (itemId: string) => {
+    private collapseItem = (itemId: string) => {
         const { treeData } = this.state;
         this.setState({
             treeData: mutateTree(treeData, itemId, { isExpanded: false }),
