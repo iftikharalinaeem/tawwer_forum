@@ -14,32 +14,39 @@ import Tree, {
     moveItemOnTree,
     IRenderItemParams,
 } from "@atlaskit/tree";
-import classNames from "classNames";
 import { t } from "@library/application";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
+import classNames from "classnames";
 
-interface IProps {}
+interface IProps {
+    className?: string;
+}
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
+    renameItemID: string | null;
+    disabled: boolean;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
+        renameItemID: null,
+        disabled: false,
     };
 
     public render() {
         return (
             <>
-                <div className="tree">
+                <div className={classNames("navigationManager", this.props.className)}>
                     <Tree
                         tree={this.state.treeData}
                         onDragEnd={this.onDragEnd}
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
-                        isDragEnabled={true}
+                        isDragEnabled={!this.state.disabled}
+                        key={this.state.renameItemID}
                     />
                 </div>
             </>
@@ -50,22 +57,21 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const hasChildren = item.children && item.children.length > 0;
         return (
-            <div
-                className={classNames("tree-item", { isDragging: snapshot.isDragging })}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                aria-roledescription={t(provided.dragHandleProps!["aria-roledescription"])}
-            >
-                <NavigationManagerContent
-                    handleEdit={this.handleEdit}
-                    hasChildren={hasChildren}
-                    item={item}
-                    handleDelete={this.deleteSelectedItem}
-                    expandItem={this.expandItem}
-                    collapseItem={this.collapseItem}
-                />
-            </div>
+            <NavigationManagerContent
+                hasChildren={hasChildren}
+                item={item}
+                snapshot={snapshot}
+                provided={provided}
+                handleDelete={this.deleteSelectedItem}
+                expandItem={this.expandItem}
+                collapseItem={this.collapseItem}
+                renameMode={this.editMode}
+                stopRenameMode={this.stopEditMode}
+                handleRename={this.handleEdit}
+                renameItemID={this.state.renameItemID}
+                disableTree={this.disableTree}
+                enableTree={this.enableTree}
+            />
         );
     };
 
@@ -76,6 +82,30 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     // For now, we hard code result. The edit can be accepted or rejected.
     private handleEdit = (item: IKbNavigationItem) => {
         return true;
+    };
+
+    private editMode = (itemID: string | null) => {
+        this.setState({
+            renameItemID: itemID,
+        });
+    };
+
+    private stopEditMode = () => {
+        this.setState({
+            renameItemID: null,
+        });
+    };
+
+    private disableTree = () => {
+        this.setState({
+            disabled: true,
+        });
+    };
+
+    private enableTree = () => {
+        this.setState({
+            disabled: false,
+        });
     };
 
     private expandItem = (itemId: string) => {
