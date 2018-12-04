@@ -38,7 +38,6 @@ interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchPr
 }
 
 class SearchForm extends React.Component<IProps> {
-    private searchBarRef: React.RefObject<SearchBar> = React.createRef();
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
@@ -46,7 +45,7 @@ class SearchForm extends React.Component<IProps> {
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} onSearchIconClick={this.focusSearchInput} />
+                <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
                     <QueryString value={this.props.form} />
                     <PanelLayout device={this.props.device}>
@@ -63,7 +62,6 @@ class SearchForm extends React.Component<IProps> {
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
                                     triggerSearchOnClear={true}
-                                    ref={this.searchBarRef}
                                     title={t("Search")}
                                     titleAsComponent={
                                         <>
@@ -181,10 +179,6 @@ class SearchForm extends React.Component<IProps> {
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
     }
-
-    private focusSearchInput = () => {
-        this.searchBarRef.current!.focus();
-    };
 }
 
 const withRedux = connect(
