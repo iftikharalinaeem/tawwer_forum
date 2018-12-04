@@ -41,7 +41,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
     /**
      * Render not found or the article.
      */
-    public render() {
+    public render(): React.ReactNode {
         const { loadable } = this.props;
         return (
             <>

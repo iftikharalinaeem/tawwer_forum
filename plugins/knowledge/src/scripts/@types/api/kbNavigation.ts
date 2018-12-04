@@ -4,28 +4,28 @@
  * @license Proprietary
  */
 
-interface ICommonNavigation {
-    name: string;
-    url: string;
-    parentID: number;
-    recordID: number;
-    sort: number | null;
-    recordType: "knowledgeCategory" | "article";
-}
+import { INavigationItem } from "@library/@types/api";
 
-export interface IKbNavigationItem extends ICommonNavigation {
-    children?: string[];
-}
-
-export interface IKbNavigationItemNested extends ICommonNavigation {
-    children?: IKbNavigationItemNested[];
+export enum NavigationRecordType {
+    KNOWLEDGE_CATEGORY = "knowledgeCategory",
+    ARTICLE = "article",
 }
 
 // API types
-export interface IKbNavigationRequest {
+export interface IGetKbNavigationRequest {
     knowledgeBaseID?: number;
     knowledgeCategoryID?: number;
     maxDepth?: number;
 }
 
-export type IKbNavigationResponse = IKbNavigationItem[];
+export type IGetKbNavigationResponse = INavigationItem[];
+
+interface IPatchFlatItem {
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    recordType: NavigationRecordType;
+}
+
+export type IPatchKBNavigationRequest = IPatchFlatItem[];
+export type IPatchKbNavigationResponse = INavigationItem[];

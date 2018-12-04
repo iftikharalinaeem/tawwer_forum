@@ -7,7 +7,7 @@
 import React, { RefObject } from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
-import classNames from "classNames";
+import classNames from "classnames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { t } from "@library/application";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
@@ -16,12 +16,17 @@ import ModalConfirm from "@library/components/modal/ModalConfirm";
 import Translate from "@library/components/translation/Translate";
 import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import { INavigationItem } from "@library/@types/api";
 
 interface IProps {
     className?: string;
-    item: ITreeItem;
-    handleRename: (item: ITreeItem) => boolean;
-    handleDelete: (item: ITreeItem, deleteButtonRef: React.RefObject<HTMLButtonElement>, callback: () => void) => void;
+    item: ITreeItem<INavigationItem>;
+    handleRename: (item: ITreeItem<INavigationItem>) => boolean;
+    handleDelete: (
+        item: ITreeItem<INavigationItem>,
+        deleteButtonRef: React.RefObject<HTMLButtonElement>,
+        callback: () => void,
+    ) => void;
     hasChildren: boolean;
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
@@ -52,7 +57,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     public render() {
         const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
-        const isRenaming = this.props.renameItemID === item.data.recordID;
+        const isRenaming = (this.props.renameItemID as any) === item.data!.recordID;
 
         return (
             <div
@@ -69,7 +74,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             >
                 {isRenaming ? (
                     <form className={classNames("navigationManger-editMode", { hasError: this.state.error })}>
-                        <input value={this.props.item.name} name="renameItem" onKeyPress={this.handleOnChange} />
+                        <input value={this.props.item.data!.name} name="renameItem" onKeyPress={this.handleOnChange} />
                         <Button onClick={this.props.stopRenameMode} className={"navigationManger-cancelRename"}>
                             {t("Cancel")}
                         </Button>
@@ -120,7 +125,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             >
                                 <Translate
                                     source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                                    c0={this.getType(item.recordType)}
+                                    c0={this.getType(item.data!.recordType)}
                                     c1={
                                         <strong>
                                             <em>{name}</em>
@@ -154,7 +159,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private submit = () => {
         const newName = this.state.newName;
-        if (newName !== "" && newName !== this.props.item.name) {
+        if (newName !== "" && newName !== this.props.item.data!.name) {
             this.setState(
                 {
                     disabled: true,
@@ -182,7 +187,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private renameItem = () => {
-        this.props.renameMode(this.props.item.data.recordID);
+        this.props.renameMode(this.props.item.data!.recordID as any);
     };
 
     private closeConfirmation = () => {

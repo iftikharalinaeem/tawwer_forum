@@ -17,6 +17,7 @@ import { IUsersStoreState } from "@library/users/UsersModel";
 import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
 import { DeepPartial } from "redux";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 
 export interface IStoreState extends IUsersStoreState {
     knowledge: {
@@ -30,6 +31,7 @@ export interface IStoreState extends IUsersStoreState {
         categoriesPage: ICategoriesPageState;
         locationPicker: ILocationPickerState;
         searchPage: ISearchPageState;
+        navigation: INavigationStoreState;
     };
 }
 

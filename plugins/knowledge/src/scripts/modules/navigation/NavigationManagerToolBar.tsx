@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { IKbNavigationItem } from "@knowledge/@types/api";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { expandAll, collapseAll } from "@library/components/icons/navigationManager";

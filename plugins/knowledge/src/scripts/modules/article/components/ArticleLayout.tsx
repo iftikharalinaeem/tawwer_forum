@@ -24,6 +24,7 @@ import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
+import Navigation from "@knowledge/modules/navigation/Navigation";
 
 interface IProps {
     article: IArticle;
@@ -41,7 +42,7 @@ export class ArticleLayout extends React.Component<IProps> {
         const { article, messages } = this.props;
 
         const mobileNav = <SiteNav collapsible={false}>{dummyNavData}</SiteNav>;
-        const nav = <SiteNav collapsible={true}>{dummyNavData}</SiteNav>;
+        const nav = <Navigation />;
 
         return (
             <React.Fragment>
