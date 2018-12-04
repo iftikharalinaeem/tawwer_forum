@@ -16,9 +16,6 @@ import Tree, {
 } from "@atlaskit/tree";
 import classNames from "classNames";
 import { t } from "@library/application";
-import get from "lodash/get";
-import NavigationManagerDelete from "@knowledge/modules/navigation/NavigationManagerDelete";
-import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 
 interface IProps {}
@@ -51,11 +48,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     private renderItem = (params: IRenderItemParams<IKbNavigationItem>) => {
         const { provided, item, snapshot } = params;
-        const name = item.data!.name;
         const hasChildren = item.children && item.children.length > 0;
-
-        const marginLeft = get(provided, "draggableProps.style.paddingLeft", false);
-
         return (
             <div
                 className={classNames("tree-item", { isDragging: snapshot.isDragging })}
@@ -64,22 +57,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 {...provided.dragHandleProps}
                 aria-roledescription={t(provided.dragHandleProps!["aria-roledescription"])}
             >
-                <div className={classNames("navigationManager-draggable")}>
-                    <NavigationManagerItemIcon
-                        expanded={!!item.isExpanded}
-                        expandItem={this.expandItem}
-                        collapseItem={this.collapseItem}
-                        itemId={item.id}
-                        hasChildren={hasChildren}
-                        className="tree-itemIcon"
-                    />
-                    <NavigationManagerContent
-                        handleEdit={this.handleEdit}
-                        item={item}
-                        beforeEdit={<span className="navigationManager-itemLabel">{name}</span>}
-                        afterEdit={<NavigationManagerDelete deleteItem={this.deleteSelectedItem} item={item} />}
-                    />
-                </div>
+                <NavigationManagerContent
+                    handleEdit={this.handleEdit}
+                    hasChildren={hasChildren}
+                    item={item}
+                    handleDelete={this.deleteSelectedItem}
+                    expandItem={this.expandItem}
+                    collapseItem={this.collapseItem}
+                />
             </div>
         );
     };

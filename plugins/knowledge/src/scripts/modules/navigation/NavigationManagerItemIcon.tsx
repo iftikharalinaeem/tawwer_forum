@@ -34,7 +34,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                 </Button>
             );
         } else {
-            return article();
+            return article("navigationManager-articleIcon", "navigationManager-articleIconFill");
         }
     }
 
