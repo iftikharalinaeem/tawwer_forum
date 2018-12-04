@@ -8,7 +8,7 @@ import React from "react";
 import { IKbNavigationItem } from "@knowledge/@types/api";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import { expandAll, collapseAll } from "@library/components/icons/tree";
+import { expandAll, collapseAll } from "@library/components/icons/navigationManager";
 import { newFolder } from "@library/components/icons/common";
 
 interface IProps {

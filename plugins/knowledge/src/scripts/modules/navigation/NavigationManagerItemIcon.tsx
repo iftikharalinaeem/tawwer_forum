@@ -6,7 +6,7 @@
 
 import React from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { folderClosed, folderOpen, article } from "@library/components/icons/tree";
+import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
 import classNames from "classNames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 
@@ -28,7 +28,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     onClick={this.handleClick}
                     className={classNames("navigationManager-toggleFolder", this.props.className)}
                     disabled={!!this.props.disabled}
-                    baseClass={ButtonBaseClass.ICON}
+                    baseClass={ButtonBaseClass.CUSTOM}
                 >
                     {this.icon()}
                 </Button>
@@ -47,15 +47,17 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
         if (this.props.expanded) {
             return (
                 <>
-                    {downTriangle()}
-                    {folderOpen()}
+                    <span className="navigationManager-triangle">{downTriangle("navigationManager-triangleDown")}</span>
+                    {folderOpen("navigationManager-folder navigationManager-folderOpen")}
                 </>
             );
         } else {
             return (
                 <>
-                    {rightTriangle()}
-                    {folderClosed()}
+                    <span className="navigationManager-triangle">
+                        {rightTriangle("navigationManager-triangleRight")}
+                    </span>
+                    {folderClosed("navigationManager-folder navigationManager-folderClosed")}
                 </>
             );
         }
