@@ -21,6 +21,7 @@ import {
 interface IProps extends IRevisionFragment {
     url: string;
     isSelected: boolean;
+    onHover?: () => void;
 }
 
 /**
@@ -31,7 +32,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
         const { name, status, dateInserted, url, isSelected } = this.props;
         const { photoUrl } = this.props.insertUser;
         return (
-            <li className="revisionsList-item">
+            <li className="revisionsList-item" onMouseOver={this.props.onHover}>
                 <Link
                     to={url}
                     className={classNames("revisionsList-link", "panelList-link", { isSelected })}
@@ -55,6 +56,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
             </li>
         );
     }
+
     private icon(status: string) {
         switch (status) {
             case "draft":
