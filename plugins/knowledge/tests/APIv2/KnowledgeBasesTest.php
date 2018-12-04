@@ -42,7 +42,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     }
 
     /**
-     * Grab values for inserting a new knowledge category.
+     * Grab values for inserting a new knowledge base.
      *
      * @return array
      */

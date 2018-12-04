@@ -9,9 +9,10 @@ namespace Vanilla\Knowledge\Models\Entities;
 /**
  * Base entity class.
  */
-class Entity {
+abstract class Entity {
     /**
      * Entity constructor.
+     *
      * @param array $fields
      */
     public function __construct(array $fields = []) {

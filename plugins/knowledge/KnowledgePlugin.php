@@ -113,10 +113,14 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("urlCode", "varchar(255)")
             ->column("icon", "varchar(255)")
             ->column("sourceLocale", "varchar(5)")
-            ->column("viewType", ["enum", Models\KnowledgeBaseModel::getAllTypes(),
-            ], ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE])
-            ->column("sortArticles", ["enum", Models\KnowledgeBaseModel::getAllSorts(),
-            ], ['Null' => false, 'Default' => Models\KnowledgeBaseModel::ORDER_MANUAL])
+            ->column("viewType",
+                ["enum", Models\KnowledgeBaseModel::getAllTypes()],
+                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE]
+            )
+            ->column("sortArticles",
+                ["enum", Models\KnowledgeBaseModel::getAllSorts()],
+                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::ORDER_MANUAL]
+            )
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")

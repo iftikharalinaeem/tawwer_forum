@@ -79,6 +79,7 @@ class KnowledgeBaseEntity extends Entity {
         $this->icon = $icon;
         return $this;
     }
+
     /**
      * SourceLocale setter
      *
@@ -89,7 +90,6 @@ class KnowledgeBaseEntity extends Entity {
         $this->sourceLocale = $locale;
         return $this;
     }
-
 
     /**
      * Description setter

@@ -9,19 +9,16 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
-use Garden\Schema\ValidationField;
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\Entities\KnowledgeBaseEntity;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiSchemes;
 
 /**
- * Endpoint for the knowledge category resource.
+ * Endpoint for the knowledge base resource.
  */
 class KnowledgeBasesApiController extends AbstractApiController {
     use KnowledgeBasesApiSchemes;
 
-    /** @var KnowledgeCategoryModel */
+    /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
     /**
@@ -33,9 +30,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
     }
 
-
     /**
-     * Get a single knowledge category.
+     * Get a single knowledge base.
      *
      * @param int $id
      * @return array
@@ -142,11 +138,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * Delete a knowledge base.
      *
      * @param int $id
-     * @throws ValidationException If output validation fails while getting the knowledge category.
-     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
-     * @throws \Garden\Web\Exception\ClientException If the target knowledge category is not empty.
+     * @throws ValidationException If output validation fails while getting the knowledge base.
+     * @throws \Garden\Web\Exception\ClientException If the root knowledge category is not empty.
      */
     public function delete(int $id) {
         $this->permission("garden.setttings.manage");

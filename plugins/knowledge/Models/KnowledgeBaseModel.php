@@ -10,7 +10,7 @@ use Garden\Schema\Schema;
 use Gdn_Session;
 
 /**
- * A model for managing knowledge categories.
+ * A model for managing knowledge bases.
  */
 class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const TYPE_GUIDE = 'guide';
