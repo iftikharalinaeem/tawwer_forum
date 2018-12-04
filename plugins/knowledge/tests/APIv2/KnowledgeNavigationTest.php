@@ -35,10 +35,11 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
      * Assert two navigation trees are identical.
      *
      * @param array $expected
-     * @param array $actual
+     * @param array $actual Navigation API response, represented as a tree.
      */
     private function assertTreesEqual(array $expected, array $actual) {
-        $filter = function (array $nav) use (&$filter){
+        // Filter a navigation tree down to its relevant components.
+        $filter = function (array $nav) use (&$filter) {
             foreach ($nav as &$item) {
                 if (is_array($item)) {
                     $item = $filter($item);
@@ -105,6 +106,10 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
         $this->knowledgeCategoryModel->delete(["knowledgeCategoryID >" => 0]);
         $this->categories = [];
 
+        /**
+         * PHPUnit can't properly initialize with this tree as a property, due to Navigation not being loadable when
+         * this test class is initially loaded.
+         */
         $this->insertNavigation([
             [
                 "name" => "Root Category",
@@ -188,7 +193,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test default sort order. No sort weights for anything.
+     * Test default sort order. No sort weights for anything. Categories first, articles second, otherwise name.
      */
     public function testDefaultSorting() {
         $expected = [
@@ -420,7 +425,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Basic sorting of articles and categories.
+     * Basic sorting of articles and categories. Only the sort values are changed.
      */
     public function testSimpleSorting() {
         $this->api()->patch(
