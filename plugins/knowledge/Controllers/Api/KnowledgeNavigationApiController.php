@@ -332,9 +332,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             }
         }
 
-        // Grab the new tree.
-        $tree = $this->getNavigation();
-        $result = $out->validate($tree);
+        // Grab the new navigation state.
+        $navigation = $this->getNavigation(true);
+        $result = $out->validate($navigation);
         return $result;
     }
 }
