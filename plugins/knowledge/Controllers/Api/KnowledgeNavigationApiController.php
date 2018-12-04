@@ -280,7 +280,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @todo Add support for multiple knowledge bases.
      */
     public function patch_flat(array $body = []): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission("garden.settings.manage");
 
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([
