@@ -421,7 +421,7 @@ class GroupModel extends Gdn_Model {
             ->from('GroupApplicant')
             ->where('GroupID', $groupID)
             ->where($where)
-            ->orderBy('Type, DateInserted', 'desc')
+            ->orderBy('DateInserted', 'desc')
             ->limit($limit, $offset)
             ->get()->resultArray();
 
