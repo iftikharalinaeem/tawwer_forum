@@ -9,14 +9,16 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { folderClosed, folderOpen, article } from "@library/components/icons/tree";
 import classNames from "classNames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
-import { ICurrentCategory } from "@knowledge/modules/navigation/NavigationManager";
 import { t } from "@library/application";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
+import { ITreeItem } from "@atlaskit/tree";
 
 interface IProps {
     className?: string;
-    item: ICurrentCategory;
-    handleEdit: (item: ICurrentCategory) => boolean;
+    item: ITreeItem;
+    handleEdit: (item: ITreeItem) => boolean;
+    beforeEdit?: React.ReactNode;
+    afterEdit?: React.ReactNode;
 }
 
 interface IState {
@@ -26,11 +28,16 @@ interface IState {
     newName: string;
 }
 
-export default class NavigationManagerDelete extends React.Component<IProps, IState> {
+export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    public state = {
+        error: false,
+        editMode: false,
+        disabled: false,
+        newName: "",
+    };
     public render() {
         if (this.state.editMode) {
-            //todo
             return (
                 <form className={classNames("navigationManger-editMode", { hasError: this.state.error })}>
                     <input value={this.props.item.name} name="renameItem" onKeyPress={this.handleOnChange} />
@@ -42,14 +49,18 @@ export default class NavigationManagerDelete extends React.Component<IProps, ISt
             );
         } else {
             return (
-                <Button
-                    onClick={this.startEdit}
-                    className={classNames("navigationManager-rename", this.props.className)}
-                    baseClass={ButtonBaseClass.ICON}
-                    buttonRef={this.buttonRef}
-                >
-                    {t("Delete")}
-                </Button>
+                <>
+                    {this.props.beforeEdit}
+                    <Button
+                        onClick={this.startEdit}
+                        className={classNames("navigationManager-rename", this.props.className)}
+                        baseClass={ButtonBaseClass.ICON}
+                        buttonRef={this.buttonRef}
+                    >
+                        {t("Edit")}
+                    </Button>
+                    {this.props.afterEdit}
+                </>
             );
         }
     }

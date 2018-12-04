@@ -14,31 +14,24 @@ import Tree, {
     moveItemOnTree,
     IRenderItemParams,
 } from "@atlaskit/tree";
-import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import classNames from "classNames";
 import { t } from "@library/application";
 import get from "lodash/get";
-import ModalConfirm from "@library/components/modal/ModalConfirm";
-import Translate from "@library/components/translation/Translate";
-import NavigationManagerDelete from "plugins/knowledge/src/scripts/modules/navigation/NavigationManagerDelete";
-import NavigationManagerEdit from "plugins/knowledge/src/scripts/modules/navigation/NavigationManagerEdit";
+import NavigationManagerDelete from "@knowledge/modules/navigation/NavigationManagerDelete";
+import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
+import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 
 interface IProps {}
 
-export interface ICurrentCategory {
-    id: number;
-    name: string;
-}
-
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
-    deleteItem: boolean;
+    deleteItem: IKbNavigationItem | null;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
-        deleteItem: false,
+        deleteItem: null,
     };
 
     public render() {
@@ -54,19 +47,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                         isDragEnabled={true}
                     />
                 </div>
-                {this.state.itemToDelete !== null && (
-                    <ModalConfirm
-                        title={t("Delete Category")}
-                        onCancel={this.hideDeleteConfirmation}
-                        onConfirm={this.deleteSelectedItem}
-                        elementToFocusOnExit={this.state.toFocusOnExit!.current!}
-                    >
-                        <Translate
-                            source={"Are you sure you want to delete category: <0/>"}
-                            c0={this.state.itemToDelete.name}
-                        />
-                    </ModalConfirm>
-                )}
             </>
         );
     }
@@ -95,32 +75,23 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                         hasChildren={hasChildren}
                         className="tree-itemIcon"
                     />
-                    <span className="navigationManager-itemLabel">{name}</span>
-                    <NavigationManagerEdit handleEdit={this.handleEdit} item={item} />
-                    <NavigationManagerDelete deleteItem={this.deleteSelectedItem} item={item} />
+                    <NavigationManagerContent
+                        handleEdit={this.handleEdit}
+                        item={item}
+                        beforeEdit={<span className="navigationManager-itemLabel">{name}</span>}
+                        afterEdit={<NavigationManagerDelete deleteItem={this.deleteSelectedItem} item={item} />}
+                    />
                 </div>
             </div>
         );
     };
 
-    private showDeleteConfirmation = () => {
-        this.setState({
-            deleteItem: true,
-        });
-    };
-
-    private hideDeleteConfirmation = () => {
-        this.setState({
-            deleteItem: false,
-        });
-    };
-
-    private deleteSelectedItem = (item: ICurrentCategory) => {
-        alert("Delete Item: " + item!.id);
+    private deleteSelectedItem = (item: IKbNavigationItem) => {
+        alert("Delete Item: " + item!.recordID);
     };
 
     // For now, we hard code result. The edit can be accepted or rejected.
-    private handleEdit = (item: ICurrentCategory) => {
+    private handleEdit = (item: IKbNavigationItem) => {
         return true;
     };
 
