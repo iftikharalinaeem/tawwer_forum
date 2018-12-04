@@ -113,11 +113,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("urlCode", "varchar(255)")
             ->column("icon", "varchar(255)")
             ->column("sourceLocale", "varchar(5)")
-            ->column("viewType",
+            ->column(
+                "viewType",
                 ["enum", Models\KnowledgeBaseModel::getAllTypes()],
                 ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE]
             )
-            ->column("sortArticles",
+            ->column(
+                "sortArticles",
                 ["enum", Models\KnowledgeBaseModel::getAllSorts()],
                 ['Null' => false, 'Default' => Models\KnowledgeBaseModel::ORDER_MANUAL]
             )
