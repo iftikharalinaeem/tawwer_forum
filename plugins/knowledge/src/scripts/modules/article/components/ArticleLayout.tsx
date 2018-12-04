@@ -22,7 +22,6 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 
@@ -41,7 +40,7 @@ export class ArticleLayout extends React.Component<IProps> {
     public render() {
         const { article, messages } = this.props;
 
-        const mobileNav = <SiteNav collapsible={false}>{dummyNavData}</SiteNav>;
+        const mobileNav = <SiteNav collapsible={false}>{[]}</SiteNav>;
         const nav = <Navigation />;
 
         return (
@@ -49,14 +48,13 @@ export class ArticleLayout extends React.Component<IProps> {
                 <Container>
                     <VanillaHeader title={article.name} mobileDropDownContent={mobileNav} />
                     <PanelLayout device={this.props.device}>
-                        {this.props.breadcrumbData.length > 1 &&
-                            this.props.device !== Devices.MOBILE && (
-                                <PanelLayout.Breadcrumbs>
-                                    <PanelWidget>
-                                        <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                                    </PanelWidget>
-                                </PanelLayout.Breadcrumbs>
-                            )}
+                        {this.props.breadcrumbData.length > 1 && this.props.device !== Devices.MOBILE && (
+                            <PanelLayout.Breadcrumbs>
+                                <PanelWidget>
+                                    <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                                </PanelWidget>
+                            </PanelLayout.Breadcrumbs>
+                        )}
                         <PanelLayout.LeftBottom>
                             <PanelWidget>{nav}</PanelWidget>
                         </PanelLayout.LeftBottom>
@@ -88,14 +86,13 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <AttachmentList attachments={this.articleAttachmentList} />
                             </PanelWidget>
                         </PanelLayout.MiddleBottom>
-                        {article.outline &&
-                            article.outline.length > 0 && (
-                                <PanelLayout.RightTop>
-                                    <PanelWidget>
-                                        <ArticleTOC items={article.outline} />
-                                    </PanelWidget>
-                                </PanelLayout.RightTop>
-                            )}
+                        {article.outline && article.outline.length > 0 && (
+                            <PanelLayout.RightTop>
+                                <PanelWidget>
+                                    <ArticleTOC items={article.outline} />
+                                </PanelWidget>
+                            </PanelLayout.RightTop>
+                        )}
                         <PanelLayout.RightBottom>
                             <OtherLanguages {...dummyOtherLanguagesData} />
                             <RelatedArticles children={this.articleRelatedArticles} />

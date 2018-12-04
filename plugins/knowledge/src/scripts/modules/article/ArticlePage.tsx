@@ -21,7 +21,6 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
-import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -47,17 +46,16 @@ export class ArticlePage extends React.Component<IProps, IState> {
             <>
                 <ErrorPage loadable={loadable} />
                 <PageLoader status={loadable.status}>
-                    {loadable.status === LoadStatus.SUCCESS &&
-                        loadable.data && (
-                            <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
-                                <ArticleLayout
-                                    title={loadable.data.article.seoName || loadable.data.article.name}
-                                    article={loadable.data.article}
-                                    breadcrumbData={loadable.data.breadcrumbs}
-                                    messages={this.renderMessages()}
-                                />
-                            </DocumentTitle>
-                        )}
+                    {loadable.status === LoadStatus.SUCCESS && loadable.data && (
+                        <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
+                            <ArticleLayout
+                                title={loadable.data.article.seoName || loadable.data.article.name}
+                                article={loadable.data.article}
+                                breadcrumbData={loadable.data.breadcrumbs}
+                                messages={this.renderMessages()}
+                            />
+                        </DocumentTitle>
+                    )}
                 </PageLoader>
             </>
         );
