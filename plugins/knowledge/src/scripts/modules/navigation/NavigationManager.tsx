@@ -18,28 +18,27 @@ import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationM
 import classNames from "classNames";
 import { t } from "@library/application";
 import get from "lodash/get";
-import Button from "@library/components/forms/Button";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
 import Translate from "@library/components/translation/Translate";
+import NavigationManagerDelete from "plugins/knowledge/src/scripts/modules/navigation/NavigationManagerDelete";
+import NavigationManagerEdit from "plugins/knowledge/src/scripts/modules/navigation/NavigationManagerEdit";
 
 interface IProps {}
 
-interface ICurrentCategory {
+export interface ICurrentCategory {
     id: number;
     name: string;
 }
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
-    itemToDelete: ICurrentCategory | null;
-    toFocusOnExit: React.RefObject<HTMLButtonElement> | null;
+    deleteItem: boolean;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
-        itemToDelete: null,
-        toFocusOnExit: null,
+        deleteItem: false,
     };
 
     public render() {
@@ -60,7 +59,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                         title={t("Delete Category")}
                         onCancel={this.hideDeleteConfirmation}
                         onConfirm={this.deleteSelectedItem}
-                        elementToFocusOnExit={}
+                        elementToFocusOnExit={this.state.toFocusOnExit!.current!}
                     >
                         <Translate
                             source={"Are you sure you want to delete category: <0/>"}
@@ -97,27 +96,32 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                         className="tree-itemIcon"
                     />
                     <span className="navigationManager-itemLabel">{name}</span>
-                    <Button>{t("Edit")}</Button>
-                    <Button>{t("Delete")}</Button>
+                    <NavigationManagerEdit handleEdit={this.handleEdit} item={item} />
+                    <NavigationManagerDelete deleteItem={this.deleteSelectedItem} item={item} />
                 </div>
             </div>
         );
     };
 
-    private showDeleteConfirmation = (item: ICurrentCategory) => {
+    private showDeleteConfirmation = () => {
         this.setState({
-            itemToDelete: item,
+            deleteItem: true,
         });
     };
 
     private hideDeleteConfirmation = () => {
         this.setState({
-            itemToDelete: null,
+            deleteItem: false,
         });
     };
 
-    private deleteSelectedItem = () => {
-        alert("Delete Item: " + this.state.itemToDelete!.id);
+    private deleteSelectedItem = (item: ICurrentCategory) => {
+        alert("Delete Item: " + item!.id);
+    };
+
+    // For now, we hard code result. The edit can be accepted or rejected.
+    private handleEdit = (item: ICurrentCategory) => {
+        return true;
     };
 
     private expandItem = (itemId: string) => {

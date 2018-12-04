@@ -4,60 +4,38 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { RefObject } from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { folderClosed, folderOpen, article } from "@library/components/icons/tree";
 import classNames from "classNames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
+import { ICurrentCategory } from "@knowledge/modules/navigation/NavigationManager";
+import { t } from "library/src/scripts/application";
 
 interface IProps {
-    expanded: boolean;
-    expandItem: (itemId: string) => void;
-    collapseItem: (itemId: string) => void;
-    itemId: string;
-    disabled?: boolean;
-    hasChildren: boolean;
     className?: string;
+    disabled?: boolean;
+    item: ICurrentCategory;
+    deleteItem: (item: ICurrentCategory, deleteButtonRef: React.RefObject<HTMLButtonElement>) => void;
 }
 
-export default class NavigationManagerEdit extends React.Component<IProps> {
+export default class NavigationManagerDelete extends React.Component<IProps> {
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
-        if (this.props.hasChildren) {
-            return (
-                <Button
-                    onClick={this.handleClick}
-                    className={classNames("navigationManager-toggleFolder", this.props.className)}
-                    disabled={!!this.props.disabled}
-                    baseClass={ButtonBaseClass.ICON}
-                >
-                    {this.icon()}
-                </Button>
-            );
-        } else {
-            return article();
-        }
+        return (
+            <Button
+                onClick={this.handleClick}
+                className={classNames("navigationManager-delete", this.props.className)}
+                disabled={!!this.props.disabled}
+                baseClass={ButtonBaseClass.ICON}
+                buttonRef={this.buttonRef}
+            >
+                {t("Delete")}
+            </Button>
+        );
     }
 
-    private handleClick = e => {
-        const { expanded, expandItem, collapseItem, itemId } = this.props;
-        expanded ? collapseItem(itemId) : expandItem(itemId);
-    };
-
-    private icon = () => {
-        if (this.props.expanded) {
-            return (
-                <>
-                    {downTriangle()}
-                    {folderOpen()}
-                </>
-            );
-        } else {
-            return (
-                <>
-                    {rightTriangle()}
-                    {folderClosed()}
-                </>
-            );
-        }
+    private handleClick = () => {
+        this.props.deleteItem(this.props.item, this.buttonRef);
     };
 }
