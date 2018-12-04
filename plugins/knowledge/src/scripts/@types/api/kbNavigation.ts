@@ -11,6 +11,10 @@ export enum NavigationRecordType {
     ARTICLE = "article",
 }
 
+export interface IKbNavigationItem extends INavigationItem {
+    recordType: NavigationRecordType;
+}
+
 // API types
 export interface IGetKbNavigationRequest {
     knowledgeBaseID?: number;
@@ -18,7 +22,7 @@ export interface IGetKbNavigationRequest {
     maxDepth?: number;
 }
 
-export type IGetKbNavigationResponse = INavigationItem[];
+export type IGetKbNavigationResponse = IKbNavigationItem[];
 
 interface IPatchFlatItem {
     parentID: number;
@@ -28,4 +32,4 @@ interface IPatchFlatItem {
 }
 
 export type IPatchKBNavigationRequest = IPatchFlatItem[];
-export type IPatchKbNavigationResponse = INavigationItem[];
+export type IPatchKbNavigationResponse = IKbNavigationItem[];

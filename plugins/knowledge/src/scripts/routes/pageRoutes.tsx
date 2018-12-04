@@ -18,9 +18,9 @@ import {
     IResponseArticleDraft,
     IKbCategoryFragment,
     IKbCategory,
-    IKbNavigationItemNested,
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
+import { IKbNavigationItem } from "@knowledge/@types/api";
 
 /**
  * Get the route for editing a particular article ID.
@@ -100,7 +100,7 @@ export const DebugRoute = new RouteHandler(
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
-    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItemNested) => category.url,
+    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
 );
 
 export const SearchRoute = new RouteHandler(
