@@ -73,7 +73,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private stopEdit = () => {
         this.setState({
-            editMode: true,
+            editMode: false,
         });
     };
 

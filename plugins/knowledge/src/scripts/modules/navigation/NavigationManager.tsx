@@ -25,13 +25,11 @@ interface IProps {}
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
-    deleteItem: IKbNavigationItem | null;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
-        deleteItem: null,
     };
 
     public render() {

@@ -46,16 +46,16 @@ export default class NavigationManagerDelete extends React.Component<IProps, ISt
                 </Button>
                 {this.state.delete && (
                     <ModalConfirm
-                        title={
-                            ((
-                                <Translate source={'Delete <0/>: "<1/>"'} c0={this.getType(recordType)} c1={name} />
-                            ) as unknown) as string
-                        }
+                        title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
                         onCancel={this.closeConfirmation}
                         onConfirm={this.handleDelete}
                         elementToFocusOnExit={this.buttonRef.current!}
                     >
-                        <Translate source={'Are you sure you want to delete: "<0/>"'} c0={name} />
+                        <Translate
+                            source={'Are you sure you want to delete <0/>: "<1/>"'}
+                            c0={this.getType(recordType)}
+                            c1={name}
+                        />
                     </ModalConfirm>
                 )}
             </>
