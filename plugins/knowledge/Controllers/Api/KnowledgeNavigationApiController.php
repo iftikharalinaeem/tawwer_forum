@@ -277,7 +277,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws PermissionException If the user does not have adequate permission(s).
      * @throws ValidationException Throws an exception when input does not validate against the input schema.
      * @throws ValidationException Throws an exception when output does not validate against the output schema.
-     * @todo Add support for multiple knowledge bases.
      */
     public function patch_flat(array $body = []): array {
         $this->permission("garden.settings.manage");
