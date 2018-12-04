@@ -62,44 +62,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     }
 
     /**
-     * Given two navigation items, compare them and determine their sort order.
-     *
-     * @param array $a
-     * @param array $b
-     * @return int A value of -1, 0 or 1, depending on if $a is less than, equal to, or greater than $b.
-     */
-    private function compareItems(array $a, array $b): int {
-        $sortA = $a["sort"] ?? null;
-        $sortB = $b["sort"] ?? null;
-        if ($sortA === $sortB) {
-            // Same sort weight? We must go deeper.
-            $typeA = $a["recordType"] ?? null;
-            $typeB = $b["recordType"] ?? null;
-            if ($typeA === $typeB) {
-                // Same record type? Sort by name.
-                $nameA = $a["name"] ?? null;
-                $nameB = $b["name"] ?? null;
-                return $nameA <=> $nameB;
-            } elseif ($typeA === Navigation::RECORD_TYPE_ARTICLE) {
-                // If the types differ, and A is an article, then B must be a category. Categories rank higher.
-                return 1;
-            } else {
-                // If they're not the same type, and A isn't an article, it must be a category. A should rank higher.
-                return -1;
-            }
-        } elseif ($sortA === null) {
-            // If they're not the same, and A is null, then B must not be null. B should rank higher.
-            return 1;
-        } elseif ($sortB === null) {
-            // If they're not the same, and B is null, then A must not be null. A should rank higher.
-            return -1;
-        } else {
-            // We have two non-null, non-equal sort weights. Compare them using the combined-comparison operator.
-            return $sortA <=> $sortB;
-        }
-    }
-
-    /**
      * Get navigation fragment schema attributes array
      *
      * @return array
@@ -239,7 +201,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         foreach ($parent as $k => $l) {
             if (isset($list[$l['knowledgeCategoryID']]) && $l['recordType'] === Navigation::RECORD_TYPE_CATEGORY) {
                 $l['children'] = $this->createTree($list, $list[$l['knowledgeCategoryID']]);
-                usort($l["children"], [$this, "compareItems"]);
+                usort($l["children"], [Navigation::class, "compareItems"]);
             }
             $tree[] = $l;
         }
@@ -362,6 +324,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $this->articleModel
         );
 
+        // Dumb update all categories until we get knowledge base support to locate the proper top-level category.
         foreach ($categories as $category) {
             $parentID = $category["parentID"] ?? null;
             if ($parentID === -1) {

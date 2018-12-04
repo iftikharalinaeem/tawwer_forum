@@ -21,6 +21,40 @@ class Navigation {
     const RECORD_TYPE_ARTICLE = "article";
 
     /**
+     * Given two navigation items, compare them and determine their sort order.
+     *
+     * @param array $a
+     * @param array $b
+     * @return int A value of -1, 0 or 1, depending on if $a is less than, equal to, or greater than $b.
+     */
+    public static function compareItems(array $a, array $b): int {
+        $sortA = $a["sort"] ?? null;
+        $sortB = $b["sort"] ?? null;
+        if ($sortA === $sortB) {
+            // Same sort weight? We must go deeper.
+            $typeA = $a["recordType"] ?? null;
+            $typeB = $b["recordType"] ?? null;
+            if ($typeA === $typeB) {
+                // Same record type? Sort by name.
+                $nameA = $a["name"] ?? null;
+                $nameB = $b["name"] ?? null;
+                return $nameA <=> $nameB;
+            }
+            // Articles rank lower than categories.
+            return $typeA === Navigation::RECORD_TYPE_ARTICLE ? 1 : -1;
+        } elseif ($sortA === null) {
+            // If they're not the same, and A is null, then B must not be null. B should rank higher.
+            return 1;
+        } elseif ($sortB === null) {
+            // If they're not the same, and B is null, then A must not be null. A should rank higher.
+            return -1;
+        } else {
+            // We have two non-null, non-equal sort weights. Compare them using the combined-comparison operator.
+            return $sortA <=> $sortB;
+        }
+    }
+
+    /**
      * Sync resource rows with a navigation structure.
      *
      * @param array $rows All rows of a particular resource that chould be represented in the tree (i.e. everything in a knowledge base).
