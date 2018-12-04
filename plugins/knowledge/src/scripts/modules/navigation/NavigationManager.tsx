@@ -18,30 +18,57 @@ import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationM
 import classNames from "classNames";
 import { t } from "@library/application";
 import get from "lodash/get";
+import Button from "@library/components/forms/Button";
+import ModalConfirm from "@library/components/modal/ModalConfirm";
+import Translate from "@library/components/translation/Translate";
 
 interface IProps {}
 
+interface ICurrentCategory {
+    id: number;
+    name: string;
+}
+
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
+    itemToDelete: ICurrentCategory | null;
+    toFocusOnExit: React.RefObject<HTMLButtonElement> | null;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
+        itemToDelete: null,
+        toFocusOnExit: null,
     };
 
     public render() {
         return (
-            <div className="tree">
-                <Tree
-                    tree={this.state.treeData}
-                    onDragEnd={this.onDragEnd}
-                    onCollapse={this.collapseItem}
-                    onExpand={this.expandItem}
-                    renderItem={this.renderItem}
-                    isDragEnabled={true}
-                />
-            </div>
+            <>
+                <div className="tree">
+                    <Tree
+                        tree={this.state.treeData}
+                        onDragEnd={this.onDragEnd}
+                        onCollapse={this.collapseItem}
+                        onExpand={this.expandItem}
+                        renderItem={this.renderItem}
+                        isDragEnabled={true}
+                    />
+                </div>
+                {this.state.itemToDelete !== null && (
+                    <ModalConfirm
+                        title={t("Delete Category")}
+                        onCancel={this.hideDeleteConfirmation}
+                        onConfirm={this.deleteSelectedItem}
+                        elementToFocusOnExit={}
+                    >
+                        <Translate
+                            source={"Are you sure you want to delete category: <0/>"}
+                            c0={this.state.itemToDelete.name}
+                        />
+                    </ModalConfirm>
+                )}
+            </>
         );
     }
 
@@ -49,9 +76,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const name = item.data!.name;
         const hasChildren = item.children && item.children.length > 0;
-        // console.log("item: ", item);
-        // console.log("provided.draggableProps: ", provided.draggableProps);
-        // console.log("provided: ", provided);
 
         const marginLeft = get(provided, "draggableProps.style.paddingLeft", false);
 
@@ -73,9 +97,27 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                         className="tree-itemIcon"
                     />
                     <span className="navigationManager-itemLabel">{name}</span>
+                    <Button>{t("Edit")}</Button>
+                    <Button>{t("Delete")}</Button>
                 </div>
             </div>
         );
+    };
+
+    private showDeleteConfirmation = (item: ICurrentCategory) => {
+        this.setState({
+            itemToDelete: item,
+        });
+    };
+
+    private hideDeleteConfirmation = () => {
+        this.setState({
+            itemToDelete: null,
+        });
+    };
+
+    private deleteSelectedItem = () => {
+        alert("Delete Item: " + this.state.itemToDelete!.id);
     };
 
     private expandItem = (itemId: string) => {
