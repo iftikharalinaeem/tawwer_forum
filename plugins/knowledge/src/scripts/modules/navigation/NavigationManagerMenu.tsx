@@ -28,13 +28,13 @@ interface IProps {
 export default class NavigationManagerMenu extends React.Component<IProps> {
     public render() {
         return (
-            <nav className={classNames("NavigationManagerMenu", "modal-pageHeader", this.props.className)}>
+            <nav className={classNames("navigationManagerMenu", "modal-pageHeader", this.props.className)}>
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
-                            <ul className="NavigationManagerMenu-items">
-                                <li className="NavigationManagerMenu-item isPullLeft">
-                                    <BackLink visibleLabel={true} className="NavigationManagerMenu-backLink" />
+                            <ul className="navigationManagerMenu-items">
+                                <li className="navigationManagerMenu-item isPullLeft">
+                                    <BackLink visibleLabel={true} className="navigationManagerMenu-backLink" />
                                 </li>
                             </ul>
                         </PanelWidgetHorizontalPadding>

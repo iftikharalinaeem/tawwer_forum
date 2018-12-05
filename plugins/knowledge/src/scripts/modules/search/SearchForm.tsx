@@ -26,19 +26,18 @@ import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
-import { withApi, IApiProps } from "@library/contexts/ApiContext";
+import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
 
-interface IProps extends ISearchFormActionProps, ISearchPageState, IApiProps {
+interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
     device: Devices;
 }
 
 class SearchForm extends React.Component<IProps> {
-    private searchBarRef: React.RefObject<SearchBar> = React.createRef();
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
@@ -46,7 +45,7 @@ class SearchForm extends React.Component<IProps> {
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} onSearchIconClick={this.focusSearchInput} />
+                <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
                     <QueryString value={this.props.form} />
                     <PanelLayout device={this.props.device}>
@@ -62,8 +61,7 @@ class SearchForm extends React.Component<IProps> {
                                     onSearch={this.props.searchActions.search}
                                     isLoading={this.props.results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
-                                    triggerSearchOnAllUpdates={true}
-                                    ref={this.searchBarRef}
+                                    triggerSearchOnClear={true}
                                     title={t("Search")}
                                     titleAsComponent={
                                         <>
@@ -109,6 +107,13 @@ class SearchForm extends React.Component<IProps> {
      */
     public componentDidMount() {
         this.initializeFromQueryString(window.location.search);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentWillUnmount() {
+        this.props.searchActions.reset();
     }
 
     /**
@@ -174,10 +179,6 @@ class SearchForm extends React.Component<IProps> {
             location: searchResult.knowledgeCategory!.breadcrumbs,
         };
     }
-
-    private focusSearchInput = () => {
-        this.searchBarRef.current!.focus();
-    };
 }
 
 const withRedux = connect(
@@ -185,4 +186,4 @@ const withRedux = connect(
     SearchPageActions.mapDispatchToProps,
 );
 
-export default withRedux(withApi(withDevice<IProps>(SearchForm)));
+export default withRedux(withSearch(withDevice(SearchForm)));

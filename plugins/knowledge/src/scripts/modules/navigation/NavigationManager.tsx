@@ -17,14 +17,15 @@ import Tree, {
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
 import { INavigationItem } from "@library/@types/api";
+import { IKbNavigationItem } from "@knowledge/@types/api";
 
 interface IProps {
     className?: string;
 }
 
 interface IState {
-    treeData: ITreeData<INavigationItem>;
-    renameItemID: string | null;
+    treeData: ITreeData<IKbNavigationItem>;
+    renameItemID: number | null;
     disabled: boolean;
 }
 
@@ -37,19 +38,17 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <>
-                <div className={classNames("navigationManager", this.props.className)}>
-                    <Tree
-                        tree={this.state.treeData}
-                        onDragEnd={this.onDragEnd}
-                        onCollapse={this.collapseItem}
-                        onExpand={this.expandItem}
-                        renderItem={this.renderItem}
-                        isDragEnabled={!this.state.disabled}
-                        key={this.state.renameItemID || undefined}
-                    />
-                </div>
-            </>
+            <div className={classNames("navigationManager", this.props.className)}>
+                <Tree
+                    tree={this.state.treeData}
+                    onDragEnd={this.onDragEnd}
+                    onCollapse={this.collapseItem}
+                    onExpand={this.expandItem}
+                    renderItem={this.renderItem}
+                    isDragEnabled={!this.state.disabled}
+                    key={this.state.renameItemID ? this.state.renameItemID : undefined}
+                />
+            </div>
         );
     }
 
@@ -59,7 +58,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         return (
             <NavigationManagerContent
                 hasChildren={hasChildren}
-                item={item}
+                item={item as ITreeItem<IKbNavigationItem>}
                 snapshot={snapshot}
                 provided={provided}
                 handleDelete={this.deleteSelectedItem}
@@ -67,7 +66,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 collapseItem={this.collapseItem}
                 renameMode={this.editMode}
                 stopRenameMode={this.stopEditMode}
-                handleRename={this.handleEdit}
+                handleRename={this.handleRename}
                 renameItemID={this.state.renameItemID}
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
@@ -75,16 +74,27 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
-    private deleteSelectedItem = (item: ITreeItem<INavigationItem>) => {
+    private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
         alert("Delete Item: " + item.data!.recordID);
     };
 
     // For now, we hard code result. The edit can be accepted or rejected.
-    private handleEdit = (item: ITreeItem<INavigationItem>) => {
+    private handleRename = (
+        e: React.SyntheticEvent,
+        item: ITreeItem<IKbNavigationItem>,
+        newName: string,
+        callback?: (result: any) => void,
+    ) => {
+        e.preventDefault();
+        callback &&
+            callback({
+                result: true,
+                message: "Success",
+            });
         return true;
     };
 
-    private editMode = (itemID: string | null) => {
+    private editMode = (itemID: number | null) => {
         this.setState({
             renameItemID: itemID,
         });
@@ -135,8 +145,8 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private calcInitialTree(items: INavigationItem[]): ITreeData<INavigationItem> {
-        const data: ITreeData<INavigationItem> = {
+    private calcInitialTree(items: IKbNavigationItem[]): ITreeData<IKbNavigationItem> {
+        const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
@@ -147,7 +157,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 hasChildren: children.length > 0,
                 id: itemID,
                 children,
-                data: itemValue as INavigationItem,
+                data: itemValue as IKbNavigationItem,
                 isExpanded: true,
             };
         }

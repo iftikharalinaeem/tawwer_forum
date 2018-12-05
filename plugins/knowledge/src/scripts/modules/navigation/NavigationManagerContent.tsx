@@ -11,19 +11,24 @@ import classNames from "classnames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { t } from "@library/application";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import { ITreeItem } from "@atlaskit/tree";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
 import Translate from "@library/components/translation/Translate";
 import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import { INavigationItem } from "@library/@types/api";
+import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
+import { ITreeItem } from "@atlaskit/tree";
 
 interface IProps {
     className?: string;
-    item: ITreeItem<INavigationItem>;
-    handleRename: (item: ITreeItem<INavigationItem>) => boolean;
+    item: ITreeItem<IKbNavigationItem>;
+    handleRename: (
+        e: React.SyntheticEvent,
+        item: ITreeItem<IKbNavigationItem>,
+        newName: string,
+        callback?: (result: any) => void,
+    ) => boolean;
     handleDelete: (
-        item: ITreeItem<INavigationItem>,
+        item: ITreeItem<IKbNavigationItem>,
         deleteButtonRef: React.RefObject<HTMLButtonElement>,
         callback: () => void,
     ) => void;
@@ -32,9 +37,9 @@ interface IProps {
     collapseItem: (itemId: string) => void;
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
-    renameMode: (itemID: string | null) => void; //Start Rename Mode
+    renameMode: (itemID: number | null) => void; //Start Rename Mode
     stopRenameMode: () => void; // Stop Rename Mode
-    renameItemID: string | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
+    renameItemID: number | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
     disableTree: () => void;
     enableTree: () => void;
 }
@@ -48,17 +53,22 @@ interface IState {
 
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    public state = {
-        error: false,
-        disabled: false,
-        deleteMode: false,
-        newName: "",
-    };
+    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            error: false,
+            disabled: false,
+            deleteMode: false,
+            newName: this.props.item.data!.name,
+        };
+    }
+
     public render() {
         const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
-        const isRenaming = (this.props.renameItemID as any) === item.data!.recordID;
-
+        const isRenaming = this.isEditMode();
         return (
             <div
                 ref={provided.innerRef}
@@ -74,7 +84,15 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             >
                 {isRenaming ? (
                     <form className={classNames("navigationManger-editMode", { hasError: this.state.error })}>
-                        <input value={this.props.item.data!.name} name="renameItem" onKeyPress={this.handleOnChange} />
+                        <label>
+                            <span className="sr-only">{t("New Name: ")}</span>
+                            <input
+                                type="text"
+                                value={this.state.newName}
+                                onChange={this.handleOnChange}
+                                ref={this.inputRef}
+                            />
+                        </label>
                         <Button onClick={this.props.stopRenameMode} className={"navigationManger-cancelRename"}>
                             {t("Cancel")}
                         </Button>
@@ -148,16 +166,32 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 this.props.enableTree();
             }
         }
+
+        if (
+            this.props.renameItemID !== prevProps.renameItemID &&
+            this.props.renameItemID === this.props.item.data!.recordID
+        ) {
+            this.setState(
+                {
+                    newName: this.props.item.data!.name,
+                },
+                () => {
+                    this.inputRef.current!.focus();
+                },
+            );
+        }
     }
 
     private handleOnChange = e => {
+        e.preventDefault();
+        e.stopPropagation();
         this.setState({
             error: false,
-            newName: e.value,
+            newName: e.target.value,
         });
     };
 
-    private submit = () => {
+    private submit = e => {
         const newName = this.state.newName;
         if (newName !== "" && newName !== this.props.item.data!.name) {
             this.setState(
@@ -165,29 +199,45 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     disabled: true,
                 },
                 () => {
-                    const editResult = this.props.handleRename(this.props.item);
-                    if (editResult) {
-                        // Success
-                        this.setState({
-                            disabled: false,
-                            error: false,
-                            newName: "",
-                        });
-                        this.props.stopRenameMode();
-                    } else {
-                        // Problem
-                        this.setState({
-                            error: editResult,
-                            disabled: false,
-                        });
-                    }
+                    const editResult = this.props.handleRename(e, this.props.item, this.state.newName, () => {
+                        const editReault = {
+                            message: "Success",
+                            success: true,
+                        };
+                        if (editReault.success) {
+                            // Success
+                            this.setState({
+                                disabled: false,
+                                error: false,
+                                newName: "",
+                            });
+                            this.props.stopRenameMode();
+                        } else {
+                            // Problem
+                            this.setState({
+                                error: editResult,
+                                disabled: false,
+                            });
+                        }
+                    });
                 },
             );
         }
     };
 
+    private isEditMode = () => {
+        return this.props.renameItemID === this.props.item.data!.recordID;
+    };
+
     private renameItem = () => {
-        this.props.renameMode(this.props.item.data!.recordID as any);
+        this.setState(
+            {
+                newName: this.props.item.data!.name,
+            },
+            () => {
+                this.props.renameMode(this.props.item.data!.recordID);
+            },
+        );
     };
 
     private closeConfirmation = () => {

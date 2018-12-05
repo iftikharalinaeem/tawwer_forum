@@ -17,9 +17,11 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { LinkContext } from "@library/components/navigation/SmartLink";
 import { formatUrl } from "@library/application";
-import ApiContext from "@library/contexts/ApiContext";
+import SearchContext from "@library/contexts/SearchContext";
+import PagesContext from "@library/contexts/PagesContext";
 import apiV2 from "@library/apiv2";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
+import { SearchRoute } from "@knowledge/routes/pageRoutes";
 
 /*
  * Top level application component for knowledge.
@@ -38,22 +40,32 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ApiContext.Provider value={{ api: apiV2, searchOptionProvider: new KnowledgeSearchProvider() }}>
-                    <LinkContext.Provider value={formatUrl("/kb", true)}>
-                        <React.Fragment>
-                            <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                            <DeviceContext.Provider
-                                value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
-                            >
-                                <BrowserRouter>
-                                    <Route component={KnowledgeRoutes} />
-                                </BrowserRouter>
-                            </DeviceContext.Provider>
-                        </React.Fragment>
-                    </LinkContext.Provider>
-                </ApiContext.Provider>
+                <PagesContext.Provider value={{ pages: this.pages }}>
+                    <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                        <LinkContext.Provider value={formatUrl("/kb", true)}>
+                            <React.Fragment>
+                                <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                                <DeviceContext.Provider
+                                    value={
+                                        this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP
+                                    }
+                                >
+                                    <BrowserRouter>
+                                        <Route component={KnowledgeRoutes} />
+                                    </BrowserRouter>
+                                </DeviceContext.Provider>
+                            </React.Fragment>
+                        </LinkContext.Provider>
+                    </SearchContext.Provider>
+                </PagesContext.Provider>
             </Provider>
         );
+    }
+
+    private get pages() {
+        return {
+            search: SearchRoute,
+        };
     }
 
     /**
