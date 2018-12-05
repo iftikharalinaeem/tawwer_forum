@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { Devices } from "@library/components/DeviceChecker";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus, NavigationRecordType } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
@@ -39,9 +39,10 @@ interface IProps {
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
         const { article, messages } = this.props;
+        const { articleID } = article;
 
         const mobileNav = <SiteNav collapsible={false}>{[]}</SiteNav>;
-        const nav = <Navigation />;
+        const nav = <Navigation activeRecord={{ recordID: articleID, recordType: NavigationRecordType.ARTICLE }} />;
 
         return (
             <React.Fragment>

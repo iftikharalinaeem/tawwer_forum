@@ -10,15 +10,17 @@ import NavigationModel, { INavigationStoreState } from "@knowledge/modules/navig
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
+import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
+    activeRecord: IActiveRecord;
 }
 
 export class Navigation extends React.Component<IProps> {
     public render(): React.ReactNode {
         return (
-            <SiteNav collapsible={true}>
+            <SiteNav collapsible={true} activeRecord={this.props.activeRecord}>
                 {NavigationModel.getChildren(this.props.navigationItems, "knowledgeCategory1")}
             </SiteNav>
         );
