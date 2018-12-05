@@ -25,8 +25,7 @@ interface IProps {
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
-    renameItemID: number | null;
-    newName: string | null;
+    renameItemID: string | null;
     disabled: boolean;
 }
 
@@ -35,7 +34,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         treeData: this.calcInitialTree(this.dummyData),
         renameItemID: null,
         disabled: false,
-        newName: null,
     };
 
     public render() {
@@ -56,6 +54,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     private renderItem = (params: IRenderItemParams<IKbNavigationItem>) => {
         const { provided, item, snapshot } = params;
+        const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
         return (
             <NavigationManagerContent
@@ -63,16 +62,16 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 item={item}
                 snapshot={snapshot}
                 provided={provided}
-                handleDelete={this.deleteSelectedItem}
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
                 activateRenameMode={this.activateRenameMode}
                 disableRenameMode={this.disableRenameMode}
-                handleRename={this.handleRename}
+                onRenameSubmit={this.handleRename}
                 renameItemID={this.state.renameItemID}
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
-                handleOnChange={this.handleOnChange}
+                handleDelete={this.handleDelete}
+                key={`${data.recordID}-${data.name}-${this.state.renameItemID === item.id}`}
             />
         );
     };
@@ -81,58 +80,25 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         alert("Delete Item: " + item.data!.recordID);
     };
 
-    private handleOnChange = (e: React.SyntheticEvent) => {
-        e.preventDefault();
-        if (e.currentTarget.value) {
-            this.setState(
-                {
-                    newName: e.value,
-                },
-                () => {
-                    return {
-                        result: true,
-                        message: "Success",
-                    };
-                },
-            );
-        }
-    };
-
     // For now, we hard code result. The edit can be accepted or rejected.
-    private handleRename = (e: React.SyntheticEvent, callback) => {
+    private handleRename = () => {
         const result = {
             result: true,
             message: "Success",
         };
-        callback(result);
+        this.disableRenameMode();
     };
 
-    private activateRenameMode = (itemID: number, callback?: () => void) => {
-        this.setState(
-            {
-                renameItemID: itemID,
-                newName: this.state.newName,
-            },
-            callback,
-        );
-    };
-
-    private handleNameChange = e => {
-        e.preventDefault();
-        e.stopPropagation();
+    private activateRenameMode = (itemID: string) => {
         this.setState({
-            newName: e.target.value,
+            renameItemID: itemID,
         });
     };
 
-    private disableRenameMode = (callback?: () => void) => {
-        this.setState(
-            {
-                renameItemID: null,
-                newName: null,
-            },
-            callback,
-        );
+    private disableRenameMode = () => {
+        this.setState({
+            renameItemID: null,
+        });
     };
 
     private disableTree = () => {
@@ -193,6 +159,10 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
         return data;
     }
+
+    private handleDelete = () => {
+        alert("Do Delete");
+    };
 
     private get normalizedData() {
         const normalizedByID: { [id: string]: IKbNavigationItem } = {};
