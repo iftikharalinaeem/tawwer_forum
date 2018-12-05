@@ -76,10 +76,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
 
-        $entity = new KnowledgeBaseEntity($body);
-        $knowledgeBaseID = $this->knowledgeBaseModel->insert($entity->asArray());
+        //$entity = new KnowledgeBaseEntity($body);
+        $knowledgeBaseID = $this->knowledgeBaseModel->insert($entity->asArray('insert'));
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
+       // die(print_r($row));
         $result = $out->validate($row);
         return $result;
     }

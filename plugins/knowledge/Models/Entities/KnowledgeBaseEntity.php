@@ -31,7 +31,17 @@ class KnowledgeBaseEntity extends Entity {
         'rootCategoryID',
     ];
 
-    protected $knowledgeBaseID = 0; //int
+    const FIELDS_INSERT = [
+        'name',
+        'description',
+        'urlCode',
+        'icon',
+        'sourceLocale',
+        'viewType',
+        'sortArticles',
+    ];
+
+    protected $knowledgeBaseID = null; //int
     protected $name = '';
     protected $description = '';
     protected $urlCode = '';
@@ -45,7 +55,7 @@ class KnowledgeBaseEntity extends Entity {
     protected $dateUpdated = 0;
     protected $countArticles = 0;
     protected $countCategories = 0;
-    protected $rootCategoryID = 0;
+    protected $rootCategoryID = -1;
 
     /**
      * Get list entity properties
@@ -54,8 +64,19 @@ class KnowledgeBaseEntity extends Entity {
      *
      * @return array
      */
-    protected function getEntityFields(): array {
+    public function getEntityFields(): array {
         return self::FIELDS;
+    }
+
+    /**
+     * Get list entity properties when insert into DB
+     *
+     * @inheritdoc
+     *
+     * @return array
+     */
+    public function getEntityInsertFields(): array {
+        return self::FIELDS_INSERT;
     }
 
     /**
@@ -130,5 +151,18 @@ class KnowledgeBaseEntity extends Entity {
         }
         $this->sortArticles = $sortArticles;
         return $this;
+    }
+
+    /**
+     * Return entity properties as array
+     *
+     * @return array
+     */
+    public function arrayInsert(): array {
+        $res = [];
+        foreach ($this->getEntityFields() as $fieldKey) {
+            $res[$fieldKey] = $this->$fieldKey;
+        }
+        return $res;
     }
 }

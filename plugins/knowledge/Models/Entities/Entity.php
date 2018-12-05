@@ -60,9 +60,18 @@ abstract class Entity {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(string $mode = 'all'): array {
         $res = [];
-        foreach ($this->getEntityFields() as $fieldKey) {
+        switch ($mode) {
+            case 'insert':
+                $fields = $this->getEntityInsertFields();
+                break;
+            case 'all':
+            default:
+            $fields = $this->getEntityInFields();
+        }
+
+        foreach ($fields as $fieldKey) {
             $res[$fieldKey] = $this->$fieldKey;
         }
         return $res;
@@ -73,7 +82,12 @@ abstract class Entity {
      *
      * @return array
      */
-    protected function getEntityFields(): array {
-        return [];
-    }
+    abstract function getEntityFields(): array;
+
+    /**
+     * Get list of entity properties to insert
+     *
+     * @return array
+     */
+    abstract function getEntityInsertFields(): array;
 }
