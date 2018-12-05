@@ -11,20 +11,18 @@ import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import Breadcrumbs from "@library/components/Breadcrumbs";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
     activeRecord: IActiveRecord;
-    collapsible: boolean;
 }
 
-export class Navigation extends React.Component<IProps> {
+export class NavigationBreadcrumbs extends React.Component<IProps> {
     public render(): React.ReactNode {
-        return (
-            <SiteNav collapsible={this.props.collapsible!} activeRecord={this.props.activeRecord}>
-                {NavigationModel.selectChildren(this.props.navigationItems, "knowledgeCategory1")}
-            </SiteNav>
-        );
+        const { activeRecord, navigationItems } = this.props;
+        const recordKey = activeRecord.recordType + activeRecord.recordID;
+        return <Breadcrumbs>{NavigationModel.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
     }
 
     public componentDidMount() {
@@ -45,4 +43,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
-)(Navigation);
+)(NavigationBreadcrumbs);

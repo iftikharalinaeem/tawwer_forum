@@ -10,6 +10,8 @@ import {
     IPatchKBNavigationRequest,
     IPatchKbNavigationResponse,
 } from "@knowledge/@types/api";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
 
 /**
  * Redux actions for knowledge base navigation data.
@@ -46,7 +48,13 @@ export default class NavigationActions extends ReduxActions {
      *
      * @param request Parameters for the request.
      */
-    public getNavigationFlat(request: IGetKbNavigationRequest) {
+    public getNavigationFlat(request: IGetKbNavigationRequest, forceUpdate = false) {
+        const state = this.getState<IStoreState>();
+        const { fetchLoadable } = state.knowledge.navigation;
+        if (!forceUpdate && fetchLoadable.status === LoadStatus.SUCCESS) {
+            return;
+        }
+
         return this.dispatchApi<IGetKbNavigationResponse>(
             "get",
             `/knowledge-navigation/flat`,
