@@ -113,6 +113,7 @@ trait KnowledgeBasesApiSchemes {
                     "sourceLocale?",
                     "viewType?",
                     "sortArticles?",
+                    "urlCode?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );

@@ -9,7 +9,6 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
-use Vanilla\Knowledge\Models\Entities\KnowledgeBaseEntity;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
@@ -75,12 +74,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ->setDescription("Create a new knowledge base.");
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
-
-        //$entity = new KnowledgeBaseEntity($body);
-        $knowledgeBaseID = $this->knowledgeBaseModel->insert($entity->asArray('insert'));
+        $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
-       // die(print_r($row));
         $result = $out->validate($row);
         return $result;
     }

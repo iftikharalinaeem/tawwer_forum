@@ -110,7 +110,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeBaseID")
             ->column("name", "varchar(255)")
             ->column("description", "text")
-            ->column("urlCode", "varchar(255)")
+            ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("icon", "varchar(255)")
             ->column("sourceLocale", "varchar(5)")
             ->column(
@@ -129,7 +129,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("dateUpdated", "datetime")
             ->column("countArticles", "int", "0")
             ->column("countCategories", "int", "0")
-            ->column("rootCategoryID", "int", true)
+            ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
             ->set();
     }
 }

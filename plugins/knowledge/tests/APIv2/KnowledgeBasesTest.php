@@ -59,21 +59,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test KnowledgeBaseEntity
-     */
-    public function testKnowledgeBaseEntity() {
-        $kb = new KnowledgeBaseEntity(['name'=>'test']);
-        $kb->name = 'Test Knowledge Base Name';
-        $this->assertEquals('Test Knowledge Base Name', $kb->name);
-        $this->expectException(\TypeError::class);
-        $kb->name = ['Test Knowledge Base Name'];
-        $kb->description = 'Knowledge Base TestDescription';
-        $this->assertEquals('Knowledge Base TestDescription', $kb->description);
-        $this->expectException(\TypeError::class);
-        $kb->description = 123;
-    }
-
-    /**
      * Test POST /knowledge-base
      * if it automatically generates rootCategory
      */
@@ -86,6 +71,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $this->assertEquals(201, $result->getStatusCode());
         $body = $result->getBody();
         // not ready yet - that is why "== 0" should be "> 0" in future!!!
-        $this->assertTrue($body['rootCategoryID'] == 0);
+        $this->assertTrue($body['rootCategoryID'] == -1);
     }
 }
