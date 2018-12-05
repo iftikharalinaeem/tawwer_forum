@@ -21,12 +21,7 @@ import { ITreeItem } from "@atlaskit/tree";
 interface IProps {
     className?: string;
     item: ITreeItem<IKbNavigationItem>;
-    handleRename: (
-        e: React.SyntheticEvent,
-        item: ITreeItem<IKbNavigationItem>,
-        newName: string,
-        callback?: (result: any) => void,
-    ) => boolean;
+    handleRename: (e: React.SyntheticEvent, callback?: (result: any) => void) => boolean;
     handleDelete: (
         item: ITreeItem<IKbNavigationItem>,
         deleteButtonRef: React.RefObject<HTMLButtonElement>,
@@ -37,17 +32,18 @@ interface IProps {
     collapseItem: (itemId: string) => void;
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
-    renameMode: (itemID: number | null) => void; //Start Rename Mode
-    stopRenameMode: () => void; // Stop Rename Mode
+    activateRenameMode: (itemID: number | null, callback?: () => void) => void; //Start Rename Mode
+    disableRenameMode: () => void; // Stop Rename Mode
     renameItemID: number | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
     disableTree: () => void;
     enableTree: () => void;
+    newName: string | null;
+    handleOnChange: (e: React.SyntheticEvent) => void;
 }
 
 interface IState {
     error: boolean;
     disabled: boolean;
-    newName: string;
     deleteMode: boolean;
 }
 
@@ -61,7 +57,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             error: false,
             disabled: false,
             deleteMode: false,
-            newName: this.props.item.data!.name,
         };
     }
 
@@ -82,21 +77,29 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     isActive: isRenaming || this.state.deleteMode,
                 })}
             >
-                {isRenaming ? (
-                    <form className={classNames("navigationManger-editMode", { hasError: this.state.error })}>
+                {isRenaming && this.props.newName !== null ? (
+                    <form
+                        className={classNames("navigationManger-editMode", { hasError: this.state.error })}
+                        onSubmit={this.submit}
+                    >
                         <label>
                             <span className="sr-only">{t("New Name: ")}</span>
                             <input
                                 type="text"
-                                value={this.state.newName}
-                                onChange={this.handleOnChange}
+                                value={this.props.newName}
+                                onChange={this.props.handleOnChange}
                                 ref={this.inputRef}
                             />
                         </label>
-                        <Button onClick={this.props.stopRenameMode} className={"navigationManger-cancelRename"}>
+                        <Button onClick={this.resetSelf} className={"navigationManger-cancelRename"}>
                             {t("Cancel")}
                         </Button>
-                        <ButtonSubmit className={"navigationManger-submitRename"}>{t("Apply")}</ButtonSubmit>
+                        <ButtonSubmit
+                            className={"navigationManger-submitRename"}
+                            disabled={this.props.newName === name}
+                        >
+                            {t("Apply")}
+                        </ButtonSubmit>
                     </form>
                 ) : (
                     <div className={classNames("navigationManager-draggable", this.props.className)}>
@@ -158,6 +161,17 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         );
     }
 
+    private focusSelf = e => {
+        const data = this.props.item.data;
+        this.props.activateRenameMode(data!.recordID, () => {
+            if (!this.isEditMode()) {
+                this.props.disableRenameMode();
+            } else {
+                e.currentTarget.focus();
+            }
+        });
+    };
+
     public componentDidUpdate(prevProps, prevState) {
         if (prevState.deleteMode !== this.state.deleteMode) {
             if (this.state.deleteMode) {
@@ -166,40 +180,44 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 this.props.enableTree();
             }
         }
+        //
+        // console.log(
+        //     "this.props.renameItemID !== prevProps.renameItemID : ",
+        //     this.props.renameItemID !== prevProps.renameItemID,
+        // );
+        // console.log(
+        //     "this.props.renameItemID === this.props.item.data!.recordID: ",
+        //     this.props.renameItemID === this.props.item.data!.recordID,
+        // );
+        //
+        // console.log("this.props.renameItemID: ", this.props.renameItemID);
+        // console.log("this.props.item.data!.recordID: ", this.props.item.data!.recordID);
 
         if (
             this.props.renameItemID !== prevProps.renameItemID &&
-            this.props.renameItemID === this.props.item.data!.recordID
+            this.props.renameItemID === this.props.item.data!.recordID &&
+            this.isEditMode()
         ) {
-            this.setState(
-                {
-                    newName: this.props.item.data!.name,
-                },
-                () => {
-                    this.inputRef.current!.focus();
-                },
-            );
+            // console.log("here");
+            this.inputRef.current!.select();
         }
     }
 
-    private handleOnChange = e => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setState({
-            error: false,
-            newName: e.target.value,
-        });
+    private resetSelf = e => {
+        this.props.disableRenameMode();
     };
 
     private submit = e => {
-        const newName = this.state.newName;
-        if (newName !== "" && newName !== this.props.item.data!.name) {
+        e.preventDefault();
+        e.stopPropagation();
+        const { newName } = this.props;
+        if (newName !== null && newName !== this.props.item.data!.name) {
             this.setState(
                 {
                     disabled: true,
                 },
                 () => {
-                    const editResult = this.props.handleRename(e, this.props.item, this.state.newName, () => {
+                    const editResult = this.props.handleRename(e, () => {
                         const editReault = {
                             message: "Success",
                             success: true,
@@ -209,9 +227,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             this.setState({
                                 disabled: false,
                                 error: false,
-                                newName: "",
                             });
-                            this.props.stopRenameMode();
+                            this.props.disableRenameMode();
                         } else {
                             // Problem
                             this.setState({
@@ -229,15 +246,12 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         return this.props.renameItemID === this.props.item.data!.recordID;
     };
 
-    private renameItem = () => {
-        this.setState(
-            {
-                newName: this.props.item.data!.name,
-            },
-            () => {
-                this.props.renameMode(this.props.item.data!.recordID);
-            },
-        );
+    private renameItem = (e: React.SyntheticEvent) => {
+        if (e && e.target) {
+            e.stopPropagation();
+            const data = this.props.item.data;
+            this.props.activateRenameMode(data!.recordID);
+        }
     };
 
     private closeConfirmation = () => {
