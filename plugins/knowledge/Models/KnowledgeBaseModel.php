@@ -26,7 +26,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     private $session;
 
     /**
-     * KnowledgeCategoryModel constructor.
+     * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
      */
