@@ -13,11 +13,11 @@ import Tree, {
     ITreeDestinationPosition,
     moveItemOnTree,
     IRenderItemParams,
+    ITreeItem,
 } from "@atlaskit/tree";
 import { t } from "@library/application";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
-import { ITreeItem } from "@knowledge/modules/navigation/NavigationManagerContent";
 
 interface IProps {
     className?: string;

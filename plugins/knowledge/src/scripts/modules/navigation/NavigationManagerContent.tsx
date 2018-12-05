@@ -171,9 +171,14 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             this.props.renameItemID !== prevProps.renameItemID &&
             this.props.renameItemID === this.props.item.data!.recordID
         ) {
-            this.setState({
-                newName: this.props.item.data!.name,
-            });
+            this.setState(
+                {
+                    newName: this.props.item.data!.name,
+                },
+                () => {
+                    this.inputRef.current!.focus();
+                },
+            );
         }
     }
 
