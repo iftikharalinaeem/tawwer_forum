@@ -26,6 +26,7 @@ export default class SearchPageActions extends ReduxActions {
     // Sum of all action types.
     public static readonly ACTION_TYPES:
         | ReturnType<typeof SearchPageActions.updateFormAC>
+        | ReturnType<typeof SearchPageActions.resetAC>
         | ActionsUnion<typeof SearchPageActions.getSearchACs>;
 
     /**
@@ -58,6 +59,17 @@ export default class SearchPageActions extends ReduxActions {
     }
 
     public updateForm = this.bindDispatch(SearchPageActions.updateFormAC);
+
+    public static readonly RESET = "@@searchPage/RESET";
+
+    /**
+     * Reset to initial state.
+     */
+    private static resetAC() {
+        return ReduxActions.createAction(SearchPageActions.RESET);
+    }
+
+    public reset = this.bindDispatch(SearchPageActions.resetAC);
 
     /**
      * Perform a search with the values in the form.
