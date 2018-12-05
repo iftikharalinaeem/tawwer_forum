@@ -10,7 +10,6 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import NavigationManager from "@knowledge/modules/navigation/NavigationManager";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import NavigationManagerMenu from "@knowledge/modules/navigation/NavigationManagerMenu";
 import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
 import { Modal } from "@library/components/modal";
 import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
@@ -18,6 +17,8 @@ import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPick
 import { ILocationInputProps } from "@knowledge/modules/locationPicker/LocationInput";
 import { LocationInput } from "@knowledge/modules/locationPicker/LocationInput";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
+import NavigationManagerMenu from "@knowledge/modules/navigation/NavigationManagerMenu";
+import Heading from "@library/components/Heading";
 interface IProps extends ILocationInputProps {}
 
 interface IState {
@@ -33,12 +34,15 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
     };
 
     public render() {
+        const pageTitle = t("Navigation Manager");
         return (
             <>
                 <FullKnowledgeModal titleID={this.titleID} className={this.props.className}>
                     <NavigationManagerMenu />
                     <div className="container">
-                        <DocumentTitle title={t("Organize Categories")} />
+                        <DocumentTitle title={pageTitle}>
+                            <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
+                        </DocumentTitle>
                         <NavigationManagerToolBar
                             collapseAll={this.todo}
                             expandAll={this.todo}

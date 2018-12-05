@@ -37,7 +37,7 @@ declare module "@atlaskit/tree" {
         items: { [id: string]: ITreeItem<T> };
     }
 
-    interface ITreeItem<T> {
+    export interface ITreeItem<T> {
         id: string;
         children: string[];
         hasChildren?: boolean;

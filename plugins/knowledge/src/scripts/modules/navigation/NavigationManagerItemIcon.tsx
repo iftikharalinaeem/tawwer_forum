@@ -7,7 +7,7 @@
 import React from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
-import classNames from "classNames";
+import classNames from "classnames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 
 interface IProps {
