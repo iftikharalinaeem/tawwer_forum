@@ -18,6 +18,7 @@ import Tree, {
 import { t } from "@library/application";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
+import TabHandler from "@library/TabHandler";
 
 interface IProps {
     className?: string;
@@ -25,20 +26,26 @@ interface IProps {
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
-    renameItemID: string | null;
+    selectedItem: ITreeItem<IKbNavigationItem> | null;
     disabled: boolean;
+    deleteMode: boolean;
+    writeMode: boolean;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
+    private self: React.RefObject<HTMLDivElement> = React.createRef();
+
     public state: IState = {
         treeData: this.calcInitialTree(this.dummyData),
-        renameItemID: null,
+        selectedItem: null,
         disabled: false,
+        deleteMode: false,
+        writeMode: false,
     };
 
     public render() {
         return (
-            <div className={classNames("navigationManager", this.props.className)}>
+            <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
                 <Tree
                     tree={this.state.treeData}
                     onDragEnd={this.onDragEnd}
@@ -46,7 +53,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={this.state.renameItemID ? this.state.renameItemID : undefined}
+                    key={this.state.selectedItem ? this.state.selectedItem.id : undefined}
                 />
             </div>
         );
@@ -56,22 +63,31 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
+        const isCurrent = this.getSelectedItemId() === item.id;
+        const isWriteMode = this.state.writeMode && isCurrent;
+        const isDeleteMode = this.state.deleteMode && isCurrent;
         return (
             <NavigationManagerContent
-                hasChildren={hasChildren}
                 item={item}
                 snapshot={snapshot}
                 provided={provided}
+                hasChildren={hasChildren}
+                onRenameSubmit={this.handleRename}
+                onDelete={this.handleDelete}
+                handleDelete={this.handleDelete}
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
-                activateRenameMode={this.activateRenameMode}
-                disableRenameMode={this.disableRenameMode}
-                onRenameSubmit={this.handleRename}
-                renameItemID={this.state.renameItemID}
+                selectedItem={this.state.selectedItem}
+                selectItem={this.selectItem}
+                unSelectItem={this.unSelectItem}
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
-                handleDelete={this.handleDelete}
-                key={`${data.recordID}-${data.name}-${this.state.renameItemID === item.id}`}
+                type={this.getType(data.recordType)}
+                key={`${item.id}-${data.name}-${isWriteMode}-${isDeleteMode}-${isCurrent}`}
+                current={isCurrent}
+                writeMode={isWriteMode}
+                deleteMode={isDeleteMode}
+                handleKeyDown={this.handleKeyDown}
             />
         );
     };
@@ -86,18 +102,24 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             result: true,
             message: "Success",
         };
-        this.disableRenameMode();
+        this.unSelectItem();
     };
 
-    private activateRenameMode = (itemID: string) => {
+    private selectItem = (
+        selectedItem: ITreeItem<IKbNavigationItem>,
+        writeMode: boolean = false,
+        deleteMode: boolean = false,
+    ) => {
         this.setState({
-            renameItemID: itemID,
+            selectedItem,
+            writeMode,
+            deleteMode,
         });
     };
 
-    private disableRenameMode = () => {
+    private unSelectItem = () => {
         this.setState({
-            renameItemID: null,
+            selectedItem: null,
         });
     };
 
@@ -184,6 +206,109 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
         return normalizedByID;
     }
+
+    private getSelectedItemId = (): string | null => {
+        return this.state.selectedItem ? this.state.selectedItem.id : null;
+    };
+
+    private getType = (type: string) => {
+        switch (type) {
+            case "article":
+                return t("article");
+            case "knowledgeCategory":
+                return t("category");
+            default:
+                return type;
+        }
+    };
+
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (document.activeElement === null) {
+            return;
+        }
+        const currentItem = document.activeElement;
+        // const selectedNode = currentLink.closest(".siteNavNode");
+        // const siteNavRoot = currentLink.closest(".siteNav");
+        const tabHandler = new TabHandler(this.self.current!);
+        const shift = "-Shift";
+
+        switch (
+            `${event.key}${event.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
+        ) {
+            case "Tab":
+                const nextElement = tabHandler.getNext(currentItem, false, true);
+                if (nextElement) {
+                    nextElement.focus();
+                }
+                break;
+            case "Tab" + shift:
+                const prevElement = tabHandler.getNext(currentItem, true, true);
+                if (prevElement) {
+                    prevElement.focus();
+                }
+                break;
+            // case "ArrowDown":
+            //     /*
+            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
+            //         If focus is on the bottom row, focus does not move.
+            //      */
+            //     if (siteNavRoot) {
+            //         event.preventDefault();
+            //         event.stopPropagation();
+            //         if (selectedNode && currentLink) {
+            //             const nextElement = tabHandler.getNext(currentLink, false, false);
+            //             if (nextElement) {
+            //                 nextElement.focus();
+            //             }
+            //         }
+            //     }
+            //     break;
+            // case "ArrowUp":
+            //     /*
+            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
+            //         If focus is on the top row, focus does not move.
+            //      */
+            //     if (selectedNode && currentLink) {
+            //         event.preventDefault();
+            //         event.stopPropagation();
+            //         const prevElement = tabHandler.getNext(currentLink, true, false);
+            //         if (prevElement) {
+            //             prevElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "Home":
+            //     /*
+            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
+            //         If a row is focused, moves focus out of the treegrid.
+            //      */
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            //     const firstLink = tabHandler.getInitial();
+            //     if (firstLink) {
+            //         firstLink.focus();
+            //     }
+            //     break;
+            // case "End":
+            //     /*
+            //         If a row is focused, moves to the first row.
+            //         If a cell is focused, moves focus to the first cell in the row containing focus.
+            //      */
+            //     event.preventDefault();
+            //     event.stopPropagation();
+            //     const lastLink = tabHandler.getLast();
+            //     if (lastLink) {
+            //         lastLink.focus();
+            //     }
+            //     break;
+        }
+    };
 
     private get dummyData(): IKbNavigationItem[] {
         return [

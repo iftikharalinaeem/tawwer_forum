@@ -29,6 +29,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     className={classNames("navigationManager-toggleFolder", this.props.className)}
                     disabled={!!this.props.disabled}
                     baseClass={ButtonBaseClass.CUSTOM}
+                    tabIndex={-1}
                 >
                     {this.icon()}
                 </Button>
