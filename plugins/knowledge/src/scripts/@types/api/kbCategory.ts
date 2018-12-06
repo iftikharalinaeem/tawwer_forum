@@ -50,6 +50,13 @@ export interface IPostKbCategoryRequestBody extends IKbCategoryRequiredData, Par
 
 export interface IPostKbCategoryResponseBody extends IKbCategory {}
 
+// Request/Response interfaces
+export interface IPatchKbCategoryRequestBody extends Partial<IPostKbCategoryRequestBody> {
+    knowledgeCategoryID: number;
+}
+
+export interface IPatchKbCategoryResponseBody extends IKbCategory {}
+
 export interface IGetKbCategoryRequestBody {
     id: number;
     expand?: KbCategoryExpandFields[];
