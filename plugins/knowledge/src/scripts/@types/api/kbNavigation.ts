@@ -13,6 +13,7 @@ export enum NavigationRecordType {
 
 export interface IKbNavigationItem extends INavigationItem {
     recordType: NavigationRecordType;
+    children?: string[];
 }
 
 // API types
