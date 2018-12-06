@@ -22,7 +22,6 @@ import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageMode
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
-import { t } from "@library/application";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
