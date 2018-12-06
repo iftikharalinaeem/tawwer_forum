@@ -279,7 +279,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws ValidationException Throws an exception when output does not validate against the output schema.
      */
     public function patch_flat(array $body = []): array {
-        $this->permission("garden.settings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([
