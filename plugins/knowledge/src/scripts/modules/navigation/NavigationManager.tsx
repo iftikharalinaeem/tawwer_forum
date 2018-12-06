@@ -20,6 +20,7 @@ import { INavigationItem } from "@library/@types/api";
 import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
 import TabHandler from "@library/TabHandler";
 import { t } from "@library/application";
+import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
@@ -37,7 +38,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
-        treeData: this.calcInitialTree(this.dummyData),
+        treeData: this.calcInitialTree(),
         selectedItem: null,
         disabled: false,
         deleteMode: false,
@@ -163,18 +164,17 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private calcInitialTree(items: IKbNavigationItem[]): ITreeData<IKbNavigationItem> {
+    private calcInitialTree(): ITreeData<IKbNavigationItem> {
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
 
-        for (const [itemID, itemValue] of Object.entries({})) {
-            const children = [];
+        for (const [itemID, itemValue] of Object.entries(NavigationModel.normalizeData(this.dummyData))) {
             data.items[itemID] = {
-                hasChildren: children.length > 0,
+                hasChildren: itemValue.children.length > 0,
                 id: itemID,
-                children,
+                children: itemValue.children,
                 data: itemValue as IKbNavigationItem,
                 isExpanded: true,
             };

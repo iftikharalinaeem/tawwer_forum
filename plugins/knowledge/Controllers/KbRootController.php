@@ -41,19 +41,6 @@ class KbRootController extends KnowledgeTwigPageController {
         return $this->twigInit()->render('default-master.twig', $data);
     }
 
-        /**
-     * Render out the /kb page.
-     */
-    public function get_debug() : string {
-        $this->setPageTitle(\Gdn::translate('Debug - Internal Testing'));
-
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getViewData();
-        $data['page']['classes'][] = 'isLoading';
-
-        return $this->twigInit()->render('default-master.twig', $data);
-    }
-
     /**
      * Render out the /kb/debug page.
      */

@@ -89,7 +89,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.fetchLoadable.status = LoadStatus.ERROR;
                     break;
                 case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
-                    nextState.navigationItems = this.normalizeData(action.payload.data);
+                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
                     nextState.fetchLoadable.status = LoadStatus.SUCCESS;
                     break;
                 case NavigationActions.GET_NAVIGATION_FLAT_ERROR:
@@ -109,7 +109,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         });
     };
 
-    private normalizeData(data: INavigationItem[]) {
+    public static normalizeData(data: INavigationItem[]) {
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
         // Loop through once to generate normalizedIDs
         for (const item of data) {
