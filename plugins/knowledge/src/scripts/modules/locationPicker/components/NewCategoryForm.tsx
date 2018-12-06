@@ -23,7 +23,7 @@ import { LoadStatus } from "@library/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 
 interface IProps {
-    exitHandler: () => void;
+    exitHandler: (e) => void;
     className?: string;
     parentCategory: IKbCategoryFragment | null;
     buttonRef: React.RefObject<HTMLButtonElement>;
@@ -104,7 +104,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     /**
      * Attempt to add category.
      */
-    private handleFormSubmit = async () => {
+    private handleFormSubmit = async e => {
         const parentCategoryID = this.props.parentCategory ? this.props.parentCategory.knowledgeCategoryID : -1;
 
         this.setState({
@@ -116,7 +116,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
             parentID: parentCategoryID,
         });
 
-        this.props.exitHandler();
+        this.props.exitHandler(e);
     };
 
     /**

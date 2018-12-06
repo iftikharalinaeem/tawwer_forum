@@ -63,9 +63,3 @@ export interface IKbCategoryFragment {
     parentID: number; // The parent category to promote a tree-structure.
     url: string; // Full URL to the resource
 }
-
-export type IKbCategoryMultiTypeFragment = MultiTypeRecord<
-    IKbCategoryFragment,
-    "knowledgeCategoryID",
-    "knowledgeCategory"
->;

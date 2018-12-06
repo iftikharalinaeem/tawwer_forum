@@ -7,10 +7,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { t } from "@library/application";
-import { ModalLink } from "@library/components/modal";
 import DocumentTitle from "@library/components/DocumentTitle";
 import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
-import { EditorRoute, SearchRoute, DraftsRoute } from "@knowledge/routes/pageRoutes";
+import { EditorRoute, SearchRoute, DraftsRoute, OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 
 export default class HomePage extends React.Component {
     public render() {
@@ -42,6 +41,11 @@ export default class HomePage extends React.Component {
                 </p>
                 <p>
                     <DraftsRoute.Link data={undefined}>{t("Drafts")}</DraftsRoute.Link>
+                </p>
+                <p>
+                    <OrganizeCategoriesRoute.Link data={{ kbID: 1 }}>
+                        {t("Organize Categories")}
+                    </OrganizeCategoriesRoute.Link>
                 </p>
             </div>
         );

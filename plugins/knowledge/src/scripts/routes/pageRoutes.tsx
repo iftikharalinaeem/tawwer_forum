@@ -18,7 +18,7 @@ import {
     IResponseArticleDraft,
     IKbCategoryFragment,
     IKbCategory,
-    IKbCategoryMultiTypeFragment,
+    IKbNavigationItemNested,
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
 
@@ -100,7 +100,7 @@ export const DebugRoute = new RouteHandler(
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
-    (category: IKbCategory | IKbCategoryFragment | IKbCategoryMultiTypeFragment) => category.url,
+    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItemNested) => category.url,
 );
 
 export const SearchRoute = new RouteHandler(
@@ -114,6 +114,13 @@ export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
     (data?: undefined) => formatUrl("/kb/drafts"),
+    ModalLoader,
+);
+
+export const OrganizeCategoriesRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/organize-categories" */ "@knowledge/pages/OrganizeCategoriesPage"),
+    "/kb/:id/organize-categories",
+    (data: { kbID: number }) => formatUrl(`/kb/${data.kbID}/organize-categories`),
     ModalLoader,
 );
 
@@ -140,6 +147,7 @@ export function getPageRoutes() {
         CategoryRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
+        OrganizeCategoriesRoute.route,
         <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
         <Route component={NotFound} key={"not found"} />,
     ];

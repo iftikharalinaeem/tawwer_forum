@@ -16,7 +16,7 @@ import {
     revisionStatus_pending,
     revisionStatus_published,
     revisionStatus_deleted,
-} from "@library/components/icons/revisionIcons";
+} from "@library/components/icons/revision";
 
 interface IProps extends IRevisionFragment {
     url: string;

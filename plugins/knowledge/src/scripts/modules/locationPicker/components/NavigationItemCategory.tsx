@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { IKbNavigationItem } from "@knowledge/@types/api";
+import { IKbNavigationItemNested } from "@knowledge/@types/api";
 import { rightChevron, categoryIcon, checkCompact } from "@library/components/icons/common";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
@@ -15,7 +15,7 @@ interface IProps {
     isInitialSelection: boolean;
     isSelected: boolean;
     name: string;
-    value: IKbNavigationItem;
+    value: IKbNavigationItemNested;
     onNavigate: () => void;
     onSelect: (event: React.SyntheticEvent) => void;
 }
