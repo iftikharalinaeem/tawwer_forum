@@ -185,6 +185,35 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     }
 
     private calcInitialTree(): ITreeData<IKbNavigationItem> {
+    private updateAllItems(update: Partial<ITreeItem<IKbNavigationItem>>) {
+        const data: ITreeData<IKbNavigationItem> = {
+            rootId: "knowledgeCategory1",
+            items: {},
+        };
+
+        for (const [itemID, itemValue] of Object.entries(this.state.treeData.items)) {
+            const newData = update.data! || {};
+            data.items[itemID] = {
+                ...itemValue,
+                ...update,
+                data: {
+                    ...itemValue.data!,
+                    ...newData,
+                },
+            };
+        }
+
+        this.setState({ treeData: data });
+    }
+
+    public collapseAll() {
+        console.log("Collapsiong all");
+        this.updateAllItems({ isExpanded: false });
+    }
+
+    public expandAll() {
+        this.updateAllItems({ isExpanded: true });
+    }
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},

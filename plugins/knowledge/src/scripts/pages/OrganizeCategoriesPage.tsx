@@ -37,6 +37,7 @@ interface IState {
 export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
     private titleID = uniqueIDFromPrefix("organzieCategoriesTitle");
     private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private managerRef = React.createRef();
 
     public state: IState = {
         showNewCategoryModal: false,
@@ -56,6 +57,8 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
                         <NavigationManagerToolBar
                             collapseAll={this.todo}
                             expandAll={this.todo}
+                            collapseAll={this.collapseAll}
+                            expandAll={this.expandAll}
                             newCategory={this.showNewCategoryModal}
                             newCategoryButtonRef={this.newCategoryButtonRef}
                         />
@@ -64,6 +67,7 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
                             key={this.props.fetchLoadable.status + "navManager"}
                             updateItems={this.props.navigationActions.patchNavigationFlat}
                         />
+                        <NavigationManager knowledgeBaseID={1} ref={this.managerRef} />
                     </div>
                 </FullKnowledgeModal>
                 {this.state.showNewCategoryModal && (
@@ -79,7 +83,17 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
 
     public componentDidMount() {
         void this.props.navigationActions.getNavigationFlat({ knowledgeBaseID: 1 });
+    private get manager(): UnwrappedNavigationManager | null {
+        return (this.managerRef.current && (this.managerRef.current as any).getWrappedInstance()) || null;
     }
+
+    private expandAll = () => {
+        this.manager && this.manager.expandAll();
+    };
+
+    private collapseAll = () => {
+        this.manager && this.manager.collapseAll();
+    };
 
     /**
      * Show the location picker modal.
