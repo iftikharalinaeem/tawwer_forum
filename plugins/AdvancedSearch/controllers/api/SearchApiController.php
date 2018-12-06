@@ -17,6 +17,12 @@ use Vanilla\DateFilterSchema;
  */
 class SearchApiController extends AbstractApiController {
 
+    /** Default limit on the number of rows returned in a page. */
+    const LIMIT_DEFAULT = 30;
+
+    /** Maximum number of items that can be returned in a page. */
+    const LIMIT_MAXIMUM = 100;
+
     /** @var Schema */
     private $searchResultSchema;
 
@@ -190,9 +196,9 @@ class SearchApiController extends AbstractApiController {
                 ],
                 'limit:i?' => [
                     'description' => 'Desired number of items per page.',
-                    'default' => 30,
+                    'default' => self::LIMIT_DEFAULT,
                     'minimum' => 1,
-                    'maximum' => 100,
+                    'maximum' => self::LIMIT_MAXIMUM,
                 ],
             ], ['SearchIndex', 'in'])
             ->addValidator('', $validator)
@@ -363,20 +369,30 @@ class SearchApiController extends AbstractApiController {
         foreach ($records as $record) {
             if ($record['RecordType'] === 'Discussion') {
                 $discussionsIDs[] = $record['PrimaryID'];
-            } else if ($record['RecordType'] === 'Comment') {
+            } elseif ($record['RecordType'] === 'Comment') {
                 $commentIDs[] = $record['PrimaryID'];
             }
         }
 
         $discussions = [];
         if ($discussionsIDs) {
-            $discussions = $this->discussionModel->getWhere(['DiscussionID' => $discussionsIDs])->resultArray();
+            $discussions = $this->discussionModel->getWhere(
+                ['DiscussionID' => $discussionsIDs],
+                "",
+                "",
+                count($discussionsIDs)
+            )->resultArray();
             $discussions = Gdn_DataSet::index($discussions, 'DiscussionID');
         }
 
         $comments = [];
         if ($commentIDs) {
-            $comments = $this->commentModel->getWhere(['CommentID' => $commentIDs])->resultArray();
+            $comments = $this->commentModel->getWhere(
+                ["CommentID" => $commentIDs],
+                "",
+                "asc",
+                count($commentIDs)
+            )->resultArray();
             $comments = Gdn_DataSet::index($comments, 'CommentID');
         }
 
@@ -385,7 +401,7 @@ class SearchApiController extends AbstractApiController {
                 if ($record['RecordType'] === 'Discussion') {
                     $record['UpdateUserID'] = $discussions[$record['PrimaryID']]['UpdateUserID'] ?? null;
                     $record['DateUpdated'] = $discussions[$record['PrimaryID']]['DateUpdated'] ?? null;
-                } else if ($record['RecordType'] === 'Comment') {
+                } elseif ($record['RecordType'] === 'Comment') {
                     $record['DiscussionID'] = $record['DiscussionID'] ?? $comments[$record['PrimaryID']]['DiscussionID'] ?? null;
                     $record['UpdateUserID'] = $comments[$record['PrimaryID']]['UpdateUserID'] ?? null;
                     $record['DateUpdated'] = $comments[$record['PrimaryID']]['DateUpdated'] ?? null;
