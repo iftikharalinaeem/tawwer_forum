@@ -22,7 +22,7 @@ interface IProps {
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
     hasChildren: boolean;
-    onRenameSubmit: () => void;
+    onRenameSubmit: (item: IKbNavigationItem, newName: string) => void;
     onDelete: () => void;
     handleDelete: () => void;
     expandItem: (itemId: string) => void;

@@ -6,7 +6,9 @@
 
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
-import NavigationManager from "@knowledge/modules/navigation/NavigationManager";
+import NavigationManager, {
+    NavigationManager as UnwrappedNavigationManager,
+} from "@knowledge/modules/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/modules/navigation/NavigationManagerMenu";
 import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
 import { t } from "@library/application";
@@ -14,27 +16,15 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";
 import Heading from "@library/components/Heading";
 import React from "react";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
-import { IStoreState } from "@knowledge/state/model";
-import apiv2 from "@library/apiv2";
-import { connect } from "react-redux";
+import { ConnectedComponentClass } from "react-redux";
 
-interface IActions {
-    navigationActions: NavigationActions;
-    articleActions: ArticleActions;
-    categoryActions: CategoryActions;
-}
-
-interface IProps extends INavigationStoreState, IActions {}
+interface IProps {}
 
 interface IState {
     showNewCategoryModal: boolean;
 }
 
-export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
+export default class OrganizeCategoriesPage extends React.Component<IProps, IState> {
     private titleID = uniqueIDFromPrefix("organzieCategoriesTitle");
     private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private managerRef = React.createRef();
@@ -45,7 +35,6 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
 
     public render() {
         const pageTitle = t("Navigation Manager");
-        console.log(this.props.fetchLoadable.status + "navManager");
         return (
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
@@ -55,17 +44,10 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
                             <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
                         </DocumentTitle>
                         <NavigationManagerToolBar
-                            collapseAll={this.todo}
-                            expandAll={this.todo}
                             collapseAll={this.collapseAll}
                             expandAll={this.expandAll}
                             newCategory={this.showNewCategoryModal}
                             newCategoryButtonRef={this.newCategoryButtonRef}
-                        />
-                        <NavigationManager
-                            navigationItems={this.props.navigationItems}
-                            key={this.props.fetchLoadable.status + "navManager"}
-                            updateItems={this.props.navigationActions.patchNavigationFlat}
                         />
                         <NavigationManager knowledgeBaseID={1} ref={this.managerRef} />
                     </div>
@@ -81,8 +63,6 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
         );
     }
 
-    public componentDidMount() {
-        void this.props.navigationActions.getNavigationFlat({ knowledgeBaseID: 1 });
     private get manager(): UnwrappedNavigationManager | null {
         return (this.managerRef.current && (this.managerRef.current as any).getWrappedInstance()) || null;
     }
@@ -130,20 +110,3 @@ export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
         alert("To do!");
     };
 }
-
-function mapStateToProps(state: IStoreState) {
-    return state.knowledge.navigation;
-}
-
-function mapDispatchToProps(dispatch): IActions {
-    return {
-        articleActions: new ArticleActions(dispatch, apiv2),
-        navigationActions: new NavigationActions(dispatch, apiv2),
-        categoryActions: new CategoryActions(dispatch, apiv2),
-    };
-}
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(OrganizeCategoriesPage);

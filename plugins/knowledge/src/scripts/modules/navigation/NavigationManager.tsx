@@ -17,15 +17,24 @@ import Tree, {
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
 import { INavigationItem } from "@library/@types/api";
-import { IKbNavigationItem, NavigationRecordType, IPatchFlatItem } from "@knowledge/@types/api";
+import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
 import TabHandler from "@library/TabHandler";
 import { t } from "@library/application";
-import NavigationModel, { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
+import NavigationModel, {
+    INormalizedNavigationItems,
+    INavigationStoreState,
+} from "@knowledge/modules/navigation/NavigationModel";
+import { connect } from "react-redux";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import { IStoreState } from "@knowledge/state/model";
+import apiv2 from "@library/apiv2";
 
-interface IProps {
+interface IProps extends IActions, INavigationStoreState {
     className?: string;
     navigationItems: INormalizedNavigationItems;
-    updateItems: (newItems: IPatchFlatItem[]) => void;
+    knowledgeBaseID: number;
 }
 
 interface IState {
@@ -36,11 +45,11 @@ interface IState {
     writeMode: boolean;
 }
 
-export default class NavigationManager extends React.Component<IProps, IState> {
+export class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
-        treeData: this.calcInitialTree(),
+        treeData: this.calcTree(),
         selectedItem: null,
         disabled: false,
         deleteMode: false,
@@ -48,7 +57,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const data = JSON.parse(JSON.stringify(this.state.treeData));
         return (
             <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
                 <Tree
@@ -78,7 +86,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 snapshot={snapshot}
                 provided={provided}
                 hasChildren={hasChildren}
-                onRenameSubmit={this.handleRename}
+                onRenameSubmit={this.commitRename}
                 onDelete={this.handleDelete}
                 handleDelete={this.handleDelete}
                 expandItem={this.expandItem}
@@ -98,16 +106,27 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
+    public async componentDidMount() {
+        const { knowledgeBaseID } = this.props;
+        this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
+    }
+
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.props.navigationItems !== prevProps.navigationItems) {
+            this.setState({ treeData: this.calcTree() });
+        }
+    }
+
     private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
         alert("Delete Item: " + item.data!.recordID);
     };
 
     // For now, we hard code result. The edit can be accepted or rejected.
-    private handleRename = () => {
-        const result = {
-            result: true,
-            message: "Success",
-        };
+    private commitRename = (item: IKbNavigationItem, newName: string) => {
+        if (item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY) {
+            void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
+        }
+
         this.unSelectItem();
     };
 
@@ -168,7 +187,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 treeData: newTree,
             },
             () => {
-                this.props.updateItems(this.calcPatchArray(this.state.treeData));
+                void this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
             },
         );
     };
@@ -184,7 +203,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         return NavigationModel.denormalizeData(outOfTree, "knowledgeCategory1");
     }
 
-    private calcInitialTree(): ITreeData<IKbNavigationItem> {
     private updateAllItems(update: Partial<ITreeItem<IKbNavigationItem>>) {
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
@@ -214,18 +232,26 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     public expandAll() {
         this.updateAllItems({ isExpanded: true });
     }
+
+    private calcTree() {
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
 
         for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
+            let stateValue: ITreeItem<IKbNavigationItem> | null = null;
+            if (this.state && this.state.treeData.items[itemID]) {
+                stateValue = this.state.treeData.items[itemID];
+            }
+
+            const children = itemValue.children;
             data.items[itemID] = {
-                hasChildren: itemValue.children.length > 0,
                 id: itemID,
-                children: itemValue.children,
-                data: itemValue as IKbNavigationItem,
-                isExpanded: true,
+                hasChildren: children.length > 0,
+                children,
+                data: itemValue,
+                isExpanded: stateValue ? stateValue.isExpanded : true,
             };
         }
 
@@ -285,3 +311,28 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         }
     };
 }
+
+interface IActions {
+    navigationActions: NavigationActions;
+    articleActions: ArticleActions;
+    categoryActions: CategoryActions;
+}
+function mapStateToProps(state: IStoreState) {
+    return state.knowledge.navigation;
+}
+
+function mapDispatchToProps(dispatch): IActions {
+    return {
+        articleActions: new ArticleActions(dispatch, apiv2),
+        navigationActions: new NavigationActions(dispatch, apiv2),
+        categoryActions: new CategoryActions(dispatch, apiv2),
+    };
+}
+const Connected = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    null,
+    { withRef: true },
+)(NavigationManager);
+
+export default Connected;

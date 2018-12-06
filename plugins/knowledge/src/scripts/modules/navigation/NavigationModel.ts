@@ -9,6 +9,7 @@ import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@li
 import { ICrumb } from "@library/components/Breadcrumbs";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 
 interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
@@ -81,12 +82,11 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
     public reducer = (
         state: INavigationStoreState = this.initialState,
-        action: typeof NavigationActions.ACTION_TYPES,
+        action: typeof NavigationActions.ACTION_TYPES | typeof CategoryActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
             switch (action.type) {
                 case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
-                    console.log("Get naviogation flat request dispatched");
                     nextState.fetchLoadable.status = LoadStatus.LOADING;
                     break;
                 case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
@@ -108,6 +108,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.submitLoadable.status = LoadStatus.SUCCESS;
                     nextState.submitLoadable.error = action.payload;
                     break;
+                case CategoryActions.PATCH_CATEGORY_REQUEST:
+                    const id = NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID;
+                    const item = nextState.navigationItems[id];
+                    if (item && action.meta.name) {
+                        item.name = action.meta.name;
+                    }
+                    break;
             }
         });
     };
@@ -116,12 +123,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         data: INormalizedNavigationItems,
         lookupID: string,
         sort: number = 0,
+        parentID: number = -1,
     ): IPatchFlatItem[] {
-        let flatPatches: IPatchFlatItem[] = [];
+        const flatPatches: IPatchFlatItem[] = [];
         const item = data[lookupID];
 
         if (item) {
-            const { parentID, recordID, recordType } = item;
+            const { recordID, recordType } = item;
             const patchItem: IPatchFlatItem = {
                 sort,
                 parentID,
@@ -131,7 +139,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             flatPatches.push(patchItem);
 
             item.children.forEach((childID, index) => {
-                flatPatches.push(...this.denormalizeData(data, childID, index));
+                flatPatches.push(...this.denormalizeData(data, childID, index, item.recordID));
             });
         }
 
