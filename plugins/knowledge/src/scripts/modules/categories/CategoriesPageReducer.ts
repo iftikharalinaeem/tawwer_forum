@@ -3,10 +3,10 @@
  * @license Proprietary
  */
 
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
+import { IArticleFragment, IKbCategory } from "@knowledge/@types/api";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
-import { IKbCategory, IArticleFragment, KbCategorySortMode } from "@knowledge/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
 
 export interface ICategoriesPageState {

@@ -4,19 +4,11 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { t } from "@library/application";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import BackLink from "@library/components/navigation/BackLink";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import classNames from "classnames";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IResponseArticleDraft } from "@knowledge/@types/api";
-import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { Devices } from "@library/components/DeviceChecker";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import BackLink from "@library/components/navigation/BackLink";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps {
     className?: string;

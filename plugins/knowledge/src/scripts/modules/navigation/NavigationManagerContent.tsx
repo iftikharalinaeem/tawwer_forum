@@ -4,19 +4,17 @@
  * @license Proprietary
  */
 
-import React, { RefObject } from "react";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
-import classNames from "classnames";
-import { downTriangle, rightTriangle } from "@library/components/icons/common";
+import { ITreeItem } from "@atlaskit/tree";
+import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
+import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import { t } from "@library/application";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
 import Translate from "@library/components/translation/Translate";
-import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
+import classNames from "classnames";
+import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
-import { ITreeItem } from "@atlaskit/tree";
 
 interface IProps {
     className?: string;
