@@ -17,13 +17,15 @@ import Tree, {
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
 import { INavigationItem } from "@library/@types/api";
-import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
+import { IKbNavigationItem, NavigationRecordType, IPatchFlatItem } from "@knowledge/@types/api";
 import TabHandler from "@library/TabHandler";
 import { t } from "@library/application";
-import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import NavigationModel, { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
+    navigationItems: INormalizedNavigationItems;
+    updateItems: (newItems: IPatchFlatItem[]) => void;
 }
 
 interface IState {
@@ -46,6 +48,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     };
 
     public render() {
+        const data = JSON.parse(JSON.stringify(this.state.treeData));
         return (
             <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
                 <Tree
@@ -68,6 +71,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const isCurrent = this.getSelectedItemId() === item.id;
         const isWriteMode = this.state.writeMode && isCurrent;
         const isDeleteMode = this.state.deleteMode && isCurrent;
+
         return (
             <NavigationManagerContent
                 item={item as ITreeItem<IKbNavigationItem>}
@@ -159,10 +163,26 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         }
 
         const newTree = moveItemOnTree(treeData, source, destination);
-        this.setState({
-            treeData: newTree,
-        });
+        this.setState(
+            {
+                treeData: newTree,
+            },
+            () => {
+                this.props.updateItems(this.calcPatchArray(this.state.treeData));
+            },
+        );
     };
+
+    private calcPatchArray(data: ITreeData<IKbNavigationItem>) {
+        const outOfTree = {};
+        for (const [index, value] of Object.entries(data.items)) {
+            outOfTree[index] = {
+                ...value.data,
+                children: value.children,
+            };
+        }
+        return NavigationModel.denormalizeData(outOfTree, "knowledgeCategory1");
+    }
 
     private calcInitialTree(): ITreeData<IKbNavigationItem> {
         const data: ITreeData<IKbNavigationItem> = {
@@ -170,7 +190,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             items: {},
         };
 
-        for (const [itemID, itemValue] of Object.entries(NavigationModel.normalizeData(this.dummyData))) {
+        for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
             data.items[itemID] = {
                 hasChildren: itemValue.children.length > 0,
                 id: itemID,
@@ -186,27 +206,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     private handleDelete = () => {
         alert("Do Delete");
     };
-
-    private get normalizedData() {
-        const normalizedByID: { [id: string]: IKbNavigationItem } = {};
-        for (const item of this.dummyData) {
-            const id = item.recordType + item.recordID;
-            normalizedByID[id] = item;
-        }
-
-        for (const [itemID, itemValue] of Object.entries(normalizedByID)) {
-            if (itemValue.parentID > 0) {
-                const lookupID = NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID;
-                const parentItem = normalizedByID[lookupID];
-                if (!parentItem.children) {
-                    parentItem.children = [];
-                }
-                parentItem.children.push(itemID);
-            }
-        }
-
-        return normalizedByID;
-    }
 
     private getSelectedItemId = (): string | null => {
         return this.state.selectedItem ? this.state.selectedItem.id : null;
@@ -256,337 +255,4 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 break;
         }
     };
-
-    private get dummyData(): IKbNavigationItem[] {
-        return [
-            {
-                name: "Base 1",
-                url: "http://dev.vanilla.localhost/kb/categories/1-base-1",
-                parentID: -1,
-                recordID: 1,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Pee Mart",
-                url: "http://dev.vanilla.localhost/kb/categories/2-pee-mart",
-                parentID: 1,
-                recordID: 2,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Predator Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/3-predator-urine",
-                parentID: 2,
-                recordID: 3,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Coyote Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/4-coyote-urine",
-                parentID: 3,
-                recordID: 4,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Fox Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/5-fox-urine",
-                parentID: 3,
-                recordID: 5,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Bobcat Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/6-bobcat-urine",
-                parentID: 3,
-                recordID: 6,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Gel",
-                url: "http://dev.vanilla.localhost/kb/categories/7-p-gel",
-                parentID: 2,
-                recordID: 7,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Cover Granules",
-                url: "http://dev.vanilla.localhost/kb/categories/8-p-cover-granules",
-                parentID: 2,
-                recordID: 8,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Prey Animals",
-                url: "http://dev.vanilla.localhost/kb/categories/9-prey-animals",
-                parentID: 2,
-                recordID: 9,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Armadillos",
-                url: "http://dev.vanilla.localhost/kb/categories/10-armadillos",
-                parentID: 9,
-                recordID: 10,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Chipmunks",
-                url: "http://dev.vanilla.localhost/kb/categories/11-chipmunks",
-                parentID: 9,
-                recordID: 11,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Dispensers",
-                url: "http://dev.vanilla.localhost/kb/categories/12-dispensers",
-                parentID: 2,
-                recordID: 12,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Mountain Lion",
-                url: "http://dev.vanilla.localhost/kb/categories/13-mountain-lion",
-                parentID: 8,
-                recordID: 13,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Bear",
-                url: "http://dev.vanilla.localhost/kb/categories/14-bear",
-                parentID: 8,
-                recordID: 14,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Wolf",
-                url: "http://dev.vanilla.localhost/kb/categories/15-wolf",
-                parentID: 8,
-                recordID: 15,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Wicks",
-                url: "http://dev.vanilla.localhost/kb/categories/16-p-wicks",
-                parentID: 12,
-                recordID: 16,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Dispensers",
-                url: "http://dev.vanilla.localhost/kb/categories/17-p-dispensers",
-                parentID: 12,
-                recordID: 17,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Test Folder!!!",
-                url: "http://dev.vanilla.localhost/kb/categories/18-test-folder",
-                parentID: 3,
-                recordID: 18,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Category in Base 1",
-                url: "http://dev.vanilla.localhost/kb/categories/19-category-in-base-1",
-                parentID: 1,
-                recordID: 19,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Test",
-                url: "http://dev.vanilla.localhost/kb/categories/20-test",
-                parentID: 2,
-                recordID: 20,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "asdf",
-                url: "http://dev.vanilla.localhost/kb/categories/21-asdf",
-                parentID: 2,
-                recordID: 21,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Search Category 1",
-                url: "http://dev.vanilla.localhost/kb/categories/22-search-category-1",
-                parentID: 1,
-                recordID: 22,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "What about PHP version??",
-                url: "http://dev.vanilla.localhost/kb/articles/1-what-about-php-version",
-                recordID: 1,
-                sort: 0,
-                parentID: 12,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Article 2",
-                url: "http://dev.vanilla.localhost/kb/articles/2-article-2",
-                recordID: 2,
-                sort: 0,
-                parentID: 7,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test 3",
-                url: "http://dev.vanilla.localhost/kb/articles/3-test-3",
-                recordID: 3,
-                sort: 0,
-                parentID: 3,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Revised!!! Test Rev Article",
-                url: "http://dev.vanilla.localhost/kb/articles/278-revised-test-rev-article",
-                recordID: 278,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test article",
-                url: "http://dev.vanilla.localhost/kb/articles/280-test-article",
-                recordID: 280,
-                sort: null,
-                parentID: 2,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test headings",
-                url: "http://dev.vanilla.localhost/kb/articles/281-test-headings",
-                recordID: 281,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test",
-                url: "http://dev.vanilla.localhost/kb/articles/290-test",
-                recordID: 290,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test in pee mart",
-                url: "http://dev.vanilla.localhost/kb/articles/291-test-in-pee-mart",
-                recordID: 291,
-                sort: null,
-                parentID: 2,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test heading article",
-                url: "http://dev.vanilla.localhost/kb/articles/293-test-heading-article",
-                recordID: 293,
-                sort: null,
-                parentID: 18,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test 2",
-                url: "http://dev.vanilla.localhost/kb/articles/302-test-2",
-                recordID: 302,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test",
-                url: "http://dev.vanilla.localhost/kb/articles/309-test",
-                recordID: 309,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "asdfasdfasdfasfasdf",
-                url: "http://dev.vanilla.localhost/kb/articles/315-asdfasdfasdfasfasdf",
-                recordID: 315,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test Draft Article",
-                url: "http://dev.vanilla.localhost/kb/articles/316-test-draft-article",
-                recordID: 316,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "What about PHP version??",
-                url: "http://dev.vanilla.localhost/kb/articles/317-what-about-php-version",
-                recordID: 317,
-                sort: null,
-                parentID: 12,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Search Article number 1",
-                url: "http://dev.vanilla.localhost/kb/articles/319-search-article-number-1",
-                recordID: 319,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test search article number 2",
-                url: "http://dev.vanilla.localhost/kb/articles/320-test-search-article-number-2",
-                recordID: 320,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test search article 3",
-                url: "http://dev.vanilla.localhost/kb/articles/321-test-search-article-3",
-                recordID: 321,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "A new article title",
-                url: "http://dev.vanilla.localhost/kb/articles/322-a-new-article-title",
-                recordID: 322,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test",
-                url: "http://dev.vanilla.localhost/kb/articles/323-test",
-                recordID: 323,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-        ];
-    }
 }

@@ -25,7 +25,7 @@ export interface IGetKbNavigationRequest {
 
 export type IGetKbNavigationResponse = IKbNavigationItem[];
 
-interface IPatchFlatItem {
+export interface IPatchFlatItem {
     parentID: number;
     recordID: number;
     sort: number | null;

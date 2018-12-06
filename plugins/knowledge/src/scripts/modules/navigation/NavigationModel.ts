@@ -3,22 +3,22 @@
  * @license GPL-2.0-only
  */
 
-import { NavigationRecordType } from "@knowledge/@types/api";
+import { NavigationRecordType, IPatchFlatItem, IKbNavigationItem } from "@knowledge/@types/api";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 
-interface INormalizedNavigationItem extends INavigationItem {
+interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
 }
-interface INavItems {
+export interface INormalizedNavigationItems {
     [key: string]: INormalizedNavigationItem;
 }
 
 export interface INavigationStoreState {
-    navigationItems: INavItems;
+    navigationItems: INormalizedNavigationItems;
     currentKnowledgeBase: ILoadable<{}>; // Needs to be replaced with an actual KB.
     submitLoadable: ILoadable<never>;
     fetchLoadable: ILoadable<never>;
@@ -27,7 +27,7 @@ export interface INavigationStoreState {
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
     public static readonly ROOT_ID = -1;
 
-    public static selectBreadcrumb(navItems: INavItems, key: string): ICrumb[] {
+    public static selectBreadcrumb(navItems: INormalizedNavigationItems, key: string): ICrumb[] {
         const item = navItems[key];
         if (!item) {
             return [];
@@ -50,7 +50,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return parents;
     }
 
-    public static selectChildren(navItems: INavItems, key: string): INavigationTreeItem[] {
+    public static selectChildren(navItems: INormalizedNavigationItems, key: string): INavigationTreeItem[] {
         const item = navItems[key];
         if (!item) {
             return [];
@@ -58,7 +58,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return item.children.map(itemID => NavigationModel.selectNavTree(navItems, itemID));
     }
 
-    public static selectNavTree(navItems: INavItems, key: string): INavigationTreeItem {
+    public static selectNavTree(navItems: INormalizedNavigationItems, key: string): INavigationTreeItem {
         const item = navItems[key];
         return {
             ...item,
@@ -86,7 +86,8 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return produce(state, nextState => {
             switch (action.type) {
                 case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
-                    nextState.fetchLoadable.status = LoadStatus.ERROR;
+                    console.log("Get naviogation flat request dispatched");
+                    nextState.fetchLoadable.status = LoadStatus.LOADING;
                     break;
                 case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
                     nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
@@ -100,16 +101,46 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.submitLoadable.status = LoadStatus.LOADING;
                     break;
                 case NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE:
+                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
                     nextState.submitLoadable.status = LoadStatus.SUCCESS;
                     break;
                 case NavigationActions.PATCH_NAVIGATION_FLAT_ERROR:
+                    nextState.submitLoadable.status = LoadStatus.SUCCESS;
                     nextState.submitLoadable.error = action.payload;
                     break;
             }
         });
     };
 
-    public static normalizeData(data: INavigationItem[]) {
+    public static denormalizeData(
+        data: INormalizedNavigationItems,
+        lookupID: string,
+        sort: number = 0,
+    ): IPatchFlatItem[] {
+        let flatPatches: IPatchFlatItem[] = [];
+        const item = data[lookupID];
+
+        if (item) {
+            const { parentID, recordID, recordType } = item;
+            const patchItem: IPatchFlatItem = {
+                sort,
+                parentID,
+                recordID,
+                recordType,
+            };
+            flatPatches.push(patchItem);
+
+            item.children.forEach((childID, index) => {
+                flatPatches.push(...this.denormalizeData(data, childID, index));
+            });
+        }
+
+        return flatPatches;
+    }
+
+    public static normalizeData(data: IKbNavigationItem[]) {
+        data = data.sort(this.sortNavigationItems);
+
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
         // Loop through once to generate normalizedIDs
         for (const item of data) {
@@ -131,5 +162,48 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         }
 
         return normalizedByID;
+    }
+
+    private static sortNavigationItems(a: IKbNavigationItem, b: IKbNavigationItem) {
+        const sortA = a.sort;
+        const sortB = b.sort;
+        if (sortA === sortB) {
+            // Same sort weight? We must go deeper.
+            const typeA = a.recordType;
+            const typeB = b.recordType;
+            if (typeA === typeB) {
+                // Same record type? Sort by name.
+                const nameA = a.name;
+                const nameB = b.name;
+                return spaceship(nameA, nameB)!;
+            }
+            // Articles rank lower than categories.
+            return typeA === NavigationRecordType.ARTICLE ? 1 : -1;
+        } else if (sortA === null) {
+            // If they're not the same, and A is null, then B must not be null. B should rank higher.
+            return 1;
+        } else if (sortB === null) {
+            // If they're not the same, and B is null, then A must not be null. A should rank higher.
+            return -1;
+        } else {
+            // We have two non-null, non-equal sort weights. Compare them using the combined-comparison operator.
+            return spaceship(sortA, sortB)!;
+        }
+    }
+}
+
+function spaceship(val1: any, val2: any) {
+    if (val1 === null || val2 === null || typeof val1 != typeof val2) {
+        return null;
+    }
+    if (typeof val1 === "string") {
+        return val1.localeCompare(val2);
+    } else {
+        if (val1 > val2) {
+            return 1;
+        } else if (val1 < val2) {
+            return -1;
+        }
+        return 0;
     }
 }

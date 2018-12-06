@@ -4,28 +4,37 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { t } from "@library/application";
-import DocumentTitle from "@library/components/DocumentTitle";
-import NavigationManager from "@knowledge/modules/navigation/NavigationManager";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
-import { Modal } from "@library/components/modal";
-import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
-import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { ILocationInputProps } from "@knowledge/modules/locationPicker/LocationInput";
-import { LocationInput } from "@knowledge/modules/locationPicker/LocationInput";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
+import NavigationManager from "@knowledge/modules/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/modules/navigation/NavigationManagerMenu";
+import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
+import { t } from "@library/application";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
+import DocumentTitle from "@library/components/DocumentTitle";
 import Heading from "@library/components/Heading";
-interface IProps extends ILocationInputProps {}
+import React from "react";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { IStoreState } from "@knowledge/state/model";
+import apiv2 from "@library/apiv2";
+import { connect } from "react-redux";
+
+interface IActions {
+    navigationActions: NavigationActions;
+    articleActions: ArticleActions;
+    categoryActions: CategoryActions;
+}
+
+interface IProps extends INavigationStoreState, IActions {}
 
 interface IState {
     showNewCategoryModal: boolean;
 }
 
-export default class OrganizeCategoriesPage extends React.Component<IProps, IState> {
+export class OrganizeCategoriesPage extends React.Component<IProps, IState> {
     private titleID = uniqueIDFromPrefix("organzieCategoriesTitle");
     private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
@@ -35,9 +44,10 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
 
     public render() {
         const pageTitle = t("Navigation Manager");
+        console.log(this.props.fetchLoadable.status + "navManager");
         return (
             <>
-                <FullKnowledgeModal titleID={this.titleID} className={this.props.className}>
+                <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
                     <div className="container">
                         <DocumentTitle title={pageTitle}>
@@ -49,7 +59,11 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
                             newCategory={this.showNewCategoryModal}
                             newCategoryButtonRef={this.newCategoryButtonRef}
                         />
-                        <NavigationManager />
+                        <NavigationManager
+                            navigationItems={this.props.navigationItems}
+                            key={this.props.fetchLoadable.status + "navManager"}
+                            updateItems={this.props.navigationActions.patchNavigationFlat}
+                        />
                     </div>
                 </FullKnowledgeModal>
                 {this.state.showNewCategoryModal && (
@@ -61,6 +75,10 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
                 )}
             </>
         );
+    }
+
+    public componentDidMount() {
+        void this.props.navigationActions.getNavigationFlat({ knowledgeBaseID: 1 });
     }
 
     /**
@@ -98,3 +116,20 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
         alert("To do!");
     };
 }
+
+function mapStateToProps(state: IStoreState) {
+    return state.knowledge.navigation;
+}
+
+function mapDispatchToProps(dispatch): IActions {
+    return {
+        articleActions: new ArticleActions(dispatch, apiv2),
+        navigationActions: new NavigationActions(dispatch, apiv2),
+        categoryActions: new CategoryActions(dispatch, apiv2),
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(OrganizeCategoriesPage);
