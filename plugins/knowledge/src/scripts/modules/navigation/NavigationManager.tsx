@@ -83,7 +83,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
-                key={`${item.id}-${data.name}-${isWriteMode}-${isDeleteMode}-${isCurrent}`}
+                key={`${item.id}-${data.name}-${isWriteMode ? 1 : 0}-${isDeleteMode ? 1 : 0}-${isCurrent ? 1 : 0}`}
                 current={isCurrent}
                 writeMode={isWriteMode}
                 deleteMode={isDeleteMode}
@@ -155,10 +155,10 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
-
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState({
             treeData: newTree,
+            selectedItem: newTree.items[source.parentId].children[source.index],
         });
     };
 
@@ -228,44 +228,41 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * Note that some of the events are on SiteNavNode.tsx
      * @param event
      */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (document.activeElement === null) {
-            return;
-        }
-        const currentItem = document.activeElement;
-        // const selectedNode = currentLink.closest(".siteNavNode");
-        // const siteNavRoot = currentLink.closest(".siteNav");
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        const currentItem = e.currentTarget.firstChild as HTMLElement;
+
         const tabHandler = new TabHandler(this.self.current!);
         const shift = "-Shift";
 
         switch (
-            `${event.key}${event.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
-        ) {
-            case "Tab":
-                const nextElement = tabHandler.getNext(currentItem, false, true);
-                if (nextElement) {
-                    nextElement.focus();
-                }
-                break;
-            case "Tab" + shift:
-                const prevElement = tabHandler.getNext(currentItem, true, true);
-                if (prevElement) {
-                    prevElement.focus();
-                }
-                break;
+            `${e.key}${e.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
+            // case "Tab":
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const nextElement = tabHandler.getNext(currentItem, false, true);
+            //     if (nextElement) {
+            //         nextElement.focus();
+            //     }
+            //     break;
+            // case "Tab" + shift:
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const prevElement = tabHandler.getNext(currentItem, true, true);
+            //     if (prevElement) {
+            //         prevElement.focus();
+            //     }
+            //     break;
             // case "ArrowDown":
             //     /*
             //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
             //         If focus is on the bottom row, focus does not move.
             //      */
-            //     if (siteNavRoot) {
-            //         event.preventDefault();
-            //         event.stopPropagation();
-            //         if (selectedNode && currentLink) {
-            //             const nextElement = tabHandler.getNext(currentLink, false, false);
-            //             if (nextElement) {
-            //                 nextElement.focus();
-            //             }
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     if (currentItem) {
+            //         const nextElement = tabHandler.getNext(currentItem, false, false);
+            //         if (nextElement) {
+            //             nextElement.focus();
             //         }
             //     }
             //     break;
@@ -274,10 +271,10 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
             //         If focus is on the top row, focus does not move.
             //      */
-            //     if (selectedNode && currentLink) {
-            //         event.preventDefault();
-            //         event.stopPropagation();
-            //         const prevElement = tabHandler.getNext(currentLink, true, false);
+            //     if (currentItem) {
+            //         e.preventDefault();
+            //         e.stopPropagation();
+            //         const prevElement = tabHandler.getNext(currentItem, true, false);
             //         if (prevElement) {
             //             prevElement.focus();
             //         }
@@ -288,8 +285,8 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             //         If a cell is focused, moves focus to the previous interactive widget in the current row.
             //         If a row is focused, moves focus out of the treegrid.
             //      */
-            //     event.preventDefault();
-            //     event.stopPropagation();
+            //     e.preventDefault();
+            //     e.stopPropagation();
             //     const firstLink = tabHandler.getInitial();
             //     if (firstLink) {
             //         firstLink.focus();
@@ -300,13 +297,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             //         If a row is focused, moves to the first row.
             //         If a cell is focused, moves focus to the first cell in the row containing focus.
             //      */
-            //     event.preventDefault();
-            //     event.stopPropagation();
+            //     e.preventDefault();
+            //     e.stopPropagation();
             //     const lastLink = tabHandler.getLast();
             //     if (lastLink) {
             //         lastLink.focus();
             //     }
             //     break;
+        ) {
         }
     };
 
