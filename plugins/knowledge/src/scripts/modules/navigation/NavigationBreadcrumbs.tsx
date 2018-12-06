@@ -18,6 +18,9 @@ interface IProps extends INavigationStoreState {
     activeRecord: IActiveRecord;
 }
 
+/**
+ * Data connected breadcrumbs component for the navigation menu.
+ */
 export class NavigationBreadcrumbs extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { activeRecord, navigationItems } = this.props;
@@ -25,6 +28,9 @@ export class NavigationBreadcrumbs extends React.Component<IProps> {
         return <Breadcrumbs>{NavigationModel.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
     }
 
+    /**
+     * Fetch navigation data when the component is mounted.
+     */
     public componentDidMount() {
         void this.props.actions.getNavigationFlat({});
     }

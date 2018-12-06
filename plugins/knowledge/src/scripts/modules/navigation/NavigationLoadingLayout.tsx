@@ -3,23 +3,28 @@
  * @license Proprietary
  */
 
-import React from "react";
-import Container from "@library/components/layouts/components/Container";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import { t } from "@library/application";
 import Navigation from "@knowledge/modules/navigation/Navigation";
-import { NavigationRecordType } from "@knowledge/@types/api";
-import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import FullPageLoader from "@library/components/FullPageLoader";
-import { withDevice } from "@library/contexts/DeviceContext";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import { t } from "@library/application";
+import { IDeviceProps } from "@library/components/DeviceChecker";
+import FullPageLoader from "@library/components/FullPageLoader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import { withDevice } from "@library/contexts/DeviceContext";
+import React from "react";
 
 interface IProps extends IDeviceProps {
     activeRecord: IActiveRecord;
 }
 
+/**
+ * A loading layout that includes navigation items.
+ *
+ * This is useful when your content loads separately from the navigation.
+ * - Provides navigation & breadcrumbs.
+ */
 export function NavigationLoadingLayout(props: IProps) {
     return (
         <Container>

@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
-import { ILoadable, LoadStatus, INavigationTreeItem, INavigationItem } from "@library/@types/api";
-import { produce } from "immer";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import { ICrumb } from "@library/components/Breadcrumbs";
 import { NavigationRecordType } from "@knowledge/@types/api";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@library/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import ReduxReducer from "@library/state/ReduxReducer";
+import { produce } from "immer";
 
 interface INormalizedNavigationItem extends INavigationItem {
     children: string[];

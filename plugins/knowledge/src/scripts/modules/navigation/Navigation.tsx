@@ -18,17 +18,26 @@ interface IProps extends INavigationStoreState {
     collapsible: boolean;
 }
 
+/**
+ * Data connect navigation component for knowledge base.
+ */
 export class Navigation extends React.Component<IProps> {
     public render(): React.ReactNode {
         return (
             <SiteNav collapsible={this.props.collapsible!} activeRecord={this.props.activeRecord}>
-                {NavigationModel.selectChildren(this.props.navigationItems, "knowledgeCategory1")}
+                {NavigationModel.selectChildren(
+                    this.props.navigationItems,
+                    "knowledgeCategory1" /** Temporarily hardcoded until knowledge bases are wired up. */,
+                )}
             </SiteNav>
         );
     }
 
+    /**
+     * Fetch navigation data when the component is mounted.
+     */
     public componentDidMount() {
-        void this.props.actions.getNavigationFlat({});
+        return this.props.actions.getNavigationFlat({});
     }
 }
 

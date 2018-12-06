@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import React from "react";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import { expandAll, collapseAll } from "@library/components/icons/navigationManager";
+import Button from "@library/components/forms/Button";
 import { newFolder } from "@library/components/icons/common";
+import { collapseAll, expandAll } from "@library/components/icons/navigationManager";
+import React from "react";
 
 interface IProps {
     expandAll: () => void;

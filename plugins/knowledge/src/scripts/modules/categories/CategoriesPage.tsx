@@ -53,6 +53,8 @@ export class CategoriesPage extends React.Component<IProps> {
 
         const hasData = categoriesPageState.articles.status === LoadStatus.SUCCESS && categoriesPageState.articles.data;
 
+        // Render either a loading layout or a full layout.
+
         return (
             <PageLoader {...categoriesPageState.articles} status={LoadStatus.SUCCESS}>
                 {hasData ? (
@@ -70,21 +72,27 @@ export class CategoriesPage extends React.Component<IProps> {
     }
 
     /**
-     * If the component mounts without any data we need to fetch request it.
+     * If the component mounts without preloaded data we need to request it.
      */
     public componentDidMount() {
         const { categoriesPageState } = this.props;
         if (categoriesPageState.articles.status !== LoadStatus.PENDING) {
-            this.fetchCategoryData();
+            return this.fetchCategoryData();
         }
     }
 
+    /**
+     * If we the id of the page changes we need to re-fetch the data.
+     */
     public componentDidUpdate(prevProps: IProps) {
         if (this.props.match.params.id !== prevProps.match.params.id) {
-            this.fetchCategoryData();
+            return this.fetchCategoryData();
         }
     }
 
+    /**
+     * Use our passed in action to fetch category.
+     */
     private fetchCategoryData() {
         const { categoriesPageActions } = this.props;
         const id = this.categoryID;
@@ -93,9 +101,12 @@ export class CategoriesPage extends React.Component<IProps> {
             return;
         }
 
-        void categoriesPageActions.getArticles(id);
+        return categoriesPageActions.getArticles(id);
     }
 
+    /**
+     * Get a numeric category ID from the string id passed by the router.
+     */
     private get categoryID(): number | null {
         const id = parseInt(this.props.match.params.id, 10);
         if (Number.isNaN(id)) {
@@ -112,6 +123,9 @@ export class CategoriesPage extends React.Component<IProps> {
         this.props.categoriesPageActions.reset();
     }
 
+    /**
+     * Map an article fragment into an `IResult`.
+     */
     private mapArticleToResult(article: IArticleFragment): IResult {
         return {
             name: article.name || "",
@@ -131,7 +145,7 @@ function mapStateToProps(state: IStoreState, ownProps: IProps) {
     const { id } = ownProps.match.params;
     return {
         categoriesPageState: state.knowledge.categoriesPage,
-        category: CategoryModel.selectKbCategoryFragment(state, id),
+        category: CategoryModel.selectKbCategoryFragment(state, parseInt(id, 10)),
     };
 }
 
