@@ -49,7 +49,6 @@ export default class NavigationActions extends ReduxActions {
      * @param request Parameters for the request.
      */
     public getNavigationFlat = (request: IGetKbNavigationRequest, forceUpdate = false) => {
-        console.log("Get navigation!");
         const state = this.getState<IStoreState>();
         const { fetchLoadable } = state.knowledge.navigation;
         if (!forceUpdate && fetchLoadable.status === LoadStatus.SUCCESS) {
