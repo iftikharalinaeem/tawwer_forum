@@ -24,13 +24,13 @@ import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import Navigation from "@knowledge/modules/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
 
 interface IProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    title?: string;
 }
 
 /**
@@ -41,23 +41,25 @@ export class ArticleLayout extends React.Component<IProps> {
         const { article, messages } = this.props;
         const { articleID } = article;
 
-        const mobileNav = <SiteNav collapsible={false}>{[]}</SiteNav>;
-        const nav = <Navigation activeRecord={{ recordID: articleID, recordType: NavigationRecordType.ARTICLE }} />;
+        const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
 
         return (
             <React.Fragment>
                 <Container>
-                    <VanillaHeader title={article.name} mobileDropDownContent={mobileNav} />
+                    <VanillaHeader
+                        title={article.name}
+                        mobileDropDownContent={<Navigation collapsible={false} activeRecord={activeRecord} />}
+                    />
                     <PanelLayout device={this.props.device}>
-                        {this.props.breadcrumbData.length > 1 && this.props.device !== Devices.MOBILE && (
+                        {this.props.device !== Devices.MOBILE && (
                             <PanelLayout.Breadcrumbs>
                                 <PanelWidget>
-                                    <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                                    <NavigationBreadcrumbs activeRecord={activeRecord} />
                                 </PanelWidget>
                             </PanelLayout.Breadcrumbs>
                         )}
                         <PanelLayout.LeftBottom>
-                            <PanelWidget>{nav}</PanelWidget>
+                            <PanelWidget>{<Navigation collapsible={true} activeRecord={activeRecord} />}</PanelWidget>
                         </PanelLayout.LeftBottom>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>

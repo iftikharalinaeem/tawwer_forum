@@ -7,6 +7,8 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import { ILoadable, LoadStatus, INavigationTreeItem, INavigationItem } from "@library/@types/api";
 import { produce } from "immer";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface INormalizedNavigationItem extends INavigationItem {
     children: string[];
@@ -17,25 +19,50 @@ interface INavItems {
 
 export interface INavigationStoreState {
     navigationItems: INavItems;
-    currentKnowledgeBase: ILoadable<{}>;
+    currentKnowledgeBase: ILoadable<{}>; // Needs to be replaced with an actual KB.
     submitLoadable: ILoadable<never>;
     fetchLoadable: ILoadable<never>;
 }
 
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
-    public static getChildren(navItems: INavItems, id: string): INavigationTreeItem[] {
-        const item = navItems[id];
+    public static readonly ROOT_ID = -1;
+
+    public static selectBreadcrumb(navItems: INavItems, key: string): ICrumb[] {
+        const item = navItems[key];
         if (!item) {
             return [];
         }
-        return item.children.map(itemID => NavigationModel.getNavTree(navItems, itemID));
+
+        const crumb = {
+            name: item.name,
+            url: item.url,
+        };
+
+        const parents = NavigationModel.selectBreadcrumb(
+            navItems,
+            NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID,
+        );
+
+        if (item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY) {
+            parents.push(crumb);
+        }
+
+        return parents;
     }
 
-    public static getNavTree(navItems: INavItems, id: string): INavigationTreeItem {
-        const item = navItems[id];
+    public static selectChildren(navItems: INavItems, key: string): INavigationTreeItem[] {
+        const item = navItems[key];
+        if (!item) {
+            return [];
+        }
+        return item.children.map(itemID => NavigationModel.selectNavTree(navItems, itemID));
+    }
+
+    public static selectNavTree(navItems: INavItems, key: string): INavigationTreeItem {
+        const item = navItems[key];
         return {
             ...item,
-            children: item.children.map(itemID => NavigationModel.getNavTree(navItems, itemID)),
+            children: item.children.map(itemID => NavigationModel.selectNavTree(navItems, itemID)),
         };
     }
 
