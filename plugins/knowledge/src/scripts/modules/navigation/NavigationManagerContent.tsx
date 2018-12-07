@@ -5,7 +5,6 @@
  */
 
 import { ITreeItem } from "@atlaskit/tree";
-import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
 import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -15,10 +14,12 @@ import Translate from "@library/components/translation/Translate";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import NavigationManagerNameForm from "./NavigationManagerNameForm";
+import {INavigationItem} from "@library/@types/api";
 
 interface IProps {
     className?: string;
-    item: ITreeItem<IKbNavigationItem>;
+    item: ITreeItem<INavigationItem>;
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
     hasChildren: boolean;
@@ -27,16 +28,15 @@ interface IProps {
     handleDelete: () => void;
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
-    selectedItem: ITreeItem<IKbNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<IKbNavigationItem> | null, writeMode: boolean, deleteMode: boolean) => void;
+    selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
+    selectItem: (item: ITreeItem<INavigationItem> | null, writeMode: boolean, deleteMode: boolean) => void;
     unSelectItem: () => void;
-    disableTree: () => void;
-    enableTree: () => void;
+    disableTree: (callback?: () => void) => void;
+    enableTree: (callback?: () => void) => void;
     type: string;
+    handleKeyDown: (e) => void;
     writeMode: boolean;
     deleteMode: boolean;
-    current: boolean;
-    handleKeyDown: (e) => void;
 }
 
 interface IState {
@@ -46,7 +46,7 @@ interface IState {
 
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
+    private wrapRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
         newName: this.props.item.data!.name,
@@ -54,150 +54,129 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot, writeMode, deleteMode, current } = this.props;
+        const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
         return (
-            <div
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                aria-roledescription={
-                    provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
-                }
-                className={classNames("navigationManager-item", {
-                    isDragging: snapshot.isDragging,
-                    isActive: this.props.current,
-                })}
-                tabIndex={0}
-                onKeyDown={this.props.handleKeyDown}
-                key={`${item.id}-${name}-${writeMode}-${deleteMode}-${current}`}
-            >
-                {this.props.writeMode ? (
-                    <form className={classNames("navigationManger-editMode")} onSubmit={this.submit}>
-                        <label>
-                            <span className="sr-only">{t("New Name: ")}</span>
-                            <input
-                                type="text"
-                                value={this.state.newName}
-                                onChange={this.handleOnChange}
-                                ref={this.inputRef}
-                            />
-                        </label>
-                        <Button onClick={this.reset} className={"navigationManger-cancelRename"}>
-                            {t("Cancel")}
-                        </Button>
-                        <ButtonSubmit
-                            className={"navigationManger-submitRename"}
-                            disabled={this.state.newName === name}
-                        >
-                            {t("Apply")}
-                        </ButtonSubmit>
-                    </form>
-                ) : (
-                    <div className={classNames("navigationManager-draggable", this.props.className)}>
-                        <NavigationManagerItemIcon
-                            expanded={!!item.isExpanded}
-                            expandItem={this.props.expandItem}
-                            collapseItem={this.props.collapseItem}
-                            itemId={item.id}
-                            className="tree-itemIcon"
-                            hasChildren={this.props.hasChildren}
+            <div ref={this.wrapRef} onKeyDown={this.props.handleKeyDown}>
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    aria-roledescription={
+                        provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
+                    }
+                    className={classNames("navigationManager-item", {
+                        isDragging: snapshot.isDragging,
+                        isActive: this.isCurrent(),
+                    })}
+                    tabIndex={0}
+                    onClick={this.focusSelf}
+                >
+                    {this.props.writeMode && this.isCurrent() ? (
+                        <NavigationManagerNameForm
+                            currentName={name}
+                            focusOnExit={this.buttonRef}
+                            applyNewName={this.props.onRenameSubmit}
+                            cancel={this.cancelRename}
                         />
-                        <span className="navigationManager-itemLabel">{name}</span>
-                        <Button
-                            onClick={this.renameItem}
-                            className={classNames(
-                                "navigationManager-rename",
-                                "navigationManager-action",
-                                this.props.className,
-                            )}
-                            baseClass={ButtonBaseClass.CUSTOM}
-                            buttonRef={this.buttonRef}
-                        >
-                            {t("Rename")}
-                        </Button>
-                        <Button
-                            onClick={this.showConfirmation}
-                            className={classNames(
-                                "navigationManager-delete",
-                                "navigationManager-action",
-                                this.props.className,
-                            )}
-                            baseClass={ButtonBaseClass.CUSTOM}
-                            buttonRef={this.buttonRef}
-                        >
-                            {t("Delete")}
-                        </Button>
-                        {this.props.deleteMode && (
-                            <ModalConfirm
-                                title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
-                                onCancel={this.closeConfirmation}
-                                onConfirm={this.props.handleDelete}
-                                elementToFocusOnExit={this.buttonRef.current!}
+                    ) : (
+                        <div className={classNames("navigationManager-draggable", this.props.className)}>
+                            <NavigationManagerItemIcon
+                                expanded={!!item.isExpanded}
+                                expandItem={this.handleExpand}
+                                collapseItem={this.handleCollapse}
+                                itemId={item.id}
+                                className="tree-itemIcon"
+                                hasChildren={this.props.hasChildren}
+                            />
+                            <span className="navigationManager-itemLabel">{name}</span>
+                            <Button
+                                onClick={this.renameItem}
+                                className={classNames(
+                                    "navigationManager-rename",
+                                    "navigationManager-action",
+                                    this.props.className,
+                                )}
+                                baseClass={ButtonBaseClass.CUSTOM}
+                                buttonRef={this.buttonRef}
                             >
-                                <Translate
-                                    source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                                    c0={this.props.type}
-                                    c1={
-                                        <strong>
-                                            <em>{name}</em>
-                                        </strong>
-                                    }
-                                />
-                            </ModalConfirm>
-                        )}
-                    </div>
-                )}
+                                {t("Rename")}
+                            </Button>
+                            <Button
+                                onClick={this.showConfirmation}
+                                className={classNames(
+                                    "navigationManager-delete",
+                                    "navigationManager-action",
+                                    this.props.className,
+                                )}
+                                baseClass={ButtonBaseClass.CUSTOM}
+                                buttonRef={this.buttonRef}
+                            >
+                                {t("Delete")}
+                            </Button>
+                            {this.props.deleteMode &&
+                                this.isCurrent() && (
+                                    <ModalConfirm
+                                        title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
+                                        onCancel={this.hideConfirmation}
+                                        onConfirm={this.props.handleDelete}
+                                        elementToFocusOnExit={this.buttonRef.current!}
+                                    >
+                                        <Translate
+                                            source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                                            c0={this.props.type}
+                                            c1={
+                                                <strong>
+                                                    <em>{name}</em>
+                                                </strong>
+                                            }
+                                        />
+                                    </ModalConfirm>
+                                )}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     }
 
-    private reset = e => {
-        e.stopPropagation();
-        this.props.selectItem(this.props.item, false, false);
-    };
-
-    public componentDidMount() {
-        if (this.props.current) {
-            if (this.props.writeMode) {
-                this.inputRef.current!.select();
-            } else {
-                (this.buttonRef.current!.closest(".navigationManager-item")! as HTMLElement).focus();
-            }
-        }
-    }
-
-    private submit = e => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.props.onRenameSubmit();
-    };
-
     private renameItem = (e: React.SyntheticEvent) => {
-        if (e && e.target) {
-            e.stopPropagation();
-            this.props.selectItem(this.props.item, true, false);
-        }
+        this.props.selectItem(this.props.item, true, false);
     };
 
-    private handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        if (e.target.value) {
-            this.setState({
-                newName: e.target.value,
-            });
-        }
+    private cancelRename = (e: React.SyntheticEvent) => {
+        this.props.selectItem(this.props.item, false, false);
+        // this.forceUpdate();
+    };
+
+    private handleExpand = () => {
+        this.props.selectItem(this.props.item, false, false);
+        this.props.expandItem(this.props.item.id);
+    };
+
+    private handleCollapse = () => {
+        this.props.selectItem(this.props.item, false, false);
+        this.props.collapseItem(this.props.item.id);
     };
 
     private showConfirmation = () => {
-        this.setState({
-            showConfirmation: true,
+        this.props.disableTree(() => {
+            this.props.selectItem(this.props.item, false, true);
         });
     };
 
-    private closeConfirmation = () => {
-        this.setState({
-            showConfirmation: false,
+    private hideConfirmation = () => {
+        this.props.disableTree(() => {
+            this.props.selectItem(this.props.item, false, false);
         });
+    };
+
+    private focusSelf = () => {
+        const content = this.wrapRef.current!.firstChild as HTMLElement;
+        content.focus();
+    };
+
+    private isCurrent = () => {
+        return this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
     };
 }

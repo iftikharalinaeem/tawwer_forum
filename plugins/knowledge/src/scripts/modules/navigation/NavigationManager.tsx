@@ -55,7 +55,9 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={this.state.selectedItem ? this.state.selectedItem.id : undefined}
+                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
+                        this.state.deleteMode
+                    }`}
                 />
             </div>
         );
@@ -65,12 +67,9 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
-        const isCurrent = this.getSelectedItemId() === item.id;
-        const isWriteMode = this.state.writeMode && isCurrent;
-        const isDeleteMode = this.state.deleteMode && isCurrent;
         return (
             <NavigationManagerContent
-                item={item as ITreeItem<IKbNavigationItem>}
+                item={item}
                 snapshot={snapshot}
                 provided={provided}
                 hasChildren={hasChildren}
@@ -85,11 +84,9 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
-                key={`${item.id}-${data.name}-${isWriteMode}-${isDeleteMode}-${isCurrent}`}
-                current={isCurrent}
-                writeMode={isWriteMode}
-                deleteMode={isDeleteMode}
                 handleKeyDown={this.handleKeyDown}
+                writeMode={this.state.writeMode}
+                deleteMode={this.state.deleteMode}
             />
         );
     };
@@ -125,16 +122,22 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private disableTree = () => {
-        this.setState({
-            disabled: true,
-        });
+    private disableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: true,
+            },
+            callback,
+        );
     };
 
-    private enableTree = () => {
-        this.setState({
-            disabled: false,
-        });
+    private enableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: false,
+            },
+            callback,
+        );
     };
 
     private expandItem = (itemId: string) => {
@@ -157,10 +160,10 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
-
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState({
             treeData: newTree,
+            selectedItem: newTree.items[source.parentId].children[source.index],
         });
     };
 
@@ -208,10 +211,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         return normalizedByID;
     }
 
-    private getSelectedItemId = (): string | null => {
-        return this.state.selectedItem ? this.state.selectedItem.id : null;
-    };
-
     private getType = (type: string) => {
         switch (type) {
             case "article":
@@ -229,31 +228,83 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * Note that some of the events are on SiteNavNode.tsx
      * @param event
      */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (document.activeElement === null) {
-            return;
-        }
-        const currentItem = document.activeElement;
-        // const selectedNode = currentLink.closest(".siteNavNode");
-        // const siteNavRoot = currentLink.closest(".siteNav");
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        const currentItem = e.currentTarget.firstChild as HTMLElement;
+
         const tabHandler = new TabHandler(this.self.current!);
         const shift = "-Shift";
 
         switch (
-            `${event.key}${event.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
+            `${e.key}${e.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
+            // case "Tab":
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const nextElement = tabHandler.getNext(currentItem, false, true);
+            //     if (nextElement) {
+            //         nextElement.focus();
+            //     }
+            //     break;
+            // case "Tab" + shift:
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const prevElement = tabHandler.getNext(currentItem, true, true);
+            //     if (prevElement) {
+            //         prevElement.focus();
+            //     }
+            //     break;
+            // case "ArrowDown":
+            //     /*
+            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
+            //         If focus is on the bottom row, focus does not move.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     if (currentItem) {
+            //         const nextElement = tabHandler.getNext(currentItem, false, false);
+            //         if (nextElement) {
+            //             nextElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "ArrowUp":
+            //     /*
+            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
+            //         If focus is on the top row, focus does not move.
+            //      */
+            //     if (currentItem) {
+            //         e.preventDefault();
+            //         e.stopPropagation();
+            //         const prevElement = tabHandler.getNext(currentItem, true, false);
+            //         if (prevElement) {
+            //             prevElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "Home":
+            //     /*
+            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
+            //         If a row is focused, moves focus out of the treegrid.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const firstLink = tabHandler.getInitial();
+            //     if (firstLink) {
+            //         firstLink.focus();
+            //     }
+            //     break;
+            // case "End":
+            //     /*
+            //         If a row is focused, moves to the first row.
+            //         If a cell is focused, moves focus to the first cell in the row containing focus.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const lastLink = tabHandler.getLast();
+            //     if (lastLink) {
+            //         lastLink.focus();
+            //     }
+            //     break;
         ) {
-            case "Tab":
-                const nextElement = tabHandler.getNext(currentItem, false, true);
-                if (nextElement) {
-                    nextElement.focus();
-                }
-                break;
-            case "Tab" + shift:
-                const prevElement = tabHandler.getNext(currentItem, true, true);
-                if (prevElement) {
-                    prevElement.focus();
-                }
-                break;
         }
     };
 
