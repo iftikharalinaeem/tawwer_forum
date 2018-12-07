@@ -225,7 +225,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
     }
 
     public collapseAll() {
-        console.log("Collapsiong all");
         this.updateAllItems({ isExpanded: false });
     }
 
@@ -251,7 +250,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 hasChildren: children.length > 0,
                 children,
                 data: itemValue,
-                isExpanded: stateValue ? stateValue.isExpanded : true,
+                isExpanded: stateValue ? stateValue.isExpanded : false,
             };
         }
 

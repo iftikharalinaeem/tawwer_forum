@@ -16,7 +16,6 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";
 import Heading from "@library/components/Heading";
 import React from "react";
-import { ConnectedComponentClass } from "react-redux";
 
 interface IProps {}
 
