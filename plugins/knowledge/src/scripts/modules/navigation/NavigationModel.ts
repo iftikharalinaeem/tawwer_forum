@@ -10,6 +10,7 @@ import { ICrumb } from "@library/components/Breadcrumbs";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import { compare } from "@library/utility";
 
 interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
@@ -183,7 +184,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 // Same record type? Sort by name.
                 const nameA = a.name;
                 const nameB = b.name;
-                return spaceship(nameA, nameB)!;
+                return compare(nameA, nameB)!;
             }
             // Articles rank lower than categories.
             return typeA === NavigationRecordType.ARTICLE ? 1 : -1;
@@ -195,23 +196,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             return -1;
         } else {
             // We have two non-null, non-equal sort weights. Compare them using the combined-comparison operator.
-            return spaceship(sortA, sortB)!;
+            return compare(sortA, sortB)!;
         }
-    }
-}
-
-function spaceship(val1: any, val2: any) {
-    if (val1 === null || val2 === null || typeof val1 != typeof val2) {
-        return null;
-    }
-    if (typeof val1 === "string") {
-        return val1.localeCompare(val2);
-    } else {
-        if (val1 > val2) {
-            return 1;
-        } else if (val1 < val2) {
-            return -1;
-        }
-        return 0;
     }
 }
