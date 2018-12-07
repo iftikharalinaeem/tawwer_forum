@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { NavigationRecordType, IPatchFlatItem, IKbNavigationItem } from "@knowledge/@types/api";
+import { NavigationRecordType, IPatchFlatItem, INormalizedNavigationItem } from "@knowledge/@types/api";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -13,9 +13,10 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
-export interface INormalizedNavigationItem extends IKbNavigationItem {
+export interface INormalizedNavigationItem extends INormalizedNavigationItem {
     children: string[];
     tempName?: string;
+    tempDeleted?: boolean;
     error?: {
         message: string;
     };
@@ -94,7 +95,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
-            const handlePatchSuccess = (key: string, newName?: string) => {
+            const handleRenameSuccess = (key: string, newName?: string) => {
                 const item = nextState.navigationItems[key];
                 if (item && newName) {
                     item.name = newName!;
@@ -103,18 +104,50 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 }
             };
 
-            const handlePatchError = (key: string, errorMessage: string) => {
+            const handleRenameError = (key: string, errorMessage: string) => {
                 const item = nextState.navigationItems[key];
                 if (item) {
                     item.error = { message: errorMessage };
                 }
             };
 
-            const handlePatchRequest = (key: string, tempName?: string) => {
+            const handleRenameRequest = (key: string, tempName?: string) => {
                 const item = nextState.navigationItems[key];
                 if (item && tempName) {
                     item.tempName = tempName;
                     delete item.error;
+                }
+            };
+
+            const handleDeleteRequest = (key: string) => {
+                const item = nextState.navigationItems[key];
+                if (item) {
+                    item.tempDeleted = true;
+                    delete item.error;
+
+                    // Remove the item from it's parent
+                    const parentItem =
+                        nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                }
+            };
+
+            const handleDeleteSuccess = (key: string) => {
+                if (nextState.navigationItems[key]) {
+                    delete nextState.navigationItems[key];
+                }
+            };
+
+            const handleDeleteError = (key: string, errorMessage: string) => {
+                const item = nextState.navigationItems[key];
+                if (item) {
+                    item.error = { message: errorMessage };
+                    delete item.tempDeleted;
+
+                    // Put the item back on its parent.
+                    const parentItem =
+                        nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                    parentItem.children.push(key);
                 }
             };
 
@@ -141,36 +174,51 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.submitLoadable.status = LoadStatus.SUCCESS;
                     nextState.submitLoadable.error = action.payload;
                     break;
-                case CategoryActions.PATCH_CATEGORY_REQUEST: {
-                    handlePatchRequest(
+                case CategoryActions.PATCH_CATEGORY_REQUEST:
+                    handleRenameRequest(
                         NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
                         action.meta.name,
                     );
                     break;
-                }
-                case ArticleActions.PATCH_ARTICLE_REQUEST: {
-                    handlePatchRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
+                case ArticleActions.PATCH_ARTICLE_REQUEST:
+                    handleRenameRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
                     break;
-                }
-                case CategoryActions.PATCH_CATEGORY_ERROR: {
-                    handlePatchError(
+                case CategoryActions.PATCH_CATEGORY_ERROR:
+                    handleRenameError(
                         NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
                         action.payload.message,
                     );
                     break;
-                }
-                case ArticleActions.PATCH_ARTICLE_ERROR: {
-                    handlePatchError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                case ArticleActions.PATCH_ARTICLE_ERROR:
+                    handleRenameError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
                     break;
-                }
-                case CategoryActions.PATCH_CATEGORY_RESPONSE: {
-                    handlePatchSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                case CategoryActions.PATCH_CATEGORY_RESPONSE:
+                    handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
                     break;
-                }
-                case ArticleActions.PATCH_ARTICLE_RESPONSE: {
-                    handlePatchSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                    handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
                     break;
-                }
+                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
+                    handleDeleteRequest(NavigationRecordType.ARTICLE + action.meta.articleID);
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
+                    handleDeleteSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
+                    handleDeleteError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                    break;
+                case CategoryActions.DELETE_CATEGORY_REQUEST:
+                    handleDeleteRequest(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                    break;
+                case CategoryActions.DELETE_CATEGORY_RESPONSE:
+                    handleDeleteSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                    break;
+                case CategoryActions.DELETE_CATEGORY_ERROR:
+                    handleDeleteError(
+                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                        action.payload.message,
+                    );
+                    break;
             }
         });
     };
@@ -202,13 +250,14 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return flatPatches;
     }
 
-    public static normalizeData(data: IKbNavigationItem[]) {
+    public static normalizeData(data: INormalizedNavigationItem[]) {
         data = data.sort(this.sortNavigationItems);
 
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
         // Loop through once to generate normalizedIDs
         for (const item of data) {
             const id = item.recordType + item.recordID;
+
             normalizedByID[id] = {
                 ...item,
                 // Temporary kludge https://github.com/vanilla/knowledge/issues/425
@@ -228,7 +277,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return normalizedByID;
     }
 
-    private static sortNavigationItems(a: IKbNavigationItem, b: IKbNavigationItem) {
+    private static sortNavigationItems(a: INormalizedNavigationItem, b: INormalizedNavigationItem) {
         const sortA = a.sort;
         const sortB = b.sort;
         if (sortA === sortB) {

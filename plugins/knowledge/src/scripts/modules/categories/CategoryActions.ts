@@ -12,12 +12,35 @@ import {
     IPatchKbCategoryRequestBody,
 } from "@knowledge/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
+import { IDeleteKbCategoryRequest } from "@knowledge/@types/api/kbCategory";
 
 export default class CategoryActions extends ReduxActions {
     public static ACTION_TYPES:
+        | ActionsUnion<typeof CategoryActions.deleteCategoryACs>
         | ActionsUnion<typeof CategoryActions.getAllCategoriesACs>
         | ActionsUnion<typeof CategoryActions.patchCategoryACs>
         | ActionsUnion<typeof CategoryActions.postCategoryACs>;
+
+    public static readonly DELETE_CATEGORY_REQUEST = "@@kbCategories/DELETE_CATEGORY_REQUEST";
+    public static readonly DELETE_CATEGORY_RESPONSE = "@@kbCategories/DELETE_CATEGORY_RESPONSE";
+    public static readonly DELETE_CATEGORY_ERROR = "@@kbCategories/DELETE_CATEGORY_ERROR";
+
+    // Raw actions for deleting a knowledge category.
+    private static deleteCategoryACs = ReduxActions.generateApiActionCreators(
+        CategoryActions.DELETE_CATEGORY_REQUEST,
+        CategoryActions.DELETE_CATEGORY_RESPONSE,
+        CategoryActions.DELETE_CATEGORY_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {},
+        {} as IDeleteKbCategoryRequest,
+    );
+
+    // Usable action for deleting a category.
+    public deleteCategory(id: number) {
+        return this.dispatchApi("delete", `/knowledge-categories/${id}`, CategoryActions.deleteCategoryACs, {
+            knowledgeCategoryID: id,
+        });
+    }
 
     public static readonly GET_ALL_REQUEST = "@@kbCategories/GET_ALL_REQUEST";
     public static readonly GET_ALL_RESPONSE = "@@kbCategories/GET_ALL_RESPONSE";

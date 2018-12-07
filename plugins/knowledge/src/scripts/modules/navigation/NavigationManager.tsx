@@ -13,7 +13,7 @@ import Tree, {
     moveItemOnTree,
     mutateTree,
 } from "@atlaskit/tree";
-import { NavigationRecordType } from "@knowledge/@types/api";
+import { NavigationRecordType, ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
@@ -30,6 +30,10 @@ import apiv2 from "@library/apiv2";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import { ModalConfirm } from "@library/components/modal";
+import Translate from "@library/components/translation/Translate";
+import { t } from "@library/application";
+import { Navigation } from "@knowledge/modules/navigation/Navigation";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -40,10 +44,11 @@ interface IProps extends IActions, INavigationStoreState {
 interface IState {
     treeData: ITreeData<INormalizedNavigationItem>;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null;
+    deleteItem: ITreeItem<INormalizedNavigationItem> | null;
     disabled: boolean;
-    deleteMode: boolean;
     showNewCategoryModal: boolean;
     writeMode: boolean;
+    elementToFocusOnDeleteClose: HTMLButtonElement | null;
 }
 
 export class NavigationManager extends React.Component<IProps, IState> {
@@ -53,10 +58,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcTree(),
         selectedItem: null,
+        deleteItem: null,
         disabled: false,
-        deleteMode: false,
         showNewCategoryModal: false,
         writeMode: false,
+        elementToFocusOnDeleteClose: null,
     };
 
     public render() {
@@ -78,10 +84,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         isDragEnabled={!this.state.disabled}
                         key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
                             this.state.writeMode
-                        }-${this.state.deleteMode}`}
+                        }`}
                     />
                 </div>
                 {this.renderNewCategoryModal()}
+                {this.renderDeleteModal()}
             </>
         );
     }
@@ -89,6 +96,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
         const hasChildren = item.children && item.children.length > 0;
+        const deleteHandler = (focusButton: HTMLButtonElement) => {
+            this.setState({ elementToFocusOnDeleteClose: focusButton });
+            this.showDeleteModal(item);
+        };
         return (
             <NavigationManagerContent
                 item={item}
@@ -96,17 +107,13 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 provided={provided}
                 hasChildren={hasChildren}
                 onRenameSubmit={this.handleRename}
-                onDelete={this.handleDelete}
-                handleDelete={this.handleDelete}
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
                 selectedItem={this.state.selectedItem}
                 selectItem={this.selectItem}
                 unSelectItem={this.unSelectItem}
-                disableTree={this.disableTree}
-                enableTree={this.enableTree}
                 writeMode={this.state.writeMode}
-                deleteMode={this.state.deleteMode}
+                onDeleteClick={deleteHandler}
             />
         );
     };
@@ -178,7 +185,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private selectItem = (
         selectedItem: ITreeItem<INormalizedNavigationItem>,
         writeMode: boolean = false,
-        deleteMode: boolean = false,
         callback?: () => void,
     ) => {
         this.expandItem(selectedItem.id);
@@ -186,7 +192,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
             {
                 selectedItem,
                 writeMode,
-                deleteMode,
             },
             callback,
         );
@@ -253,6 +258,82 @@ export class NavigationManager extends React.Component<IProps, IState> {
             showNewCategoryModal: false,
         });
     };
+
+    /// DELETE MODAL
+    private renderDeleteModal(): React.ReactNode {
+        const { deleteItem } = this.state;
+        return (
+            deleteItem && (
+                <ModalConfirm
+                    title={(<Translate source={'Delete "<0/>"'} c0={deleteItem.data.name} /> as unknown) as string}
+                    onCancel={this.dismissDeleteModal}
+                    onConfirm={this.handleDeleteConfirm}
+                    elementToFocusOnExit={this.state.elementToFocusOnDeleteClose || document.body}
+                >
+                    <Translate
+                        source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                        c0={this.getItemTypeLabel(deleteItem.data)}
+                        c1={
+                            <strong>
+                                <em>{deleteItem.data.name}</em>
+                            </strong>
+                        }
+                    />
+                </ModalConfirm>
+            )
+        );
+    }
+
+    private handleDeleteConfirm = async () => {
+        const { deleteItem } = this.state;
+        if (deleteItem) {
+            const { recordType, recordID } = deleteItem.data;
+            switch (recordType) {
+                case NavigationRecordType.ARTICLE:
+                    await this.props.articleActions.patchStatus({ articleID: recordID, status: ArticleStatus.DELETED });
+                    break;
+                case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                    await this.props.categoryActions.deleteCategory(recordID);
+                    break;
+            }
+        }
+        this.dismissDeleteModal();
+    };
+
+    private showDeleteModal = (item: ITreeItem<INormalizedNavigationItem>) => {
+        this.setState({ deleteItem: item });
+        this.disableTree(() => {
+            this.selectItem(item, false);
+        });
+    };
+
+    private dismissDeleteModal = () => {
+        const { deleteItem } = this.state;
+        this.setState({
+            deleteItem: null,
+            elementToFocusOnDeleteClose: null,
+        });
+        this.enableTree(() => {
+            if (deleteItem) {
+                this.selectItem(deleteItem, false);
+            }
+        });
+    };
+
+    /**
+     * The label of the current type.
+     */
+    private getItemTypeLabel(item: INormalizedNavigationItem): string {
+        const { recordType } = item;
+        switch (recordType) {
+            case NavigationRecordType.ARTICLE:
+                return t("article");
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                return t("category");
+            default:
+                return recordType;
+        }
+    }
 
     /**
      * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
