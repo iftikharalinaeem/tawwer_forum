@@ -55,7 +55,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
         return (
-            <div ref={this.wrapRef} >
+
                 <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -68,7 +68,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                         isActive: this.isCurrent(),
                     })}
                     tabIndex={0}
-                    onClick={this.focusSelf}
                 >
                     {this.props.writeMode && this.isCurrent() ? (
                         <NavigationManagerNameForm
@@ -97,6 +96,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonBaseClass.CUSTOM}
                                 buttonRef={this.buttonRef}
+                                tabIndex={0}
                             >
                                 {t("Rename")}
                             </Button>
@@ -109,6 +109,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonBaseClass.CUSTOM}
                                 buttonRef={this.buttonRef}
+                                tabIndex={0}
                             >
                                 {t("Delete")}
                             </Button>
@@ -134,9 +135,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                         </div>
                     )}
                 </div>
-            </div>
+
         );
     }
+    //
+    // public componentDidMount() {
+    //     this.props.setDomElement(this.props.item.id, this.getRef());
+    // }
 
     private renameItem = (e: React.SyntheticEvent) => {
         this.props.selectItem(this.props.item, true, false);
@@ -144,7 +149,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private cancelRename = (e: React.SyntheticEvent) => {
         this.props.selectItem(this.props.item, false, false);
-        // this.forceUpdate();
     };
 
     private handleExpand = () => {
@@ -169,9 +173,17 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         });
     };
 
+    private getRef () {
+        return this.wrapRef.current!.firstChild as HTMLElement;
+    }
+
     private focusSelf = () => {
         const content = this.wrapRef.current!.firstChild as HTMLElement;
         content.focus();
+    };
+
+    private selectSelf = () => {
+        this.props.selectItem(this.props.item, this.props.writeMode, this.props.deleteMode);
     };
 
     private isCurrent = () => {

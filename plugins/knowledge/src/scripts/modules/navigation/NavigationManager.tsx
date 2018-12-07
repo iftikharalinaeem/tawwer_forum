@@ -100,7 +100,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             result: true,
             message: "Success",
         };
-        this.unSelectItem();
     };
 
     private selectItem = (
