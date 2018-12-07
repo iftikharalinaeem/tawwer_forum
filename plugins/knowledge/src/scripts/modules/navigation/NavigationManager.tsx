@@ -221,6 +221,98 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        const currentItem = null;
+        const tabHandler = new TabHandler(this.self.current!);
+        const shift = "-Shift";
+        if (currentItem) {
+            switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+                case "Tab":
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const nextElement = tabHandler.getNext(currentItem, false, true);
+                    if (nextElement) {
+                        nextElement.focus();
+                    }
+                    break;
+                // case "Tab" + shift:
+                //     e.stopPropagation();
+                //     e.preventDefault();
+                //     const prevElement = tabHandler.getNext(currentItem, true, true);
+                //     if (prevElement) {
+                //         prevElement.focus();
+                //     }
+                //     break;
+                // case "ArrowDown":
+                //     /*
+                //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
+                //         If focus is on the bottom row, focus does not move.
+                //      */
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     if (currentItem) {
+                //         const nextElement = tabHandler.getNext(currentItem, false, false);
+                //         if (nextElement) {
+                //             nextElement.focus();
+                //         }
+                //     }
+                //     break;
+                // case "ArrowUp":
+                //     /*
+                //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
+                //         If focus is on the top row, focus does not move.
+                //      */
+                //     if (currentItem) {
+                //         e.preventDefault();
+                //         e.stopPropagation();
+                //         const prevElement = tabHandler.getNext(currentItem, true, false);
+                //         if (prevElement) {
+                //             prevElement.focus();
+                //         }
+                //     }
+                //     break;
+                // case "Home":
+                //     /*
+                //         If a cell is focused, moves focus to the previous interactive widget in the current row.
+                //         If a row is focused, moves focus out of the treegrid.
+                //      */
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     const firstLink = tabHandler.getInitial();
+                //     if (firstLink) {
+                //         firstLink.focus();
+                //     }
+                //     break;
+                // case "End":
+                //     /*
+                //         If a row is focused, moves to the first row.
+                //         If a cell is focused, moves focus to the first cell in the row containing focus.
+                //      */
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     const lastLink = tabHandler.getLast();
+                //     if (lastLink) {
+                //         lastLink.focus();
+                //     }
+                //     break;
+            }
+
+        }
+
+    };
+
+    // private setDomElement = (itemId: string, element: HTMLElement) => {
+    //     this.setState({
+    //         treeData: mutateTree(this.state.treeData, itemId, { domElement: element }),
+    //     });
+    // };
+
     private get dummyData(): IKbNavigationItem[] {
         return [
             {
