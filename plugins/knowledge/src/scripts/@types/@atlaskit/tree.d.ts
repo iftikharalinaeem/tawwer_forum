@@ -67,7 +67,7 @@ declare module "@atlaskit/tree" {
         tree: ITreeData<T>;
         onExpand?(itemID: string): void;
         onCollapse?(itemID: string): void;
-        onDragStart?(source: ITreeSourcePosition, destination?: ITreeDestinationPosition): void;
+        onDragStart?(source: ITreeSourcePosition): void;
         onDragEnd?(source: ITreeSourcePosition, destination?: ITreeDestinationPosition): void;
         renderItem(params: IRenderItemParams<T>): void;
         offsetPerLevel?: number;
