@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import React from "react";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
-import classNames from "classnames";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
+import { article, folderClosed, folderOpen } from "@library/components/icons/navigationManager";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps {
     expanded: boolean;

@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { Devices } from "@library/components/DeviceChecker";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus, NavigationRecordType } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
@@ -22,15 +22,15 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import { dummyNavData } from "@knowledge/modules/categories/state/dummyNavData";
 import SiteNav from "@library/components/siteNav/SiteNav";
+import Navigation from "@knowledge/modules/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
 
 interface IProps {
     article: IArticle;
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    title?: string;
 }
 
 /**
@@ -39,25 +39,27 @@ interface IProps {
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
         const { article, messages } = this.props;
+        const { articleID } = article;
 
-        const mobileNav = <SiteNav collapsible={false}>{dummyNavData}</SiteNav>;
-        const nav = <SiteNav collapsible={true}>{dummyNavData}</SiteNav>;
+        const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
 
         return (
             <React.Fragment>
                 <Container>
-                    <VanillaHeader title={article.name} mobileDropDownContent={mobileNav} />
+                    <VanillaHeader
+                        title={article.name}
+                        mobileDropDownContent={<Navigation collapsible={false} activeRecord={activeRecord} />}
+                    />
                     <PanelLayout device={this.props.device}>
-                        {this.props.breadcrumbData.length > 1 &&
-                            this.props.device !== Devices.MOBILE && (
-                                <PanelLayout.Breadcrumbs>
-                                    <PanelWidget>
-                                        <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
-                                    </PanelWidget>
-                                </PanelLayout.Breadcrumbs>
-                            )}
+                        {this.props.device !== Devices.MOBILE && (
+                            <PanelLayout.Breadcrumbs>
+                                <PanelWidget>
+                                    <NavigationBreadcrumbs activeRecord={activeRecord} />
+                                </PanelWidget>
+                            </PanelLayout.Breadcrumbs>
+                        )}
                         <PanelLayout.LeftBottom>
-                            <PanelWidget>{nav}</PanelWidget>
+                            <PanelWidget>{<Navigation collapsible={true} activeRecord={activeRecord} />}</PanelWidget>
                         </PanelLayout.LeftBottom>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
@@ -87,14 +89,13 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <AttachmentList attachments={this.articleAttachmentList} />
                             </PanelWidget>
                         </PanelLayout.MiddleBottom>
-                        {article.outline &&
-                            article.outline.length > 0 && (
-                                <PanelLayout.RightTop>
-                                    <PanelWidget>
-                                        <ArticleTOC items={article.outline} />
-                                    </PanelWidget>
-                                </PanelLayout.RightTop>
-                            )}
+                        {article.outline && article.outline.length > 0 && (
+                            <PanelLayout.RightTop>
+                                <PanelWidget>
+                                    <ArticleTOC items={article.outline} />
+                                </PanelWidget>
+                            </PanelLayout.RightTop>
+                        )}
                         <PanelLayout.RightBottom>
                             <OtherLanguages {...dummyOtherLanguagesData} />
                             <RelatedArticles children={this.articleRelatedArticles} />

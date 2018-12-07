@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { IKbNavigationItem } from "@knowledge/@types/api";
 import Tree, {
     ITreeData,
     mutateTree,
@@ -15,10 +14,13 @@ import Tree, {
     IRenderItemParams,
     ITreeItem,
 } from "@atlaskit/tree";
-import { t } from "@library/application";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
 import classNames from "classnames";
+import { INavigationItem } from "@library/@types/api";
+import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
 import TabHandler from "@library/TabHandler";
+import { t } from "@library/application";
+import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
@@ -28,19 +30,19 @@ interface IState {
     treeData: ITreeData<IKbNavigationItem>;
     selectedItem: ITreeItem<IKbNavigationItem> | null;
     disabled: boolean;
-    writeMode: boolean;
     deleteMode: boolean;
+    writeMode: boolean;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
-        treeData: this.calcInitialTree(this.dummyData),
+        treeData: this.calcInitialTree(),
         selectedItem: null,
         disabled: false,
-        writeMode: false,
         deleteMode: false,
+        writeMode: false,
     };
 
     public render() {
@@ -53,21 +55,22 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
-                        this.state.deleteMode
-                    }`}
+                    key={this.state.selectedItem ? this.state.selectedItem.id : undefined}
                 />
             </div>
         );
     }
 
-    private renderItem = (params: IRenderItemParams<IKbNavigationItem>) => {
+    private renderItem = (params: IRenderItemParams<INavigationItem>) => {
         const { provided, item, snapshot } = params;
         const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
+        const isCurrent = this.getSelectedItemId() === item.id;
+        const isWriteMode = this.state.writeMode && isCurrent;
+        const isDeleteMode = this.state.deleteMode && isCurrent;
         return (
             <NavigationManagerContent
-                item={item}
+                item={item as ITreeItem<IKbNavigationItem>}
                 snapshot={snapshot}
                 provided={provided}
                 hasChildren={hasChildren}
@@ -82,9 +85,11 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
+                key={`${item.id}-${data.name}-${isWriteMode}-${isDeleteMode}-${isCurrent}`}
+                current={isCurrent}
+                writeMode={isWriteMode}
+                deleteMode={isDeleteMode}
                 handleKeyDown={this.handleKeyDown}
-                writeMode={this.state.writeMode}
-                deleteMode={this.state.deleteMode}
             />
         );
     };
@@ -102,7 +107,11 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         this.unSelectItem();
     };
 
-    private selectItem = (selectedItem: ITreeItem<IKbNavigationItem>, writeMode: boolean, deleteMode: boolean) => {
+    private selectItem = (
+        selectedItem: ITreeItem<IKbNavigationItem>,
+        writeMode: boolean = false,
+        deleteMode: boolean = false,
+    ) => {
         this.setState({
             selectedItem,
             writeMode,
@@ -116,22 +125,16 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private disableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: true,
-            },
-            callback,
-        );
+    private disableTree = () => {
+        this.setState({
+            disabled: true,
+        });
     };
 
-    private enableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: false,
-            },
-            callback,
-        );
+    private enableTree = () => {
+        this.setState({
+            disabled: false,
+        });
     };
 
     private expandItem = (itemId: string) => {
@@ -154,26 +157,25 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
+
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState({
             treeData: newTree,
-            selectedItem: newTree.items[source.parentId].children[source.index],
         });
     };
 
-    private calcInitialTree(items: IKbNavigationItem[]): ITreeData<IKbNavigationItem> {
+    private calcInitialTree(): ITreeData<IKbNavigationItem> {
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
 
-        for (const [itemID, itemValue] of Object.entries(this.normalizedData)) {
-            const children = itemValue.children || [];
+        for (const [itemID, itemValue] of Object.entries(NavigationModel.normalizeData(this.dummyData))) {
             data.items[itemID] = {
-                hasChildren: children.length > 0,
+                hasChildren: itemValue.children.length > 0,
                 id: itemID,
-                children,
-                data: itemValue,
+                children: itemValue.children,
+                data: itemValue as IKbNavigationItem,
                 isExpanded: true,
             };
         }
@@ -194,7 +196,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
         for (const [itemID, itemValue] of Object.entries(normalizedByID)) {
             if (itemValue.parentID > 0) {
-                const lookupID = "knowledgeCategory" + itemValue.parentID;
+                const lookupID = NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID;
                 const parentItem = normalizedByID[lookupID];
                 if (!parentItem.children) {
                     parentItem.children = [];
@@ -214,7 +216,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         switch (type) {
             case "article":
                 return t("article");
-            case "knowledgeCategory":
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
                 return t("category");
             default:
                 return type;
@@ -227,83 +229,31 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * Note that some of the events are on SiteNavNode.tsx
      * @param event
      */
-    private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = e.currentTarget.firstChild as HTMLElement;
-
+    private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (document.activeElement === null) {
+            return;
+        }
+        const currentItem = document.activeElement;
+        // const selectedNode = currentLink.closest(".siteNavNode");
+        // const siteNavRoot = currentLink.closest(".siteNav");
         const tabHandler = new TabHandler(this.self.current!);
         const shift = "-Shift";
 
         switch (
-            `${e.key}${e.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
-            // case "Tab":
-            //     e.stopPropagation();
-            //     e.preventDefault();
-            //     const nextElement = tabHandler.getNext(currentItem, false, true);
-            //     if (nextElement) {
-            //         nextElement.focus();
-            //     }
-            //     break;
-            // case "Tab" + shift:
-            //     e.stopPropagation();
-            //     e.preventDefault();
-            //     const prevElement = tabHandler.getNext(currentItem, true, true);
-            //     if (prevElement) {
-            //         prevElement.focus();
-            //     }
-            //     break;
-            // case "ArrowDown":
-            //     /*
-            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
-            //         If focus is on the bottom row, focus does not move.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     if (currentItem) {
-            //         const nextElement = tabHandler.getNext(currentItem, false, false);
-            //         if (nextElement) {
-            //             nextElement.focus();
-            //         }
-            //     }
-            //     break;
-            // case "ArrowUp":
-            //     /*
-            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
-            //         If focus is on the top row, focus does not move.
-            //      */
-            //     if (currentItem) {
-            //         e.preventDefault();
-            //         e.stopPropagation();
-            //         const prevElement = tabHandler.getNext(currentItem, true, false);
-            //         if (prevElement) {
-            //             prevElement.focus();
-            //         }
-            //     }
-            //     break;
-            // case "Home":
-            //     /*
-            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
-            //         If a row is focused, moves focus out of the treegrid.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     const firstLink = tabHandler.getInitial();
-            //     if (firstLink) {
-            //         firstLink.focus();
-            //     }
-            //     break;
-            // case "End":
-            //     /*
-            //         If a row is focused, moves to the first row.
-            //         If a cell is focused, moves focus to the first cell in the row containing focus.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     const lastLink = tabHandler.getLast();
-            //     if (lastLink) {
-            //         lastLink.focus();
-            //     }
-            //     break;
+            `${event.key}${event.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
         ) {
+            case "Tab":
+                const nextElement = tabHandler.getNext(currentItem, false, true);
+                if (nextElement) {
+                    nextElement.focus();
+                }
+                break;
+            case "Tab" + shift:
+                const prevElement = tabHandler.getNext(currentItem, true, true);
+                if (prevElement) {
+                    prevElement.focus();
+                }
+                break;
         }
     };
 
@@ -315,7 +265,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: -1,
                 recordID: 1,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Pee Mart",
@@ -323,7 +273,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 1,
                 recordID: 2,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Predator Urine",
@@ -331,7 +281,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 3,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Coyote Urine",
@@ -339,7 +289,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 3,
                 recordID: 4,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Fox Urine",
@@ -347,7 +297,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 3,
                 recordID: 5,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Bobcat Urine",
@@ -355,7 +305,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 3,
                 recordID: 6,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "P-Gel",
@@ -363,7 +313,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 7,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "P-Cover Granules",
@@ -371,7 +321,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 8,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Prey Animals",
@@ -379,7 +329,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 9,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Armadillos",
@@ -387,7 +337,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 9,
                 recordID: 10,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Chipmunks",
@@ -395,7 +345,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 9,
                 recordID: 11,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Dispensers",
@@ -403,7 +353,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 12,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Mountain Lion",
@@ -411,7 +361,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 8,
                 recordID: 13,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Bear",
@@ -419,7 +369,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 8,
                 recordID: 14,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Wolf",
@@ -427,7 +377,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 8,
                 recordID: 15,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "P-Wicks",
@@ -435,7 +385,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 12,
                 recordID: 16,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "P-Dispensers",
@@ -443,7 +393,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 12,
                 recordID: 17,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Test Folder!!!",
@@ -451,7 +401,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 3,
                 recordID: 18,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Category in Base 1",
@@ -459,7 +409,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 1,
                 recordID: 19,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Test",
@@ -467,7 +417,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 20,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "asdf",
@@ -475,7 +425,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 2,
                 recordID: 21,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "Search Category 1",
@@ -483,7 +433,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 parentID: 1,
                 recordID: 22,
                 sort: null,
-                recordType: "knowledgeCategory",
+                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             },
             {
                 name: "What about PHP version??",
@@ -491,7 +441,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 1,
                 sort: 0,
                 parentID: 12,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Article 2",
@@ -499,7 +449,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 2,
                 sort: 0,
                 parentID: 7,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test 3",
@@ -507,7 +457,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 3,
                 sort: 0,
                 parentID: 3,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Revised!!! Test Rev Article",
@@ -515,7 +465,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 278,
                 sort: null,
                 parentID: 1,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test article",
@@ -523,7 +473,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 280,
                 sort: null,
                 parentID: 2,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test headings",
@@ -531,7 +481,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 281,
                 sort: null,
                 parentID: 1,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test",
@@ -539,7 +489,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 290,
                 sort: null,
                 parentID: 1,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "test in pee mart",
@@ -547,7 +497,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 291,
                 sort: null,
                 parentID: 2,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test heading article",
@@ -555,7 +505,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 293,
                 sort: null,
                 parentID: 18,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "test 2",
@@ -563,7 +513,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 302,
                 sort: null,
                 parentID: 19,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "test",
@@ -571,7 +521,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 309,
                 sort: null,
                 parentID: 1,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "asdfasdfasdfasfasdf",
@@ -579,7 +529,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 315,
                 sort: null,
                 parentID: 19,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test Draft Article",
@@ -587,7 +537,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 316,
                 sort: null,
                 parentID: 19,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "What about PHP version??",
@@ -595,7 +545,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 317,
                 sort: null,
                 parentID: 12,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Search Article number 1",
@@ -603,7 +553,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 319,
                 sort: null,
                 parentID: 22,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test search article number 2",
@@ -611,7 +561,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 320,
                 sort: null,
                 parentID: 22,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "Test search article 3",
@@ -619,7 +569,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 321,
                 sort: null,
                 parentID: 22,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "A new article title",
@@ -627,7 +577,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 322,
                 sort: null,
                 parentID: 22,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
             {
                 name: "test",
@@ -635,7 +585,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 recordID: 323,
                 sort: null,
                 parentID: 1,
-                recordType: "article",
+                recordType: NavigationRecordType.ARTICLE,
             },
         ];
     }
