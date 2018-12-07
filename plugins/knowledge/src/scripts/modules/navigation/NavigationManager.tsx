@@ -4,30 +4,32 @@
  * @license Proprietary
  */
 
-import React from "react";
 import Tree, {
-    ITreeData,
-    mutateTree,
-    ITreeSourcePosition,
-    ITreeDestinationPosition,
-    moveItemOnTree,
     IRenderItemParams,
+    ITreeData,
+    ITreeDestinationPosition,
     ITreeItem,
+    ITreeSourcePosition,
+    moveItemOnTree,
+    mutateTree,
 } from "@atlaskit/tree";
-import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
-import classNames from "classnames";
-import { INavigationItem } from "@library/@types/api";
-import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
-import NavigationModel, {
-    INormalizedNavigationItems,
-    INavigationStoreState,
-} from "@knowledge/modules/navigation/NavigationModel";
-import { connect } from "react-redux";
+import { NavigationRecordType } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
+import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
+import NavigationModel, {
+    INavigationStoreState,
+    INormalizedNavigationItem,
+    INormalizedNavigationItems,
+} from "@knowledge/modules/navigation/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
+import classNames from "classnames";
+import React from "react";
+import { connect } from "react-redux";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -36,43 +38,55 @@ interface IProps extends IActions, INavigationStoreState {
 }
 
 interface IState {
-    treeData: ITreeData<IKbNavigationItem>;
-    selectedItem: ITreeItem<IKbNavigationItem> | null;
+    treeData: ITreeData<INormalizedNavigationItem>;
+    selectedItem: ITreeItem<INormalizedNavigationItem> | null;
     disabled: boolean;
     deleteMode: boolean;
+    showNewCategoryModal: boolean;
     writeMode: boolean;
 }
 
 export class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
+    private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state: IState = {
         treeData: this.calcTree(),
         selectedItem: null,
         disabled: false,
         deleteMode: false,
+        showNewCategoryModal: false,
         writeMode: false,
     };
 
     public render() {
         return (
-            <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
-                <Tree
-                    tree={this.state.treeData}
-                    onDragEnd={this.onDragEnd}
-                    onCollapse={this.collapseItem}
-                    onExpand={this.expandItem}
-                    renderItem={this.renderItem}
-                    isDragEnabled={!this.state.disabled}
-                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
-                        this.state.deleteMode
-                    }`}
+            <>
+                <NavigationManagerToolBar
+                    collapseAll={this.collapseAll}
+                    expandAll={this.expandAll}
+                    newCategory={this.showNewCategoryModal}
+                    newCategoryButtonRef={this.newCategoryButtonRef}
                 />
-            </div>
+                <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
+                    <Tree
+                        tree={this.state.treeData}
+                        onDragEnd={this.onDragEnd}
+                        onCollapse={this.collapseItem}
+                        onExpand={this.expandItem}
+                        renderItem={this.renderItem}
+                        isDragEnabled={!this.state.disabled}
+                        key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
+                            this.state.writeMode
+                        }-${this.state.deleteMode}`}
+                    />
+                </div>
+                {this.renderNewCategoryModal()}
+            </>
         );
     }
 
-    private renderItem = (params: IRenderItemParams<INavigationItem>) => {
+    private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
         const hasChildren = item.children && item.children.length > 0;
         return (
@@ -99,7 +113,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
     public async componentDidMount() {
         const { knowledgeBaseID } = this.props;
-        this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
+        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
     }
 
     public componentDidUpdate(prevProps: IProps) {
@@ -111,16 +125,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Collapse all items in the tree.
      */
-    public collapseAll() {
+    private collapseAll = () => {
         this.updateAllItems({ isExpanded: false });
-    }
+    };
 
     /**
      * Expand all items in the tree.
      */
-    public expandAll() {
+    private expandAll = () => {
         this.updateAllItems({ isExpanded: true });
-    }
+    };
 
     /**
      * Expand a single item.
@@ -145,9 +159,14 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Handle the rename of a navigatio item.
      */
-    private handleRename = (item: IKbNavigationItem, newName: string) => {
-        if (item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY) {
-            void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
+    private handleRename = (item: INormalizedNavigationItem, newName: string) => {
+        switch (item.recordType) {
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
+                break;
+            case NavigationRecordType.ARTICLE:
+                void this.props.articleActions.patchArticle({ articleID: item.recordID, name: newName });
+                break;
         }
 
         this.unSelectItem();
@@ -157,11 +176,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * Select a single item. Takes an optional callback for after the state has been updated.
      */
     private selectItem = (
-        selectedItem: ITreeItem<IKbNavigationItem>,
+        selectedItem: ITreeItem<INormalizedNavigationItem>,
         writeMode: boolean = false,
         deleteMode: boolean = false,
         callback?: () => void,
     ) => {
+        this.expandItem(selectedItem.id);
         this.setState(
             {
                 selectedItem,
@@ -175,6 +195,62 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private unSelectItem = () => {
         this.setState({
             selectedItem: null,
+        });
+    };
+
+    /// MODALS
+    /**
+     * Get the currently "selected" category. If we have an article selected use it's parent category.
+     */
+    private get currentTargetCategoryID(): number {
+        const { selectedItem } = this.state;
+
+        if (!selectedItem) {
+            // This should be the category assosciated with the knowledge base once hooked up.
+            return this.props.knowledgeBaseID;
+        }
+
+        if (selectedItem.data.recordType === NavigationRecordType.ARTICLE) {
+            return selectedItem.data.parentID;
+        } else {
+            return selectedItem.data.recordID;
+        }
+    }
+
+    private renderNewCategoryModal(): React.ReactNode {
+        return (
+            this.state.showNewCategoryModal && (
+                <NewCategoryForm
+                    exitHandler={this.hideNewFolderModal}
+                    parentCategoryID={this.currentTargetCategoryID}
+                    buttonRef={this.newCategoryButtonRef}
+                    onSuccessfulSubmit={this.onNewCategorySuccess}
+                />
+            )
+        );
+    }
+
+    private onNewCategorySuccess = async () => {
+        console.log("New cateory success!!!");
+        const { knowledgeBaseID } = this.props;
+        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID }, true);
+    };
+
+    /**
+     * Show the location picker modal.
+     */
+    private showNewCategoryModal = () => {
+        this.setState({
+            showNewCategoryModal: true,
+        });
+    };
+
+    /**
+     * Hiders the location picker modal.
+     */
+    private hideNewFolderModal = () => {
+        this.setState({
+            showNewCategoryModal: false,
         });
     };
 
@@ -208,6 +284,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
+        // Do nothing if we leave it in the spot we started.
+        if (source.index === destination.index && source.parentId === destination.parentId) {
+            return;
+        }
+
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState(
             {
@@ -229,8 +310,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
      *
      * @param update
      */
-    private updateAllItems(update: Partial<ITreeItem<IKbNavigationItem>>) {
-        const data: ITreeData<IKbNavigationItem> = {
+    private updateAllItems(update: Partial<ITreeItem<INormalizedNavigationItem>>) {
+        const data: ITreeData<INormalizedNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
@@ -253,7 +334,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Take the internal tree state and convert back to a pure data array for patching the API endpoint.
      */
-    private calcPatchArray(data: ITreeData<IKbNavigationItem>) {
+    private calcPatchArray(data: ITreeData<INormalizedNavigationItem>) {
         const outOfTree = {};
         for (const [index, value] of Object.entries(data.items)) {
             outOfTree[index] = {
@@ -272,13 +353,13 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * - Preserves existing expand state if it exists.
      */
     private calcTree() {
-        const data: ITreeData<IKbNavigationItem> = {
+        const data: ITreeData<INormalizedNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
 
         for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
-            let stateValue: ITreeItem<IKbNavigationItem> | null = null;
+            let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
             if (this.state && this.state.treeData.items[itemID]) {
                 stateValue = this.state.treeData.items[itemID];
             }
@@ -316,8 +397,6 @@ function mapDispatchToProps(dispatch): IActions {
 const Connected = connect(
     mapStateToProps,
     mapDispatchToProps,
-    null,
-    { withRef: true },
 )(NavigationManager);
 
 export default Connected;

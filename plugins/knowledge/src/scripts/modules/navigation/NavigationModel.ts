@@ -11,9 +11,14 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
-interface INormalizedNavigationItem extends IKbNavigationItem {
+export interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
+    tempName?: string;
+    error?: {
+        message: string;
+    };
 }
 export interface INormalizedNavigationItems {
     [key: string]: INormalizedNavigationItem;
@@ -83,9 +88,36 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
     public reducer = (
         state: INavigationStoreState = this.initialState,
-        action: typeof NavigationActions.ACTION_TYPES | typeof CategoryActions.ACTION_TYPES,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
+            const handlePatchSuccess = (key: string, newName?: string) => {
+                const item = nextState.navigationItems[key];
+                if (item && newName) {
+                    item.name = newName!;
+                    delete item.error;
+                    delete item.tempName;
+                }
+            };
+
+            const handlePatchError = (key: string, errorMessage: string) => {
+                const item = nextState.navigationItems[key];
+                if (item) {
+                    item.error = { message: errorMessage };
+                }
+            };
+
+            const handlePatchRequest = (key: string, tempName?: string) => {
+                const item = nextState.navigationItems[key];
+                if (item && tempName) {
+                    item.tempName = tempName;
+                    delete item.error;
+                }
+            };
+
             switch (action.type) {
                 case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
                     nextState.fetchLoadable.status = LoadStatus.LOADING;
@@ -109,13 +141,36 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.submitLoadable.status = LoadStatus.SUCCESS;
                     nextState.submitLoadable.error = action.payload;
                     break;
-                case CategoryActions.PATCH_CATEGORY_REQUEST:
-                    const id = NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID;
-                    const item = nextState.navigationItems[id];
-                    if (item && action.meta.name) {
-                        item.name = action.meta.name;
-                    }
+                case CategoryActions.PATCH_CATEGORY_REQUEST: {
+                    handlePatchRequest(
+                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                        action.meta.name,
+                    );
                     break;
+                }
+                case ArticleActions.PATCH_ARTICLE_REQUEST: {
+                    handlePatchRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
+                    break;
+                }
+                case CategoryActions.PATCH_CATEGORY_ERROR: {
+                    handlePatchError(
+                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                        action.payload.message,
+                    );
+                    break;
+                }
+                case ArticleActions.PATCH_ARTICLE_ERROR: {
+                    handlePatchError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                    break;
+                }
+                case CategoryActions.PATCH_CATEGORY_RESPONSE: {
+                    handlePatchSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                    break;
+                }
+                case ArticleActions.PATCH_ARTICLE_RESPONSE: {
+                    handlePatchSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                    break;
+                }
             }
         });
     };

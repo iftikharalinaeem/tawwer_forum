@@ -9,6 +9,7 @@ import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { article, folderClosed, folderOpen } from "@library/components/icons/navigationManager";
 import classNames from "classnames";
 import React from "react";
+import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface IProps {
     expanded: boolean;
@@ -16,13 +17,13 @@ interface IProps {
     collapseItem: (itemId: string) => void;
     itemId: string;
     disabled?: boolean;
-    hasChildren: boolean;
+    type: NavigationRecordType;
     className?: string;
 }
 
 export default class NavigationManagerItemIcon extends React.Component<IProps> {
     public render() {
-        if (this.props.hasChildren) {
+        if (this.props.type === NavigationRecordType.KNOWLEDGE_CATEGORY) {
             return (
                 <Button
                     onClick={this.handleClick}

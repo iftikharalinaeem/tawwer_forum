@@ -14,23 +14,23 @@ import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import NavigationManagerNameForm from "./NavigationManagerNameForm";
-import { INavigationItem } from "@library/@types/api";
 import { NavigationRecordType } from "@knowledge/@types/api";
+import { INormalizedNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
-    item: ITreeItem<INavigationItem>;
+    item: ITreeItem<INormalizedNavigationItem>;
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
     hasChildren: boolean;
-    onRenameSubmit: (item: IKbNavigationItem, newName: string) => void;
+    onRenameSubmit: (item: INormalizedNavigationItem, newName: string) => void;
     onDelete: () => void;
     handleDelete: () => void;
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
-    selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
+    selectedItem: ITreeItem<INormalizedNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
     selectItem: (
-        item: ITreeItem<INavigationItem> | null,
+        item: ITreeItem<INormalizedNavigationItem> | null,
         writeMode: boolean,
         deleteMode: boolean,
         callback?: () => void,
@@ -58,7 +58,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     public render() {
         const { item, provided, snapshot } = this.props;
-        const name = item.data.name;
+        const { error } = item.data;
         return (
             <div ref={this.wrapRef}>
                 <div
@@ -70,6 +70,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     }
                     className={classNames("navigationManager-item", {
                         isDragging: snapshot.isDragging,
+                        hasError: error,
                         isActive: this.isCurrent(),
                     })}
                     tabIndex={0}
@@ -77,9 +78,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 >
                     {this.props.writeMode && this.isCurrent() ? (
                         <NavigationManagerNameForm
-                            currentName={name}
+                            currentName={this.displayName}
                             focusOnExit={this.buttonRef}
-                            applyNewName={this.props.onRenameSubmit}
+                            applyNewName={this.applyNewName}
                             cancel={this.cancelRename}
                         />
                     ) : (
@@ -90,9 +91,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 collapseItem={this.handleCollapse}
                                 itemId={item.id}
                                 className="tree-itemIcon"
-                                hasChildren={this.props.hasChildren}
+                                type={item.data.recordType}
                             />
-                            <span className="navigationManager-itemLabel">{name}</span>
+                            <span className="navigationManager-itemLabel">{this.displayName}</span>
                             <Button
                                 onClick={this.renameItem}
                                 className={classNames(
@@ -119,17 +120,21 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             </Button>
                             {this.props.deleteMode && this.isCurrent() && (
                                 <ModalConfirm
-                                    title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
+                                    title={
+                                        ((
+                                            <Translate source={'Delete "<0/>"'} c0={this.displayName} />
+                                        ) as unknown) as string
+                                    }
                                     onCancel={this.hideConfirmation}
                                     onConfirm={this.props.handleDelete}
                                     elementToFocusOnExit={this.buttonRef.current!}
                                 >
                                     <Translate
                                         source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                                        c0={this.props.type}
+                                        c0={this.typeLabel}
                                         c1={
                                             <strong>
-                                                <em>{name}</em>
+                                                <em>{this.displayName}</em>
                                             </strong>
                                         }
                                     />
@@ -141,6 +146,15 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             </div>
         );
     }
+
+    private get displayName(): string {
+        const { name, tempName } = this.props.item.data;
+        return tempName || name;
+    }
+
+    private applyNewName = (newName: string) => {
+        this.props.onRenameSubmit(this.props.item.data, newName);
+    };
 
     private renameItem = (e: React.SyntheticEvent) => {
         this.props.selectItem(this.props.item, true, false);
@@ -174,6 +188,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private focusSelf = () => {
+        this.props.expandItem(this.props.item.id);
         const content = this.wrapRef.current!.firstChild as HTMLElement;
         content.focus();
     };
@@ -193,7 +208,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
             case NavigationRecordType.KNOWLEDGE_CATEGORY:
                 return t("category");
             default:
-                return;
+                return recordType;
         }
     }
 }

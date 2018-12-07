@@ -4,29 +4,27 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { t } from "@library/application";
-import { Modal } from "@library/components/modal";
-import Button from "@library/components/forms/Button";
-import FramePanel from "@library/components/frame/FramePanel";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import { newFolder } from "@library/components/icons/";
-import { Frame, FrameHeader, FrameBody, FrameFooter } from "@library/components/frame";
-import ModalSizes from "@library/components/modal/ModalSizes";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import ButtonLoader from "@library/components/ButtonLoader";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import getStore from "@library/state/getStore";
 import apiv2 from "@library/apiv2";
-import { LoadStatus } from "@library/@types/api";
-import { IStoreState } from "@knowledge/state/model";
+import { t } from "@library/application";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
+import ButtonLoader from "@library/components/ButtonLoader";
+import Button from "@library/components/forms/Button";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
+import { Frame, FrameBody, FrameFooter, FrameHeader } from "@library/components/frame";
+import FramePanel from "@library/components/frame/FramePanel";
+import { Modal } from "@library/components/modal";
+import ModalSizes from "@library/components/modal/ModalSizes";
+import getStore from "@library/state/getStore";
+import * as React from "react";
 
 interface IProps {
-    exitHandler: (e) => void;
+    exitHandler: (e: React.SyntheticEvent) => void;
     className?: string;
-    parentCategory: IKbCategoryFragment | null;
+    parentCategoryID: number;
     buttonRef: React.RefObject<HTMLButtonElement>;
+    onSuccessfulSubmit?: () => Promise<void>;
 }
 
 interface IState {
@@ -40,7 +38,7 @@ interface IState {
  * A modal based new form for adding a new category
  */
 export default class NewCategoryForm extends React.Component<IProps, IState> {
-    public state = {
+    public state: IState = {
         valid: false,
         categoryName: "",
         url: "",
@@ -49,16 +47,8 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
 
     private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
-    private id;
-
-    public constructor(props) {
-        super(props);
-        this.id = uniqueIDFromPrefix("navigationItemList");
-    }
-
-    private get titleID() {
-        return this.id + "-title";
-    }
+    private id = uniqueIDFromPrefix("navigationItemList");
+    private inputRef = React.createRef<InputTextBlock>();
 
     public render() {
         return (
@@ -74,6 +64,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock
+                                ref={this.inputRef}
                                 label={t("Name")}
                                 inputProps={{
                                     value: this.state.categoryName,
@@ -101,11 +92,19 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         );
     }
 
+    public componentDidMount() {
+        this.inputRef.current!.focus();
+    }
+
+    private get titleID() {
+        return this.id + "-title";
+    }
+
     /**
      * Attempt to add category.
      */
     private handleFormSubmit = async e => {
-        const parentCategoryID = this.props.parentCategory ? this.props.parentCategory.knowledgeCategoryID : -1;
+        const { parentCategoryID } = this.props;
 
         this.setState({
             isSubmitLoading: true,
@@ -115,6 +114,11 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
             name: this.state.categoryName,
             parentID: parentCategoryID,
         });
+
+        if (this.props.onSuccessfulSubmit) {
+            console.log("do refresh");
+            await this.props.onSuccessfulSubmit();
+        }
 
         this.props.exitHandler(e);
     };
@@ -132,13 +136,5 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
             state.valid = true;
         }
         this.setState(state);
-    };
-
-    /**
-     * Change handler for the email input.
-     */
-    private handleUrlCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        this.setState({ url: value });
     };
 }

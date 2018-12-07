@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
@@ -22,11 +23,13 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Garden\Web\Exception\ClientException;
 
 /**
  * API controller for managing the articles resource.
  */
-class ArticlesApiController extends AbstractKnowledgeApiController {
+class ArticlesApiController extends AbstractKnowledgeApiController
+{
     use ArticlesApiSchemes;
 
     /** @var ArticleModel */
@@ -85,7 +88,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function articleByID(int $id, bool $includeRevision = false): array {
+    private function articleByID(int $id, bool $includeRevision = false) : array
+    {
         try {
             if ($includeRevision) {
                 $article = $this->articleModel->getIDWithRevision($id);
@@ -108,7 +112,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function delete_drafts(int $draftID) {
+    public function delete_drafts(int $draftID)
+    {
         $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
@@ -136,7 +141,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the draft could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function draftByID(int $id): array {
+    private function draftByID(int $id) : array
+    {
         try {
             $draft = $this->draftModel->selectSingle([
                 "draftID" => $id,
@@ -161,7 +167,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ServerException If there was an error normalizing the output.
      */
-    public function get(int $id) {
+    public function get(int $id)
+    {
         $this->permission("knowledge.kb.view");
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
@@ -188,7 +195,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function get_drafts(int $draftID) {
+    public function get_drafts(int $draftID)
+    {
         $this->permission("knowledge.articles.add");
 
         $in = $this->schema([
@@ -215,7 +223,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function get_edit(int $id): array {
+    public function get_edit(int $id) : array
+    {
         $this->permission("knowledge.articles.add");
 
         $this->idParamSchema()->setDescription("Get an article for editing.");
@@ -247,7 +256,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function index(array $query = []) {
+    public function index(array $query = [])
+    {
         $this->permission("knowledge.kb.view");
         $in = $this->schema([
             "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
@@ -324,7 +334,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If input validation fails.
      * @throws ValidationException If output validation fails.
      */
-    public function index_drafts(array $query) {
+    public function index_drafts(array $query)
+    {
         $this->permission("knowledge.articles.add");
 
         $in = $this->schema([
@@ -367,7 +378,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function index_revisions(int $id): array {
+    public function index_revisions(int $id) : array
+    {
         $this->permission("knowledge.kb.view");
 
         $this->idParamSchema()->setDescription("Get revisions from a specific article.");
@@ -410,7 +422,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      * @throws ServerException If no article ID was found in the row.
      */
-    public function normalizeOutput(array $row): array {
+    public function normalizeOutput(array $row) : array
+    {
         $articleID = $row["articleID"] ?? null;
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
@@ -441,7 +454,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch(int $id, array $body = []): array {
+    public function patch(int $id, array $body = []) : array
+    {
         $this->permission("knowledge.articles.add");
 
         $in = $this->articlePostSchema("in")->setDescription("Update an existing article.");
@@ -465,7 +479,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch_drafts(int $draftID, array $body): array {
+    public function patch_drafts(int $draftID, array $body) : array
+    {
         $this->permission("knowledge.articles.add");
 
 
@@ -503,7 +518,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch_status(int $id, array $body): array {
+    public function patch_status(int $id, array $body) : array
+    {
         $this->permission("knowledge.articles.add");
 
         $this->idParamSchema();
@@ -538,7 +554,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function post(array $body): array {
+    public function post(array $body) : array
+    {
         $this->permission("knowledge.articles.add");
 
         $in = $this->articlePostSchema("in")->setDescription("Create a new article.");
@@ -561,7 +578,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function post_drafts(array $body): array {
+    public function post_drafts(array $body) : array
+    {
         $this->permission("knowledge.articles.add");
 
         $in = $this->schema($this->draftPostSchema(), "in")
@@ -589,7 +607,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws Exception If an error is encountered while performing underlying database operations.
      * @throws NoResultsException If the article could not be found.
      */
-    private function save(array $fields, int $articleID = null): int {
+    private function save(array $fields, int $articleID = null) : int
+    {
         $revisionFields = ["body" => true, "format" => true, "locale" => true, "name" => true];
 
         $article = array_diff_key($fields, $revisionFields);
