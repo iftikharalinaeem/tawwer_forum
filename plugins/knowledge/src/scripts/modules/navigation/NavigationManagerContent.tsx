@@ -85,8 +85,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                         <div className={classNames("navigationManager-draggable", this.props.className)}>
                             <NavigationManagerItemIcon
                                 expanded={!!item.isExpanded}
-                                expandItem={this.props.expandItem}
-                                collapseItem={this.props.collapseItem}
+                                expandItem={this.handleExpand}
+                                collapseItem={this.handleCollapse}
                                 itemId={item.id}
                                 className="tree-itemIcon"
                                 hasChildren={this.props.hasChildren}
@@ -148,16 +148,17 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private cancelRename = (e: React.SyntheticEvent) => {
         this.props.selectItem(this.props.item, false, false);
-        this.forceUpdate();
+        // this.forceUpdate();
     };
 
-    private handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        if (e.target.value) {
-            this.setState({
-                newName: e.target.value,
-            });
-        }
+    private handleExpand = () => {
+        this.props.selectItem(this.props.item, false, false);
+        this.props.expandItem(this.props.item.id);
+    };
+
+    private handleCollapse = () => {
+        this.props.selectItem(this.props.item, false, false);
+        this.props.collapseItem(this.props.item.id);
     };
 
     private showConfirmation = () => {
