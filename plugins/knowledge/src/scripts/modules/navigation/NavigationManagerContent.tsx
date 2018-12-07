@@ -17,6 +17,7 @@ import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationM
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
 import { ITreeItem } from "@atlaskit/tree";
+import NavigationManagerNameForm from "@knowledge/modules/navigation/NavigationManagerNameForm";
 
 interface IProps {
     className?: string;
@@ -30,34 +31,33 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<IKbNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<IKbNavigationItem> | null, writeMode: boolean, deleteMode: boolean) => void;
+    selectItem: (item: ITreeItem<IKbNavigationItem> | null, writeMode: boolean) => void;
     unSelectItem: () => void;
     disableTree: () => void;
     enableTree: () => void;
     type: string;
-    writeMode: boolean;
-    deleteMode: boolean;
-    current: boolean;
     handleKeyDown: (e) => void;
+    writeMode: boolean;
 }
 
 interface IState {
     newName: string;
     showConfirmation: boolean;
+    deleteMode: boolean;
 }
 
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
     private wrapRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
         newName: this.props.item.data!.name,
         showConfirmation: false,
+        deleteMode: false,
     };
 
     public render() {
-        const { item, provided, snapshot, writeMode, deleteMode, current } = this.props;
+        const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
         return (
             <div ref={this.wrapRef} onKeyDown={this.props.handleKeyDown}>
@@ -70,37 +70,18 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     }
                     className={classNames("navigationManager-item", {
                         isDragging: snapshot.isDragging,
-                        isActive: this.props.current,
+                        isActive: this.isCurrent(),
                     })}
                     tabIndex={0}
                     onClick={this.focusSelf}
                 >
-                    {this.props.writeMode ? (
-                        <form className={classNames("navigationManger-editMode")} onSubmit={this.submit}>
-                            <label>
-                                <span className="sr-only">{t("New Name: ")}</span>
-                                <input
-                                    type="text"
-                                    value={this.state.newName}
-                                    onChange={this.handleOnChange}
-                                    ref={this.inputRef}
-                                />
-                            </label>
-                            <Button
-                                onClick={this.reset}
-                                baseClass={ButtonBaseClass.CUSTOM}
-                                className={"navigationManger-cancelRename"}
-                            >
-                                {t("Cancel")}
-                            </Button>
-                            <ButtonSubmit
-                                className={"navigationManger-submitRename"}
-                                baseClass={ButtonBaseClass.CUSTOM}
-                                disabled={this.state.newName === name}
-                            >
-                                {t("Apply")}
-                            </ButtonSubmit>
-                        </form>
+                    {this.props.writeMode && this.isCurrent() ? (
+                        <NavigationManagerNameForm
+                            currentName={name}
+                            focusOnExit={this.buttonRef}
+                            applyNewName={this.props.onRenameSubmit}
+                            cancel={this.cancelRename}
+                        />
                     ) : (
                         <div className={classNames("navigationManager-draggable", this.props.className)}>
                             <NavigationManagerItemIcon
@@ -136,7 +117,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             >
                                 {t("Delete")}
                             </Button>
-                            {this.props.deleteMode && (
+                            {this.state.deleteMode && (
                                 <ModalConfirm
                                     title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
                                     onCancel={this.hideConfirmation}
@@ -161,36 +142,30 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         );
     }
 
-    private reset = e => {
-        e.stopPropagation();
-        this.props.selectItem(this.props.item, false, false);
-    };
-
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
-        if (!prevProps.current && this.props.current) {
-            this.focusSelf();
-            this.props.selectItem(this.props.item, this.props.writeMode, this.props.deleteMode);
+        if (prevProps.writeMode !== this.props.writeMode) {
+            this.forceUpdate();
+            console.log("component did update!");
         }
     }
 
-    public componentDidMount() {
-        const input = this.inputRef.current;
-        if (input) {
-            input.select();
-        }
-    }
-
-    private submit = e => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.props.onRenameSubmit();
-    };
+    // public componentDidMount() {
+    //     if (this.isCurrent()) {
+    //         const input = this.inputRef.current;
+    //         if (input) {
+    //             input.select();
+    //         }
+    //     }
+    // }
 
     private renameItem = (e: React.SyntheticEvent) => {
-        if (e && e.target) {
-            e.stopPropagation();
-            this.props.selectItem(this.props.item, true, false);
-        }
+        this.props.selectItem(this.props.item, true);
+    };
+
+    private cancelRename = (e: React.SyntheticEvent) => {
+        console.log("click");
+        this.props.selectItem(this.props.item, false);
+        this.forceUpdate();
     };
 
     private handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,17 +178,19 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private showConfirmation = () => {
-        this.props.selectItem(this.props.item, false, true);
+        this.props.selectItem(this.props.item, false);
     };
 
     private hideConfirmation = () => {
-        this.props.selectItem(this.props.item, false, false);
+        this.props.selectItem(this.props.item, false);
     };
 
     private focusSelf = () => {
-        if (this.wrapRef.current) {
-            const content = this.wrapRef.current.firstChild as HTMLElement;
-            content.focus();
-        }
+        const content = this.wrapRef.current!.firstChild as HTMLElement;
+        content.focus();
+    };
+
+    private isCurrent = () => {
+        return this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
     };
 }

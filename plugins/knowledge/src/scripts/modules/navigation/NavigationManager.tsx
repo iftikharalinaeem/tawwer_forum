@@ -28,7 +28,6 @@ interface IState {
     treeData: ITreeData<IKbNavigationItem>;
     selectedItem: ITreeItem<IKbNavigationItem> | null;
     disabled: boolean;
-    deleteMode: boolean;
     writeMode: boolean;
 }
 
@@ -39,7 +38,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         treeData: this.calcInitialTree(this.dummyData),
         selectedItem: null,
         disabled: false,
-        deleteMode: false,
         writeMode: false,
     };
 
@@ -53,7 +51,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={this.state.selectedItem ? this.state.selectedItem.id : undefined}
+                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}`}
                 />
             </div>
         );
@@ -63,9 +61,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
-        const isCurrent = this.getSelectedItemId() === item.id;
-        const isWriteMode = this.state.writeMode && isCurrent;
-        const isDeleteMode = this.state.deleteMode && isCurrent;
         return (
             <NavigationManagerContent
                 item={item}
@@ -83,11 +78,8 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
-                key={`${item.id}-${data.name}-${isWriteMode ? 1 : 0}-${isDeleteMode ? 1 : 0}-${isCurrent ? 1 : 0}`}
-                current={isCurrent}
-                writeMode={isWriteMode}
-                deleteMode={isDeleteMode}
                 handleKeyDown={this.handleKeyDown}
+                writeMode={this.state.writeMode}
             />
         );
     };
@@ -105,16 +97,16 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         this.unSelectItem();
     };
 
-    private selectItem = (
-        selectedItem: ITreeItem<IKbNavigationItem>,
-        writeMode: boolean = false,
-        deleteMode: boolean = false,
-    ) => {
-        this.setState({
-            selectedItem,
-            writeMode,
-            deleteMode,
-        });
+    private selectItem = (selectedItem: ITreeItem<IKbNavigationItem>, writeMode: boolean) => {
+        this.setState(
+            {
+                selectedItem,
+                writeMode,
+            },
+            () => {
+                console.log("this.state: ", this.state);
+            },
+        );
     };
 
     private unSelectItem = () => {
