@@ -8,7 +8,6 @@ import { ITreeItem } from "@atlaskit/tree";
 import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import ModalConfirm from "@library/components/modal/ModalConfirm";
 import Translate from "@library/components/translation/Translate";
 import classNames from "classnames";
