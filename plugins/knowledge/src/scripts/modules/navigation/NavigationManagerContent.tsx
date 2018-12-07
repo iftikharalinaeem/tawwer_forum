@@ -28,12 +28,11 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<INavigationItem> | null, writeMode: boolean, deleteMode: boolean) => void;
+    selectItem: (item: ITreeItem<INavigationItem> | null, writeMode: boolean, deleteMode: boolean, callback?: () => void) => void;
     unSelectItem: () => void;
     disableTree: (callback?: () => void) => void;
     enableTree: (callback?: () => void) => void;
     type: string;
-    handleKeyDown: (e) => void;
     writeMode: boolean;
     deleteMode: boolean;
 }
@@ -56,7 +55,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
         return (
-            <div ref={this.wrapRef} onKeyDown={this.props.handleKeyDown}>
+            <div ref={this.wrapRef} >
                 <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}

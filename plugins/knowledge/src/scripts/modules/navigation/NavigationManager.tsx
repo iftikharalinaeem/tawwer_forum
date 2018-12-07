@@ -84,7 +84,6 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
-                handleKeyDown={this.handleKeyDown}
                 writeMode={this.state.writeMode}
                 deleteMode={this.state.deleteMode}
             />
@@ -108,12 +107,13 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         selectedItem: ITreeItem<IKbNavigationItem>,
         writeMode: boolean = false,
         deleteMode: boolean = false,
+        callback?: () => void,
     ) => {
         this.setState({
             selectedItem,
             writeMode,
             deleteMode,
-        });
+        }, callback);
     };
 
     private unSelectItem = () => {
