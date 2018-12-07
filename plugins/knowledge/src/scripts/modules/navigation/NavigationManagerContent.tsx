@@ -14,7 +14,8 @@ import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import NavigationManagerNameForm from "./NavigationManagerNameForm";
-import {INavigationItem} from "@library/@types/api";
+import { INavigationItem } from "@library/@types/api";
+import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface IProps {
     className?: string;
@@ -28,11 +29,15 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<INavigationItem> | null, writeMode: boolean, deleteMode: boolean, callback?: () => void) => void;
+    selectItem: (
+        item: ITreeItem<INavigationItem> | null,
+        writeMode: boolean,
+        deleteMode: boolean,
+        callback?: () => void,
+    ) => void;
     unSelectItem: () => void;
     disableTree: (callback?: () => void) => void;
     enableTree: (callback?: () => void) => void;
-    type: string;
     writeMode: boolean;
     deleteMode: boolean;
 }
@@ -47,15 +52,15 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     private wrapRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     public state: IState = {
-        newName: this.props.item.data!.name,
+        newName: this.props.item.data.name,
         showConfirmation: false,
     };
 
     public render() {
         const { item, provided, snapshot } = this.props;
-        const name = item.data!.name;
+        const name = item.data.name;
         return (
-            <div ref={this.wrapRef} >
+            <div ref={this.wrapRef}>
                 <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
@@ -112,25 +117,24 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             >
                                 {t("Delete")}
                             </Button>
-                            {this.props.deleteMode &&
-                                this.isCurrent() && (
-                                    <ModalConfirm
-                                        title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
-                                        onCancel={this.hideConfirmation}
-                                        onConfirm={this.props.handleDelete}
-                                        elementToFocusOnExit={this.buttonRef.current!}
-                                    >
-                                        <Translate
-                                            source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                                            c0={this.props.type}
-                                            c1={
-                                                <strong>
-                                                    <em>{name}</em>
-                                                </strong>
-                                            }
-                                        />
-                                    </ModalConfirm>
-                                )}
+                            {this.props.deleteMode && this.isCurrent() && (
+                                <ModalConfirm
+                                    title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
+                                    onCancel={this.hideConfirmation}
+                                    onConfirm={this.props.handleDelete}
+                                    elementToFocusOnExit={this.buttonRef.current!}
+                                >
+                                    <Translate
+                                        source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                                        c0={this.props.type}
+                                        c1={
+                                            <strong>
+                                                <em>{name}</em>
+                                            </strong>
+                                        }
+                                    />
+                                </ModalConfirm>
+                            )}
                         </div>
                     )}
                 </div>
@@ -177,4 +181,19 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     private isCurrent = () => {
         return this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
     };
+
+    /**
+     * The label of the current type.
+     */
+    private get typeLabel(): string {
+        const { recordType } = this.props.item.data;
+        switch (recordType) {
+            case NavigationRecordType.ARTICLE:
+                return t("article");
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                return t("category");
+            default:
+                return;
+        }
+    }
 }

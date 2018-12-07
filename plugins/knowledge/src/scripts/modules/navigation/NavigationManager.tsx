@@ -18,8 +18,6 @@ import NavigationManagerContent from "@knowledge/modules/navigation/NavigationMa
 import classNames from "classnames";
 import { INavigationItem } from "@library/@types/api";
 import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
-import TabHandler from "@library/TabHandler";
-import { t } from "@library/application";
 import NavigationModel, {
     INormalizedNavigationItems,
     INavigationStoreState,
@@ -76,7 +74,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
     private renderItem = (params: IRenderItemParams<INavigationItem>) => {
         const { provided, item, snapshot } = params;
-        const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
         return (
             <NavigationManagerContent
@@ -84,7 +81,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 snapshot={snapshot}
                 provided={provided}
                 hasChildren={hasChildren}
-                onRenameSubmit={this.commitRename}
+                onRenameSubmit={this.handleRename}
                 onDelete={this.handleDelete}
                 handleDelete={this.handleDelete}
                 expandItem={this.expandItem}
@@ -94,7 +91,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 unSelectItem={this.unSelectItem}
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
-                type={this.getType(data.recordType)}
                 writeMode={this.state.writeMode}
                 deleteMode={this.state.deleteMode}
             />
@@ -112,12 +108,44 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
     }
 
-    private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
-        alert("Delete Item: " + item.data!.recordID);
+    /**
+     * Collapse all items in the tree.
+     */
+    public collapseAll() {
+        this.updateAllItems({ isExpanded: false });
+    }
+
+    /**
+     * Expand all items in the tree.
+     */
+    public expandAll() {
+        this.updateAllItems({ isExpanded: true });
+    }
+
+    /**
+     * Expand a single item.
+     */
+    private expandItem = (itemId: string) => {
+        const { treeData } = this.state;
+        this.setState({
+            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+        });
     };
 
-    // For now, we hard code result. The edit can be accepted or rejected.
-    private commitRename = (item: IKbNavigationItem, newName: string) => {
+    /**
+     * Collapse a single item.
+     */
+    private collapseItem = (itemId: string) => {
+        const { treeData } = this.state;
+        this.setState({
+            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+        });
+    };
+
+    /**
+     * Handle the rename of a navigatio item.
+     */
+    private handleRename = (item: IKbNavigationItem, newName: string) => {
         if (item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY) {
             void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
         }
@@ -125,6 +153,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         this.unSelectItem();
     };
 
+    /**
+     * Select a single item. Takes an optional callback for after the state has been updated.
+     */
     private selectItem = (
         selectedItem: ITreeItem<IKbNavigationItem>,
         writeMode: boolean = false,
@@ -147,6 +178,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
+    /**
+     * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
     private disableTree = (callback?: () => void) => {
         this.setState(
             {
@@ -156,6 +190,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
+    /**
+     * Enable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
     private enableTree = (callback?: () => void) => {
         this.setState(
             {
@@ -163,20 +200,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
             },
             callback,
         );
-    };
-
-    private expandItem = (itemId: string) => {
-        const { treeData } = this.state;
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
-        });
-    };
-
-    private collapseItem = (itemId: string) => {
-        const { treeData } = this.state;
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
-        });
     };
 
     private onDragEnd = (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
@@ -197,6 +220,39 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
+    private handleDelete = () => {
+        alert("Do Delete");
+    };
+
+    /**
+     * Update all of the items in the tree with the same data partial.
+     *
+     * @param update
+     */
+    private updateAllItems(update: Partial<ITreeItem<IKbNavigationItem>>) {
+        const data: ITreeData<IKbNavigationItem> = {
+            rootId: "knowledgeCategory1",
+            items: {},
+        };
+
+        for (const [itemID, itemValue] of Object.entries(this.state.treeData.items)) {
+            const newData = update.data || {};
+            data.items[itemID] = {
+                ...itemValue,
+                ...update,
+                data: {
+                    ...itemValue.data,
+                    ...newData,
+                },
+            };
+        }
+
+        this.setState({ treeData: data });
+    }
+
+    /**
+     * Take the internal tree state and convert back to a pure data array for patching the API endpoint.
+     */
     private calcPatchArray(data: ITreeData<IKbNavigationItem>) {
         const outOfTree = {};
         for (const [index, value] of Object.entries(data.items)) {
@@ -208,35 +264,13 @@ export class NavigationManager extends React.Component<IProps, IState> {
         return NavigationModel.denormalizeData(outOfTree, "knowledgeCategory1");
     }
 
-    private updateAllItems(update: Partial<ITreeItem<IKbNavigationItem>>) {
-        const data: ITreeData<IKbNavigationItem> = {
-            rootId: "knowledgeCategory1",
-            items: {},
-        };
-
-        for (const [itemID, itemValue] of Object.entries(this.state.treeData.items)) {
-            const newData = update.data! || {};
-            data.items[itemID] = {
-                ...itemValue,
-                ...update,
-                data: {
-                    ...itemValue.data!,
-                    ...newData,
-                },
-            };
-        }
-
-        this.setState({ treeData: data });
-    }
-
-    public collapseAll() {
-        this.updateAllItems({ isExpanded: false });
-    }
-
-    public expandAll() {
-        this.updateAllItems({ isExpanded: true });
-    }
-
+    /**
+     * Convert the pure data representation of the tree data into one that contains UI state.
+     *
+     * - Makes ITreeData items.
+     * - Preserves the existing IDs
+     * - Preserves existing expand state if it exists.
+     */
     private calcTree() {
         const data: ITreeData<IKbNavigationItem> = {
             rootId: "knowledgeCategory1",
@@ -261,21 +295,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
         return data;
     }
-
-    private getType = (type: string) => {
-        switch (type) {
-            case "article":
-                return t("article");
-            case NavigationRecordType.KNOWLEDGE_CATEGORY:
-                return t("category");
-            default:
-                return type;
-        }
-    };
-
-    private handleDelete = () => {
-        alert("Do Delete");
-    };
 }
 
 interface IActions {
