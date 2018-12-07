@@ -116,7 +116,6 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
         });
 
         if (this.props.onSuccessfulSubmit) {
-            console.log("do refresh");
             await this.props.onSuccessfulSubmit();
         }
 
