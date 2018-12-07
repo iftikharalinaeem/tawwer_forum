@@ -1,0 +1,6 @@
+{
+    "extends": "../vanilla/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "../vanilla"
+    }
+}
