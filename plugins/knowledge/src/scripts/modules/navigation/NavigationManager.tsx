@@ -66,7 +66,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={this.state.selectedItem ? this.state.selectedItem.id : undefined}
+                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
+                        this.state.deleteMode
+                    }`}
                 />
             </div>
         );
@@ -76,13 +78,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const { provided, item, snapshot } = params;
         const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
-        const isCurrent = this.getSelectedItemId() === item.id;
-        const isWriteMode = this.state.writeMode && isCurrent;
-        const isDeleteMode = this.state.deleteMode && isCurrent;
-
         return (
             <NavigationManagerContent
-                item={item as ITreeItem<IKbNavigationItem>}
+                item={item}
                 snapshot={snapshot}
                 provided={provided}
                 hasChildren={hasChildren}
@@ -97,11 +95,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 disableTree={this.disableTree}
                 enableTree={this.enableTree}
                 type={this.getType(data.recordType)}
-                key={`${item.id}-${data.name}-${isWriteMode}-${isDeleteMode}-${isCurrent}`}
-                current={isCurrent}
-                writeMode={isWriteMode}
-                deleteMode={isDeleteMode}
-                handleKeyDown={this.handleKeyDown}
+                writeMode={this.state.writeMode}
+                deleteMode={this.state.deleteMode}
             />
         );
     };
@@ -134,12 +129,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
         selectedItem: ITreeItem<IKbNavigationItem>,
         writeMode: boolean = false,
         deleteMode: boolean = false,
+        callback?: () => void,
     ) => {
-        this.setState({
-            selectedItem,
-            writeMode,
-            deleteMode,
-        });
+        this.setState(
+            {
+                selectedItem,
+                writeMode,
+                deleteMode,
+            },
+            callback,
+        );
     };
 
     private unSelectItem = () => {
@@ -148,16 +147,22 @@ export class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private disableTree = () => {
-        this.setState({
-            disabled: true,
-        });
+    private disableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: true,
+            },
+            callback,
+        );
     };
 
-    private enableTree = () => {
-        this.setState({
-            disabled: false,
-        });
+    private enableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: false,
+            },
+            callback,
+        );
     };
 
     private expandItem = (itemId: string) => {
@@ -180,11 +185,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
-
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState(
             {
                 treeData: newTree,
+                selectedItem: newTree.items[source.parentId].children[source.index],
             },
             () => {
                 void this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
@@ -257,14 +262,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         return data;
     }
 
-    private handleDelete = () => {
-        alert("Do Delete");
-    };
-
-    private getSelectedItemId = (): string | null => {
-        return this.state.selectedItem ? this.state.selectedItem.id : null;
-    };
-
     private getType = (type: string) => {
         switch (type) {
             case "article":
@@ -276,38 +273,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
     };
 
-    /**
-     * Keyboard handler for arrow up, arrow down, home and end.
-     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
-     * Note that some of the events are on SiteNavNode.tsx
-     * @param event
-     */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (document.activeElement === null) {
-            return;
-        }
-        const currentItem = document.activeElement;
-        // const selectedNode = currentLink.closest(".siteNavNode");
-        // const siteNavRoot = currentLink.closest(".siteNav");
-        const tabHandler = new TabHandler(this.self.current!);
-        const shift = "-Shift";
-
-        switch (
-            `${event.key}${event.shiftKey ? shift : ""}` // See SiteNavNode for the rest of the keyboard handler
-        ) {
-            case "Tab":
-                const nextElement = tabHandler.getNext(currentItem, false, true);
-                if (nextElement) {
-                    nextElement.focus();
-                }
-                break;
-            case "Tab" + shift:
-                const prevElement = tabHandler.getNext(currentItem, true, true);
-                if (prevElement) {
-                    prevElement.focus();
-                }
-                break;
-        }
+    private handleDelete = () => {
+        alert("Do Delete");
     };
 }
 
