@@ -29,6 +29,7 @@ interface IState {
     selectedItem: ITreeItem<IKbNavigationItem> | null;
     disabled: boolean;
     writeMode: boolean;
+    deleteMode: boolean;
 }
 
 export default class NavigationManager extends React.Component<IProps, IState> {
@@ -39,6 +40,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         selectedItem: null,
         disabled: false,
         writeMode: false,
+        deleteMode: false,
     };
 
     public render() {
@@ -51,7 +53,9 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     onExpand={this.expandItem}
                     renderItem={this.renderItem}
                     isDragEnabled={!this.state.disabled}
-                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}`}
+                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
+                        this.state.deleteMode
+                    }`}
                 />
             </div>
         );
@@ -80,6 +84,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 type={this.getType(data.recordType)}
                 handleKeyDown={this.handleKeyDown}
                 writeMode={this.state.writeMode}
+                deleteMode={this.state.deleteMode}
             />
         );
     };
@@ -97,16 +102,12 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         this.unSelectItem();
     };
 
-    private selectItem = (selectedItem: ITreeItem<IKbNavigationItem>, writeMode: boolean) => {
-        this.setState(
-            {
-                selectedItem,
-                writeMode,
-            },
-            () => {
-                console.log("this.state: ", this.state);
-            },
-        );
+    private selectItem = (selectedItem: ITreeItem<IKbNavigationItem>, writeMode: boolean, deleteMode: boolean) => {
+        this.setState({
+            selectedItem,
+            writeMode,
+            deleteMode,
+        });
     };
 
     private unSelectItem = () => {
@@ -115,16 +116,22 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         });
     };
 
-    private disableTree = () => {
-        this.setState({
-            disabled: true,
-        });
+    private disableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: true,
+            },
+            callback,
+        );
     };
 
-    private enableTree = () => {
-        this.setState({
-            disabled: false,
-        });
+    private enableTree = (callback?: () => void) => {
+        this.setState(
+            {
+                disabled: false,
+            },
+            callback,
+        );
     };
 
     private expandItem = (itemId: string) => {

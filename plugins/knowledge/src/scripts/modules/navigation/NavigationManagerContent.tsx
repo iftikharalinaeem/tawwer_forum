@@ -31,19 +31,19 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<IKbNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<IKbNavigationItem> | null, writeMode: boolean) => void;
+    selectItem: (item: ITreeItem<IKbNavigationItem> | null, writeMode: boolean, deleteMode: boolean) => void;
     unSelectItem: () => void;
-    disableTree: () => void;
-    enableTree: () => void;
+    disableTree: (callback?: () => void) => void;
+    enableTree: (callback?: () => void) => void;
     type: string;
     handleKeyDown: (e) => void;
     writeMode: boolean;
+    deleteMode: boolean;
 }
 
 interface IState {
     newName: string;
     showConfirmation: boolean;
-    deleteMode: boolean;
 }
 
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
@@ -53,7 +53,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     public state: IState = {
         newName: this.props.item.data!.name,
         showConfirmation: false,
-        deleteMode: false,
     };
 
     public render() {
@@ -117,24 +116,25 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             >
                                 {t("Delete")}
                             </Button>
-                            {this.state.deleteMode && (
-                                <ModalConfirm
-                                    title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
-                                    onCancel={this.hideConfirmation}
-                                    onConfirm={this.props.handleDelete}
-                                    elementToFocusOnExit={this.buttonRef.current!}
-                                >
-                                    <Translate
-                                        source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                                        c0={this.props.type}
-                                        c1={
-                                            <strong>
-                                                <em>{name}</em>
-                                            </strong>
-                                        }
-                                    />
-                                </ModalConfirm>
-                            )}
+                            {this.props.deleteMode &&
+                                this.isCurrent() && (
+                                    <ModalConfirm
+                                        title={(<Translate source={'Delete "<0/>"'} c0={name} /> as unknown) as string}
+                                        onCancel={this.hideConfirmation}
+                                        onConfirm={this.props.handleDelete}
+                                        elementToFocusOnExit={this.buttonRef.current!}
+                                    >
+                                        <Translate
+                                            source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                                            c0={this.props.type}
+                                            c1={
+                                                <strong>
+                                                    <em>{name}</em>
+                                                </strong>
+                                            }
+                                        />
+                                    </ModalConfirm>
+                                )}
                         </div>
                     )}
                 </div>
@@ -142,29 +142,12 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         );
     }
 
-    public componentDidUpdate(prevProps: IProps, prevState: IState) {
-        if (prevProps.writeMode !== this.props.writeMode) {
-            this.forceUpdate();
-            console.log("component did update!");
-        }
-    }
-
-    // public componentDidMount() {
-    //     if (this.isCurrent()) {
-    //         const input = this.inputRef.current;
-    //         if (input) {
-    //             input.select();
-    //         }
-    //     }
-    // }
-
     private renameItem = (e: React.SyntheticEvent) => {
-        this.props.selectItem(this.props.item, true);
+        this.props.selectItem(this.props.item, true, false);
     };
 
     private cancelRename = (e: React.SyntheticEvent) => {
-        console.log("click");
-        this.props.selectItem(this.props.item, false);
+        this.props.selectItem(this.props.item, false, false);
         this.forceUpdate();
     };
 
@@ -178,11 +161,15 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private showConfirmation = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.disableTree(() => {
+            this.props.selectItem(this.props.item, false, true);
+        });
     };
 
     private hideConfirmation = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.disableTree(() => {
+            this.props.selectItem(this.props.item, false, false);
+        });
     };
 
     private focusSelf = () => {
