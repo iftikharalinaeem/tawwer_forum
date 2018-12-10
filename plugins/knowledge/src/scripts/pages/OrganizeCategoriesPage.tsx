@@ -40,19 +40,25 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
                 <FullKnowledgeModal titleID={this.titleID} className={this.props.className}>
                     <NavigationManagerMenu />
                     <div className="container">
-                            <DocumentTitle title={pageTitle}>
-                                <div className="navigationManagerWrap">
-                                    <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
-                                </div>
-                            </DocumentTitle>
-                            <NavigationManagerToolBar
-                                collapseAll={this.todo}
-                                expandAll={this.todo}
-                                newCategory={this.showNewCategoryModal}
-                                newCategoryButtonRef={this.newCategoryButtonRef}
-                            />
+                        <DocumentTitle title={pageTitle}>
+                            <div className="navigationManagerWrap">
+                                <Heading
+                                    id={this.titleID}
+                                    depth={1}
+                                    renderAsDepth={2}
+                                    className="pageSubTitle"
+                                    title={pageTitle}
+                                />
+                            </div>
+                        </DocumentTitle>
+                        <NavigationManagerToolBar
+                            collapseAll={this.todo}
+                            expandAll={this.todo}
+                            newCategory={this.showNewCategoryModal}
+                            newCategoryButtonRef={this.newCategoryButtonRef}
+                        />
                         <div className="navigationManagerWrap">
-                            <NavigationManager />
+                            <NavigationManager describedBy={this.titleID} />
                         </div>
                     </div>
                 </FullKnowledgeModal>

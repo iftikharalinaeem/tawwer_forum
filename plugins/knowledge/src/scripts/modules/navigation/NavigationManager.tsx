@@ -24,6 +24,7 @@ import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
+    describedBy?: string;
 }
 
 interface IState {
@@ -36,6 +37,7 @@ interface IState {
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
+    private foundFirst = false;
 
     public state: IState = {
         treeData: this.calcInitialTree(),
@@ -47,7 +49,13 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
+            <div
+                ref={this.self}
+                className={classNames("navigationManager", this.props.className)}
+                role="tree"
+                aria-describedby={this.props.describedBy}
+                onKeyDown={this.handleKeyDown}
+            >
                 <Tree
                     tree={this.state.treeData}
                     onDragEnd={this.onDragEnd}
@@ -86,6 +94,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 type={this.getType(data.recordType)}
                 writeMode={this.state.writeMode}
                 deleteMode={this.state.deleteMode}
+                isFirst={this.isFirst()}
             />
         );
     };
@@ -232,80 +241,85 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = null;
-        const tabHandler = new TabHandler(this.self.current!);
+        // const currentItem = null;
+        // const tabHandler = new TabHandler(this.self.current!);
         const shift = "-Shift";
-        if (currentItem) {
-            switch (`${e.key}${e.shiftKey ? shift : ""}`) {
-                case "Tab":
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const nextElement = tabHandler.getNext(currentItem, false, true);
-                    if (nextElement) {
-                        nextElement.focus();
-                    }
-                    break;
-                // case "Tab" + shift:
-                //     e.stopPropagation();
-                //     e.preventDefault();
-                //     const prevElement = tabHandler.getNext(currentItem, true, true);
-                //     if (prevElement) {
-                //         prevElement.focus();
-                //     }
-                //     break;
-                // case "ArrowDown":
-                //     /*
-                //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
-                //         If focus is on the bottom row, focus does not move.
-                //      */
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     if (currentItem) {
-                //         const nextElement = tabHandler.getNext(currentItem, false, false);
-                //         if (nextElement) {
-                //             nextElement.focus();
-                //         }
-                //     }
-                //     break;
-                // case "ArrowUp":
-                //     /*
-                //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
-                //         If focus is on the top row, focus does not move.
-                //      */
-                //     if (currentItem) {
-                //         e.preventDefault();
-                //         e.stopPropagation();
-                //         const prevElement = tabHandler.getNext(currentItem, true, false);
-                //         if (prevElement) {
-                //             prevElement.focus();
-                //         }
-                //     }
-                //     break;
-                // case "Home":
-                //     /*
-                //         If a cell is focused, moves focus to the previous interactive widget in the current row.
-                //         If a row is focused, moves focus out of the treegrid.
-                //      */
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     const firstLink = tabHandler.getInitial();
-                //     if (firstLink) {
-                //         firstLink.focus();
-                //     }
-                //     break;
-                // case "End":
-                //     /*
-                //         If a row is focused, moves to the first row.
-                //         If a cell is focused, moves focus to the first cell in the row containing focus.
-                //      */
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     const lastLink = tabHandler.getLast();
-                //     if (lastLink) {
-                //         lastLink.focus();
-                //     }
-                //     break;
-            }
+        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+            case "Escape":
+                e.preventDefault();
+                e.stopPropagation();
+                this.setState({
+                    disabled: false,
+                    writeMode: false,
+                });
+            case "Tab":
+                // e.stopPropagation();
+                // e.preventDefault();
+                // const nextElement = tabHandler.getNext(currentItem, false, true);
+                // if (nextElement) {
+                //     nextElement.focus();
+                // }
+                break;
+            // case "Tab" + shift:
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const prevElement = tabHandler.getNext(currentItem, true, true);
+            //     if (prevElement) {
+            //         prevElement.focus();
+            //     }
+            //     break;
+            // case "ArrowDown":
+            //     /*
+            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
+            //         If focus is on the bottom row, focus does not move.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     if (currentItem) {
+            //         const nextElement = tabHandler.getNext(currentItem, false, false);
+            //         if (nextElement) {
+            //             nextElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "ArrowUp":
+            //     /*
+            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
+            //         If focus is on the top row, focus does not move.
+            //      */
+            //     if (currentItem) {
+            //         e.preventDefault();
+            //         e.stopPropagation();
+            //         const prevElement = tabHandler.getNext(currentItem, true, false);
+            //         if (prevElement) {
+            //             prevElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "Home":
+            //     /*
+            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
+            //         If a row is focused, moves focus out of the treegrid.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const firstLink = tabHandler.getInitial();
+            //     if (firstLink) {
+            //         firstLink.focus();
+            //     }
+            //     break;
+            // case "End":
+            //     /*
+            //         If a row is focused, moves to the first row.
+            //         If a cell is focused, moves focus to the first cell in the row containing focus.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const lastLink = tabHandler.getLast();
+            //     if (lastLink) {
+            //         lastLink.focus();
+            //     }
+            //     break;
         }
     };
 
@@ -314,6 +328,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     //         treeData: mutateTree(this.state.treeData, itemId, { domElement: element }),
     //     });
     // };
+
+    private isFirst(): boolean {
+        if (!this.foundFirst) {
+            this.foundFirst = true;
+            return true;
+        }
+        return false;
+    }
 
     private get dummyData(): IKbNavigationItem[] {
         return [

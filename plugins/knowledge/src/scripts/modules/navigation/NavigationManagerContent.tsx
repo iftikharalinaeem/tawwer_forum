@@ -41,6 +41,7 @@ interface IProps {
     type: string;
     writeMode: boolean;
     deleteMode: boolean;
+    isFirst: boolean;
 }
 
 interface IState {
@@ -73,7 +74,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     isDragging: snapshot.isDragging,
                     isActive: this.isCurrent(),
                 })}
-                tabIndex={0}
+                aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
+                tabIndex={this.props.isFirst ? 0 : -1}
+                role="treeitem"
             >
                 <div className={classNames("navigationManager-draggable", this.props.className)}>
                     <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
@@ -138,7 +141,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                         elementToFocusOnExit={this.buttonRef.current!}
                                     >
                                         <Translate
-                                            source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                                            source={'Are you sure you want to delete <0/> "<1/>"?'}
                                             c0={this.props.type}
                                             c1={
                                                 <strong>
@@ -204,5 +207,95 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private isCurrent = () => {
         return this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
+    };
+
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        // const currentItem = null;
+        // const tabHandler = new TabHandler(this.self.current!);
+        const shift = "-Shift";
+        window.console.log("e.key ", e.key);
+        e.stopPropagation();
+        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+            case "Escape":
+                this.cancelRename(e);
+            // this.setState({
+            //     disabled: false,
+            //     writeMode: false,
+            // });
+            // case "Tab":
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const nextElement = tabHandler.getNext(currentItem, false, true);
+            //     if (nextElement) {
+            //         nextElement.focus();
+            //     }
+            //     break;
+            // case "Tab" + shift:
+            //     e.stopPropagation();
+            //     e.preventDefault();
+            //     const prevElement = tabHandler.getNext(currentItem, true, true);
+            //     if (prevElement) {
+            //         prevElement.focus();
+            //     }
+            //     break;
+            // case "ArrowDown":
+            //     /*
+            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
+            //         If focus is on the bottom row, focus does not move.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     if (currentItem) {
+            //         const nextElement = tabHandler.getNext(currentItem, false, false);
+            //         if (nextElement) {
+            //             nextElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "ArrowUp":
+            //     /*
+            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
+            //         If focus is on the top row, focus does not move.
+            //      */
+            //     if (currentItem) {
+            //         e.preventDefault();
+            //         e.stopPropagation();
+            //         const prevElement = tabHandler.getNext(currentItem, true, false);
+            //         if (prevElement) {
+            //             prevElement.focus();
+            //         }
+            //     }
+            //     break;
+            // case "Home":
+            //     /*
+            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
+            //         If a row is focused, moves focus out of the treegrid.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const firstLink = tabHandler.getInitial();
+            //     if (firstLink) {
+            //         firstLink.focus();
+            //     }
+            //     break;
+            // case "End":
+            //     /*
+            //         If a row is focused, moves to the first row.
+            //         If a cell is focused, moves focus to the first cell in the row containing focus.
+            //      */
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     const lastLink = tabHandler.getLast();
+            //     if (lastLink) {
+            //         lastLink.focus();
+            //     }
+            //     break;
+        }
     };
 }
