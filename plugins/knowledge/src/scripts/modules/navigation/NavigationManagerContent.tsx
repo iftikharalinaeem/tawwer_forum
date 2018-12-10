@@ -183,7 +183,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const active = this.props.selectedItem && this.props.item.id === this.props.selectedItem.id;
 
         if (!prevActive && active) {
-            console.log("Focusing");
             this.getRef().focus();
         }
     }
