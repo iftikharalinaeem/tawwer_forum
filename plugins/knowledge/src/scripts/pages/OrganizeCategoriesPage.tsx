@@ -26,9 +26,19 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
                     <NavigationManagerMenu />
                     <div className="container">
                         <DocumentTitle title={pageTitle}>
-                            <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
+                            <div className="navigationManagerWrap">
+                                <Heading
+                                    id={this.titleID}
+                                    depth={1}
+                                    renderAsDepth={2}
+                                    className="pageSubTitle"
+                                    title={pageTitle}
+                                />
+                            </div>
                         </DocumentTitle>
-                        <NavigationManager knowledgeBaseID={1} />
+                        <div className="navigationManagerWrap">
+                            <NavigationManager knowledgeBaseID={1} />
+                        </div>
                     </div>
                 </FullKnowledgeModal>
             </>

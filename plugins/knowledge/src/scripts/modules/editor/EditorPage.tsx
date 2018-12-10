@@ -47,6 +47,7 @@ export class EditorPage extends React.PureComponent<IProps> {
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
+                isWholePage={true}
             >
                 <Permission
                     permission="articles.add"

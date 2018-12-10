@@ -33,17 +33,20 @@ import { connect } from "react-redux";
 import { ModalConfirm } from "@library/components/modal";
 import Translate from "@library/components/translation/Translate";
 import { t } from "@library/application";
+import TabHandler from "@library/TabHandler";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
     navigationItems: INormalizedNavigationItems;
     knowledgeBaseID: number;
+    describedBy?: string;
 }
 
 interface IState {
     treeData: ITreeData<INormalizedNavigationItem>;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null;
     deleteItem: ITreeItem<INormalizedNavigationItem> | null;
+    selectedElement: HTMLElement | null;
     disabled: boolean;
     showNewCategoryModal: boolean;
     writeMode: boolean;
@@ -58,6 +61,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
         treeData: this.calcTree(),
         selectedItem: null,
         deleteItem: null,
+        selectedElement: null,
         disabled: false,
         showNewCategoryModal: false,
         writeMode: false,
@@ -76,18 +80,26 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     newCategory={this.showNewCategoryModal}
                     newCategoryButtonRef={this.newCategoryButtonRef}
                 />
-                <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
-                    <Tree
-                        tree={this.state.treeData}
-                        onDragEnd={this.onDragEnd}
-                        onCollapse={this.collapseItem}
-                        onExpand={this.expandItem}
-                        renderItem={this.renderItem}
-                        isDragEnabled={!this.state.disabled}
-                        key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
-                            this.state.writeMode
-                        }`}
-                    />
+                <div
+                    ref={this.self}
+                    className={classNames("navigationManager", this.props.className)}
+                    role="tree"
+                    aria-describedby={this.props.describedBy}
+                    onKeyDown={this.handleKeyDown}
+                >
+                    <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
+                        <Tree
+                            tree={this.state.treeData}
+                            onDragEnd={this.onDragEnd}
+                            onCollapse={this.collapseItem}
+                            onExpand={this.expandItem}
+                            renderItem={this.renderItem}
+                            isDragEnabled={!this.state.disabled}
+                            key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
+                                this.state.writeMode
+                            }`}
+                        />
+                    </div>
                 </div>
                 {this.renderNewCategoryModal()}
                 {this.renderDeleteModal()}
@@ -118,6 +130,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 selectItem={this.selectItem}
                 writeMode={this.state.writeMode}
                 onDeleteClick={deleteHandler}
+                firstID={this.getFirstTreeItemID()}
             />
         );
     };
@@ -162,6 +175,30 @@ export class NavigationManager extends React.Component<IProps, IState> {
             treeData: mutateTree(treeData, itemId, { isExpanded: true }),
         });
     };
+    private getFirstTreeItemID = (): string | null => {
+        const items = this.state.treeData.items;
+        if (items) {
+            return Object.values(items)[1].id;
+        } else {
+            return null;
+        }
+    };
+
+    /**
+     * Select a single item. Takes an optional callback for after the state has been updated.
+     */
+    private selectItem = (
+        selectedItem: ITreeItem<INormalizedNavigationItem>,
+        writeMode: boolean = false,
+        selectedElement?: HTMLElement | null,
+    ) => {
+        this.setState({
+            disabled: writeMode,
+            selectedItem,
+            selectedElement: selectedElement || null,
+            writeMode,
+        });
+    };
 
     /**
      * Collapse a single item.
@@ -170,6 +207,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const { treeData } = this.state;
         this.setState({
             treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+            selectedItem: null,
+            selectedElement: null,
         });
     };
 
@@ -187,24 +226,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
 
         this.clearSelectedItem();
-    };
-
-    /**
-     * Select a single item. Takes an optional callback for after the state has been updated.
-     */
-    private selectItem = (
-        selectedItem: ITreeItem<INormalizedNavigationItem>,
-        writeMode: boolean = false,
-        callback?: () => void,
-    ) => {
-        this.expandItem(selectedItem.id);
-        this.setState(
-            {
-                selectedItem,
-                writeMode,
-            },
-            callback,
-        );
     };
 
     /**
@@ -480,6 +501,42 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
         return data;
     }
+
+    /**
+     * Keyboard handler for arrow up, arrow down, home, end and escape.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        const currentItem = this.state.selectedElement as HTMLElement;
+        const shift = "-Shift";
+        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+            case "Escape":
+                e.preventDefault();
+                e.stopPropagation();
+                this.setState({
+                    disabled: false,
+                    writeMode: false,
+                });
+            case "ArrowDown":
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentItem) {
+                    currentItem.focus();
+                }
+                const excluded: HTMLElement[] = [];
+                currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
+                    excluded.push(item as HTMLElement);
+                });
+                const tabHandler = new TabHandler(this.self.current! as HTMLElement, excluded);
+                const nextElement = tabHandler.getNext(currentItem, false, false);
+                if (nextElement) {
+                    nextElement.focus();
+                }
+                break;
+        }
+    };
 }
 
 interface IActions {

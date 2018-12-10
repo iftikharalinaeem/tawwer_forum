@@ -32,21 +32,23 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
     public render() {
         return (
             <form className={classNames("navigationManger-editMode", this.props.className)} onSubmit={this.submit}>
-                <label>
+                <label className="navigationManger-text">
                     <span className="sr-only">{t("New Name: ")}</span>
                     <input type="text" value={this.state.newName} onChange={this.handleChange} ref={this.inputRef} />
                 </label>
                 <Button
                     onClick={this.props.cancel}
                     baseClass={ButtonBaseClass.CUSTOM}
-                    className="navigationManger-cancelRename"
+                    className="navigationManger-cancelRename navigationManager-action"
+                    tabIndex={0}
                 >
                     {t("Cancel")}
                 </Button>
                 <ButtonSubmit
-                    className="navigationManger-submitRename"
+                    className="navigationManger-submitRename navigationManager-action"
                     baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.isSubmitDisabled}
+                    tabIndex={0}
                 >
                     {t("Apply")}
                 </ButtonSubmit>
