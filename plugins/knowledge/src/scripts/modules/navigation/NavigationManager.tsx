@@ -447,6 +447,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
         return NavigationModel.denormalizeData(outOfTree, "knowledgeCategory1");
     }
 
+    private static readonly DEFAULT_EXPAND_VALUE = true;
+
     /**
      * Convert the pure data representation of the tree data into one that contains UI state.
      *
@@ -472,7 +474,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 hasChildren: children.length > 0,
                 children,
                 data: itemValue,
-                isExpanded: stateValue ? stateValue.isExpanded : false,
+                isExpanded: stateValue ? stateValue.isExpanded : NavigationManager.DEFAULT_EXPAND_VALUE,
             };
         }
 
