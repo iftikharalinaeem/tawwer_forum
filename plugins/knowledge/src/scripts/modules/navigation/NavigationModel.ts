@@ -344,7 +344,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
         // Loop through once to generate normalizedIDs
         for (const item of data) {
-            const id = this.calcUniqueID(item);
+            const id = item.recordType + item.recordID;
 
             normalizedByID[id] = {
                 ...item,
@@ -357,19 +357,12 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         // Loop through again to gather the children.
         for (const [itemID, itemValue] of Object.entries(normalizedByID)) {
             if (itemValue.parentID > 0) {
-                const lookupID = this.calcUniqueID(itemValue);
+                const lookupID = "knowledgeCategory" + itemValue.parentID;
                 normalizedByID[lookupID].children.push(itemID);
             }
         }
 
         return normalizedByID;
-    }
-
-    /**
-     * Calculate a unique ID from a navigation item.
-     */
-    private static calcUniqueID(navigationItem: IKbNavigationItem): string {
-        return navigationItem.recordType + navigationItem.recordID;
     }
 
     /**
