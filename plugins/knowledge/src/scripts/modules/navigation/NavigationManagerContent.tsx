@@ -42,7 +42,7 @@ interface IProps {
     type: string;
     writeMode: boolean;
     deleteMode: boolean;
-    firstID: string;
+    firstID: string | null;
 }
 
 interface IState {
@@ -78,7 +78,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     })}
                     aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
                     tabIndex={
-                        (this.props.selectedItem === null && this.props.firstID === item.id) ||
+                        (this.props.selectedItem === null &&
+                            this.props.firstID !== null &&
+                            this.props.firstID === item.id) ||
                         (this.props.selectedItem && this.isCurrent())
                             ? 0
                             : -1
@@ -205,7 +207,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private focusSelf = () => {
         const content = this.wrapRef.current!.firstChild as HTMLElement;
-        content.focus();
+        if (content) {
+            content.focus();
+        }
     };
 
     private selectSelf = () => {
@@ -220,12 +224,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         }
     };
 
-    /**
-     * Keyboard handler for arrow up, arrow down, home and end.
-     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
-     * Note that some of the events are on SiteNavNode.tsx
-     * @param event
-     */
     private handleKeyDown = (e: React.KeyboardEvent) => {
         // const currentItem = null;
         // const tabHandler = new TabHandler(this.self.current!);

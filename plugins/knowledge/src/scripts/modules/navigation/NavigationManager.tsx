@@ -44,6 +44,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     public state: IState = {
         treeData: this.calcInitialTree(),
         selectedItem: null,
+        selectedElement: null,
         disabled: false,
         deleteMode: false,
         writeMode: false,
@@ -101,12 +102,12 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
-    private getFirstTreeItemID = () => {
+    private getFirstTreeItemID = (): string | null => {
         const items = this.state.treeData.items;
         if (items) {
-            return items[Object.keys(items)[1]].id.toString();
+            return Object.values(items)[1].id;
         } else {
-            return "";
+            return null;
         }
     };
 
@@ -249,13 +250,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     };
 
     /**
-     * Keyboard handler for arrow up, arrow down, home and end.
+     * Keyboard handler for arrow up, arrow down, home, end and escape.
      * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
      * Note that some of the events are on SiteNavNode.tsx
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = this.state.selectedItem;
+        console.log("this.state: ", this.state);
+        const currentItem = this.state.selectedElement as HTMLElement;
         const tabHandler = new TabHandler(this.self.current! as HTMLElement);
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
@@ -266,20 +268,19 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     disabled: false,
                     writeMode: false,
                 });
+            case "ArrowDown":
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentItem) {
+                    currentItem.focus();
+                }
+                const nextElement = tabHandler.getNext(currentItem, false, false);
+                if (nextElement) {
+                    nextElement.focus();
+                }
+                break;
         }
     };
-
-    private setDomElement = (itemId: string, element: HTMLElement) => {
-        this.domElements[itemId] = element;
-    };
-
-    private isFirst(): boolean {
-        if (!this.foundFirst) {
-            this.foundFirst = true;
-            return true;
-        }
-        return false;
-    }
 
     private get dummyData(): IKbNavigationItem[] {
         return [
