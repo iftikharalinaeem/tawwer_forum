@@ -257,9 +257,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        console.log("this.state: ", this.state);
         const currentItem = this.state.selectedElement as HTMLElement;
-        const tabHandler = new TabHandler(this.self.current! as HTMLElement);
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
             case "Escape":
@@ -275,6 +273,11 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 if (currentItem) {
                     currentItem.focus();
                 }
+                const excluded = [];
+                currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
+                    excluded.push(item as HTMLElement);
+                });
+                const tabHandler = new TabHandler(this.self.current! as HTMLElement, excluded);
                 const nextElement = tabHandler.getNext(currentItem, false, false);
                 if (nextElement) {
                     nextElement.focus();
