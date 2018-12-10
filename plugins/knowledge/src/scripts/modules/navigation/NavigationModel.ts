@@ -5,8 +5,7 @@
 
 import { NavigationRecordType, IPatchFlatItem, IKbNavigationItem } from "@knowledge/@types/api";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ILoadable, LoadStatus } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -40,45 +39,6 @@ export interface INavigationStoreState {
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
     public static readonly ROOT_ID = -1;
 
-    public static selectBreadcrumb(navItems: INormalizedNavigationItems, key: string): ICrumb[] {
-        const item = navItems[key];
-        if (!item) {
-            return [];
-        }
-
-        const crumb = {
-            name: item.name,
-            url: item.url,
-        };
-
-        const parents = NavigationModel.selectBreadcrumb(
-            navItems,
-            NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID,
-        );
-
-        if (item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY) {
-            parents.push(crumb);
-        }
-
-        return parents;
-    }
-
-    public static selectChildren(navItems: INormalizedNavigationItems, key: string): INavigationTreeItem[] {
-        const item = navItems[key];
-        if (!item) {
-            return [];
-        }
-        return item.children.map(itemID => NavigationModel.selectNavTree(navItems, itemID));
-    }
-
-    public static selectNavTree(navItems: INormalizedNavigationItems, key: string): INavigationTreeItem {
-        const item = navItems[key];
-        return {
-            ...item,
-            children: item.children.map(itemID => NavigationModel.selectNavTree(navItems, itemID)),
-        };
-    }
-
     public initialState: INavigationStoreState = {
         navigationItems: {},
         currentKnowledgeBase: {
@@ -93,6 +53,11 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         patchTransactionID: null,
     };
 
+    /**
+     * Main reducer function for the navigation model.
+     *
+     * Made up of multiple sub-reduceres.
+     */
     public reducer = (
         state: INavigationStoreState = this.initialState,
         action:
@@ -101,13 +66,16 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
-            return reduceReducers(this.reduceGetNav, this.reducePatchNav, this.reduceDelete, this.reduceRename)(
+            return reduceReducers(this.reduceGetNav, this.reduceSortOrder, this.reduceDelete, this.reduceRename)(
                 nextState,
                 action,
             );
         });
     };
 
+    /**
+     * Reduce actions related to fetching navigation.
+     */
     private reduceGetNav = (
         nextState: INavigationStoreState = this.initialState,
         action:
@@ -132,7 +100,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return nextState;
     };
 
-    private reducePatchNav = (
+    /**
+     * Reduce actions related to updating navigation order.
+     */
+    private reduceSortOrder = (
         nextState: INavigationStoreState = this.initialState,
         action:
             | typeof NavigationActions.ACTION_TYPES
@@ -161,6 +132,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return nextState;
     };
 
+    /**
+     * Reduce actions related to renaming a single item.
+     */
     private reduceRename = (
         nextState: INavigationStoreState = this.initialState,
         action:
@@ -168,6 +142,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof CategoryActions.ACTION_TYPES
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
+        /**
+         * Utility for handling successfull rename action.
+         */
         const handleRenameSuccess = (key: string, newName?: string) => {
             const item = nextState.navigationItems[key];
             if (item && newName) {
@@ -177,6 +154,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             }
         };
 
+        /**
+         * Utility for handling an error while renaming an item.
+         */
         const handleRenameError = (key: string, errorMessage: string) => {
             const item = nextState.navigationItems[key];
             if (item) {
@@ -184,6 +164,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             }
         };
 
+        /**
+         * Utility for handling the initialization of a rename request.
+         */
         const handleRenameRequest = (key: string, tempName?: string) => {
             const item = nextState.navigationItems[key];
             if (item && tempName) {
@@ -221,6 +204,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return nextState;
     };
 
+    /**
+     * Reduce actions related to the deletion of a navigation item.
+     */
     private reduceDelete = (
         nextState: INavigationStoreState = this.initialState,
         action:
@@ -228,6 +214,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof CategoryActions.ACTION_TYPES
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
+        /**
+         * Utility for handling the initialization of a delete item request.
+         *
+         * - Cleans up previous error statements.
+         * - Mark item as temporarily deleted.
+         * - Preemptively remove the item's reference ont it's parent.
+         */
         const handleDeleteRequest = (key: string) => {
             const item = nextState.navigationItems[key];
             if (item) {
@@ -240,12 +233,29 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             }
         };
 
+        /**
+         * Utility for handling successful server responses after a deletion.
+         *
+         * Fully deletes itself and removes it's parent reference.
+         */
         const handleDeleteSuccess = (key: string) => {
+            const item = nextState.navigationItems[key];
             if (nextState.navigationItems[key]) {
                 delete nextState.navigationItems[key];
+
+                // Remove the item from it's parent
+                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
             }
         };
 
+        /**
+         * Utility for handling a failed delete action.
+         *
+         * - Clears the tempDeleted status.
+         * - Sets the error message on the item.
+         * - Puts a reference to the item back on it's parent.
+         */
         const handleDeleteError = (key: string, errorMessage: string) => {
             const item = nextState.navigationItems[key];
             if (item) {
@@ -284,6 +294,16 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return nextState;
     };
 
+    /**
+     * Function to transform the normalized nav data into an array of navigation items.
+     *
+     * Calculated items will have a numeric sort values and references to their parent ID.
+     *
+     * @param data The data to run calculations on.
+     * @param lookupID The unique id of the item to calculate. It's children will also be calculated recursively.
+     * @param sort The sort value of the current item. Defaults to 0.
+     * @param parentID The id of the current item's parent.
+     */
     public static denormalizeData(
         data: INormalizedNavigationItems,
         lookupID: string,
@@ -311,6 +331,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return flatPatches;
     }
 
+    /**
+     * Normalize the data returned from the server.
+     *
+     * - Sort the items.
+     * - Generate a unique ID for each item.
+     * - Store the the item in an indexed Map.
+     */
     public static normalizeData(data: IKbNavigationItem[]) {
         data = data.sort(this.sortNavigationItems);
 
@@ -338,6 +365,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return normalizedByID;
     }
 
+    /**
+     * Given two navigation items, compare them and determine their sort order.
+     */
     private static sortNavigationItems(a: INormalizedNavigationItem, b: INormalizedNavigationItem) {
         const sortA = a.sort;
         const sortB = b.sort;
