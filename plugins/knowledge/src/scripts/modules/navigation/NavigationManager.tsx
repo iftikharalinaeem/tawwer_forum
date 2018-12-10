@@ -30,6 +30,7 @@ interface IProps {
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
     selectedItem: ITreeItem<IKbNavigationItem> | null;
+    selectedElement: HTMLElement | null;
     disabled: boolean;
     deleteMode: boolean;
     writeMode: boolean;
@@ -38,6 +39,7 @@ interface IState {
 export default class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
     private foundFirst = false;
+    private domElements = {};
 
     public state: IState = {
         treeData: this.calcInitialTree(),
@@ -94,9 +96,18 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 type={this.getType(data.recordType)}
                 writeMode={this.state.writeMode}
                 deleteMode={this.state.deleteMode}
-                isFirst={this.isFirst()}
+                firstID={this.getFirstTreeItemID()}
             />
         );
+    };
+
+    private getFirstTreeItemID = () => {
+        const items = this.state.treeData.items;
+        if (items) {
+            return items[Object.keys(items)[1]].id.toString();
+        } else {
+            return "";
+        }
     };
 
     private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
@@ -115,12 +126,14 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         selectedItem: ITreeItem<IKbNavigationItem>,
         writeMode: boolean = false,
         deleteMode: boolean = false,
+        selectedElement: HTMLElement,
         callback?: () => void,
     ) => {
         this.setState(
             {
                 disabled: writeMode || deleteMode,
                 selectedItem,
+                selectedElement,
                 writeMode,
                 deleteMode,
             },
@@ -131,6 +144,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
     private unSelectItem = () => {
         this.setState({
             selectedItem: null,
+            selectedElement: null,
         });
     };
 
@@ -241,8 +255,8 @@ export default class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        // const currentItem = null;
-        // const tabHandler = new TabHandler(this.self.current!);
+        const currentItem = this.state.selectedItem;
+        const tabHandler = new TabHandler(this.self.current! as HTMLElement);
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
             case "Escape":
@@ -252,82 +266,12 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                     disabled: false,
                     writeMode: false,
                 });
-            case "Tab":
-                // e.stopPropagation();
-                // e.preventDefault();
-                // const nextElement = tabHandler.getNext(currentItem, false, true);
-                // if (nextElement) {
-                //     nextElement.focus();
-                // }
-                break;
-            // case "Tab" + shift:
-            //     e.stopPropagation();
-            //     e.preventDefault();
-            //     const prevElement = tabHandler.getNext(currentItem, true, true);
-            //     if (prevElement) {
-            //         prevElement.focus();
-            //     }
-            //     break;
-            // case "ArrowDown":
-            //     /*
-            //         Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
-            //         If focus is on the bottom row, focus does not move.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     if (currentItem) {
-            //         const nextElement = tabHandler.getNext(currentItem, false, false);
-            //         if (nextElement) {
-            //             nextElement.focus();
-            //         }
-            //     }
-            //     break;
-            // case "ArrowUp":
-            //     /*
-            //         Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
-            //         If focus is on the top row, focus does not move.
-            //      */
-            //     if (currentItem) {
-            //         e.preventDefault();
-            //         e.stopPropagation();
-            //         const prevElement = tabHandler.getNext(currentItem, true, false);
-            //         if (prevElement) {
-            //             prevElement.focus();
-            //         }
-            //     }
-            //     break;
-            // case "Home":
-            //     /*
-            //         If a cell is focused, moves focus to the previous interactive widget in the current row.
-            //         If a row is focused, moves focus out of the treegrid.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     const firstLink = tabHandler.getInitial();
-            //     if (firstLink) {
-            //         firstLink.focus();
-            //     }
-            //     break;
-            // case "End":
-            //     /*
-            //         If a row is focused, moves to the first row.
-            //         If a cell is focused, moves focus to the first cell in the row containing focus.
-            //      */
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     const lastLink = tabHandler.getLast();
-            //     if (lastLink) {
-            //         lastLink.focus();
-            //     }
-            //     break;
         }
     };
 
-    // private setDomElement = (itemId: string, element: HTMLElement) => {
-    //     this.setState({
-    //         treeData: mutateTree(this.state.treeData, itemId, { domElement: element }),
-    //     });
-    // };
+    private setDomElement = (itemId: string, element: HTMLElement) => {
+        this.domElements[itemId] = element;
+    };
 
     private isFirst(): boolean {
         if (!this.foundFirst) {
