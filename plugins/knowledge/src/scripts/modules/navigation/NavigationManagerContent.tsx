@@ -174,7 +174,6 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     public componentDidMount() {
         if (this.props.firstID === this.props.item.id) {
-            console.log("in here");
             this.props.selectItem(this.props.item, this.props.writeMode, this.props.deleteMode, this.getRef());
         }
     }
@@ -233,10 +232,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        // const currentItem = null;
-        // const tabHandler = new TabHandler(this.self.current!);
         const shift = "-Shift";
-        window.console.log("e.key ", e.key);
         e.stopPropagation();
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
             case "Escape":
