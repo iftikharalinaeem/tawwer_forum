@@ -179,26 +179,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         }
     }
 
-    public componentDidUpdate(prevProps: IProps) {
-        const prevActive = prevProps.selectedItem && prevProps.item.id === prevProps.selectedItem.id;
-        const active = this.props.selectedItem && this.props.item.id === this.props.selectedItem.id;
-
-        if (!prevActive && active) {
-            this.getRef().focus();
-        }
-    }
-
     private getRef(): HTMLElement {
         return this.wrapRef.current!.firstChild as HTMLElement;
     }
-
-    private focusSelf = () => {
-        this.props.expandItem(this.props.item.id);
-        const content = this.wrapRef.current!.firstChild as HTMLElement;
-        if (content) {
-            content.focus();
-        }
-    };
 
     private selectSelf = () => {
         this.props.selectItem(this.props.item, this.props.writeMode, this.getRef());
