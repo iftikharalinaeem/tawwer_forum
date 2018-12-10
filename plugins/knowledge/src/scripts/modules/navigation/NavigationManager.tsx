@@ -13,7 +13,7 @@ import Tree, {
     moveItemOnTree,
     mutateTree,
 } from "@atlaskit/tree";
-import { NavigationRecordType, ArticleStatus } from "@knowledge/@types/api";
+import { NavigationRecordType, ArticleStatus, IKbNavigationItem } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
@@ -176,7 +176,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Handle the rename of a navigatio item.
      */
-    private handleRename = (item: INormalizedNavigationItem, newName: string) => {
+    private handleRename = (item: IKbNavigationItem, newName: string) => {
         switch (item.recordType) {
             case NavigationRecordType.KNOWLEDGE_CATEGORY:
                 void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });

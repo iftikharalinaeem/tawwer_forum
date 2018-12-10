@@ -359,7 +359,7 @@ describe("EditorPageActions", () => {
 
             expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_REQUEST)).eq(true);
             expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_RESPONSE)).eq(true);
-            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_REQUEST)).eq(false);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).eq(false);
 
             expect(history.location.pathname).eq(dummyArticle.url);
 
@@ -401,8 +401,8 @@ describe("EditorPageActions", () => {
             initWithState(initialState);
             void (await editorPageActions.publish(history));
 
-            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_REQUEST)).eq(true);
-            expect(mockStore.isActionTypeDispatched(EditorPageActions.PATCH_ARTICLE_RESPONSE)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).eq(true);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_RESPONSE)).eq(true);
             expect(mockStore.isActionTypeDispatched(EditorPageActions.POST_ARTICLE_REQUEST)).eq(false);
 
             expect(history.location.pathname).eq(dummyArticle.url);
