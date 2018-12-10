@@ -12,6 +12,7 @@ import {
 } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
+import uniqueId from "lodash/uniqueId";
 
 /**
  * Redux actions for knowledge base navigation data.
@@ -48,7 +49,7 @@ export default class NavigationActions extends ReduxActions {
      *
      * @param request Parameters for the request.
      */
-    public getNavigationFlat(request: IGetKbNavigationRequest, forceUpdate = false) {
+    public getNavigationFlat = (request: IGetKbNavigationRequest, forceUpdate = false) => {
         const state = this.getState<IStoreState>();
         const { fetchLoadable } = state.knowledge.navigation;
         if (!forceUpdate && fetchLoadable.status === LoadStatus.SUCCESS) {
@@ -61,7 +62,7 @@ export default class NavigationActions extends ReduxActions {
             NavigationActions.getNavigationFlatACs,
             request,
         );
-    }
+    };
 
     /**
      * GET /knowledge-navigation/flat
@@ -79,7 +80,7 @@ export default class NavigationActions extends ReduxActions {
         NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE,
         NavigationActions.PATCH_NAVIGATION_FLAT_ERROR,
         {} as IPatchKbNavigationResponse,
-        {} as IPatchKBNavigationRequest,
+        {} as IPatchKBNavigationRequest & { transactionID: string },
     );
 
     /**
@@ -87,12 +88,13 @@ export default class NavigationActions extends ReduxActions {
      *
      * @param request Patch request parameters.
      */
-    public patchNavigationFlat(request: IPatchKBNavigationRequest) {
+    public patchNavigationFlat = (request: IPatchKBNavigationRequest) => {
         return this.dispatchApi<IPatchKbNavigationResponse>(
             "patch",
             `/knowledge-navigation/flat`,
-            NavigationActions.getNavigationFlatACs,
+            NavigationActions.patchNavigationFlatACs,
             request,
+            { transactionID: uniqueId("patchNav") },
         );
-    }
+    };
 }

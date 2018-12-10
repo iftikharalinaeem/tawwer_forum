@@ -4,80 +4,117 @@
  * @license Proprietary
  */
 
-import React from "react";
 import Tree, {
-    ITreeData,
-    mutateTree,
-    ITreeSourcePosition,
-    ITreeDestinationPosition,
-    moveItemOnTree,
     IRenderItemParams,
+    ITreeData,
+    ITreeDestinationPosition,
     ITreeItem,
+    ITreeSourcePosition,
+    moveItemOnTree,
+    mutateTree,
 } from "@atlaskit/tree";
+import { NavigationRecordType, ArticleStatus, IKbNavigationItem } from "@knowledge/@types/api";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
+import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
+import NavigationModel, {
+    INavigationStoreState,
+    INormalizedNavigationItem,
+    INormalizedNavigationItems,
+} from "@knowledge/modules/navigation/NavigationModel";
+import { IStoreState } from "@knowledge/state/model";
+import apiv2 from "@library/apiv2";
 import classNames from "classnames";
-import { INavigationItem } from "@library/@types/api";
-import { IKbNavigationItem, NavigationRecordType } from "@knowledge/@types/api";
-import TabHandler from "@library/TabHandler";
+import React from "react";
+import { connect } from "react-redux";
+import { ModalConfirm } from "@library/components/modal";
+import Translate from "@library/components/translation/Translate";
 import { t } from "@library/application";
-import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import TabHandler from "@library/TabHandler";
 
-interface IProps {
+interface IProps extends IActions, INavigationStoreState {
     className?: string;
+    navigationItems: INormalizedNavigationItems;
+    knowledgeBaseID: number;
     describedBy?: string;
+    rootNavigationItemID: string;
 }
 
 interface IState {
-    treeData: ITreeData<IKbNavigationItem>;
-    selectedItem: ITreeItem<IKbNavigationItem> | null;
+    treeData: ITreeData<INormalizedNavigationItem>;
+    selectedItem: ITreeItem<INormalizedNavigationItem> | null;
+    deleteItem: ITreeItem<INormalizedNavigationItem> | null;
     selectedElement: HTMLElement | null;
     disabled: boolean;
-    deleteMode: boolean;
+    showNewCategoryModal: boolean;
     writeMode: boolean;
+    elementToFocusOnDeleteClose: HTMLButtonElement | null;
 }
 
-export default class NavigationManager extends React.Component<IProps, IState> {
+export class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
-    private foundFirst = false;
-    private domElements = {};
+    private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state: IState = {
-        treeData: this.calcInitialTree(),
+        treeData: this.calcTree(),
         selectedItem: null,
+        deleteItem: null,
         selectedElement: null,
         disabled: false,
-        deleteMode: false,
+        showNewCategoryModal: false,
         writeMode: false,
+        elementToFocusOnDeleteClose: null,
     };
 
+    /**
+     * @inheritdoc
+     */
     public render() {
         return (
-            <div
-                ref={this.self}
-                className={classNames("navigationManager", this.props.className)}
-                role="tree"
-                aria-describedby={this.props.describedBy}
-                onKeyDown={this.handleKeyDown}
-            >
-                <Tree
-                    tree={this.state.treeData}
-                    onDragEnd={this.onDragEnd}
-                    onCollapse={this.collapseItem}
-                    onExpand={this.expandItem}
-                    renderItem={this.renderItem}
-                    isDragEnabled={!this.state.disabled}
-                    key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${this.state.writeMode}-${
-                        this.state.deleteMode
-                    }`}
+            <>
+                <NavigationManagerToolBar
+                    collapseAll={this.collapseAll}
+                    expandAll={this.expandAll}
+                    newCategory={this.showNewCategoryModal}
+                    newCategoryButtonRef={this.newCategoryButtonRef}
                 />
-            </div>
+                <div
+                    ref={this.self}
+                    className={classNames("navigationManager", this.props.className)}
+                    role="tree"
+                    aria-describedby={this.props.describedBy}
+                    onKeyDown={this.handleKeyDown}
+                >
+                    <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
+                        <Tree
+                            tree={this.state.treeData}
+                            onDragEnd={this.onDragEnd}
+                            onCollapse={this.collapseItem}
+                            onExpand={this.expandItem}
+                            renderItem={this.renderItem}
+                            isDragEnabled={!this.state.disabled}
+                        />
+                    </div>
+                </div>
+                {this.renderNewCategoryModal()}
+                {this.renderDeleteModal()}
+            </>
         );
     }
 
-    private renderItem = (params: IRenderItemParams<INavigationItem>) => {
+    /**
+     * Render callback for @atlaskit/tree. Render's a single navigation item.
+     */
+    private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
-        const data = item.data!;
         const hasChildren = item.children && item.children.length > 0;
+        const deleteHandler = (focusButton: HTMLButtonElement) => {
+            this.setState({ elementToFocusOnDeleteClose: focusButton });
+            this.showDeleteModal(item);
+        };
         return (
             <NavigationManagerContent
                 item={item}
@@ -85,170 +122,411 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 provided={provided}
                 hasChildren={hasChildren}
                 onRenameSubmit={this.handleRename}
-                onDelete={this.handleDelete}
-                handleDelete={this.handleDelete}
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
                 selectedItem={this.state.selectedItem}
-                selectedElement={this.state.selectedElement}
                 selectItem={this.selectItem}
-                unSelectItem={this.unSelectItem}
-                disableTree={this.disableTree}
-                enableTree={this.enableTree}
-                type={this.getType(data.recordType)}
                 writeMode={this.state.writeMode}
-                deleteMode={this.state.deleteMode}
+                onDeleteClick={deleteHandler}
                 firstID={this.getFirstTreeItemID()}
             />
         );
     };
 
+    /**
+     * @inheritdoc
+     */
+    public async componentDidMount() {
+        const { knowledgeBaseID } = this.props;
+        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.props.navigationItems !== prevProps.navigationItems) {
+            this.setState({ treeData: this.calcTree() });
+        }
+    }
+
+    /**
+     * Collapse all items in the tree.
+     */
+    private collapseAll = () => {
+        this.updateAllItems({ isExpanded: false });
+    };
+
+    /**
+     * Expand all items in the tree.
+     */
+    private expandAll = () => {
+        this.updateAllItems({ isExpanded: true });
+    };
+
+    /**
+     * Expand a single item.
+     */
+    private expandItem = (itemId: string) => {
+        const { treeData } = this.state;
+        const itemData = treeData[itemId];
+        this.setState({
+            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+            selectedItem: itemData,
+        });
+    };
+
+    /**
+     * Get the id of the first element in the tree to focus it.
+     */
     private getFirstTreeItemID = (): string | null => {
         const items = this.state.treeData.items;
         if (items) {
-            return Object.values(items)[1].id;
+            // Hard coded until we
+            return this.state.treeData.items[this.props.rootNavigationItemID].children[0];
         } else {
             return null;
         }
     };
 
-    private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
-        alert("Delete Item: " + item.data!.recordID);
-    };
-
-    // For now, we hard code result. The edit can be accepted or rejected.
-    private handleRename = () => {
-        const result = {
-            result: true,
-            message: "Success",
-        };
-    };
-
+    /**
+     * Select a single item. Takes an optional callback for after the state has been updated.
+     */
     private selectItem = (
-        selectedItem: ITreeItem<IKbNavigationItem>,
+        selectedItem: ITreeItem<INormalizedNavigationItem>,
         writeMode: boolean = false,
-        deleteMode: boolean = false,
-        selectedElement: HTMLElement,
-        callback?: () => void,
+        selectedElement?: HTMLElement | null,
     ) => {
-        this.setState(
-            {
-                disabled: writeMode || deleteMode,
-                selectedItem,
-                selectedElement,
-                writeMode,
-                deleteMode,
-            },
-            callback,
-        );
+        const newID = selectedItem.id;
+        const { treeData, selectedItem: oldSelectedItem } = this.state;
+        const oldID = oldSelectedItem ? oldSelectedItem.id : null;
+
+        let nextTree = mutateTree(treeData, newID, {});
+        if (oldID) {
+            nextTree = mutateTree(nextTree, oldID, {});
+        }
+
+        this.setState({
+            treeData: nextTree,
+            disabled: writeMode,
+            selectedItem,
+            selectedElement: selectedElement || null,
+            writeMode,
+        });
     };
 
-    private unSelectItem = () => {
+    /**
+     * Collapse a single item.
+     */
+    private collapseItem = (itemId: string) => {
+        const { treeData } = this.state;
+        const itemData = treeData[itemId];
         this.setState({
-            selectedItem: null,
+            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+            selectedItem: itemData,
             selectedElement: null,
         });
     };
 
-    private disableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: true,
-            },
-            callback,
-        );
+    /**
+     * Handle the rename of a navigatio item.
+     */
+    private handleRename = (item: IKbNavigationItem, newName: string) => {
+        switch (item.recordType) {
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
+                break;
+            case NavigationRecordType.ARTICLE:
+                void this.props.articleActions.patchArticle({ articleID: item.recordID, name: newName });
+                break;
+        }
+
+        this.clearSelectedItem();
     };
 
-    private enableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: false,
-            },
-            callback,
-        );
-    };
-
-    private expandItem = (itemId: string) => {
-        const { treeData } = this.state;
+    /**
+     * Reset the selected item.
+     */
+    private clearSelectedItem = () => {
         this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+            selectedItem: null,
         });
     };
 
-    private collapseItem = (itemId: string) => {
-        const { treeData } = this.state;
+    /// MODALS
+
+    /**
+     * Get the currently "selected" category. If we have an article selected use it's parent category.
+     */
+    private get currentTargetCategoryID(): number {
+        const { selectedItem } = this.state;
+
+        if (!selectedItem) {
+            // This should be the category assosciated with the knowledge base once hooked up.
+            return this.props.knowledgeBaseID;
+        }
+
+        if (selectedItem.data.recordType === NavigationRecordType.ARTICLE) {
+            return selectedItem.data.parentID;
+        } else {
+            return selectedItem.data.recordID;
+        }
+    }
+
+    /**
+     * Render function for the new category modal.
+     */
+    private renderNewCategoryModal(): React.ReactNode {
+        return (
+            this.state.showNewCategoryModal && (
+                <NewCategoryForm
+                    exitHandler={this.hideNewFolderModal}
+                    parentCategoryID={this.currentTargetCategoryID}
+                    buttonRef={this.newCategoryButtonRef}
+                    onSuccessfulSubmit={this.onNewCategorySuccess}
+                />
+            )
+        );
+    }
+
+    /**
+     * Handler for the when a new category has been successfully created.
+     *
+     * - Re-fetches the navigation tree.
+     */
+    private onNewCategorySuccess = async () => {
+        const { knowledgeBaseID } = this.props;
+        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID }, true);
+    };
+
+    /**
+     * Show the location picker modal.
+     */
+    private showNewCategoryModal = () => {
         this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+            showNewCategoryModal: true,
         });
     };
 
-    private onDragEnd = (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
+    /**
+     * Hiders the location picker modal.
+     */
+    private hideNewFolderModal = () => {
+        this.setState({
+            showNewCategoryModal: false,
+        });
+    };
+
+    /// DELETE MODAL
+
+    /**
+     * Render method for the delete category modal.
+     */
+    private renderDeleteModal(): React.ReactNode {
+        const { deleteItem } = this.state;
+        return (
+            deleteItem && (
+                <ModalConfirm
+                    title={(<Translate source={'Delete "<0/>"'} c0={deleteItem.data.name} /> as unknown) as string}
+                    onCancel={this.dismissDeleteModal}
+                    onConfirm={this.handleDeleteConfirm}
+                    elementToFocusOnExit={this.state.elementToFocusOnDeleteClose || document.body}
+                >
+                    <Translate
+                        source={'Are you sure you want to delete <0/> "<1/>" ?'}
+                        c0={this.getItemTypeLabel(deleteItem.data)}
+                        c1={
+                            <strong>
+                                <em>{deleteItem.data.name}</em>
+                            </strong>
+                        }
+                    />
+                </ModalConfirm>
+            )
+        );
+    }
+
+    /**
+     * Handle confirmation that an item should be deleted.
+     *
+     * Updates either an article of category using their respective endpoints.
+     */
+    private handleDeleteConfirm = async () => {
+        const { deleteItem } = this.state;
+        if (deleteItem) {
+            const { recordType, recordID } = deleteItem.data;
+            switch (recordType) {
+                case NavigationRecordType.ARTICLE:
+                    await this.props.articleActions.patchStatus({ articleID: recordID, status: ArticleStatus.DELETED });
+                    break;
+                case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                    await this.props.categoryActions.deleteCategory(recordID);
+                    break;
+            }
+        }
+        this.dismissDeleteModal();
+    };
+
+    /**
+     * Display the delete modal.
+     */
+    private showDeleteModal = (item: ITreeItem<INormalizedNavigationItem>) => {
+        this.setState({ deleteItem: item });
+        this.disableTree();
+        this.selectItem(item, false);
+    };
+
+    /**
+     * Dismiss the delete modal.
+     */
+    private dismissDeleteModal = () => {
+        const { deleteItem } = this.state;
+        this.setState({
+            deleteItem: null,
+            elementToFocusOnDeleteClose: null,
+        });
+        this.enableTree();
+        if (deleteItem) {
+            this.selectItem(deleteItem, false);
+        }
+    };
+
+    /**
+     * The label of the current type.
+     */
+    private getItemTypeLabel(item: INormalizedNavigationItem): string {
+        const { recordType } = item;
+        switch (recordType) {
+            case NavigationRecordType.ARTICLE:
+                return t("article");
+            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                return t("category");
+            default:
+                return recordType;
+        }
+    }
+
+    /**
+     * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
+    private disableTree = () => {
+        this.setState({ disabled: true });
+    };
+
+    /**
+     * Enable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
+    private enableTree = () => {
+        this.setState({ disabled: false });
+    };
+
+    /**
+     * Handle completion of drag.
+     *
+     * - Update item in local state, and additionally dispatch to the API endoint.
+     */
+    private onDragEnd = async (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
         const { treeData } = this.state;
 
         if (!destination) {
             return;
         }
-        const newTree = moveItemOnTree(treeData, source, destination);
+
+        // Do nothing if we leave it in the spot we started.
+        if (source.index === destination.index && source.parentId === destination.parentId) {
+            return;
+        }
+
+        const itemID = treeData.items[source.parentId].children[source.index];
+        const item = treeData.items[itemID];
+
+        let newTree = moveItemOnTree(treeData, source, destination);
+        const currentlySelectedItem = this.state.selectedItem;
+        if (currentlySelectedItem) {
+            // Touch the old item so it re-renders.
+            newTree = mutateTree(newTree, currentlySelectedItem.id, {});
+        }
         this.setState({
             treeData: newTree,
-            selectedItem: newTree.items[source.parentId].children[source.index],
+            writeMode: false,
+            selectedItem: item,
         });
+        await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
     };
 
-    private calcInitialTree(): ITreeData<IKbNavigationItem> {
-        const data: ITreeData<IKbNavigationItem> = {
+    /**
+     * Update all of the items in the tree with the same data partial.
+     *
+     * @param update
+     */
+    private updateAllItems(update: Partial<ITreeItem<INormalizedNavigationItem>>) {
+        const data: ITreeData<INormalizedNavigationItem> = {
+            rootId: this.props.rootNavigationItemID,
+            items: {},
+        };
+
+        for (const [itemID, itemValue] of Object.entries(this.state.treeData.items)) {
+            const newData = update.data || {};
+            data.items[itemID] = {
+                ...itemValue,
+                ...update,
+                data: {
+                    ...itemValue.data,
+                    ...newData,
+                },
+            };
+        }
+
+        this.setState({ treeData: data });
+    }
+
+    /**
+     * Take the internal tree state and convert back to a pure data array for patching the API endpoint.
+     */
+    private calcPatchArray(data: ITreeData<INormalizedNavigationItem>) {
+        const outOfTree = {};
+        for (const [index, value] of Object.entries(data.items)) {
+            outOfTree[index] = {
+                ...value.data,
+                children: value.children,
+            };
+        }
+        return NavigationModel.denormalizeData(outOfTree, this.props.rootNavigationItemID);
+    }
+
+    private static readonly DEFAULT_EXPAND_VALUE = true;
+
+    /**
+     * Convert the pure data representation of the tree data into one that contains UI state.
+     *
+     * - Makes ITreeData items.
+     * - Preserves the existing IDs
+     * - Preserves existing expand state if it exists.
+     */
+    private calcTree() {
+        const data: ITreeData<INormalizedNavigationItem> = {
             rootId: "knowledgeCategory1",
             items: {},
         };
 
-        for (const [itemID, itemValue] of Object.entries(NavigationModel.normalizeData(this.dummyData))) {
+        for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
+            let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
+            if (this.state && this.state.treeData.items[itemID]) {
+                stateValue = this.state.treeData.items[itemID];
+            }
+
+            const children = itemValue.children;
             data.items[itemID] = {
-                hasChildren: itemValue.children.length > 0,
                 id: itemID,
-                children: itemValue.children,
-                data: itemValue as IKbNavigationItem,
-                isExpanded: true,
+                hasChildren: children.length > 0,
+                children,
+                data: itemValue,
+                isExpanded: stateValue ? stateValue.isExpanded : NavigationManager.DEFAULT_EXPAND_VALUE,
             };
         }
 
         return data;
     }
-
-    private handleDelete = () => {
-        alert("Do Delete");
-    };
-
-    private get normalizedData() {
-        const normalizedByID: { [id: string]: IKbNavigationItem } = {};
-        for (const item of this.dummyData) {
-            const id = item.recordType + item.recordID;
-            normalizedByID[id] = item;
-        }
-
-        for (const [itemID, itemValue] of Object.entries(normalizedByID)) {
-            if (itemValue.parentID > 0) {
-                const lookupID = NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID;
-                const parentItem = normalizedByID[lookupID];
-                if (!parentItem.children) {
-                    parentItem.children = [];
-                }
-                parentItem.children.push(itemID);
-            }
-        }
-
-        return normalizedByID;
-    }
-
-    private getType = (type: string) => {
-        switch (type) {
-            case "article":
-                return t("article");
-            case NavigationRecordType.KNOWLEDGE_CATEGORY:
-                return t("category");
-            default:
-                return type;
-        }
-    };
 
     /**
      * Keyboard handler for arrow up, arrow down, home, end and escape.
@@ -285,337 +563,27 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 break;
         }
     };
-
-    private get dummyData(): IKbNavigationItem[] {
-        return [
-            {
-                name: "Base 1",
-                url: "http://dev.vanilla.localhost/kb/categories/1-base-1",
-                parentID: -1,
-                recordID: 1,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Pee Mart",
-                url: "http://dev.vanilla.localhost/kb/categories/2-pee-mart",
-                parentID: 1,
-                recordID: 2,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Predator Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/3-predator-urine",
-                parentID: 2,
-                recordID: 3,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Coyote Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/4-coyote-urine",
-                parentID: 3,
-                recordID: 4,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Fox Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/5-fox-urine",
-                parentID: 3,
-                recordID: 5,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Bobcat Urine",
-                url: "http://dev.vanilla.localhost/kb/categories/6-bobcat-urine",
-                parentID: 3,
-                recordID: 6,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Gel",
-                url: "http://dev.vanilla.localhost/kb/categories/7-p-gel",
-                parentID: 2,
-                recordID: 7,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Cover Granules",
-                url: "http://dev.vanilla.localhost/kb/categories/8-p-cover-granules",
-                parentID: 2,
-                recordID: 8,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Prey Animals",
-                url: "http://dev.vanilla.localhost/kb/categories/9-prey-animals",
-                parentID: 2,
-                recordID: 9,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Armadillos",
-                url: "http://dev.vanilla.localhost/kb/categories/10-armadillos",
-                parentID: 9,
-                recordID: 10,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Chipmunks",
-                url: "http://dev.vanilla.localhost/kb/categories/11-chipmunks",
-                parentID: 9,
-                recordID: 11,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Dispensers",
-                url: "http://dev.vanilla.localhost/kb/categories/12-dispensers",
-                parentID: 2,
-                recordID: 12,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Mountain Lion",
-                url: "http://dev.vanilla.localhost/kb/categories/13-mountain-lion",
-                parentID: 8,
-                recordID: 13,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Bear",
-                url: "http://dev.vanilla.localhost/kb/categories/14-bear",
-                parentID: 8,
-                recordID: 14,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Wolf",
-                url: "http://dev.vanilla.localhost/kb/categories/15-wolf",
-                parentID: 8,
-                recordID: 15,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Wicks",
-                url: "http://dev.vanilla.localhost/kb/categories/16-p-wicks",
-                parentID: 12,
-                recordID: 16,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "P-Dispensers",
-                url: "http://dev.vanilla.localhost/kb/categories/17-p-dispensers",
-                parentID: 12,
-                recordID: 17,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Test Folder!!!",
-                url: "http://dev.vanilla.localhost/kb/categories/18-test-folder",
-                parentID: 3,
-                recordID: 18,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Category in Base 1",
-                url: "http://dev.vanilla.localhost/kb/categories/19-category-in-base-1",
-                parentID: 1,
-                recordID: 19,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Test",
-                url: "http://dev.vanilla.localhost/kb/categories/20-test",
-                parentID: 2,
-                recordID: 20,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "asdf",
-                url: "http://dev.vanilla.localhost/kb/categories/21-asdf",
-                parentID: 2,
-                recordID: 21,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "Search Category 1",
-                url: "http://dev.vanilla.localhost/kb/categories/22-search-category-1",
-                parentID: 1,
-                recordID: 22,
-                sort: null,
-                recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
-            },
-            {
-                name: "What about PHP version??",
-                url: "http://dev.vanilla.localhost/kb/articles/1-what-about-php-version",
-                recordID: 1,
-                sort: 0,
-                parentID: 12,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Article 2",
-                url: "http://dev.vanilla.localhost/kb/articles/2-article-2",
-                recordID: 2,
-                sort: 0,
-                parentID: 7,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test 3",
-                url: "http://dev.vanilla.localhost/kb/articles/3-test-3",
-                recordID: 3,
-                sort: 0,
-                parentID: 3,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Revised!!! Test Rev Article",
-                url: "http://dev.vanilla.localhost/kb/articles/278-revised-test-rev-article",
-                recordID: 278,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test article",
-                url: "http://dev.vanilla.localhost/kb/articles/280-test-article",
-                recordID: 280,
-                sort: null,
-                parentID: 2,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test headings",
-                url: "http://dev.vanilla.localhost/kb/articles/281-test-headings",
-                recordID: 281,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test",
-                url: "http://dev.vanilla.localhost/kb/articles/290-test",
-                recordID: 290,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test in pee mart",
-                url: "http://dev.vanilla.localhost/kb/articles/291-test-in-pee-mart",
-                recordID: 291,
-                sort: null,
-                parentID: 2,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test heading article",
-                url: "http://dev.vanilla.localhost/kb/articles/293-test-heading-article",
-                recordID: 293,
-                sort: null,
-                parentID: 18,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test 2",
-                url: "http://dev.vanilla.localhost/kb/articles/302-test-2",
-                recordID: 302,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test",
-                url: "http://dev.vanilla.localhost/kb/articles/309-test",
-                recordID: 309,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "asdfasdfasdfasfasdf",
-                url: "http://dev.vanilla.localhost/kb/articles/315-asdfasdfasdfasfasdf",
-                recordID: 315,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test Draft Article",
-                url: "http://dev.vanilla.localhost/kb/articles/316-test-draft-article",
-                recordID: 316,
-                sort: null,
-                parentID: 19,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "What about PHP version??",
-                url: "http://dev.vanilla.localhost/kb/articles/317-what-about-php-version",
-                recordID: 317,
-                sort: null,
-                parentID: 12,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Search Article number 1",
-                url: "http://dev.vanilla.localhost/kb/articles/319-search-article-number-1",
-                recordID: 319,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test search article number 2",
-                url: "http://dev.vanilla.localhost/kb/articles/320-test-search-article-number-2",
-                recordID: 320,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "Test search article 3",
-                url: "http://dev.vanilla.localhost/kb/articles/321-test-search-article-3",
-                recordID: 321,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "A new article title",
-                url: "http://dev.vanilla.localhost/kb/articles/322-a-new-article-title",
-                recordID: 322,
-                sort: null,
-                parentID: 22,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-            {
-                name: "test",
-                url: "http://dev.vanilla.localhost/kb/articles/323-test",
-                recordID: 323,
-                sort: null,
-                parentID: 1,
-                recordType: NavigationRecordType.ARTICLE,
-            },
-        ];
-    }
 }
+
+interface IActions {
+    navigationActions: NavigationActions;
+    articleActions: ArticleActions;
+    categoryActions: CategoryActions;
+}
+function mapStateToProps(state: IStoreState) {
+    return state.knowledge.navigation;
+}
+
+function mapDispatchToProps(dispatch): IActions {
+    return {
+        articleActions: new ArticleActions(dispatch, apiv2),
+        navigationActions: new NavigationActions(dispatch, apiv2),
+        categoryActions: new CategoryActions(dispatch, apiv2),
+    };
+}
+const Connected = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(NavigationManager);
+
+export default Connected;

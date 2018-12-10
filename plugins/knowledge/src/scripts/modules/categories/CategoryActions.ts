@@ -3,22 +3,48 @@
  * @license Proprietary
  */
 
-import { createAction, generateApiActionCreators, ActionsUnion } from "@library/state/utility";
-import { IKbCategory, IPostKbCategoryRequestBody, IPostKbCategoryResponseBody } from "@knowledge/@types/api";
+import { ActionsUnion } from "@library/state/utility";
+import {
+    IKbCategory,
+    IPostKbCategoryRequestBody,
+    IPostKbCategoryResponseBody,
+    IPatchKbCategoryResponseBody,
+    IPatchKbCategoryRequestBody,
+} from "@knowledge/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
+import { IDeleteKbCategoryRequest } from "@knowledge/@types/api/kbCategory";
 
 export default class CategoryActions extends ReduxActions {
+    public static ACTION_TYPES:
+        | ActionsUnion<typeof CategoryActions.deleteCategoryACs>
+        | ActionsUnion<typeof CategoryActions.getAllCategoriesACs>
+        | ActionsUnion<typeof CategoryActions.patchCategoryACs>
+        | ActionsUnion<typeof CategoryActions.postCategoryACs>;
+
+    public static readonly DELETE_CATEGORY_REQUEST = "@@kbCategories/DELETE_CATEGORY_REQUEST";
+    public static readonly DELETE_CATEGORY_RESPONSE = "@@kbCategories/DELETE_CATEGORY_RESPONSE";
+    public static readonly DELETE_CATEGORY_ERROR = "@@kbCategories/DELETE_CATEGORY_ERROR";
+
+    // Raw actions for deleting a knowledge category.
+    private static deleteCategoryACs = ReduxActions.generateApiActionCreators(
+        CategoryActions.DELETE_CATEGORY_REQUEST,
+        CategoryActions.DELETE_CATEGORY_RESPONSE,
+        CategoryActions.DELETE_CATEGORY_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {},
+        {} as IDeleteKbCategoryRequest,
+    );
+
+    // Usable action for deleting a category.
+    public deleteCategory(id: number) {
+        return this.dispatchApi("delete", `/knowledge-categories/${id}`, CategoryActions.deleteCategoryACs, {
+            knowledgeCategoryID: id,
+        });
+    }
+
     public static readonly GET_ALL_REQUEST = "@@kbCategories/GET_ALL_REQUEST";
     public static readonly GET_ALL_RESPONSE = "@@kbCategories/GET_ALL_RESPONSE";
     public static readonly GET_ALL_ERROR = "@@kbCategories/GET_ALL_ERROR";
-
-    public static readonly POST_CATEGORY_REQUEST = "@@kbCategories/POST_CATEGORY_REQUEST";
-    public static readonly POST_CATEGORY_RESPONSE = "@@kbCategories/POST_CATEGORY_RESPONSE";
-    public static readonly POST_CATEGORY_ERROR = "@@kbCategories/POST_CATEGORY_ERROR";
-
-    public static ACTION_TYPES:
-        | ActionsUnion<typeof CategoryActions.getAllCategoriesACs>
-        | ActionsUnion<typeof CategoryActions.postCategoryACs>;
 
     // Raw actions for getting all knowledge categories
     private static getAllCategoriesACs = ReduxActions.generateApiActionCreators(
@@ -30,6 +56,15 @@ export default class CategoryActions extends ReduxActions {
         {},
     );
 
+    // Usable action for getting a list of all categories.
+    public getAllCategories() {
+        return this.dispatchApi("get", "/knowledge-categories", CategoryActions.getAllCategoriesACs, {});
+    }
+
+    public static readonly POST_CATEGORY_REQUEST = "@@kbCategories/POST_CATEGORY_REQUEST";
+    public static readonly POST_CATEGORY_RESPONSE = "@@kbCategories/POST_CATEGORY_RESPONSE";
+    public static readonly POST_CATEGORY_ERROR = "@@kbCategories/POST_CATEGORY_ERROR";
+
     // Raw actions for getting all knowledge categories
     private static postCategoryACs = ReduxActions.generateApiActionCreators(
         CategoryActions.POST_CATEGORY_REQUEST,
@@ -39,11 +74,6 @@ export default class CategoryActions extends ReduxActions {
         {} as IKbCategory,
         {} as IPostKbCategoryRequestBody,
     );
-
-    // Usable action for getting a list of all categories.
-    public getAllCategories() {
-        return this.dispatchApi("get", "/knowledge-categories", CategoryActions.getAllCategoriesACs, {});
-    }
 
     /**
      * Create a new category.
@@ -55,6 +85,34 @@ export default class CategoryActions extends ReduxActions {
             "post",
             "/knowledge-categories",
             CategoryActions.postCategoryACs,
+            data,
+        );
+    };
+
+    public static readonly PATCH_CATEGORY_REQUEST = "@@kbCategories/PATCH_CATEGORY_REQUEST";
+    public static readonly PATCH_CATEGORY_RESPONSE = "@@kbCategories/PATCH_CATEGORY_RESPONSE";
+    public static readonly PATCH_CATEGORY_ERROR = "@@kbCategories/PATCH_CATEGORY_ERROR";
+
+    // Raw actions for getting all knowledge categories
+    private static patchCategoryACs = ReduxActions.generateApiActionCreators(
+        CategoryActions.PATCH_CATEGORY_REQUEST,
+        CategoryActions.PATCH_CATEGORY_RESPONSE,
+        CategoryActions.PATCH_CATEGORY_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {} as IPatchKbCategoryResponseBody,
+        {} as IPatchKbCategoryRequestBody,
+    );
+
+    /**
+     * Update a new category.
+     *
+     * @param data The category data.
+     */
+    public patchCategory = (data: IPatchKbCategoryRequestBody) => {
+        return this.dispatchApi<IPatchKbCategoryResponseBody>(
+            "patch",
+            `/knowledge-categories/${data.knowledgeCategoryID}`,
+            CategoryActions.patchCategoryACs,
             data,
         );
     };

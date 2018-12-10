@@ -315,7 +315,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         // Update articles.
         Navigation::updateAlteredRows(
-            $this->articleModel->get(),
+            $this->articleModel->get([], ["limit" => false]),
             $navigation,
             Navigation::RECORD_TYPE_ARTICLE,
             "articleID",

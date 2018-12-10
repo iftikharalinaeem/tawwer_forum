@@ -6,12 +6,13 @@
 import React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { IStoreState } from "@knowledge/state/model";
-import NavigationModel, { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 import Breadcrumbs from "@library/components/Breadcrumbs";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
@@ -25,7 +26,7 @@ export class NavigationBreadcrumbs extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { activeRecord, navigationItems } = this.props;
         const recordKey = activeRecord.recordType + activeRecord.recordID;
-        return <Breadcrumbs>{NavigationModel.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
+        return <Breadcrumbs>{NavigationSelector.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
     }
 
     /**
