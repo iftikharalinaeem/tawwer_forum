@@ -12,6 +12,7 @@ import { produce } from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import reduceReducers from "reduce-reducers";
 
 export interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
@@ -33,6 +34,9 @@ export interface INavigationStoreState {
     patchTransactionID: string | null;
 }
 
+/**
+ * Model for managing and selection navigation data.
+ */
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
     public static readonly ROOT_ID = -1;
 
@@ -97,137 +101,187 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
-            const handleRenameSuccess = (key: string, newName?: string) => {
-                const item = nextState.navigationItems[key];
-                if (item && newName) {
-                    item.name = newName!;
-                    delete item.error;
-                    delete item.tempName;
-                }
-            };
-
-            const handleRenameError = (key: string, errorMessage: string) => {
-                const item = nextState.navigationItems[key];
-                if (item) {
-                    item.error = { message: errorMessage };
-                }
-            };
-
-            const handleRenameRequest = (key: string, tempName?: string) => {
-                const item = nextState.navigationItems[key];
-                if (item && tempName) {
-                    item.tempName = tempName;
-                    delete item.error;
-                }
-            };
-
-            const handleDeleteRequest = (key: string) => {
-                const item = nextState.navigationItems[key];
-                if (item) {
-                    item.tempDeleted = true;
-                    delete item.error;
-
-                    // Remove the item from it's parent
-                    const parentItem =
-                        nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
-                }
-            };
-
-            const handleDeleteSuccess = (key: string) => {
-                if (nextState.navigationItems[key]) {
-                    delete nextState.navigationItems[key];
-                }
-            };
-
-            const handleDeleteError = (key: string, errorMessage: string) => {
-                const item = nextState.navigationItems[key];
-                if (item) {
-                    item.error = { message: errorMessage };
-                    delete item.tempDeleted;
-
-                    // Put the item back on its parent.
-                    const parentItem =
-                        nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                    parentItem.children.push(key);
-                }
-            };
-
-            switch (action.type) {
-                case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
-                    nextState.fetchLoadable.status = LoadStatus.LOADING;
-                    break;
-                case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
-                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
-                    nextState.fetchLoadable.status = LoadStatus.SUCCESS;
-                    break;
-                case NavigationActions.GET_NAVIGATION_FLAT_ERROR:
-                    nextState.fetchLoadable.status = LoadStatus.ERROR;
-                    nextState.fetchLoadable.error = action.payload;
-                    break;
-                case NavigationActions.PATCH_NAVIGATION_FLAT_REQUEST:
-                    nextState.patchTransactionID = action.meta.transactionID;
-                    nextState.submitLoadable.status = LoadStatus.LOADING;
-                    break;
-                case NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE:
-                    // Use a transaction ID so that only that last request/response in a series of patches
-                    // "finishes" the state updates.
-                    if (nextState.patchTransactionID === action.meta.transactionID) {
-                        nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
-                        nextState.submitLoadable.status = LoadStatus.SUCCESS;
-                    }
-                    break;
-                case NavigationActions.PATCH_NAVIGATION_FLAT_ERROR:
-                    nextState.submitLoadable.status = LoadStatus.SUCCESS;
-                    nextState.submitLoadable.error = action.payload;
-                    break;
-                case CategoryActions.PATCH_CATEGORY_REQUEST:
-                    handleRenameRequest(
-                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                        action.meta.name,
-                    );
-                    break;
-                case ArticleActions.PATCH_ARTICLE_REQUEST:
-                    handleRenameRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
-                    break;
-                case CategoryActions.PATCH_CATEGORY_ERROR:
-                    handleRenameError(
-                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                        action.payload.message,
-                    );
-                    break;
-                case ArticleActions.PATCH_ARTICLE_ERROR:
-                    handleRenameError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
-                    break;
-                case CategoryActions.PATCH_CATEGORY_RESPONSE:
-                    handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
-                    break;
-                case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                    handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
-                    break;
-                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
-                    handleDeleteRequest(NavigationRecordType.ARTICLE + action.meta.articleID);
-                    break;
-                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                    handleDeleteSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
-                    break;
-                case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
-                    handleDeleteError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
-                    break;
-                case CategoryActions.DELETE_CATEGORY_REQUEST:
-                    handleDeleteRequest(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
-                    break;
-                case CategoryActions.DELETE_CATEGORY_RESPONSE:
-                    handleDeleteSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
-                    break;
-                case CategoryActions.DELETE_CATEGORY_ERROR:
-                    handleDeleteError(
-                        NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                        action.payload.message,
-                    );
-                    break;
-            }
+            return reduceReducers(this.reduceGetNav, this.reducePatchNav, this.reduceDelete, this.reduceRename)(
+                nextState,
+                action,
+            );
         });
+    };
+
+    private reduceGetNav = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        switch (action.type) {
+            case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
+                nextState.fetchLoadable.status = LoadStatus.LOADING;
+                break;
+            case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
+                nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
+                nextState.fetchLoadable.status = LoadStatus.SUCCESS;
+                break;
+            case NavigationActions.GET_NAVIGATION_FLAT_ERROR:
+                nextState.fetchLoadable.status = LoadStatus.ERROR;
+                nextState.fetchLoadable.error = action.payload;
+                break;
+        }
+
+        return nextState;
+    };
+
+    private reducePatchNav = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        switch (action.type) {
+            case NavigationActions.PATCH_NAVIGATION_FLAT_REQUEST:
+                nextState.patchTransactionID = action.meta.transactionID;
+                nextState.submitLoadable.status = LoadStatus.LOADING;
+                break;
+            case NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE:
+                // Use a transaction ID so that only that last request/response in a series of patches
+                // "finishes" the state updates.
+                if (nextState.patchTransactionID === action.meta.transactionID) {
+                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
+                    nextState.submitLoadable.status = LoadStatus.SUCCESS;
+                }
+                break;
+            case NavigationActions.PATCH_NAVIGATION_FLAT_ERROR:
+                nextState.submitLoadable.status = LoadStatus.SUCCESS;
+                nextState.submitLoadable.error = action.payload;
+                break;
+        }
+
+        return nextState;
+    };
+
+    private reduceRename = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        const handleRenameSuccess = (key: string, newName?: string) => {
+            const item = nextState.navigationItems[key];
+            if (item && newName) {
+                item.name = newName!;
+                delete item.error;
+                delete item.tempName;
+            }
+        };
+
+        const handleRenameError = (key: string, errorMessage: string) => {
+            const item = nextState.navigationItems[key];
+            if (item) {
+                item.error = { message: errorMessage };
+            }
+        };
+
+        const handleRenameRequest = (key: string, tempName?: string) => {
+            const item = nextState.navigationItems[key];
+            if (item && tempName) {
+                item.tempName = tempName;
+                delete item.error;
+            }
+        };
+
+        switch (action.type) {
+            case CategoryActions.PATCH_CATEGORY_REQUEST:
+                handleRenameRequest(
+                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                    action.meta.name,
+                );
+                break;
+            case ArticleActions.PATCH_ARTICLE_REQUEST:
+                handleRenameRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
+                break;
+            case CategoryActions.PATCH_CATEGORY_ERROR:
+                handleRenameError(
+                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                    action.payload.message,
+                );
+                break;
+            case ArticleActions.PATCH_ARTICLE_ERROR:
+                handleRenameError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                break;
+            case CategoryActions.PATCH_CATEGORY_RESPONSE:
+                handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                break;
+            case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                break;
+        }
+        return nextState;
+    };
+
+    private reduceDelete = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        const handleDeleteRequest = (key: string) => {
+            const item = nextState.navigationItems[key];
+            if (item) {
+                item.tempDeleted = true;
+                delete item.error;
+
+                // Remove the item from it's parent
+                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+            }
+        };
+
+        const handleDeleteSuccess = (key: string) => {
+            if (nextState.navigationItems[key]) {
+                delete nextState.navigationItems[key];
+            }
+        };
+
+        const handleDeleteError = (key: string, errorMessage: string) => {
+            const item = nextState.navigationItems[key];
+            if (item) {
+                item.error = { message: errorMessage };
+                delete item.tempDeleted;
+
+                // Put the item back on its parent.
+                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                parentItem.children.push(key);
+            }
+        };
+
+        switch (action.type) {
+            case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
+                handleDeleteRequest(NavigationRecordType.ARTICLE + action.meta.articleID);
+                break;
+            case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
+                handleDeleteSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                break;
+            case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
+                handleDeleteError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                break;
+            case CategoryActions.DELETE_CATEGORY_REQUEST:
+                handleDeleteRequest(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                break;
+            case CategoryActions.DELETE_CATEGORY_RESPONSE:
+                handleDeleteSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                break;
+            case CategoryActions.DELETE_CATEGORY_ERROR:
+                handleDeleteError(
+                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
+                    action.payload.message,
+                );
+                break;
+        }
+        return nextState;
     };
 
     public static denormalizeData(

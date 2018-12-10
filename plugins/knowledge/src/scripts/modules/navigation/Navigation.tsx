@@ -6,7 +6,7 @@
 import React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { IStoreState } from "@knowledge/state/model";
-import NavigationModel, { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
@@ -15,6 +15,7 @@ import { organize } from "@library/components/icons";
 import { t } from "@library/application";
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/users/Permission";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
@@ -43,7 +44,7 @@ export class Navigation extends React.Component<IProps> {
                     </Permission>
                 }
             >
-                {NavigationModel.selectChildren(
+                {NavigationSelector.selectChildren(
                     this.props.navigationItems,
                     "knowledgeCategory1" /** Temporarily hardcoded until knowledge bases are wired up. */,
                 )}
