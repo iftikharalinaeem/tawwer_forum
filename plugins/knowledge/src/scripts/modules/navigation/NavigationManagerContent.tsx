@@ -120,19 +120,21 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 >
                                     {t("Rename")}
                                 </Button>
-                                <Button
-                                    onClick={this.props.onDeleteClick}
-                                    className={classNames(
-                                        "navigationManager-delete",
-                                        "navigationManager-action",
-                                        this.props.className,
-                                    )}
-                                    baseClass={ButtonBaseClass.CUSTOM}
-                                    buttonRef={this.deleteButtonRef}
-                                    tabIndex={0}
-                                >
-                                    {t("Delete")}
-                                </Button>
+                                {this.props.item.children.length === 0 && (
+                                    <Button
+                                        onClick={this.handleDeleteClick}
+                                        className={classNames(
+                                            "navigationManager-delete",
+                                            "navigationManager-action",
+                                            this.props.className,
+                                        )}
+                                        baseClass={ButtonBaseClass.CUSTOM}
+                                        buttonRef={this.deleteButtonRef}
+                                        tabIndex={0}
+                                    >
+                                        {t("Delete")}
+                                    </Button>
+                                )}
                             </>
                         )}
                     </div>
@@ -151,24 +153,24 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private renameItem = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.selectItem(this.props.item, true, this.getRef());
     };
 
-    private deleteItem = () => {
+    private handleDeleteClick = () => {
         this.props.onDeleteClick(this.deleteButtonRef.current!);
     };
 
     private cancelRename = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.selectItem(this.props.item, false, this.getRef());
     };
 
     private handleExpand = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.selectItem(this.props.item, false, this.getRef());
         this.props.expandItem(this.props.item.id);
     };
 
     private handleCollapse = () => {
-        this.props.selectItem(this.props.item, false);
+        this.props.selectItem(this.props.item, false, this.getRef());
         this.props.collapseItem(this.props.item.id);
     };
     public componentDidMount() {

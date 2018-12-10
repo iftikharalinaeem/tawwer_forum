@@ -95,9 +95,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
                             onExpand={this.expandItem}
                             renderItem={this.renderItem}
                             isDragEnabled={!this.state.disabled}
-                            key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
-                                this.state.writeMode
-                            }`}
+                            // key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
+                            //     this.state.writeMode
+                            // }`}
                         />
                     </div>
                 </div>
