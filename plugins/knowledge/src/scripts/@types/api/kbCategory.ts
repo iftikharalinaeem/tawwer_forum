@@ -46,9 +46,21 @@ type KbCategoryExpandFields = "user" | "lastArticle";
 export interface IKbCategory extends IKbCategoryRequiredData, IKbCategoryDefaultedData, IKbCategoryServerManagedData {}
 
 // Request/Response interfaces
+
+export interface IDeleteKbCategoryRequest {
+    knowledgeCategoryID: number;
+}
+
 export interface IPostKbCategoryRequestBody extends IKbCategoryRequiredData, Partial<IKbCategoryDefaultedData> {}
 
 export interface IPostKbCategoryResponseBody extends IKbCategory {}
+
+// Request/Response interfaces
+export interface IPatchKbCategoryRequestBody extends Partial<IPostKbCategoryRequestBody> {
+    knowledgeCategoryID: number;
+}
+
+export interface IPatchKbCategoryResponseBody extends IKbCategory {}
 
 export interface IGetKbCategoryRequestBody {
     id: number;

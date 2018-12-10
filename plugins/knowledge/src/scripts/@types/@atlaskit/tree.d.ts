@@ -43,7 +43,7 @@ declare module "@atlaskit/tree" {
         hasChildren?: boolean;
         isExpanded?: boolean;
         isChildrenLoading?: boolean;
-        data?: T;
+        data: T;
     }
 
     export interface IRenderItemParams<T> {

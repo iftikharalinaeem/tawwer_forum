@@ -4,21 +4,18 @@
  * @license Proprietary
  */
 
-import React from "react";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { folderClosed, folderOpen, article } from "@library/components/icons/navigationManager";
-import classNames from "classnames";
-import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { t } from "@library/application";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import { IKbNavigationItem } from "@knowledge/@types/api/kbNavigation";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps {
     className?: string;
     currentName: string;
     focusOnExit: React.RefObject<HTMLButtonElement>;
     applyNewName: (newName: string) => void;
-    cancel: (e) => void;
+    cancel: (e: React.MouseEvent) => void;
 }
 
 interface IState {
@@ -37,7 +34,7 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
             <form className={classNames("navigationManger-editMode", this.props.className)} onSubmit={this.submit}>
                 <label className="navigationManger-text">
                     <span className="sr-only">{t("New Name: ")}</span>
-                    <input type="text" value={this.state.newName} onChange={this.handleOnChange} ref={this.inputRef} />
+                    <input type="text" value={this.state.newName} onChange={this.handleChange} ref={this.inputRef} />
                 </label>
                 <Button
                     onClick={this.props.cancel}
@@ -50,7 +47,7 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                 <ButtonSubmit
                     className="navigationManger-submitRename navigationManager-action"
                     baseClass={ButtonBaseClass.CUSTOM}
-                    disabled={this.state.newName === this.props.currentName}
+                    disabled={this.isSubmitDisabled}
                     tabIndex={0}
                 >
                     {t("Apply")}
@@ -66,18 +63,20 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
         }
     }
 
+    private get isSubmitDisabled(): boolean {
+        return this.state.newName === this.props.currentName || this.state.newName === "";
+    }
+
     private submit = e => {
         e.preventDefault();
         e.stopPropagation();
         this.props.applyNewName(this.state.newName);
     };
 
-    private handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        if (e.target.value) {
-            this.setState({
-                newName: e.target.value,
-            });
-        }
+    private handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        event.preventDefault();
+        this.setState({
+            newName: event.target.value,
+        });
     };
 }

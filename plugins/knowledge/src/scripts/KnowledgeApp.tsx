@@ -19,7 +19,6 @@ import { LinkContext } from "@library/components/navigation/SmartLink";
 import { formatUrl } from "@library/application";
 import SearchContext from "@library/contexts/SearchContext";
 import PagesContext from "@library/contexts/PagesContext";
-import apiV2 from "@library/apiv2";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
 

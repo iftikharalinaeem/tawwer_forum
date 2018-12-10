@@ -1,7 +1,6 @@
 {
     "dependencies": {
         "@atlaskit/tree": "^4.1.8",
-        "@types/react-beautiful-dnd": "^7.1.2",
         "normalize.css": "^8.0.0",
         "shave": "^2.4.0",
         "swiper": "^4.3.5"

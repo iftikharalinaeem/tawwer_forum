@@ -6,11 +6,16 @@
 import React from "react";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { IStoreState } from "@knowledge/state/model";
-import NavigationModel, { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import { organize } from "@library/components/icons";
+import { t } from "@library/application";
+import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
+import Permission from "@library/users/Permission";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
@@ -22,10 +27,27 @@ interface IProps extends INavigationStoreState {
  * Data connect navigation component for knowledge base.
  */
 export class Navigation extends React.Component<IProps> {
+    /**
+     * @inheritdoc
+     */
     public render(): React.ReactNode {
         return (
-            <SiteNav collapsible={this.props.collapsible!} activeRecord={this.props.activeRecord}>
-                {NavigationModel.selectChildren(
+            <SiteNav
+                collapsible={this.props.collapsible!}
+                activeRecord={this.props.activeRecord}
+                bottomCTA={
+                    <Permission permission="kb.manage">
+                        <hr className="navigation-divider" />
+                        <div className="navigation-cta">
+                            {organize()}
+                            <OrganizeCategoriesRoute.Link data={{ kbID: 1 }}>
+                                {t("Organize Categories")}
+                            </OrganizeCategoriesRoute.Link>
+                        </div>
+                    </Permission>
+                }
+            >
+                {NavigationSelector.selectChildren(
                     this.props.navigationItems,
                     "knowledgeCategory1" /** Temporarily hardcoded until knowledge bases are wired up. */,
                 )}

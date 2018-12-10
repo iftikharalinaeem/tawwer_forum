@@ -296,10 +296,10 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 nextState.article.error = action.payload;
                 break;
             // Patching the article
-            case EditorPageActions.PATCH_ARTICLE_REQUEST:
+            case ArticleActions.PATCH_ARTICLE_REQUEST:
                 nextState.submit.status = LoadStatus.LOADING;
                 break;
-            case EditorPageActions.PATCH_ARTICLE_ERROR:
+            case ArticleActions.PATCH_ARTICLE_ERROR:
                 nextState.submit.status = LoadStatus.ERROR;
                 nextState.submit.error = action.payload;
                 break;
