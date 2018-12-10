@@ -273,7 +273,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 if (currentItem) {
                     currentItem.focus();
                 }
-                const excluded = [];
+                const excluded: HTMLElement[] = [];
                 currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
                     excluded.push(item as HTMLElement);
                 });
