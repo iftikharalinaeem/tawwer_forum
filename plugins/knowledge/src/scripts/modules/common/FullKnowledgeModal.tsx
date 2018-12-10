@@ -26,6 +26,7 @@ export class FullKnowledgeModal extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
                 className={this.props.className}
+                isWholePage={true}
             >
                 {this.props.children}
             </Modal>

@@ -24,11 +24,13 @@ import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     className?: string;
+    describedBy?: string;
 }
 
 interface IState {
     treeData: ITreeData<IKbNavigationItem>;
     selectedItem: ITreeItem<IKbNavigationItem> | null;
+    selectedElement: HTMLElement | null;
     disabled: boolean;
     deleteMode: boolean;
     writeMode: boolean;
@@ -36,10 +38,13 @@ interface IState {
 
 export default class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
+    private foundFirst = false;
+    private domElements = {};
 
     public state: IState = {
         treeData: this.calcInitialTree(),
         selectedItem: null,
+        selectedElement: null,
         disabled: false,
         deleteMode: false,
         writeMode: false,
@@ -47,7 +52,13 @@ export default class NavigationManager extends React.Component<IProps, IState> {
 
     public render() {
         return (
-            <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
+            <div
+                ref={this.self}
+                className={classNames("navigationManager", this.props.className)}
+                role="tree"
+                aria-describedby={this.props.describedBy}
+                onKeyDown={this.handleKeyDown}
+            >
                 <Tree
                     tree={this.state.treeData}
                     onDragEnd={this.onDragEnd}
@@ -79,6 +90,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
                 selectedItem={this.state.selectedItem}
+                selectedElement={this.state.selectedElement}
                 selectItem={this.selectItem}
                 unSelectItem={this.unSelectItem}
                 disableTree={this.disableTree}
@@ -86,8 +98,18 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 type={this.getType(data.recordType)}
                 writeMode={this.state.writeMode}
                 deleteMode={this.state.deleteMode}
+                firstID={this.getFirstTreeItemID()}
             />
         );
+    };
+
+    private getFirstTreeItemID = (): string | null => {
+        const items = this.state.treeData.items;
+        if (items) {
+            return Object.values(items)[1].id;
+        } else {
+            return null;
+        }
     };
 
     private deleteSelectedItem = (item: ITreeItem<IKbNavigationItem>) => {
@@ -100,25 +122,31 @@ export default class NavigationManager extends React.Component<IProps, IState> {
             result: true,
             message: "Success",
         };
-        this.unSelectItem();
     };
 
     private selectItem = (
         selectedItem: ITreeItem<IKbNavigationItem>,
         writeMode: boolean = false,
         deleteMode: boolean = false,
+        selectedElement: HTMLElement,
         callback?: () => void,
     ) => {
-        this.setState({
-            selectedItem,
-            writeMode,
-            deleteMode,
-        }, callback);
+        this.setState(
+            {
+                disabled: writeMode || deleteMode,
+                selectedItem,
+                selectedElement,
+                writeMode,
+                deleteMode,
+            },
+            callback,
+        );
     };
 
     private unSelectItem = () => {
         this.setState({
             selectedItem: null,
+            selectedElement: null,
         });
     };
 
@@ -219,6 +247,42 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 return t("category");
             default:
                 return type;
+        }
+    };
+
+    /**
+     * Keyboard handler for arrow up, arrow down, home, end and escape.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (e: React.KeyboardEvent) => {
+        const currentItem = this.state.selectedElement as HTMLElement;
+        const shift = "-Shift";
+        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+            case "Escape":
+                e.preventDefault();
+                e.stopPropagation();
+                this.setState({
+                    disabled: false,
+                    writeMode: false,
+                });
+            case "ArrowDown":
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentItem) {
+                    currentItem.focus();
+                }
+                const excluded: HTMLElement[] = [];
+                currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
+                    excluded.push(item as HTMLElement);
+                });
+                const tabHandler = new TabHandler(this.self.current! as HTMLElement, excluded);
+                const nextElement = tabHandler.getNext(currentItem, false, false);
+                if (nextElement) {
+                    nextElement.focus();
+                }
+                break;
         }
     };
 

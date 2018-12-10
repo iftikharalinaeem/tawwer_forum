@@ -30,32 +30,35 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
 
     public render() {
         return (
-            <div className="treeToolBar">
-                <Button
-                    className="treeToolBar-button treeToolBar-expandAll"
-                    onClick={this.props.expandAll}
-                    disabled={this.state.allExpanded}
-                >
-                    {expandAll()}
-                    {t("Expand All")}
-                </Button>
-                <Button
-                    className="treeToolBar-button treeToolBar-collapseAll"
-                    onClick={this.props.collapseAll}
-                    disabled={this.state.allCollapsed}
-                >
-                    {collapseAll()}
-                    {t("Collapse All")}
-                </Button>
-                <Button
-                    className="treeToolBar-button treeToolBar-collapseAll"
-                    onClick={this.props.newCategory}
-                    disabled={this.state.allExpanded}
-                    buttonRef={this.props.newCategoryButtonRef}
-                >
-                    {newFolder()}
-                    {t("New Category")}
-                </Button>
+            <div className="navigationManagerToolbar">
+                <div className="navigationManagerToolbar-bar">
+                    <Button
+                        className="navigationManagerToolbar-button navigationManagerToolbar-expandAll"
+                        onClick={this.props.expandAll}
+                        disabled={this.state.allExpanded}
+                    >
+                        {expandAll("navigationManagerToolbar-icon")}
+                        <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>
+                    </Button>
+                    <Button
+                        className="navigationManagerToolbar-button navigationManagerToolbar-collapseAll"
+                        onClick={this.props.collapseAll}
+                        disabled={this.state.allCollapsed}
+                    >
+                        {collapseAll("navigationManagerToolbar-icon")}
+                        <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>
+                    </Button>
+                    <Button
+                        className="navigationManagerToolbar-button navigationManagerToolbar-newFolder"
+                        onClick={this.props.newCategory}
+                        disabled={this.state.allExpanded}
+                        buttonRef={this.props.newCategoryButtonRef}
+                    >
+                        {newFolder("navigationManagerToolbar-icon navigationManagerToolbar-newFolder")}
+                        <span className="navigationManagerToolbar-buttonLabel">{t("New Category")}</span>
+                    </Button>
+                </div>
+                <hr className="navigationManagerToolbar-separator" />
             </div>
         );
     }
