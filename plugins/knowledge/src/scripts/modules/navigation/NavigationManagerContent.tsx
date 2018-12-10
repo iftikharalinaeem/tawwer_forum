@@ -14,7 +14,8 @@ import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import NavigationManagerNameForm from "./NavigationManagerNameForm";
-import {INavigationItem} from "@library/@types/api";
+import { INavigationItem } from "@library/@types/api";
+import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps {
     className?: string;
@@ -28,7 +29,12 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (item: ITreeItem<INavigationItem> | null, writeMode: boolean, deleteMode: boolean, callback?: () => void) => void;
+    selectItem: (
+        item: ITreeItem<INavigationItem> | null,
+        writeMode: boolean,
+        deleteMode: boolean,
+        callback?: () => void,
+    ) => void;
     unSelectItem: () => void;
     disableTree: (callback?: () => void) => void;
     enableTree: (callback?: () => void) => void;
@@ -54,22 +60,34 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     public render() {
         const { item, provided, snapshot } = this.props;
         const name = item.data!.name;
+        const isEditing = this.props.writeMode && !!this.isCurrent();
         return (
+            <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                aria-roledescription={
+                    provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
+                }
+                className={classNames("navigationManager-item", {
+                    isDragging: snapshot.isDragging,
+                    isActive: this.isCurrent(),
+                })}
+                tabIndex={0}
+            >
+                <div className={classNames("navigationManager-draggable", this.props.className)}>
+                    <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
+                        <NavigationManagerItemIcon
+                            expanded={!!item.isExpanded}
+                            expandItem={this.handleExpand}
+                            collapseItem={this.handleCollapse}
+                            itemId={item.id}
+                            className="tree-itemIcon"
+                            hasChildren={this.props.hasChildren}
+                        />
+                    </ConditionalWrap>
 
-                <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    aria-roledescription={
-                        provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
-                    }
-                    className={classNames("navigationManager-item", {
-                        isDragging: snapshot.isDragging,
-                        isActive: this.isCurrent(),
-                    })}
-                    tabIndex={0}
-                >
-                    {this.props.writeMode && this.isCurrent() ? (
+                    {isEditing ? (
                         <NavigationManagerNameForm
                             currentName={name}
                             focusOnExit={this.buttonRef}
@@ -77,16 +95,14 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             cancel={this.cancelRename}
                         />
                     ) : (
-                        <div className={classNames("navigationManager-draggable", this.props.className)}>
-                            <NavigationManagerItemIcon
-                                expanded={!!item.isExpanded}
-                                expandItem={this.handleExpand}
-                                collapseItem={this.handleCollapse}
-                                itemId={item.id}
-                                className="tree-itemIcon"
-                                hasChildren={this.props.hasChildren}
-                            />
-                            <span className="navigationManager-itemLabel">{name}</span>
+                        <>
+                            <span
+                                className={classNames("navigationManager-itemLabel", {
+                                    isFolder: this.props.hasChildren,
+                                })}
+                            >
+                                {name}
+                            </span>
                             <Button
                                 onClick={this.renameItem}
                                 className={classNames(
@@ -132,10 +148,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                         />
                                     </ModalConfirm>
                                 )}
-                        </div>
+                        </>
                     )}
                 </div>
-
+            </div>
         );
     }
     //
@@ -173,7 +189,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         });
     };
 
-    private getRef () {
+    private getRef() {
         return this.wrapRef.current!.firstChild as HTMLElement;
     }
 

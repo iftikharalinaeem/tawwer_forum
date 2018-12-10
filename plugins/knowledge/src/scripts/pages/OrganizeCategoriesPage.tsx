@@ -40,16 +40,20 @@ export default class OrganizeCategoriesPage extends React.Component<IProps, ISta
                 <FullKnowledgeModal titleID={this.titleID} className={this.props.className}>
                     <NavigationManagerMenu />
                     <div className="container">
-                        <DocumentTitle title={pageTitle}>
-                            <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
-                        </DocumentTitle>
-                        <NavigationManagerToolBar
-                            collapseAll={this.todo}
-                            expandAll={this.todo}
-                            newCategory={this.showNewCategoryModal}
-                            newCategoryButtonRef={this.newCategoryButtonRef}
-                        />
-                        <NavigationManager />
+                            <DocumentTitle title={pageTitle}>
+                                <div className="navigationManagerWrap">
+                                    <Heading depth={1} renderAsDepth={2} className="pageSubTitle" title={pageTitle} />
+                                </div>
+                            </DocumentTitle>
+                            <NavigationManagerToolBar
+                                collapseAll={this.todo}
+                                expandAll={this.todo}
+                                newCategory={this.showNewCategoryModal}
+                                newCategoryButtonRef={this.newCategoryButtonRef}
+                            />
+                        <div className="navigationManagerWrap">
+                            <NavigationManager />
+                        </div>
                     </div>
                 </FullKnowledgeModal>
                 {this.state.showNewCategoryModal && (

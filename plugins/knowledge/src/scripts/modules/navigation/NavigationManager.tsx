@@ -108,11 +108,15 @@ export default class NavigationManager extends React.Component<IProps, IState> {
         deleteMode: boolean = false,
         callback?: () => void,
     ) => {
-        this.setState({
-            selectedItem,
-            writeMode,
-            deleteMode,
-        }, callback);
+        this.setState(
+            {
+                disabled: writeMode || deleteMode,
+                selectedItem,
+                writeMode,
+                deleteMode,
+            },
+            callback,
+        );
     };
 
     private unSelectItem = () => {
@@ -302,9 +306,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 //     }
                 //     break;
             }
-
         }
-
     };
 
     // private setDomElement = (itemId: string, element: HTMLElement) => {
