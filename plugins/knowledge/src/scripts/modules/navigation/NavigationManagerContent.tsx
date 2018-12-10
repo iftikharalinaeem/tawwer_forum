@@ -13,7 +13,6 @@ import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import NavigationManagerNameForm from "./NavigationManagerNameForm";
-import { INavigationItem } from "@library/@types/api";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps {
@@ -77,7 +76,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             : -1
                     }
                     role="treeitem"
-                    onClick={this.focusSelf}
+                    onClick={this.selectSelf}
                 >
                     <div className={classNames("navigationManager-draggable", this.props.className)}>
                         <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
@@ -152,7 +151,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         this.props.onRenameSubmit(this.props.item.data, newName);
     };
 
-    private renameItem = () => {
+    private renameItem = (e: React.MouseEvent) => {
+        e.stopPropagation();
         this.props.selectItem(this.props.item, true, this.getRef());
     };
 
@@ -160,17 +160,16 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         this.props.onDeleteClick(this.deleteButtonRef.current!);
     };
 
-    private cancelRename = () => {
+    private cancelRename = (e: React.MouseEvent) => {
+        e.stopPropagation();
         this.props.selectItem(this.props.item, false, this.getRef());
     };
 
     private handleExpand = () => {
-        this.props.selectItem(this.props.item, false, this.getRef());
         this.props.expandItem(this.props.item.id);
     };
 
     private handleCollapse = () => {
-        this.props.selectItem(this.props.item, false, this.getRef());
         this.props.collapseItem(this.props.item.id);
     };
     public componentDidMount() {

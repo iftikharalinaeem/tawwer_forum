@@ -13,8 +13,8 @@ import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface IProps {
     expanded: boolean;
-    expandItem: (itemId: string) => void;
-    collapseItem: (itemId: string) => void;
+    expandItem: () => void;
+    collapseItem: () => void;
     itemId: string;
     disabled?: boolean;
     type: NavigationRecordType;
@@ -40,9 +40,10 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
         }
     }
 
-    private handleClick = e => {
-        const { expanded, expandItem, collapseItem, itemId } = this.props;
-        expanded ? collapseItem(itemId) : expandItem(itemId);
+    private handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const { expanded, expandItem, collapseItem } = this.props;
+        expanded ? collapseItem() : expandItem();
     };
 
     private icon = () => {

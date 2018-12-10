@@ -15,7 +15,7 @@ interface IProps {
     currentName: string;
     focusOnExit: React.RefObject<HTMLButtonElement>;
     applyNewName: (newName: string) => void;
-    cancel: (e) => void;
+    cancel: (e: React.MouseEvent) => void;
 }
 
 interface IState {

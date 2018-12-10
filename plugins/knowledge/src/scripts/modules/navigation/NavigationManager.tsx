@@ -40,6 +40,7 @@ interface IProps extends IActions, INavigationStoreState {
     navigationItems: INormalizedNavigationItems;
     knowledgeBaseID: number;
     describedBy?: string;
+    rootNavigationItemID: string;
 }
 
 interface IState {
@@ -95,9 +96,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
                             onExpand={this.expandItem}
                             renderItem={this.renderItem}
                             isDragEnabled={!this.state.disabled}
-                            // key={`${this.state.selectedItem ? this.state.selectedItem.id : undefined}-${
-                            //     this.state.writeMode
-                            // }`}
                         />
                     </div>
                 </div>
@@ -171,14 +169,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private expandItem = (itemId: string) => {
         const { treeData } = this.state;
+        const itemData = treeData[itemId];
         this.setState({
             treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+            selectedItem: itemData,
         });
     };
     private getFirstTreeItemID = (): string | null => {
         const items = this.state.treeData.items;
         if (items) {
-            return Object.values(items)[1].id;
+            // Hard coded until we
+            return this.state.treeData.items[this.props.rootNavigationItemID].children[0];
         } else {
             return null;
         }
@@ -192,7 +193,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
         writeMode: boolean = false,
         selectedElement?: HTMLElement | null,
     ) => {
+        const newID = selectedItem.id;
+        const { treeData, selectedItem: oldSelectedItem } = this.state;
+        const oldID = oldSelectedItem ? oldSelectedItem.id : null;
+
+        let nextTree = mutateTree(treeData, newID, {});
+        if (oldID) {
+            nextTree = mutateTree(nextTree, oldID, {});
+        }
+
         this.setState({
+            treeData: nextTree,
             disabled: writeMode,
             selectedItem,
             selectedElement: selectedElement || null,
@@ -205,9 +216,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private collapseItem = (itemId: string) => {
         const { treeData } = this.state;
+        const itemData = treeData[itemId];
         this.setState({
             treeData: mutateTree(treeData, itemId, { isExpanded: false }),
-            selectedItem: null,
+            selectedItem: itemData,
             selectedElement: null,
         });
     };
@@ -415,15 +427,20 @@ export class NavigationManager extends React.Component<IProps, IState> {
         if (!destination) {
             return;
         }
+
         // Do nothing if we leave it in the spot we started.
         if (source.index === destination.index && source.parentId === destination.parentId) {
             return;
         }
 
+        const itemID = treeData.items[source.parentId].children[source.index];
+        const item = treeData.items[itemID];
+
         const newTree = moveItemOnTree(treeData, source, destination);
         this.setState({
             treeData: newTree,
-            selectedItem: newTree.items[source.parentId].children[source.index],
+            writeMode: false,
+            selectedItem: item,
         });
         await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
     };
@@ -435,7 +452,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private updateAllItems(update: Partial<ITreeItem<INormalizedNavigationItem>>) {
         const data: ITreeData<INormalizedNavigationItem> = {
-            rootId: "knowledgeCategory1",
+            rootId: this.props.rootNavigationItemID,
             items: {},
         };
 

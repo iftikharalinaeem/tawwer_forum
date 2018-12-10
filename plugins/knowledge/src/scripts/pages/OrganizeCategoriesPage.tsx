@@ -37,7 +37,7 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
                             </div>
                         </DocumentTitle>
                         <div className="navigationManagerWrap">
-                            <NavigationManager knowledgeBaseID={1} />
+                            <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
                         </div>
                     </div>
                 </FullKnowledgeModal>
