@@ -436,13 +436,18 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const itemID = treeData.items[source.parentId].children[source.index];
         const item = treeData.items[itemID];
 
-        const newTree = moveItemOnTree(treeData, source, destination);
+        let newTree = moveItemOnTree(treeData, source, destination);
+        const currentlySelectedItem = this.state.selectedItem;
+        if (currentlySelectedItem) {
+            // Touch the old item so it re-renders.
+            newTree = mutateTree(newTree, currentlySelectedItem.id, {});
+        }
         this.setState({
             treeData: newTree,
             writeMode: false,
             selectedItem: item,
         });
-        await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
+        await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
     };
 
     /**
@@ -482,7 +487,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 children: value.children,
             };
         }
-        return NavigationModel.denormalizeData(outOfTree, "knowledgeCategory1");
+        return NavigationModel.denormalizeData(outOfTree, this.props.rootNavigationItemID);
     }
 
     private static readonly DEFAULT_EXPAND_VALUE = true;
