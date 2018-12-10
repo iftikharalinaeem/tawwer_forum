@@ -31,12 +31,41 @@ class KbRootController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->setPageTitle(\Gdn::translate('Home'));
+        $this->setPageTitle(\Gdn::translate('Debug'));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();
         $data['page']['classes'][] = 'isLoading';
         $data['template'] = 'seo/pages/home.twig';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * Render out the /kb/debug page.
+     */
+    public function get_debug(): string {
+        $this->setPageTitle(\Gdn::translate('Debug - Internal Links'));
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
+
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * Render out the /kb/{id}/organize-categories page.
+     *
+     * @param int $id Knowledge base ID
+     */
+    public function get_organizeCategories(int $id) : string {
+        $this->setPageTitle(\Gdn::translate('Organize Categories'));
+
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getViewData();
+        $data['page']['classes'][] = 'isLoading';
+        $data['template'] = 'seo/pages/organize-categories.twig';
 
         return $this->twigInit()->render('default-master.twig', $data);
     }

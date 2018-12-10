@@ -8,11 +8,12 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import produce from "immer";
-import { IKbCategory, IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import { createSelector } from "reselect";
+import { INavigationTreeItem } from "@library/@types/api";
 
 export interface ILocationPickerState {
     navigatedCategoryID: number; // What page the user is on in the picker.
@@ -21,7 +22,7 @@ export interface ILocationPickerState {
 }
 
 export interface ILPConnectedData extends ILocationPickerState {
-    pageContents: IKbNavigationItem[];
+    pageContents: INavigationTreeItem[];
     locationBreadcrumb: ICrumb[] | null;
     navigatedCategory: IKbCategoryFragment | null; // What page the user is on in the picker.
     selectedCategory: IKbCategoryFragment | null; // What category is selected (still not chosen).

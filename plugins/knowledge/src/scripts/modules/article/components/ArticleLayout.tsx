@@ -4,9 +4,8 @@
  * @license Proprietary
  */
 import * as React from "react";
-import SiteNav from "@library/components/siteNav/SiteNav";
 import { Devices } from "@library/components/DeviceChecker";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
+import { IArticle, ArticleStatus, NavigationRecordType } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
@@ -16,14 +15,16 @@ import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
-import { dummyNavData } from "../../categories/state/dummyNavData";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
-import VanillaHeader from "@library/components/VanillaHeader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import SiteNav from "@library/components/siteNav/SiteNav";
+import Navigation from "@knowledge/modules/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
 
 interface IProps {
     article: IArticle;
@@ -32,67 +33,76 @@ interface IProps {
     messages?: React.ReactNode;
 }
 
-interface IState {}
-
 /**
  * Implements the article's layout
  */
-export class ArticleLayout extends React.Component<IProps, IState> {
+export class ArticleLayout extends React.Component<IProps> {
     public render() {
         const { article, messages } = this.props;
+        const { articleID } = article;
+
+        const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
 
         return (
-            <Container>
-                <VanillaHeader />
-                <PanelLayout device={this.props.device}>
-                    {this.props.breadcrumbData.length > 1 && (
-                        <PanelLayout.Breadcrumbs>
+            <React.Fragment>
+                <Container>
+                    <VanillaHeader
+                        title={article.name}
+                        mobileDropDownContent={<Navigation collapsible={false} activeRecord={activeRecord} />}
+                    />
+                    <PanelLayout device={this.props.device}>
+                        {this.props.device !== Devices.MOBILE && (
+                            <PanelLayout.Breadcrumbs>
+                                <PanelWidget>
+                                    <NavigationBreadcrumbs activeRecord={activeRecord} />
+                                </PanelWidget>
+                            </PanelLayout.Breadcrumbs>
+                        )}
+                        <PanelLayout.LeftBottom>
+                            <PanelWidget>{<Navigation collapsible={true} activeRecord={activeRecord} />}</PanelWidget>
+                        </PanelLayout.LeftBottom>
+                        <PanelLayout.MiddleTop>
                             <PanelWidget>
-                                <Breadcrumbs>{this.props.breadcrumbData}</Breadcrumbs>
+                                <PageTitle
+                                    title={article.name}
+                                    actions={
+                                        <ArticleMenu
+                                            article={article}
+                                            buttonClassName="pageTitle-menu"
+                                            device={this.props.device}
+                                        />
+                                    }
+                                    meta={
+                                        <ArticleMeta
+                                            updateUser={article.updateUser!}
+                                            dateUpdated={article.dateUpdated}
+                                            permaLink={article.url}
+                                        />
+                                    }
+                                />
+                                {messages && <div className="messages">{messages}</div>}
                             </PanelWidget>
-                        </PanelLayout.Breadcrumbs>
-                    )}
-                    <PanelLayout.LeftBottom>
-                        <PanelWidget>
-                            <SiteNav>{dummyNavData}</SiteNav>
-                        </PanelWidget>
-                    </PanelLayout.LeftBottom>
-                    <PanelLayout.MiddleTop>
-                        <PanelWidget>
-                            <PageTitle
-                                title={article.name}
-                                actions={<ArticleMenu article={article} buttonClassName="pageTitle-menu" />}
-                                meta={
-                                    <ArticleMeta
-                                        updateUser={article.updateUser!}
-                                        dateUpdated={article.dateUpdated}
-                                        permaLink={article.url}
-                                    />
-                                }
-                            />
-                            {messages && <div className="messages">{messages}</div>}
-                        </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
-                        <PanelWidget>
-                            <UserContent content={article.body} />
-                            <AttachmentList attachments={this.articleAttachmentList} />
-                        </PanelWidget>
-                    </PanelLayout.MiddleBottom>
-                    {article.outline &&
-                        article.outline.length > 0 && (
+                        </PanelLayout.MiddleTop>
+                        <PanelLayout.MiddleBottom>
+                            <PanelWidget>
+                                <UserContent content={article.body} />
+                                <AttachmentList attachments={this.articleAttachmentList} />
+                            </PanelWidget>
+                        </PanelLayout.MiddleBottom>
+                        {article.outline && article.outline.length > 0 && (
                             <PanelLayout.RightTop>
                                 <PanelWidget>
                                     <ArticleTOC items={article.outline} />
                                 </PanelWidget>
                             </PanelLayout.RightTop>
                         )}
-                    <PanelLayout.RightBottom>
-                        <OtherLanguages {...dummyOtherLanguagesData} />
-                        <RelatedArticles children={this.articleRelatedArticles} />
-                    </PanelLayout.RightBottom>
-                </PanelLayout>
-            </Container>
+                        <PanelLayout.RightBottom>
+                            <OtherLanguages {...dummyOtherLanguagesData} />
+                            <RelatedArticles children={this.articleRelatedArticles} />
+                        </PanelLayout.RightBottom>
+                    </PanelLayout>
+                </Container>
+            </React.Fragment>
         );
     }
 

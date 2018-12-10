@@ -13,8 +13,8 @@ import {
     DropDownItemButton,
     DropDownItemMetas,
     DropDownItemSeparator,
+    DropDownItem,
 } from "@library/components/dropdown";
-import { makeEditUrl, makeRevisionsUrl } from "@knowledge/modules/editor/route";
 import { ModalConfirm } from "@library/components/modal";
 import { connect } from "react-redux";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
@@ -26,10 +26,13 @@ import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
+import { Devices } from "@library/components/DeviceChecker";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
     buttonClassName?: string;
+    device?: Devices;
 }
 
 interface IState {
@@ -48,8 +51,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { article } = this.props;
-        const editUrl = makeEditUrl(article);
-        const revisionUrl = makeRevisionsUrl(article);
 
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
@@ -63,6 +64,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
+                    openAsModal={this.props.device === Devices.MOBILE}
                 >
                     <Frame>
                         <FrameBody className="dropDownItem-verticalPadding">
@@ -83,9 +85,17 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                             <DropDownItemSeparator />
                             <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                             <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
-                            <DropDownItemLink name={t("Edit article")} to={editUrl} />
+                            <DropDownItem>
+                                <EditorRoute.Link data={this.props.article} className={DropDownItemLink.CSS_CLASS}>
+                                    {t("Edit article")}
+                                </EditorRoute.Link>
+                            </DropDownItem>
                             <DropDownItemSeparator />
-                            <DropDownItemLink name={t("Revision History")} to={revisionUrl} />
+                            <DropDownItem>
+                                <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                                    {t("Revision History")}
+                                </RevisionsRoute.Link>
+                            </DropDownItem>
                             <DropDownItemSeparator />
                             {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
                         </FrameBody>

@@ -9,13 +9,7 @@ import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { InlineTypes } from "@library/components/translation/Sentence";
 
-import {
-    DropDownItemLink,
-    DropDownItemButton,
-    DropDownItemMetas,
-    DropDownItemSeparator,
-} from "@library/components/dropdown";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { DropDownItemButton, DropDownItemMetas, DropDownItemSeparator } from "@library/components/dropdown";
 
 export interface IProps {}
 

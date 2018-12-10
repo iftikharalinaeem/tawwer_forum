@@ -21,7 +21,7 @@ import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -245,21 +245,27 @@ export default class EditorPageActions extends ReduxActions {
         }
 
         const response = await this.postArticle(request);
-        if (response) {
-            const article = response.data;
-
-            // Redirect
-            const editLocation = {
-                ...history.location,
-                pathname: makeEditUrl(article),
-                search: "",
-            };
-
-            history.replace(editLocation);
-            history.push({
-                pathname: article.url,
-            });
+        if (!response) {
+            return;
         }
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        if (!fullArticleResponse) {
+            return;
+        }
+
+        const article = fullArticleResponse.data;
+
+        // Redirect
+        const editLocation = {
+            ...history.location,
+            pathname: EditorRoute.url(article),
+            search: "",
+        };
+
+        history.replace(editLocation);
+        history.push({
+            pathname: article.url,
+        });
     }
 
     /**
@@ -326,13 +332,16 @@ export default class EditorPageActions extends ReduxActions {
      * @param body - The body of the submit request.
      */
     private async updateArticle(article: IPatchArticleRequestBody, history: History) {
-        const articleResult = await this.patchArticle(article);
-        // Our API request has failed
-        if (!articleResult) {
+        const response = await this.patchArticle(article);
+        if (!response) {
+            return;
+        }
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        if (!fullArticleResponse) {
             return;
         }
 
-        const { url } = articleResult.data;
+        const { url } = fullArticleResponse.data;
 
         // Redirect to the new url.
         history.replace({

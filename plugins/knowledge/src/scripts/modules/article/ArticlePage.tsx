@@ -15,16 +15,18 @@ import PageLoader from "@library/components/PageLoader";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/components/DocumentTitle";
-import { ArticleStatus } from "@knowledge/@types/api";
+import { ArticleStatus, NavigationRecordType } from "@knowledge/@types/api";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage from "@knowledge/routes/ErrorPage";
+import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
+import { t } from "@library/application";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
-        id: number;
+        id: string;
     }>;
     articlePageActions: ArticlePageActions;
 }
@@ -40,23 +42,27 @@ export class ArticlePage extends React.Component<IProps, IState> {
     /**
      * Render not found or the article.
      */
-    public render() {
+    public render(): React.ReactNode {
         const { loadable } = this.props;
 
+        const id = this.articleID;
+        const hasData = loadable.status === LoadStatus.SUCCESS && loadable.data && id;
+        const activeRecord = { recordID: id!, recordType: NavigationRecordType.ARTICLE };
         return (
             <>
                 <ErrorPage loadable={loadable} />
-                <PageLoader status={loadable.status}>
-                    {loadable.status === LoadStatus.SUCCESS &&
-                        loadable.data && (
-                            <DocumentTitle title={loadable.data.article.seoName || loadable.data.article.name}>
-                                <ArticleLayout
-                                    article={loadable.data.article}
-                                    breadcrumbData={loadable.data.breadcrumbs}
-                                    messages={this.renderMessages()}
-                                />
-                            </DocumentTitle>
-                        )}
+                <PageLoader status={LoadStatus.SUCCESS}>
+                    {hasData ? (
+                        <DocumentTitle title={loadable.data!.article.seoName || loadable.data!.article.name}>
+                            <ArticleLayout
+                                article={loadable.data!.article}
+                                breadcrumbData={loadable.data!.breadcrumbs}
+                                messages={this.renderMessages()}
+                            />
+                        </DocumentTitle>
+                    ) : (
+                        <NavigationLoadingLayout activeRecord={activeRecord} />
+                    )}
                 </PageLoader>
             </>
         );
@@ -116,12 +122,21 @@ export class ArticlePage extends React.Component<IProps, IState> {
         });
     };
 
+    private get articleID(): number | null {
+        const id = parseInt(this.props.match.params.id, 10);
+        if (Number.isNaN(id)) {
+            return null;
+        } else {
+            return id;
+        }
+    }
+
     /**
      * Initialize the page's data from it's url.
      */
     private initializeFromUrl() {
         const { articlePageActions } = this.props;
-        const { id } = this.props.match.params;
+        const id = this.articleID;
 
         if (id === null) {
             return;
@@ -146,4 +161,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(ArticlePage));
+export default withRedux(withDevice<IProps>(ArticlePage));

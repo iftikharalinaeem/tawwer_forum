@@ -26,6 +26,7 @@ export default class SearchPageActions extends ReduxActions {
     // Sum of all action types.
     public static readonly ACTION_TYPES:
         | ReturnType<typeof SearchPageActions.updateFormAC>
+        | ReturnType<typeof SearchPageActions.resetAC>
         | ActionsUnion<typeof SearchPageActions.getSearchACs>;
 
     /**
@@ -59,6 +60,17 @@ export default class SearchPageActions extends ReduxActions {
 
     public updateForm = this.bindDispatch(SearchPageActions.updateFormAC);
 
+    public static readonly RESET = "@@searchPage/RESET";
+
+    /**
+     * Reset to initial state.
+     */
+    private static resetAC() {
+        return ReduxActions.createAction(SearchPageActions.RESET);
+    }
+
+    public reset = this.bindDispatch(SearchPageActions.resetAC);
+
     /**
      * Perform a search with the values in the form.
      */
@@ -73,11 +85,19 @@ export default class SearchPageActions extends ReduxActions {
         // Convert start/endDate into format for our API.
         let dateUpdated: string | undefined;
         if (form.startDate && form.endDate) {
-            dateUpdated = `[${form.startDate},${form.endDate}]`;
+            if (form.startDate === form.endDate) {
+                // Simple equality.
+                dateUpdated = form.startDate;
+            } else {
+                // Date range
+                dateUpdated = `[${form.startDate},${form.endDate}]`;
+            }
         } else if (form.startDate) {
-            dateUpdated = `>${form.startDate}`;
+            // Only start date
+            dateUpdated = `>=${form.startDate}`;
         } else if (form.endDate) {
-            dateUpdated = `<${form.endDate}`;
+            // Only end date.
+            dateUpdated = `<=${form.endDate}`;
         }
 
         // Put together the search query.

@@ -265,11 +265,13 @@ export default class ArticleActions extends ReduxActions {
      * Get an article by its ID from the API.
      */
     public fetchByID = (options: IGetArticleRequestBody) => {
+        const { articleID, ...rest } = options;
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
             `/articles/${options.articleID}?expand=all`,
             ArticleActions.getArticleACs,
-            options,
+            rest,
+            { articleID },
         );
     };
 
