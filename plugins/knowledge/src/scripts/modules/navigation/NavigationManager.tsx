@@ -175,6 +175,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
             selectedItem: itemData,
         });
     };
+
+    /**
+     * Get the id of the first element in the tree to focus it.
+     */
     private getFirstTreeItemID = (): string | null => {
         const items = this.state.treeData.items;
         if (items) {
