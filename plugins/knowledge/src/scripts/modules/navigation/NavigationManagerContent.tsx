@@ -87,6 +87,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 itemId={item.id}
                                 className="tree-itemIcon"
                                 type={item.data.recordType}
+                                hasChildren={this.props.hasChildren}
                             />
                         </ConditionalWrap>
 
