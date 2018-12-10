@@ -12,6 +12,7 @@ import {
 } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
+import uniqueId from "lodash/uniqueId";
 
 /**
  * Redux actions for knowledge base navigation data.
@@ -79,7 +80,7 @@ export default class NavigationActions extends ReduxActions {
         NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE,
         NavigationActions.PATCH_NAVIGATION_FLAT_ERROR,
         {} as IPatchKbNavigationResponse,
-        {} as IPatchKBNavigationRequest,
+        {} as IPatchKBNavigationRequest & { transactionID: string },
     );
 
     /**
@@ -93,6 +94,7 @@ export default class NavigationActions extends ReduxActions {
             `/knowledge-navigation/flat`,
             NavigationActions.patchNavigationFlatACs,
             request,
+            { transactionID: uniqueId("patchNav") },
         );
     };
 }

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { NavigationRecordType, IPatchFlatItem, INormalizedNavigationItem } from "@knowledge/@types/api";
+import { NavigationRecordType, IPatchFlatItem, IKbNavigationItem } from "@knowledge/@types/api";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import { ILoadable, INavigationItem, INavigationTreeItem, LoadStatus } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -13,7 +13,7 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
-export interface INormalizedNavigationItem extends INormalizedNavigationItem {
+export interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
     tempName?: string;
     tempDeleted?: boolean;
@@ -30,6 +30,7 @@ export interface INavigationStoreState {
     currentKnowledgeBase: ILoadable<{}>; // Needs to be replaced with an actual KB.
     submitLoadable: ILoadable<never>;
     fetchLoadable: ILoadable<never>;
+    patchTransactionID: string | null;
 }
 
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
@@ -85,6 +86,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchLoadable: {
             status: LoadStatus.PENDING,
         },
+        patchTransactionID: null,
     };
 
     public reducer = (
@@ -164,11 +166,16 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     nextState.fetchLoadable.error = action.payload;
                     break;
                 case NavigationActions.PATCH_NAVIGATION_FLAT_REQUEST:
+                    nextState.patchTransactionID = action.meta.transactionID;
                     nextState.submitLoadable.status = LoadStatus.LOADING;
                     break;
                 case NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE:
-                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
-                    nextState.submitLoadable.status = LoadStatus.SUCCESS;
+                    // Use a transaction ID so that only that last request/response in a series of patches
+                    // "finishes" the state updates.
+                    if (nextState.patchTransactionID === action.meta.transactionID) {
+                        nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
+                        nextState.submitLoadable.status = LoadStatus.SUCCESS;
+                    }
                     break;
                 case NavigationActions.PATCH_NAVIGATION_FLAT_ERROR:
                     nextState.submitLoadable.status = LoadStatus.SUCCESS;
@@ -250,7 +257,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         return flatPatches;
     }
 
-    public static normalizeData(data: INormalizedNavigationItem[]) {
+    public static normalizeData(data: IKbNavigationItem[]) {
         data = data.sort(this.sortNavigationItems);
 
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
