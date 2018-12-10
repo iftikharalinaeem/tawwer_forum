@@ -43,7 +43,6 @@ export default class EditorPageActions extends ReduxActions {
     public static ACTION_TYPES:
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
-        | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setInitialDraftAC>
