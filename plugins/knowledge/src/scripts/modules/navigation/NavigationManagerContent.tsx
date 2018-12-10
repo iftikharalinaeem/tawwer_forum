@@ -29,6 +29,7 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
+    selectedElement: HTMLElement | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
     selectItem: (
         item: ITreeItem<INavigationItem> | null,
         writeMode: boolean,
@@ -169,6 +170,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 </div>
             </div>
         );
+    }
+
+    public componentDidMount() {
+        if (this.props.firstID === this.props.item.id) {
+            console.log("in here");
+            this.props.selectItem(this.props.item, this.props.writeMode, this.props.deleteMode, this.getRef());
+        }
     }
 
     private renameItem = (e: React.SyntheticEvent) => {

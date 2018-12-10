@@ -90,6 +90,7 @@ export default class NavigationManager extends React.Component<IProps, IState> {
                 expandItem={this.expandItem}
                 collapseItem={this.collapseItem}
                 selectedItem={this.state.selectedItem}
+                selectedElement={this.state.selectedElement}
                 selectItem={this.selectItem}
                 unSelectItem={this.unSelectItem}
                 disableTree={this.disableTree}
