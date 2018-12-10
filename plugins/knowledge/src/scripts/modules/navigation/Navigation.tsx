@@ -27,6 +27,9 @@ interface IProps extends INavigationStoreState {
  * Data connect navigation component for knowledge base.
  */
 export class Navigation extends React.Component<IProps> {
+    /**
+     * @inheritdoc
+     */
     public render(): React.ReactNode {
         return (
             <SiteNav

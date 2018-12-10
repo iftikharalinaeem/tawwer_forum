@@ -33,7 +33,6 @@ import { connect } from "react-redux";
 import { ModalConfirm } from "@library/components/modal";
 import Translate from "@library/components/translation/Translate";
 import { t } from "@library/application";
-import { Navigation } from "@knowledge/modules/navigation/Navigation";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -65,6 +64,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         elementToFocusOnDeleteClose: null,
     };
 
+    /**
+     * @inheritdoc
+     */
     public render() {
         return (
             <>
@@ -93,6 +95,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Render callback for @atlaskit/tree. Render's a single navigation item.
+     */
     private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
         const hasChildren = item.children && item.children.length > 0;
@@ -111,18 +116,23 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 collapseItem={this.collapseItem}
                 selectedItem={this.state.selectedItem}
                 selectItem={this.selectItem}
-                unSelectItem={this.unSelectItem}
                 writeMode={this.state.writeMode}
                 onDeleteClick={deleteHandler}
             />
         );
     };
 
+    /**
+     * @inheritdoc
+     */
     public async componentDidMount() {
         const { knowledgeBaseID } = this.props;
         await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentDidUpdate(prevProps: IProps) {
         if (this.props.navigationItems !== prevProps.navigationItems) {
             this.setState({ treeData: this.calcTree() });
@@ -176,7 +186,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 break;
         }
 
-        this.unSelectItem();
+        this.clearSelectedItem();
     };
 
     /**
@@ -197,13 +207,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
-    private unSelectItem = () => {
+    /**
+     * Reset the selected item.
+     */
+    private clearSelectedItem = () => {
         this.setState({
             selectedItem: null,
         });
     };
 
     /// MODALS
+
     /**
      * Get the currently "selected" category. If we have an article selected use it's parent category.
      */
@@ -222,6 +236,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
     }
 
+    /**
+     * Render function for the new category modal.
+     */
     private renderNewCategoryModal(): React.ReactNode {
         return (
             this.state.showNewCategoryModal && (
@@ -235,8 +252,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Handler for the when a new category has been successfully created.
+     *
+     * - Re-fetches the navigation tree.
+     */
     private onNewCategorySuccess = async () => {
-        console.log("New cateory success!!!");
         const { knowledgeBaseID } = this.props;
         await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID }, true);
     };
@@ -260,6 +281,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
     };
 
     /// DELETE MODAL
+
+    /**
+     * Render method for the delete category modal.
+     */
     private renderDeleteModal(): React.ReactNode {
         const { deleteItem } = this.state;
         return (
@@ -284,6 +309,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * Handle confirmation that an item should be deleted.
+     *
+     * Updates either an article of category using their respective endpoints.
+     */
     private handleDeleteConfirm = async () => {
         const { deleteItem } = this.state;
         if (deleteItem) {
@@ -300,24 +330,28 @@ export class NavigationManager extends React.Component<IProps, IState> {
         this.dismissDeleteModal();
     };
 
+    /**
+     * Display the delete modal.
+     */
     private showDeleteModal = (item: ITreeItem<INormalizedNavigationItem>) => {
         this.setState({ deleteItem: item });
-        this.disableTree(() => {
-            this.selectItem(item, false);
-        });
+        this.disableTree();
+        this.selectItem(item, false);
     };
 
+    /**
+     * Dismiss the delete modal.
+     */
     private dismissDeleteModal = () => {
         const { deleteItem } = this.state;
         this.setState({
             deleteItem: null,
             elementToFocusOnDeleteClose: null,
         });
-        this.enableTree(() => {
-            if (deleteItem) {
-                this.selectItem(deleteItem, false);
-            }
-        });
+        this.enableTree();
+        if (deleteItem) {
+            this.selectItem(deleteItem, false);
+        }
     };
 
     /**
@@ -338,28 +372,23 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
      */
-    private disableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: true,
-            },
-            callback,
-        );
+    private disableTree = () => {
+        this.setState({ disabled: true });
     };
 
     /**
      * Enable editing of the whole tree. Takes an optional callback for when the state update has completed.
      */
-    private enableTree = (callback?: () => void) => {
-        this.setState(
-            {
-                disabled: false,
-            },
-            callback,
-        );
+    private enableTree = () => {
+        this.setState({ disabled: false });
     };
 
-    private onDragEnd = (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
+    /**
+     * Handle completion of drag.
+     *
+     * - Update item in local state, and additionally dispatch to the API endoint.
+     */
+    private onDragEnd = async (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
         const { treeData } = this.state;
 
         if (!destination) {
@@ -371,19 +400,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
 
         const newTree = moveItemOnTree(treeData, source, destination);
-        this.setState(
-            {
-                treeData: newTree,
-                selectedItem: newTree.items[source.parentId].children[source.index],
-            },
-            () => {
-                void this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
-            },
-        );
-    };
-
-    private handleDelete = () => {
-        alert("Do Delete");
+        this.setState({
+            treeData: newTree,
+            selectedItem: newTree.items[source.parentId].children[source.index],
+        });
+        await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(this.state.treeData));
     };
 
     /**

@@ -26,7 +26,6 @@ interface IProps {
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
     selectItem: (item: ITreeItem<INormalizedNavigationItem> | null, writeMode: boolean, callback?: () => void) => void;
-    unSelectItem: () => void;
     writeMode: boolean;
 }
 
