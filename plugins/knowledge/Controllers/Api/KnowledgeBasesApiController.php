@@ -74,7 +74,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body): array {
-        $this->permission("garden.settings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->setDescription("Create a new knowledge base.");
@@ -100,7 +100,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_edit(int $id): array {
-        $this->permission("garden.settings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema()->setDescription("Get a knowledge base for editing.");
         $out = $this->schema(Schema::parse([
@@ -126,7 +126,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission("garden.setttings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeBasePostSchema())
@@ -151,7 +151,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException If the root knowledge category is not empty.
      */
     public function delete(int $id) {
-        $this->permission("garden.setttings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema()->setDescription("Delete a knowledge base.");
         $this->schema([], "out");
