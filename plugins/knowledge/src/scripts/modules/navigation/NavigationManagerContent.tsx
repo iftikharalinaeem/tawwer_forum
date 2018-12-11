@@ -12,7 +12,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import NavigationManagerNameForm from "./NavigationManagerNameForm";
+import NavigationManagerNameForm from "@knowledge/modules/navigation/NavigationManagerNameForm";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps {
@@ -26,13 +26,10 @@ interface IProps {
     expandItem: (itemId: string) => void;
     collapseItem: (itemId: string) => void;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null; // Item in rename mode. Parent manages it so only 1 can be in rename mode at a time.
-    selectItem: (
-        item: ITreeItem<INormalizedNavigationItem> | null,
-        writeMode: boolean,
-        selectedElement?: HTMLElement | null,
-    ) => void;
+    selectItem: (item: ITreeItem<INormalizedNavigationItem> | null, writeMode: boolean, callback?: () => void) => void;
     writeMode: boolean;
     firstID: string | null;
+    getItemID: (id: string) => string;
 }
 
 interface IState {
@@ -53,94 +50,104 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         return (
-            <div className={"navigationManager-itemFocusManager"} ref={this.wrapRef}>
-                <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    aria-roledescription={
-                        provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
-                    }
-                    className={classNames("navigationManager-item", {
-                        isDragging: snapshot.isDragging,
-                        hasError: error,
-                        isActive: this.isCurrent(),
-                    })}
-                    aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
-                    tabIndex={
-                        (this.props.selectedItem === null &&
-                            this.props.firstID !== null &&
-                            this.props.firstID === item.id) ||
-                        (this.props.selectedItem && this.isCurrent())
-                            ? 0
-                            : -1
-                    }
-                    role="treeitem"
-                    onClick={this.selectSelf}
-                >
-                    <div className={classNames("navigationManager-draggable", this.props.className)}>
-                        <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
-                            <NavigationManagerItemIcon
-                                expanded={!!item.isExpanded}
-                                expandItem={this.handleExpand}
-                                collapseItem={this.handleCollapse}
-                                itemId={item.id}
-                                className="tree-itemIcon"
-                                type={item.data.recordType}
-                                hasChildren={this.props.hasChildren}
-                            />
-                        </ConditionalWrap>
+            <div
+                id={this.id}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                aria-roledescription={
+                    provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
+                }
+                className={classNames("navigationManager-item", {
+                    isDragging: snapshot.isDragging,
+                    hasError: error,
+                    isActive: this.isCurrent(),
+                })}
+                aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
+                tabIndex={
+                    (this.props.selectedItem === null &&
+                        this.props.firstID !== null &&
+                        this.props.firstID === item.id) ||
+                    (this.props.selectedItem && this.isCurrent())
+                        ? 0
+                        : -1
+                }
+                role="treeitem"
+                onClick={this.selectSelf}
+                onFocus={this.selectSelf}
+            >
+                <div className={classNames("navigationManager-draggable", this.props.className)}>
+                    <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
+                        <NavigationManagerItemIcon
+                            expanded={!!item.isExpanded}
+                            expandItem={this.handleExpand}
+                            collapseItem={this.handleCollapse}
+                            itemId={item.id}
+                            className="tree-itemIcon"
+                            type={item.data.recordType}
+                            hasChildren={this.props.hasChildren}
+                        />
+                    </ConditionalWrap>
 
-                        {isEditing ? (
-                            <NavigationManagerNameForm
-                                currentName={this.displayName}
-                                focusOnExit={this.renameButtonRef}
-                                applyNewName={this.applyNewName}
-                                cancel={this.cancelRename}
-                            />
-                        ) : (
-                            <>
-                                <span
-                                    className={classNames("navigationManager-itemLabel", {
-                                        isFolder: this.props.hasChildren,
-                                    })}
-                                >
-                                    {this.displayName}
-                                </span>
+                    {isEditing ? (
+                        <NavigationManagerNameForm
+                            currentName={this.displayName}
+                            focusOnExit={this.renameButtonRef}
+                            applyNewName={this.applyNewName}
+                            cancel={this.cancelRename}
+                        />
+                    ) : (
+                        <>
+                            <span
+                                className={classNames("navigationManager-itemLabel", {
+                                    isFolder: this.props.hasChildren,
+                                })}
+                            >
+                                {this.displayName}
+                            </span>
+                            <Button
+                                onClick={this.renameItem}
+                                className={classNames(
+                                    "navigationManager-rename",
+                                    "navigationManager-action",
+                                    this.props.className,
+                                )}
+                                baseClass={ButtonBaseClass.CUSTOM}
+                                buttonRef={this.renameButtonRef}
+                                tabIndex={0}
+                            >
+                                {t("Rename")}
+                            </Button>
+                            {this.props.item.children.length === 0 && (
                                 <Button
-                                    onClick={this.renameItem}
+                                    onClick={this.handleDeleteClick}
                                     className={classNames(
-                                        "navigationManager-rename",
+                                        "navigationManager-delete",
                                         "navigationManager-action",
                                         this.props.className,
                                     )}
                                     baseClass={ButtonBaseClass.CUSTOM}
-                                    buttonRef={this.renameButtonRef}
+                                    buttonRef={this.deleteButtonRef}
                                     tabIndex={0}
                                 >
-                                    {t("Rename")}
+                                    {t("Delete")}
                                 </Button>
-                                {this.props.item.children.length === 0 && (
-                                    <Button
-                                        onClick={this.handleDeleteClick}
-                                        className={classNames(
-                                            "navigationManager-delete",
-                                            "navigationManager-action",
-                                            this.props.className,
-                                        )}
-                                        baseClass={ButtonBaseClass.CUSTOM}
-                                        buttonRef={this.deleteButtonRef}
-                                        tabIndex={0}
-                                    >
-                                        {t("Delete")}
-                                    </Button>
-                                )}
-                            </>
-                        )}
-                    </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         );
+    }
+
+    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
+        if (!this.props.selectedItem && this.isCurrent()) {
+            this.selectSelf();
+        }
+    }
+
+    private get id() {
+        return this.props.getItemID(this.props.item.id);
     }
 
     private get displayName(): string {
@@ -154,7 +161,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private renameItem = (e: React.MouseEvent) => {
         e.stopPropagation();
-        this.props.selectItem(this.props.item, true, this.getRef());
+        this.props.selectItem(this.props.item, true);
     };
 
     private handleDeleteClick = () => {
@@ -163,7 +170,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private cancelRename = (e: React.MouseEvent) => {
         e.stopPropagation();
-        this.props.selectItem(this.props.item, false, this.getRef());
+        this.props.selectItem(this.props.item, false);
     };
 
     private handleExpand = () => {
@@ -173,18 +180,14 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     private handleCollapse = () => {
         this.props.collapseItem(this.props.item.id);
     };
-    public componentDidMount() {
-        if (this.props.firstID === this.props.item.id) {
-            this.props.selectItem(this.props.item, this.props.writeMode, this.getRef());
-        }
-    }
-
-    private getRef(): HTMLElement {
-        return this.wrapRef.current!.firstChild as HTMLElement;
-    }
 
     private selectSelf = () => {
-        this.props.selectItem(this.props.item, this.props.writeMode, this.getRef());
+        this.props.selectItem(this.props.item, this.props.writeMode, () => {
+            const self = document.getElementById(this.props.getItemID(this.props.item.id));
+            if (self) {
+                self.focus();
+            }
+        });
     };
 
     private isCurrent = () => {

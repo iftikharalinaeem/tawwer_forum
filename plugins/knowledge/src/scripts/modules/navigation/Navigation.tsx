@@ -11,7 +11,7 @@ import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
-import { organize } from "@library/components/icons";
+import { organize } from "@library/components/icons/navigationManager";
 import { t } from "@library/application";
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/users/Permission";

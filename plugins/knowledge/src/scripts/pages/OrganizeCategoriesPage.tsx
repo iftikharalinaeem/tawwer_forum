@@ -24,20 +24,22 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className="container">
-                        <DocumentTitle title={pageTitle}>
-                            <div className="navigationManagerWrap">
-                                <Heading
-                                    id={this.titleID}
-                                    depth={1}
-                                    renderAsDepth={2}
-                                    className="pageSubTitle"
-                                    title={pageTitle}
-                                />
+                    <div className="modal-scroll">
+                        <div className="container">
+                            <DocumentTitle title={pageTitle}>
+                                <div className="navigationManagerWrap">
+                                    <Heading
+                                        id={this.titleID}
+                                        depth={1}
+                                        renderAsDepth={2}
+                                        className="pageSubTitle"
+                                        title={pageTitle}
+                                    />
+                                </div>
+                            </DocumentTitle>
+                            <div className="navigationManagerWrap inheritHeight">
+                                <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
                             </div>
-                        </DocumentTitle>
-                        <div className="navigationManagerWrap">
-                            <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
                         </div>
                     </div>
                 </FullKnowledgeModal>

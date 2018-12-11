@@ -33,7 +33,7 @@ import { connect } from "react-redux";
 import { ModalConfirm } from "@library/components/modal";
 import Translate from "@library/components/translation/Translate";
 import { t } from "@library/application";
-import TabHandler from "@library/TabHandler";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -47,7 +47,6 @@ interface IState {
     treeData: ITreeData<INormalizedNavigationItem>;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null;
     deleteItem: ITreeItem<INormalizedNavigationItem> | null;
-    selectedElement: HTMLElement | null;
     disabled: boolean;
     showNewCategoryModal: boolean;
     writeMode: boolean;
@@ -57,12 +56,12 @@ interface IState {
 export class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
     private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private id = uniqueIDFromPrefix("tree");
 
     public state: IState = {
         treeData: this.calcTree(),
         selectedItem: null,
         deleteItem: null,
-        selectedElement: null,
         disabled: false,
         showNewCategoryModal: false,
         writeMode: false,
@@ -83,21 +82,19 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 />
                 <div
                     ref={this.self}
-                    className={classNames("navigationManager", this.props.className)}
+                    className={classNames("navigationManager", "inheritHeight", this.props.className)}
                     role="tree"
                     aria-describedby={this.props.describedBy}
-                    onKeyDown={this.handleKeyDown}
+                    onKeyDownCapture={this.handleKeyDown}
                 >
-                    <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
-                        <Tree
-                            tree={this.state.treeData}
-                            onDragEnd={this.onDragEnd}
-                            onCollapse={this.collapseItem}
-                            onExpand={this.expandItem}
-                            renderItem={this.renderItem}
-                            isDragEnabled={!this.state.disabled}
-                        />
-                    </div>
+                    <Tree
+                        tree={this.state.treeData}
+                        onDragEnd={this.onDragEnd}
+                        onCollapse={this.collapseItem}
+                        onExpand={this.expandItem}
+                        renderItem={this.renderItem}
+                        isDragEnabled={!this.state.disabled}
+                    />
                 </div>
                 {this.renderNewCategoryModal()}
                 {this.renderDeleteModal()}
@@ -129,6 +126,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 writeMode={this.state.writeMode}
                 onDeleteClick={deleteHandler}
                 firstID={this.getFirstTreeItemID()}
+                getItemID={this.getItemId}
             />
         );
     };
@@ -167,13 +165,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Expand a single item.
      */
-    private expandItem = (itemId: string) => {
+    private expandItem = (itemId: string, callback?: () => void) => {
         const { treeData } = this.state;
         const itemData = treeData[itemId];
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
-            selectedItem: itemData,
-        });
+        this.setState(
+            {
+                treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+                selectedItem: itemData,
+            },
+            callback,
+        );
     };
 
     /**
@@ -195,7 +196,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private selectItem = (
         selectedItem: ITreeItem<INormalizedNavigationItem>,
         writeMode: boolean = false,
-        selectedElement?: HTMLElement | null,
+        callback?: () => void,
     ) => {
         const newID = selectedItem.id;
         const { treeData, selectedItem: oldSelectedItem } = this.state;
@@ -206,26 +207,30 @@ export class NavigationManager extends React.Component<IProps, IState> {
             nextTree = mutateTree(nextTree, oldID, {});
         }
 
-        this.setState({
-            treeData: nextTree,
-            disabled: writeMode,
-            selectedItem,
-            selectedElement: selectedElement || null,
-            writeMode,
-        });
+        this.setState(
+            {
+                treeData: nextTree,
+                disabled: writeMode,
+                selectedItem,
+                writeMode,
+            },
+            callback,
+        );
     };
 
     /**
      * Collapse a single item.
      */
-    private collapseItem = (itemId: string) => {
+    private collapseItem = (itemId: string, callback?: () => void) => {
         const { treeData } = this.state;
         const itemData = treeData[itemId];
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
-            selectedItem: itemData,
-            selectedElement: null,
-        });
+        this.setState(
+            {
+                treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+                selectedItem: itemData,
+            },
+            callback,
+        );
     };
 
     /**
@@ -409,6 +414,13 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
      */
+    public getItemId = (id: string) => {
+        return `${this.id}-${id}`;
+    };
+
+    /**
+     * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
     private disableTree = () => {
         this.setState({ disabled: true });
     };
@@ -418,6 +430,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private enableTree = () => {
         this.setState({ disabled: false });
+    };
+
+    /**
+     * Focus item
+     */
+    private focusItem = (item: ITreeItem<INormalizedNavigationItem>) => {
+        const element = document.getElementById(this.getItemId(item.id));
+        if (element) {
+            element.focus();
+        }
     };
 
     /**
@@ -535,30 +557,127 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = this.state.selectedElement as HTMLElement;
+        const currentItem = this.state.selectedItem;
+        let currentElement: HTMLElement | null = null;
+        if (currentItem) {
+            currentElement = document.getElementById(this.getItemId(currentItem.id));
+        } else {
+            if (this.self.current) {
+                const item = this.self.current.querySelectorAll(".navigationManager-item, [tabindex=0]");
+                if (item) {
+                    ((item as unknown) as HTMLElement).focus();
+                }
+            }
+        }
+
+        const prevElement = currentElement && (currentElement.previousElementSibling as HTMLElement);
+        const nextElement = currentElement && (currentElement.nextElementSibling as HTMLElement);
+        const isFirstElement = prevElement === null;
+        const isLastElement = nextElement === null;
+        const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
+
+        console.log("-------- " + e.key + " --------");
+        console.log("currentItem: ", currentItem);
+        console.log("currentElement: ", currentElement);
+        console.log("prevElement: ", prevElement);
+        console.log("nextElement: ", nextElement);
+        console.log("isFirstElement: ", isFirstElement);
+        console.log("isLastElement: ", isLastElement);
+        console.log("------------------");
+
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
             case "Escape":
                 e.preventDefault();
                 e.stopPropagation();
-                this.setState({
-                    disabled: false,
-                    writeMode: false,
-                });
+                this.setState(
+                    {
+                        disabled: false,
+                        writeMode: false,
+                    },
+                    () => {
+                        if (currentItem) {
+                            this.selectItem(currentItem);
+                        }
+                    },
+                );
+                break;
             case "ArrowDown":
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentItem) {
-                    currentItem.focus();
-                }
-                const excluded: HTMLElement[] = [];
-                currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
-                    excluded.push(item as HTMLElement);
-                });
-                const tabHandler = new TabHandler(this.self.current! as HTMLElement, excluded);
-                const nextElement = tabHandler.getNext(currentItem, false, false);
-                if (nextElement) {
+                if (!isLastElement && nextElement) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     nextElement.focus();
+                }
+                break;
+            case "ArrowUp":
+                if (!isFirstElement && prevElement) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    prevElement.focus();
+                }
+                break;
+            case "ArrowRight":
+                /*
+                    When focus is on a closed node, opens the node; focus does not move.
+                    When focus is on a open node, moves focus to the first child node.
+                    When focus is on an end node, does nothing.
+                */
+                if (currentElement && currentItem && currentItem.children.length > 0) {
+                    if (!currentItem.isExpanded) {
+                        e.stopPropagation();
+                        this.expandItem(currentItem.id, () => {
+                            const newItem = document.getElementById(this.getItemId(currentItem.id));
+                            console.log(">> currentItem: ", newItem);
+                            if (newItem) {
+                                newItem.focus();
+                            }
+                        });
+                    } else {
+                        // Note that children are not nested in DOM.
+                        if (nextElement && !isLastElement) {
+                            nextElement.focus();
+                        }
+                    }
+                }
+                break;
+            case "ArrowLeft":
+                /*
+                    When focus is on an open node, closes the node.
+                    When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
+                    When focus is on a root node that is also either an end node or a closed node, does nothing.
+                */
+                if (currentElement && currentItem) {
+                    if (currentItem.children.length > 0 && currentItem.isExpanded) {
+                        e.stopPropagation();
+                        this.collapseItem(currentItem.id, () => {
+                            const newItem = document.getElementById(this.getItemId(currentItem.id));
+                            console.log(">> newItem: ", newItem);
+                            if (newItem) {
+                                newItem.focus();
+                            }
+                        });
+                    } else {
+                        // Note that children are not nested in DOM.
+                        if (prevElement && !isFirstElement) {
+                            prevElement.focus();
+                        }
+                    }
+                }
+                break;
+            case "Home":
+                const firstEl = tree ? (tree.lastChild as HTMLElement) : null;
+                if (firstEl) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    firstEl.focus();
+                }
+                break;
+            case "End":
+                const lastEl = tree ? (tree.firstChild as HTMLElement) : null;
+                if (lastEl) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    lastEl.focus();
                 }
                 break;
         }
