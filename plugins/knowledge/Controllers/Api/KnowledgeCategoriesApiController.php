@@ -316,6 +316,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
         if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
+            $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
             $this->knowledgeCategoryModel->updateCounts($id);
         }
         $row = $this->knowledgeCategoryByID($id);
