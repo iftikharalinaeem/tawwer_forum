@@ -128,7 +128,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 selectItem={this.selectItem}
                 writeMode={this.state.writeMode}
                 onDeleteClick={deleteHandler}
-                firstID={this.getFirstTreeItemID()}
+                firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
             />
         );
@@ -168,39 +168,124 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Expand a single item.
      */
-    private expandItem = (itemId: string, callback?: () => void) => {
+    private expandItem = (itemId: string) => {
         const { treeData } = this.state;
-        const itemData = treeData[itemId];
         this.setState(
             {
                 treeData: mutateTree(treeData, itemId, { isExpanded: true }),
-                selectedItem: itemData,
             },
-            callback,
+            () => {
+                this.selectItemByID(itemId);
+            },
         );
     };
 
     /**
      * Get the id of the first element in the tree to focus it.
      */
-    private getFirstTreeItemID = (): string | null => {
-        const items = this.state.treeData.items;
-        if (items) {
+    private getFirstItemID = (): string | null => {
+        const { items } = this.state.treeData;
+        const rootItem = items[this.props.rootNavigationItemID];
+        if (rootItem && rootItem.children.length > 0) {
             // Hard coded until we
-            return this.state.treeData.items[this.props.rootNavigationItemID].children[0];
+            return rootItem.children[0];
         } else {
             return null;
         }
     };
 
     /**
+     * Get the id of the last element in the tree to focus it.
+     */
+    private getLastItemID = (): string | null => {
+        const { items } = this.state.treeData;
+        const rootItem = items[this.props.rootNavigationItemID];
+        if (rootItem && rootItem.children.length > 0) {
+            // Hard coded until we
+            return rootItem.children[rootItem.children.length - 1];
+        } else {
+            return null;
+        }
+    };
+
+    private getNextSiblingID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const { treeData } = this.state;
+        const parent = treeData.items[this.calcParentID(item)];
+        if (parent) {
+            const indexInChildren = parent.children.indexOf(item.id);
+            const lastIndex = parent.children.length - 1;
+            if (indexInChildren >= 0 && indexInChildren < lastIndex) {
+                return parent.children[indexInChildren + 1];
+            }
+        }
+
+        return null;
+    }
+
+    private getPrevSiblingID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const { treeData } = this.state;
+        const parent = treeData.items[this.calcParentID(item)];
+        if (parent) {
+            const indexInChildren = parent.children.indexOf(item.id);
+            if (indexInChildren > 0) {
+                return parent.children[indexInChildren - 1];
+            }
+        }
+
+        return null;
+    }
+
+    private getNextFlatID(item: ITreeItem<INormalizedNavigationItem>, checkChildren = true): string | null {
+        if (checkChildren && item.children.length > 0 && item.isExpanded) {
+            return item.children[0];
+        } else {
+            const siblingID = this.getNextSiblingID(item);
+            if (siblingID) {
+                return siblingID;
+            } else {
+                const parentID = this.calcParentID(item);
+                const parent = this.state.treeData.items[parentID];
+                if (parent) {
+                    return this.getNextFlatID(parent, false);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private getPrevFlatID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const prevSiblingID = this.getPrevSiblingID(item);
+        if (prevSiblingID) {
+            const prevSibling = this.state.treeData.items[prevSiblingID];
+            if (prevSibling) {
+                if (prevSibling.children.length > 0 && prevSibling.isExpanded) {
+                    return prevSibling.children[prevSibling.children.length - 1];
+                } else {
+                    return prevSiblingID;
+                }
+            }
+        } else {
+            return this.calcParentID(item);
+        }
+
+        return null;
+    }
+
+    private calcParentID(item: ITreeItem<INormalizedNavigationItem>): string {
+        return NavigationRecordType.KNOWLEDGE_CATEGORY + item.data.parentID;
+    }
+
+    private selectItemByID = (itemID: string) => {
+        const item = this.state.treeData.items[itemID];
+        if (item) {
+            this.selectItem(item);
+        }
+    };
+    /**
      * Select a single item. Takes an optional callback for after the state has been updated.
      */
-    private selectItem = (
-        selectedItem: ITreeItem<INormalizedNavigationItem>,
-        writeMode: boolean = false,
-        callback?: () => void,
-    ) => {
+    private selectItem = (selectedItem: ITreeItem<INormalizedNavigationItem>, writeMode: boolean = false) => {
         const newID = selectedItem.id;
         const { treeData, selectedItem: oldSelectedItem } = this.state;
         const oldID = oldSelectedItem ? oldSelectedItem.id : null;
@@ -217,22 +302,28 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 selectedItem,
                 writeMode,
             },
-            callback,
+            // () => {
+            //     const selectedElement = document.querySelector(this.getItemId(newID));
+            //     if (selectedElement instanceof HTMLElement) {
+            //         selectedElement.focus();
+            //     }
+            // },
+            // callback,
         );
     };
 
     /**
      * Collapse a single item.
      */
-    private collapseItem = (itemId: string, callback?: () => void) => {
+    private collapseItem = (itemId: string) => {
         const { treeData } = this.state;
-        const itemData = treeData[itemId];
         this.setState(
             {
                 treeData: mutateTree(treeData, itemId, { isExpanded: false }),
-                selectedItem: itemData,
             },
-            callback,
+            () => {
+                this.selectItemByID(itemId);
+            },
         );
     };
 
@@ -471,13 +562,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
             // Touch the old item so it re-renders.
             newTree = mutateTree(newTree, currentlySelectedItem.id, {});
         }
-        this.setState({
-            treeData: newTree,
-            writeMode: false,
-            disabled: false,
-            selectedItem: item,
-            dragging: false,
-        });
+        this.setState(
+            {
+                treeData: newTree,
+                writeMode: false,
+                disabled: false,
+                dragging: false,
+            },
+            () => {
+                this.selectItem(item);
+            },
+        );
         await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
     };
 
@@ -568,137 +663,112 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!this.state.disabled) {
-            const currentItem = this.state.selectedItem;
-            const container = this.self.current;
-            let currentElement: HTMLElement | null = null;
-            if (currentItem) {
-                currentElement = document.getElementById(this.getItemId(currentItem.id));
-            } else {
-                if (container) {
-                    let tabbable: HTMLElement = container!.querySelector(
-                        ".navigationManager-item[tabindex='0']",
-                    ) as HTMLElement;
-                    if (!tabbable) {
-                        tabbable = container!.querySelector(".navigationManager-item") as HTMLElement;
-                    }
-                    if (tabbable) {
-                        tabbable.focus();
-                    }
-                }
+        if (this.state.disabled || this.state.dragging) {
+            return;
+        }
+        const currentItem = this.state.selectedItem;
+        const container = this.self.current;
+        let currentElement: HTMLElement | null = null;
+        if (currentItem) {
+            currentElement = document.getElementById(this.getItemId(currentItem.id));
+        } else if (container) {
+            let tabbable: HTMLElement = container.querySelector(".navigationManager-item[tabindex='0']") as HTMLElement;
+            if (!tabbable) {
+                tabbable = container.querySelector(".navigationManager-item") as HTMLElement;
             }
+            if (tabbable) {
+                tabbable.focus();
+            }
+        }
 
-            const prevElement = currentElement && (currentElement.previousElementSibling as HTMLElement);
-            const nextElement = currentElement && (currentElement.nextElementSibling as HTMLElement);
-            const isFirstElement = prevElement === null;
-            const isLastElement = nextElement === null;
-            const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
+        if (!currentItem) {
+            return;
+        }
 
-            console.log("-------- " + e.key + " --------");
-            console.log("currentItem: ", currentItem);
-            console.log("currentElement: ", currentElement);
-            console.log("prevElement: ", prevElement);
-            console.log("nextElement: ", nextElement);
-            console.log("isFirstElement: ", isFirstElement);
-            console.log("isLastElement: ", isLastElement);
-            console.log("------------------");
+        const prevID = this.getPrevFlatID(currentItem);
+        const nextID = this.getNextFlatID(currentItem);
+        const parentID = this.calcParentID(currentItem);
+        const firstID = this.getFirstItemID();
+        const lastID = this.getLastItemID();
+        const isFirstItem = currentItem.id === firstID;
+        const isLastItem = currentItem.id === lastID;
+        const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
 
-            const shift = "-Shift";
-            switch (`${e.key}${e.shiftKey ? shift : ""}`) {
-                case "Escape":
+        const shift = "-Shift";
+        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+            case "Escape":
+                e.preventDefault();
+                e.stopPropagation();
+                this.setState({
+                    disabled: false,
+                    writeMode: false,
+                });
+                if (currentItem) {
+                    this.selectItem(currentItem);
+                }
+                break;
+            case "ArrowDown":
+                if (!isLastItem && nextID) {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.setState(
-                        {
-                            disabled: false,
-                            writeMode: false,
-                        },
-                        () => {
-                            if (currentItem) {
-                                this.selectItem(currentItem);
-                            }
-                        },
-                    );
-                    break;
-                case "ArrowDown":
-                    if (!isLastElement && nextElement) {
-                        e.preventDefault();
+                    this.selectItemByID(nextID);
+                }
+                break;
+            case "ArrowUp":
+                if (!isFirstItem && prevID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(prevID);
+                }
+                break;
+            case "ArrowRight":
+                /**
+                 * Only applies to items with children.
+                 * When focus is on a closed node, opens the node; focus does not move.
+                 * When focus is on a open node, moves focus to the first child node.
+                 * When focus is on an end node, does nothing.
+                 */
+                if (currentItem && currentItem.children.length > 0) {
+                    if (!currentItem.isExpanded) {
                         e.stopPropagation();
-                        nextElement.focus();
-                    }
-                    break;
-                case "ArrowUp":
-                    if (!isFirstElement && prevElement) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        prevElement.focus();
-                    }
-                    break;
-                case "ArrowRight":
-                    /*
-                    When focus is on a closed node, opens the node; focus does not move.
-                    When focus is on a open node, moves focus to the first child node.
-                    When focus is on an end node, does nothing.
-                */
-                    if (currentElement && currentItem && currentItem.children.length > 0) {
-                        if (!currentItem.isExpanded) {
-                            e.stopPropagation();
-                            this.expandItem(currentItem.id, () => {
-                                const newItem = document.getElementById(this.getItemId(currentItem.id));
-                                console.log(">> currentItem: ", newItem);
-                                if (newItem) {
-                                    newItem.focus();
-                                }
-                            });
-                        } else {
-                            // Note that children are not nested in DOM.
-                            if (nextElement && !isLastElement) {
-                                nextElement.focus();
-                            }
+                        this.expandItem(currentItem.id);
+                    } else {
+                        const firstChildID = currentItem.children.length > 0 ? currentItem.children[0] : null;
+                        if (firstChildID) {
+                            this.selectItemByID(firstChildID);
                         }
                     }
-                    break;
-                case "ArrowLeft":
-                    /*
+                }
+                break;
+            case "ArrowLeft":
+                /*
                     When focus is on an open node, closes the node.
                     When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
                     When focus is on a root node that is also either an end node or a closed node, does nothing.
                 */
-                    if (currentElement && currentItem) {
-                        if (currentItem.children.length > 0 && currentItem.isExpanded) {
-                            e.stopPropagation();
-                            this.collapseItem(currentItem.id, () => {
-                                const newItem = document.getElementById(this.getItemId(currentItem.id));
-                                console.log(">> newItem: ", newItem);
-                                if (newItem) {
-                                    newItem.focus();
-                                }
-                            });
-                        } else {
-                            // Note that children are not nested in DOM.
-                            if (prevElement && !isFirstElement) {
-                                prevElement.focus();
-                            }
-                        }
-                    }
-                    break;
-                case "Home":
-                    const firstEl = tree ? (tree.lastChild as HTMLElement) : null;
-                    if (firstEl) {
-                        e.preventDefault();
+                if (currentElement && currentItem) {
+                    if (currentItem.children.length > 0 && currentItem.isExpanded) {
                         e.stopPropagation();
-                        firstEl.focus();
+                        this.collapseItem(currentItem.id);
+                    } else {
+                        this.selectItemByID(parentID);
                     }
-                    break;
-                case "End":
-                    const lastEl = tree ? (tree.firstChild as HTMLElement) : null;
-                    if (lastEl) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        lastEl.focus();
-                    }
-                    break;
-            }
+                }
+                break;
+            case "Home":
+                if (!isFirstItem && firstID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(firstID);
+                }
+                break;
+            case "End":
+                if (isLastItem && lastID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(lastID);
+                }
+                break;
         }
     };
 }

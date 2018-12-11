@@ -39,6 +39,7 @@ interface IState {
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private renameButtonRef = React.createRef<HTMLButtonElement>();
     private deleteButtonRef = React.createRef<HTMLButtonElement>();
+    private selfRef: HTMLDivElement | null;
 
     public state: IState = {
         newName: this.props.item.data.name,
@@ -51,7 +52,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         return (
             <div
                 id={this.id}
-                ref={provided.innerRef}
+                ref={ref => {
+                    this.selfRef = ref;
+                    provided.innerRef(ref);
+                }}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
                 aria-roledescription={
@@ -73,7 +77,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 }
                 role="treeitem"
                 onClick={this.selectSelf}
-                onFocus={this.selectSelf}
+                onFocus={this.handleFocusIn}
             >
                 <div className={classNames("navigationManager-draggable", this.props.className)}>
                     <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
@@ -139,11 +143,33 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         );
     }
 
-    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
-        if (!this.props.selectedItem && this.isCurrent()) {
-            this.selectSelf();
+    public componentDidUpdate(prevProps: Readonly<IProps>): void {
+        const wasPrevSelected = prevProps.selectedItem && prevProps.selectedItem.id === prevProps.item.id;
+        const isNowSelected = this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
+        if (!wasPrevSelected && isNowSelected) {
+            this.focusSelf();
         }
     }
+
+    // Focus self
+
+    private focusingSelf = false;
+
+    private focusSelf() {
+        this.focusingSelf = true;
+        if (this.selfRef) {
+            this.selfRef.focus();
+        }
+    }
+
+    private handleFocusIn = () => {
+        if (this.focusingSelf) {
+            this.focusingSelf = true;
+            return;
+        }
+
+        this.selectSelf();
+    };
 
     private get id() {
         return this.props.getItemID(this.props.item.id);
@@ -182,12 +208,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
 
     private selectSelf = () => {
         if (!this.isCurrent()) {
-            this.props.selectItem(this.props.item, this.props.writeMode, () => {
-                const self = document.getElementById(this.props.getItemID(this.props.item.id));
-                if (self) {
-                    self.focus();
-                }
-            });
+            this.props.selectItem(this.props.item, this.props.writeMode);
         }
     };
 
