@@ -108,7 +108,7 @@ export class EditorHeader extends React.Component<IProps> {
         if (status === LoadStatus.LOADING) {
             return (
                 <li className="editorHeader-item">
-                    <span className="editorHeader-saveDraft metaStyle">{t("Saving Draft...")}</span>
+                    <span className="editorHeader-saveDraft metaStyle">{t("Saving draft...")}</span>
                 </li>
             );
         }
@@ -118,7 +118,7 @@ export class EditorHeader extends React.Component<IProps> {
                 <li className="editorHeader-item">
                     <span className="editorHeader-saveDraft metaStyle">
                         <Translate
-                            source="Draft Saved <0/>"
+                            source="Draft saved <0/>"
                             c0={<DateTime mode="relative" timestamp={data.dateUpdated} />}
                         />
                     </span>
@@ -129,7 +129,7 @@ export class EditorHeader extends React.Component<IProps> {
         if (status === LoadStatus.ERROR) {
             return (
                 <li className="editorHeader-item">
-                    <span className="editorHeader-saveDraft metaStyle isError">{t("Error Saving Draft.")}</span>
+                    <span className="editorHeader-saveDraft metaStyle isError">{t("Error saving draft.")}</span>
                 </li>
             );
         }
