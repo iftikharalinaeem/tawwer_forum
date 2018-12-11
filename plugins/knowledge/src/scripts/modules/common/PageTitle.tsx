@@ -4,12 +4,9 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { PanelWidget } from "@library/components/layouts/PanelLayout";
 import PageHeading from "@library/components/PageHeading";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import classNames from "classnames";
+import * as React from "react";
 
 export interface IPageTitle {
     title: string;
@@ -23,9 +20,10 @@ export interface IPageTitle {
  * Generates main title for page as well as possibly a back link and some meta information about the page
  */
 export default class PageTitle extends React.Component<IPageTitle> {
-    public defaultProps = {
+    public static defaultProps = {
         includeBackLink: true,
     };
+
     public render() {
         return (
             <div className={classNames("pageTitleContainer", this.props.className)}>

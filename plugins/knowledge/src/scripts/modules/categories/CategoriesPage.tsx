@@ -76,7 +76,7 @@ export class CategoriesPage extends React.Component<IProps> {
      */
     public componentDidMount() {
         const { categoriesPageState } = this.props;
-        if (categoriesPageState.articles.status !== LoadStatus.PENDING) {
+        if (categoriesPageState.articles.status === LoadStatus.PENDING) {
             return this.fetchCategoryData();
         }
     }
