@@ -71,6 +71,11 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $this->assertEquals(201, $result->getStatusCode());
         $body = $result->getBody();
         // not ready yet - that is why "== 0" should be "> 0" in future!!!
-        $this->assertTrue($body['rootCategoryID'] == -1);
+        $this->assertTrue($body['rootCategoryID'] > 0);
+
+        $rootCat = $this->api()->get(
+            'knowledge-categories/'.$body['rootCategoryID']
+        )->getBody();
+        $this->assertEquals($body['knowledgeBaseID'], $rootCat['knowledgeBaseID']);
     }
 }

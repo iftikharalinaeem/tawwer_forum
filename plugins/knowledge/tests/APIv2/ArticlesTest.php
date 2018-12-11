@@ -131,14 +131,18 @@ class ArticlesTest extends AbstractResourceTest {
      */
     public function testIndex() {
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+        $knowledgeBase = $this->api()->post("knowledge-bases", [
+            "name" => __FUNCTION__ . " KB #1",
+            "description" => __FUNCTION__,
+        ])->getBody();
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Primary",
-            "parentID" => -1,
+            "parentID" => $knowledgeBase['rootCategoryID'],
         ])->getBody();
         $secondaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Secondary",
-            "parentID" => -1,
+            "parentID" => $knowledgeBase['rootCategoryID'],
         ])->getBody();
 
         // Setup the test articles.

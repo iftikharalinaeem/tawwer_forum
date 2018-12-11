@@ -80,10 +80,20 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                     $this->articles[$item["name"]] = $response->getBody();
                     break;
                 case Navigation::RECORD_TYPE_CATEGORY:
-                    $response = $this->api()->post("knowledge-categories", [
-                        "name" => $item["name"],
-                        "parentID" => $parentID,
-                    ]);
+                    if ($parentID === -1) {
+                        $knowledgeBase = $this->api()->post("knowledge-bases", [
+                            "name" => $item["name"],
+                            "description" => $item["name"],
+                        ]);
+                        $parentID = $knowledgeBase['rootCategoryID'];
+                        $response = $this->api()->get("knowledge-categories/".$parentID);
+                    } else {
+                        $response = $this->api()->post("knowledge-categories", [
+                            "name" => $item["name"],
+                            "parentID" => $parentID,
+                        ]);
+                    }
+
                     $category = $response->getBody();
                     $this->categories[$item["name"]] = $category;
                     if (!empty($item["children"])) {

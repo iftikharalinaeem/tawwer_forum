@@ -91,7 +91,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeCategoryID")
             ->column("name", "varchar(255)")
             ->column("parentID", "int")
-            ->column("knowledgeBaseID", "int", true, "index")
+            ->column("knowledgeBaseID", "int", false, "index")
             ->column("sortChildren", ["name", "dateInserted", "dateInsertedDesc", "manual"], true)
             ->column("sort", "int", true)
             ->column("insertUserID", "int")
@@ -111,8 +111,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("name", "varchar(255)")
             ->column("description", "text")
             ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''])
-            ->column("icon", "varchar(255)")
-            ->column("sourceLocale", "varchar(5)")
+            ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
+            ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(
                 "viewType",
                 ["enum", Models\KnowledgeBaseModel::getAllTypes()],

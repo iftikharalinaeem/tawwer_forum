@@ -84,6 +84,11 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 "description" => "Unique ID of the parent for a category.",
                 "type" => "integer",
             ],
+            "knowledgeBaseID" => [
+                "allowNull" => true,
+                "description" => "Knowledge base ID for a category.",
+                "type" => "integer",
+            ],
             "sortChildren" => [
                 "allowNull" => true,
                 "description" => "Sort order for contents of the category.",
@@ -261,6 +266,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
+                    "knowledgeBaseID",
                     "sort?",
                     "sortChildren?",
                 ])->add($this->fullSchema()),
@@ -337,6 +343,11 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
         $out = $this->schema($this->fullSchema(), "out");
 
+
+        if ($body['parentID'] !== -1) {
+            $parentCategory = $this->knowledgeCategoryByID($body['parentID']);
+            $body['knowledgeBaseID'] = $parentCategory['knowledgeBaseID'];
+        }
         $body = $in->validate($body);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);

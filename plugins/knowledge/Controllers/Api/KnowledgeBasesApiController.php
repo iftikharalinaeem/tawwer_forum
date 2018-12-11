@@ -10,6 +10,7 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -20,13 +21,18 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
+    /** @var KnowledgeCategoryModel */
+    private $knowledgeCategoryModel;
+
     /**
      * KnowledgeBaseApiController constructor.
      *
      * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param KnowledgeCategoryModel $knowledgeCategoryModel
      */
-    public function __construct(KnowledgeBaseModel $knowledgeBaseModel) {
+    public function __construct(KnowledgeBaseModel $knowledgeBaseModel, KnowledgeCategoryModel $knowledgeCategoryModel) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
     /**
@@ -68,13 +74,19 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body): array {
-        $this->permission("garden.setttings.manage");
+        $this->permission("garden.settings.manage");
 
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->setDescription("Create a new knowledge base.");
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
+        $knowledgeCategoryID = $this->knowledgeCategoryModel->insert([
+            'name' => $body['name'],
+            'knowledgeBaseID' => $knowledgeBaseID,
+            'parentID' => -1
+        ]);
+        $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $result = $out->validate($row);

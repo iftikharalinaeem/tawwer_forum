@@ -25,6 +25,15 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         "sortChildren",
     ];
 
+    /** @var array Fields to be checked with get/<id>/edit */
+    protected $patchFields = [
+        "name",
+        "parentID",
+        "sort",
+        "sortChildren",
+    ];
+
+
     /** @var string The name of the primary key of the resource. */
     protected $pk = "knowledgeCategoryID";
 
@@ -75,6 +84,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $record = [
             "name" => "Test Knowledge Category",
             "parentID" => -1,
+            "knowledgeBaseID" => 1,
             "sortChildren" => "name",
             "sort" => 0,
         ];
@@ -110,11 +120,13 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     protected function prepareCategoriesData(): array {
         $data =[];
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
-        // Setup the test categories.
-        $rootCategory = $this->api()->post($this->baseUrl, [
-            "name" => __FUNCTION__ . " Primary category",
-            "parentID" => -1,
+
+        $newKnowledgeBase = $this->api()->post('knowledge-bases', [
+            "name" => __FUNCTION__ . " Test Knowledge Base",
+            "description" => 'Some description'
         ])->getBody();
+        // Setup the test categories.
+        $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
 
         $this->api()->post($this->kbArticlesUrl, [
             "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
