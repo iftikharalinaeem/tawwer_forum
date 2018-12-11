@@ -39,7 +39,6 @@ interface IState {
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private renameButtonRef = React.createRef<HTMLButtonElement>();
     private deleteButtonRef = React.createRef<HTMLButtonElement>();
-    private wrapRef = React.createRef<HTMLDivElement>();
 
     public state: IState = {
         newName: this.props.item.data.name,
@@ -182,12 +181,14 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     private selectSelf = () => {
-        this.props.selectItem(this.props.item, this.props.writeMode, () => {
-            const self = document.getElementById(this.props.getItemID(this.props.item.id));
-            if (self) {
-                self.focus();
-            }
-        });
+        if (!this.isCurrent()) {
+            this.props.selectItem(this.props.item, this.props.writeMode, () => {
+                const self = document.getElementById(this.props.getItemID(this.props.item.id));
+                if (self) {
+                    self.focus();
+                }
+            });
+        }
     };
 
     private isCurrent = () => {
