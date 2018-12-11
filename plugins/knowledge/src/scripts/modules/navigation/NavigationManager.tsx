@@ -51,6 +51,7 @@ interface IState {
     showNewCategoryModal: boolean;
     writeMode: boolean;
     elementToFocusOnDeleteClose: HTMLButtonElement | null;
+    dragging: boolean;
 }
 
 export class NavigationManager extends React.Component<IProps, IState> {
@@ -66,6 +67,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
         showNewCategoryModal: false,
         writeMode: false,
         elementToFocusOnDeleteClose: null,
+        dragging: false,
     };
 
     /**
@@ -85,11 +87,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     className={classNames("navigationManager", "inheritHeight", this.props.className)}
                     role="tree"
                     aria-describedby={this.props.describedBy}
-                    onKeyDownCapture={this.handleKeyDown}
+                    onKeyDown={this.handleKeyDown}
                 >
                     <Tree
                         tree={this.state.treeData}
                         onDragEnd={this.onDragEnd}
+                        onDragStart={this.onDragStart}
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
@@ -471,9 +474,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
         this.setState({
             treeData: newTree,
             writeMode: false,
+            disabled: false,
             selectedItem: item,
+            dragging: false,
         });
         await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
+    };
+
+    private onDragStart = (source: ITreeSourcePosition) => {
+        this.setState({
+            dragging: true,
+        });
     };
 
     /**
@@ -557,129 +568,137 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = this.state.selectedItem;
-        let currentElement: HTMLElement | null = null;
-        if (currentItem) {
-            currentElement = document.getElementById(this.getItemId(currentItem.id));
-        } else {
-            if (this.self.current) {
-                const item = this.self.current.querySelectorAll(".navigationManager-item, [tabindex=0]");
-                if (item) {
-                    ((item as unknown) as HTMLElement).focus();
+        if (!this.state.disabled) {
+            const currentItem = this.state.selectedItem;
+            const container = this.self.current;
+            let currentElement: HTMLElement | null = null;
+            if (currentItem) {
+                currentElement = document.getElementById(this.getItemId(currentItem.id));
+            } else {
+                if (container) {
+                    let tabbable: HTMLElement = container!.querySelector(
+                        ".navigationManager-item[tabindex='0']",
+                    ) as HTMLElement;
+                    if (!tabbable) {
+                        tabbable = container!.querySelector(".navigationManager-item") as HTMLElement;
+                    }
+                    if (tabbable) {
+                        tabbable.focus();
+                    }
                 }
             }
-        }
 
-        const prevElement = currentElement && (currentElement.previousElementSibling as HTMLElement);
-        const nextElement = currentElement && (currentElement.nextElementSibling as HTMLElement);
-        const isFirstElement = prevElement === null;
-        const isLastElement = nextElement === null;
-        const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
+            const prevElement = currentElement && (currentElement.previousElementSibling as HTMLElement);
+            const nextElement = currentElement && (currentElement.nextElementSibling as HTMLElement);
+            const isFirstElement = prevElement === null;
+            const isLastElement = nextElement === null;
+            const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
 
-        console.log("-------- " + e.key + " --------");
-        console.log("currentItem: ", currentItem);
-        console.log("currentElement: ", currentElement);
-        console.log("prevElement: ", prevElement);
-        console.log("nextElement: ", nextElement);
-        console.log("isFirstElement: ", isFirstElement);
-        console.log("isLastElement: ", isLastElement);
-        console.log("------------------");
+            console.log("-------- " + e.key + " --------");
+            console.log("currentItem: ", currentItem);
+            console.log("currentElement: ", currentElement);
+            console.log("prevElement: ", prevElement);
+            console.log("nextElement: ", nextElement);
+            console.log("isFirstElement: ", isFirstElement);
+            console.log("isLastElement: ", isLastElement);
+            console.log("------------------");
 
-        const shift = "-Shift";
-        switch (`${e.key}${e.shiftKey ? shift : ""}`) {
-            case "Escape":
-                e.preventDefault();
-                e.stopPropagation();
-                this.setState(
-                    {
-                        disabled: false,
-                        writeMode: false,
-                    },
-                    () => {
-                        if (currentItem) {
-                            this.selectItem(currentItem);
-                        }
-                    },
-                );
-                break;
-            case "ArrowDown":
-                if (!isLastElement && nextElement) {
+            const shift = "-Shift";
+            switch (`${e.key}${e.shiftKey ? shift : ""}`) {
+                case "Escape":
                     e.preventDefault();
                     e.stopPropagation();
-                    nextElement.focus();
-                }
-                break;
-            case "ArrowUp":
-                if (!isFirstElement && prevElement) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    prevElement.focus();
-                }
-                break;
-            case "ArrowRight":
-                /*
+                    this.setState(
+                        {
+                            disabled: false,
+                            writeMode: false,
+                        },
+                        () => {
+                            if (currentItem) {
+                                this.selectItem(currentItem);
+                            }
+                        },
+                    );
+                    break;
+                case "ArrowDown":
+                    if (!isLastElement && nextElement) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextElement.focus();
+                    }
+                    break;
+                case "ArrowUp":
+                    if (!isFirstElement && prevElement) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        prevElement.focus();
+                    }
+                    break;
+                case "ArrowRight":
+                    /*
                     When focus is on a closed node, opens the node; focus does not move.
                     When focus is on a open node, moves focus to the first child node.
                     When focus is on an end node, does nothing.
                 */
-                if (currentElement && currentItem && currentItem.children.length > 0) {
-                    if (!currentItem.isExpanded) {
-                        e.stopPropagation();
-                        this.expandItem(currentItem.id, () => {
-                            const newItem = document.getElementById(this.getItemId(currentItem.id));
-                            console.log(">> currentItem: ", newItem);
-                            if (newItem) {
-                                newItem.focus();
+                    if (currentElement && currentItem && currentItem.children.length > 0) {
+                        if (!currentItem.isExpanded) {
+                            e.stopPropagation();
+                            this.expandItem(currentItem.id, () => {
+                                const newItem = document.getElementById(this.getItemId(currentItem.id));
+                                console.log(">> currentItem: ", newItem);
+                                if (newItem) {
+                                    newItem.focus();
+                                }
+                            });
+                        } else {
+                            // Note that children are not nested in DOM.
+                            if (nextElement && !isLastElement) {
+                                nextElement.focus();
                             }
-                        });
-                    } else {
-                        // Note that children are not nested in DOM.
-                        if (nextElement && !isLastElement) {
-                            nextElement.focus();
                         }
                     }
-                }
-                break;
-            case "ArrowLeft":
-                /*
+                    break;
+                case "ArrowLeft":
+                    /*
                     When focus is on an open node, closes the node.
                     When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
                     When focus is on a root node that is also either an end node or a closed node, does nothing.
                 */
-                if (currentElement && currentItem) {
-                    if (currentItem.children.length > 0 && currentItem.isExpanded) {
-                        e.stopPropagation();
-                        this.collapseItem(currentItem.id, () => {
-                            const newItem = document.getElementById(this.getItemId(currentItem.id));
-                            console.log(">> newItem: ", newItem);
-                            if (newItem) {
-                                newItem.focus();
+                    if (currentElement && currentItem) {
+                        if (currentItem.children.length > 0 && currentItem.isExpanded) {
+                            e.stopPropagation();
+                            this.collapseItem(currentItem.id, () => {
+                                const newItem = document.getElementById(this.getItemId(currentItem.id));
+                                console.log(">> newItem: ", newItem);
+                                if (newItem) {
+                                    newItem.focus();
+                                }
+                            });
+                        } else {
+                            // Note that children are not nested in DOM.
+                            if (prevElement && !isFirstElement) {
+                                prevElement.focus();
                             }
-                        });
-                    } else {
-                        // Note that children are not nested in DOM.
-                        if (prevElement && !isFirstElement) {
-                            prevElement.focus();
                         }
                     }
-                }
-                break;
-            case "Home":
-                const firstEl = tree ? (tree.lastChild as HTMLElement) : null;
-                if (firstEl) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    firstEl.focus();
-                }
-                break;
-            case "End":
-                const lastEl = tree ? (tree.firstChild as HTMLElement) : null;
-                if (lastEl) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    lastEl.focus();
-                }
-                break;
+                    break;
+                case "Home":
+                    const firstEl = tree ? (tree.lastChild as HTMLElement) : null;
+                    if (firstEl) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        firstEl.focus();
+                    }
+                    break;
+                case "End":
+                    const lastEl = tree ? (tree.firstChild as HTMLElement) : null;
+                    if (lastEl) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        lastEl.focus();
+                    }
+                    break;
+            }
         }
     };
 }
