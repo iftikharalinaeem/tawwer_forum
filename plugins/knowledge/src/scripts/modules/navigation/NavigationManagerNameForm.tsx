@@ -35,11 +35,13 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                 <label className="navigationManger-text">
                     <span className="sr-only">{t("New Name: ")}</span>
                     <input
+                        maxLength={255}
                         type="text"
                         value={this.state.newName}
                         onChange={this.handleChange}
                         ref={this.inputRef}
                         onKeyDown={this.handleKeyDown}
+                        className="navigationManger-input"
                     />
                 </label>
                 <Button

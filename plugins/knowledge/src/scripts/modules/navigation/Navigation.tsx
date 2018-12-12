@@ -14,13 +14,13 @@ import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 import { organize } from "@library/components/icons/navigationManager";
 import { t } from "@library/application";
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
-import Permission from "@library/users/Permission";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
     activeRecord: IActiveRecord;
     collapsible: boolean;
+    kbID: number;
 }
 
 /**
@@ -35,17 +35,7 @@ export class Navigation extends React.Component<IProps> {
             <SiteNav
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
-                bottomCTA={
-                    <Permission permission="kb.manage">
-                        <hr className="navigation-divider" />
-                        <div className="navigation-cta">
-                            {organize()}
-                            <OrganizeCategoriesRoute.Link data={{ kbID: 1 }}>
-                                {t("Organize Categories")}
-                            </OrganizeCategoriesRoute.Link>
-                        </div>
-                    </Permission>
-                }
+                kbID={this.props.kbID}
             >
                 {NavigationSelector.selectChildren(
                     this.props.navigationItems,

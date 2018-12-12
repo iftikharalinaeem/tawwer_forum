@@ -24,13 +24,14 @@ interface IProps extends IDeviceProps {
  *
  * This is useful when your content loads separately from the navigation.
  * - Provides navigation & breadcrumbs.
+ * - Note that hard coded kbID is temporary
  */
 export function NavigationLoadingLayout(props: IProps) {
     return (
         <Container>
             <VanillaHeader
                 title={t("Loading")}
-                mobileDropDownContent={<Navigation activeRecord={props.activeRecord} collapsible={false} />}
+                mobileDropDownContent={<Navigation activeRecord={props.activeRecord} collapsible={false} kbID={1} />}
             />
             <PanelLayout device={props.device}>
                 <PanelLayout.Breadcrumbs>
@@ -40,7 +41,7 @@ export function NavigationLoadingLayout(props: IProps) {
                 </PanelLayout.Breadcrumbs>
                 <PanelLayout.LeftBottom>
                     <PanelWidget>
-                        <Navigation activeRecord={props.activeRecord} collapsible={true} />
+                        <Navigation activeRecord={props.activeRecord} collapsible={true} kbID={1} />
                     </PanelWidget>
                 </PanelLayout.LeftBottom>
                 <PanelLayout.MiddleBottom>
