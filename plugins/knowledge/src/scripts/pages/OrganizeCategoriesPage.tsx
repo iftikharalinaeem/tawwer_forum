@@ -24,9 +24,9 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className="modal-scroll">
-                        <div className="container">
-                            <div className="navigationManager-container">
+                    <div className="modal-scroll inheritHeight">
+                        <div className="container inheritHeight">
+                            <div className="navigationManager-container inheritHeight">
                                 <DocumentTitle title={pageTitle}>
                                     <Heading
                                         id={this.titleID}
