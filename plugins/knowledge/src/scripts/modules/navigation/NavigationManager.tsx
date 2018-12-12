@@ -523,16 +523,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
     };
 
     /**
-     * Focus item
-     */
-    private focusItem = (item: ITreeItem<INormalizedNavigationItem>) => {
-        const element = document.getElementById(this.getItemId(item.id));
-        if (element) {
-            element.focus();
-        }
-    };
-
-    /**
      * Handle completion of drag.
      *
      * - Update item in local state, and additionally dispatch to the API endoint.
