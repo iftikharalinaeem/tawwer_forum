@@ -201,7 +201,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const { items } = this.state.treeData;
         const rootItem = items[this.props.rootNavigationItemID];
         if (rootItem && rootItem.children.length > 0) {
-            // Hard coded until we
             return rootItem.children[rootItem.children.length - 1];
         } else {
             return null;
@@ -256,20 +255,26 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
     private getPrevFlatID(item: ITreeItem<INormalizedNavigationItem>): string | null {
         const prevSiblingID = this.getPrevSiblingID(item);
-        if (prevSiblingID) {
-            const prevSibling = this.state.treeData.items[prevSiblingID];
-            if (prevSibling) {
-                if (prevSibling.children.length > 0 && prevSibling.isExpanded) {
-                    return prevSibling.children[prevSibling.children.length - 1];
-                } else {
-                    return prevSiblingID;
-                }
-            }
-        } else {
+
+        if (!prevSiblingID) {
             return this.calcParentID(item);
         }
-
+        const prevSibling = this.state.treeData.items[prevSiblingID];
+        if (prevSibling) {
+            return this.getLastLeafID(prevSibling);
+        }
         return null;
+    }
+
+    private getLastLeafID(item: ITreeItem<INormalizedNavigationItem>): string {
+        if (item.children.length > 0 && item.isExpanded) {
+            const lastChildID = item.children[item.children.length - 1];
+            const lastChild = this.state.treeData.items[lastChildID];
+            if (lastChild) {
+                return this.getLastLeafID(lastChild);
+            }
+        }
+        return item.id;
     }
 
     private calcParentID(item: ITreeItem<INormalizedNavigationItem>): string {
@@ -295,21 +300,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
             nextTree = mutateTree(nextTree, oldID, {});
         }
 
-        this.setState(
-            {
-                treeData: nextTree,
-                disabled: writeMode,
-                selectedItem,
-                writeMode,
-            },
-            // () => {
-            //     const selectedElement = document.querySelector(this.getItemId(newID));
-            //     if (selectedElement instanceof HTMLElement) {
-            //         selectedElement.focus();
-            //     }
-            // },
-            // callback,
-        );
+        this.setState({
+            treeData: nextTree,
+            disabled: writeMode,
+            selectedItem,
+            writeMode,
+        });
     };
 
     /**
@@ -544,6 +540,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private onDragEnd = async (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
         const { treeData } = this.state;
 
+        this.setState({
+            dragging: false,
+            disabled: false,
+            writeMode: false,
+        });
         if (!destination) {
             return;
         }
@@ -565,9 +566,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         this.setState(
             {
                 treeData: newTree,
-                writeMode: false,
-                disabled: false,
-                dragging: false,
             },
             () => {
                 this.selectItem(item);
@@ -645,6 +643,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
             const children = itemValue.children;
             data.items[itemID] = {
+                parentID: NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID,
                 id: itemID,
                 hasChildren: children.length > 0,
                 children,
@@ -692,7 +691,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const lastID = this.getLastItemID();
         const isFirstItem = currentItem.id === firstID;
         const isLastItem = currentItem.id === lastID;
-        const tree = !!this.self.current ? (this.self.current.firstChild as HTMLElement) : null;
 
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
@@ -763,7 +761,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 }
                 break;
             case "End":
-                if (isLastItem && lastID) {
+                if (!isLastItem && lastID) {
                     e.preventDefault();
                     e.stopPropagation();
                     this.selectItemByID(lastID);

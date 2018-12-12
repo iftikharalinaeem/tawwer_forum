@@ -193,9 +193,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         this.props.onDeleteClick(this.deleteButtonRef.current!);
     };
 
-    private cancelRename = (e: React.MouseEvent) => {
-        e.stopPropagation();
+    private cancelRename = (event: React.SyntheticEvent) => {
+        event.stopPropagation();
         this.props.selectItem(this.props.item, false);
+        this.focusSelf();
     };
 
     private handleExpand = () => {
