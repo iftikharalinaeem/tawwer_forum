@@ -1458,7 +1458,7 @@ if (!function_exists('writeReactions')) {
                 t('Log'),
                 "/reactions/log/{$recordType}/{$iD}",
                 'Popup ReactButton ReactButton-Log',
-                 ['rel' => 'nofollow']
+                ['rel' => 'nofollow']
             );
         }
 
