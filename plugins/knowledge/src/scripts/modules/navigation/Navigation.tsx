@@ -3,24 +3,23 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import SiteNav from "@library/components/siteNav/SiteNav";
-import { IStoreState } from "@knowledge/state/model";
-import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import apiv2 from "@library/apiv2";
-import { connect } from "react-redux";
-import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
-import { organize } from "@library/components/icons";
-import { t } from "@library/application";
-import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
-import Permission from "@library/users/Permission";
+import NavigationAdminLinks from "@knowledge/modules/navigation/NavigationAdminLinks";
+import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import SiteNav from "@library/components/siteNav/SiteNav";
+import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import React from "react";
+import { connect } from "react-redux";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
     activeRecord: IActiveRecord;
     collapsible: boolean;
+    kbID: number;
 }
 
 /**
@@ -36,15 +35,9 @@ export class Navigation extends React.Component<IProps> {
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={
-                    <Permission permission="kb.manage">
-                        <hr className="navigation-divider" />
-                        <div className="navigation-cta">
-                            {organize()}
-                            <OrganizeCategoriesRoute.Link data={{ kbID: 1 }}>
-                                {t("Organize Categories")}
-                            </OrganizeCategoriesRoute.Link>
-                        </div>
-                    </Permission>
+                    this.props.fetchLoadable.status === LoadStatus.SUCCESS && (
+                        <NavigationAdminLinks kbID={this.props.kbID} />
+                    )
                 }
             >
                 {NavigationSelector.selectChildren(

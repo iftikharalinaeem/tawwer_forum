@@ -31,6 +31,7 @@ interface IProps {
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
+    kbID: number;
 }
 
 /**
@@ -48,7 +49,9 @@ export class ArticleLayout extends React.Component<IProps> {
                 <Container>
                     <VanillaHeader
                         title={article.name}
-                        mobileDropDownContent={<Navigation collapsible={false} activeRecord={activeRecord} />}
+                        mobileDropDownContent={
+                            <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
+                        }
                     />
                     <PanelLayout device={this.props.device}>
                         {this.props.device !== Devices.MOBILE && (
@@ -59,7 +62,9 @@ export class ArticleLayout extends React.Component<IProps> {
                             </PanelLayout.Breadcrumbs>
                         )}
                         <PanelLayout.LeftBottom>
-                            <PanelWidget>{<Navigation collapsible={true} activeRecord={activeRecord} />}</PanelWidget>
+                            <PanelWidget>
+                                {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                            </PanelWidget>
                         </PanelLayout.LeftBottom>
                         <PanelLayout.MiddleTop>
                             <PanelWidget>

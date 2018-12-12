@@ -57,6 +57,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                                 article={loadable.data!.article}
                                 breadcrumbData={loadable.data!.breadcrumbs}
                                 messages={this.renderMessages()}
+                                kbID={1}
                             />
                         </DocumentTitle>
                     ) : (

@@ -24,20 +24,22 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className="container">
-                        <DocumentTitle title={pageTitle}>
-                            <div className="navigationManagerWrap">
-                                <Heading
-                                    id={this.titleID}
-                                    depth={1}
-                                    renderAsDepth={2}
-                                    className="pageSubTitle"
-                                    title={pageTitle}
-                                />
+                    <div className="modal-scroll inheritHeight">
+                        <div className="container inheritHeight">
+                            <div className="navigationManager-container inheritHeight">
+                                <DocumentTitle title={pageTitle}>
+                                    <Heading
+                                        id={this.titleID}
+                                        depth={1}
+                                        renderAsDepth={2}
+                                        className="pageSubTitle navigationManager-header"
+                                        title={pageTitle}
+                                    />
+                                </DocumentTitle>
+                                <div className="inheritHeight">
+                                    <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
+                                </div>
                             </div>
-                        </DocumentTitle>
-                        <div className="navigationManagerWrap">
-                            <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
                         </div>
                     </div>
                 </FullKnowledgeModal>

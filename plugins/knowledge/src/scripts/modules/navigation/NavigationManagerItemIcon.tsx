@@ -42,7 +42,11 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                 return <span className={className}>{this.icon()}</span>;
             }
         } else {
-            return article("navigationManager-articleIcon", "navigationManager-articleIconFill");
+            return (
+                <span className="navigationManager-articlePage">
+                    {article("navigationManager-articleIcon", "navigationManager-articleIconFill")}
+                </span>
+            );
         }
     }
 

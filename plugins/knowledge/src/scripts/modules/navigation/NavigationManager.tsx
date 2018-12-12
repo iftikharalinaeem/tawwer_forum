@@ -33,7 +33,7 @@ import { connect } from "react-redux";
 import { ModalConfirm } from "@library/components/modal";
 import Translate from "@library/components/translation/Translate";
 import { t } from "@library/application";
-import TabHandler from "@library/TabHandler";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -47,26 +47,27 @@ interface IState {
     treeData: ITreeData<INormalizedNavigationItem>;
     selectedItem: ITreeItem<INormalizedNavigationItem> | null;
     deleteItem: ITreeItem<INormalizedNavigationItem> | null;
-    selectedElement: HTMLElement | null;
     disabled: boolean;
     showNewCategoryModal: boolean;
     writeMode: boolean;
     elementToFocusOnDeleteClose: HTMLButtonElement | null;
+    dragging: boolean;
 }
 
 export class NavigationManager extends React.Component<IProps, IState> {
     private self: React.RefObject<HTMLDivElement> = React.createRef();
     private newCategoryButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private id = uniqueIDFromPrefix("tree");
 
     public state: IState = {
         treeData: this.calcTree(),
         selectedItem: null,
         deleteItem: null,
-        selectedElement: null,
         disabled: false,
         showNewCategoryModal: false,
         writeMode: false,
         elementToFocusOnDeleteClose: null,
+        dragging: false,
     };
 
     /**
@@ -83,21 +84,20 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 />
                 <div
                     ref={this.self}
-                    className={classNames("navigationManager", this.props.className)}
+                    className={classNames("navigationManager", "inheritHeight", this.props.className)}
                     role="tree"
                     aria-describedby={this.props.describedBy}
                     onKeyDown={this.handleKeyDown}
                 >
-                    <div ref={this.self} className={classNames("navigationManager", this.props.className)}>
-                        <Tree
-                            tree={this.state.treeData}
-                            onDragEnd={this.onDragEnd}
-                            onCollapse={this.collapseItem}
-                            onExpand={this.expandItem}
-                            renderItem={this.renderItem}
-                            isDragEnabled={!this.state.disabled}
-                        />
-                    </div>
+                    <Tree
+                        tree={this.state.treeData}
+                        onDragEnd={this.onDragEnd}
+                        onDragStart={this.onDragStart}
+                        onCollapse={this.collapseItem}
+                        onExpand={this.expandItem}
+                        renderItem={this.renderItem}
+                        isDragEnabled={!this.state.disabled}
+                    />
                 </div>
                 {this.renderNewCategoryModal()}
                 {this.renderDeleteModal()}
@@ -128,7 +128,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 selectItem={this.selectItem}
                 writeMode={this.state.writeMode}
                 onDeleteClick={deleteHandler}
-                firstID={this.getFirstTreeItemID()}
+                firstID={this.getFirstItemID()}
+                getItemID={this.getItemId}
             />
         );
     };
@@ -169,34 +170,127 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private expandItem = (itemId: string) => {
         const { treeData } = this.state;
-        const itemData = treeData[itemId];
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: true }),
-            selectedItem: itemData,
-        });
+        this.setState(
+            {
+                treeData: mutateTree(treeData, itemId, { isExpanded: true }),
+            },
+            () => {
+                this.selectItemByID(itemId);
+            },
+        );
     };
 
     /**
      * Get the id of the first element in the tree to focus it.
      */
-    private getFirstTreeItemID = (): string | null => {
-        const items = this.state.treeData.items;
-        if (items) {
+    private getFirstItemID = (): string | null => {
+        const { items } = this.state.treeData;
+        const rootItem = items[this.props.rootNavigationItemID];
+        if (rootItem && rootItem.children.length > 0) {
             // Hard coded until we
-            return this.state.treeData.items[this.props.rootNavigationItemID].children[0];
+            return rootItem.children[0];
         } else {
             return null;
         }
     };
 
     /**
+     * Get the id of the last element in the tree to focus it.
+     */
+    private getLastItemID = (): string | null => {
+        const { items } = this.state.treeData;
+        const rootItem = items[this.props.rootNavigationItemID];
+        if (rootItem && rootItem.children.length > 0) {
+            return rootItem.children[rootItem.children.length - 1];
+        } else {
+            return null;
+        }
+    };
+
+    private getNextSiblingID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const { treeData } = this.state;
+        const parent = treeData.items[this.calcParentID(item)];
+        if (parent) {
+            const indexInChildren = parent.children.indexOf(item.id);
+            const lastIndex = parent.children.length - 1;
+            if (indexInChildren >= 0 && indexInChildren < lastIndex) {
+                return parent.children[indexInChildren + 1];
+            }
+        }
+
+        return null;
+    }
+
+    private getPrevSiblingID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const { treeData } = this.state;
+        const parent = treeData.items[this.calcParentID(item)];
+        if (parent) {
+            const indexInChildren = parent.children.indexOf(item.id);
+            if (indexInChildren > 0) {
+                return parent.children[indexInChildren - 1];
+            }
+        }
+
+        return null;
+    }
+
+    private getNextFlatID(item: ITreeItem<INormalizedNavigationItem>, checkChildren = true): string | null {
+        if (checkChildren && item.children.length > 0 && item.isExpanded) {
+            return item.children[0];
+        } else {
+            const siblingID = this.getNextSiblingID(item);
+            if (siblingID) {
+                return siblingID;
+            } else {
+                const parentID = this.calcParentID(item);
+                const parent = this.state.treeData.items[parentID];
+                if (parent) {
+                    return this.getNextFlatID(parent, false);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private getPrevFlatID(item: ITreeItem<INormalizedNavigationItem>): string | null {
+        const prevSiblingID = this.getPrevSiblingID(item);
+
+        if (!prevSiblingID) {
+            return this.calcParentID(item);
+        }
+        const prevSibling = this.state.treeData.items[prevSiblingID];
+        if (prevSibling) {
+            return this.getLastLeafID(prevSibling);
+        }
+        return null;
+    }
+
+    private getLastLeafID(item: ITreeItem<INormalizedNavigationItem>): string {
+        if (item.children.length > 0 && item.isExpanded) {
+            const lastChildID = item.children[item.children.length - 1];
+            const lastChild = this.state.treeData.items[lastChildID];
+            if (lastChild) {
+                return this.getLastLeafID(lastChild);
+            }
+        }
+        return item.id;
+    }
+
+    private calcParentID(item: ITreeItem<INormalizedNavigationItem>): string {
+        return NavigationRecordType.KNOWLEDGE_CATEGORY + item.data.parentID;
+    }
+
+    private selectItemByID = (itemID: string) => {
+        const item = this.state.treeData.items[itemID];
+        if (item) {
+            this.selectItem(item);
+        }
+    };
+    /**
      * Select a single item. Takes an optional callback for after the state has been updated.
      */
-    private selectItem = (
-        selectedItem: ITreeItem<INormalizedNavigationItem>,
-        writeMode: boolean = false,
-        selectedElement?: HTMLElement | null,
-    ) => {
+    private selectItem = (selectedItem: ITreeItem<INormalizedNavigationItem>, writeMode: boolean = false) => {
         const newID = selectedItem.id;
         const { treeData, selectedItem: oldSelectedItem } = this.state;
         const oldID = oldSelectedItem ? oldSelectedItem.id : null;
@@ -210,7 +304,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
             treeData: nextTree,
             disabled: writeMode,
             selectedItem,
-            selectedElement: selectedElement || null,
             writeMode,
         });
     };
@@ -220,12 +313,14 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private collapseItem = (itemId: string) => {
         const { treeData } = this.state;
-        const itemData = treeData[itemId];
-        this.setState({
-            treeData: mutateTree(treeData, itemId, { isExpanded: false }),
-            selectedItem: itemData,
-            selectedElement: null,
-        });
+        this.setState(
+            {
+                treeData: mutateTree(treeData, itemId, { isExpanded: false }),
+            },
+            () => {
+                this.selectItemByID(itemId);
+            },
+        );
     };
 
     /**
@@ -409,6 +504,13 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
      */
+    public getItemId = (id: string) => {
+        return `${this.id}-${id}`;
+    };
+
+    /**
+     * Disable editing of the whole tree. Takes an optional callback for when the state update has completed.
+     */
     private disableTree = () => {
         this.setState({ disabled: true });
     };
@@ -428,6 +530,11 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private onDragEnd = async (source: ITreeSourcePosition, destination?: ITreeDestinationPosition) => {
         const { treeData } = this.state;
 
+        this.setState({
+            dragging: false,
+            disabled: false,
+            writeMode: false,
+        });
         if (!destination) {
             return;
         }
@@ -446,12 +553,21 @@ export class NavigationManager extends React.Component<IProps, IState> {
             // Touch the old item so it re-renders.
             newTree = mutateTree(newTree, currentlySelectedItem.id, {});
         }
-        this.setState({
-            treeData: newTree,
-            writeMode: false,
-            selectedItem: item,
-        });
+        this.setState(
+            {
+                treeData: newTree,
+            },
+            () => {
+                this.selectItem(item);
+            },
+        );
         await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
+    };
+
+    private onDragStart = (source: ITreeSourcePosition) => {
+        this.setState({
+            dragging: true,
+        });
     };
 
     /**
@@ -517,6 +633,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
             const children = itemValue.children;
             data.items[itemID] = {
+                parentID: NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID,
                 id: itemID,
                 hasChildren: children.length > 0,
                 children,
@@ -535,7 +652,36 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (e: React.KeyboardEvent) => {
-        const currentItem = this.state.selectedElement as HTMLElement;
+        if (this.state.disabled || this.state.dragging) {
+            return;
+        }
+        const currentItem = this.state.selectedItem;
+        const container = this.self.current;
+        let currentElement: HTMLElement | null = null;
+        if (currentItem) {
+            currentElement = document.getElementById(this.getItemId(currentItem.id));
+        } else if (container) {
+            let tabbable: HTMLElement = container.querySelector(".navigationManager-item[tabindex='0']") as HTMLElement;
+            if (!tabbable) {
+                tabbable = container.querySelector(".navigationManager-item") as HTMLElement;
+            }
+            if (tabbable) {
+                tabbable.focus();
+            }
+        }
+
+        if (!currentItem) {
+            return;
+        }
+
+        const prevID = this.getPrevFlatID(currentItem);
+        const nextID = this.getNextFlatID(currentItem);
+        const parentID = this.calcParentID(currentItem);
+        const firstID = this.getFirstItemID();
+        const lastID = this.getLastItemID();
+        const isFirstItem = currentItem.id === firstID;
+        const isLastItem = currentItem.id === lastID;
+
         const shift = "-Shift";
         switch (`${e.key}${e.shiftKey ? shift : ""}`) {
             case "Escape":
@@ -545,20 +691,70 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     disabled: false,
                     writeMode: false,
                 });
-            case "ArrowDown":
-                e.preventDefault();
-                e.stopPropagation();
                 if (currentItem) {
-                    currentItem.focus();
+                    this.selectItem(currentItem);
                 }
-                const excluded: HTMLElement[] = [];
-                currentItem.querySelectorAll(".navigationManager-action").forEach(item => {
-                    excluded.push(item as HTMLElement);
-                });
-                const tabHandler = new TabHandler(this.self.current! as HTMLElement, excluded);
-                const nextElement = tabHandler.getNext(currentItem, false, false);
-                if (nextElement) {
-                    nextElement.focus();
+                break;
+            case "ArrowDown":
+                if (!isLastItem && nextID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(nextID);
+                }
+                break;
+            case "ArrowUp":
+                if (!isFirstItem && prevID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(prevID);
+                }
+                break;
+            case "ArrowRight":
+                /**
+                 * Only applies to items with children.
+                 * When focus is on a closed node, opens the node; focus does not move.
+                 * When focus is on a open node, moves focus to the first child node.
+                 * When focus is on an end node, does nothing.
+                 */
+                if (currentItem && currentItem.children.length > 0) {
+                    if (!currentItem.isExpanded) {
+                        e.stopPropagation();
+                        this.expandItem(currentItem.id);
+                    } else {
+                        const firstChildID = currentItem.children.length > 0 ? currentItem.children[0] : null;
+                        if (firstChildID) {
+                            this.selectItemByID(firstChildID);
+                        }
+                    }
+                }
+                break;
+            case "ArrowLeft":
+                /*
+                    When focus is on an open node, closes the node.
+                    When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
+                    When focus is on a root node that is also either an end node or a closed node, does nothing.
+                */
+                if (currentElement && currentItem) {
+                    if (currentItem.children.length > 0 && currentItem.isExpanded) {
+                        e.stopPropagation();
+                        this.collapseItem(currentItem.id);
+                    } else {
+                        this.selectItemByID(parentID);
+                    }
+                }
+                break;
+            case "Home":
+                if (!isFirstItem && firstID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(firstID);
+                }
+                break;
+            case "End":
+                if (!isLastItem && lastID) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectItemByID(lastID);
                 }
                 break;
         }

@@ -15,7 +15,7 @@ interface IProps {
     currentName: string;
     focusOnExit: React.RefObject<HTMLButtonElement>;
     applyNewName: (newName: string) => void;
-    cancel: (e: React.MouseEvent) => void;
+    cancel: (event: React.SyntheticEvent) => void;
 }
 
 interface IState {
@@ -34,7 +34,15 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
             <form className={classNames("navigationManger-editMode", this.props.className)} onSubmit={this.submit}>
                 <label className="navigationManger-text">
                     <span className="sr-only">{t("New Name: ")}</span>
-                    <input type="text" value={this.state.newName} onChange={this.handleChange} ref={this.inputRef} />
+                    <input
+                        maxLength={255}
+                        type="text"
+                        value={this.state.newName}
+                        onChange={this.handleChange}
+                        ref={this.inputRef}
+                        onKeyDown={this.handleKeyDown}
+                        className="navigationManger-input"
+                    />
                 </label>
                 <Button
                     onClick={this.props.cancel}
@@ -62,6 +70,14 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
             input.select();
         }
     }
+
+    private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === "Escape" && !event.shiftKey) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.props.cancel(event);
+        }
+    };
 
     private get isSubmitDisabled(): boolean {
         return this.state.newName === this.props.currentName || this.state.newName === "";

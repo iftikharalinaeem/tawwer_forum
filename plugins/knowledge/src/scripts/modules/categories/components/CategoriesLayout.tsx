@@ -26,6 +26,7 @@ interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;
     results: IResult[];
     query?: string;
+    kbID: number;
 }
 
 interface IState {
@@ -49,7 +50,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             <Container>
                 <VanillaHeader
                     title={category.name}
-                    mobileDropDownContent={<Navigation collapsible={false} activeRecord={activeRecord} />}
+                    mobileDropDownContent={
+                        <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
+                    }
                 />
                 <PanelLayout device={this.props.device}>
                     <PanelLayout.Breadcrumbs>
@@ -58,7 +61,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         </PanelWidget>
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
-                        <PanelWidget>{<Navigation collapsible={true} activeRecord={activeRecord} />}</PanelWidget>
+                        <PanelWidget>
+                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                        </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>
                         <PanelWidget>
