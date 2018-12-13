@@ -16,6 +16,7 @@ interface IProps {
     focusOnExit: React.RefObject<HTMLButtonElement>;
     applyNewName: (newName: string) => void;
     cancel: (event: React.SyntheticEvent) => void;
+    isFolder: boolean;
 }
 
 interface IState {
@@ -41,7 +42,7 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                         onChange={this.handleChange}
                         ref={this.inputRef}
                         onKeyDown={this.handleKeyDown}
-                        className="navigationManger-input"
+                        className={classNames("navigationManger-input", { isFolder: this.props.isFolder })}
                     />
                 </label>
                 <Button
