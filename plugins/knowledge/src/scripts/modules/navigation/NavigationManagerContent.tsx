@@ -80,17 +80,15 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 onFocus={this.handleFocusIn}
             >
                 <div className={classNames("navigationManager-draggable", this.props.className)}>
-                    <ConditionalWrap condition={isEditing} className="isVisibilityHidden">
-                        <NavigationManagerItemIcon
-                            expanded={!!item.isExpanded}
-                            expandItem={this.handleExpand}
-                            collapseItem={this.handleCollapse}
-                            itemId={item.id}
-                            className="tree-itemIcon"
-                            type={item.data.recordType}
-                            hasChildren={this.props.hasChildren}
-                        />
-                    </ConditionalWrap>
+                    <NavigationManagerItemIcon
+                        expanded={!!item.isExpanded}
+                        expandItem={this.handleExpand}
+                        collapseItem={this.handleCollapse}
+                        itemId={item.id}
+                        className="tree-itemIcon"
+                        type={item.data.recordType}
+                        hasChildren={this.props.hasChildren}
+                    />
 
                     {isEditing ? (
                         <NavigationManagerNameForm
@@ -98,6 +96,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             focusOnExit={this.renameButtonRef}
                             applyNewName={this.applyNewName}
                             cancel={this.cancelRename}
+                            isFolder={this.props.hasChildren}
                         />
                     ) : (
                         <>

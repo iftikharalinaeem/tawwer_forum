@@ -10,6 +10,7 @@ import { article, folderClosed, folderOpen } from "@library/components/icons/nav
 import classNames from "classnames";
 import React from "react";
 import { NavigationRecordType } from "@knowledge/@types/api";
+import FlexSpacer from "@library/components/FlexSpacer";
 
 interface IProps {
     expanded: boolean;
@@ -24,6 +25,7 @@ interface IProps {
 
 export default class NavigationManagerItemIcon extends React.Component<IProps> {
     public render() {
+        const spacerClassName = classNames("navigationManager-toggleSpacer");
         if (this.props.type === NavigationRecordType.KNOWLEDGE_CATEGORY) {
             const className = classNames("navigationManager-toggleFolder", this.props.className);
             if (this.props.hasChildren) {
@@ -39,11 +41,17 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     </Button>
                 );
             } else {
-                return <span className={className}>{this.icon()}</span>;
+                return (
+                    <span className={className}>
+                        <FlexSpacer className={spacerClassName} />
+                        {this.icon()}
+                    </span>
+                );
             }
         } else {
             return (
                 <span className="navigationManager-articlePage">
+                    <FlexSpacer className={spacerClassName} />
                     {article("navigationManager-articleIcon", "navigationManager-articleIconFill")}
                 </span>
             );
@@ -63,7 +71,9 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     <span className="navigationManager-triangle">
                         {this.props.hasChildren && downTriangle("navigationManager-triangleDown")}
                     </span>
-                    {folderOpen("navigationManager-folder navigationManager-folderOpen")}
+                    <span className="navigationManager-folderIcon">
+                        {folderOpen("navigationManager-folder navigationManager-folderOpen")}
+                    </span>
                 </>
             );
         } else {
@@ -72,7 +82,9 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                     <span className="navigationManager-triangle">
                         {this.props.hasChildren && rightTriangle("navigationManager-triangleRight")}
                     </span>
-                    {folderClosed("navigationManager-folder navigationManager-folderClosed")}
+                    <span className="navigationManager-folderIcon">
+                        {folderClosed("navigationManager-folder navigationManager-folderClosed")}
+                    </span>
                 </>
             );
         }
