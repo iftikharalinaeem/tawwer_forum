@@ -71,7 +71,6 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
 
         $this->addGdnScript();
-        $this->scripts[] = $assetProvider->getLocaleAsset()->getWebPath();
         $this->addGlobalReduxActions();
 
     }
