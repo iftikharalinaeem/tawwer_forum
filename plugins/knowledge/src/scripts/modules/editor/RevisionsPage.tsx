@@ -20,18 +20,22 @@ import { LoadStatus } from "@library/@types/api";
 import UserContent from "@library/components/UserContent";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import { makeRevisionsUrl, makeEditUrl } from "@knowledge/modules/editor/route";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import apiv2 from "@library/apiv2";
 
 interface IProps
     extends IDeviceProps,
         IInjectableRevisionsState,
-        IInjectableRevisionsPageActions,
         RouteComponentProps<{
             id: string;
             revisionID?: string;
-        }> {}
+        }> {
+    revisionsPageActions: RevisionsPageActions;
+    articleActions: ArticleActions;
+}
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -81,12 +85,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
             <PageTitle
                 title={selectedRevision.data.name}
-                backUrl={null}
                 meta={
                     <ArticleMeta
                         updateUser={selectedRevision.data.insertUser!}
                         dateUpdated={selectedRevision.data.dateInserted}
-                        permaLink={makeRevisionsUrl(selectedRevision.data)}
+                        permaLink={RevisionsRoute.url(selectedRevision.data)}
                     />
                 }
             />
@@ -105,14 +108,19 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                     {revisions.data
                         .slice()
                         .reverse()
-                        .map(item => (
-                            <RevisionsListItem
-                                {...item}
-                                isSelected={item.articleRevisionID === selectedRevisionID}
-                                url={makeRevisionsUrl(item)}
-                                key={item.articleRevisionID}
-                            />
-                        ))}
+                        .map(item => {
+                            const preload = () =>
+                                this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });
+                            return (
+                                <RevisionsListItem
+                                    {...item}
+                                    isSelected={item.articleRevisionID === selectedRevisionID}
+                                    url={RevisionsRoute.url(item)}
+                                    onHover={preload}
+                                    key={item.articleRevisionID}
+                                />
+                            );
+                        })}
                 </RevisionsList>
             )
         );
@@ -122,7 +130,8 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        void this.initializeFromUrl();
+        // Initialize the page data, then preload the editor page because we are likely to navigate there.
+        void this.initializeFromUrl().then(EditorRoute.preload);
     }
 
     /**
@@ -152,7 +161,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     private onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (this.canSubmit) {
-            this.props.history.push(makeEditUrl(this.props.selectedRevision.data!));
+            this.props.history.push(EditorRoute.url(this.props.selectedRevision.data!));
         }
     };
 
@@ -186,7 +195,12 @@ export class RevisionsPage extends React.Component<IProps, IState> {
 
 const withRedux = connect(
     RevisionsPageModel.getInjectableProps,
-    RevisionsPageActions.getInjectableActions,
+    dispatch => {
+        return {
+            articleActions: new ArticleActions(dispatch, apiv2),
+            revisionsPageActions: new RevisionsPageActions(dispatch, apiv2),
+        };
+    },
 );
 
 export default withRedux(withDevice(RevisionsPage));

@@ -16,23 +16,18 @@ import {
 } from "@knowledge/@types/api";
 import { History } from "history";
 import qs from "qs";
-import ArticleActions from "../article/ArticleActions";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
-import { makeEditUrl } from "@knowledge/modules/editor/route";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
     public static readonly POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
     public static readonly POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
     public static readonly POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
-
-    // API actions
-    public static readonly PATCH_ARTICLE_REQUEST = "@@articleEditor/PATCH_ARTICLE_REQUEST";
-    public static readonly PATCH_ARTICLE_RESPONSE = "@@articleEditor/PATCH_ARTICLE_RESPONSE";
-    public static readonly PATCH_ARTICLE_ERROR = "@@articleEditor/PATCH_ARTICLE_ERROR";
 
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
@@ -48,7 +43,6 @@ export default class EditorPageActions extends ReduxActions {
     public static ACTION_TYPES:
         | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
-        | ActionsUnion<typeof EditorPageActions.patchArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setInitialDraftAC>
@@ -76,18 +70,6 @@ export default class EditorPageActions extends ReduxActions {
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPostArticleResponseBody,
         {} as IPostArticleRequestBody,
-    );
-
-    /**
-     * Action creators for POST /articles
-     */
-    private static patchArticleACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.PATCH_ARTICLE_REQUEST,
-        EditorPageActions.PATCH_ARTICLE_RESPONSE,
-        EditorPageActions.PATCH_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IPatchArticleRequestBody,
-        {} as IPatchArticleResponseBody,
     );
 
     /**
@@ -258,7 +240,7 @@ export default class EditorPageActions extends ReduxActions {
         // Redirect
         const editLocation = {
             ...history.location,
-            pathname: makeEditUrl(article),
+            pathname: EditorRoute.url(article),
             search: "",
         };
 
@@ -332,7 +314,7 @@ export default class EditorPageActions extends ReduxActions {
      * @param body - The body of the submit request.
      */
     private async updateArticle(article: IPatchArticleRequestBody, history: History) {
-        const response = await this.patchArticle(article);
+        const response = await this.articleActions.patchArticle(article);
         if (!response) {
             return;
         }
@@ -358,19 +340,6 @@ export default class EditorPageActions extends ReduxActions {
      */
     private postArticle(data: IPostArticleRequestBody) {
         return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
-    }
-
-    /**
-     * Update an article
-     */
-    private patchArticle(data: IPatchArticleRequestBody) {
-        const { articleID, ...rest } = data;
-        return this.dispatchApi<IPatchArticleResponseBody>(
-            "patch",
-            `/articles/${articleID}`,
-            EditorPageActions.patchArticleACs,
-            rest,
-        );
     }
 
     /**

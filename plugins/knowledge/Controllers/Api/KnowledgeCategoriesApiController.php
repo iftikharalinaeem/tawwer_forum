@@ -47,7 +47,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException If the target knowledge category is not empty.
      */
     public function delete(int $id) {
-        $this->permission("garden.setttings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema()->setDescription("Delete a knowledge category.");
         $this->schema([], "out");
@@ -82,6 +82,11 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "parentID" => [
                 "allowNull" => true,
                 "description" => "Unique ID of the parent for a category.",
+                "type" => "integer",
+            ],
+            "knowledgeBaseID" => [
+                "allowNull" => true,
+                "description" => "Knowledge base ID for a category.",
                 "type" => "integer",
             ],
             "sortChildren" => [
@@ -176,7 +181,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function get_edit(int $id): array {
-        $this->permission("garden.settings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema()->setDescription("Get a knowledge category for editing.");
         $out = $this->schema(Schema::parse([
@@ -261,6 +266,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 Schema::parse([
                     "name",
                     "parentID",
+                    "knowledgeBaseID",
                     "sort?",
                     "sortChildren?",
                 ])->add($this->fullSchema()),
@@ -296,7 +302,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission("garden.setttings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeCategoryPostSchema())
@@ -310,6 +316,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
         if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
+            $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
             $this->knowledgeCategoryModel->updateCounts($id);
         }
         $row = $this->knowledgeCategoryByID($id);
@@ -330,13 +337,18 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body = []): array {
-        $this->permission("garden.setttings.manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema($this->knowledgeCategoryPostSchema())
             ->setDescription("Create a new knowledge category.")
             ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
         $out = $this->schema($this->fullSchema(), "out");
 
+
+        if ($body['parentID'] !== -1) {
+            $parentCategory = $this->knowledgeCategoryByID($body['parentID']);
+            $body['knowledgeBaseID'] = $parentCategory['knowledgeBaseID'];
+        }
         $body = $in->validate($body);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);

@@ -1,8 +1,12 @@
 {
     "dependencies": {
+        "@atlaskit/tree": "^4.1.8",
         "normalize.css": "^8.0.0",
         "shave": "^2.4.0",
         "swiper": "^4.3.5"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "@vanillaforums/prettier-config": "^1.0.0",
+        "prettier": "^1.15.3"
+    }
 }

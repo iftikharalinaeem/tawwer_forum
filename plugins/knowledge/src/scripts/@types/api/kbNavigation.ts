@@ -4,23 +4,33 @@
  * @license Proprietary
  */
 
-import { IArticleFragment, IKbCategoryMultiTypeFragment } from "@knowledge/@types/api";
-import { MultiTypeRecord } from "@library/@types/api";
+import { INavigationItem } from "@library/@types/api";
 
-// Base types
-type IKbNavigationArticle = MultiTypeRecord<IArticleFragment, "articleID", "article">;
-
-export interface IKbNavigationCategory extends IKbCategoryMultiTypeFragment {
-    children?: IKbNavigationItem[];
+export enum NavigationRecordType {
+    KNOWLEDGE_CATEGORY = "knowledgeCategory",
+    ARTICLE = "article",
 }
 
-export type IKbNavigationItem = IKbNavigationCategory | IKbNavigationArticle;
+export interface IKbNavigationItem extends INavigationItem {
+    recordType: NavigationRecordType;
+    children?: string[];
+}
 
 // API types
-export interface IKbNavigationRequest {
+export interface IGetKbNavigationRequest {
     knowledgeBaseID?: number;
     knowledgeCategoryID?: number;
     maxDepth?: number;
 }
 
-export type IKbNavigationResponse = IKbNavigationItem[];
+export type IGetKbNavigationResponse = IKbNavigationItem[];
+
+export interface IPatchFlatItem {
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    recordType: NavigationRecordType;
+}
+
+export type IPatchKBNavigationRequest = IPatchFlatItem[];
+export type IPatchKbNavigationResponse = IKbNavigationItem[];

@@ -11,10 +11,10 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { t } from "@library/application";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
-import { PageTitle } from "@knowledge/modules/common/PageTitle";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
 import DraftHeader from "@knowledge/modules/drafts/components/DraftHeader";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import PageTitle from "@knowledge/modules/common/PageTitle";
 
 interface IProps {
     device: Devices;
@@ -37,7 +37,7 @@ class DraftsLayout extends React.Component<IProps> {
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                         <PanelLayout.MiddleTop>
                             <PanelWidget>
-                                <PageTitle title={t("Drafts")} device={device} backUrl={null} />
+                                <PageTitle title={t("Drafts")} />
                             </PanelWidget>
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>

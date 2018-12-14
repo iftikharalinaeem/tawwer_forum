@@ -24,6 +24,8 @@ import {
     IPatchArticleDraftRequest,
     IDeleteArticleDraftResponse,
     IDeleteArticleDraftRequest,
+    IPatchArticleRequestBody,
+    IPatchArticleResponseBody,
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
@@ -78,6 +80,7 @@ export default class ArticleActions extends ReduxActions {
      */
     public static readonly ACTION_TYPES:
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
+        | ActionsUnion<typeof ArticleActions.patchArticleACs>
         | ActionsUnion<typeof ArticleActions.getArticleACs>
         | ActionsUnion<typeof ArticleActions.getDraftACs>
         | ActionsUnion<typeof ArticleActions.getDraftsACs>
@@ -245,6 +248,31 @@ export default class ArticleActions extends ReduxActions {
         return {
             articleActions: new ArticleActions(dispatch, apiv2),
         };
+    }
+
+    /// PATCH /articles/:id
+
+    public static readonly PATCH_ARTICLE_REQUEST = "@@article/PATCH_ARTICLE_REQUEST";
+    public static readonly PATCH_ARTICLE_RESPONSE = "@@article/PATCH_ARTICLE_RESPONSE";
+    public static readonly PATCH_ARTICLE_ERROR = "@@article/PATCH_ARTICLE_ERROR";
+    private static patchArticleACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.PATCH_ARTICLE_REQUEST,
+        ArticleActions.PATCH_ARTICLE_RESPONSE,
+        ArticleActions.PATCH_ARTICLE_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {} as IPatchArticleRequestBody,
+        {} as IPatchArticleResponseBody,
+    );
+
+    public patchArticle(data: IPatchArticleRequestBody) {
+        const { articleID, ...rest } = data;
+        return this.dispatchApi<IPatchArticleResponseBody>(
+            "patch",
+            `/articles/${articleID}`,
+            ArticleActions.patchArticleACs,
+            rest,
+            { articleID },
+        );
     }
 
     /**

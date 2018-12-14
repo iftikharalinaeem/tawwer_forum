@@ -8,8 +8,9 @@ import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import NavigationItemCategory from "./NavigationItemCategory";
 import NavigationItemList from "./NavigationItemList";
-import { IKbCategoryFragment, IKbNavigationItem } from "@knowledge/@types/api";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { t } from "@library/application";
+import { INavigationTreeItem } from "@library/@types/api";
 
 interface IProps {
     onCategoryNavigate: (categoryID: number) => void;
@@ -17,7 +18,7 @@ interface IProps {
     selectedCategory: IKbCategoryFragment | null;
     navigatedCategory: IKbCategoryFragment | null;
     chosenCategory: IKbCategoryFragment | null;
-    items: IKbNavigationItem[];
+    items: INavigationTreeItem[];
 }
 
 interface IState {

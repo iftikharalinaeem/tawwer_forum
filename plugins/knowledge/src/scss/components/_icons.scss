@@ -42,8 +42,6 @@
 .icon-chevronLeftCompact {
     height: $icon-small_size;
     width: 14.15px;
-    margin-right: $utility-baseUnit;
-    opacity: .8;
 }
 
 
@@ -88,4 +86,20 @@
 .icon-chevronUp {
     width: 51px;
     height: 17px;
+}
+
+
+.icon-folderOpen {
+    width: 18.612px;
+    height: 14px;
+}
+
+.icon-folderClosed {
+    width: 16px;
+    height: 14px;
+}
+
+.icon-article {
+    width: 16px;
+    height: 16px;
 }

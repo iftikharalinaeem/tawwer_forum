@@ -109,7 +109,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function delete_drafts(int $draftID) {
-        $this->permission("signin.allow");
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
             "draftID" => [
@@ -121,7 +121,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $draft = $this->draftByID($draftID);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("settings.manage");
+            $this->permission("Garden.Settings.Manage");
         }
         $this->draftModel->delete(
             ["draftID" => $draft["draftID"]]
@@ -189,7 +189,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function get_drafts(int $draftID) {
-        $this->permission("articles.add");
+        $this->permission("knowledge.articles.add");
 
         $in = $this->schema([
             "draftID" => [
@@ -325,7 +325,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If output validation fails.
      */
     public function index_drafts(array $query) {
-        $this->permission("articles.add");
+        $this->permission("knowledge.articles.add");
 
         $in = $this->schema([
             "articleID?" => [
@@ -350,7 +350,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
 
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
-        $rows = $this->draftModel->get($where);
+        $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
+        $rows = $this->draftModel->get($where, $options);
         $rows = (new ArticleDraft($this->parser))->normalizeDraftFields($rows, false);
         $result = $out->validate($rows);
         return $result;
@@ -465,7 +466,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch_drafts(int $draftID, array $body): array {
-        $this->permission("articles.add");
+        $this->permission("knowledge.articles.add");
 
 
         $this->schema(["draftID" => "Target article draft ID."], "in");
@@ -480,7 +481,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $draft = $this->draftByID($draftID);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("settings.manage");
+            $this->permission("Garden.Settings.Manage");
         }
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
@@ -561,7 +562,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post_drafts(array $body): array {
-        $this->permission("articles.add");
+        $this->permission("knowledge.articles.add");
 
         $in = $this->schema($this->draftPostSchema(), "in")
             ->setDescription("Create a new article draft.");

@@ -91,6 +91,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeCategoryID")
             ->column("name", "varchar(255)")
             ->column("parentID", "int")
+            ->column("knowledgeBaseID", "int", false, "index")
             ->column("sortChildren", ["name", "dateInserted", "dateInsertedDesc", "manual"], true)
             ->column("sort", "int", true)
             ->column("insertUserID", "int")
@@ -102,7 +103,33 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("articleCount", "int", "0")
             ->column("articleCountRecursive", "int", "0")
             ->column("childCategoryCount", "int", "0")
-            ->set()
-        ;
+            ->set();
+
+        $this->database->structure()
+            ->table("knowledgeBase")
+            ->primaryKey("knowledgeBaseID")
+            ->column("name", "varchar(255)")
+            ->column("description", "text")
+            ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''])
+            ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
+            ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
+            ->column(
+                "viewType",
+                ["enum", Models\KnowledgeBaseModel::getAllTypes()],
+                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE]
+            )
+            ->column(
+                "sortArticles",
+                ["enum", Models\KnowledgeBaseModel::getAllSorts()],
+                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::ORDER_MANUAL]
+            )
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int")
+            ->column("dateUpdated", "datetime")
+            ->column("countArticles", "int", "0")
+            ->column("countCategories", "int", "0")
+            ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
+            ->set();
     }
 }

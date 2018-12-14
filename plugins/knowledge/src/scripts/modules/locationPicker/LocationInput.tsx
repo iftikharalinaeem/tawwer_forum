@@ -17,9 +17,8 @@ import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locati
 import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
 import { plusCircle, categoryIcon } from "@library/components/icons/common";
-import ButtonLoader from "@library/components/ButtonLoader";
 
-interface IProps extends ILPActionsProps, ILPConnectedData {
+export interface ILocationInputProps extends ILPActionsProps, ILPConnectedData {
     className?: string;
     initialCategoryID: number | null;
     disabled?: boolean;
@@ -34,7 +33,7 @@ interface IState {
  * This component allows to display and edit the location of the current page.
  * Creates a location picker in a modal when activated.
  */
-export class LocationInput extends React.PureComponent<IProps, IState> {
+export class LocationInput extends React.PureComponent<ILocationInputProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
 
@@ -80,7 +79,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                     <Modal
                         exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
-                        className={classNames(this.props.className)}
+                        className={classNames(this.props.className, "isCompact")}
                         label={t("Choose a location for this page.")}
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >

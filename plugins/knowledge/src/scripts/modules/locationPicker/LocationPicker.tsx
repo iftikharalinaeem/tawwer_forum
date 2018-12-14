@@ -34,6 +34,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
 
     public render() {
         const { actions } = this.props;
+        const title = this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Knowledge Bases");
 
         return (
             <React.Fragment>
@@ -42,9 +43,8 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                         className="isShadowed"
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
                         closeFrame={this.props.onCloseClick}
-                    >
-                        {this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Knowledge Bases")}
-                    </FrameHeader>
+                        title={title}
+                    />
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
                             <LocationContents
@@ -75,7 +75,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                 {this.state.showNewCategoryModal && (
                     <NewCategoryForm
                         exitHandler={this.hideNewFolderModal}
-                        parentCategory={this.props.navigatedCategory}
+                        parentCategoryID={this.props.navigatedCategoryID}
                         buttonRef={this.newFolderButtonRef}
                     />
                 )}
