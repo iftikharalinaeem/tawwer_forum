@@ -50,6 +50,3 @@ jobs:
 
 # No additional system dependencies to install. Skip the install step.
 install: true
-
-# Run build in a Docker container.  Reduces time between commit and start of build.
-sudo: false

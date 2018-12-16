@@ -74,7 +74,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @return array
      */
     private function addAttributes(array $row, $attributes) {
-        if (is_array($attributes)) {
+        if (is_array($attributes) || (is_object($attributes) && $attributes instanceof ArrayObject)) {
             // Normalize the casing of attributes and reaction URL codes.
             if (array_key_exists('react', $attributes)) {
                 $attributes['React'] = $attributes['react'];
@@ -1457,7 +1457,8 @@ if (!function_exists('writeReactions')) {
             echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
                 t('Log'),
                 "/reactions/log/{$recordType}/{$iD}",
-                'Popup ReactButton ReactButton-Log'
+                'Popup ReactButton ReactButton-Log',
+                ['rel' => 'nofollow']
             );
         }
 

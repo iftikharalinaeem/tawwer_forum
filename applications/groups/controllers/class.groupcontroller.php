@@ -371,7 +371,7 @@ class GroupController extends Gdn_Controller {
         $this->verifyAccess($group);
 
         $userID = Gdn::session()->UserID;
-        if ($this->GroupModel->isMember($userID, $group)) {
+        if ($this->GroupModel->isMember($userID, $group['GroupID'])) {
             redirectTo(groupUrl($group));
         }
         $this->groupPermission('Join', $group);

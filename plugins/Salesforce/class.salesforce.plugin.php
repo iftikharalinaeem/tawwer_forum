@@ -430,7 +430,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Content Type not supported');
         }
         $sender->Form->addHidden('ForumUrl', $url);
-        $sender->Form->addHidden('Description', Gdn_Format::textEx($content->Body));
+        $sender->Form->addHidden('Description', Gdn_Format::textEx(Gdn_Format::to($content->Body, $content->Format)));
 
         //See if user is already registered in Sales Force
         if (!c('Plugins.Salesforce.AllowDuplicateLeads', false)) {
@@ -469,9 +469,14 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Company' => $formValues['Company'],
                     'Title' => $formValues['Title'],
                     'Status' => $formValues['Status'],
-                    'Vanilla__ForumUrl__c' => $formValues['ForumUrl'],
                     'Description' => $formValues['Description']
                 ];
+                // Add Vanilla custom field only if it exists.
+                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__ForumUrl__c', 'Lead');
+                if ($vanillaUrl) {
+                    $leadData['Vanilla__ForumUrl__c'] = $formValues['ForumUrl'] ?? '';
+                }
+
                 $sender->EventArguments['LeadData'] = &$leadData;
                 $sender->fireEvent('SendingLeadData');
                 $leadID = $salesforce->createLead($leadData);
@@ -502,25 +507,27 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $sender->informMessage('Salesforce Lead Created.');
             }
         }
-        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+
         try {
-            $data = [
-                'DiscussionID' => $content->DiscussionID,
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'Name' => $user->Name,
-                'Email' => $user->Email,
-                'Title' => $user->Title,
-                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
-                'Options' => $salesforce->getLeadStatusOptions(),
-                'Type' => $type,
-                'CommentID' => val('CommentID', $content),
-                'InsertUserID' => val('InsertUserID', $content),
-            ];
+            $salesforce->getLeadStatusOptions();
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
-
+        
+        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+        $data = [
+            'DiscussionID' => $content->DiscussionID,
+            'FirstName' => $firstName,
+            'LastName' => $lastName,
+            'Name' => $user->Name,
+            'Email' => $user->Email,
+            'Title' => $user->Title,
+            'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+            'Options' => $salesforce->getLeadStatusOptions(),
+            'Type' => $type,
+            'CommentID' => val('CommentID', $content),
+            'InsertUserID' => val('InsertUserID', $content),
+        ];
         $this->EventArguments['Data'] = &$data;
         $this->fireEvent('LeadFormData');
 
@@ -614,9 +621,14 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Origin' => $formValues['Origin'],
                     'Priority' => $formValues['Priority'],
                     'Subject' => $sender->DiscussionModel->getID($content->DiscussionID)->Name,
-                    'Description' => $formValues['Body'],
-                    'Vanilla__ForumUrl__c' => $formValues['SourceUri']
+                    'Description' => $formValues['Body']
                 ];
+
+                // Add Vanilla custom field only if it exists.
+                $vanillaUrl = $salesforce->salesforceFieldExists('Vanilla__ForumUrl__c', 'Case');
+                if ($vanillaUrl) {
+                    $caseData['Vanilla__ForumUrl__c'] = $formValues['SourceUri'] ?? '';
+                }
                 $sender->EventArguments['CaseData'] = &$caseData;
                 $sender->fireEvent('SendingCaseData');
                 $caseID = $salesforce->createCase($caseData);
@@ -645,26 +657,28 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $sender->Form->setValidationResults($attachmentModel->validationResults());
         }
-        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
 
         try {
-            $data = [
-                'DiscussionID' => $content->DiscussionID,
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'Email' => $user->Email,
-                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
-                'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
-                'Options' => $salesforce->getCaseStatusOptions(),
-                'Priorities' => $salesforce->getCasePriorityOptions(),
-                'Body' => Gdn_Format::textEx($content->Body),
-                'Type' => $type,
-                'CommentID' => val('CommentID', $content),
-                'InsertUserID' => val('InsertUserID', $content),
-            ];
+            $salesforce->getCasePriorityOptions();
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
+
+        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
+        $data = [
+            'DiscussionID' => $content->DiscussionID,
+            'FirstName' => $firstName,
+            'LastName' => $lastName,
+            'Email' => $user->Email,
+            'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+            'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
+            'Options' => $salesforce->getCaseStatusOptions(),
+            'Priorities' => $salesforce->getCasePriorityOptions(),
+            'Body' => Gdn_Format::textEx(Gdn_Format::to($content->Body, $content->Format)),
+            'Type' => $type,
+            'CommentID' => val('CommentID', $content),
+            'InsertUserID' => val('InsertUserID', $content),
+        ];
 
         $sender->EventArguments['Data'] = &$data;
         $sender->fireEvent('CaseFormData');

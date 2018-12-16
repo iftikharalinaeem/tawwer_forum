@@ -405,8 +405,8 @@ class ZendeskPlugin extends Gdn_Plugin {
             if ($sender->Form->errorCount() == 0) {
                 $formValues = $sender->Form->formValues();
                 $body = $formValues['Body'];
-
-                $body .= "\n--\n\nThis ticket was generated from: ".$url."\n\n";
+                $ticketUrl = anchor($url, $url);
+                $body .= "<br><br>"."This ticket was generated from: ".$ticketUrl;
                 $this->setZendesk();
                 $ticketID = $this->zendesk->createTicket(
                     $formValues['Title'],
@@ -450,7 +450,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $sender->Form->addHidden('InsertEmail', $content->InsertEmail);
 
         $sender->Form->setValue('Title', $ticketTitle);
-        $content = Gdn_Format::to($content->Body, c('Garden.InputFormatter'));
+        $content = Gdn_Format::to($content->Body, $content->Format);
         $sender->Form->setValue('Body', $content);
 
         $sender->setData('Data', [
