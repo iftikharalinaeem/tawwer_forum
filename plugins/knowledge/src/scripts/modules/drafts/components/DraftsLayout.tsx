@@ -33,7 +33,7 @@ class DraftsLayout extends React.Component<IProps> {
             <React.Fragment>
                 <DraftHeader />
                 <Container>
-                    <PanelLayout device={this.props.device}>
+                    <PanelLayout device={this.props.device} topPadding={false}>
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                         <PanelLayout.MiddleTop>
                             <PanelWidget>

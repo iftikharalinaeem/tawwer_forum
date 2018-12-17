@@ -22,7 +22,6 @@ import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import SiteNav from "@library/components/siteNav/SiteNav";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
 
