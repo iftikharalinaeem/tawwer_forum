@@ -32,7 +32,7 @@ export default class PageTitle extends React.Component<IPageTitle> {
                     title={this.props.title}
                     includeBackLink={this.props.includeBackLink}
                 />
-                {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
+                {this.props.meta && <div className="pageMetas metas pageTitleContainer-metas">{this.props.meta}</div>}
             </div>
         );
     }
