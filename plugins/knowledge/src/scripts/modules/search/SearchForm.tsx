@@ -47,7 +47,7 @@ class SearchForm extends React.Component<IProps> {
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
-                    <QueryString value={this.props.form} />
+                    <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
                     <PanelLayout device={this.props.device}>
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                         <PanelLayout.MiddleTop>

@@ -51,6 +51,18 @@ export interface ISearchPageState {
 }
 
 export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
+    public static readonly INITIAL_FORM = {
+        query: "",
+        title: "",
+        domain: SearchDomain.ARTICLES,
+        authors: [],
+        fileName: "",
+        startDate: undefined,
+        endDate: undefined,
+        includeDeleted: false,
+        kb: null,
+    };
+
     public static mapStateToProps(state: IStoreState): ISearchPageState {
         return SearchPageModel.stateSlice(state);
     }
@@ -67,17 +79,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         results: {
             status: LoadStatus.PENDING,
         },
-        form: {
-            query: "",
-            title: "",
-            domain: SearchDomain.ARTICLES,
-            authors: [],
-            fileName: "",
-            startDate: undefined,
-            endDate: undefined,
-            includeDeleted: false,
-            kb: null,
-        },
+        form: SearchPageModel.INITIAL_FORM,
     };
 
     public reducer = (

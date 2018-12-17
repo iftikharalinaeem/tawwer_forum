@@ -18,6 +18,7 @@ import MultiUserInput from "@library/users/MultiUserInput";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { LoadStatus } from "@library/@types/api";
+import Permission from "@library/users/Permission";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -54,12 +55,14 @@ export class AdvancedSearch extends React.Component<IProps> {
                     start={this.props.form.startDate}
                     end={this.props.form.endDate}
                 />
-                <Checkbox
-                    label={t("Deleted Articles")}
-                    onChange={this.handleCheckBoxDeletedArticleChange}
-                    checked={formData.includeDeleted}
-                    className="inputBlock"
-                />
+                <Permission permission="articles.add">
+                    <Checkbox
+                        label={t("Deleted Articles")}
+                        onChange={this.handleCheckBoxDeletedArticleChange}
+                        checked={formData.includeDeleted}
+                        className="inputBlock"
+                    />
+                </Permission>
                 <Button type="submit" className="advancedSearch-submit" prefix="submitButton">
                     {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Search")}
                 </Button>
