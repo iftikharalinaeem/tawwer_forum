@@ -67,7 +67,7 @@ $pageHeading-backLink_width                    : $pageHeading-backLink_height * 
     margin: {
         top: -#{lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio)};
         bottom: -#{$pageHeading-backLink_width + 21px};
-        left: -#{$pageHeading-backLink_width + 12px};
+        left: -#{$pageHeading-backLink_width + 12px + 6px};
     }
 }
 
