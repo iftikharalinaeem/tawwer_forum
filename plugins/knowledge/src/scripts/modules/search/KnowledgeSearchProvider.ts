@@ -20,7 +20,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
      */
     private fetchSearch = async (value: string): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
         const queryObj = {
-            name: value,
+            all: value,
             expand: ["user", "category"],
         };
         const query = qs.stringify(queryObj);
@@ -30,6 +30,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
                 crumbs: result.knowledgeCategory!.breadcrumbs,
                 name: result.name,
                 dateUpdated: result.dateUpdated,
+                url: result.url,
             };
             return {
                 label: result.name,
