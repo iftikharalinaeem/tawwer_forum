@@ -12,6 +12,7 @@ $panelList-link_color      : $link_default-color;
 .panelList {
     position: relative;
     display: block;
+    margin-top: #{$global-title_fontSize * $global-condensed_lineHeight / 2 - $panelList-title_fontSize/2};
 }
 
 .panelList-title {

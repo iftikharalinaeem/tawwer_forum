@@ -90,7 +90,6 @@ export class ArticleLayout extends React.Component<IProps> {
                         <PanelLayout.MiddleBottom>
                             <PanelWidget>
                                 <UserContent content={article.body} />
-                                <AttachmentList attachments={this.articleAttachmentList} />
                             </PanelWidget>
                         </PanelLayout.MiddleBottom>
                         {article.outline &&

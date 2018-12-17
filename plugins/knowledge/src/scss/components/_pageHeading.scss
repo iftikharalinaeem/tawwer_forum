@@ -6,6 +6,8 @@
 
 $pageHeading-cta_margin                        : 1em !default;
 $pageHeading-dropdown_width                    : 150px !default;
+$pageHeading-backLink_height                   : $icon-default_size;
+$pageHeading-backLink_width                    : $pageHeading-backLink_height * 12px / 21px;
 
 .pageHeading {
     display: flex;
@@ -50,26 +52,31 @@ $pageHeading-dropdown_width                    : 150px !default;
     margin-left: $pageHeading-cta_margin;
     align-self: flex-start;
     position: relative;
-
-    //.choices {
-    //    width: $pageHeading-dropdown_width;
-    //}
 }
 
 .pageHeading-backLink {
-    @include absolute-topLeft($global-condensed_lineHeight * 1.5em);
+    @include absolute-topLeft(50%);
     overflow: visible;
-    width: $icon-default_size;
-    height: $icon-default_size;
     display: flex;
     align-items: center;
     justify-content: center;
     transform: translateY(-50%);
-
+    height: $pageHeading-backLink_height;
+    width: $pageHeading-backLink_width;
+    flex-basis: $pageHeading-backLink_width;
     margin: {
-        left: -#{$icon-default_size + $utility-baseUnit * 2};
+        top: -#{lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio)};
+        bottom: -#{$pageHeading-backLink_width + 21px};
+        left: -#{$pageHeading-backLink_width + 12px};
     }
 }
+
+
+.icon-chevronLeftCompact {
+    height: $pageHeading-backLink_height;
+    width: 14.14px;
+}
+
 
 .pageHeading-link {
     display: block;
@@ -94,8 +101,3 @@ $pageHeading-dropdown_width                    : 150px !default;
     align-items: center;
 }
 
-.pageHeading-backLink {
-    height: $vanillaHeader-button_size;
-    width: $vanillaHeader-button_size;
-    flex-basis: $vanillaHeader-button_size;
-}
