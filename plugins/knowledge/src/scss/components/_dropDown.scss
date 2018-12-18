@@ -88,9 +88,7 @@ $dropDown-spacer_margin                        : 6px;
         font-size: $metaText_fontSize;
         color: $metaText_color;
         padding: {
-            top: $dropDown-metas_verticalPadding * 2;
             right: $dropDown-metas_horizontalPadding;
-            bottom: $dropDown-metas_verticalPadding * 2;
             left: $dropDown-metas_horizontalPadding;
         }
 
@@ -151,7 +149,6 @@ $dropDown-spacer_margin                        : 6px;
 
     @include mediaQuery-panelLayout_oneColumn {
         font-size: $dropDown-item_mobile_fontSize;
-        font-weight: $global-fontWeight_semiBold;
         min-height: $dropDown-item_mobile_minHeight;
     }
 }
