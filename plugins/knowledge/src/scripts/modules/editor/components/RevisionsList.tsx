@@ -19,12 +19,7 @@ export default class RevisionsList extends React.Component<IProps> {
     public render() {
         return (
             <div className="revisionsList related">
-                <Heading
-                    className="panelList-title revisionsList-title"
-                    title={t("Revisions")}
-                    depth={1}
-                    renderAsDepth={2}
-                />
+                <Heading className="panelList-title revisionsList-title" title={t("Revisions")} depth={2} />
                 <ul className="revisionsList-items panelList-items">{this.props.children}</ul>
             </div>
         );

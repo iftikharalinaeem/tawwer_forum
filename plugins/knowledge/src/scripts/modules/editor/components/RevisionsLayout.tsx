@@ -13,6 +13,7 @@ import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import { t } from "@library/application";
 import { RouteComponentProps, withRouter } from "react-router";
 import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
+import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
@@ -20,6 +21,7 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     revisionList: React.ReactNode;
     canSubmit: boolean;
     crumbs: ICrumb[];
+    mobileDropDownTitle?: string;
 }
 
 /**
@@ -27,8 +29,10 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
  */
 export class ArticleRevisionsLayout extends React.Component<IProps> {
     public render() {
-        const { device } = this.props;
-        const isFullWidth = device === (Devices.DESKTOP || Devices.NO_BLEED); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
+        const isDesktop = device === Devices.DESKTOP;
+        const isMobile = device === Devices.MOBILE;
+        const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revisions");
 
         return (
             <>
@@ -37,24 +41,30 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                     isSubmitLoading={false}
                     className="richEditorRevisionsForm-header"
                     callToAction={t("Restore")}
+                    mobileDropDownTitle={mobileTitle}
+                    mobileDropDownContent={this.props.revisionList}
                 />
                 <Container className="richEditorRevisionsForm-body">
-                    <PanelLayout device={this.props.device} topPadding={false}>
-                        <PanelLayout.LeftTop />
-                        <PanelLayout.MiddleTop>
-                            {this.props.device !== Devices.MOBILE && (
+                    <PanelLayout device={this.props.device} topPadding={true}>
+                        {this.props.device !== Devices.MOBILE && (
+                            <PanelLayout.Breadcrumbs>
                                 <PanelWidget>
-                                    <Breadcrumbs children={this.props.crumbs} />
+                                    <Breadcrumbs children={crumbs} />
                                 </PanelWidget>
-                            )}
-                            <PanelWidget>{this.props.bodyHeading}</PanelWidget>
+                            </PanelLayout.Breadcrumbs>
+                        )}
+                        {isDesktop && <PanelLayout.LeftTop />}
+                        <PanelLayout.MiddleTop>
+                            <PanelWidget>{bodyHeading}</PanelWidget>
                         </PanelLayout.MiddleTop>
                         <PanelLayout.MiddleBottom>
-                            <PanelWidget>{this.props.bodyContent}</PanelWidget>
+                            <PanelWidget>{bodyContent}</PanelWidget>
                         </PanelLayout.MiddleBottom>
-                        <PanelLayout.RightTop>
-                            <PanelWidget className="isSelfPadded">{this.props.revisionList}</PanelWidget>
-                        </PanelLayout.RightTop>
+                        {!isMobile && (
+                            <PanelLayout.RightTop>
+                                <PanelWidgetVerticalPadding>{this.props.revisionList}</PanelWidgetVerticalPadding>
+                            </PanelLayout.RightTop>
+                        )}
                     </PanelLayout>
                 </Container>
             </>

@@ -21,6 +21,7 @@ import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
+import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -32,6 +33,8 @@ interface IProps extends IDeviceProps {
     saveDraft?: ILoadable<{}>;
     selectedLang?: string;
     selectedKey?: string;
+    mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
+    mobileDropDownTitle?: string; // For mobile
 }
 
 /**
@@ -49,6 +52,7 @@ export class EditorHeader extends React.Component<IProps> {
         isSubmitLoading: false,
     };
     public render() {
+        const showMobileDropDown = this.props.device === Devices.MOBILE;
         return (
             <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
                 <Container>
@@ -63,7 +67,17 @@ export class EditorHeader extends React.Component<IProps> {
                                     />
                                 </li>
                                 {this.renderDraftIndicator()}
-                                <li className="editorHeader-center" role="presentation" />
+                                {showMobileDropDown &&
+                                    this.props.mobileDropDownTitle && (
+                                        <li className="editorHeader-center" role="presentation">
+                                            <MobileDropDown
+                                                title={this.props.mobileDropDownTitle!}
+                                                buttonClass="vanillaHeader-mobileDropDown"
+                                            >
+                                                {this.props.mobileDropDownContent}
+                                            </MobileDropDown>
+                                        </li>
+                                    )}
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
