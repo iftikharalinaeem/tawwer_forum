@@ -299,7 +299,7 @@ export default class ArticleActions extends ReduxActions {
         if (existingArticle) {
             const articleResponse: IApiResponse<IGetArticleResponseBody> = { data: existingArticle, status: 200 };
             this.dispatch(ArticleActions.getArticleACs.response(articleResponse, options));
-            return Promise.resolve(existingArticle);
+            return Promise.resolve(articleResponse);
         }
 
         return this.dispatchApi<IGetArticleResponseBody>(
