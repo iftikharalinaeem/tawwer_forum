@@ -1,0 +1,177 @@
+openapi: 3.0.0
+info:
+paths:
+  /knowledge/search:
+    get:
+      parameters:
+      - description: >
+          <p>Unique ID of a knowledge base. Results will be relative to this
+          value.</p>
+        in: query
+        name: knowledgeBaseID
+        schema:
+          type: integer
+      - description: |
+          <p>Knowledge category ID to filter results.</p>
+        in: query
+        name: knowledgeCategoryID
+        schema:
+          type: integer
+      - description: >
+          <p>Array of insertUserIDs (authors of article) to filter
+          results.</p>
+        in: query
+        name: insertUserIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - description: >
+          <p>Array of updateUserIDs (last editors of an article) to filter
+          results.</p>
+        in: query
+        name: updateUserIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - description: |
+          <p>Expand data for: user, category.</p>
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - category
+            type: string
+          type: array
+      - description: >
+          <p>Filter by date when the article was updated.<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.</p>
+        in: query
+        name: dateUpdated
+        schema:
+          format: date-filter
+          type: string
+      - description: |
+          <p>Article statuses array to filter results.</p>
+        in: query
+        name: statuses
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: |
+          <p>Keywords to search against article name.</p>
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: |
+          <p>Keywords to search against article body.</p>
+        in: query
+        name: body
+        schema:
+          type: string
+      - description: |
+          <p>Keywords to search against article name or body.</p>
+        in: query
+        name: all
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/searchResultSchema'
+                type: array
+          description: Success
+      tags:
+      - Knowledge
+      summary: Get a navigation-friendly category hierarchy flat mode.
+components:
+  schemas:
+    searchResultSchema:
+      properties:
+        body:
+          type: string
+        dateInserted:
+          format: date-time
+          type: string
+        dateUpdated:
+          format: date-time
+          type: string
+        insertUserID:
+          type: integer
+        knowledgeCategory:
+          $ref: '#/components/schemas/CategoryBreadcrumbsFragment'
+        knowledgeCategoryID:
+          type: integer
+        name:
+          type: string
+        recordID:
+          type: integer
+        recordType:
+          enum:
+          - article
+          - knowledgeCategory
+          type: string
+        status:
+          type: string
+        updateUser:
+          $ref: '#/components/schemas/UserFragment'
+        updateUserID:
+          type: integer
+        url:
+          type: string
+      required:
+      - name
+      - url
+      - insertUserID
+      - updateUserID
+      - recordID
+      - dateInserted
+      - dateUpdated
+      - status
+      - recordType
+      type: object
+    CategoryBreadcrumbsFragment:
+      properties:
+        breadcrumbs:
+          items:
+            properties:
+              name:
+                description: Breadcrumb element name.
+                minLength: 1
+                type: string
+              url:
+                description: Breadcrumb element url.
+                minLength: 1
+                type: string
+            required:
+            - name
+            - url
+            type: object
+          type: array
+        knowledgeCategoryID:
+          description: Knowledge category ID.
+          type: integer
+      required:
+      - knowledgeCategoryID
+      - breadcrumbs
+      type: object

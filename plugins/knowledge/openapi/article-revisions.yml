@@ -1,0 +1,80 @@
+openapi: 3.0.0
+info:
+paths:
+  '/article-revisions/{id}':
+    get:
+      parameters:
+      - description: |
+          <p>The article revision ID.</p>
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ArticleRevision'
+          description: Success
+      tags:
+      - Article Revisions
+      summary: Get an article revision.
+components:
+  schemas:
+    ArticleRevision:
+      properties:
+        articleID:
+          description: Associated article ID.
+          type: integer
+        articleRevisionID:
+          description: Unique article revision ID.
+          type: integer
+        body:
+          description: Body contents.
+          minLength: 1
+          nullable: true
+          type: string
+        bodyRendered:
+          description: Rendered body contents.
+          minLength: 1
+          nullable: true
+          type: string
+        dateInserted:
+          description: When the article was created.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: Unique ID of the user who originally created the article.
+          type: integer
+        locale:
+          description: Locale the article was written in.
+          minLength: 1
+          nullable: true
+          type: string
+        name:
+          description: Title of the article.
+          minLength: 1
+          nullable: true
+          type: string
+        status:
+          description: ''
+          enum:
+          - published
+          minLength: 1
+          nullable: true
+          type: string
+      required:
+      - articleRevisionID
+      - articleID
+      - status
+      - name
+      - body
+      - bodyRendered
+      - locale
+      - insertUserID
+      - dateInserted
+      type: object

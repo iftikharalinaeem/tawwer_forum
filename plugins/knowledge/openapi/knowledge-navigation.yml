@@ -1,0 +1,150 @@
+openapi: 3.0.0
+info:
+paths:
+  '/knowledge-navigation/flat':
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/CategoryNavigationFragment'
+                type: array
+          description: Success
+      tags:
+      - Knowledge Navigation
+      summary: Get a navigation-friendly category hierarchy flat mode.
+    patch:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/CategoryNavigationFragment'
+                type: array
+          description: Success
+      tags:
+      - Knowledge Navigation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                properties:
+                  parentID:
+                    description: Unique ID of the category this record belongs to.
+                    type: integer
+                  recordID:
+                    description: >-
+                      Unique ID of the record represented by the navigation
+                      item.
+                    type: integer
+                  recordType:
+                    description: Type of record represented by the navigation item.
+                    enum:
+                    - knowledgeCategory
+                    - article
+                    type: string
+                  sort:
+                    description: Sort weight.
+                    nullable: true
+                    type: integer
+                required:
+                - recordType
+                - recordID
+                - parentID
+                - sort
+                type: object
+              type: array
+        required: true
+      summary: >-
+        Update the navigation structure of a knowledge base, using the flat
+        format.
+  '/knowledge-navigation/tree':
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/navigationTreeSchema'
+                type: array
+          description: Success
+      tags:
+      - Knowledge Navigation
+      summary: Get a navigation-friendly category hierarchy tree mode.
+components:
+  schemas:
+    CategoryNavigationFragment:
+      properties:
+        knowledgeCategoryID:
+          type: integer
+        name:
+          description: Name of the item.
+          nullable: true
+          type: string
+        parentID:
+          description: Unique ID of the category this record belongs to.
+          type: integer
+        recordID:
+          description: Unique ID of the record represented by the navigation item.
+          type: integer
+        recordType:
+          description: Type of record represented by the navigation item.
+          enum:
+          - knowledgeCategory
+          - article
+          type: string
+        sort:
+          description: Sort weight.
+          nullable: true
+          type: integer
+        url:
+          description: Full URL to the record.
+          type: string
+      required:
+      - name
+      - recordID
+      - sort
+      - recordType
+      type: object
+    navigationTreeSchema:
+      properties:
+        children:
+          items:
+            $ref: '#/components/schemas/navigationTreeSchema'
+          type: array
+        knowledgeCategoryID:
+          type: integer
+        name:
+          description: Name of the item.
+          nullable: true
+          type: string
+        parentID:
+          description: Unique ID of the category this record belongs to.
+          type: integer
+        recordID:
+          description: Unique ID of the record represented by the navigation item.
+          type: integer
+        recordType:
+          description: Type of record represented by the navigation item.
+          enum:
+          - knowledgeCategory
+          - article
+          type: string
+        sort:
+          description: Sort weight.
+          nullable: true
+          type: integer
+        url:
+          description: Full URL to the record.
+          type: string
+      required:
+      - name
+      - recordID
+      - sort
+      - recordType
+      type: object
