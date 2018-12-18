@@ -11,12 +11,11 @@ import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@library/contexts/DeviceContext";
-import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import AttachmentList from "@knowledge/modules/article/components/AttachmentList";
 import { AttachmentType } from "@library/components/attachments";
 import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
@@ -49,7 +48,7 @@ export class ArticleLayout extends React.Component<IProps> {
                     <VanillaHeader
                         title={article.name}
                         mobileDropDownContent={
-                            <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
+                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
                         }
                     />
                     <PanelLayout device={this.props.device}>
@@ -83,6 +82,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                             permaLink={article.url}
                                         />
                                     }
+                                    includeBackLink={this.props.device !== Devices.MOBILE}
                                 />
                                 {messages && <div className="messages">{messages}</div>}
                             </PanelWidget>
