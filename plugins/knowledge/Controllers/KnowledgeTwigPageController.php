@@ -13,12 +13,14 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
 use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
+use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Knowledge\Models\SiteMeta;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 
 /**
  * Knowledge Twig & ArticlesApi controller abstract class.
@@ -58,25 +60,20 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         $this->knowledgeCategoryModel = $container->get(KnowledgeCategoryModel::class);
         $this->siteMeta = $container->get(SiteMeta::class);
         $this->session = $this->container->get(\Gdn_Session::class);
-        $assetModel = $this->container->get(\AssetModel::class);
+        /** @var WebpackAssetProvider $assetProvider */
+        $assetProvider = $this->container->get(WebpackAssetProvider::class);
         self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
 
-        // Scripts
-        // Assemble our site context for the frontend.
-        $locale = $container->get(\Gdn_Locale::class);
-        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
-        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        $this->addGdnScript();
-        $this->scripts[] = $assetModel->getJSLocalePath($locale->current());
-        $this->addGlobalReduxActions();
+        $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
 
-        // Stylesheets
-        if (\Gdn::config('HotReload.Enabled', false) === false) {
-            $this->styles = [
-                '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/knowledge.min.css',
-                '/' . \AssetModel::WEBPACK_DIST_DIRECTORY_NAME . '/knowledge/addons/rich-editor.min.css',
-            ];
-        }
+        $mapAssetToPath = function (AssetInterface $asset) {
+            return $asset->getWebPath();
+        };
+        $this->scripts = array_map($mapAssetToPath, $assetProvider->getScripts('knowledge'));
+        $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
+
+        $this->addGdnScript();
+        $this->addGlobalReduxActions();
     }
 
     /**
