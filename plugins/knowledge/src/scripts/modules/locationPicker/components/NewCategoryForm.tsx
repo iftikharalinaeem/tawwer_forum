@@ -64,7 +64,8 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         <FramePanel>
                             <InputTextBlock
                                 ref={this.inputRef}
-                                label={t("Name")}
+                                label={t("New Folder")}
+                                labelClassName="sr-only"
                                 inputProps={{
                                     value: this.state.categoryName,
                                     onChange: this.handleNameChange,
