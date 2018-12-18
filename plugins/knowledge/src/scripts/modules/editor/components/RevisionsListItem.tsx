@@ -17,6 +17,7 @@ import {
     revisionStatus_published,
     revisionStatus_deleted,
 } from "@library/components/icons/revision";
+import Hoverable from "@library/utils/Hoverable";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -32,28 +33,32 @@ export default class RevisionsListItem extends React.Component<IProps> {
         const { name, status, dateInserted, url, isSelected } = this.props;
         const { photoUrl } = this.props.insertUser;
         return (
-            <li className="revisionsList-item" onMouseOver={this.props.onHover}>
-                <Link
-                    to={url}
-                    className={classNames("revisionsList-link", "panelList-link", { isSelected })}
-                    tabIndex={-1}
-                >
-                    <div className="revisionsList-photoFrame">
-                        <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
-                    </div>
-                    <div className="revisionsList-content">
-                        <div className="revisionsList-userName">{name}</div>
-                        <div className="revisionsList-dateTime">
-                            <DateTime timestamp={dateInserted} className="metaStyle" />
-                        </div>
-                    </div>
-                    {status && (
-                        <div className={classNames("revisionsList-status", `status-${status.toLowerCase()}`)}>
-                            {this.icon(status)}
-                        </div>
-                    )}
-                </Link>
-            </li>
+            <Hoverable onHover={this.props.onHover} duration={50}>
+                {provided => (
+                    <li {...provided} className="revisionsList-item">
+                        <Link
+                            to={url}
+                            className={classNames("revisionsList-link", "panelList-link", { isSelected })}
+                            tabIndex={-1}
+                        >
+                            <div className="revisionsList-photoFrame">
+                                <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
+                            </div>
+                            <div className="revisionsList-content">
+                                <div className="revisionsList-userName">{name}</div>
+                                <div className="revisionsList-dateTime">
+                                    <DateTime timestamp={dateInserted} className="metaStyle" />
+                                </div>
+                            </div>
+                            {status && (
+                                <div className={classNames("revisionsList-status", `status-${status.toLowerCase()}`)}>
+                                    {this.icon(status)}
+                                </div>
+                            )}
+                        </Link>
+                    </li>
+                )}
+            </Hoverable>
         );
     }
 

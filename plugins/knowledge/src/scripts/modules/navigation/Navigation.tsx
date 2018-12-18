@@ -8,15 +8,18 @@ import NavigationAdminLinks from "@knowledge/modules/navigation/NavigationAdminL
 import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, INavigationTreeItem } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface IProps extends INavigationStoreState {
-    actions: NavigationActions;
+    navActions: NavigationActions;
+    articleActions: ArticleActions;
     activeRecord: IActiveRecord;
     collapsible: boolean;
     kbID: number;
@@ -39,6 +42,7 @@ export class Navigation extends React.Component<IProps> {
                         <NavigationAdminLinks kbID={this.props.kbID} />
                     )
                 }
+                onItemHover={this.preloadItem}
             >
                 {NavigationSelector.selectChildren(
                     this.props.navigationItems,
@@ -49,10 +53,19 @@ export class Navigation extends React.Component<IProps> {
     }
 
     /**
+     * Preload a navigation item from the API.
+     */
+    private preloadItem = (item: INavigationTreeItem) => {
+        if (item.recordType === NavigationRecordType.ARTICLE) {
+            this.props.articleActions.fetchByID({ articleID: item.recordID });
+        }
+    };
+
+    /**
      * Fetch navigation data when the component is mounted.
      */
     public componentDidMount() {
-        return this.props.actions.getNavigationFlat({});
+        return this.props.navActions.getNavigationFlat({});
     }
 }
 
@@ -62,7 +75,8 @@ function mapStateToProps(store: IStoreState) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: new NavigationActions(dispatch, apiv2),
+        navActions: new NavigationActions(dispatch, apiv2),
+        articleActions: new ArticleActions(dispatch, apiv2),
     };
 }
 

@@ -9,6 +9,7 @@ import Loadable, { LoadableComponent } from "react-loadable";
 import FullPageLoader from "@library/components/FullPageLoader";
 import { Route, NavLinkProps, NavLink } from "react-router-dom";
 import { Omit } from "react-redux";
+import Hoverable from "@library/utils/Hoverable";
 
 type LoadFunction = () => Promise<any>;
 
@@ -36,7 +37,11 @@ export default class RouteHandler<GeneratorProps> {
     }
 
     public Link = (props: Omit<NavLinkProps, "to"> & { data: GeneratorProps }) => {
-        return <NavLink {...props} to={this.url(props.data)} onMouseOver={this.preload} />;
+        return (
+            <Hoverable duration={50} onHover={this.preload}>
+                {provided => <NavLink {...provided} {...props} to={this.url(props.data)} />}
+            </Hoverable>
+        );
     };
 
     public preload = () => {

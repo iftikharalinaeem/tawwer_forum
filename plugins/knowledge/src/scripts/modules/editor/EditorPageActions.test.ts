@@ -15,6 +15,7 @@ import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/Edit
 import { DeepPartial } from "redux";
 import { LoadStatus } from "@library/@types/api";
 import { Format } from "@knowledge/@types/api";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -23,11 +24,13 @@ describe("EditorPageActions", () => {
 
     before(() => {
         mockApi = new MockAdapter(apiv2);
-        initWithState({});
+    });
+
+    beforeEach(() => {
+        initWithState({ knowledge: { articles: ArticleModel.INITIAL_STATE } });
     });
 
     afterEach(() => {
-        initWithState({});
         mockApi.reset();
     });
 
@@ -345,6 +348,7 @@ describe("EditorPageActions", () => {
                         ...EditorPageModel.INITIAL_STATE,
                         form: initialForm,
                     },
+                    articles: ArticleModel.INITIAL_STATE,
                 },
             };
 
@@ -389,6 +393,7 @@ describe("EditorPageActions", () => {
                         },
                         form: initialForm,
                     },
+                    articles: ArticleModel.INITIAL_STATE,
                 },
             };
 
