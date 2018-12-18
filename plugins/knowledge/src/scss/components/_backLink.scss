@@ -23,7 +23,8 @@
 }
 
 .backLink-label {
-    padding-left: $utility-baseUnit;
+    padding-left: $utility-baseUnit * 2;
     line-height: $icon-default_size;
     font-weight: $global_fontWeight_semiBold;
+    white-space: nowrap;
 }

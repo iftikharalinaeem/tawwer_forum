@@ -66,6 +66,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                 ref={this.inputRef}
                                 label={t("New Folder")}
                                 labelClassName="sr-only"
+                                className="isFirst isLast"
                                 inputProps={{
                                     value: this.state.categoryName,
                                     onChange: this.handleNameChange,
@@ -127,13 +128,9 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
      */
     private handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        const state = {
+        this.setState({
             categoryName: value,
-            valid: false,
-        };
-        if (value.length > 0) {
-            state.valid = true;
-        }
-        this.setState(state);
+            valid: value.length > 0,
+        });
     };
 }

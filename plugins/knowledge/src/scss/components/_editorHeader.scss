@@ -6,7 +6,7 @@
 
 .editorHeader-items {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-end;
     align-items: center;
 }
@@ -24,8 +24,7 @@
 }
 
 .editorHeader-saveDraft {
-    white-space: nowrap;
-    line-height: $icon-default_size;
+    line-height: $global-condensed_lineHeight;
     margin-top: .083em;
 }
 

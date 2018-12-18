@@ -61,12 +61,11 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                             title={t("New Category")}
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
-                            baseClass={ButtonBaseClass.STANDARD}
                             buttonRef={this.newFolderButtonRef}
                         >
                             {newFolder()}
                         </Button>
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose}>
+                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className="buttonPrimary">
                             {t("Choose")}
                         </Button>
                     </FrameFooter>
