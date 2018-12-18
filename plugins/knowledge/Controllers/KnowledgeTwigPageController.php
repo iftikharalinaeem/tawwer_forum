@@ -66,13 +66,14 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
 
         $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
 
-        $mapAssetToPath = function(AssetInterface $asset) { return $asset->getWebPath(); };
+        $mapAssetToPath = function (AssetInterface $asset) {
+            return $asset->getWebPath();
+        };
         $this->scripts = array_map($mapAssetToPath, $assetProvider->getScripts('knowledge'));
         $this->styles = array_map($mapAssetToPath, $assetProvider->getStylesheets('knowledge'));
 
         $this->addGdnScript();
         $this->addGlobalReduxActions();
-
     }
 
     /**
