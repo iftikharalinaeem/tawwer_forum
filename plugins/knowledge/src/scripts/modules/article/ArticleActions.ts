@@ -30,6 +30,7 @@ import {
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
 import { IApiResponse } from "@library/@types/api";
+import { IStoreState } from "@knowledge/state/model";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -294,6 +295,11 @@ export default class ArticleActions extends ReduxActions {
      */
     public fetchByID = (options: IGetArticleRequestBody) => {
         const { articleID, ...rest } = options;
+        const existingItem = ArticleModel.selectArticle(this.getState(), articleID);
+        if (existingItem) {
+            return Promise.resolve(existingItem);
+        }
+
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
             `/articles/${options.articleID}?expand=all`,
