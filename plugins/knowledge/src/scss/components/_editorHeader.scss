@@ -21,6 +21,10 @@
         margin-left: 0;
         margin-right: auto;
     }
+
+    &.editorHeader-itemDraftStatus {
+        margin-left: 0;
+    }
 }
 
 .editorHeader-saveDraft {
@@ -39,4 +43,9 @@
 
 .editorHeader-otherLanguagesToggle {
     font-weight: $global-fontWeight_semiBold;
+}
+
+.editorHeader-split {
+    flex-grow: 1;
+    height: 1px;
 }

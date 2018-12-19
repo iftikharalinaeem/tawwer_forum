@@ -31,6 +31,7 @@ $dropDown-spacer_margin                        : 6px;
     min-width: $dropDown_width;
     background-color: $global-color_bg;
     color: $global-color_fg;
+    overflow: hidden;
     border: {
         radius: $global_borderRadius;
         style: solid;

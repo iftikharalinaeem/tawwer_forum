@@ -16,6 +16,8 @@
     align-items: center;
     justify-content: flex-start;
     color: inherit;
+    min-width: $icon-default_size;
+    margin-right: $global_gutter_halfSize;
 
     &:hover {
         color: $global-color_primary;
@@ -23,8 +25,13 @@
 }
 
 .backLink-label {
-    padding-left: $utility-baseUnit * 2;
     line-height: $icon-default_size;
     font-weight: $global_fontWeight_semiBold;
     white-space: nowrap;
+    padding-left: $utility-baseUnit * 2;
+    padding-right: $global_gutter_halfSize;
+
+    @include mediaQuery_panelLayout_xs {
+        @include sr-only;
+    }
 }
