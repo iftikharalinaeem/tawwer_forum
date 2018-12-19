@@ -106,22 +106,19 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             revisions.status === LoadStatus.SUCCESS &&
             revisions.data && (
                 <RevisionsList>
-                    {revisions.data
-                        .slice()
-                        .reverse()
-                        .map(item => {
-                            const preload = () =>
-                                this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });
-                            return (
-                                <RevisionsListItem
-                                    {...item}
-                                    isSelected={item.articleRevisionID === selectedRevisionID}
-                                    url={RevisionsRoute.url(item)}
-                                    onHover={preload}
-                                    key={item.articleRevisionID}
-                                />
-                            );
-                        })}
+                    {revisions.data.slice().map(item => {
+                        const preload = () =>
+                            this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });
+                        return (
+                            <RevisionsListItem
+                                {...item}
+                                isSelected={item.articleRevisionID === selectedRevisionID}
+                                url={RevisionsRoute.url(item)}
+                                onHover={preload}
+                                key={item.articleRevisionID}
+                            />
+                        );
+                    })}
                 </RevisionsList>
             )
         );

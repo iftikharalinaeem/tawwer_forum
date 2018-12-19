@@ -91,13 +91,15 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         return state.knowledge.articles;
     }
 
-    public initialState: IArticleState = {
+    public static readonly INITIAL_STATE: IArticleState = {
         articlesByID: {},
         articleFragmentsByID: {},
         revisionsByID: {},
         revisionFragmentsByID: {},
         draftsByID: {},
     };
+
+    public initialState: IArticleState = ArticleModel.INITIAL_STATE;
 
     public reducer = (
         state: IArticleState = this.initialState,
