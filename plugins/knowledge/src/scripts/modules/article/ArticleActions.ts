@@ -26,6 +26,8 @@ import {
     IDeleteArticleDraftRequest,
     IPatchArticleRequestBody,
     IPatchArticleResponseBody,
+    IPostArticleResponseBody,
+    IPostArticleRequestBody,
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
@@ -80,6 +82,7 @@ export default class ArticleActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static readonly ACTION_TYPES:
+        | ActionsUnion<typeof ArticleActions.postArticleACs>
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.patchArticleACs>
         | ActionsUnion<typeof ArticleActions.getArticleACs>
@@ -181,6 +184,32 @@ export default class ArticleActions extends ReduxActions {
             ArticleActions.getDraftACs,
             request,
         );
+    }
+
+    // POST /articles
+    public static readonly POST_ARTICLE_REQUEST = "@@article/POST_ARTICLE_REQUEST";
+    public static readonly POST_ARTICLE_RESPONSE = "@@article/POST_ARTICLE_RESPONSE";
+    public static readonly POST_ARTICLE_ERROR = "@@article/POST_ARTICLE_ERROR";
+
+    /**
+     * Action creators for POST /articles
+     */
+    private static postArticleACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.POST_ARTICLE_REQUEST,
+        ArticleActions.POST_ARTICLE_RESPONSE,
+        ArticleActions.POST_ARTICLE_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        {} as IPostArticleResponseBody,
+        {} as IPostArticleRequestBody,
+    );
+
+    /**
+     * Create a new article.
+     *
+     * @param data The article data.
+     */
+    public postArticle(data: IPostArticleRequestBody) {
+        return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, ArticleActions.postArticleACs, data);
     }
 
     // POST /articles/drafts

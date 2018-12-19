@@ -25,10 +25,6 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
-    public static readonly POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
-    public static readonly POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
-    public static readonly POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
-
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
     public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_EDIT_ARTICLE_ERROR";
@@ -41,7 +37,6 @@ export default class EditorPageActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static ACTION_TYPES:
-        | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.updateFormAC>
@@ -58,18 +53,6 @@ export default class EditorPageActions extends ReduxActions {
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPostArticleResponseBody,
         {} as any,
-    );
-
-    /**
-     * Action creators for POST /articles
-     */
-    private static postArticleACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.POST_ARTICLE_REQUEST,
-        EditorPageActions.POST_ARTICLE_RESPONSE,
-        EditorPageActions.POST_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IPostArticleResponseBody,
-        {} as IPostArticleRequestBody,
     );
 
     /**
@@ -226,7 +209,7 @@ export default class EditorPageActions extends ReduxActions {
             return this.updateArticle(patchRequest, history);
         }
 
-        const response = await this.postArticle(request);
+        const response = await this.articleActions.postArticle(request);
         if (!response) {
             return;
         }
@@ -331,15 +314,6 @@ export default class EditorPageActions extends ReduxActions {
             search: "",
         });
         history.push(url);
-    }
-
-    /**
-     * Create a new article.
-     *
-     * @param data The article data.
-     */
-    private postArticle(data: IPostArticleRequestBody) {
-        return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
     }
 
     /**
