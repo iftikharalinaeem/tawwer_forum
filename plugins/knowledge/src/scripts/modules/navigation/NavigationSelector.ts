@@ -62,7 +62,7 @@ export default class NavigationSelector {
         const item = navItems[rootKey];
         return {
             ...item,
-            children: item.children.map(itemID => NavigationSelector.selectNavTree(navItems, itemID)),
+            children: NavigationSelector.selectChildren(navItems, rootKey),
         };
     }
 }
