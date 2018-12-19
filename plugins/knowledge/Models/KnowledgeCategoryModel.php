@@ -220,15 +220,15 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return bool Return tru when record updated successfully
      */
     public function resetAllCounts(int $knowledgeBaseID): bool {
-        $noParents = $this->sql()
+        $notParent = $this->sql()
             ->select('c.knowledgeCategoryID')
             ->from('knowledgeCategory c')
             ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
             ->where('c.knowledgeBaseID', $knowledgeBaseID)
             ->where('children.knowledgeCategoryID', null)
             ->get()->resultArray();
-        if (is_array($noParents)) {
-            foreach ($noParents as $cat) {
+        if (is_array($notParent)) {
+            foreach ($notParent as $cat) {
                 $this->updateCounts($cat['knowledgeCategoryID']);
             }
             return true;
