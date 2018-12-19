@@ -52,7 +52,7 @@ export class EditorHeader extends React.Component<IProps> {
         isSubmitLoading: false,
     };
     public render() {
-        const showMobileDropDown = this.props.device === Devices.MOBILE;
+        const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         return (
             <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
                 <Container>
@@ -67,17 +67,16 @@ export class EditorHeader extends React.Component<IProps> {
                                     />
                                 </li>
                                 {this.renderDraftIndicator()}
-                                {showMobileDropDown &&
-                                    this.props.mobileDropDownTitle && (
-                                        <li className="editorHeader-center" role="presentation">
-                                            <MobileDropDown
-                                                title={this.props.mobileDropDownTitle!}
-                                                buttonClass="vanillaHeader-mobileDropDown"
-                                            >
-                                                {this.props.mobileDropDownContent}
-                                            </MobileDropDown>
-                                        </li>
-                                    )}
+                                {showMobileDropDown && (
+                                    <li className="editorHeader-center" role="presentation">
+                                        <MobileDropDown
+                                            title={this.props.mobileDropDownTitle!}
+                                            buttonClass="editorHeader-mobileDropDown"
+                                        >
+                                            {this.props.mobileDropDownContent}
+                                        </MobileDropDown>
+                                    </li>
+                                )}
                                 <li className="editorHeader-item">
                                     <Button
                                         type="submit"
