@@ -15,6 +15,12 @@ use Gdn_Session;
  */
 class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
+    /** Maximum articles allowed in a KB root-level category. */
+    const ROOT_LIMIT_ARTICLES_RECURSIVE = 1000;
+
+    /** Maximum child categories allowed in a KB root-level category. */
+    const ROOT_LIMIT_CATEGORIES_RECURSIVE = 500;
+
     /** @var int Root-level category ID. */
     const ROOT_ID = -1;
 
@@ -54,6 +60,48 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Given a knowledge base ID, get all categories therein. Does not include the root category.
+     *
+     * @param int $knowledgeBaseID
+     * @return int
+     */
+    private function getTotalInKnowledgeBase(int $knowledgeBaseID): int {
+        $result = $this->sql()
+            ->select("knowledgeCategoryID", "count", "total")
+            ->from($this->getTable())
+            ->where([
+                "knowledgeBaseID" => $knowledgeBaseID,
+                "parentID <>" => self::ROOT_ID, // Don't include the knowledge base root as part of the categories in a knowledge base.
+            ])
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        return $result["total"] ?? 0;
+    }
+
+    /**
+     * Given a category ID, get its root-level parent in the knowledge base.
+     *
+     * @param int $knowledgeCategoryID
+     * @return array
+     */
+    private function selectRootCategory(int $knowledgeCategoryID): array {
+        $category = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+
+        if ($category["parentID"] !== self::ROOT_ID) {
+            try {
+                $category = $this->selectSingle([
+                    "knowledgeBaseID" => $category["knowledgeBaseID"],
+                    "parentID" => self::ROOT_ID,
+                ]);
+            } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+                throw new \Vanilla\Exception\Database\NoResultsException("Root category not found.");
+            }
+        }
+
+        return $category;
+    }
+
+    /**
      * Given a category ID, get the row and the rows of all its ancestors in order.
      *
      * @param int $categoryID
@@ -89,6 +137,65 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         return parent::update($set, $where);
+    }
+
+    /**
+     * Given a category ID, verify its knowledge base has not met or exceeded its limit of articles, based on the root-level category.
+     *
+     * @param int $knowledgeCategoryID
+     * @param \Garden\Schema\ValidationField $validationField
+     * @return bool
+     * @throws \Garden\Schema\ValidationException If the selected row fails output validation.
+     */
+    public function validateKBArticlesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
+        try {
+            $category = $this->selectRootCategory($knowledgeCategoryID);
+        } catch (\Exception $e) {
+            // Couldn't find the KB root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
+            return true;
+        }
+
+        // Use the root category's recursive article count as a hint for the total number of articles in its knowledge base.
+        if ($category["articleCountRecursive"] >= self::ROOT_LIMIT_ARTICLES_RECURSIVE) {
+            $validationField->getValidation()->addError(
+                $validationField->getName(),
+                "The article maximum has been reached for this knowledge base."
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Given a category ID, verify its knowledge base has not met or exceeded its limit of categories.
+     *
+     * @param int $knowledgeCategoryID
+     * @param \Garden\Schema\ValidationField $validationField
+     * @return bool
+     * @throws \Garden\Schema\ValidationException If the selected row fails output validation.
+     */
+    public function validateKBCategoriesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
+        try {
+            $category = $this->selectSingle([
+                "knowledgeCategoryID" => $knowledgeCategoryID,
+            ]);
+        } catch (\Exception $e) {
+            // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
+            return true;
+        }
+
+        $total = $this->getTotalInKnowledgeBase($category["knowledgeBaseID"]);
+
+        if ($total >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
+            $validationField->getValidation()->addError(
+                $validationField->getName(),
+                "The category maximum has been reached for this knowledge base."
+            );
+            return false;
+        }
+
+        return true;
     }
 
     /**
