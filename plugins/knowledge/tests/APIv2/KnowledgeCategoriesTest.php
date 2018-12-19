@@ -179,6 +179,20 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "format" => "rich",
         ])->getBody();
 
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
         $childCategory = $this->api()->post($this->baseUrl, [
             "name" => __FUNCTION__ . " Child category",
             "parentID" => $rootCategory["knowledgeCategoryID"],
@@ -196,6 +210,21 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "format" => "rich",
         ])->getBody();
 
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+
         $childCategory2 = $this->api()->post($this->baseUrl, [
             "name" => __FUNCTION__ . " 2nd level child category",
             "parentID" => $childCategory["knowledgeCategoryID"],
@@ -207,6 +236,21 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "body" => $helloWorldBody,
             "format" => "rich",
         ])->getBody();
+
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory2["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory2["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
 
         return [
             'rootCategory' => $rootCategory,
@@ -238,6 +282,13 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $this->api()->post($this->kbArticlesUrl, [
             "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
             "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article #2",
             "body" => $helloWorldBody,
             "format" => "rich",
         ])->getBody();
@@ -363,11 +414,11 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         return [
             'Root category' => [
                 'rootCategory',
-                ['articleCount' => 1, 'articleCountRecursive' => 3, 'childCategoryCount' => 2]
+                ['articleCount' => 3, 'articleCountRecursive' => 9, 'childCategoryCount' => 2]
             ],
             '1st Level Child Category' => [
                 'childCategory',
-                ['articleCount' => 1, 'articleCountRecursive' => 2, 'childCategoryCount' => 1]
+                ['articleCount' => 3, 'articleCountRecursive' => 6, 'childCategoryCount' => 1]
             ],
             '1st Level 2nd Child Empty Category' => [
                 'child2Category',
@@ -375,7 +426,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             ],
             '2nd Level Child Category' => [
                 'childCategory2',
-                ['articleCount' => 1, 'articleCountRecursive' => 1, 'childCategoryCount' => 0]
+                ['articleCount' => 3, 'articleCountRecursive' => 3, 'childCategoryCount' => 0]
             ]
         ];
     }
@@ -387,7 +438,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         return [
             'Root category' => [
                 'rootCategory',
-                ['articleCount' => 1, 'articleCountRecursive' => 3, 'childCategoryCount' => 3]
+                ['articleCount' => 2, 'articleCountRecursive' => 4, 'childCategoryCount' => 3]
             ],
             '1st Level Child Category' => [
                 'childCategory',

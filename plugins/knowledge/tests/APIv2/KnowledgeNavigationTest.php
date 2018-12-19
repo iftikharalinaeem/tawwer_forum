@@ -432,6 +432,57 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
         $actual = $this->api()->get("knowledge-navigation/tree")->getBody();
 
         $this->assertTreesEqual($expected, $actual);
+
+        //extra check for Count fields updated correctly
+
+        $expected = [
+            "Root Category" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 5,
+                'childCategoryCount' => 3 //A, B, C
+            ],
+            "Parent Category A" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 5 //A, B, C, D, E
+            ],
+            "Child Category A" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category B" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category C" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Parent Category B" => [
+                'articleCount' => 5,
+                'articleCountRecursive' => 5, // 1, 2, 3, 4, 5
+                'childCategoryCount' => 0
+            ],
+            "Parent Category C" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category D" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category E" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+        ];
+        $this->checkCountFields($expected);
     }
 
     /**
@@ -591,6 +642,78 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
         $actual = $this->api()->get("knowledge-navigation/tree")->getBody();
 
         $this->assertTreesEqual($expected, $actual);
+
+        //extra check for Count fields updated correctly
+
+        $expected = [
+            "Root Category" => [
+                'articleCount' => 1,
+                'articleCountRecursive' => 5,
+                'childCategoryCount' => 3 //A, B, C
+            ],
+            "Parent Category A" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 3 //A, B, C
+            ],
+            "Child Category A" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category B" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category C" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Parent Category B" => [
+                'articleCount' => 3,
+                'articleCountRecursive' => 3, // 2, 3, 4
+                'childCategoryCount' => 0
+            ],
+            "Parent Category C" => [
+                'articleCount' => 1,
+                'articleCountRecursive' => 1, // 2, 3, 4
+                'childCategoryCount' => 2 // D, E
+            ],
+            "Child Category D" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+            "Child Category E" => [
+                'articleCount' => 0,
+                'articleCountRecursive' => 0,
+                'childCategoryCount' => 0
+            ],
+        ];
+        $this->checkCountFields($expected);
+    }
+
+    /**
+     * Check if knowledge category "count" fields got properly updated after sorting
+     *
+     * @param array $expected Array of Expected values of categories "count" fields.
+     */
+    public function checkCountFields(array $expected) {
+        $categories = $this->api()->get("knowledge-categories")->getBody();
+        $countAsserts = 0;
+        foreach ($categories as $actual) {
+            if ($expectedCounts = ($expected[$actual['name']] ?? false)) {
+                $countAsserts++;
+                $this->assertEquals($expectedCounts['articleCount'], $actual['articleCount']);
+                $this->assertEquals($expectedCounts['articleCountRecursive'], $actual['articleCountRecursive']);
+                $this->assertEquals($expectedCounts['childCategoryCount'], $actual['childCategoryCount']);
+            } else {
+                $this->assertTrue(false, 'Unexpected category name : '.$actual['name']);
+            }
+        }
+        $this->assertEquals(count($expected), $countAsserts);
     }
 
     /**

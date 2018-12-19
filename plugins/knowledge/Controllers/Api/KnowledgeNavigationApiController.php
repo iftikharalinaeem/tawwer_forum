@@ -327,7 +327,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         foreach ($categories as $category) {
             $parentID = $category["parentID"] ?? null;
             if ($parentID === -1) {
-                $this->knowledgeCategoryModel->updateCounts($category["knowledgeCategoryID"]);
+                $this->knowledgeCategoryModel->resetAllCounts($category["knowledgeBaseID"]);
                 break;
             }
         }
