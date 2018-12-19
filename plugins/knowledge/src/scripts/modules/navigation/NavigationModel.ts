@@ -348,8 +348,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
             normalizedByID[id] = {
                 ...item,
-                // Temporary kludge https://github.com/vanilla/knowledge/issues/425
-                parentID: item.parentID || (item as any).knowledgeCategoryID,
                 children: [],
             };
         }

@@ -90,7 +90,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "description" => "Sort weight.",
                 "type" => "integer",
             ],
-            "knowledgeCategoryID?" => ["type" => "integer"],
             "recordType" => [
                 "description" => "Type of record represented by the navigation item.",
                 "enum" => [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE],
@@ -200,7 +199,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $tree = [];
         foreach ($parent as $k => $l) {
             if (isset($list[$l['knowledgeCategoryID']]) && $l['recordType'] === Navigation::RECORD_TYPE_CATEGORY) {
-                $l['children'] = $this->createTree($list, $list[$l['knowledgeCategoryID']]);
+                $l['children'] = $this->createTree($list, $list[$l['recordID']]);
                 usort($l["children"], [Navigation::class, "compareItems"]);
             }
             $tree[] = $l;
@@ -256,6 +255,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 $row["recordType"] = Navigation::RECORD_TYPE_CATEGORY;
                 $row["url"] = $this->knowledgeCategoryModel->url($row);
             } elseif ($recordType === Navigation::RECORD_TYPE_ARTICLE && $row["recordType"] == Navigation::RECORD_TYPE_ARTICLE) {
+                $row["parentID"] = $row["knowledgeCategoryID"];
                 $row["recordID"] = $row["articleID"];
                 $row["url"] = $this->articleModel->url($row);
             }
