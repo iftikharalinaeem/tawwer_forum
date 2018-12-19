@@ -222,7 +222,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 const article = action.payload.data;
                 const stringID = NavigationRecordType.ARTICLE + article.articleID;
-                console.log("New item", article, stringID);
                 const parentStringID = NavigationRecordType.KNOWLEDGE_CATEGORY + article.knowledgeCategoryID;
                 nextState.navigationItems[stringID] = {
                     name: article.name,
