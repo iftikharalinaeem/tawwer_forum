@@ -159,29 +159,36 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /**
      * Recalculate and update articleCount, articleCountRecursive and childCategoryCount columns
      *
-     * @param int $knowledgeCategoryID Categori id to recalculate
+     * @param int $knowledgeCategoryID Category id to recalculate
      * @param bool $updateParents Flag for recursive or non-recursive mode to update all parents
      *
      * @return bool Return tru when record updated succesfully
      */
     public function updateCounts(int $knowledgeCategoryID, bool $updateParents = true): bool {
-        $count = $this->sql()
+        $countCategories = $this->sql()
             ->select('c.knowledgeCategoryID')
-            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
             ->select('DISTINCT children.knowledgeCategoryID', 'COUNT', 'childrenCount')
             ->select('children.articleCountRecursive', 'SUM', 'countRecursive')
             ->from('knowledgeCategory c')
-            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID')
             ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
             ->where('c.knowledgeCategoryID', $knowledgeCategoryID)
             ->groupBy('c.knowledgeCategoryID')
             ->get()->nextRow(DATASET_TYPE_ARRAY);
-        if (is_array($count)) {
+        $countArticles = $this->sql()
+            ->select('c.knowledgeCategoryID')
+            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
+            ->from('knowledgeCategory c')
+            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID')
+            ->where('c.knowledgeCategoryID', $knowledgeCategoryID)
+            ->groupBy('c.knowledgeCategoryID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        if (is_array($countCategories)  && is_array($countArticles)) {
             $res = $this->update(
                 [
-                    'articleCount' => $count['articleCount'],
-                    'articleCountRecursive' => ($count['articleCount'] + $count['countRecursive']),
-                    'childCategoryCount' => $count['childrenCount'],
+                    'articleCount' => $countArticles['articleCount'],
+                    'articleCountRecursive' => ($countArticles['articleCount'] + $countCategories['countRecursive']),
+                    'childCategoryCount' => $countCategories['childrenCount'],
                 ],
                 [
                     'knowledgeCategoryID' => $knowledgeCategoryID
@@ -200,6 +207,31 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             } else {
                 return $res;
             }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Recalculate all counts fields for all categories of knowledgeBase
+     *
+     * @param int $knowledgeBaseID Knowledge Base id to recalculate
+     *
+     * @return bool Return tru when record updated successfully
+     */
+    public function resetAllCounts(int $knowledgeBaseID): bool {
+        $notParent = $this->sql()
+            ->select('c.knowledgeCategoryID')
+            ->from('knowledgeCategory c')
+            ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
+            ->where('c.knowledgeBaseID', $knowledgeBaseID)
+            ->where('children.knowledgeCategoryID', null)
+            ->get()->resultArray();
+        if (is_array($notParent)) {
+            foreach ($notParent as $cat) {
+                $this->updateCounts($cat['knowledgeCategoryID']);
+            }
+            return true;
         } else {
             return false;
         }
