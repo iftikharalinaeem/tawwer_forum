@@ -12,6 +12,7 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import reduceReducers from "reduce-reducers";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 
 export interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
@@ -66,10 +67,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
-            return reduceReducers(this.reduceGetNav, this.reduceSortOrder, this.reduceDelete, this.reduceRename)(
-                nextState,
-                action,
-            );
+            return reduceReducers(
+                this.reduceGetNav,
+                this.reduceSortOrder,
+                this.reduceDelete,
+                this.reduceRename,
+                this.reduceAdd,
+            )(nextState, action);
         });
     };
 
@@ -199,6 +203,37 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 break;
             case ArticleActions.PATCH_ARTICLE_RESPONSE:
                 handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                break;
+        }
+        return nextState;
+    };
+
+    /**
+     * Reduce actions related to adding new items.
+     */
+    private reduceAdd = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        switch (action.type) {
+            case ArticleActions.POST_ARTICLE_RESPONSE:
+                const article = action.payload.data;
+                const stringID = NavigationRecordType.ARTICLE + article.articleID;
+                const parentStringID = NavigationRecordType.KNOWLEDGE_CATEGORY + article.knowledgeCategoryID;
+                nextState.navigationItems[stringID] = {
+                    name: article.name,
+                    url: article.url,
+                    parentID: article.knowledgeCategoryID!,
+                    recordID: article.articleID,
+                    sort: article.sort,
+                    recordType: NavigationRecordType.ARTICLE,
+                    children: [],
+                };
+                nextState.navigationItems[parentStringID].children.push(stringID);
+                NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
                 break;
         }
         return nextState;
@@ -363,6 +398,25 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         }
 
         return normalizedByID;
+    }
+
+    /**
+     * Sort a navigation item's children.
+     *
+     * @param navItems The keyed items to pull from.
+     * @param idToSort The item whos children you want to sort.
+     */
+    private static sortItemChildren(navItems: INormalizedNavigationItems, idToSort: string) {
+        const item = navItems[idToSort];
+        if (!item) {
+            return;
+        }
+
+        const newChildren = item.children
+            .map(childID => navItems[childID]) // Map to actual items.
+            .sort(this.sortNavigationItems) // Sort
+            .map(child => child.recordType + child.recordID); // Back to IDs
+        item.children = newChildren;
     }
 
     /**
