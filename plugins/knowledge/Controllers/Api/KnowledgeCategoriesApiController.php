@@ -306,8 +306,10 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeCategoryPostSchema())
-            ->setDescription("Update an existing knowledge category.")
-            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateKBCategoriesLimit"])
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"])
+            ->setDescription("Update an existing knowledge category.");
+
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
@@ -340,8 +342,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema($this->knowledgeCategoryPostSchema())
-            ->setDescription("Create a new knowledge category.")
-            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"]);
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateKBCategoriesLimit"])
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"])
+            ->setDescription("Create a new knowledge category.");
         $out = $this->schema($this->fullSchema(), "out");
 
 
