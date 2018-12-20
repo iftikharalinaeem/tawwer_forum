@@ -12,6 +12,7 @@ import {
     DropDownItemLink,
     DropDownItemButton,
     DropDownItemMetas,
+    DropDownItemMeta,
     DropDownItemSeparator,
     DropDownItem,
 } from "@library/components/dropdown";
@@ -54,6 +55,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
+        const isMobile = this.props.device === Devices.MOBILE;
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
@@ -65,44 +67,43 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
                     openAsModal={this.props.device === Devices.MOBILE}
+                    title={isMobile ? t("Article") : undefined}
                 >
-                    <Frame>
-                        <FrameBody className="dropDownItem-verticalPadding">
-                            <DropDownItemMetas>
-                                <Translate
-                                    source="Published on <0/> by <1/>"
-                                    c0={<DateTime timestamp={dateInserted} />}
-                                    c1={<ProfileLink className="metaStyle" username={insertUser!.name} />}
-                                />
-                            </DropDownItemMetas>
-                            <DropDownItemMetas>
-                                <Translate
-                                    source="Updated on <0/> by <1/>"
-                                    c0={<DateTime timestamp={dateUpdated} />}
-                                    c1={<ProfileLink className="metaStyle" username={updateUser!.name} />}
-                                />
-                            </DropDownItemMetas>
-                            <DropDownItemSeparator />
-                            <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
-                            <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
-                            <DropDownItem>
-                                <EditorRoute.Link data={this.props.article} className={DropDownItemLink.CSS_CLASS}>
-                                    {t("Edit article")}
-                                </EditorRoute.Link>
-                            </DropDownItem>
-                            <DropDownItemSeparator />
-                            <DropDownItem>
-                                <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
-                                    {t("Revision History")}
-                                </RevisionsRoute.Link>
-                            </DropDownItem>
-                            <DropDownItemSeparator />
-                            {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
-                        </FrameBody>
-                    </Frame>
+                    <DropDownItemMetas>
+                        <DropDownItemMeta>
+                            <Translate
+                                source="Published on <0/> by <1/>"
+                                c0={<DateTime timestamp={dateInserted} />}
+                                c1={<ProfileLink className="metaStyle" username={insertUser!.name} />}
+                            />
+                        </DropDownItemMeta>
+                        <DropDownItemMeta>
+                            <Translate
+                                source="Updated on <0/> by <1/>"
+                                c0={<DateTime timestamp={dateUpdated} />}
+                                c1={<ProfileLink className="metaStyle" username={updateUser!.name} />}
+                            />
+                        </DropDownItemMeta>
+                    </DropDownItemMetas>
+                    <DropDownItemSeparator />
+                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
+                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
+                    <DropDownItem>
+                        <EditorRoute.Link data={this.props.article} className={DropDownItemLink.CSS_CLASS}>
+                            {t("Edit article")}
+                        </EditorRoute.Link>
+                    </DropDownItem>
+                    <DropDownItemSeparator />
+                    <DropDownItem>
+                        <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                            {t("Revision History")}
+                        </RevisionsRoute.Link>
+                    </DropDownItem>
+                    <DropDownItemSeparator />
+                    {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
+                    {this.renderDeleteModal()}
+                    {this.renderRestoreModal()}
                 </DropDown>
-                {this.renderDeleteModal()}
-                {this.renderRestoreModal()}
             </Permission>
         );
     }
@@ -199,11 +200,8 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         return "articleMenuDropDown-" + this.props.article.articleID;
     }
 
-    /**
-     * Fallback click handle until all functionaility has been implemented.
-     */
-    private dummyClick = () => {
-        alert("Click works");
+    private doNothing = e => {
+        e.stopPropagation();
     };
 }
 

@@ -35,7 +35,6 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
-                    contentsClassName="dropDownItem-verticalPadding"
                 >
                     <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
                     <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
