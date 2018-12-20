@@ -1,0 +1,359 @@
+openapi: 3.0.2
+info:
+paths:
+  /events:
+    get:
+      parameters:
+      - description: |
+          Filter by group ID.
+        in: query
+        name: groupID
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Sort the results by the specified field. The default sort order
+          is ascending.Prefixing the field with "-" will sort using a
+          descending order.
+        in: query
+        name: sort
+        schema:
+          enum:
+          - dateInserted
+          - '-dateInserted'
+          - dateStarts
+          - '-dateStarts'
+          type: string
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Event'
+                type: array
+          description: Success
+      tags:
+      - Events
+      summary: List events.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Success
+      tags:
+      - Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventPost'
+        required: true
+      summary: Create an event.
+  '/events/{id}':
+    delete:
+      parameters:
+      - description: |
+          The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Events
+      summary: Delete an event.
+    get:
+      parameters:
+      - description: |
+          The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Success
+      tags:
+      - Events
+      summary: Get an event.
+    patch:
+      parameters:
+      - description: The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Success
+      tags:
+      - Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventPatch'
+        required: true
+      summary: Update an event.
+  '/events/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Success
+      tags:
+      - Events
+      summary: Get an event for editing.
+  '/events/{id}/participants':
+    get:
+      parameters:
+      - description: |
+          The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Filter participant by attending status.
+        in: query
+        name: attending
+        schema:
+          type: string
+          default: all
+          enum:
+          - 'yes'
+          - 'no'
+          - maybe
+          - answered
+          - unanswered
+          - all
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Event'
+                type: array
+          description: Success
+      tags:
+      - Events
+      summary: Get event's participants.
+    post:
+      parameters:
+      - description: The event ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Success
+      tags:
+      - Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                attending:
+                  description: Is the participant attending the event.
+                  enum:
+                  - 'yes'
+                  - 'no'
+                  - maybe
+                  minLength: 1
+                  nullable: true
+                  type: string
+                userID:
+                  description: The ID of the user that RSVP.
+                  type: string
+              required:
+              - attending
+              type: object
+        required: true
+      summary: RSVP to an event.
+components:
+  schemas:
+    Event:
+      properties:
+        attending:
+          description: Is the participant attending the event.
+          enum:
+          - 'yes'
+          - 'no'
+          - maybe
+          minLength: 1
+          nullable: true
+          type: string
+        dateInserted:
+          description: When the event was created.
+          format: date-time
+          type: string
+        eventID:
+          description: The ID of the event.
+          type: integer
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The user ID of the participant.
+          type: integer
+      required:
+      - eventID
+      - userID
+      - dateInserted
+      - attending
+      type: object
+    EventPost:
+        properties:
+          body:
+            description: The description of the event.
+            minLength: 1
+            type: string
+          dateEnds:
+            description: When the event ends.
+            format: date-time
+            nullable: true
+            type: string
+          dateStarts:
+            description: When the event starts.
+            format: date-time
+            type: string
+          format:
+            description: The input format of the event.
+            minLength: 1
+            type: string
+          groupID:
+            description: The group the event is in.
+            type: integer
+          location:
+            description: The location of the event.
+            maxLength: 255
+            minLength: 1
+            nullable: true
+            type: string
+          name:
+            description: The name of the event.
+            minLength: 1
+            type: string
+        required:
+        - groupID
+        - name
+        - body
+        - format
+        - location
+        - dateStarts
+        type: object
+    EventPatch:
+      properties:
+        body:
+          description: The description of the event.
+          minLength: 1
+          type: string
+        dateEnds:
+          description: When the event ends.
+          format: date-time
+          nullable: true
+          type: string
+        dateStarts:
+          description: When the event starts.
+          format: date-time
+          type: string
+        format:
+          description: The input format of the event.
+          minLength: 1
+          type: string
+        groupID:
+          description: The group the event is in.
+          type: integer
+        location:
+          description: The location of the event.
+          maxLength: 255
+          minLength: 1
+          nullable: true
+          type: string
+        name:
+          description: The name of the event.
+          minLength: 1
+          type: string
+      type: object
