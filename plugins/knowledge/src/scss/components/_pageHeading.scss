@@ -24,6 +24,17 @@ $pageHeading-backLink_width                    : $pageHeading-backLink_height * 
     }
 }
 
+.pageSmallTitle {
+    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
+    font-size: $global-smallTitle_fontSize;
+    font-weight: $global-fontWeight_bold;
+    display: block;
+    margin: {
+        top: 0;
+        bottom: 0;
+    }
+}
+
 .pageHeading-underTitle {
     margin-top: $utility-baseUnit;
 }

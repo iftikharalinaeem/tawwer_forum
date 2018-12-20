@@ -69,7 +69,7 @@ export class EditorHeader extends React.Component<IProps> {
                                 </li>
                                 {this.renderDraftIndicator()}
                                 {showMobileDropDown ? (
-                                    <li className="editorHeader-center" role="presentation">
+                                    <li className="editorHeader-center">
                                         <MobileDropDown
                                             title={this.props.mobileDropDownTitle!}
                                             buttonClass="editorHeader-mobileDropDown"
