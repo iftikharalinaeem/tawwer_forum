@@ -51,7 +51,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   properties:
@@ -111,7 +111,7 @@ paths:
       responses:
         '201':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   countOptions:
@@ -199,7 +199,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   countOptions:
@@ -264,7 +264,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   countOptions:
@@ -337,7 +337,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/PollGetEdit'
           description: Success
@@ -375,7 +375,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   properties:
@@ -437,7 +437,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   body:
@@ -532,7 +532,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   body:
@@ -657,7 +657,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   properties:
@@ -690,7 +690,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 properties:
                   dateInserted:

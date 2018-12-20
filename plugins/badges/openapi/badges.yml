@@ -38,7 +38,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/Badge'
@@ -51,7 +51,7 @@ paths:
       responses:
         '201':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Badge'
           description: Success
@@ -111,7 +111,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/BadgeRequest'
@@ -171,7 +171,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/UserBadge'
@@ -208,7 +208,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Badge'
           description: Success
@@ -226,7 +226,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Badge'
           description: Success
@@ -252,7 +252,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Badge'
           description: Success
@@ -271,7 +271,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/BadgeRequest'
           description: Success
@@ -319,7 +319,7 @@ paths:
       responses:
         '200':
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/UserBadge'
           description: Success
