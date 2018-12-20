@@ -68,8 +68,7 @@ export class EditorHeader extends React.Component<IProps> {
                                     />
                                 </li>
                                 {this.renderDraftIndicator()}
-                                <FlexSpacer tag="li" className="editorHeader-split" />
-                                {showMobileDropDown && (
+                                {showMobileDropDown ? (
                                     <li className="editorHeader-center" role="presentation">
                                         <MobileDropDown
                                             title={this.props.mobileDropDownTitle!}
@@ -78,6 +77,8 @@ export class EditorHeader extends React.Component<IProps> {
                                             {this.props.mobileDropDownContent}
                                         </MobileDropDown>
                                     </li>
+                                ) : (
+                                    <FlexSpacer tag="li" className="editorHeader-split" />
                                 )}
                                 <li className="editorHeader-item">
                                     <Button

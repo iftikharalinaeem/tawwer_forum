@@ -105,7 +105,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return (
             revisions.status === LoadStatus.SUCCESS &&
             revisions.data && (
-                <RevisionsList>
+                <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
                     {revisions.data.slice().map(item => {
                         const preload = () =>
                             this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });
