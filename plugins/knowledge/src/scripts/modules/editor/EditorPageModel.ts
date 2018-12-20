@@ -282,15 +282,15 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case ArticleActions.POST_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
-            case ArticleActions.GET_ARTICLE_REQUEST:
+            case EditorPageActions.GET_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
-            case ArticleActions.GET_ARTICLE_RESPONSE:
+            case EditorPageActions.GET_ARTICLE_RESPONSE:
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 nextState.article.status = LoadStatus.SUCCESS;
                 nextState.article.data = action.payload.data;
                 break;
-            case ArticleActions.GET_ARTICLE_ERROR:
+            case EditorPageActions.GET_ARTICLE_ERROR:
             case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.article.status = LoadStatus.ERROR;
                 nextState.article.error = action.payload;
