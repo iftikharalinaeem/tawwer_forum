@@ -86,26 +86,6 @@ a {
     }
 }
 
-//    color: $link_default-color;
-//
-//    &:not(.isDisabled):not([disabled]):hover {
-//        color: $link_default_hover-color;
-//    }
-//
-//    &:not(.isDisabled):not([disabled]):focus {
-//        color: $link_default_focus-color;
-//    }
-//
-//    &.isActive {
-//        pointer-events: none;
-//    }
-//
-//    &[aria-current] {
-//        pointer-events: none;
-//        cursor: default;
-//    }
-//}
-
 b,
 strong {
     font-weight: $global-fontWeight_bold;

@@ -5,18 +5,26 @@
  */
 
 @include headings {
-  @include headingFontStyle;
+    @include headingFontStyle;
 }
 
 .pageTitle {
-  font-size: $global-title_fontSize;
+    font-size: $global-title_fontSize;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $global-title_mobile_fontSize;
+    }
+}
+
+.pageTitleContainer-metas {
+    margin-top: $global-gutter_quarterSize;
 }
 
 .pageSubTitle {
-  font-size: $global-subTitle_fontSize;
+    font-size: $global-subTitle_fontSize;
 }
 
 .componentSubTitle {
-  @include headingFontStyle;
-  font-size: $global-large_fontSize;
+    @include headingFontStyle;
+    font-size: $global-large_fontSize;
 }

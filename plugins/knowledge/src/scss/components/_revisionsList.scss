@@ -6,6 +6,7 @@
 
 $revisionList-avatar_size: 30px;
 $revisionList-avatar_margin: 9px;
+$revisionList-avatar_borderWidth: 1px;
 $revisionList-avatar_borderRadius: 50%;
 $revisionList-avatar_borderColor: mix($global-color_fg, $global-color_bg, 10%);
 
@@ -64,11 +65,11 @@ $revisionList-border_color: $global-border_color;
 
 .revisionsList-photoFrame {
     position: relative;
-    width: $revisionList-avatar_size;
-    height: $revisionList-avatar_size;
+    width: $revisionList-avatar_size + $revisionList-avatar_borderWidth * 2;
+    height: $revisionList-avatar_size + $revisionList-avatar_borderWidth * 2;
     margin-right: $revisionList-avatar_margin;
     border-radius: $revisionList-avatar_borderRadius;
-    border: solid $revisionList-avatar_borderColor 1px;
+    border: solid $revisionList-avatar_borderColor $revisionList-avatar_borderWidth;
     overflow: hidden;
 }
 
@@ -79,6 +80,7 @@ $revisionList-border_color: $global-border_color;
     align-items: flex-start;
     flex-grow: 1;
     line-height: $global-condensed_lineHeight;
+    max-width: calc(100% - #{$revisionList-avatar_size + $revisionList-avatar_margin + $revisionList-avatar_borderWidth * 2});
 }
 
 .revisionsList-photo {
@@ -87,8 +89,8 @@ $revisionList-border_color: $global-border_color;
     right: 0;
     bottom: 0;
     left: 0;
-    min-width: $revisionList-avatar_size;
-    min-height: $revisionList-avatar_size;
+    min-width: 100%;
+    min-height: 100%;
 
     @supports (object-fit: cover) {
         height: 100%;

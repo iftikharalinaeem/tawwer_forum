@@ -143,9 +143,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     }
 
     public componentDidUpdate(prevProps: Readonly<IProps>): void {
-        const wasPrevSelected = prevProps.selectedItem && prevProps.selectedItem.id === prevProps.item.id;
         const isNowSelected = this.props.selectedItem && this.props.selectedItem.id === this.props.item.id;
-        if (!wasPrevSelected && isNowSelected) {
+        if (isNowSelected) {
             this.focusSelf();
         }
     }

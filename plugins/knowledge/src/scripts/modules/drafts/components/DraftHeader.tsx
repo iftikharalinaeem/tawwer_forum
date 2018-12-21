@@ -9,9 +9,11 @@ import BackLink from "@library/components/navigation/BackLink";
 import classNames from "classnames";
 import Container from "@library/components/layouts/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 
 interface IProps {
     className?: string;
+    mobileDropDownTitle?: string;
 }
 
 /**
@@ -20,12 +22,24 @@ interface IProps {
 export default class DraftHeader extends React.Component<IProps> {
     public render() {
         return (
-            <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
+            <nav className={classNames("draftPage-header", "modal-pageHeader", this.props.className)}>
                 <Container>
                     <PanelArea>
-                        <PanelWidgetHorizontalPadding>
-                            <BackLink title={t("Back")} className="draftPage-backLink" visibleLabel={true} />
-                        </PanelWidgetHorizontalPadding>
+                        <ul className="editorHeader-items">
+                            <li className="editorHeader-item isPullLeft">
+                                <PanelWidgetHorizontalPadding>
+                                    <BackLink title={t("Back")} className="draftPage-backLink" visibleLabel={true} />
+                                </PanelWidgetHorizontalPadding>
+                            </li>
+                            {this.props.mobileDropDownTitle && (
+                                <li className="editorHeader-center">
+                                    <MobileDropDown
+                                        title={this.props.mobileDropDownTitle!}
+                                        buttonClass="editorHeader-mobileDropDown"
+                                    />
+                                </li>
+                            )}
+                        </ul>
                     </PanelArea>
                 </Container>
             </nav>

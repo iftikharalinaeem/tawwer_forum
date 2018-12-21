@@ -7,6 +7,12 @@
 $buttonLoader-size: 16px;
 $buttonLoader-thickness: 3px;
 
+button {
+    .icon {
+        display: block;
+    }
+}
+
 .button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
@@ -56,6 +62,10 @@ $buttonLoader-thickness: 3px;
             left: $utility-baseUnit;
             right: $utility-baseUnit;
         }
+    }
+
+    .icon {
+        display: block;
     }
 }
 
