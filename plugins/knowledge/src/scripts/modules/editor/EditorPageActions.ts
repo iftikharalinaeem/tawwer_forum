@@ -13,6 +13,7 @@ import {
     IPatchArticleResponseBody,
     IResponseArticleDraft,
     Format,
+    IArticle,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import qs from "qs";
@@ -207,7 +208,7 @@ export default class EditorPageActions extends ReduxActions {
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
-            const { body:prevBody, name:prevName, knowledgeCategoryID:prevCategoryID } = editorState.article.data;
+            const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
             const { body, name, knowledgeCategoryID } = request;
             const patchRequest: IPatchArticleRequestBody = {
                 articleID: editorState.article.data.articleID,
@@ -251,17 +252,29 @@ export default class EditorPageActions extends ReduxActions {
      */
     private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
         // We don't have an article, but we have ID for one. Go get it.
-        const [articleResponse, draftLoaded] = await Promise.all([
+        const [editArticleResponse, articleResponse, draftLoaded] = await Promise.all([
             this.getEditableArticleByID(articleID),
+            this.articleActions.fetchByID({ articleID }),
             forRevision ? Promise.resolve(false) : this.initializeDraftFromUrl(history),
         ]);
 
-        if (!draftLoaded && !forRevision && articleResponse && articleResponse.data) {
+        // Merge together the two results and re-dispatch with the full data.
+        if (editArticleResponse && articleResponse) {
+            const article: IArticle = {
+                ...articleResponse.data,
+                ...editArticleResponse.data,
+            };
+            editArticleResponse.data = article;
+
+            this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
+        }
+
+        if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
             this.updateForm(
                 {
-                    name: articleResponse.data.name,
-                    body: JSON.parse(articleResponse.data.body),
-                    knowledgeCategoryID: articleResponse.data.knowledgeCategoryID,
+                    name: editArticleResponse.data.name,
+                    body: JSON.parse(editArticleResponse.data.body),
+                    knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
                 },
                 true,
             );

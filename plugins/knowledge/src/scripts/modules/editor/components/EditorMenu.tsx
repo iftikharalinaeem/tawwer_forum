@@ -45,6 +45,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                         insertUser={insertUser!}
                         updateUser={updateUser!}
                     />
+                    <DropDownItemSeparator />
                     <DropDownItem>
                         <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
                             {t("Revision History")}
