@@ -5,7 +5,6 @@
  */
 
 $panelList-title_fontSize  : $global-large_fontSize;
-$panelList_fontSize        : $global-medium_fontSize;
 $panelList_offset          : $utility-baseUnit * 2;
 $panelList-link_color      : $link_default-color;
 
@@ -29,7 +28,7 @@ $panelList-link_color      : $link_default-color;
     display: block;
     position: relative;
     width: 100%;
-    font-size: $panelList_fontSize;
+    font-size: $global-medium_fontSize;
     color: inherit;
 
     &:hover {

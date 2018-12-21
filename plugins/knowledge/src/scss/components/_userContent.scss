@@ -40,6 +40,10 @@
                 top: $global-block_margin * .5;
             };
         }
+
+        &:first-child {
+            @include lineHeightAdjustment($global-base_lineHeight, $global-body_lineHeightRatio);
+        }
     }
 
     h1 {

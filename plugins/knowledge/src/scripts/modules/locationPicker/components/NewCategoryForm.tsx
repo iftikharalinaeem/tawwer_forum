@@ -57,7 +57,6 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 size={ModalSizes.SMALL}
                 exitHandler={this.props.exitHandler}
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
-                className="isCompact"
             >
                 <Frame>
                     <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Folder")} />
@@ -65,7 +64,9 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         <FramePanel>
                             <InputTextBlock
                                 ref={this.inputRef}
-                                label={t("Name")}
+                                label={t("New Folder")}
+                                labelClassName="sr-only"
+                                className="isFirst isLast"
                                 inputProps={{
                                     value: this.state.categoryName,
                                     onChange: this.handleNameChange,
@@ -127,13 +128,9 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
      */
     private handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        const state = {
+        this.setState({
             categoryName: value,
-            valid: false,
-        };
-        if (value.length > 0) {
-            state.valid = true;
-        }
-        this.setState(state);
+            valid: value.length > 0,
+        });
     };
 }

@@ -62,7 +62,14 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
                         <PanelWidget>
-                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                            {
+                                <Navigation
+                                    collapsible={true}
+                                    activeRecord={activeRecord}
+                                    kbID={1}
+                                    title={t("Subcategories")}
+                                />
+                            }
                         </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>

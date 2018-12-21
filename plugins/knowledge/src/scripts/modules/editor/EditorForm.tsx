@@ -30,6 +30,7 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     actions: EditorPageActions;
     className?: string;
     titleID?: string;
+    mobileDropDownTitle?: string;
 }
 
 interface IState {
@@ -50,7 +51,7 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
@@ -69,7 +70,12 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                     <h1 id={this.props.titleID} className="sr-only">
                         {t("Write Discussion")}
                     </h1>
-                    <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
+                    <PanelLayout
+                        className="isOneCol"
+                        growMiddleBottom={true}
+                        device={this.props.device}
+                        topPadding={false}
+                    >
                         <PanelLayout.MiddleBottom>
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                                 <LocationInput

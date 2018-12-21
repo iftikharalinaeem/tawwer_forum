@@ -5,38 +5,47 @@
  */
 
 .editorHeader-items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .editorHeader-item {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: $global_spacer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: $global_spacer;
 
-  &.isPullLeft {
-    margin-left: 0;
-    margin-right: auto;
-  }
+    &.isPullLeft {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
+    &.editorHeader-itemDraftStatus {
+        margin-left: 0;
+    }
 }
 
 .editorHeader-saveDraft {
-  white-space: nowrap;
-  line-height: $icon-default_size;
+    line-height: $global-condensed_lineHeight;
+    margin-top: .083em;
 }
 
 .editorHeader-center {
-  flex: 1;
+    flex: 1;
 }
 
 .editorHeader-publish {
-  color: $global-color_primary;
-  font-weight: $global-fontWeight_semiBold;
+    color: $global-color_primary;
+    font-weight: $global-fontWeight_semiBold;
 }
 
 .editorHeader-otherLanguagesToggle {
-  font-weight: $global-fontWeight_semiBold;
+    font-weight: $global-fontWeight_semiBold;
+}
+
+.editorHeader-split {
+    flex-grow: 1;
+    height: 1px;
 }

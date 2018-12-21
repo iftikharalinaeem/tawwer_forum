@@ -40,7 +40,6 @@ export default class LocationPicker extends React.Component<IProps, IState> {
             <React.Fragment>
                 <Frame>
                     <FrameHeader
-                        className="isShadowed"
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
                         closeFrame={this.props.onCloseClick}
                         title={title}
@@ -57,17 +56,16 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                             />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter className="isShadowed">
+                    <FrameFooter>
                         <Button
                             title={t("New Category")}
                             className="locationPicker-newFolder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
-                            baseClass={ButtonBaseClass.STANDARD}
                             buttonRef={this.newFolderButtonRef}
                         >
                             {newFolder()}
                         </Button>
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose}>
+                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className="buttonPrimary">
                             {t("Choose")}
                         </Button>
                     </FrameFooter>

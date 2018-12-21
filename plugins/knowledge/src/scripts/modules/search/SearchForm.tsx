@@ -48,7 +48,7 @@ class SearchForm extends React.Component<IProps> {
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
-                    <PanelLayout device={this.props.device}>
+                    <PanelLayout device={this.props.device} className="hasLargePadding">
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                         <PanelLayout.MiddleTop>
                             <PanelWidget>

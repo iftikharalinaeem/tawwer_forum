@@ -23,6 +23,7 @@ interface IProps extends INavigationStoreState {
     activeRecord: IActiveRecord;
     collapsible: boolean;
     kbID: number;
+    title?: string; // Title on top of navigation
 }
 
 /**
@@ -35,6 +36,7 @@ export class Navigation extends React.Component<IProps> {
     public render(): React.ReactNode {
         return (
             <SiteNav
+                title={this.props.title}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={
