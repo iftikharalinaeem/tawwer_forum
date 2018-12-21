@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { getRequiredID } from "@library/componentIDs";
+import { getRequiredID, uniqueIDFromPrefix } from "@library/componentIDs";
 import LocationPickerItem from "./LocationPickerItem";
 import LocationPickerItemList from "./LocationPickerItemList";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
@@ -21,22 +21,12 @@ interface IProps {
     items: INavigationTreeItem[];
 }
 
-interface IState {
-    selectedRecordID?: number;
-}
-
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-export default class LocationContents extends React.Component<IProps, IState> {
-    private legendRef;
-    private listID;
-
-    public constructor(props) {
-        super(props);
-        this.legendRef = React.createRef();
-        this.listID = getRequiredID(props, "navigationItemList");
-    }
+export default class LocationContents extends React.Component<IProps> {
+    private legendRef = React.createRef<HTMLLegendElement>();
+    private listID = uniqueIDFromPrefix("navigationItemList");
 
     public render() {
         const { selectedCategory, items, navigatedCategory, chosenCategory } = this.props;
@@ -79,9 +69,18 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     /**
-     * Check for focus
+     * @inheritdoc
      */
-    public componentDidUpdate() {
+    public componentDidMount() {
         this.setFocusOnLegend();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.navigatedCategory !== this.props.navigatedCategory) {
+            this.setFocusOnLegend();
+        }
     }
 }
