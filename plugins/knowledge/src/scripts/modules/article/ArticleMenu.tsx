@@ -108,6 +108,10 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         );
     }
 
+    private dummyClick = () => {
+        return;
+    };
+
     /**
      * Render the delete modal if it should be shown.
      */
