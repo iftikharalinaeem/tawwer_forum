@@ -202,7 +202,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
                 break;
             case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.data.name);
                 break;
         }
         return nextState;
