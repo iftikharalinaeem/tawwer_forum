@@ -244,8 +244,12 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
-        $offset = $options["offset"] ?? 0;
-        $page = $offset / $limit;
+        if ($limit !== false) {
+            $offset = $options["offset"] ?: 0;
+            $page = $offset / $limit;
+        } else {
+            $page = false;
+        }
 
         $sql = $this->sql()
             ->from('article a')

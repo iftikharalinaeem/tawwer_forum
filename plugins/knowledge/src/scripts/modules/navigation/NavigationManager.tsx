@@ -151,6 +151,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
     }
 
+
     /**
      * Collapse all items in the tree.
      */
@@ -343,9 +344,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * Reset the selected item.
      */
     private clearSelectedItem = () => {
+        const { selectedItem, treeData } = this.state;
+        if (selectedItem === null) {
+            return;
+        }
+
         this.setState({
             selectedItem: null,
+            writeMode: false,
         });
+        this.updateAllItems({});
     };
 
     /// MODALS

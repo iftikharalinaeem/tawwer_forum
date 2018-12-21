@@ -155,7 +155,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 'a.knowledgeCategoryID' => $catIds,
                 'a.status' => ArticleModel::STATUS_PUBLISHED
             ],
-            [],
+            ["limit" => false],
             ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
         );
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);

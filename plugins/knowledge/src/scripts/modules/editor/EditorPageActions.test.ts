@@ -277,6 +277,7 @@ describe("EditorPageActions", () => {
                 knowledge: {
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
+                        isDirty: true,
                         form: initialForm,
                     },
                 },
@@ -289,9 +290,18 @@ describe("EditorPageActions", () => {
             initWithState(initialState);
             void (await editorPageActions.syncDraft(tempID));
 
-            expect(mockStore.isActionTypeDispatched(EditorPageActions.SET_INITIAL_DRAFT)).eq(true);
-            expect(mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_REQUEST)).eq(true);
-            expect(mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_RESPONSE)).eq(true);
+            expect(
+                mockStore.isActionTypeDispatched(EditorPageActions.SET_INITIAL_DRAFT),
+                "It sets the initial draft",
+            ).eq(true);
+            expect(
+                mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_REQUEST),
+                "It makes a request to the server",
+            ).eq(true);
+            expect(
+                mockStore.isActionTypeDispatched(ArticleActions.POST_DRAFT_RESPONSE),
+                "It receives a response from the server",
+            ).eq(true);
 
             const initAction = mockStore.getAction(EditorPageActions.SET_INITIAL_DRAFT);
             expect(initAction!.payload.tempID).eq(tempID);
@@ -309,6 +319,7 @@ describe("EditorPageActions", () => {
                 knowledge: {
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
+                        isDirty: true,
                         form: initialForm,
                         draft: {
                             data: {

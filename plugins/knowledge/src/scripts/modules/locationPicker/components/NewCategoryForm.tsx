@@ -58,37 +58,39 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 exitHandler={this.props.exitHandler}
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
             >
-                <Frame>
-                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Folder")} />
-                    <FrameBody>
-                        <FramePanel>
-                            <InputTextBlock
-                                ref={this.inputRef}
-                                label={t("New Folder")}
-                                labelClassName="sr-only"
-                                className="isFirst isLast"
-                                inputProps={{
-                                    value: this.state.categoryName,
-                                    onChange: this.handleNameChange,
-                                    placeholder: t("Example: Appearance"),
-                                }}
-                            />
-                        </FramePanel>
-                    </FrameBody>
-                    <FrameFooter>
-                        <Button className="locationPicker-validate" onClick={this.props.exitHandler}>
-                            {t("Cancel")}
-                        </Button>
-                        <Button
-                            title={t("New Folder")}
-                            className="locationPicker-newFolder buttonPrimary"
-                            disabled={!this.state.valid}
-                            onClick={this.handleFormSubmit}
-                        >
-                            {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
-                        </Button>
-                    </FrameFooter>
-                </Frame>
+                <form onSubmit={this.handleFormSubmit}>
+                    <Frame>
+                        <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Category")} />
+                        <FrameBody>
+                            <FramePanel>
+                                <InputTextBlock
+                                    ref={this.inputRef}
+                                    label={t("New Category")}
+                                    labelClassName="sr-only"
+                                    className="isFirst isLast"
+                                    inputProps={{
+                                        value: this.state.categoryName,
+                                        onChange: this.handleNameChange,
+                                        placeholder: t("Example: Appearance"),
+                                    }}
+                                />
+                            </FramePanel>
+                        </FrameBody>
+                        <FrameFooter>
+                            <Button className="locationPicker-validate" onClick={this.props.exitHandler}>
+                                {t("Cancel")}
+                            </Button>
+                            <Button
+                                title={t("New Category")}
+                                className="locationPicker-newFolder buttonPrimary"
+                                disabled={!this.state.valid}
+                                type="submit"
+                            >
+                                {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
+                            </Button>
+                        </FrameFooter>
+                    </Frame>
+                </form>
             </Modal>
         );
     }
@@ -104,7 +106,10 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     /**
      * Attempt to add category.
      */
-    private handleFormSubmit = async e => {
+    private handleFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         const { parentCategoryID } = this.props;
 
         this.setState({
