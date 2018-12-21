@@ -21,37 +21,42 @@ import {
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
 import { IKbNavigationItem } from "@knowledge/@types/api";
+import qs from "qs";
+
+interface IEditorURLData {
+    articleID?: number;
+    articleRevisionID?: number;
+    draftID?: number;
+    knowledgeCategoryID?: number;
+}
 
 /**
  * Get the route for editing a particular article ID.
  *
  * @param articleID - The articleID.
  */
-function makeEditorUrl(
-    data?:
-        | IArticleFragment
-        | IArticle
-        | IRevisionFragment
-        | IRevision
-        | IResponseArticleDraft
-        | IKbCategoryFragment
-        | undefined,
-) {
-    if (data === undefined) {
-        return formatUrl("/kb/articles/add");
-    } else if ("articleRevisionID" in data) {
-        return formatUrl(`/kb/articles/${data.articleID}/editor?revisionID=${data.articleRevisionID}`);
-    } else if ("draftID" in data) {
-        if (data.recordType === "article" && data.recordID !== null) {
-            return formatUrl(`/kb/articles/${data.recordID}/editor?draftID=${data.draftID}`);
-        } else {
-            return formatUrl(`/kb/articles/add?draftID=${data.draftID}`);
-        }
-    } else if ("knowledgeCategoryID" in data && "parentID" in data) {
-        return formatUrl(`/kb/articles/add?knowledgeCategoryID=${data.knowledgeCategoryID}`);
-    } else {
-        return formatUrl(`/kb/articles/${data.articleID}/editor`);
+function makeEditorUrl(data?: IEditorURLData) {
+    let baseUrl = "";
+    const addRoot = formatUrl("/kb/articles/add");
+
+    if (!data) {
+        return addRoot;
     }
+
+    if (data.articleID === undefined) {
+        baseUrl = addRoot;
+    } else {
+        baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
+    }
+
+    const { articleID, ...restQuery } = data;
+    const query = qs.stringify(restQuery);
+
+    if (query) {
+        baseUrl += `?${query}`;
+    }
+
+    return baseUrl;
 }
 
 // Editor
