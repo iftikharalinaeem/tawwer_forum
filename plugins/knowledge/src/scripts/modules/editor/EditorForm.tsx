@@ -33,19 +33,11 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     mobileDropDownTitle?: string;
 }
 
-interface IState {
-    isDirty: boolean;
-}
-
 /**
  * Form for the editor page.
  */
-export class EditorForm extends React.PureComponent<IProps, IState> {
+export class EditorForm extends React.PureComponent<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
-
-    public state: IState = {
-        isDirty: false,
-    };
 
     /**
      * @inheritdoc
@@ -170,7 +162,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     private editorChangeHandler = debounce((content: DeltaOperation[]) => {
         this.handleFormChange({ body: content });
-        this.updateDraft();
     }, 1000 / 60);
 
     /**
@@ -180,7 +171,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     private updateDraft = throttle(
         () => {
-            this.setState({ isDirty: false });
             void this.props.actions.syncDraft();
         },
         10000,

@@ -33,6 +33,7 @@ export interface IEditorPageState {
     revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
+    isDirty: boolean;
 }
 
 export interface IInjectableEditorProps {
@@ -146,6 +147,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         submit: {
             status: LoadStatus.PENDING,
         },
+        isDirty: false,
     };
     public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
 
@@ -180,7 +182,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     ...nextState.form,
                     ...action.payload.formData,
                 };
-                nextState.formNeedsRefresh = action.payload.forceRefresh;
+                const { forceRefresh } = action.payload;
+                nextState.formNeedsRefresh = forceRefresh;
+                nextState.isDirty = !forceRefresh;
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;

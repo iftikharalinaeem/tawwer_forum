@@ -150,7 +150,11 @@ export default class EditorPageActions extends ReduxActions {
      */
     public async syncDraft(newDraftID: string = uniqueId()) {
         const state = this.getState<IStoreState>();
-        const { form, article, draft } = state.knowledge.editorPage;
+        const { form, article, draft, isDirty } = state.knowledge.editorPage;
+
+        if (!isDirty) {
+            return;
+        }
 
         const recordID = article.data ? article.data.articleID : undefined;
 
