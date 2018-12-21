@@ -108,6 +108,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
      */
     private handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation();
 
         const { parentCategoryID } = this.props;
 

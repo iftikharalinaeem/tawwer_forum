@@ -201,8 +201,11 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
     private onSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        void this.props.actions.publish(this.props.history);
+        if (this.canSubmit) {
+            event.preventDefault();
+            event.stopPropagation();
+            void this.props.actions.publish(this.props.history);
+        }
     };
 }
 
