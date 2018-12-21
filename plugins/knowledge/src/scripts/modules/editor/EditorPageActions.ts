@@ -311,7 +311,7 @@ export default class EditorPageActions extends ReduxActions {
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID }, true);
         if (!fullArticleResponse) {
             return;
         }

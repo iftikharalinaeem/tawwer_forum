@@ -322,10 +322,10 @@ export default class ArticleActions extends ReduxActions {
     /**
      * Get an article by its ID from the API.
      */
-    public fetchByID = (options: IGetArticleRequestBody) => {
+    public fetchByID = (options: IGetArticleRequestBody, force: boolean = false) => {
         const { articleID, ...rest } = options;
         const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
-        if (existingArticle) {
+        if (existingArticle && !force) {
             const articleResponse: IApiResponse<IGetArticleResponseBody> = { data: existingArticle, status: 200 };
             this.dispatch(ArticleActions.getArticleACs.response(articleResponse, options));
             return Promise.resolve(articleResponse);
