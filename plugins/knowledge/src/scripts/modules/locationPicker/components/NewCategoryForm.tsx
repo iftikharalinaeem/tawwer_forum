@@ -59,12 +59,12 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
             >
                 <Frame>
-                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Folder")} />
+                    <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Category")} />
                     <FrameBody>
                         <FramePanel>
                             <InputTextBlock
                                 ref={this.inputRef}
-                                label={t("New Folder")}
+                                label={t("New Category")}
                                 labelClassName="sr-only"
                                 className="isFirst isLast"
                                 inputProps={{
@@ -80,7 +80,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             {t("Cancel")}
                         </Button>
                         <Button
-                            title={t("New Folder")}
+                            title={t("New Category")}
                             className="locationPicker-newFolder buttonPrimary"
                             disabled={!this.state.valid}
                             onClick={this.handleFormSubmit}
