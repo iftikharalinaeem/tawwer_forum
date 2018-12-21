@@ -22,6 +22,7 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import isEqual from "lodash/isEqual";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -206,10 +207,15 @@ export default class EditorPageActions extends ReduxActions {
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+            const { body:prevBody, name:prevName, knowledgeCategoryID:prevCategoryID } = editorState.article.data;
+            const { body, name, knowledgeCategoryID } = request;
             const patchRequest: IPatchArticleRequestBody = {
-                ...request,
                 articleID: editorState.article.data.articleID,
+                body: !isEqual(prevBody, body) ? body : undefined,
+                name: prevName !== name ? name : undefined,
+                knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
             };
+
             return this.updateArticle(patchRequest, history);
         }
 
