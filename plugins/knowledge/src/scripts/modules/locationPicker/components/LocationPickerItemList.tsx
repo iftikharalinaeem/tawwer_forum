@@ -19,7 +19,7 @@ interface IProps {
 /**
  * Represents a list of NavigationItems
  */
-export default class NavigationItemList extends React.Component<IProps> {
+export default class LocationPickerItemList extends React.Component<IProps> {
     public render() {
         return (
             <fieldset id={this.props.id} className={classNames("folderContents")}>

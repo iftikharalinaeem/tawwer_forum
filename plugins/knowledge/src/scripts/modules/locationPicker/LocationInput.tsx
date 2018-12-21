@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
+import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import Button from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";

@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import NavigationItemCategory from "./NavigationItemCategory";
-import NavigationItemList from "./NavigationItemList";
+import LocationPickerItem from "./LocationPickerItem";
+import LocationPickerItemList from "./LocationPickerItemList";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { t } from "@library/application";
 import { INavigationTreeItem } from "@library/@types/api";
@@ -47,7 +47,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
             const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
             const selectCallback = () => this.props.onItemSelect(item.recordID);
             return (
-                <NavigationItemCategory
+                <LocationPickerItem
                     key={index}
                     isInitialSelection={!!chosenCategory && item.recordID === chosenCategory.knowledgeCategoryID}
                     isSelected={isSelected}
@@ -59,14 +59,14 @@ export default class LocationContents extends React.Component<IProps, IState> {
             );
         });
         return (
-            <NavigationItemList
+            <LocationPickerItemList
                 id={this.listID}
                 legendRef={this.legendRef}
                 categoryName={title}
                 key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
             >
                 {contents}
-            </NavigationItemList>
+            </LocationPickerItemList>
         );
     }
 
