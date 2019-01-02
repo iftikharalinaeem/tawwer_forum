@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2008-2018 Vanilla Forums, Inc.
+ * @copyright 2008-2019 Vanilla Forums, Inc.
  * @license Proprietary
  */
 
