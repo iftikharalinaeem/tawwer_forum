@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -991,7 +991,7 @@ class ReactionModel extends Gdn_Model {
             // Fail silently because we don't have a lock, so we shouldn't execute the trailing code.
             return;
         }
-        
+
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 
         // Now decide whether we need to log or delete the record.
