@@ -60,6 +60,9 @@ export default class NavigationSelector {
      */
     public static selectNavTree(navItems: INormalizedNavigationItems, rootKey: string): INavigationTreeItem {
         const item = navItems[rootKey];
+        if (!item) {
+            throw new Error("Root element not found in navigation items.");
+        }
         return {
             ...item,
             children: NavigationSelector.selectChildren(navItems, rootKey),
