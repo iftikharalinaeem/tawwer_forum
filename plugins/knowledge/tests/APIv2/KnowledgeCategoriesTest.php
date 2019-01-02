@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -90,7 +90,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         ];
         return $record;
     }
-    
+
     /**
      * Test knowledge categories "count" fields calculations.
      *
