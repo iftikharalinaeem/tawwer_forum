@@ -27,7 +27,7 @@ interface IEditorURLData {
     articleID?: number;
     articleRevisionID?: number;
     draftID?: number;
-    knowledgeCategoryID?: number;
+    knowledgeCategoryID?: number | null;
 }
 
 /**
