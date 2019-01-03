@@ -12,7 +12,6 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import reduceReducers from "reduce-reducers";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 
 export interface INormalizedNavigationItem extends IKbNavigationItem {
     children: string[];
@@ -23,7 +22,7 @@ export interface INormalizedNavigationItem extends IKbNavigationItem {
     };
 }
 export interface INormalizedNavigationItems {
-    [key: string]: INormalizedNavigationItem;
+    [key: string]: INormalizedNavigationItem | undefined;
 }
 
 export interface INavigationStoreState {
@@ -232,8 +231,12 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                     recordType: NavigationRecordType.ARTICLE,
                     children: [],
                 };
-                nextState.navigationItems[parentStringID].children.push(stringID);
-                NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
+
+                const parentItem = nextState.navigationItems[parentStringID];
+                if (parentItem) {
+                    parentItem.children.push(stringID);
+                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
+                }
                 break;
         }
         return nextState;
@@ -264,7 +267,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
                 // Remove the item from it's parent
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                if (parentItem) {
+                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                }
             }
         };
 
@@ -275,12 +280,14 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
          */
         const handleDeleteSuccess = (key: string) => {
             const item = nextState.navigationItems[key];
-            if (nextState.navigationItems[key]) {
+            if (item) {
                 delete nextState.navigationItems[key];
 
                 // Remove the item from it's parent
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                if (parentItem) {
+                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                }
             }
         };
 
@@ -299,7 +306,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
                 // Put the item back on its parent.
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children.push(key);
+                if (parentItem) {
+                    parentItem.children.push(key);
+                }
             }
         };
 
@@ -413,7 +422,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         const newChildren = item.children
             .map(childID => navItems[childID]) // Map to actual items.
             .sort(this.sortNavigationItems) // Sort
-            .map(child => child.recordType + child.recordID); // Back to IDs
+            .map(child => child!.recordType + child!.recordID); // Back to IDs
         item.children = newChildren;
     }
 

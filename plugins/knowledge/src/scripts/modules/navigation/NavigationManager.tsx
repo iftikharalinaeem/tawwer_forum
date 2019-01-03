@@ -634,6 +634,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
         };
 
         for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
+            if (!itemValue) {
+                continue;
+            }
+
             let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
             if (this.state && this.state.treeData.items[itemID]) {
                 stateValue = this.state.treeData.items[itemID];
