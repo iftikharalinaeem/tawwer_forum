@@ -14,7 +14,7 @@ import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
 import { LoadStatus } from "@library/@types/api";
-import { Format } from "@knowledge/@types/api";
+import { Format, IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 describe("EditorPageActions", () => {
@@ -22,17 +22,18 @@ describe("EditorPageActions", () => {
     let mockApi: MockAdapter;
     let editorPageActions: EditorPageActions;
 
-    before(() => {
-        mockApi = new MockAdapter(apiv2);
-    });
-
     beforeEach(() => {
+        mockApi = new MockAdapter(apiv2);
         initWithState({ knowledge: { articles: ArticleModel.INITIAL_STATE } });
     });
 
-    afterEach(() => {
-        mockApi.reset();
-    });
+    const mockGetEditAPI = () => {
+        mockApi
+            .onGet("/api/v2/articles/1/edit")
+            .replyOnce(200, dummyEditArticle)
+            .onGet("/api/v2/articles/1")
+            .replyOnce(200, dummyArticle);
+    };
 
     const assertDraftLoaded = (draft: any) => {
         expect(mockStore.isActionTypeDispatched(EditorPageActions.SET_INITIAL_DRAFT)).eq(true);
@@ -58,10 +59,21 @@ describe("EditorPageActions", () => {
         format: Format.RICH,
     };
 
-    const dummyArticle = {
+    const dummyArticle: IArticle = {
         articleID: 1,
         knowledgeCategoryID: 4,
-        sort: null,
+        sort: 0,
+        seoName: "",
+        seoDescription: "",
+        slug: "example-article",
+        status: ArticleStatus.PUBLISHED,
+        score: 5,
+        countViews: 5,
+        outline: [],
+        insertUserID: 0,
+        updateUserID: 0,
+        dateInserted: "",
+        dateUpdated: "",
         name: "Example Article",
         body: '[{"insert":"Hello Article."}]',
         format: "rich",
@@ -142,7 +154,7 @@ describe("EditorPageActions", () => {
         const testSimpleInitialization = async (fromUrl = "/kb/articles/1/editor") => {
             const history = createMemoryHistory();
             history.push(fromUrl);
-            mockApi.onGet("/api/v2/articles/1/edit").replyOnce(200, dummyEditArticle);
+            mockGetEditAPI();
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -169,11 +181,8 @@ describe("EditorPageActions", () => {
         it("initializes with a draft ID", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/1/editor?draftID=1");
-            mockApi
-                .onGet("/api/v2/articles/1/edit")
-                .replyOnce(200, dummyEditArticle)
-                .onGet("/api/v2/articles/drafts/1")
-                .replyOnce(200, dummyDraft);
+            mockGetEditAPI();
+            mockApi.onGet("/api/v2/articles/drafts/1").replyOnce(200, dummyDraft);
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -213,13 +222,10 @@ describe("EditorPageActions", () => {
         it("initializes with a revision ID", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/1/editor?revisionID=6");
-            mockApi
-                .onGet("/api/v2/articles/1/edit")
-                .replyOnce(200, dummyEditArticle)
-                .onGet("/api/v2/article-revisions/6")
-                .replyOnce(200, dummyRevision);
+            mockGetEditAPI();
+            mockApi.onGet("/api/v2/article-revisions/6").replyOnce(200, dummyRevision);
 
-            initWithState({ knowledge: { articles: { revisionsByID: {} } } });
+            initWithState({ knowledge: { articles: { revisionsByID: {}, articlesByID: {} } } });
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -230,7 +236,7 @@ describe("EditorPageActions", () => {
         it("initializes with a revision ID from a cached revision", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/1/editor?revisionID=6");
-            mockApi.onGet("/api/v2/articles/1/edit").replyOnce(200, dummyEditArticle);
+            mockGetEditAPI();
 
             initWithState({
                 knowledge: {
@@ -238,6 +244,7 @@ describe("EditorPageActions", () => {
                         revisionsByID: {
                             6: dummyRevision,
                         },
+                        articlesByID: {},
                     },
                 },
             });

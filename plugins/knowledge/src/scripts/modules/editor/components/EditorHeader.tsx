@@ -9,15 +9,13 @@ import { t } from "@library/application";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import BackLink from "@library/components/navigation/BackLink";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import { IResponseArticleDraft } from "@knowledge/@types/api";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import LanguagesDropDown from "@library/components/LanguagesDropDown";
-import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Container from "@library/components/layouts/components/Container";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
@@ -93,19 +91,6 @@ export class EditorHeader extends React.Component<IProps> {
                                     >
                                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                                     </Button>
-                                </li>
-                                <li className="editorHeader-item">
-                                    <LanguagesDropDown
-                                        widthOfParent={false}
-                                        className="editorHeader-otherLanguages"
-                                        renderLeft={true}
-                                        buttonClassName="buttonNoBorder buttonNoMinWidth buttonNoHorizontalPadding editorHeader-otherLanguagesToggle"
-                                        buttonBaseClass={ButtonBaseClass.STANDARD}
-                                        selected={this.props.selectedLang}
-                                        openAsModal={this.props.device === Devices.MOBILE}
-                                    >
-                                        {dummyOtherLanguagesData.children}
-                                    </LanguagesDropDown>
                                 </li>
                                 {this.props.optionsMenu && (
                                     <li className="editorHeader-item">{this.props.optionsMenu}</li>

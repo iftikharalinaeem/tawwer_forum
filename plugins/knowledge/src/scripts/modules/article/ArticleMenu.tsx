@@ -25,10 +25,9 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import ProfileLink from "@library/components/navigation/ProfileLink";
 import Permission from "@library/users/Permission";
-import Frame from "@library/components/frame/Frame";
-import FrameBody from "@library/components/frame/FrameBody";
 import { Devices } from "@library/components/DeviceChecker";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -69,28 +68,29 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     openAsModal={this.props.device === Devices.MOBILE}
                     title={isMobile ? t("Article") : undefined}
                 >
-                    <DropDownItemMetas>
-                        <DropDownItemMeta>
-                            <Translate
-                                source="Published on <0/> by <1/>"
-                                c0={<DateTime timestamp={dateInserted} />}
-                                c1={<ProfileLink className="metaStyle" username={insertUser!.name} />}
-                            />
-                        </DropDownItemMeta>
-                        <DropDownItemMeta>
-                            <Translate
-                                source="Updated on <0/> by <1/>"
-                                c0={<DateTime timestamp={dateUpdated} />}
-                                c1={<ProfileLink className="metaStyle" username={updateUser!.name} />}
-                            />
-                        </DropDownItemMeta>
-                    </DropDownItemMetas>
+                    <InsertUpdateMetas
+                        dateInserted={dateInserted}
+                        dateUpdated={dateUpdated}
+                        insertUser={insertUser!}
+                        updateUser={updateUser!}
+                    />
                     <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
-                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
                     <DropDownItem>
-                        <EditorRoute.Link data={this.props.article} className={DropDownItemLink.CSS_CLASS}>
+                        <EditorRoute.Link
+                            data={{ articleID: this.props.article.articleID }}
+                            className={DropDownItemLink.CSS_CLASS}
+                        >
                             {t("Edit article")}
+                        </EditorRoute.Link>
+                    </DropDownItem>
+                    <DropDownItem>
+                        <EditorRoute.Link
+                            data={{
+                                knowledgeCategoryID: this.props.article.knowledgeCategoryID!,
+                            }}
+                            className={DropDownItemLink.CSS_CLASS}
+                        >
+                            {t("New Article")}
                         </EditorRoute.Link>
                     </DropDownItem>
                     <DropDownItemSeparator />
@@ -107,10 +107,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
             </Permission>
         );
     }
-
-    private dummyClick = () => {
-        return;
-    };
 
     /**
      * Render the delete modal if it should be shown.
