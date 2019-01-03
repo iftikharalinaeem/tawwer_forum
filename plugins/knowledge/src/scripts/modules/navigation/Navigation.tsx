@@ -59,7 +59,7 @@ export class Navigation extends React.Component<IProps> {
      */
     private preloadItem = (item: INavigationTreeItem) => {
         if (item.recordType === NavigationRecordType.ARTICLE) {
-            this.props.articleActions.fetchByID({ articleID: item.recordID });
+            void this.props.articleActions.fetchByID({ articleID: item.recordID });
         }
     };
 

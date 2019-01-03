@@ -49,8 +49,8 @@ function makeEditorUrl(data?: IEditorURLData) {
         baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
 
-    const { articleID, ...restQuery } = data;
-    const query = qs.stringify(restQuery);
+    const { articleRevisionID, draftID, knowledgeCategoryID } = data;
+    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID });
 
     if (query) {
         baseUrl += `?${query}`;

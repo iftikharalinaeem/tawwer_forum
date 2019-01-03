@@ -234,7 +234,7 @@ export default class EditorPageActions extends ReduxActions {
         // Redirect
         const editLocation = {
             ...history.location,
-            pathname: EditorRoute.url(article),
+            pathname: EditorRoute.url({ articleID: article.articleID }),
             search: "",
         };
 
@@ -280,7 +280,7 @@ export default class EditorPageActions extends ReduxActions {
             );
         }
 
-        return articleResponse;
+        return editArticleResponse;
     }
 
     /**
