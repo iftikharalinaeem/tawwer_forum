@@ -18,6 +18,8 @@ $revisionList-item_minHeight: 63px;
 
 $revisionList-user_fontSize: 14px;
 
+$revisionList-linkPadding_mobile: 16px;
+
 $revisionList-border_color: $global-border_color;
 
 .revisionsList {
@@ -53,6 +55,22 @@ $revisionList-border_color: $global-border_color;
 
     &.isSelected {
         background-color: $state-hover_color;
+    }
+}
+
+@include mediaQuery-panelLayout_oneColumn {
+    .revisionsList {
+        padding: {
+            top: 0;
+            bottom: 0;
+        }
+    }
+
+    .revisionsList-link {
+        padding: {
+            left: $revisionList-linkPadding_mobile;
+            right: $revisionList-linkPadding_mobile;
+        }
     }
 }
 
