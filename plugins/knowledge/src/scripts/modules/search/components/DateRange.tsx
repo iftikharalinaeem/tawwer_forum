@@ -29,7 +29,6 @@ export default class DateRange extends React.PureComponent<IProps> {
         const endDate = this.props.end ? moment(this.props.end).toDate() : undefined;
         const startDate = this.props.start ? moment(this.props.start).toDate() : undefined;
         const fromLabel = t("From");
-        // const fromLabel = t("From FromFromFromFrom FromFromFromFrom FromFromFromFromFromFrom");
         const toLabel = t("To");
         const longestLabelCount = (fromLabel.length >= toLabel.length ? fromLabel.length : toLabel.length) + 4; // offset
         const labelPadding = 4;
@@ -52,7 +51,7 @@ export default class DateRange extends React.PureComponent<IProps> {
         return (
             <fieldset className={classNames("dateRange", "inputBlock", this.props.className)}>
                 <legend className="inputBlock-labelText dateUpdated-label">{t("Date Updated")}</legend>
-                <label className={classNames("dateRange-dateBlock", dateBlockOffset)}>
+                <label className={classNames("dateRange-boundary", dateBlockOffset)}>
                     <span className={classNames("dateRange-label", labelStyles)}>{fromLabel}</span>
                     <DateInput
                         alignment="right"
@@ -67,7 +66,7 @@ export default class DateRange extends React.PureComponent<IProps> {
                         ]}
                     />
                 </label>
-                <label className={classNames("dateRange-dateBlock", dateBlockOffset)}>
+                <label className={classNames("dateRange-boundary", dateBlockOffset)}>
                     <span className={classNames("dateRange-label", labelStyles)}>{toLabel}</span>
                     <DateInput
                         alignment="right"
