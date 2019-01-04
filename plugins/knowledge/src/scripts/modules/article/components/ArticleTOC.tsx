@@ -1,11 +1,10 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import * as React from "react";
-import { PanelWidget } from "@library/components/layouts/PanelLayout";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import { IOutlineItem } from "@knowledge/@types/api";
@@ -19,10 +18,10 @@ interface IProps {
  * Implements the table of contents component
  */
 export default class ArticleTOC extends React.Component<IProps> {
-    private static readonly minimumChildrenCount = 2;
+    private static readonly MINIMUM_CHILD_COUNT = 1;
 
     public render() {
-        if (this.props.items.length < ArticleTOC.minimumChildrenCount) {
+        if (this.props.items.length < ArticleTOC.MINIMUM_CHILD_COUNT) {
             return null;
         }
 

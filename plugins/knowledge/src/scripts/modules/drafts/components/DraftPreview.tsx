@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -37,7 +37,13 @@ export class DraftPreview extends React.Component<IProps> {
                 <article className="draftPreview-item">
                     <div className="draftPreview-header">
                         <HeadingTag className="draftPreview-title" level={this.props.headingLevel}>
-                            <EditorRoute.Link data={this.props} className="draftPreview-link">
+                            <EditorRoute.Link
+                                data={{
+                                    articleID: this.props.recordID,
+                                    draftID: this.props.draftID,
+                                }}
+                                className="draftPreview-link"
+                            >
                                 {!!name ? name : <em>{t("(Untitled)")}</em>}
                             </EditorRoute.Link>
                         </HeadingTag>

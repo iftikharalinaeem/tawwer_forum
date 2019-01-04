@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 import { expect } from "chai";
@@ -21,7 +21,7 @@ describe("EditorPageModel", () => {
                 },
             };
 
-            const expected: IInjectableEditorProps = EditorPageModel.INITIAL_STATE;
+            const { isDirty, ...expected } = EditorPageModel.INITIAL_STATE;
 
             expect(EditorPageModel.getInjectableProps(state as any)).deep.eq(expected);
         });
@@ -38,6 +38,7 @@ describe("EditorPageModel", () => {
             };
 
             const mixedState: IEditorPageState = {
+                ...EditorPageModel.INITIAL_STATE,
                 article: {
                     status: LoadStatus.LOADING,
                 },
@@ -52,12 +53,6 @@ describe("EditorPageModel", () => {
                     status: LoadStatus.SUCCESS,
                     error: undefined,
                     data: revision.articleRevisionID,
-                },
-                submit: {
-                    status: LoadStatus.PENDING,
-                },
-                saveDraft: {
-                    status: LoadStatus.PENDING,
                 },
                 form: {
                     name: "test",

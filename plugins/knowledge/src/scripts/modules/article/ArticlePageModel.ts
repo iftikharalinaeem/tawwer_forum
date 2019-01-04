@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -70,35 +70,35 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
         state: IArticlePageState = this.initialState,
         action: typeof ArticlePageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
     ): IArticlePageState => {
-        return produce(state, draft => {
+        return produce(state, nextState => {
             switch (action.type) {
                 case ArticlePageActions.INIT:
                     const { preloaded, articleID } = action.payload;
-                    draft.articleID = articleID;
+                    nextState.articleID = articleID;
                     if (preloaded) {
-                        draft.articleLoadable.status = LoadStatus.SUCCESS;
+                        nextState.articleLoadable.status = LoadStatus.SUCCESS;
                     }
                     break;
                 case ArticlePageActions.RESET:
                     return this.initialState;
             }
 
-            if (action.meta && action.meta.articleID && draft.articleID === action.meta.articleID) {
+            if (action.meta && action.meta.articleID && nextState.articleID === action.meta.articleID) {
                 switch (action.type) {
                     case ArticleActions.GET_ARTICLE_REQUEST:
-                        draft.articleLoadable.status = LoadStatus.LOADING;
+                        nextState.articleLoadable.status = LoadStatus.LOADING;
                         break;
                     case ArticleActions.GET_ARTICLE_RESPONSE:
-                        draft.articleLoadable.status = LoadStatus.SUCCESS;
+                        nextState.articleLoadable.status = LoadStatus.SUCCESS;
                         break;
                     case ArticleActions.GET_ARTICLE_ERROR:
-                        draft.articleLoadable.status = LoadStatus.ERROR;
+                        nextState.articleLoadable.status = LoadStatus.ERROR;
                         break;
                     case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
-                        draft.restoreStatus = LoadStatus.LOADING;
+                        nextState.restoreStatus = LoadStatus.LOADING;
                         break;
                     case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                        draft.restoreStatus = LoadStatus.SUCCESS;
+                        nextState.restoreStatus = LoadStatus.SUCCESS;
                         break;
                 }
             }

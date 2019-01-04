@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -59,7 +59,7 @@ export class Navigation extends React.Component<IProps> {
      */
     private preloadItem = (item: INavigationTreeItem) => {
         if (item.recordType === NavigationRecordType.ARTICLE) {
-            this.props.articleActions.fetchByID({ articleID: item.recordID });
+            void this.props.articleActions.fetchByID({ articleID: item.recordID });
         }
     };
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -155,7 +155,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 'a.knowledgeCategoryID' => $catIds,
                 'a.status' => ArticleModel::STATUS_PUBLISHED
             ],
-            [],
+            ["limit" => false],
             ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
         );
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);

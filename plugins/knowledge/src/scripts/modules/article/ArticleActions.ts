@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -322,10 +322,13 @@ export default class ArticleActions extends ReduxActions {
     /**
      * Get an article by its ID from the API.
      */
-    public fetchByID = (options: IGetArticleRequestBody) => {
+    public fetchByID = (
+        options: IGetArticleRequestBody,
+        force: boolean = false,
+    ): Promise<IApiResponse<IGetArticleResponseBody> | undefined> => {
         const { articleID, ...rest } = options;
         const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
-        if (existingArticle) {
+        if (existingArticle && !force) {
             const articleResponse: IApiResponse<IGetArticleResponseBody> = { data: existingArticle, status: 200 };
             this.dispatch(ArticleActions.getArticleACs.response(articleResponse, options));
             return Promise.resolve(articleResponse);

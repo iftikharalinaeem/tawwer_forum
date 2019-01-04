@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -9,7 +9,8 @@ import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/icons/common";
-import { LocationContents, NewCategoryForm } from "@knowledge/modules/locationPicker/components";
+import LocationContents from "@knowledge/modules/locationPicker/components/LocationContents";
+import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
 import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
 

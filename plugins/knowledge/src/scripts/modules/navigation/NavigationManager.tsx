@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -150,6 +150,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
             this.setState({ treeData: this.calcTree() });
         }
     }
+
 
     /**
      * Collapse all items in the tree.
@@ -343,9 +344,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * Reset the selected item.
      */
     private clearSelectedItem = () => {
+        const { selectedItem, treeData } = this.state;
+        if (selectedItem === null) {
+            return;
+        }
+
         this.setState({
             selectedItem: null,
+            writeMode: false,
         });
+        this.updateAllItems({});
     };
 
     /// MODALS
@@ -626,6 +634,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
         };
 
         for (const [itemID, itemValue] of Object.entries(this.props.navigationItems)) {
+            if (!itemValue) {
+                continue;
+            }
+
             let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
             if (this.state && this.state.treeData.items[itemID]) {
                 stateValue = this.state.treeData.items[itemID];

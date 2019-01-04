@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -33,6 +33,7 @@ export interface IEditorPageState {
     revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
+    isDirty: boolean;
 }
 
 export interface IInjectableEditorProps {
@@ -146,6 +147,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         submit: {
             status: LoadStatus.PENDING,
         },
+        isDirty: false,
     };
     public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
 
@@ -180,7 +182,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                     ...nextState.form,
                     ...action.payload.formData,
                 };
-                nextState.formNeedsRefresh = action.payload.forceRefresh;
+                const { forceRefresh } = action.payload;
+                nextState.formNeedsRefresh = forceRefresh;
+                nextState.isDirty = !forceRefresh;
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;
@@ -282,15 +286,15 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case ArticleActions.POST_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
-            case ArticleActions.GET_ARTICLE_REQUEST:
+            case EditorPageActions.GET_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
-            case ArticleActions.GET_ARTICLE_RESPONSE:
+            case EditorPageActions.GET_ARTICLE_RESPONSE:
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 nextState.article.status = LoadStatus.SUCCESS;
                 nextState.article.data = action.payload.data;
                 break;
-            case ArticleActions.GET_ARTICLE_ERROR:
+            case EditorPageActions.GET_ARTICLE_ERROR:
             case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.article.status = LoadStatus.ERROR;
                 nextState.article.error = action.payload;

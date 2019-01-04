@@ -1,12 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import * as React from "react";
 import classNames from "classnames";
-import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
+import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import Button from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";

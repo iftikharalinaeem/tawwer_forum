@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -244,8 +244,12 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
-        $offset = $options["offset"] ?? 0;
-        $page = $offset / $limit;
+        if ($limit !== false) {
+            $offset = $options["offset"] ?: 0;
+            $page = $offset / $limit;
+        } else {
+            $page = false;
+        }
 
         $sql = $this->sql()
             ->from('article a')
