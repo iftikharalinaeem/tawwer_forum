@@ -15,6 +15,23 @@
             color: $global-error_fg;
         }
     }
+
+    &.isHorizontal {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .inputBlock-labelAndDescription {
+            display: inline-flex;
+            width: auto;
+        }
+
+        .inputBlock-inputWrap {
+            display: inline-flex;
+            flex-grow: 1;
+        }
+    }
 }
 
 .inputBlock-columns {
