@@ -321,17 +321,22 @@ TOOLTIP
                     $stepNumber = $tourStep+1;
                     $tourStepText = " at <b>{$stepName}</b> step (#{$stepNumber}) ";
                 }
-                Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
-                        ->color(HipNotify::COLOR_RED)
-                        ->message("{$userSlug} skipped {$tourSlug}{$tourStepText} on {$siteName}")
-                        ->send();
+
+                Notify::queueNotification(
+                    Notify::DOMAIN_DIRECTED,
+                    'sales',
+                    "{$userSlug} skipped {$tourSlug}{$tourStepText} on {$siteName}",
+                    Notify::CLASS_BAD
+                );
                 break;
 
             case 'completed':
-                Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
-                        ->color(HipNotify::COLOR_GREEN)
-                        ->message("{$userSlug} completed {$tourSlug} on {$siteName}")
-                        ->send();
+                Notify::queueNotification(
+                    Notify::DOMAIN_DIRECTED,
+                    'sales',
+                    "{$userSlug} completed {$tourSlug} on {$siteName}",
+                    Notify::CLASS_GOOD
+                );
                 break;
         }
     }

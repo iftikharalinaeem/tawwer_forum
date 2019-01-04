@@ -43,10 +43,12 @@ class HostedToursController extends Gdn_Controller {
         $tourSlug = "<b>{$tourName}</b>";
 
         // Notify
-        Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
-                ->color(HipNotify::COLOR_PURPLE)
-                ->message("{$userSlug} wants to take the {$tourSlug} again on {$siteName}")
-                ->send();
+        Notify::queueNotification(
+            Notify::DOMAIN_DIRECTED,
+            'sales',
+            "{$userSlug} wants to take the {$tourSlug} again on {$siteName}",
+            Notify::CLASS_SPECIAL
+        );
 
         redirectTo('/');
     }
