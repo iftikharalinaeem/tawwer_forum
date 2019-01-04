@@ -4,18 +4,27 @@
  * @license Proprietary
  */
 
+.advancedSearch {
+    display: block;
+    position: relative;
+}
+
 .advancedSearch-title {
-  margin-bottom: $global_spacer;
+    margin-bottom: $global_spacer;
 }
 
 .advancedSearchDomain-tab {
-  flex-grow: 1;
-  .radioButtonsAsTabs-label {
-    width: 100%;
-  }
+    flex-grow: 1;
+
+    .radioButtonsAsTabs-label {
+        width: 100%;
+    }
 }
 
 .advancedSearch-submit {
-  display: block;
-  margin-left: auto;
+    display: block;
+    margin: {
+        left: auto;
+        top: 24px;
+    }
 }
