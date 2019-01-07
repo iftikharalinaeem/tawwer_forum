@@ -125,10 +125,19 @@ $revisionList-border_color: $global-border_color;
 }
 
 .revisionsList-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: $revisionList-status_size;
     width: $revisionList-status_size;
     color: $revisionList-status_color;
 
     &.status-published {
         color: $global-color_primary;
     }
+}
+
+.revisionsList-icon {
+    display: block;
+    margin: auto;
 }
