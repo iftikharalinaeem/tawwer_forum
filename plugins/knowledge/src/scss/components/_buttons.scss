@@ -6,6 +6,7 @@
 
 $buttonLoader-size: 16px;
 $buttonLoader-thickness: 3px;
+$buttonIcon_color: mixContentBgAndFg(40%);
 
 button {
     .icon {
@@ -77,10 +78,10 @@ button {
     width: $formElement-height;
     min-width: $formElement-height;
     padding: 0;
-    color: $global-color_fg;
+    color: $buttonIcon_color;
 
     &:visited {
-        color: $global-color_fg;
+        color: $buttonIcon_color;
     }
 
     .icon {
