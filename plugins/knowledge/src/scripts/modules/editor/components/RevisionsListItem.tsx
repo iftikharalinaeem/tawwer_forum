@@ -63,17 +63,18 @@ export default class RevisionsListItem extends React.Component<IProps> {
     }
 
     private icon(status: string) {
+        const commonClass = "revisionsList-icon";
         switch (status) {
             case "draft":
-                return revisionStatus_draft();
+                return revisionStatus_draft(commonClass);
             case "pending":
-                return revisionStatus_pending();
+                return revisionStatus_pending(commonClass);
             case "published":
-                return revisionStatus_published();
+                return revisionStatus_published(commonClass);
             case "deleted":
-                return revisionStatus_deleted();
+                return revisionStatus_deleted(commonClass);
             default:
-                return revisionStatus_revision();
+                return revisionStatus_revision(commonClass);
         }
     }
 }

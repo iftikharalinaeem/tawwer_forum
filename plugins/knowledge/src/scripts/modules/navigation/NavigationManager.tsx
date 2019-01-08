@@ -151,7 +151,6 @@ export class NavigationManager extends React.Component<IProps, IState> {
         }
     }
 
-
     /**
      * Collapse all items in the tree.
      */
