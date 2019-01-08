@@ -6,7 +6,6 @@
 
 $buttonLoader-size: 16px;
 $buttonLoader-thickness: 3px;
-$buttonIcon_color: mixContentBgAndFg(40%);
 
 button {
     .icon {
@@ -30,6 +29,7 @@ button {
     user-select: none;
     overflow: hidden;
     cursor: pointer;
+    color: $icon_color;
     border: {
         width: $formElement_borderWidth;
         radius: $global-button_radius;
@@ -78,10 +78,10 @@ button {
     width: $formElement-height;
     min-width: $formElement-height;
     padding: 0;
-    color: $buttonIcon_color;
+    color: $icon_color;
 
     &:visited {
-        color: $buttonIcon_color;
+        color: $icon_color;
     }
 
     .icon {
