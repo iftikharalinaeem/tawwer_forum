@@ -47,6 +47,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->knowledgeBaseByID($id);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -63,6 +64,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $rows = $this->knowledgeBaseModel->get();
+        $rows = array_map(function ($row) { return $this->normalizeOutput($row); }, $rows);
         $result = $out->validate($rows);
         return $result;
     }
@@ -89,6 +91,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -138,7 +141,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
 
         $row = $this->knowledgeBaseByID($id);
-
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -179,5 +182,17 @@ class KnowledgeBasesApiController extends AbstractApiController {
             throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
         }
         return $result;
+    }
+
+    /**
+     * Normalize output.
+     *
+     * @param array $record A single knowledge base record.
+     *
+     * @return array
+     */
+    private function normalizeOutput(array $record): array {
+        $record['url'] = $this->knowledgeBaseModel->url($record, true);
+        return $record;
     }
 }

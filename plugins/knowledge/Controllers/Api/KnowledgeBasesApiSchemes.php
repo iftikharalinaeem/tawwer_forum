@@ -72,6 +72,10 @@ trait KnowledgeBasesApiSchemes {
                 "type" => "integer",
             ],
             "urlCode" => [
+                "description" => "URL code to the knowledge base.",
+                "type" => "string",
+            ],
+            "url" => [
                 "description" => "Full URL to the knowledge base.",
                 "type" => "string",
             ],
