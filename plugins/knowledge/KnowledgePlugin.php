@@ -48,6 +48,32 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->structure();
     }
 
+    const NAV_SECTION = "knowledge";
+
+    /**
+     * Event handler for adding navigation items into the dashboard.
+     *
+     * @param \Gdn_Pluggable $sender
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var \NestedCollectionAdapter */
+        $menu = $sender->EventArguments['SideMenu'];
+        $this->createDashboardMenus($menu);
+    }
+
+    /**
+     * Construct the knowledge base dashboard menu items.
+     *
+     * @param \NestedCollectionAdapter $navCollection
+     */
+    private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
+        $navCollection
+            ->addItem(self::NAV_SECTION, t('Knowledge'), 'Garden.Settings.Manage')
+            ->addLink(self::NAV_SECTION, t('Knowledge Bases'), '/knowledge/settings', 'Garden.Settings.Manage');
+    }
+
     /**
      * Ensure the database is configured.
      */
