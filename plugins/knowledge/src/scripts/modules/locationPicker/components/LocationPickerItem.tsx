@@ -28,7 +28,7 @@ export default class LocationPickerItem extends React.Component<IProps> {
         const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
         const isCategory = value.recordType === "knowledgeCategory";
         return (
-            <li className="folderContents-item">
+            <li className={classNames("folderContents-item", { isActive: isSelected })}>
                 <label className="folderContents-folder">
                     <input
                         type="radio"
@@ -58,7 +58,7 @@ export default class LocationPickerItem extends React.Component<IProps> {
                         baseClass={ButtonBaseClass.ICON}
                         className="folderContents-subFolder"
                     >
-                        {rightChevron()}
+                        {rightChevron("folderContents-chevron isSmall", true)}
                         <span className="sr-only">{t("Sub folder")}</span>
                     </Button>
                 )}

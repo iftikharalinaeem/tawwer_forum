@@ -71,6 +71,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         <MobileDropDown
                                             title={this.props.mobileDropDownTitle!}
                                             buttonClass="editorHeader-mobileDropDown"
+                                            frameBodyClassName="isSelfPadded"
                                         >
                                             {this.props.mobileDropDownContent}
                                         </MobileDropDown>
