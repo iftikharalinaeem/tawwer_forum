@@ -46,6 +46,26 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Generate a URL to the provided knowledge base row.
+     *
+     * @param array $knowledgeBase An knowledge base row.
+     * @param bool $withDomain
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function url(array $knowledgeBase, bool $withDomain = true): string {
+        $urlCode = $knowledgeBase["urlCode"] ?? null;
+
+        if (!$urlCode) {
+            throw new \Exception('Invalid knowledge-base row.');
+        }
+
+        $slug = \Gdn_Format::url($urlCode);
+        $result = \Gdn::request()->url("/kb/" . $slug, $withDomain);
+        return $result;
+    }
+
+    /**
      * Get list of all knowledge base types
      *
      * @return array
