@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -23,6 +23,7 @@ interface IProps extends INavigationStoreState {
     activeRecord: IActiveRecord;
     collapsible: boolean;
     kbID: number;
+    title?: string; // Title on top of navigation
 }
 
 /**
@@ -35,6 +36,7 @@ export class Navigation extends React.Component<IProps> {
     public render(): React.ReactNode {
         return (
             <SiteNav
+                title={this.props.title}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={
@@ -57,7 +59,7 @@ export class Navigation extends React.Component<IProps> {
      */
     private preloadItem = (item: INavigationTreeItem) => {
         if (item.recordType === NavigationRecordType.ARTICLE) {
-            this.props.articleActions.fetchByID({ articleID: item.recordID });
+            void this.props.articleActions.fetchByID({ articleID: item.recordID });
         }
     };
 

@@ -1,12 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 $folderContents-item_minHeight: 42px;
 $folderContents-item_spacing: 12px;
-$folderContents_borderColor: mix($global-color_fg, $global-color_bg, 15%);
+$folderContents_borderColor: $overlay-border_color;
 $folderContents_minHeight: 396px;
 
 .folderContents {
@@ -18,11 +18,6 @@ $folderContents_minHeight: 396px;
 .folderContents-items {
     display: block;
     position: relative;
-    border-top: {
-        style: solid;
-        width: $formElement-borderWidth;
-        color: $folderContents_borderColor;
-    }
 }
 
 .folderContents-item {

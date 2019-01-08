@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -15,7 +15,8 @@ import {
     DropDownItem,
 } from "@library/components/dropdown";
 import Permission from "@library/users/Permission";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 
 interface IProps {
     article: IArticle;
@@ -28,6 +29,8 @@ export default class EditorMenu extends React.PureComponent<IProps> {
     public render() {
         const { article } = this.props;
 
+        const { insertUser, updateUser, dateInserted, dateUpdated } = article;
+
         return (
             <Permission permission="articles.add">
                 <DropDown
@@ -36,14 +39,17 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
                 >
-                    <DropDownItemSeparator />
-                    <DropDownItemButton name={t("Customize SEO")} onClick={this.dummyClick} />
-                    <DropDownItemButton name={t("Move")} onClick={this.dummyClick} />
+                    <InsertUpdateMetas
+                        dateInserted={dateInserted}
+                        dateUpdated={dateUpdated}
+                        insertUser={insertUser!}
+                        updateUser={updateUser!}
+                    />
                     <DropDownItemSeparator />
                     <DropDownItem>
-                        <EditorRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                        <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
                             {t("Revision History")}
-                        </EditorRoute.Link>
+                        </RevisionsRoute.Link>
                     </DropDownItem>
                     {this.props.article.status === ArticleStatus.PUBLISHED && (
                         <DropDownItemLink name={t("View Article")} to={this.props.article.url} />

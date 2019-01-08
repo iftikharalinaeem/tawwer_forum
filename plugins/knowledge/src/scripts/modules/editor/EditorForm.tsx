@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -30,27 +30,20 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     actions: EditorPageActions;
     className?: string;
     titleID?: string;
-}
-
-interface IState {
-    isDirty: boolean;
+    mobileDropDownTitle?: string;
 }
 
 /**
  * Form for the editor page.
  */
-export class EditorForm extends React.PureComponent<IProps, IState> {
+export class EditorForm extends React.PureComponent<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
-
-    public state: IState = {
-        isDirty: false,
-    };
 
     /**
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
         return (
             <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                 <EditorHeader
@@ -69,7 +62,12 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
                     <h1 id={this.props.titleID} className="sr-only">
                         {t("Write Discussion")}
                     </h1>
-                    <PanelLayout className="isOneCol" growMiddleBottom={true} device={this.props.device}>
+                    <PanelLayout
+                        className="isOneCol"
+                        growMiddleBottom={true}
+                        device={this.props.device}
+                        topPadding={false}
+                    >
                         <PanelLayout.MiddleBottom>
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                                 <LocationInput
@@ -164,7 +162,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     private editorChangeHandler = debounce((content: DeltaOperation[]) => {
         this.handleFormChange({ body: content });
-        this.updateDraft();
     }, 1000 / 60);
 
     /**
@@ -174,7 +171,6 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      */
     private updateDraft = throttle(
         () => {
-            this.setState({ isDirty: false });
             void this.props.actions.syncDraft();
         },
         10000,
@@ -195,8 +191,11 @@ export class EditorForm extends React.PureComponent<IProps, IState> {
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
     private onSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        void this.props.actions.publish(this.props.history);
+        if (this.canSubmit) {
+            event.preventDefault();
+            event.stopPropagation();
+            void this.props.actions.publish(this.props.history);
+        }
     };
 }
 

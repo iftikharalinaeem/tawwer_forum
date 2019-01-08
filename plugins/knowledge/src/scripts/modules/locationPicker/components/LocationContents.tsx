@@ -1,13 +1,13 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import * as React from "react";
-import { getRequiredID } from "@library/componentIDs";
-import NavigationItemCategory from "./NavigationItemCategory";
-import NavigationItemList from "./NavigationItemList";
+import { getRequiredID, uniqueIDFromPrefix } from "@library/componentIDs";
+import LocationPickerItem from "./LocationPickerItem";
+import LocationPickerItemList from "./LocationPickerItemList";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { t } from "@library/application";
 import { INavigationTreeItem } from "@library/@types/api";
@@ -21,22 +21,12 @@ interface IProps {
     items: INavigationTreeItem[];
 }
 
-interface IState {
-    selectedRecordID?: number;
-}
-
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-export default class LocationContents extends React.Component<IProps, IState> {
-    private legendRef;
-    private listID;
-
-    public constructor(props) {
-        super(props);
-        this.legendRef = React.createRef();
-        this.listID = getRequiredID(props, "navigationItemList");
-    }
+export default class LocationContents extends React.Component<IProps> {
+    private legendRef = React.createRef<HTMLLegendElement>();
+    private listID = uniqueIDFromPrefix("navigationItemList");
 
     public render() {
         const { selectedCategory, items, navigatedCategory, chosenCategory } = this.props;
@@ -47,7 +37,7 @@ export default class LocationContents extends React.Component<IProps, IState> {
             const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
             const selectCallback = () => this.props.onItemSelect(item.recordID);
             return (
-                <NavigationItemCategory
+                <LocationPickerItem
                     key={index}
                     isInitialSelection={!!chosenCategory && item.recordID === chosenCategory.knowledgeCategoryID}
                     isSelected={isSelected}
@@ -59,14 +49,14 @@ export default class LocationContents extends React.Component<IProps, IState> {
             );
         });
         return (
-            <NavigationItemList
+            <LocationPickerItemList
                 id={this.listID}
                 legendRef={this.legendRef}
                 categoryName={title}
                 key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
             >
                 {contents}
-            </NavigationItemList>
+            </LocationPickerItemList>
         );
     }
 
@@ -79,9 +69,18 @@ export default class LocationContents extends React.Component<IProps, IState> {
     }
 
     /**
-     * Check for focus
+     * @inheritdoc
      */
-    public componentDidUpdate() {
+    public componentDidMount() {
         this.setFocusOnLegend();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.navigatedCategory !== this.props.navigatedCategory) {
+            this.setFocusOnLegend();
+        }
     }
 }

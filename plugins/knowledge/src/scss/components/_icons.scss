@@ -1,6 +1,6 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -24,6 +24,8 @@
 .icon-close {
     display: block;
     margin: auto;
+    width: 10px;
+    height: 10px;
 }
 
 .icon-triangleDown,
@@ -38,12 +40,6 @@
     width: $icon-small_size;
     height: $icon-small_size;
 }
-
-.icon-chevronLeftCompact {
-    height: $icon-small_size;
-    width: 14.15px;
-}
-
 
 .icon-search {
     width: 18px;
@@ -101,5 +97,10 @@
 
 .icon-article {
     width: 16px;
+    height: 16px;
+}
+
+.icon-organize {
+    width: 18px;
     height: 16px;
 }

@@ -1,11 +1,13 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 $pageHeading-cta_margin                        : 1em !default;
 $pageHeading-dropdown_width                    : 150px !default;
+$pageHeading-backLink_height                   : $icon-default_size;
+$pageHeading-backLink_width                    : $pageHeading-backLink_height * 12px / 21px;
 
 .pageHeading {
     display: flex;
@@ -15,6 +17,17 @@ $pageHeading-dropdown_width                    : 150px !default;
 
 .pageTitle {
     @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
+    display: block;
+    margin: {
+        top: 0;
+        bottom: 0;
+    }
+}
+
+.pageSmallTitle {
+    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
+    font-size: $global-smallTitle_fontSize;
+    font-weight: $global-fontWeight_bold;
     display: block;
     margin: {
         top: 0;
@@ -50,26 +63,31 @@ $pageHeading-dropdown_width                    : 150px !default;
     margin-left: $pageHeading-cta_margin;
     align-self: flex-start;
     position: relative;
-
-    //.choices {
-    //    width: $pageHeading-dropdown_width;
-    //}
 }
 
 .pageHeading-backLink {
-    @include absolute-topLeft($global-condensed_lineHeight * 1.5em);
+    @include absolute-topLeft(50%);
     overflow: visible;
-    width: $icon-default_size;
-    height: $icon-default_size;
     display: flex;
     align-items: center;
     justify-content: center;
     transform: translateY(-50%);
-
+    height: $pageHeading-backLink_height;
+    width: $pageHeading-backLink_width;
+    flex-basis: $pageHeading-backLink_width;
     margin: {
-        left: -#{$icon-default_size + $utility-baseUnit * 2};
+        top: -#{lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio)};
+        bottom: -#{$pageHeading-backLink_width + 21px};
+        left: -#{$pageHeading-backLink_width + 12px + 6px};
     }
 }
+
+
+.icon-chevronLeftCompact {
+    height: $pageHeading-backLink_height;
+    width: 14.14px;
+}
+
 
 .pageHeading-link {
     display: block;
@@ -94,8 +112,3 @@ $pageHeading-dropdown_width                    : 150px !default;
     align-items: center;
 }
 
-.pageHeading-backLink {
-    height: $vanillaHeader-button_size;
-    width: $vanillaHeader-button_size;
-    flex-basis: $vanillaHeader-button_size;
-}

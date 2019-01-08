@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -48,7 +48,7 @@ class SearchForm extends React.Component<IProps> {
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
-                    <PanelLayout device={this.props.device}>
+                    <PanelLayout device={this.props.device} className="hasLargePadding">
                         {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
                         <PanelLayout.MiddleTop>
                             <PanelWidget>

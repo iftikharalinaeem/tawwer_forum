@@ -1,6 +1,6 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -18,5 +18,6 @@ $pageLocation-icon_opacity: .8;
 }
 
 .locationBreadcrumb-icon {
-    transform: translateY(-.15em);
+    transform: translateY(.1em);
+    margin-right: .5em;
 }

@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -23,10 +23,10 @@ interface IProps {
 /**
  * Component representing a single navigation item in a list of navigation items.
  */
-export default class NavigationItemCategory extends React.Component<IProps> {
+export default class LocationPickerItem extends React.Component<IProps> {
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
-        const hasChildren = value.recordType === "knowledgeCategory" && (value.children && value.children.length > 0);
+        const isCategory = value.recordType === "knowledgeCategory";
         return (
             <li className="folderContents-item">
                 <label className="folderContents-folder">
@@ -52,7 +52,7 @@ export default class NavigationItemCategory extends React.Component<IProps> {
                         <span className="folderContents-label">{value.name}</span>
                     </span>
                 </label>
-                {hasChildren && (
+                {isCategory && (
                     <Button
                         onClick={this.props.onNavigate}
                         baseClass={ButtonBaseClass.ICON}

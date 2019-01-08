@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -13,6 +13,7 @@ import {
     IPatchArticleResponseBody,
     IResponseArticleDraft,
     Format,
+    IArticle,
 } from "@knowledge/@types/api";
 import { History } from "history";
 import qs from "qs";
@@ -22,13 +23,10 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import isEqual from "lodash/isEqual";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
-    public static readonly POST_ARTICLE_REQUEST = "@@articleEditor/POST_ARTICLE_REQUEST";
-    public static readonly POST_ARTICLE_RESPONSE = "@@articleEditor/POST_ARTICLE_RESPONSE";
-    public static readonly POST_ARTICLE_ERROR = "@@articleEditor/POST_ARTICLE_ERROR";
-
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
     public static readonly GET_ARTICLE_ERROR = "@@articleEditor/GET_EDIT_ARTICLE_ERROR";
@@ -41,7 +39,6 @@ export default class EditorPageActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static ACTION_TYPES:
-        | ActionsUnion<typeof EditorPageActions.postArticleACs>
         | ActionsUnion<typeof EditorPageActions.getArticleACs>
         | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.updateFormAC>
@@ -58,18 +55,6 @@ export default class EditorPageActions extends ReduxActions {
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPostArticleResponseBody,
         {} as any,
-    );
-
-    /**
-     * Action creators for POST /articles
-     */
-    private static postArticleACs = ReduxActions.generateApiActionCreators(
-        EditorPageActions.POST_ARTICLE_REQUEST,
-        EditorPageActions.POST_ARTICLE_RESPONSE,
-        EditorPageActions.POST_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IPostArticleResponseBody,
-        {} as IPostArticleRequestBody,
     );
 
     /**
@@ -167,7 +152,11 @@ export default class EditorPageActions extends ReduxActions {
      */
     public async syncDraft(newDraftID: string = uniqueId()) {
         const state = this.getState<IStoreState>();
-        const { form, article, draft } = state.knowledge.editorPage;
+        const { form, article, draft, isDirty } = state.knowledge.editorPage;
+
+        if (!isDirty) {
+            return;
+        }
 
         const recordID = article.data ? article.data.articleID : undefined;
 
@@ -219,14 +208,19 @@ export default class EditorPageActions extends ReduxActions {
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+            const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
+            const { body, name, knowledgeCategoryID } = request;
             const patchRequest: IPatchArticleRequestBody = {
-                ...request,
                 articleID: editorState.article.data.articleID,
+                body: !isEqual(prevBody, body) ? body : undefined,
+                name: prevName !== name ? name : undefined,
+                knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
             };
+
             return this.updateArticle(patchRequest, history);
         }
 
-        const response = await this.postArticle(request);
+        const response = await this.articleActions.postArticle(request);
         if (!response) {
             return;
         }
@@ -240,7 +234,7 @@ export default class EditorPageActions extends ReduxActions {
         // Redirect
         const editLocation = {
             ...history.location,
-            pathname: EditorRoute.url(article),
+            pathname: EditorRoute.url({ articleID: article.articleID }),
             search: "",
         };
 
@@ -258,23 +252,35 @@ export default class EditorPageActions extends ReduxActions {
      */
     private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
         // We don't have an article, but we have ID for one. Go get it.
-        const [articleResponse, draftLoaded] = await Promise.all([
+        const [editArticleResponse, articleResponse, draftLoaded] = await Promise.all([
             this.getEditableArticleByID(articleID),
+            this.articleActions.fetchByID({ articleID }),
             forRevision ? Promise.resolve(false) : this.initializeDraftFromUrl(history),
         ]);
 
-        if (!draftLoaded && !forRevision && articleResponse && articleResponse.data) {
+        // Merge together the two results and re-dispatch with the full data.
+        if (editArticleResponse && articleResponse) {
+            const article: IArticle = {
+                ...articleResponse.data,
+                ...editArticleResponse.data,
+            };
+            editArticleResponse.data = article;
+
+            this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
+        }
+
+        if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
             this.updateForm(
                 {
-                    name: articleResponse.data.name,
-                    body: JSON.parse(articleResponse.data.body),
-                    knowledgeCategoryID: articleResponse.data.knowledgeCategoryID,
+                    name: editArticleResponse.data.name,
+                    body: JSON.parse(editArticleResponse.data.body),
+                    knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
                 },
                 true,
             );
         }
 
-        return articleResponse;
+        return editArticleResponse;
     }
 
     /**
@@ -318,7 +324,7 @@ export default class EditorPageActions extends ReduxActions {
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID }, true);
         if (!fullArticleResponse) {
             return;
         }
@@ -331,15 +337,6 @@ export default class EditorPageActions extends ReduxActions {
             search: "",
         });
         history.push(url);
-    }
-
-    /**
-     * Create a new article.
-     *
-     * @param data The article data.
-     */
-    private postArticle(data: IPostArticleRequestBody) {
-        return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, EditorPageActions.postArticleACs, data);
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -19,7 +19,7 @@ interface IProps {
 /**
  * Represents a list of NavigationItems
  */
-export default class NavigationItemList extends React.Component<IProps> {
+export default class LocationPickerItemList extends React.Component<IProps> {
     public render() {
         return (
             <fieldset id={this.props.id} className={classNames("folderContents")}>

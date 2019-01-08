@@ -1,11 +1,17 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 $buttonLoader-size: 16px;
 $buttonLoader-thickness: 3px;
+
+button {
+    .icon {
+        display: block;
+    }
+}
 
 .button {
     @include singleLineEllipsis;
@@ -56,6 +62,10 @@ $buttonLoader-thickness: 3px;
             left: $utility-baseUnit;
             right: $utility-baseUnit;
         }
+    }
+
+    .icon {
+        display: block;
     }
 }
 

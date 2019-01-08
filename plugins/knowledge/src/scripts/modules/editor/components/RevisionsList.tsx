@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -10,6 +10,7 @@ import Heading from "@library/components/Heading";
 
 interface IProps {
     children: React.ReactNode;
+    hideTitle?: boolean;
 }
 
 /**
@@ -19,12 +20,9 @@ export default class RevisionsList extends React.Component<IProps> {
     public render() {
         return (
             <div className="revisionsList related">
-                <Heading
-                    className="panelList-title revisionsList-title"
-                    title={t("Revisions")}
-                    depth={1}
-                    renderAsDepth={2}
-                />
+                {!this.props.hideTitle && (
+                    <Heading className="panelList-title revisionsList-title" title={t("Revisions")} depth={2} />
+                )}
                 <ul className="revisionsList-items panelList-items">{this.props.children}</ul>
             </div>
         );

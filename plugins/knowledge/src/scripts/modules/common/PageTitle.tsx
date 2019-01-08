@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -14,6 +14,7 @@ export interface IPageTitle {
     meta?: React.ReactNode;
     className?: string;
     includeBackLink?: boolean;
+    smallPageTitle?: boolean;
 }
 
 /**
@@ -31,8 +32,9 @@ export default class PageTitle extends React.Component<IPageTitle> {
                     actions={this.props.actions}
                     title={this.props.title}
                     includeBackLink={this.props.includeBackLink}
+                    headingClassName={classNames({ pageSmallTitle: !!this.props.smallPageTitle })}
                 />
-                {this.props.meta && <div className="pageMetas metas">{this.props.meta}</div>}
+                {this.props.meta && <div className="pageMetas metas pageTitleContainer-metas">{this.props.meta}</div>}
             </div>
         );
     }

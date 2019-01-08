@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -18,6 +18,8 @@ $dropDown-sectionTitle_verticalPadding         : 6px;
 
 $dropDown-spacer_margin                        : 6px;
 
+$dropDown-title_color                          : mixContentBgAndFg(15%);
+
 .dropDown {
     position: relative;
     .framePanel {
@@ -31,6 +33,7 @@ $dropDown-spacer_margin                        : 6px;
     min-width: $dropDown_width;
     background-color: $global-color_bg;
     color: $global-color_fg;
+    overflow: hidden;
     border: {
         radius: $global_borderRadius;
         style: solid;
@@ -64,6 +67,22 @@ $dropDown-spacer_margin                        : 6px;
     &.noMinWidth {
         min-width: 0;
     }
+
+    &.hasVerticalPadding {
+        padding: {
+            top: $utility-baseUnit;
+            bottom: $utility-baseUnit;
+        }
+    }
+}
+
+.dropDown-asModal {
+    &.hasVerticalPadding {
+        padding: {
+            top: $utility-baseUnit;
+            bottom: $utility-baseUnit;
+        }
+    }
 }
 
 .likeDropDownContent {
@@ -82,15 +101,16 @@ $dropDown-spacer_margin                        : 6px;
     font-size: $global-medium_fontSize;
 }
 
+
 .dropDown-metasItem {
+    padding: $dropDown-metas_verticalPadding 0;
+
     &.dropDown-item {
         display: block;
         font-size: $metaText_fontSize;
         color: $metaText_color;
         padding: {
-            top: $dropDown-metas_verticalPadding * 2;
             right: $dropDown-metas_horizontalPadding;
-            bottom: $dropDown-metas_verticalPadding * 2;
             left: $dropDown-metas_horizontalPadding;
         }
 
@@ -100,6 +120,10 @@ $dropDown-spacer_margin                        : 6px;
             }
         }
     }
+}
+
+.dropDown-meta {
+    display: block;
 }
 
 .dropDownMeta-link {
@@ -151,7 +175,6 @@ $dropDown-spacer_margin                        : 6px;
 
     @include mediaQuery-panelLayout_oneColumn {
         font-size: $dropDown-item_mobile_fontSize;
-        font-weight: $global-fontWeight_semiBold;
         min-height: $dropDown-item_mobile_minHeight;
     }
 }
@@ -203,4 +226,13 @@ $dropDown-spacer_margin                        : 6px;
         bottom: $dropDown-spacer_margin;
         left: 0;
     }
+}
+
+.dropDown-title {
+    font-weight: $global-fontWeight_semiBold;
+    font-size: $global-small_fontSize;
+    line-height: $global-condensed_lineHeight;
+    padding: $dropDown-sectionTitle_verticalPadding 0 $dropDown-sectionTitle_verticalPadding;
+    text-transform: uppercase;
+    color: $dropDown-title_color;
 }

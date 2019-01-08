@@ -1,13 +1,13 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
 import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
-import { IDeviceProps } from "@library/components/DeviceChecker";
+import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import PageLoader from "@library/components/PageLoader";
@@ -81,10 +81,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render the active revisions title and metadata.
      */
     private renderTitle(): React.ReactNode {
-        const { selectedRevision } = this.props;
+        const { selectedRevision, device } = this.props;
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
             <PageTitle
                 title={selectedRevision.data.name}
+                includeBackLink={device === Devices.DESKTOP}
                 meta={
                     <ArticleMeta
                         updateUser={selectedRevision.data.insertUser!}
@@ -104,7 +105,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return (
             revisions.status === LoadStatus.SUCCESS &&
             revisions.data && (
-                <RevisionsList>
+                <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
                     {revisions.data.slice().map(item => {
                         const preload = () =>
                             this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });

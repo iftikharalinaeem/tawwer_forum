@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -23,8 +23,8 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{
-        id?: string;
-    }> {}
+            id?: string;
+        }> {}
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -60,9 +60,12 @@ export default class NavigationSelector {
      */
     public static selectNavTree(navItems: INormalizedNavigationItems, rootKey: string): INavigationTreeItem {
         const item = navItems[rootKey];
+        if (!item) {
+            throw new Error("Root element not found in navigation items.");
+        }
         return {
             ...item,
-            children: item.children.map(itemID => NavigationSelector.selectNavTree(navItems, itemID)),
+            children: NavigationSelector.selectChildren(navItems, rootKey),
         };
     }
 }

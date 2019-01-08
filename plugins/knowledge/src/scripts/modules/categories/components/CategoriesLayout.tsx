@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -62,7 +62,14 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     </PanelLayout.Breadcrumbs>
                     <PanelLayout.LeftBottom>
                         <PanelWidget>
-                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                            {
+                                <Navigation
+                                    collapsible={true}
+                                    activeRecord={activeRecord}
+                                    kbID={1}
+                                    title={t("Subcategories")}
+                                />
+                            }
                         </PanelWidget>
                     </PanelLayout.LeftBottom>
                     <PanelLayout.MiddleTop>

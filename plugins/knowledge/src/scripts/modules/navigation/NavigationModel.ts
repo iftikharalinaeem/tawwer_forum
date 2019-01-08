@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -22,7 +22,7 @@ export interface INormalizedNavigationItem extends IKbNavigationItem {
     };
 }
 export interface INormalizedNavigationItems {
-    [key: string]: INormalizedNavigationItem;
+    [key: string]: INormalizedNavigationItem | undefined;
 }
 
 export interface INavigationStoreState {
@@ -66,10 +66,13 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             | typeof ArticleActions.ACTION_TYPES,
     ): INavigationStoreState => {
         return produce(state, nextState => {
-            return reduceReducers(this.reduceGetNav, this.reduceSortOrder, this.reduceDelete, this.reduceRename)(
-                nextState,
-                action,
-            );
+            return reduceReducers(
+                this.reduceGetNav,
+                this.reduceSortOrder,
+                this.reduceDelete,
+                this.reduceRename,
+                this.reduceAdd,
+            )(nextState, action);
         });
     };
 
@@ -198,7 +201,42 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
                 break;
             case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.data.name);
+                break;
+        }
+        return nextState;
+    };
+
+    /**
+     * Reduce actions related to adding new items.
+     */
+    private reduceAdd = (
+        nextState: INavigationStoreState = this.initialState,
+        action:
+            | typeof NavigationActions.ACTION_TYPES
+            | typeof CategoryActions.ACTION_TYPES
+            | typeof ArticleActions.ACTION_TYPES,
+    ): INavigationStoreState => {
+        switch (action.type) {
+            case ArticleActions.POST_ARTICLE_RESPONSE:
+                const article = action.payload.data;
+                const stringID = NavigationRecordType.ARTICLE + article.articleID;
+                const parentStringID = NavigationRecordType.KNOWLEDGE_CATEGORY + article.knowledgeCategoryID;
+                nextState.navigationItems[stringID] = {
+                    name: article.name,
+                    url: article.url,
+                    parentID: article.knowledgeCategoryID!,
+                    recordID: article.articleID,
+                    sort: article.sort,
+                    recordType: NavigationRecordType.ARTICLE,
+                    children: [],
+                };
+
+                const parentItem = nextState.navigationItems[parentStringID];
+                if (parentItem) {
+                    parentItem.children.push(stringID);
+                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
+                }
                 break;
         }
         return nextState;
@@ -229,7 +267,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
                 // Remove the item from it's parent
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                if (parentItem) {
+                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                }
             }
         };
 
@@ -240,12 +280,14 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
          */
         const handleDeleteSuccess = (key: string) => {
             const item = nextState.navigationItems[key];
-            if (nextState.navigationItems[key]) {
+            if (item) {
                 delete nextState.navigationItems[key];
 
                 // Remove the item from it's parent
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                if (parentItem) {
+                    parentItem.children = parentItem.children.filter(childKey => childKey !== key);
+                }
             }
         };
 
@@ -264,7 +306,9 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
                 // Put the item back on its parent.
                 const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
-                parentItem.children.push(key);
+                if (parentItem) {
+                    parentItem.children.push(key);
+                }
             }
         };
 
@@ -348,8 +392,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
             normalizedByID[id] = {
                 ...item,
-                // Temporary kludge https://github.com/vanilla/knowledge/issues/425
-                parentID: item.parentID || (item as any).knowledgeCategoryID,
                 children: [],
             };
         }
@@ -363,6 +405,25 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         }
 
         return normalizedByID;
+    }
+
+    /**
+     * Sort a navigation item's children.
+     *
+     * @param navItems The keyed items to pull from.
+     * @param idToSort The item whos children you want to sort.
+     */
+    private static sortItemChildren(navItems: INormalizedNavigationItems, idToSort: string) {
+        const item = navItems[idToSort];
+        if (!item) {
+            return;
+        }
+
+        const newChildren = item.children
+            .map(childID => navItems[childID]) // Map to actual items.
+            .sort(this.sortNavigationItems) // Sort
+            .map(child => child!.recordType + child!.recordID); // Back to IDs
+        item.children = newChildren;
     }
 
     /**

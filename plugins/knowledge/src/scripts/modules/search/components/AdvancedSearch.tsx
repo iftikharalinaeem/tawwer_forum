@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -19,6 +19,8 @@ import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { LoadStatus } from "@library/@types/api";
 import Permission from "@library/users/Permission";
+import classNames from "classnames";
+import TabContext from "library/src/scripts/contexts/TabContext";
 
 export enum ISearchDomain {
     ARTICLES = "articles",

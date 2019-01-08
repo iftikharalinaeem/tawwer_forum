@@ -1,12 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import * as React from "react";
 import classNames from "classnames";
-import { LocationBreadcrumbs } from "@knowledge/modules/locationPicker/components";
+import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import Button from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { Modal } from "@library/components/modal";
@@ -79,7 +79,7 @@ export class LocationInput extends React.PureComponent<ILocationInputProps, ISta
                     <Modal
                         exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
-                        className={classNames(this.props.className, "isCompact")}
+                        className={classNames(this.props.className)}
                         label={t("Choose a location for this page.")}
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >
