@@ -15,14 +15,17 @@ use Gdn_Session;
  */
 class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
-    /** Maximum articles allowed in a KB root-level category. */
-    const ROOT_LIMIT_ARTICLES_RECURSIVE = 1000;
+    /** Maximum articles allowed in a guide KB root-level category. */
+    const ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE = 1000;
 
     /** Maximum child categories allowed in a KB root-level category. */
     const ROOT_LIMIT_CATEGORIES_RECURSIVE = 500;
 
     /** @var int Root-level category ID. */
     const ROOT_ID = -1;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
 
     /** @var Gdn_Session */
     private $session;
@@ -32,8 +35,10 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel) {
         parent::__construct("knowledgeCategory");
+
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
@@ -150,13 +155,17 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     public function validateKBArticlesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
         try {
             $category = $this->selectRootCategory($knowledgeCategoryID);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeCategoryID" => $category["knowledgeCategoryID"]]);
         } catch (\Exception $e) {
-            // Couldn't find the KB root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
+            // Couldn't find the KB or root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }
 
+        // Guides are currently the only KB type with a limit, due to the desire to keep the size of the navigation tree low.
         // Use the root category's recursive article count as a hint for the total number of articles in its knowledge base.
-        if ($category["articleCountRecursive"] >= self::ROOT_LIMIT_ARTICLES_RECURSIVE) {
+        if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE
+            && $category["articleCountRecursive"] >= self::ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE
+        ) {
             $validationField->getValidation()->addError(
                 $validationField->getName(),
                 "The article maximum has been reached for this knowledge base."
