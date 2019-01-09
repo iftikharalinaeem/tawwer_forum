@@ -45,7 +45,7 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                     mobileDropDownContent={this.props.revisionList}
                 />
                 <Container className="richEditorRevisionsForm-body">
-                    <PanelLayout device={this.props.device} topPadding={true}>
+                    <PanelLayout device={this.props.device} topPadding={this.props.device !== Devices.MOBILE}>
                         {this.props.device !== Devices.MOBILE && (
                             <PanelLayout.Breadcrumbs>
                                 <PanelWidget>

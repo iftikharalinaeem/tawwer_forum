@@ -8,16 +8,14 @@ import { Devices } from "@library/components/DeviceChecker";
 import { IArticle, NavigationRecordType } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
-import RelatedArticles, { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
+import { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
-import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import { AttachmentType } from "@library/components/attachments";
-import { IFileAttachment } from "./AttachmentItem";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
@@ -92,13 +90,14 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <UserContent content={article.body} />
                             </PanelWidget>
                         </PanelLayout.MiddleBottom>
-                        {article.outline && article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
-                                <PanelWidget>
-                                    <ArticleTOC items={article.outline} />
-                                </PanelWidget>
-                            </PanelLayout.RightTop>
-                        )}
+                        {article.outline &&
+                            article.outline.length > 0 && (
+                                <PanelLayout.RightTop>
+                                    <PanelWidget>
+                                        <ArticleTOC items={article.outline} />
+                                    </PanelWidget>
+                                </PanelLayout.RightTop>
+                            )}
                     </PanelLayout>
                 </Container>
             </React.Fragment>

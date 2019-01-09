@@ -60,7 +60,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
                     <FrameFooter>
                         <Button
                             title={t("New Category")}
-                            className="locationPicker-newFolder isSquare button-pushLeft"
+                            className="buttonNoBorder isSquare button-pushLeft"
                             onClick={this.showNewCategoryModal}
                             buttonRef={this.newFolderButtonRef}
                         >
