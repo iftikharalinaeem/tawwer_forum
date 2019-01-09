@@ -7,14 +7,17 @@
 use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 
- /**
-  * Undocumented class
-  */
+/**
+ * Undocumented class
+ */
 class KnowledgeSettingsController extends SettingsController {
     use \Garden\TwigTrait;
 
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
+
+    /** @var MediaApiController */
+    private $mediaApiController;
 
     /** @var Gdn_Form */
     private $form;
@@ -23,28 +26,69 @@ class KnowledgeSettingsController extends SettingsController {
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $apiController
+     * @param MediaApiController $mediaApiController
      */
-    public function __construct(KnowledgeBasesApiController $apiController) {
+    public function __construct(
+        KnowledgeBasesApiController $apiController,
+        MediaApiController $mediaApiController
+    ) {
         $this->apiController = $apiController;
+        $this->mediaApiController = $mediaApiController;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         $this->form = new Gdn_Form('', 'bootstrap');
         parent::__construct();
     }
+
     /**
      * Undocumented function
      *
      * @return void
      */
-    public function addedit($knowledgeBaseID = null) {
+    public function knowledgeBases() {
+        $pathArgs = $this->RequestArgs;
+        $isIndex = count($pathArgs) === 0;
+        $isEdit =
+            count($pathArgs) === 2 &&
+            $id = filter_var($pathArgs[0], FILTER_VALIDATE_INT) &&
+            $pathArgs[1] === 'edit';
+        $isAdd = count($pathArgs) === 1 && $pathArgs[0] === 'add';
+
+        if ($isIndex) {
+            $this->knowledgeBases_index();
+        } elseif ($isEdit) {
+            $this->knowledgeBases_addedit($id);
+        } elseif ($isAdd) {
+            $this->knowledgeBases_addedit();
+        }
+    }
+
+    /**
+     * Render the /knowledge/settings/knowledge-categories page.
+     */
+    private function knowledgeBases_index() {
         $this->permission('Garden.Settings.Manage');
+        $knowledgeBases = $this->apiController->index();
+        $this->setData('knowledgeBases', $knowledgeBases);
+        $this->render('index');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    private function knowledgeBases_addedit($knowledgeBaseID = null) {
+        $this->permission('Garden.Settings.Manage');
+
         if ($knowledgeBaseID) {
             $record = $this->apiController->get($knowledgeBaseID);
             $this->form->setData($record);
         }
 
         if ($this->form->authenticatedPostBack()) {
-            $this->addEditPostBack($knowledgeBaseID);
+            $this->post_addEdit($knowledgeBaseID);
         }
+
         // Set the form elements on the add/edit form.
         $formData = [
             'name' => [
@@ -91,33 +135,42 @@ class KnowledgeSettingsController extends SettingsController {
         $this->render('addedit');
     }
 
-    private function addEditPostBack($knowledgeBaseID = null) {
+    /**
+     * Post method for the add/edit pages.
+     *
+     * @param string|null $knowledgeBaseID The ID of the edit page or null for an add page.
+     */
+    private function post_addEdit($knowledgeBaseID = null) {
         $values = $this->form->formValues();
         try {
+            if ($values['icon_New']) {
+                $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
+            }
+
             if ($knowledgeBaseID) {
                 $this->apiController->patch($knowledgeBaseID, $values);
             } else {
                 $this->apiController->post($values);
             }
 
-            $type = $this->deliveryType();
-
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                 $this->jsonTarget('', '', 'Refresh');
-                $this->render();
+                $this->render('blank', 'utility', 'dashboard');
             } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                redirectTo('/knowledge/settings');
-                $this->render();
+                $this->setRedirectTo('/vanilla/settings/categories');
+                $this->render('blank', 'utility', 'dashboard');
             }
         } catch (Exception $e) {
             throw $e;
         }
     }
 
-    public function index() {
-        $this->permission('Garden.Settings.Manage');
-        $knowledgeBases = $this->apiController->index();
-        $this->setData('knowledgeBases', $knowledgeBases);
-        $this->render();
+    private function handleFormMediaUpload(Vanilla\UploadedFile $file): string {
+        $image = $this->mediaApiController->post([
+            'file' => $file,
+            'type' => MediaApiController::TYPE_IMAGE,
+        ]);
+
+        return $image['url'];
     }
 }
