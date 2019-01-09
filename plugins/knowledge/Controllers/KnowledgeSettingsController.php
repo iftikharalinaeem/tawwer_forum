@@ -18,6 +18,9 @@ class KnowledgeSettingsController extends SettingsController {
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
 
+    /** @var MediaApiController */
+    private $mediaApiController;
+
     /**
      * Constructor for DI.
      *
