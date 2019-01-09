@@ -65,7 +65,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $rows = $this->knowledgeBaseModel->get();
-        $rows = array_map(function ($row) { return $this->normalizeOutput($row); }, $rows);
+        $rows = array_map(function ($row) {
+            return $this->normalizeOutput($row);
+        }, $rows);
         $result = $out->validate($rows);
         return $result;
     }

@@ -52,18 +52,18 @@ class KnowledgeSettingsController extends SettingsController {
         $isAdd = count($pathArgs) === 1 && $pathArgs[0] === 'add';
 
         if ($isIndex) {
-            $this->knowledgeBases_index();
+            $this->knowledgeBasesIndex();
         } elseif ($isEdit) {
-            $this->knowledgeBases_addedit($id);
+            $this->knowledgeBasesAddEdit($id);
         } elseif ($isAdd) {
-            $this->knowledgeBases_addedit();
+            $this->knowledgeBasesAddEdit();
         }
     }
 
     /**
      * Render the /knowledge/settings/knowledge-categories page.
      */
-    private function knowledgeBases_index() {
+    private function knowledgeBasesIndex() {
         $this->permission('Garden.Settings.Manage');
         $knowledgeBases = $this->apiController->index();
         $this->setData('knowledgeBases', $knowledgeBases);
@@ -71,11 +71,16 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Undocumented function
+     * Render the add & edit pages for the knowledge base.
+     *
+     * - /knowledge/settings/knowledge-bases/add
+     * - /knowledge/settings/knowledge-bases/:id/edit
+     *
+     * @param string|int|null $knowledgeBaseID The ID of the KB being edited.
      *
      * @return void
      */
-    private function knowledgeBases_addedit($knowledgeBaseID = null) {
+    private function knowledgeBasesAddEdit($knowledgeBaseID = null) {
         $this->permission('Garden.Settings.Manage');
 
         if ($knowledgeBaseID) {
@@ -162,6 +167,13 @@ class KnowledgeSettingsController extends SettingsController {
         }
     }
 
+    /**
+     * Pass along an UploadFile to the MediaApiController and return it's URL.
+     *
+     * @param Vanilla\UploadedFile $file
+     *
+     * @return string
+     */
     private function handleFormMediaUpload(Vanilla\UploadedFile $file): string {
         $image = $this->mediaApiController->post([
             'file' => $file,
