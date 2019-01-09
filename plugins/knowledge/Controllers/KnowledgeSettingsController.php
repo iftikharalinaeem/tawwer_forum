@@ -47,7 +47,7 @@ class KnowledgeSettingsController extends SettingsController {
         $isIndex = count($pathArgs) === 0;
         $isEdit =
             count($pathArgs) === 2 &&
-            $id = filter_var($pathArgs[0], FILTER_VALIDATE_INT) &&
+            ($id = filter_var($pathArgs[0], FILTER_VALIDATE_INT)) &&
             $pathArgs[1] === 'edit';
         $isAdd = count($pathArgs) === 1 && $pathArgs[0] === 'add';
 
