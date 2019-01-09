@@ -17,7 +17,21 @@
         <tbody>
         {% for kb in knowledgeBases %}
             <tr data-id="knowledgeBase-{{ kb.knowledgeBaseID }}">
-                <td>{{ kb.name }}</td>
+                <td>
+                    <div class="media media-sm">
+                        <div class="media-left">
+                            <div class="media-image-wrap">
+                                <a href="#">
+                                    <img src="{{ kb.icon }}" />
+                                </a>
+                            </div>
+                        </div>
+                        <div class="media-body">
+                            <div class="media-title">{{ kb.name }}</div>
+                            <div class="info">{{ kb.description }}</div>
+                        </div>
+                    </div>
+                </td>
                 <td>
                     <a href="{{ kb.url }}">/{{ kb.urlCode }}</a>
                 </td>
