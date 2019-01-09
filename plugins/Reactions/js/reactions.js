@@ -48,4 +48,8 @@ jQuery(document).ready(function($) {
    $(document).on('mouseleave', '.ReactButton', function() {
        $('.MenuItems-Reactions', $(this)).css({visibility: 'hidden'});
    });
+
+    $(document).on('click', '.MenuItems-Reactions a', function(event) {
+        event.stopPropagation();
+    });
 });
