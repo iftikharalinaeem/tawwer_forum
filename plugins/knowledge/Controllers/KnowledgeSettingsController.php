@@ -6,6 +6,8 @@
 
 use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
+use Garden\Schema\ValidationException;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Undocumented class
@@ -15,12 +17,6 @@ class KnowledgeSettingsController extends SettingsController {
 
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
-
-    /** @var MediaApiController */
-    private $mediaApiController;
-
-    /** @var Gdn_Form */
-    private $form;
 
     /**
      * Constructor for DI.
@@ -35,7 +31,6 @@ class KnowledgeSettingsController extends SettingsController {
         $this->apiController = $apiController;
         $this->mediaApiController = $mediaApiController;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
-        $this->form = new Gdn_Form('', 'bootstrap');
         parent::__construct();
     }
 
@@ -82,11 +77,16 @@ class KnowledgeSettingsController extends SettingsController {
 
         if ($knowledgeBaseID) {
             $record = $this->apiController->get($knowledgeBaseID);
-            $this->form->setData($record);
+            $this->Form->setData($record);
         }
 
-        if ($this->form->authenticatedPostBack()) {
-            $this->post_addEdit($knowledgeBaseID);
+        if ($this->Form->authenticatedPostBack()) {
+            try {
+                $this->post_addEdit($knowledgeBaseID);
+            } catch (ValidationException $e) {
+                $validation = ModelUtils::validationExceptionToValidationResult($e);
+                $this->Form->setValidationResults($validation->results());
+            }
         }
 
         // Set the form elements on the add/edit form.
@@ -128,9 +128,7 @@ class KnowledgeSettingsController extends SettingsController {
 
         $this->setData([
             'formData' => $formData,
-            'form' => $this->form,
-            'formErrors' => [],
-            'title' => 'Hello World'
+            'form' => $this->Form
         ]);
         $this->render('addedit');
     }
@@ -141,27 +139,23 @@ class KnowledgeSettingsController extends SettingsController {
      * @param string|null $knowledgeBaseID The ID of the edit page or null for an add page.
      */
     private function post_addEdit($knowledgeBaseID = null) {
-        $values = $this->form->formValues();
-        try {
-            if ($values['icon_New']) {
-                $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
-            }
+        $values = $this->Form->formValues();
+        if ($values['icon_New']) {
+            $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
+        }
 
-            if ($knowledgeBaseID) {
-                $this->apiController->patch($knowledgeBaseID, $values);
-            } else {
-                $this->apiController->post($values);
-            }
+        if ($knowledgeBaseID) {
+            $this->apiController->patch($knowledgeBaseID, $values);
+        } else {
+            $this->apiController->post($values);
+        }
 
-            if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
-                $this->jsonTarget('', '', 'Refresh');
-                $this->render('blank', 'utility', 'dashboard');
-            } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                $this->setRedirectTo('/vanilla/settings/categories');
-                $this->render('blank', 'utility', 'dashboard');
-            }
-        } catch (Exception $e) {
-            throw $e;
+        if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+            $this->jsonTarget('', '', 'Refresh');
+            $this->render('blank', 'utility', 'dashboard');
+        } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            $this->setRedirectTo('/vanilla/settings/categories');
+            $this->render('blank', 'utility', 'dashboard');
         }
     }
 
