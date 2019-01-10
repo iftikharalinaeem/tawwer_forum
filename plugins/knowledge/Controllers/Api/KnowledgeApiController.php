@@ -16,6 +16,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\Breadcrumb;
 use DiscussionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use \CommentModel;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -28,6 +29,8 @@ class KnowledgeApiController extends AbstractApiController {
     const TYPE_ARTICLE = 5;
     const TYPE_DISCUSSION = 0;
     const TYPE_POLL = 2;
+
+    const FORMAT_RICH = 'Rich';
 
     const ARTICLE_STATUSES = [
         1 => ArticleModel::STATUS_PUBLISHED,
@@ -45,6 +48,15 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
         ],
+        1 => [
+            'model' => 'discussion',
+            'recordType' => 'discussion',
+            'recordID' => 'DiscussionID',
+            'offset' => 1,
+            'multiplier' => 10,
+            'getRecordsFunction' => 'getDiscussions',
+            'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
+        ],
         2 => [
             'model' => 'discussion',
             'recordType' => 'discussion',
@@ -53,6 +65,24 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
+        ],
+        100 => [
+            'model' => 'comment',
+            'recordType' => 'comment',
+            'recordID' => 'DiscussionID',
+            'offset' => 2,
+            'multiplier' => 10,
+            'getRecordsFunction' => 'getComments',
+            'sphinxIndexName' => ['Comment', 'Comment_Delta'],
+        ],
+        101 => [
+            'model' => 'comment',
+            'recordType' => 'comment',
+            'recordID' => 'DiscussionID',
+            'offset' => 2,
+            'multiplier' => 10,
+            'getRecordsFunction' => 'getComments',
+            'sphinxIndexName' => ['Comment', 'Comment_Delta'],
         ],
         5 => [
             'model' => 'articleRevisionModel',
@@ -82,7 +112,8 @@ class KnowledgeApiController extends AbstractApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      * @param knowledgeCategoryModel $knowledgeCategoryModel
-     * @param DiscussionModel $discussionModel
+     * @param DiscussionModel $discussionModels
+     * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      */
     public function __construct(
@@ -91,6 +122,7 @@ class KnowledgeApiController extends AbstractApiController {
         \UserModel $userModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         DiscussionModel $discussionModel,
+        \CommentModel $commentModel,
         \CategoryCollection $categoryCollection
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
@@ -98,7 +130,9 @@ class KnowledgeApiController extends AbstractApiController {
         $this->userModel = $userModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
         $this->categoryCollectionModel = $categoryCollection;
+
     }
 
     /**
@@ -120,7 +154,7 @@ class KnowledgeApiController extends AbstractApiController {
                 "knowledgeCategoryID?"=> ["type" => "integer"],
                 "status?" => ["type" => "string"],
                 "recordType" => [
-                    "enum" => ["article", "knowledgeCategory", "discussion"],
+                    "enum" => ["article", "knowledgeCategory", "discussion", "comment"],
                     "type" => "string",
                 ],
                 "updateUser?" => $this->getUserFragmentSchema(),
@@ -172,7 +206,6 @@ class KnowledgeApiController extends AbstractApiController {
     public function get_search(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
-
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
 
@@ -181,7 +214,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->query = $in->validate($query);
 
         $searchResults = $this->sphinxSearch();
-
+//die(print_r($searchResults));
         $results = $this->getNormalizedData($searchResults);
 
         $result = $out->validate($results);
@@ -212,6 +245,9 @@ class KnowledgeApiController extends AbstractApiController {
             }
             if (isset($query['body']) && !empty(trim($query['body']))) {
                 $sphinxQuery .= ' @body (' . $sphinx->escapeString($query['body']) . ')*';
+            }
+            if (isset($query['all']) && !empty(trim($query['all']))) {
+                $sphinxQuery .= ' @(name,body) (' . $sphinx->escapeString($query['all']) . ')*';
             }
         } else {
             $sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
@@ -293,11 +329,12 @@ class KnowledgeApiController extends AbstractApiController {
     protected function getNormalizedData(array $searchResults): array {
         $expand = $this->query['expand'] ?? [];
         $results = [];
-
         $this->results['matches'] = $searchResults['matches'];
+
         if (in_array('category', $expand)) {
             $this->results['kbCategories'] = $this->getCategoriesData();
             $this->results['categories'] = $this->getForumCategoriesData();
+            $this->results['discussions'] = $this->getForumDiscussionsData();
         }
 
         if (in_array('user', $expand)) {
@@ -312,7 +349,9 @@ class KnowledgeApiController extends AbstractApiController {
             };
             $results = [];
             foreach ($ids as $dtype => $recordIds) {
+
                 array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype, $expand));
+
             }
         }
         return $results;
@@ -365,11 +404,16 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function getDiscussions(array $iDs, int $type, array $expand = []): array {
-        $result = $this->discussionModel->get(
-            ['DiscussionID' => $iDs]
+
+        $result = $this->discussionModel->get( null, '',
+            ['d.DiscussionID' => $iDs]
         )->resultArray();
+
+
         $type = self::RECORD_TYPES[$type];
         foreach ($result as &$discussion) {
+
+            $discussion["body"] = $this->format($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
             $discussion["recordType"] = $type['recordType'];
@@ -377,7 +421,73 @@ class KnowledgeApiController extends AbstractApiController {
             if (in_array('category', $expand)) {
                 $discussion["forumCategory"] = $this->results['categories'][$discussion['CategoryID']];
             }
+            if (in_array('user', $expand)) {
+                if (isset($this->results['users'][$discussion['UpdateUserID']])) {
+                    $discussion["updateUser"] = $this->results['users'][$discussion['UpdateUserID']];
+                } elseif (isset($this->results['users'][$discussion['InsertUserID']])) {
+                    $discussion["insertUser"] = $this->results['users'][$discussion['InsertUserID']];
+                }
+            }
         }
+        return $result;
+    }
+
+    public static function format(string $body,string $format, bool $text = true): string {
+        if ($format === self::FORMAT_RICH) {
+            $body = \Gdn_Format::rich($body);
+        } else {
+            $body = \Gdn_Format::to($body,$format);
+        }
+        if ($text) {
+            $body = strip_tags($body);
+        }
+        return $body;
+    }
+    /**
+     * Get records from commentModel model
+     *
+     * @param array $iDs
+     * @param int $type
+     * @param array $expand
+     * @return array
+     */
+    public function getComments(array $iDs, int $type, array $expand = []): array {
+        $result = $this->commentModel->getWhere(
+            ['CommentID' => $iDs]
+        )->resultArray();
+        //if($type > 99 ) $t = $type;
+        $type = self::RECORD_TYPES[$type];
+
+        foreach ($result as &$comment) {
+            //print_r($comment);
+            //if ($comment['Format'] === 'Rich') die(\Gdn_Format::rich($comment['Body']));
+            $comment["body"] =  $this->format($comment['Body'], $comment['Format']);
+            $comment["recordID"] = $comment[$type['recordID']];
+            $discussion = $this->results['discussions'][$comment['DiscussionID']];
+            $comment["name"] = $discussion['Name'];
+            $comment["discussionID"] = $comment['DiscussionID'];
+            $comment["guid"] = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $comment["recordType"] = $type['recordType'];
+            $comment['url'] = \Gdn::request()->url('/discussion/'.urlencode($comment['DiscussionID']).'/'.urlencode($discussion['Name']), true);
+            if (in_array('category', $expand)) {
+                $cat = ($this->results['categories'][$discussion['CategoryID']] ?? false);
+                if ($cat) {
+                    //print_r($cat)
+                    $comment["forumCategory"] = $cat;
+                } else {
+                    ;
+                };
+            }
+            if (in_array('user', $expand)) {
+                if (isset($this->results['users'][$comment['UpdateUserID']])) {
+                    $comment["updateUser"] = $this->results['users'][$comment['UpdateUserID']];
+                } elseif (isset($this->results['users'][$comment['InsertUserID']])) {
+                    $comment["insertUser"] = $this->results['users'][$comment['InsertUserID']];
+                }
+            }
+        }
+        //die();
+
         return $result;
     }
 
@@ -444,11 +554,13 @@ class KnowledgeApiController extends AbstractApiController {
         $categoryResults = [];
 
         $categories = [];
+       // die(print_r($this->results['matches']));
         foreach ($this->results['matches'] as $key => $article) {
             if ($article['attrs']['dtype'] !== self::TYPE_ARTICLE) {
                 $categories[$article['attrs']['categoryid']] = true;
             }
         };
+        //die(print_r($this->results['matches']));
 
         foreach ($categories as $categoryID => $drop) {
             $ancestors = $this->categoryCollectionModel->getAncestors($categoryID);
@@ -465,6 +577,28 @@ class KnowledgeApiController extends AbstractApiController {
             ];
         }
         return $categoryResults;
+    }
+
+    /**
+     * Check if need to expand category and return categories data.
+     *
+     * @return array
+     */
+    protected function getForumDiscussionsData(): array {
+        $discussions = [];
+        foreach ($this->results['matches'] as $key => $article) {
+            if ($article['attrs']['dtype'] !== self::TYPE_ARTICLE) {
+                $discussions[$article['attrs']['discussionid']] = true;
+            }
+        };
+
+        $result = [];
+        foreach ($this->discussionModel->get(
+            ['DiscussionID' => array_keys($discussions)]
+        )->resultArray() as $discussion) {
+            $result[$discussion['DiscussionID']] = $discussion;
+        }
+        return $result;
     }
 
     /**
