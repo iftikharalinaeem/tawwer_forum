@@ -156,7 +156,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     public function validateKBArticlesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
         try {
             $category = $this->selectRootCategory($knowledgeCategoryID);
-            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeCategoryID" => $category["knowledgeCategoryID"]]);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["rootCategoryID" => $category["knowledgeCategoryID"]]);
         } catch (\Exception $e) {
             // Couldn't find the KB or root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
