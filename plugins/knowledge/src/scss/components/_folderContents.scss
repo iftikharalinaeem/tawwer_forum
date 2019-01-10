@@ -4,8 +4,9 @@
  * @license Proprietary
  */
 
-$folderContents-item_minHeight: 42px;
+$folderContents-item_minHeight: 44px;
 $folderContents-item_spacing: 12px;
+$folderContents-itemAction_width: 48px;
 $folderContents_borderColor: $overlay-border_color;
 $folderContents_minHeight: 396px;
 
@@ -30,11 +31,19 @@ $folderContents_minHeight: 396px;
         width: $formElement-borderWidth;
         color: $folderContents_borderColor;
     }
+
+    &:hover,
+    &.isActive {
+        .folderContents-subFolder {
+            border-left-color: $overlay-border_color;
+        }
+    }
 }
 
 .folderContents-folder {
     display: block;
     width: 100%;
+    max-width: calc(100% - #{$folderContents-itemAction_width});
 }
 
 .folderContents-input {
@@ -71,11 +80,11 @@ $folderContents_minHeight: 396px;
     align-items: center;
     justify-content: center;
     flex-shrink: 1;
-    margin-right: $folderContents-item_spacing;
+    margin-right: 4px;
 }
 
 .folderContents-folderIcon {
-    //color: $global-color_primary;
+    color: mixContentBgAndFg(50%);
 }
 
 .folderContents-checkIcon {
@@ -84,17 +93,13 @@ $folderContents_minHeight: 396px;
 
 
 .icon-selectedCategory {
-    width: 18px;
-    height: 18px;
-}
 
-.icon-categoryIcon {
-    width: 18px;
-    height: 12px;
 }
 
 .folderContents-subFolder {
     height: $folderContents-item_minHeight;
+    width: $folderContents-itemAction_width;
+    border-left: solid 1px transparent;
 
     &:focus,
     &:hover {

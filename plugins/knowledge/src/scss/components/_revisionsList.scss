@@ -16,7 +16,9 @@ $revisionList-status_size: $icon-default_size;
 $revisionList-spacing: 16px;
 $revisionList-item_minHeight: 63px;
 
-$revisionList-user_fontSize: 14px;
+$revisionList-user_fontSize: 16px;
+
+$revisionList-linkPadding_mobile: 16px;
 
 $revisionList-border_color: $global-border_color;
 
@@ -56,6 +58,22 @@ $revisionList-border_color: $global-border_color;
     }
 }
 
+@include mediaQuery-panelLayout_oneColumn {
+    .revisionsList {
+        padding: {
+            top: 0;
+            bottom: 0;
+        }
+    }
+
+    .revisionsList-link {
+        padding: {
+            left: $revisionList-linkPadding_mobile;
+            right: $revisionList-linkPadding_mobile;
+        }
+    }
+}
+
 .revisionsList-title {
     padding: {
         right: $global-gutter_quarterSize;
@@ -80,7 +98,8 @@ $revisionList-border_color: $global-border_color;
     align-items: flex-start;
     flex-grow: 1;
     line-height: $global-condensed_lineHeight;
-    max-width: calc(100% - #{$revisionList-avatar_size + $revisionList-avatar_margin + $revisionList-avatar_borderWidth * 2});
+    max-width: calc(100% - #{$revisionList-avatar_size + $revisionList-avatar_margin + $revisionList-avatar_borderWidth * 2 + $revisionList-spacing * 2});
+    padding: 8px 0;
 }
 
 .revisionsList-photo {
@@ -104,13 +123,23 @@ $revisionList-border_color: $global-border_color;
     text-decoration: none;
     color: inherit;
     font-size: $revisionList-user_fontSize;
+    font-weight: $global-fontWeight_semiBold;
 }
 
 .revisionsList-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: $revisionList-status_size;
     width: $revisionList-status_size;
     color: $revisionList-status_color;
 
     &.status-published {
         color: $global-color_primary;
     }
+}
+
+.revisionsList-icon {
+    display: block;
+    margin: auto;
 }
