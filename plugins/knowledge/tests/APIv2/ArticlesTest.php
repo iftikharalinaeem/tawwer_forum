@@ -134,6 +134,7 @@ class ArticlesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post("knowledge-bases", [
             "name" => __FUNCTION__ . " KB #1",
             "description" => __FUNCTION__,
+            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
         ])->getBody();
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [

@@ -162,12 +162,12 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * @return array Generated categories filled with few articles
      */
     protected function prepareCategoriesData(): array {
-        $data =[];
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
 
         $newKnowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " Test Knowledge Base",
-            "description" => 'Some description'
+            "description" => 'Some description',
+            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
         ])->getBody();
         // Setup the test categories.
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
@@ -268,12 +268,12 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * @return array Generated categories filled with few articles
      */
     protected function prepareCategoryMove(): array {
-        $data =[];
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
         // Setup the test categories.
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
+            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
@@ -346,12 +346,12 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * @return array Generated categories filled with few articles
      */
     protected function prepareCategoryDelete(): array {
-        $data =[];
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
         // Setup the test categories.
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
+            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
