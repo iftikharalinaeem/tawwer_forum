@@ -10,7 +10,7 @@ use Garden\Schema\ValidationException;
 use Vanilla\Utility\ModelUtils;
 
 /**
- * Undocumented class
+ * Controller for serving the /knowledge/settings pages.
  */
 class KnowledgeSettingsController extends SettingsController {
     use \Garden\TwigTrait;
@@ -38,7 +38,7 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Undocumented function
+     * Main entry function for all /knowledge/settings/knowledge-bases routes.
      *
      * @return void
      */
