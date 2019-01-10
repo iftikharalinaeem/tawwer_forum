@@ -9,21 +9,33 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { IUserFragment } from "@library/@types/api";
 import BreadCrumbString, { ICrumbString } from "@library/components/BreadCrumbString";
+import { t } from "@library/application";
 
 interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
     crumbs?: ICrumbString[];
+    deleted?: boolean;
 }
 
 export class SearchResultMeta extends React.Component<IProps> {
+    public static defaultProps = {
+        deleted: false,
+    };
     public render() {
-        const { dateUpdated, updateUser, crumbs } = this.props;
+        const { dateUpdated, updateUser, crumbs, deleted } = this.props;
 
         return (
             <React.Fragment>
                 <span className="meta">
-                    <Translate source="By <0/>" c0={updateUser.name} />
+                    {deleted ? (
+                        <>
+                            <span className="meta-inline isDeleted">{t("Deleted")}</span>
+                            <Translate source=" by <0/>" c0={updateUser.name} />
+                        </>
+                    ) : (
+                        <Translate source="By <0/>" c0={updateUser.name} />
+                    )}
                 </span>
                 <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />

@@ -8,6 +8,7 @@ $metas_verticalMargin         : $utility-baseUnit * 2;
 $metas_color                  : $metaText_color !default;
 $meta_spacing                 : $global-gutter_quarterSize;
 $meta_lineHeight              : $global-base_lineHeight;
+$meta-deleted_color           : #D0021B;
 
 .metas {
     display: block;
@@ -68,6 +69,13 @@ a.metaStyle {
 .meta-textPart {
     display: inline-block;
     vertical-align: middle;
+
+}
+
+.meta-inline {
+    &.isDeleted {
+        color: $meta-deleted_color;
+    }
 }
 
 .metaBreadcrumb {
