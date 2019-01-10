@@ -93,7 +93,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                             {t("New Article")}
                         </EditorRoute.Link>
                     </DropDownItem>
-                    <DropDownItemSeparator />
                     <DropDownItem>
                         <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
                             {t("Revision History")}
