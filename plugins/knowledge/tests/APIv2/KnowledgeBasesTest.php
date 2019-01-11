@@ -43,9 +43,10 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /**
      * Grab values for inserting a new knowledge base.
      *
+     * @param string $name Name of the knowledge base.
      * @return array
      */
-    public function record($name = 'Test Knowledge Base') {
+    public function record(string $name = 'Test Knowledge Base'): array {
         static $knowledgeBaseID = 1;
 
         $record = [
