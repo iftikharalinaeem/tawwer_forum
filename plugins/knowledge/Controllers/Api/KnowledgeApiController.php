@@ -112,7 +112,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      * @param knowledgeCategoryModel $knowledgeCategoryModel
-     * @param DiscussionModel $discussionModels
+     * @param DiscussionModel $discussionModel
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      */
@@ -132,7 +132,6 @@ class KnowledgeApiController extends AbstractApiController {
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->categoryCollectionModel = $categoryCollection;
-
     }
 
     /**
@@ -214,7 +213,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->query = $in->validate($query);
 
         $searchResults = $this->sphinxSearch();
-//die(print_r($searchResults));
+
         $results = $this->getNormalizedData($searchResults);
 
         $result = $out->validate($results);
@@ -237,8 +236,12 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (($query['global'] ?? false)) {
             $sphinxIndexes = $this->getIndexes();
+
             if (isset($query['insertUserIDs'])) {
                 $sphinx->setFilter('insertUserID', $query['insertUserIDs']);
+            }
+            if (isset($query['categoryIDs'])) {
+                $sphinx->setFilter('CategoryID', $query['categoryIDs']);
             }
             if (isset($query['name']) && !empty(trim($query['name']))) {
                 $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
@@ -333,6 +336,8 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (in_array('category', $expand)) {
             $this->results['kbCategories'] = $this->getCategoriesData();
+        }
+        if ($this->query['global'] ?? false) {
             $this->results['categories'] = $this->getForumCategoriesData();
             $this->results['discussions'] = $this->getForumDiscussionsData();
         }
@@ -349,9 +354,7 @@ class KnowledgeApiController extends AbstractApiController {
             };
             $results = [];
             foreach ($ids as $dtype => $recordIds) {
-
                 array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype, $expand));
-
             }
         }
         return $results;
@@ -405,14 +408,15 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function getDiscussions(array $iDs, int $type, array $expand = []): array {
 
-        $result = $this->discussionModel->get( null, '',
+        $result = $this->discussionModel->get(
+            null,
+            '',
             ['d.DiscussionID' => $iDs]
         )->resultArray();
 
 
         $type = self::RECORD_TYPES[$type];
         foreach ($result as &$discussion) {
-
             $discussion["body"] = $this->format($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
@@ -432,11 +436,19 @@ class KnowledgeApiController extends AbstractApiController {
         return $result;
     }
 
-    public static function format(string $body,string $format, bool $text = true): string {
+    /**
+     * Format body of forum discussion or comment when Rich or Markdown format is in use
+     *
+     * @param string $body
+     * @param string $format
+     * @param bool $text
+     * @return string
+     */
+    public static function format(string $body, string $format, bool $text = true): string {
         if ($format === self::FORMAT_RICH) {
             $body = \Gdn_Format::rich($body);
         } else {
-            $body = \Gdn_Format::to($body,$format);
+            $body = \Gdn_Format::to($body, $format);
         }
         if ($text) {
             $body = strip_tags($body);
@@ -455,24 +467,22 @@ class KnowledgeApiController extends AbstractApiController {
         $result = $this->commentModel->getWhere(
             ['CommentID' => $iDs]
         )->resultArray();
-        //if($type > 99 ) $t = $type;
         $type = self::RECORD_TYPES[$type];
-
         foreach ($result as &$comment) {
-            //print_r($comment);
-            //if ($comment['Format'] === 'Rich') die(\Gdn_Format::rich($comment['Body']));
-            $comment["body"] =  $this->format($comment['Body'], $comment['Format']);
+            $comment["body"] = $this->format($comment['Body'], $comment['Format']);
             $comment["recordID"] = $comment[$type['recordID']];
             $discussion = $this->results['discussions'][$comment['DiscussionID']];
             $comment["name"] = $discussion['Name'];
             $comment["discussionID"] = $comment['DiscussionID'];
             $comment["guid"] = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
             $comment["recordType"] = $type['recordType'];
-            $comment['url'] = \Gdn::request()->url('/discussion/'.urlencode($comment['DiscussionID']).'/'.urlencode($discussion['Name']), true);
+            $comment['url'] = \Gdn::request()->url(
+                '/discussion/' . urlencode($comment['DiscussionID']) . '/' . urlencode($discussion['Name']),
+                true
+            );
             if (in_array('category', $expand)) {
                 $cat = ($this->results['categories'][$discussion['CategoryID']] ?? false);
                 if ($cat) {
-                    //print_r($cat)
                     $comment["forumCategory"] = $cat;
                 } else {
                     ;
@@ -486,8 +496,6 @@ class KnowledgeApiController extends AbstractApiController {
                 }
             }
         }
-        //die();
-
         return $result;
     }
 
@@ -554,14 +562,11 @@ class KnowledgeApiController extends AbstractApiController {
         $categoryResults = [];
 
         $categories = [];
-       // die(print_r($this->results['matches']));
         foreach ($this->results['matches'] as $key => $article) {
             if ($article['attrs']['dtype'] !== self::TYPE_ARTICLE) {
                 $categories[$article['attrs']['categoryid']] = true;
             }
         };
-        //die(print_r($this->results['matches']));
-
         foreach ($categories as $categoryID => $drop) {
             $ancestors = $this->categoryCollectionModel->getAncestors($categoryID);
             $breadcrumbs = [];
@@ -610,6 +615,7 @@ class KnowledgeApiController extends AbstractApiController {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
+            "categoryIDs:a?" => "Forum category IDs to filter results. Applies only when 'global' = true.",
             "insertUserIDs:a?" => "Array of insertUserIDs (authors of article) to filter results.",
             "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
             "expand:a?" => [
