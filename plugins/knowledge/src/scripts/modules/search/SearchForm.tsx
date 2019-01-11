@@ -21,7 +21,7 @@ import QueryString from "@library/components/navigation/QueryString";
 import qs from "qs";
 import { LoadStatus } from "@library/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
-import { ISearchResult } from "@knowledge/@types/api";
+import { ISearchResult, ArticleStatus } from "@knowledge/@types/api";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import DocumentTitle from "@library/components/DocumentTitle";
 import SearchOption from "@library/components/search/SearchOption";
@@ -170,6 +170,7 @@ class SearchForm extends React.Component<IProps> {
             excerpt: searchResult.body,
             meta: (
                 <SearchResultMeta
+                    deleted={searchResult.status === ArticleStatus.DELETED}
                     updateUser={searchResult.updateUser!}
                     dateUpdated={searchResult.dateUpdated}
                     crumbs={searchResult.knowledgeCategory!.breadcrumbs}

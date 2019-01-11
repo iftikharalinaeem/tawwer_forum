@@ -99,6 +99,7 @@ $dropDown-title_color                          : mixContentBgAndFg(15%);
 
 .dropDownItems {
     font-size: $global-medium_fontSize;
+    padding-top: 6px;
 }
 
 
@@ -175,7 +176,9 @@ $dropDown-title_color                          : mixContentBgAndFg(15%);
 
     @include mediaQuery-panelLayout_oneColumn {
         font-size: $dropDown-item_mobile_fontSize;
+        font-weight: $global-fontWeight_semiBold;
         min-height: $dropDown-item_mobile_minHeight;
+
     }
 }
 
@@ -232,7 +235,7 @@ $dropDown-title_color                          : mixContentBgAndFg(15%);
     font-weight: $global-fontWeight_semiBold;
     font-size: $global-small_fontSize;
     line-height: $global-condensed_lineHeight;
-    padding: $dropDown-sectionTitle_verticalPadding 0 $dropDown-sectionTitle_verticalPadding;
+    padding: 0 0 $dropDown-sectionTitle_verticalPadding;
     text-transform: uppercase;
     color: $dropDown-title_color;
 }
