@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 use DateTimeImmutable;
 use Garden\Schema\Schema;
 use Gdn_Session;
+use Vanilla\Exception\Database\NoResultsException;
 
 /**
  * A model for managing knowledge categories.
@@ -157,7 +158,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         try {
             $category = $this->selectRootCategory($knowledgeCategoryID);
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["rootCategoryID" => $category["knowledgeCategoryID"]]);
-        } catch (\Exception $e) {
+        } catch (NoResultsException $e) {
             // Couldn't find the KB or root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }
@@ -190,7 +191,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             $category = $this->selectSingle([
                 "knowledgeCategoryID" => $knowledgeCategoryID,
             ]);
-        } catch (\Exception $e) {
+        } catch (NoResultsException $e) {
             // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }

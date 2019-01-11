@@ -102,15 +102,15 @@ class KnowledgeBasesTest extends AbstractResourceTest {
                         "knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"],
                     ]
                 );
-            } catch (\Exception $e) {
-                print_r($e);
+            } catch (\Garden\Web\Exception\ClientException $e) {
+                // That error should mean we've hit our limit.
+                break;
             }
         }
 
         /** @var KnowledgeCategoryModel */
-        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
-        $knowledgeCategory = $knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $knowledgeBase["rootCategoryID"]]);
-        $this->assertEquals($knowledgeCategory["countChildren"], KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE);
+        $knowledgeCategory = $this->api()->get("knowledge-categories/{$knowledgeBase["rootCategoryID"]}");
+        $this->assertEquals($knowledgeCategory["childCategoryCount"], KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE);
     }
 
     /**
