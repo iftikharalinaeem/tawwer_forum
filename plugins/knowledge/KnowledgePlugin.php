@@ -136,7 +136,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeBaseID")
             ->column("name", "varchar(255)")
             ->column("description", "text")
-            ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''], 'unique')
+            ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''], 'unique.urlCode')
             ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(
