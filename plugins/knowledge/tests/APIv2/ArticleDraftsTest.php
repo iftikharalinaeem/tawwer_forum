@@ -55,12 +55,21 @@ class ArticleDraftsTest extends AbstractResourceTest {
     public function modifyRow(array $row): array {
         $row["parentRecordID"] = $row["parentRecordID"] === null ? 1 : null;
         $attributes = $row["attributes"] ?? [];
-        $format = $attributes["format"] ?? "markdown";
+        $format = $body["format"] ?? "markdown";
         $categoryID = intval($attributes["knowledgeCategoryID"] ?? 1);
 
         $attributes["name"] = md5(time());
-        $attributes["body"] = md5($attributes["name"]);
-        $attributes["format"] = $format === "markdown" ? "rich" : "markdown";
+
+        switch ($format) {
+            case "markdown":
+                $row["format"] = "rich";
+                $row["body"] = '[{"insert":"Hello world.\n"}]';
+                break;
+            default:
+                $row["format"] = "markdown";
+                $row["body"] = "**Hello world**.";
+        }
+
         $attributes["knowledgeCategoryID"] = ++$categoryID;
 
         return $row;
