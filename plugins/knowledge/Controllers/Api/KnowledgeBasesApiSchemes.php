@@ -33,12 +33,12 @@ trait KnowledgeBasesApiSchemes {
             ],
             "name" => [
                 "description" => "Name for the knowledge base.",
-                "length" => 255,
+                "minLength" => 1,
                 "type" => "string",
             ],
             "description" => [
                 "description" => "Description for the knowledge base.",
-                "length" => 255,
+                "minLength" => 1,
                 "type" => "string",
             ],
             "sortArticles" => [
@@ -72,6 +72,11 @@ trait KnowledgeBasesApiSchemes {
                 "type" => "integer",
             ],
             "urlCode" => [
+                "description" => "URL code to the knowledge base.",
+                "minLength" => 1,
+                "type" => "string",
+            ],
+            "url" => [
                 "description" => "Full URL to the knowledge base.",
                 "type" => "string",
             ],
@@ -113,7 +118,7 @@ trait KnowledgeBasesApiSchemes {
                     "sourceLocale?",
                     "viewType?",
                     "sortArticles?",
-                    "urlCode?",
+                    "urlCode",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );

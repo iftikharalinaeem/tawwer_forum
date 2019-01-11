@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Models;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Gdn_Session;
 
 /**
@@ -43,6 +44,76 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function configureWriteSchema(Schema $schema): Schema {
+        $writeSchema = parent::configureWriteSchema($schema);
+        $writeSchema->addValidator('urlCode', [$this, 'urlCodeValidator']);
+        return $writeSchema;
+    }
+
+    /**
+     * Generate a URL to the provided knowledge base row.
+     *
+     * @param array $knowledgeBase An knowledge base row.
+     * @param bool $withDomain
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function url(array $knowledgeBase, bool $withDomain = true): string {
+        $urlCode = $knowledgeBase["urlCode"] ?? null;
+
+        if (!$urlCode) {
+            throw new \Exception('Invalid knowledge-base row.');
+        }
+
+        $slug = \Gdn_Format::url($urlCode);
+        $result = \Gdn::request()->url("/kb/" . $slug, $withDomain);
+        return $result;
+    }
+
+    /**
+     * Validate the URL code of a knowledge base record.
+     *
+     * Currently this needs to take the
+     *
+     * - Must be unique.
+     * - Must be made up of only
+     *
+     * @param string $urlCode The value of the urlcode.
+     * @param ValidationField $field The field being validated.
+     *
+     * @return bool
+     */
+    public function urlCodeValidator(string $urlCode, ValidationField $field): bool {
+        $regex = '/^[\w\-]+$/';
+        $reservedSlugs = [
+            'articles',
+            'categories',
+            'drafts',
+            'search',
+        ];
+        $validation = $field->getValidation();
+
+        if (!preg_match($regex, $urlCode)) {
+            $validation->addError('urlCode', <<<MESSAGE
+URL code can only be made of the following characters: a-z, A-Z, 0-9, _, -
+MESSAGE
+            );
+        }
+
+        if (in_array($urlCode, $reservedSlugs)) {
+            $readableReservedWords = implode(", ", $reservedSlugs);
+            $validation->addError('urlCode', <<<MESSAGE
+URL code cannot be any of the following: $readableReservedWords.
+MESSAGE
+            );
+        }
+
+        return $validation->isValid();
     }
 
     /**
