@@ -11,7 +11,7 @@ cd "$TRAVIS_BUILD_DIR/vanilla"
 printf "\nCloning the main vanilla repository..."
 git init
 git remote add origin https://github.com/vanilla/vanilla
-git pull --depth 50 origin fix/mysql-throw
+git pull --depth 50 origin master
 
 # Symlink in the knowledge plugin
 printf "\nSymlinking plugins from the knowledge repo..."
