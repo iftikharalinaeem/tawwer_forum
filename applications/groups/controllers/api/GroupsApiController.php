@@ -1046,7 +1046,7 @@ class GroupsApiController extends AbstractApiController {
      * @return array
      */
     public function post_members($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission("Garden.Moderation.Manage");
 
         $this->idParamGroupSchema();
         $in = $this->schema([
@@ -1058,12 +1058,6 @@ class GroupsApiController extends AbstractApiController {
             ],
         ])->setDescription('Add a user to a group.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
-
-        $group = $this->groupByID($id);
-
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
 
         $body = $in->validate($body);
 
