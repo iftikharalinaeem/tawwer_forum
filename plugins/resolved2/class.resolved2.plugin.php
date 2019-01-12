@@ -71,7 +71,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             Gdn::pluginManager()->disablePlugin('Resolved');
         }
 
-        touchConfig('Resolved2.DiscussionTitle.DisplayResolved', true);
+        \Gdn::config()->touch('Resolved2.DiscussionTitle.DisplayResolved', true);
     }
 
     /**

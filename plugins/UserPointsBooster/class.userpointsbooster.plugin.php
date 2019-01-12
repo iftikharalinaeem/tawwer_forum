@@ -17,7 +17,7 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
      * Plugin setup
      */
     public function setup() {
-        touchConfig('UserPointsBooster.PostPoints', 1);
+        \Gdn::config()->touch('UserPointsBooster.PostPoints', 1);
     }
 
     /**

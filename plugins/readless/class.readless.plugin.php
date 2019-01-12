@@ -40,6 +40,6 @@ class ReadLess extends Gdn_Plugin {
    }
    
    public function setup() {
-      touchConfig('Plugins.readless.maxheight', $this->max_height_default); 
+      \Gdn::config()->touch('Plugins.readless.maxheight', $this->max_height_default); 
    }
 }
