@@ -23,6 +23,8 @@
 @import "~library-scss/layouts/panelWidget";
 @import "~library-scss/layouts/mobileMenu";
 @import "~library-scss/layouts/deviceChecker";
+@import "~library-scss/components/attachment";
+@import "~library-scss/components/attachmentIcons";
 
 @import "~library-scss/userContent/_spoiler";
 @import "~library-scss/userContent/_atMention";
@@ -44,9 +46,7 @@
 @import "components/inputBlock";
 @import "components/inputText";
 @import "components/pageHeading";
-@import "components/attachment";
 @import "components/errorPage";
-@import "components/attachmentIcons";
 @import "components/navMenu";
 @import "components/tableOfContents";
 @import "components/panelList";
