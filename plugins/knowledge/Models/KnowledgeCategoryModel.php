@@ -9,14 +9,24 @@ namespace Vanilla\Knowledge\Models;
 use DateTimeImmutable;
 use Garden\Schema\Schema;
 use Gdn_Session;
+use Vanilla\Exception\Database\NoResultsException;
 
 /**
  * A model for managing knowledge categories.
  */
 class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
+    /** Maximum articles allowed in a guide KB root-level category. */
+    const ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE = 1000;
+
+    /** Maximum child categories allowed in a KB root-level category. */
+    const ROOT_LIMIT_CATEGORIES_RECURSIVE = 500;
+
     /** @var int Root-level category ID. */
     const ROOT_ID = -1;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
 
     /** @var Gdn_Session */
     private $session;
@@ -25,9 +35,12 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * KnowledgeCategoryModel constructor.
      *
      * @param Gdn_Session $session
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel) {
         parent::__construct("knowledgeCategory");
+
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
@@ -51,6 +64,48 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $schema = parent::configureWriteSchema($schema);
         $schema->addValidator("parentID", [$this, "validateParentID"]);
         return $schema;
+    }
+
+    /**
+     * Given a knowledge base ID, get all categories therein. Does not include the root category.
+     *
+     * @param int $knowledgeBaseID
+     * @return int
+     */
+    private function getTotalInKnowledgeBase(int $knowledgeBaseID): int {
+        $result = $this->sql()
+            ->select("knowledgeCategoryID", "count", "total")
+            ->from($this->getTable())
+            ->where([
+                "knowledgeBaseID" => $knowledgeBaseID,
+                "parentID <>" => self::ROOT_ID, // Don't include the knowledge base root as part of the categories in a knowledge base.
+            ])
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        return $result["total"] ?? 0;
+    }
+
+    /**
+     * Given a category ID, get its root-level parent in the knowledge base.
+     *
+     * @param int $knowledgeCategoryID
+     * @return array
+     */
+    private function selectRootCategory(int $knowledgeCategoryID): array {
+        $category = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+
+        if ($category["parentID"] !== self::ROOT_ID) {
+            try {
+                $category = $this->selectSingle([
+                    "knowledgeBaseID" => $category["knowledgeBaseID"],
+                    "parentID" => self::ROOT_ID,
+                ]);
+            } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+                throw new \Vanilla\Exception\Database\NoResultsException("Root category not found.");
+            }
+        }
+
+        return $category;
     }
 
     /**
@@ -89,6 +144,69 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         return parent::update($set, $where);
+    }
+
+    /**
+     * Given a category ID, verify its knowledge base has not met or exceeded its limit of articles, based on the root-level category.
+     *
+     * @param int $knowledgeCategoryID
+     * @param \Garden\Schema\ValidationField $validationField
+     * @return bool
+     * @throws \Garden\Schema\ValidationException If the selected row fails output validation.
+     */
+    public function validateKBArticlesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
+        try {
+            $category = $this->selectRootCategory($knowledgeCategoryID);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["rootCategoryID" => $category["knowledgeCategoryID"]]);
+        } catch (NoResultsException $e) {
+            // Couldn't find the KB or root category. Maybe bad data. Unable to gather enough relevant data to perform validation.
+            return true;
+        }
+
+        // Guides are currently the only KB type with a limit, due to the desire to keep the size of the navigation tree low.
+        // Use the root category's recursive article count as a hint for the total number of articles in its knowledge base.
+        if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE
+            && $category["articleCountRecursive"] >= self::ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE
+        ) {
+            $validationField->getValidation()->addError(
+                $validationField->getName(),
+                "The article maximum has been reached for this knowledge base."
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Given a category ID, verify its knowledge base has not met or exceeded its limit of categories.
+     *
+     * @param int $knowledgeCategoryID
+     * @param \Garden\Schema\ValidationField $validationField
+     * @return bool
+     * @throws \Garden\Schema\ValidationException If the selected row fails output validation.
+     */
+    public function validateKBCategoriesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
+        try {
+            $category = $this->selectSingle([
+                "knowledgeCategoryID" => $knowledgeCategoryID,
+            ]);
+        } catch (NoResultsException $e) {
+            // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
+            return true;
+        }
+
+        $total = $this->getTotalInKnowledgeBase($category["knowledgeBaseID"]);
+
+        if ($total >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
+            $validationField->getValidation()->addError(
+                $validationField->getName(),
+                "The category maximum has been reached for this knowledge base."
+            );
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -6,7 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Knowledge\Models\Entities\KnowledgeBaseEntity;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * Test the /api/v2/knowledge-bases endpoint.
@@ -54,11 +54,14 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /**
      * Grab values for inserting a new knowledge base.
      *
+     * @param string $name Name of the knowledge base.
      * @return array
      */
-    public function record() {
+    public function record(string $name = 'Test Knowledge Base'): array {
+        static $knowledgeBaseID = 1;
+
         $record = [
-            'name' => 'Test Knowledge Base',
+            'name' => $name,
             'description' => 'Test Knowledge Base DESCRIPTION',
             'viewType' => 'guide',
             'icon' => '',
@@ -76,7 +79,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     public function testRootCategory() {
         $result = $this->api()->post(
             $this->baseUrl,
-            $this->record()
+            $this->record(__FUNCTION__)
         );
 
         $this->assertEquals(201, $result->getStatusCode());
@@ -88,5 +91,129 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             'knowledge-categories/'.$body['rootCategoryID']
         )->getBody();
         $this->assertEquals($body['knowledgeBaseID'], $rootCat['knowledgeBaseID']);
+    }
+
+    /**
+     * Test adding a category to a knowledge base that has not met or exceeded the article limits.
+     */
+    public function testAddCategoryToLimit() {
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $this->record(__FUNCTION__)
+        );
+
+        // Try to add more categories than should be allowed.
+        for ($i = 1; $i <= (KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE + 10); $i++) {
+            try {
+                $this->api()->post(
+                    "knowledge-categories",
+                    [
+                        "name" => (__FUNCTION__ . " {$i}"),
+                        "parentID" => $knowledgeBase["rootCategoryID"],
+                        "knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"],
+                    ]
+                );
+            } catch (\Garden\Web\Exception\ClientException $e) {
+                // That error should mean we've hit our limit.
+                break;
+            }
+        }
+
+        /** @var KnowledgeCategoryModel */
+        $knowledgeCategory = $this->api()->get("knowledge-categories/{$knowledgeBase["rootCategoryID"]}");
+        $this->assertEquals($knowledgeCategory["childCategoryCount"], KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE);
+    }
+
+    /**
+     * Test adding an article to a guide that has not met or exceeded the article limits.
+     */
+    public function testAddGuideArticleOverLimit() {
+        $this->expectException(\Garden\Web\Exception\ClientException::class);
+        $this->expectExceptionMessage("The article maximum has been reached for this knowledge base.");
+
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $this->record()
+        );
+
+        /** @var KnowledgeCategoryModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
+        // Instead of making X articles, we're going to manually set the count used for the limit hint.
+        $knowledgeCategoryModel->update(
+            ["articleCountRecursive" => (KnowledgeCategoryModel::ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE)],
+            ["knowledgeCategoryID" => $knowledgeBase["rootCategoryID"]]
+        );
+
+        $article = $this->api()->post(
+            "articles",
+            [
+                "body" => "Hello world.",
+                "format" => "markdown",
+                "name" => "Hello World.",
+                "knowledgeCategoryID" => $knowledgeBase["rootCategoryID"],
+            ]
+        );
+    }
+
+    /**
+     * Test adding an article to a guide that has not met or exceeded the article limits.
+     */
+    public function testAddGuideArticleUnderLimit() {
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $this->record(__FUNCTION__)
+        );
+
+        /** @var KnowledgeCategoryModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
+        // Instead of making X articles, we're going to manually set the count used for the limit hint.
+        $knowledgeCategoryModel->update(
+            ["articleCountRecursive" => (KnowledgeCategoryModel::ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE - 1)],
+            ["knowledgeCategoryID" => $knowledgeBase["rootCategoryID"]]
+        );
+
+        $article = $this->api()->post(
+            "articles",
+            [
+                "body" => "Hello world.",
+                "format" => "markdown",
+                "name" => "Hello World.",
+                "knowledgeCategoryID" => $knowledgeBase["rootCategoryID"],
+            ]
+        );
+
+        $this->assertEquals($knowledgeBase["rootCategoryID"], $article["knowledgeCategoryID"]);
+    }
+
+    /**
+     * Test adding an article to a help center that has met or exceeded the article limits enforced on guides.
+     */
+    public function testAddHelpCenterArticleOverLimit() {
+        $record = $this->record(__FUNCTION__);
+        $record["viewType"] = "help";
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $record
+        );
+
+        /** @var KnowledgeCategoryModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
+        // Instead of making X articles, we're going to manually set the count used for the limit hint.
+        $knowledgeCategoryModel->update(
+            ["articleCountRecursive" => (KnowledgeCategoryModel::ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE)],
+            ["knowledgeCategoryID" => $knowledgeBase["rootCategoryID"]]
+        );
+
+        $article = $this->api()->post(
+            "articles",
+            [
+                "body" => "Hello world.",
+                "format" => "markdown",
+                "name" => "Hello World.",
+                "knowledgeCategoryID" => $knowledgeBase["rootCategoryID"],
+            ]
+        );
+
+        $this->assertEquals($knowledgeBase["rootCategoryID"], $article["knowledgeCategoryID"]);
     }
 }

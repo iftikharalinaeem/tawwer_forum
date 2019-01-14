@@ -444,7 +444,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function patch(int $id, array $body = []): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->articlePostSchema("in")->setDescription("Update an existing article.");
+        $in = $this->articlePostSchema("in")
+            ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
+            ->setDescription("Update an existing article.");
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body, true);
@@ -541,7 +543,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function post(array $body): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->articlePostSchema("in")->setDescription("Create a new article.");
+        $in = $this->articlePostSchema("in")
+            ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
+            ->setDescription("Create a new article.");
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body);
