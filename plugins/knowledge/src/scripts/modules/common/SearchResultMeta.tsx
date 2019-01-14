@@ -12,7 +12,8 @@ import BreadCrumbString, { ICrumbString } from "@library/components/BreadCrumbSt
 import { t } from "@library/application";
 
 interface IProps {
-    updateUser: IUserFragment;
+    updateUser?: IUserFragment;
+    insertUser?: IUserFragment;
     dateUpdated: string;
     crumbs?: ICrumbString[];
     deleted?: boolean;
@@ -23,20 +24,24 @@ export class SearchResultMeta extends React.Component<IProps> {
         deleted: false,
     };
     public render() {
-        const { dateUpdated, updateUser, crumbs, deleted } = this.props;
+        const { dateUpdated, updateUser, insertUser, crumbs, deleted } = this.props;
+
+        const user = updateUser || insertUser;
 
         return (
             <React.Fragment>
-                <span className="meta">
-                    {deleted ? (
-                        <>
-                            <span className="meta-inline isDeleted">{t("Deleted")}</span>
-                            <Translate source=" by <0/>" c0={updateUser.name} />
-                        </>
-                    ) : (
-                        <Translate source="By <0/>" c0={updateUser.name} />
-                    )}
-                </span>
+                {user && (
+                    <span className="meta">
+                        {deleted ? (
+                            <>
+                                <span className="meta-inline isDeleted">{t("Deleted")}</span>
+                                <Translate source=" by <0/>" c0={user.name} />
+                            </>
+                        ) : (
+                            <Translate source="By <0/>" c0={user.name} />
+                        )}
+                    </span>
+                )}
                 <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
