@@ -11,20 +11,25 @@ import { IUserFragment } from "@library/@types/api";
 import BreadCrumbString, { ICrumbString } from "@library/components/BreadCrumbString";
 
 interface IProps {
-    updateUser: IUserFragment;
+    updateUser?: IUserFragment;
+    insertUser?: IUserFragment;
     dateUpdated: string;
     crumbs?: ICrumbString[];
 }
 
 export class SearchResultMeta extends React.Component<IProps> {
     public render() {
-        const { dateUpdated, updateUser, crumbs } = this.props;
+        const { dateUpdated, updateUser, insertUser, crumbs } = this.props;
+
+        const user = updateUser || insertUser;
 
         return (
             <React.Fragment>
-                <span className="meta">
-                    <Translate source="By <0/>" c0={updateUser.name} />
-                </span>
+                {user && (
+                    <span className="meta">
+                        <Translate source="By <0/>" c0={user.name} />
+                    </span>
+                )}
                 <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>

@@ -5,7 +5,7 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import SearchPageModel, { ISearchFormState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import apiv2 from "@library/apiv2";
 import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
 
@@ -112,6 +112,7 @@ export default class SearchPageActions extends ReduxActions {
         const requestOptions: ISearchRequestBody = {
             ...query,
             updateUserIDs: form.authors.map(author => author.value as number),
+            global: form.domain === SearchDomain.EVERYWHERE,
             statuses,
             dateUpdated,
             expand: ["user", "category"],

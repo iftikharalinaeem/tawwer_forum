@@ -165,6 +165,8 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
+        const categoryData = searchResult.knowledgeCategory || searchResult.forumCategory;
+        const crumbs = categoryData ? categoryData.breadcrumbs : [];
         return {
             name: searchResult.name,
             excerpt: searchResult.body,
@@ -172,11 +174,11 @@ class SearchForm extends React.Component<IProps> {
                 <SearchResultMeta
                     updateUser={searchResult.updateUser!}
                     dateUpdated={searchResult.dateUpdated}
-                    crumbs={searchResult.knowledgeCategory!.breadcrumbs}
+                    crumbs={crumbs}
                 />
             ),
             url: searchResult.url,
-            location: searchResult.knowledgeCategory!.breadcrumbs,
+            location: crumbs,
         };
     }
 }

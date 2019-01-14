@@ -11,7 +11,7 @@ import InputTextBlock from "@library/components/forms/InputTextBlock";
 import Checkbox from "@library/components/forms/Checkbox";
 import Button from "@library/components/forms/Button";
 import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import DateRange from "@knowledge/modules/search/components/DateRange";
 import MultiUserInput from "@library/users/MultiUserInput";
@@ -21,6 +21,8 @@ import { LoadStatus } from "@library/@types/api";
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
 import TabContext from "library/src/scripts/contexts/TabContext";
+import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
+import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 
 export enum ISearchDomain {
     ARTICLES = "articles",
@@ -43,6 +45,16 @@ export class AdvancedSearch extends React.Component<IProps> {
                 {!this.props.hideTitle && (
                     <Heading className="advancedSearch-title pageSubTitle" title={t("Advanced Search")} />
                 )}
+                <RadioButtonsAsTabs
+                    accessibleTitle={t("Search in:")}
+                    prefix="advancedSearchDomain"
+                    setData={this.handleDomainChange}
+                    defaultTab={this.props.form.domain || ISearchDomain.EVERYWHERE}
+                    childClass="advancedSearchDomain-tab"
+                >
+                    <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
+                    <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
+                </RadioButtonsAsTabs>
                 <InputTextBlock
                     label={t("Title")}
                     inputProps={{
@@ -106,6 +118,13 @@ export class AdvancedSearch extends React.Component<IProps> {
      */
     private handleUserChange = (options: IComboBoxOption[]) => {
         this.props.searchActions.updateForm({ authors: options });
+    };
+
+    /**
+     * Simple form setter.
+     */
+    private handleDomainChange = (domain: SearchDomain) => {
+        this.props.searchActions.updateForm({ domain: domain });
     };
 
     /**

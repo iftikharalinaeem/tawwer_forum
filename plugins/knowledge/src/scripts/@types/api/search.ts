@@ -25,6 +25,10 @@ export interface ISearchResult {
         knowledgeCategoryID: number;
         breadcrumbs: ICrumb[];
     };
+    forumCategory?: {
+        categoryID: number;
+        breadcrumbs: ICrumb[];
+    };
 }
 
 export interface ISearchRequestBody {
@@ -32,6 +36,7 @@ export interface ISearchRequestBody {
     name?: string;
     all?: string;
     dateUpdated?: string;
+    global?: boolean;
     // Filter by date when the article was updated.
     // This filter receive a string that can take two forms.
     // A single date that matches '{Operator}{DateTime}' where {Operator} can be =, <, >, <=, >= and, if omitted, defaults to =.
