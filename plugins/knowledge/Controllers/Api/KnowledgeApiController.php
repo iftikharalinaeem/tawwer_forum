@@ -443,7 +443,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $type = self::RECORD_TYPES[$type];
         foreach ($result as &$discussion) {
-            $discussion["body"] = $this->format($discussion['Body'], $discussion['Format']);
+            $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
             $discussion["recordType"] = $type['recordType'];
@@ -463,22 +463,6 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
-     * Format body of forum discussion or comment when Rich or Markdown format is in use
-     *
-     * @param string $body
-     * @param string $format
-     * @param bool $text
-     * @return string
-     */
-    public static function format(string $body, string $format, bool $text = true): string {
-        $body = \Gdn_Format::to($body, $format);
-
-        if ($text) {
-            $body = strip_tags($body);
-        }
-        return $body;
-    }
-    /**
      * Get records from commentModel model
      *
      * @param array $ids
@@ -492,7 +476,7 @@ class KnowledgeApiController extends AbstractApiController {
         )->resultArray();
         $type = self::RECORD_TYPES[$type];
         foreach ($result as &$comment) {
-            $comment["body"] = $this->format($comment['Body'], $comment['Format']);
+            $comment["body"] = \Gdn_Format::excerpt($comment['Body'], $comment['Format']);
             $comment["recordID"] = $comment[$type['recordID']];
             $discussion = $this->results['discussions'][$comment['DiscussionID']];
             $comment["name"] = $discussion['Name'];
