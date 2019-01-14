@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Garden\Schema\Schema;
 use Gdn_Session;
 
 /**
