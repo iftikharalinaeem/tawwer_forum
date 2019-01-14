@@ -272,6 +272,10 @@ class KnowledgeApiController extends AbstractApiController {
             if (isset($query['updateUserIDs'])) {
                 $sphinx->setFilter('updateUserID', $query['updateUserIDs']);
             }
+
+            if (isset($query['knowledgeCategoryIDs'])) {
+                $sphinx->setFilter('categoryID', $query['knowledgeCategoryIDs']);
+            }
             if (isset($query['dateUpdated'])) {
                 $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
                 $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
@@ -614,7 +618,7 @@ class KnowledgeApiController extends AbstractApiController {
     protected function defaultSchema() {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-            "knowledgeCategoryID:i?" => "Knowledge category ID to filter results.",
+            "knowledgeCategoryIDs:a?" => "Knowledge category ID to filter results.",
             "categoryIDs:a?" => "Forum category IDs to filter results. Applies only when 'global' = true.",
             "insertUserIDs:a?" => "Array of insertUserIDs (authors of article) to filter results.",
             "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
