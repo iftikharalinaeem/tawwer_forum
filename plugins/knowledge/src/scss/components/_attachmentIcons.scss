@@ -6,7 +6,6 @@
 
 $attachmentIcon_spacing: $utility-baseUnit / 2;
 $attachmentIcon-icon_shadowColor: mix($global-color_fg, $global-color_bg, 10%);
-$attachmentIcon-icon_borderRadius: 2px;
 
 .attachmentsIcons {
     display: block;
@@ -34,6 +33,7 @@ $attachmentIcon-icon_borderRadius: 2px;
 }
 
 .attachmentIcon {
-    border-radius: $attachmentIcon-icon_borderRadius;
+    width: 16px;
+    height: 16px;
     box-shadow: 0 0 0 1px $attachmentIcon-icon_shadowColor;
 }

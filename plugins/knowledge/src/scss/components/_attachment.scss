@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$attachment_borderColor              : mix($global-color_fg, $global-color_bg, 20%) !default;
+$attachment_borderColor              : mix($global-color_fg, $global-color_bg, 5%) !default;
 $attachment_borderStyle              : solid !default;
 $attachment_borderWidth              : $formElement_borderWidth !default;
 $attachment_borderRadius             : 2px !default;
@@ -12,7 +12,7 @@ $attachment_padding                  : $utility-baseUnit * 2 !default;
 $attachment_boxShadow                : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
 $attachment_maxWidth                 : $embed_width;
 
-$attachment_boxShadow                : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
+$attachment_boxShadow                : 0 1px 3px 0 rgba($global-color_fg, .3);
 
 $attachment-text_fontSize            : $global-medium_fontSize;
 $attachment-title_color              : mix($global-color_fg, $global-color_bg, 90%) !default;
@@ -37,17 +37,20 @@ $attachment-title_color              : mix($global-color_fg, $global-color_bg, 9
 }
 
 .attachment-link {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: $attachment_padding;
-    border: solid transparent 2px;
-
-    width: 100%;
     @include allLinkStates {
         text-decoration: none;
     }
+}
+
+.attachment-box {
+    position: relative;
+    //display: flex;
+    //flex-wrap: nowrap;
+    //align-items: center;
+    //justify-content: space-between;
+    padding: $attachment_padding;
+    border: solid transparent 2px;
+    width: 100%;
 }
 
 .attachment-format {
@@ -58,7 +61,6 @@ $attachment-title_color              : mix($global-color_fg, $global-color_bg, 9
 
 .attachment-main {
     display: flex;
-    flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
     flex-grow: 1;
