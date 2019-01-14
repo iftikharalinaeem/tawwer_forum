@@ -48,6 +48,32 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->structure();
     }
 
+    const NAV_SECTION = "knowledge";
+
+    /**
+     * Event handler for adding navigation items into the dashboard.
+     *
+     * @param \Gdn_Pluggable $sender
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var \NestedCollectionAdapter */
+        $menu = $sender->EventArguments['SideMenu'];
+        $this->createDashboardMenus($menu);
+    }
+
+    /**
+     * Construct the knowledge base dashboard menu items.
+     *
+     * @param \NestedCollectionAdapter $navCollection
+     */
+    private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
+        $navCollection
+            ->addItem(self::NAV_SECTION, t('Knowledge'), 'Garden.Settings.Manage')
+            ->addLink(self::NAV_SECTION, t('Knowledge Bases'), '/knowledge/settings/knowledge-bases', 'Garden.Settings.Manage');
+    }
+
     /**
      * Ensure the database is configured.
      */
@@ -110,7 +136,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->primaryKey("knowledgeBaseID")
             ->column("name", "varchar(255)")
             ->column("description", "text")
-            ->column("urlCode", "varchar(255)", ['Null' => false, 'Default' => ''])
+            // Size of this cannot be larger than 191 UT8-mb4 to be an index.
+            ->column("urlCode", "varchar(191)", false, 'unique.urlCode')
             ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(

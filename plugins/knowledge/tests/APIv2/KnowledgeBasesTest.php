@@ -30,8 +30,18 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         'icon',
         'sortArticles',
         'sourceLocale',
+        'urlCode',
     ];
 
+    /**
+     * Generate a unique URL code for a knowledge base
+     *
+     * @return string
+     */
+    public static function getUniqueUrlCode(): string {
+        static $inc = 0;
+        return 'kb-url-code' . $inc++;
+    }
 
     /**
      * This method is called before the first test of this test class is run.
@@ -54,6 +64,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             'icon' => '',
             'sortArticles' => 'manual',
             'sourceLocale' => '',
+            'urlCode' => self::getUniqueUrlCode(),
         ];
         return $record;
     }

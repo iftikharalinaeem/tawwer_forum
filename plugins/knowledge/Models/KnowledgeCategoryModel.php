@@ -136,7 +136,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Build bredcrumbs array for particular knowledge category
+     * Build breadcrumbs array for particular knowledge category
      *
      * @param int $knowledgeCategoryID
      * @return array
