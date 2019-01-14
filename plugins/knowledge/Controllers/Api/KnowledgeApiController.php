@@ -425,7 +425,7 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
             $discussion["recordType"] = $type['recordType'];
-            $discussion['url'] = \Gdn::request()->url('/discussion/'.urlencode($discussion['DiscussionID']).'/'.urlencode($discussion['Name']), true);
+            $discussion['url'] = discussionUrl($discussion);
             if (in_array('category', $expand)) {
                 $discussion["forumCategory"] = $this->results['categories'][$discussion['CategoryID']];
             }
@@ -577,7 +577,7 @@ class KnowledgeApiController extends AbstractApiController {
             foreach ($ancestors as $category) {
                 $breadcrumbs[] = (new Breadcrumb(
                     $category["Name"],
-                    \Gdn::request()->url('/categories/'.rawurlencode($category['UrlCode']), true)
+                    \CategoryModel::categoryUrl($category['UrlCode'])
                 ))->asArray();
             }
             $categoryResults[$categoryID] = [
