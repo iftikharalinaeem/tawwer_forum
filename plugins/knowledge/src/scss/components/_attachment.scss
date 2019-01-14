@@ -4,46 +4,36 @@
  * @license Proprietary
  */
 
-$attachment-block_topMargin          : $global-gutter_size * 2 !default;
-$attachment-block_gap                : $utility-baseUnit * 2 !default;
-$attachment-block_borderColor        : mix($global-color_fg, $global-color_bg, 20%) !default;
-$attachment-block_borderStyle        : solid !default;
-$attachment-block_borderWidth        : $formElement_borderWidth !default;
-$attachment-block_borderRadius       : $global-borderRadius !default;
-$attachment-block_padding            : $utility-baseUnit * 2 !default;
-$attachment-block_boxShadow          : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
+$attachment_borderColor              : mix($global-color_fg, $global-color_bg, 20%) !default;
+$attachment_borderStyle              : solid !default;
+$attachment_borderWidth              : $formElement_borderWidth !default;
+$attachment_borderRadius             : 2px !default;
+$attachment_padding                  : $utility-baseUnit * 2 !default;
+$attachment_boxShadow                : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
+$attachment_maxWidth                 : $embed_width;
 
-$attachment-text_fontSize            : $global-small_fontSize;
-$attachment-title_color              :    mix($global-color_fg, $global-color_bg, 90%) !default;
+$attachment_boxShadow                : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
 
-$attachment-downloadIcon_color       : mix($global-color_fg, $global-color_bg, 60%) !default;
-$attachment-downloadIcon_margin      : $utility-baseUnit !default;
+$attachment-text_fontSize            : $global-medium_fontSize;
+$attachment-title_color              : mix($global-color_fg, $global-color_bg, 90%) !default;
 
-.attachments {
-    display: block;
-    margin-top: $attachment-block_topMargin;
-}
-
-.attachments-list {
-    display: block;
-}
 
 .attachment {
     display: block;
-    width: 100%;
     text-decoration: none;
     color: inherit;
-    box-shadow: $attachment-block_boxShadow;
+    box-shadow: $attachment_boxShadow;
+    width: $attachment_maxWidth;
+    max-width: 100%;
+    margin: auto;
 
     border: {
-        color: $attachment-block_borderColor;
-        width: $attachment-block_borderWidth;
-        style: $attachment-block_borderStyle;
-        radius: $attachment-block_borderRadius;
+        color: $attachment_borderColor;
+        width: $attachment_borderWidth;
+        style: $attachment_borderStyle;
+        radius: $attachment_borderRadius;
     }
-    + .attachment {
-        margin-top: $attachment-block_gap;
-    }
+
 }
 
 .attachment-link {
@@ -51,7 +41,8 @@ $attachment-downloadIcon_margin      : $utility-baseUnit !default;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
-    padding: $attachment-block_padding;
+    padding: $attachment_padding;
+    border: solid transparent 2px;
 
     width: 100%;
     @include allLinkStates {
@@ -60,8 +51,8 @@ $attachment-downloadIcon_margin      : $utility-baseUnit !default;
 }
 
 .attachment-format {
-    flex-basis: #{$icon-default_size + $attachment-block_padding};
-    padding-right: $attachment-block_padding;
+    flex-basis: #{$icon-default_size + $attachment_padding};
+    padding-right: $attachment_padding;
     flex-shrink: 1;
 }
 
@@ -78,12 +69,6 @@ $attachment-downloadIcon_margin      : $utility-baseUnit !default;
     color: $attachment-title_color;
     font-weight: $global-fontWeight_bold;
     line-height: $global-condensed_lineHeight;
-}
-
-.attachment-download {
-    color: $attachment-downloadIcon_color;
-    flex-basis: #{$icon-default_size + $attachment-downloadIcon_margin};
-    padding-left: $attachment-downloadIcon_margin;
 }
 
 
