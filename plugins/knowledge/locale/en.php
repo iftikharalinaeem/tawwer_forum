@@ -25,3 +25,8 @@ $Definition['<0/> (Type: <1/>)'] = '<0/> (Type: <1/>)';
 // Search
 $Definition["No results for '<0/>'."] = "No results for '<0/>'.";
 $Definition['No results.'] = 'No results.';
+
+$Definition['Are you want to delete this knowledge base?'] = <<<MESSAGE
+Are you sure you wan't to delete this knowledge base?
+It can restored later from the Deleted Knowledge Bases page.
+MESSAGE;

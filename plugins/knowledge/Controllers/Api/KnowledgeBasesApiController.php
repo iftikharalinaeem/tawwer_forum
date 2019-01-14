@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
@@ -47,6 +48,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->knowledgeBaseByID($id);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -63,6 +65,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $rows = $this->knowledgeBaseModel->get();
+        $rows = array_map(function ($row) {
+            return $this->normalizeOutput($row);
+        }, $rows);
         $result = $out->validate($rows);
         return $result;
     }
@@ -78,6 +83,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->setDescription("Create a new knowledge base.");
+        $in = $this->applyUrlCodeValidator($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
@@ -89,6 +95,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -132,6 +139,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->setDescription("Update an existing knowledge base.");
+        $in = $this->applyUrlCodeValidator($in, $id);
+
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
@@ -139,9 +148,45 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
 
         $row = $this->knowledgeBaseByID($id);
-
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Apply {@link KnowledgeBasedApiController::validateUniqueUrlCode} to a Schema object.
+     *
+     * @param Schema $schema The schema to apply to.
+     * @param int|null $recordID The existing ID of the current record if applicable.
+     *
+     * @return Schema
+     */
+    private function applyUrlCodeValidator(Schema $schema, int $recordID = null) {
+        return $schema->addValidator(
+            'urlCode',
+            function (string $urlCode, ValidationField $validationField) use ($recordID) {
+                return $this->validateUniqueUrlCode($urlCode, $validationField, $recordID);
+            }
+        );
+    }
+
+    /**
+     * Validate that a url code is unique.
+     *
+     * @param string $urlCode The code to check.
+     * @param ValidationField $validationField The validation field to apply errors to.
+     * @param int|null $recordID The existing ID of the current record if applicable.
+     *
+     * @return bool Whether or not the url code passed validation.
+     */
+    private function validateUniqueUrlCode(string $urlCode, ValidationField $validationField, int $recordID = null): bool {
+        $existingRow = $this->knowledgeBaseModel->get(['urlCode' => $urlCode])[0] ?? null;
+        if ($existingRow && $existingRow['knowledgeBaseID'] !== $recordID) {
+            $validationField->addError('The specified URL code is already in use by another knowledge base.');
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -180,5 +225,17 @@ class KnowledgeBasesApiController extends AbstractApiController {
             throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
         }
         return $result;
+    }
+
+    /**
+     * Normalize output.
+     *
+     * @param array $record A single knowledge base record.
+     *
+     * @return array
+     */
+    private function normalizeOutput(array $record): array {
+        $record['url'] = $this->knowledgeBaseModel->url($record, true);
+        return $record;
     }
 }

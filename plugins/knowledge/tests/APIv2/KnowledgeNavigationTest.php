@@ -84,6 +84,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                         $knowledgeBase = $this->api()->post("knowledge-bases", [
                             "name" => $item["name"],
                             "description" => $item["name"],
+                            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
                         ]);
                         $parentID = $knowledgeBase['rootCategoryID'];
                         $response = $this->api()->get("knowledge-categories/".$parentID);
