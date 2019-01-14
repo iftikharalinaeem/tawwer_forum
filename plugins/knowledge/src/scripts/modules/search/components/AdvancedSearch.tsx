@@ -124,7 +124,7 @@ export class AdvancedSearch extends React.Component<IProps> {
      * Simple form setter.
      */
     private handleDomainChange = (domain: SearchDomain) => {
-        this.props.searchActions.updateForm({ domain: domain });
+        this.props.searchActions.updateForm({ domain });
     };
 
     /**
