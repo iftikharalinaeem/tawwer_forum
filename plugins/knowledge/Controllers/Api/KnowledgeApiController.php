@@ -8,6 +8,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
+use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
 use Vanilla\DateFilterSphinxSchema;
@@ -28,7 +29,10 @@ class KnowledgeApiController extends AbstractApiController {
 
     const TYPE_ARTICLE = 5;
     const TYPE_DISCUSSION = 0;
+    const TYPE_QUESTION = 1;
     const TYPE_POLL = 2;
+    const TYPE_COMMENT = 100;
+    const TYPE_ANSWER = 101;
 
     const FORMAT_RICH = 'Rich';
 
@@ -39,7 +43,7 @@ class KnowledgeApiController extends AbstractApiController {
     ];
 
     const RECORD_TYPES = [
-        0 => [
+        self::TYPE_DISCUSSION => [
             'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
@@ -48,7 +52,7 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
         ],
-        1 => [
+        self::TYPE_QUESTION => [
             'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
@@ -57,7 +61,7 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
         ],
-        2 => [
+        self::TYPE_POLL => [
             'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
@@ -66,7 +70,7 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
         ],
-        100 => [
+        self::TYPE_COMMENT => [
             'model' => 'comment',
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
@@ -75,7 +79,7 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getComments',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
         ],
-        101 => [
+        self::TYPE_ANSWER => [
             'model' => 'comment',
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
@@ -84,7 +88,7 @@ class KnowledgeApiController extends AbstractApiController {
             'getRecordsFunction' => 'getComments',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
         ],
-        5 => [
+        self::TYPE_ARTICLE => [
             'model' => 'articleRevisionModel',
             'recordType' => 'article',
             'recordID' => 'articleID',
@@ -104,6 +108,15 @@ class KnowledgeApiController extends AbstractApiController {
 
     /** @var array */
     private $query = [];
+
+    /** @var SphinxClient */
+    private $sphinx = null;
+
+    /** @var string */
+    private $sphinxQuery = '';
+
+    /** @var string */
+    private $sphinxIndexes = '';
 
     /**
      * Knowledge API controller constructor.
@@ -226,83 +239,92 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     protected function sphinxSearch(): array {
-        $sphinx = $this->sphinxClient();
-        $sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
-        $query = $this->query;
-        if (isset($query['knowledgeCategoryID'])) {
-            $sphinx->setFilter('knowledgeCategoryID', [$query['knowledgeCategoryID']]);
-        }
-        $sphinxQuery = '';
+        $this->sphinx = $this->sphinxClient();
+        $this->sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
 
-        if (($query['global'] ?? false)) {
-            $sphinxIndexes = $this->getIndexes();
 
-            if (isset($query['insertUserIDs'])) {
-                $sphinx->setFilter('insertUserID', $query['insertUserIDs']);
-            }
-            if (isset($query['categoryIDs'])) {
-                $sphinx->setFilter('CategoryID', $query['categoryIDs']);
-            }
-            if (isset($query['name']) && !empty(trim($query['name']))) {
-                $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
-            }
-            if (isset($query['body']) && !empty(trim($query['body']))) {
-                $sphinxQuery .= ' @body (' . $sphinx->escapeString($query['body']) . ')*';
-            }
-            if (isset($query['all']) && !empty(trim($query['all']))) {
-                $sphinxQuery .= ' @(name,body) (' . $sphinx->escapeString($query['all']) . ')*';
-            }
+        if (($this->query['global'] ?? false)) {
+            $this->defineGlobalQuery();
         } else {
-            $sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
-            if (isset($query['statuses'])) {
-                $statuses = array_map(
-                    function ($status) {
-                        return array_search($status, self::ARTICLE_STATUSES);
-                    },
-                    $query['statuses']
-                );
-                $sphinx->setFilter('status', $statuses);
-            } else {
-                $sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
-            }
-
-            if (isset($query['insertUserIDs'])) {
-                $sphinx->setFilter('insertUserID', $query['insertUserIDs']);
-            }
-            if (isset($query['updateUserIDs'])) {
-                $sphinx->setFilter('updateUserID', $query['updateUserIDs']);
-            }
-
-            if (isset($query['knowledgeCategoryIDs'])) {
-                $sphinx->setFilter('categoryID', $query['knowledgeCategoryIDs']);
-            }
-            if (isset($query['dateUpdated'])) {
-                $range = DateFilterSphinxSchema::dateFilterRange($query['dateUpdated']);
-                $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
-                $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-                $sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
-            }
-
-
-            if (isset($query['name']) && !empty(trim($query['name']))) {
-                $sphinxQuery .= '@name (' . $sphinx->escapeString($query['name']) . ')*';
-            }
-            if (isset($query['body']) && !empty(trim($query['body']))) {
-                $sphinxQuery .= ' @body (' . $sphinx->escapeString($query['body']) . ')*';
-            }
-            if (isset($query['all']) && !empty(trim($query['all']))) {
-                $sphinxQuery .= ' @(name,body) (' . $sphinx->escapeString($query['all']) . ')*';
-            }
+            $this->defineArticlesQuery();
         }
 
-        if ($sphinxRes = $sphinx->query($sphinxQuery, $sphinxIndexes)) {
+        if ($sphinxRes = $this->sphinx->query($this->sphinxQuery, $this->sphinxIndexes)) {
             return $sphinxRes;
         } else {
-            $errorMessage = $sphinx->getLastError();
+            $errorMessage = $this->sphinx->getLastError();
             if (empty($errorMessage)) {
-                $errorMessage = $sphinx->getLastWarning();
+                $errorMessage = $this->sphinx->getLastWarning();
             }
             throw new ClientException($errorMessage);
+        }
+    }
+
+    /**
+     * Prepare Sphinx query when global search mode
+     */
+    protected function defineGlobalQuery() {
+        $this->sphinxIndexes = $this->getIndexes();
+        if (isset($this->query['insertUserIDs'])) {
+            $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
+        }
+        if (isset($this->query['categoryIDs'])) {
+            $this->sphinx->setFilter('CategoryID', $this->query['categoryIDs']);
+        }
+        if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
+            $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
+        }
+        if (isset($this->query['body']) && !empty(trim($this->query['body']))) {
+            $this->sphinxQuery .= ' @body (' . $this->sphinx->escapeString($this->query['body']) . ')*';
+        }
+        if (isset($this->query['all']) && !empty(trim($this->query['all']))) {
+            $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
+        }
+    }
+
+    /**
+     * Prepare Sphinx query when Knowledge Base Articles search mode
+     */
+    protected function defineArticlesQuery() {
+        $this->sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
+        if (isset($this->query['statuses'])) {
+            $statuses = array_map(
+                function ($status) {
+                    return array_search($status, self::ARTICLE_STATUSES);
+                },
+                $this->query['statuses']
+            );
+            $this->sphinx->setFilter('status', $statuses);
+        } else {
+            $this->sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
+        }
+
+        if (isset($this->query['insertUserIDs'])) {
+            $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
+        }
+        if (isset($this->query['updateUserIDs'])) {
+            $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
+        }
+
+        if (isset($this->query['knowledgeCategoryIDs'])) {
+            $this->sphinx->setFilter('categoryID', $this->query['knowledgeCategoryIDs']);
+        }
+        if (isset($this->query['dateUpdated'])) {
+            $range = DateFilterSphinxSchema::dateFilterRange($this->query['dateUpdated']);
+            $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+            $this->sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
+        }
+
+
+        if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
+            $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
+        }
+        if (isset($this->query['body']) && !empty(trim($this->query['body']))) {
+            $this->sphinxQuery .= ' @body (' . $this->sphinx->escapeString($this->query['body']) . ')*';
+        }
+        if (isset($query['all']) && !empty(trim($this->query['all']))) {
+            $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
     }
 
@@ -405,17 +427,17 @@ class KnowledgeApiController extends AbstractApiController {
     /**
      * Get records from discussionModel model
      *
-     * @param array $iDs
+     * @param array $ids
      * @param int $type
      * @param array $expand
      * @return array
      */
-    public function getDiscussions(array $iDs, int $type, array $expand = []): array {
+    public function getDiscussions(array $ids, int $type, array $expand = []): array {
 
         $result = $this->discussionModel->get(
             null,
             '',
-            ['d.DiscussionID' => $iDs]
+            ['d.DiscussionID' => $ids]
         )->resultArray();
 
 
@@ -449,11 +471,8 @@ class KnowledgeApiController extends AbstractApiController {
      * @return string
      */
     public static function format(string $body, string $format, bool $text = true): string {
-        if ($format === self::FORMAT_RICH) {
-            $body = \Gdn_Format::rich($body);
-        } else {
-            $body = \Gdn_Format::to($body, $format);
-        }
+        $body = \Gdn_Format::to($body, $format);
+
         if ($text) {
             $body = strip_tags($body);
         }
@@ -462,14 +481,14 @@ class KnowledgeApiController extends AbstractApiController {
     /**
      * Get records from commentModel model
      *
-     * @param array $iDs
+     * @param array $ids
      * @param int $type
      * @param array $expand
      * @return array
      */
-    public function getComments(array $iDs, int $type, array $expand = []): array {
+    public function getComments(array $ids, int $type, array $expand = []): array {
         $result = $this->commentModel->getWhere(
-            ['CommentID' => $iDs]
+            ['CommentID' => $ids]
         )->resultArray();
         $type = self::RECORD_TYPES[$type];
         foreach ($result as &$comment) {
@@ -581,7 +600,7 @@ class KnowledgeApiController extends AbstractApiController {
                 ))->asArray();
             }
             $categoryResults[$categoryID] = [
-                'CategoryID' => $categoryID,
+                'categoryID' => $categoryID,
                 'breadcrumbs' => $breadcrumbs,
             ];
         }
