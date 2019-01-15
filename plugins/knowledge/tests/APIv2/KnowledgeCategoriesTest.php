@@ -164,14 +164,24 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      *
      */
     public function testDelete() {
-        $categoryToDelete = $this->prepareCategoryToDelete();
+
+        $testData = $this->prepareCategoryToDelete();
+        $categoryToDelete = $testData['childCategory'];
+        $article = $testData['article'];
+
 
         $r = $this->api()->delete("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}", []);
 
         $this->assertEquals(204, $r->getStatusCode());
 
+        try {
+            $this->api()->get("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}");
+        } catch (NotFoundException $ex) {
+            $this->assertEquals(404, $ex->getCode());
+        }
+
         $this->expectException(NotFoundException::class);
-        $this->api()->get("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}");
+        $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
     }
 
     /**
@@ -483,7 +493,11 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$rootCategory["knowledgeCategoryID"]);
         $childCategory = $this->api()->get($this->baseUrl.'/'.$childCategory["knowledgeCategoryID"]);
 
-        return  $childCategory->getBody();
+        return [
+            'rootCategory' => $rootCategory,
+            'childCategory' => $childCategory,
+            'article' => $articleToDelete
+        ];
     }
     /**
      * @return array Data with expected correct Count values
