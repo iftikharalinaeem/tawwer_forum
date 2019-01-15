@@ -8,17 +8,14 @@ import { Devices } from "@library/components/DeviceChecker";
 import { IArticle, NavigationRecordType } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
-import { IInternalLink } from "@knowledge/modules/article/components/RelatedArticles";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import UserContent from "@library/components/UserContent";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import { AttachmentType } from "@library/components/attachments";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
-import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
 
