@@ -523,6 +523,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 ['status' => $body['status']],
                 ["articleID" => $id]
             );
+            $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
         }
 
         $row = $this->articleByID($id, true);
