@@ -195,7 +195,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $newKnowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " Test Knowledge Base",
             "description" => 'Some description',
-            "urlCode" => 'test-Knowledge-Base-'.$this->ms().rand(1, 1000),
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
         // Setup the test categories.
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
@@ -314,7 +314,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => 'test-Knowledge-Base'.$this->ms().rand(1, 1000),
+            "urlCode" => 'test-Knowledge-Base'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
@@ -380,16 +380,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * Get current microtime as an int
-     *
-     * @return int
-     */
-    public static function ms() {
-        $mt = explode(' ', microtime());
-        return ((int)$mt[1]) * 1000 + ((int)round($mt[0] * 1000));
-    }
-
-    /**
      * Generate few categories and attach few articles to them same way as prepareCategoriesData
      * Then: delete one category.
      *
@@ -401,7 +391,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => 'test-Knowledge-Base-'.$this->ms().rand(1, 1000),
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
@@ -469,7 +459,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => 'test-Knowledge-Base-'.$this->ms().rand(1, 1000),
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
