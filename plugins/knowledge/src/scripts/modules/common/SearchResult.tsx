@@ -7,14 +7,13 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { Link } from "react-router-dom";
 import Paragraph from "@library/components/Paragraph";
-import AttachmentIcons from "@knowledge/modules/common/AttachmentIcons";
-import { IAttachmentIcon } from "@knowledge/modules/common/AttachmentIcon";
+import AttachmentIcons from "@library/components/attachments/AttachmentIcons";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import SmartLink from "@library/components/navigation/SmartLink";
 import TruncatedText from "@library/components/TruncatedText";
+import { IAttachmentIcon } from "@library/components/attachments/AttachmentIcon";
 
 export interface IResult {
     name: string;
