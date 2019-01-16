@@ -296,8 +296,8 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->select('c.knowledgeCategoryID')
             ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
             ->from('knowledgeCategory c')
-            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID')
-            ->where('c.knowledgeCategoryID', $knowledgeCategoryID)
+            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID AND a.status = \''.ArticleModel::STATUS_PUBLISHED.'\'')
+            ->where(['c.knowledgeCategoryID' => $knowledgeCategoryID])
             ->groupBy('c.knowledgeCategoryID')
             ->get()->nextRow(DATASET_TYPE_ARRAY);
 

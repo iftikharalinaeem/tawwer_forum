@@ -6,6 +6,9 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Knowledge\Models\ArticleModel;
+
 /**
  * Test the /api/v2/knowledge-categories endpoint.
  */
@@ -157,6 +160,31 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * @inheritdoc
+     *
+     */
+    public function testDelete() {
+
+        $testData = $this->prepareCategoryToDelete();
+        $categoryToDelete = $testData['childCategory'];
+        $article = $testData['article'];
+
+
+        $r = $this->api()->delete("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}", []);
+
+        $this->assertEquals(204, $r->getStatusCode());
+
+        try {
+            $this->api()->get("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}");
+        } catch (NotFoundException $ex) {
+            $this->assertEquals(404, $ex->getCode());
+        }
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
+    }
+
+    /**
      * Generate few categories and attach few articles to them to have some variety of counts in DB for integrations tests.
      *
      * @return array Generated categories filled with few articles
@@ -167,7 +195,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $newKnowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " Test Knowledge Base",
             "description" => 'Some description',
-            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
         // Setup the test categories.
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
@@ -192,6 +220,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "body" => $helloWorldBody,
             "format" => "rich",
         ])->getBody();
+
+
 
         $childCategory = $this->api()->post($this->baseUrl, [
             "name" => __FUNCTION__ . " Child category",
@@ -222,6 +252,17 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "name" => "Primary Category Article",
             "body" => $helloWorldBody,
             "format" => "rich",
+        ])->getBody();
+
+        $articleToDelete = $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $articleToDelete = $this->api()->patch($this->kbArticlesUrl.'/'.$articleToDelete['articleID'].'/status', [
+            "status" => ArticleModel::STATUS_DELETED
         ])->getBody();
 
 
@@ -273,11 +314,10 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
+            "urlCode" => 'test-Knowledge-Base'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
-
 
         $this->api()->post($this->kbArticlesUrl, [
             "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
@@ -351,7 +391,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
@@ -405,6 +445,48 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             'childCategory' => $childCategory,
             'child2Category' => $child2Category,
             'childCategory2' => $childCategory2,
+        ];
+    }
+
+    /**
+     * Prepare one category with one soft deleted article
+     *
+     * @return array Generated categories filled with few articles
+     */
+    protected function prepareCategoryToDelete(): array {
+        $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+        // Setup the test categories.
+        $knowledgeBase = $this->api()->post('knowledge-bases', [
+            "name" => __FUNCTION__ . " KB #1",
+            "Description" => 'Test knowledge base description',
+            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+        ])->getBody();
+
+        $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
+
+        $childCategory = $this->api()->post($this->baseUrl, [
+            "name" => __FUNCTION__ . " Child category",
+            "parentID" => $rootCategory["knowledgeCategoryID"],
+        ])->getBody();
+
+        $articleToDelete = $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => $childCategory["knowledgeCategoryID"],
+            "name" => "Primary Category Article",
+            "body" => $helloWorldBody,
+            "format" => "rich",
+        ])->getBody();
+
+        $articleToDelete = $this->api()->patch($this->kbArticlesUrl.'/'.$articleToDelete['articleID'].'/status', [
+            "status" => ArticleModel::STATUS_DELETED
+        ])->getBody();
+
+        $rootCategory = $this->api()->get($this->baseUrl.'/'.$rootCategory["knowledgeCategoryID"]);
+        $childCategory = $this->api()->get($this->baseUrl.'/'.$childCategory["knowledgeCategoryID"]);
+
+        return [
+            'rootCategory' => $rootCategory,
+            'childCategory' => $childCategory,
+            'article' => $articleToDelete
         ];
     }
     /**
