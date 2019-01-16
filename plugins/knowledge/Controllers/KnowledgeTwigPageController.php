@@ -19,7 +19,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ReduxAction;
-use Vanilla\Knowledge\Models\SiteMeta;
+use Vanilla\Models\SiteMeta;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 
 /**
