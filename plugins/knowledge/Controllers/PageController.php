@@ -7,10 +7,8 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Models\PageMetaModel;
 use Vanilla\Knowledge\Models\ReduxAction;
-use Vanilla\Knowledge\Models\SiteMeta;
 
 /**
  * Knowledge Base base controller class.
