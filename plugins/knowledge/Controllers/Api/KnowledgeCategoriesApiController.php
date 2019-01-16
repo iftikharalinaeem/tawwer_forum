@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
@@ -24,6 +25,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var ArticleModel */
+    private $articleModel;
+
     /** @var Schema */
     private $knowledgeCategoryPostSchema;
 
@@ -31,9 +35,14 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * KnowledgeCategoriesApiController constructor.
      *
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
+     * @param ArticleModel $articleModel
      */
-    public function __construct(KnowledgeCategoryModel $knowledgeCategoryModel) {
+    public function __construct(
+        KnowledgeCategoryModel $knowledgeCategoryModel,
+        ArticleModel $articleModel
+    ) {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->articleModel = $articleModel;
     }
 
     /**
@@ -55,6 +64,8 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $row = $this->knowledgeCategoryByID($id);
         if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
             $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+            $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+
             if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
                 $this->knowledgeCategoryModel->updateCounts($row['parentID']);
             }
