@@ -7,6 +7,8 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
+use Gdn_Session as SessionInterface;
+use MediaModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
@@ -21,13 +23,18 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * API controller for managing the articles resource.
  */
 class ArticlesApiController extends AbstractKnowledgeApiController {
+
     use ArticlesApiSchemes;
+
+    use UpdateMediaTrait;
 
     /** @var ArticleModel */
     private $articleModel;
@@ -66,7 +73,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         UserModel $userModel,
         DraftModel $draftModel,
         Parser $parser,
-        KnowledgeCategoryModel $knowledgeCategoryModel
+        KnowledgeCategoryModel $knowledgeCategoryModel,
+        FormatService $formatService,
+        MediaModel $mediaModel,
+        SessionInterface $sessionInterface
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -74,6 +84,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->draftModel = $draftModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->parser = $parser;
+
+        $this->setMediaForeignTable("article");
+        $this->setMediaModel($mediaModel);
+        $this->setFormatterService($formatService);
+        $this->setSessionInterface($sessionInterface);
     }
 
     /**
@@ -645,6 +660,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
             $this->articleRevisionModel->publish($articleRevisionID);
+
+            $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
+            $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);
         }
 
         if (array_key_exists("draftID", $fields)) {
