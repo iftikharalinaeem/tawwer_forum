@@ -4,30 +4,25 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import DropDown from "@library/components/dropdown/DropDown";
-import { t } from "@library/application";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import {
-    DropDownItemLink,
-    DropDownItemButton,
-    DropDownItemMetas,
-    DropDownItemMeta,
-    DropDownItemSeparator,
-    DropDownItem,
-} from "@library/components/dropdown";
-import { ModalConfirm } from "@library/components/modal";
-import { connect } from "react-redux";
-import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
+import { ArticleStatus, IArticle } from "@knowledge/@types/api";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
-import { LoadStatus } from "@library/@types/api";
-import Translate from "@library/components/translation/Translate";
-import DateTime from "@library/components/DateTime";
-import ProfileLink from "@library/components/navigation/ProfileLink";
-import Permission from "@library/users/Permission";
-import { Devices } from "@library/components/DeviceChecker";
-import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { LoadStatus } from "@library/@types/api";
+import { t } from "@library/application";
+import { Devices } from "@library/components/DeviceChecker";
+import {
+    DropDownItem,
+    DropDownItemButton,
+    DropDownItemLink,
+    DropDownItemSeparator,
+} from "@library/components/dropdown";
+import DropDown from "@library/components/dropdown/DropDown";
+import { ModalConfirm } from "@library/components/modal";
+import Permission from "@library/users/Permission";
+import * as React from "react";
+import { connect } from "react-redux";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -100,9 +95,9 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     </DropDownItem>
                     <DropDownItemSeparator />
                     {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
-                    {this.renderDeleteModal()}
-                    {this.renderRestoreModal()}
                 </DropDown>
+                {this.renderDeleteModal()}
+                {this.renderRestoreModal()}
             </Permission>
         );
     }
