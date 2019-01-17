@@ -6,7 +6,7 @@
 import { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import { NavigationRecordType } from "@knowledge/@types/api";
-import { INavigationTreeItem } from "@library/@types/api";
+import { INavigationTreeItem, INavigationItem } from "@library/@types/api";
 
 export default class NavigationSelector {
     /**
@@ -67,5 +67,10 @@ export default class NavigationSelector {
             ...item,
             children: NavigationSelector.selectChildren(navItems, rootKey),
         };
+    }
+
+    public static selectCategory(knowledgeCategoryID: number, navItems: INormalizedNavigationItems): INavigationItem | undefined {
+        const key = `knowledgeCategory${knowledgeCategoryID}`;
+        return navItems[key];
     }
 }

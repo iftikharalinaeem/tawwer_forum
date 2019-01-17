@@ -3,21 +3,26 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-import * as React from "react";
-import { Devices } from "@library/components/DeviceChecker";
 import { IArticle, NavigationRecordType } from "@knowledge/@types/api";
-import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { ICrumb } from "@library/components/Breadcrumbs";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import UserContent from "@library/components/UserContent";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import Container from "@library/components/layouts/components/Container";
+import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
+import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import { IStoreState } from "@knowledge/state/model";
+import { INavigationItem } from "@library/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import { Devices } from "@library/components/DeviceChecker";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
+import UserContent from "@library/components/UserContent";
+import { withDevice } from "@library/contexts/DeviceContext";
+import * as React from "react";
+import { connect } from "react-redux";
 
 interface IProps {
     article: IArticle;
@@ -25,6 +30,7 @@ interface IProps {
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
     kbID: number;
+    navigationItems: INormalizedNavigationItems;
 }
 
 /**
@@ -32,16 +38,22 @@ interface IProps {
  */
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
-        const { article, messages } = this.props;
-        const { articleID } = article;
+        const { article, navigationItems, messages } = this.props;
+        const { articleID, knowledgeCategoryID } = article;
 
         const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
+
+        let title = "";
+        if (knowledgeCategoryID) {
+            const currentCategory = NavigationSelector.selectCategory(knowledgeCategoryID, navigationItems);
+            title = currentCategory ? currentCategory.name : "";
+        }
 
         return (
             <React.Fragment>
                 <Container>
                     <VanillaHeader
-                        title={article.name}
+                        title={title}
                         mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
                         }
@@ -101,4 +113,14 @@ export class ArticleLayout extends React.Component<IProps> {
     }
 }
 
-export default withDevice<IProps>(ArticleLayout);
+interface IInjectableStoreState {
+    navigationItems: INormalizedNavigationItems;
+}
+
+function mapStateToProps(state: IStoreState): IInjectableStoreState {
+    return {
+        navigationItems: state.knowledge.navigation.navigationItems,
+    };
+}
+
+export default connect(mapStateToProps)(withDevice<IProps>(ArticleLayout));
