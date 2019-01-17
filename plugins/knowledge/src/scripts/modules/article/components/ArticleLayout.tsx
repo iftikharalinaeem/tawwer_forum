@@ -134,4 +134,4 @@ function mapStateToProps(state: IStoreState, ownProps: IProps): IInjectableStore
     };
 }
 
-export default connect(mapStateToProps)(withDevice<IProps>(ArticleLayout));
+export default withDevice(connect(mapStateToProps)(ArticleLayout));
