@@ -138,6 +138,21 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test knowledge base "count" fields calculations
+     */
+    public function testKnowledgeBaseCounts() {
+
+        $rootCategory = $this->prepareCategoryMove()['rootCategory'];
+
+        $r = $this->api()->get(
+            'knowledge-bases/'.$rootCategory['knowledgeBaseID']
+        )->getBody();
+
+        $this->assertEquals($rootCategory['articleCountRecursive'], $r['countArticles']);
+        $this->assertEquals(4, $r['countCategories']);
+    }
+
+    /**
      * Test knowledge categories "count" fields calculations
      * when delete category.
      *

@@ -321,7 +321,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                     $res = $this->updateCounts($parent['knowledgeCategoryID'], false);
                     $cat = $parent;
                 }
-                if (!$parent) {
+                if ($updateParents) {
                     $this->knowledgeBaseModel->updateCounts($cat['knowledgeBaseID']);
                 }
                 return $res;
