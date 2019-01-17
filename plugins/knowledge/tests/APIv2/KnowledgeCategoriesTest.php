@@ -125,7 +125,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * @dataProvider provideValidCategoriesCountsAfterMoveUp
      */
     public function testCountFieldsAfterCategoryMove(string $categoryKey, array $correctCounts) {
-
         $data = $this->prepareCategoryMove();
 
         $categoryResponse = $this->api()->get(
@@ -141,7 +140,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * Test knowledge base "count" fields calculations
      */
     public function testKnowledgeBaseCounts() {
-
         $rootCategory = $this->prepareCategoryMove()['rootCategory'];
 
         $r = $this->api()->get(
