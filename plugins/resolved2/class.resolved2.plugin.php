@@ -10,6 +10,13 @@
  */
 class Resolved2Plugin extends Gdn_Plugin {
 
+    const UNRESOLVED_CACHE = 'plugin.resolved2.unresolved_count';
+    const UNRESOLVED_CACHE_TTL = 3600;
+
+    const UNRESOLVED_RECALC = 'plugin.resolved2.recalculate';
+    const UNRESOLVED_RECALC_INIT = 1;
+    const UNRESOLVED_RECALC_TRIGGER = 2;
+
     /**
      * @var DiscussionModel
      */
@@ -135,9 +142,28 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @return int
      */
     private function getUnresolvedDiscussionCount() {
-        return $this->discussionModel->getCount([
+        $unresolved = Gdn::cache()->get(self::UNRESOLVED_CACHE);
+        if ($unresolved == Gdn_Cache::CACHEOP_FAILURE) {
+            $unresolved = $this->updateUnresolvedDiscussionCache();
+        }
+        return $unresolved;
+    }
+
+    /**
+     * Update count of unresolved discussions.
+     *
+     * @return int
+     */
+    private function updateUnresolvedDiscussionCache() {
+        $unresolved = $this->discussionModel->getCount([
             'Resolved' => 0,
         ]);
+
+        Gdn::cache()->store(self::UNRESOLVED_CACHE, $unresolved, [
+            Gdn_Cache::FEATURE_EXPIRY => self::UNRESOLVED_CACHE_TTL
+        ]);
+
+        return $unresolved;
     }
 
     /**
@@ -234,6 +260,10 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         $this->discussionModel->setField($discussion['DiscussionID'], $resolutionFields);
 
+        Gdn::cache()->store(self::UNRESOLVED_RECALC, self::UNRESOLVED_RECALC_INIT, [
+            Gdn_Cache::FEATURE_EXPIRY => 60
+        ]);
+
         // Force a trackEvent since we are calling update instead of DiscussionModel->save()
         if (class_exists('AnalyticsTracker')) {
             $type = 'discussion_edit';
@@ -276,6 +306,31 @@ class Resolved2Plugin extends Gdn_Plugin {
             ];
 
             $args['Data']['resolvedMetric'] = $resolvedMetric;
+        }
+    }
+
+    /**
+     * Hook into the Tick event for every real page load
+     *
+     * Look for a reason to update the unresolved count.
+     *
+     * @param Gdn_Statistics $sender
+     */
+    public function gdn_statistics_analyticsTick_handler($sender) {
+        if (Gdn::session()->isValid()) {
+
+            // Check is recalc flag is set
+            $recalcFlag = Gdn::cache()->get(self::UNRESOLVED_RECALC);
+            if ($recalcFlag) {
+
+                // Increment it, to see if we're the lucky winner
+                $recalcIncrement = Gdn::cache()->increment(self::UNRESOLVED_RECALC, 1);
+                if ($recalcIncrement == self::UNRESOLVED_RECALC_TRIGGER) {
+                    $this->updateUnresolvedDiscussionCache();
+                    Gdn::cache()->remove(self::UNRESOLVED_RECALC);
+                }
+            }
+
         }
     }
 
