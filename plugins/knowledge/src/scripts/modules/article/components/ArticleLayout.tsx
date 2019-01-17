@@ -10,7 +10,6 @@ import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
-import { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { INavigationItem } from "@library/@types/api";
@@ -30,7 +29,7 @@ interface IProps {
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
     kbID: number;
-    navigationItems: INormalizedNavigationItems;
+    currentNavigationCategory?: INavigationItem;
 }
 
 /**
@@ -38,15 +37,14 @@ interface IProps {
  */
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
-        const { article, navigationItems, messages } = this.props;
-        const { articleID, knowledgeCategoryID } = article;
+        const { article, currentNavigationCategory, messages } = this.props;
+        const { articleID } = article;
 
         const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
 
         let title = "";
-        if (knowledgeCategoryID) {
-            const currentCategory = NavigationSelector.selectCategory(knowledgeCategoryID, navigationItems);
-            title = currentCategory ? currentCategory.name : "";
+        if (currentNavigationCategory) {
+            title = currentNavigationCategory.name;
         }
 
         return (
@@ -113,13 +111,26 @@ export class ArticleLayout extends React.Component<IProps> {
     }
 }
 
+/**
+ * Injectable props from the application state.
+ */
 interface IInjectableStoreState {
-    navigationItems: INormalizedNavigationItems;
+    currentNavigationCategory?: INavigationItem;
 }
 
-function mapStateToProps(state: IStoreState): IInjectableStoreState {
+/**
+ * Map elements in the application state to this component's properties.
+ * @param state - The full, current state of the application.
+ * @param ownProps - Current component instance props.
+ */
+function mapStateToProps(state: IStoreState, ownProps: IProps): IInjectableStoreState {
+    const { article } = ownProps;
+    const { knowledgeCategoryID } = article;
+
     return {
-        navigationItems: state.knowledge.navigation.navigationItems,
+        currentNavigationCategory: knowledgeCategoryID
+            ? NavigationSelector.selectCategory(knowledgeCategoryID, state.knowledge.navigation.navigationItems)
+            : undefined,
     };
 }
 

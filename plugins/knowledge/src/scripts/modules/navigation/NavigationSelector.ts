@@ -69,6 +69,11 @@ export default class NavigationSelector {
         };
     }
 
+    /**
+     * Select a single category, by its ID, from an INormalizedNavigationItems collection.
+     * @param knowledgeCategoryID - Unique ID of the knowledge category to select.
+     * @param navItems - An collection of INormalizedNavigationItems elements, indexed by their type and ID.
+     */
     public static selectCategory(knowledgeCategoryID: number, navItems: INormalizedNavigationItems): INavigationItem | undefined {
         const key = `knowledgeCategory${knowledgeCategoryID}`;
         return navItems[key];
