@@ -10,12 +10,10 @@
  */
 class Resolved2Plugin extends Gdn_Plugin {
 
-    const UNRESOLVED_CACHE = 'plugin.resolved2.unresolved_count';
+    const UNRESOLVED_CACHE = 'plugin.resolved2.unresolved_count.%s';
     const UNRESOLVED_CACHE_TTL = 3600;
 
-    const UNRESOLVED_RECALC = 'plugin.resolved2.recalculate';
-    const UNRESOLVED_RECALC_INIT = 1;
-    const UNRESOLVED_RECALC_TRIGGER = 2;
+    const UNRESOLVED_RECALC = 'plugin.resolved2.recalculate.%s';
 
     /**
      * @var DiscussionModel
@@ -137,14 +135,37 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Get a hash of category permissions
+     *
+     * @return string
+     */
+    private function getPermissionHash() {
+        static $permissionHash;
+
+        if (is_null($permissionHash)) {
+            $permissions = DiscussionModel::categoryPermissions();
+            if ($permissions === true) {
+                $permissionHash = 'all';
+            } else {
+                $permissionHash = sha1(serialize(sort($permissions)));
+            }
+        }
+
+        return $permissionHash;
+    }
+
+    /**
      * Return the number of unresolved discussions.
      *
      * @return int
      */
     private function getUnresolvedDiscussionCount() {
-        $unresolved = Gdn::cache()->get(self::UNRESOLVED_CACHE);
+        $permissionHash = $this->getPermissionHash();
+        $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+
+        $unresolved = Gdn::cache()->get($unresolvedKey);
         if ($unresolved == Gdn_Cache::CACHEOP_FAILURE) {
-            $unresolved = $this->updateUnresolvedDiscussionCache();
+            $unresolved = $this->updateUnresolvedDiscussionCache($unresolvedKey);
         }
         return $unresolved;
     }
@@ -152,14 +173,21 @@ class Resolved2Plugin extends Gdn_Plugin {
     /**
      * Update count of unresolved discussions.
      *
+     * @param string $unresolvedKey precaclculated permissions-based key
      * @return int
      */
-    private function updateUnresolvedDiscussionCache() {
+    private function updateUnresolvedDiscussionCache(string $unresolvedKey = null) {
+
+        if (is_null($unresolvedKey)) {
+            $permissionHash = $this->getPermissionHash();
+            $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+        }
+
         $unresolved = $this->discussionModel->getCount([
             'Resolved' => 0,
         ]);
 
-        Gdn::cache()->store(self::UNRESOLVED_CACHE, $unresolved, [
+        Gdn::cache()->store($unresolvedKey, $unresolved, [
             Gdn_Cache::FEATURE_EXPIRY => self::UNRESOLVED_CACHE_TTL
         ]);
 
@@ -260,7 +288,9 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         $this->discussionModel->setField($discussion['DiscussionID'], $resolutionFields);
 
-        Gdn::cache()->store(self::UNRESOLVED_RECALC, self::UNRESOLVED_RECALC_INIT, [
+        $permissionHash = $this->getPermissionHash();
+        $recalcKey = sprintf(self::UNRESOLVED_RECALC, $permissionHash);
+        Gdn::cache()->store($recalcKey, $permissionHash, [
             Gdn_Cache::FEATURE_EXPIRY => 60
         ]);
 
@@ -317,20 +347,16 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @param Gdn_Statistics $sender
      */
     public function gdn_statistics_analyticsTick_handler($sender) {
-        if (Gdn::session()->isValid()) {
+        $permissionHash = $this->getPermissionHash();
+        $recalcKey = sprintf(self::UNRESOLVED_RECALC, $permissionHash);
 
-            // Check is recalc flag is set
-            $recalcFlag = Gdn::cache()->get(self::UNRESOLVED_RECALC);
-            if ($recalcFlag) {
+        // Check is recalc flag is set
+        $recalcFlag = Gdn::cache()->get($recalcKey);
+        if ($recalcFlag) {
+            Gdn::cache()->remove($recalcKey);
 
-                // Increment it, to see if we're the lucky winner
-                $recalcIncrement = Gdn::cache()->increment(self::UNRESOLVED_RECALC, 1);
-                if ($recalcIncrement == self::UNRESOLVED_RECALC_TRIGGER) {
-                    $this->updateUnresolvedDiscussionCache();
-                    Gdn::cache()->remove(self::UNRESOLVED_RECALC);
-                }
-            }
-
+            $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+            $this->updateUnresolvedDiscussionCache($unresolvedKey);
         }
     }
 
