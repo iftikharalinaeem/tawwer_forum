@@ -1,0 +1,157 @@
+openapi: 3.0.2
+info:
+paths:
+  /statuses:
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Status'
+                type: array
+          description: Success
+      tags:
+      - Statuses
+      summary: Get a list of idea statuses.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Success
+      tags:
+      - Statuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+        required: true
+      summary: Create an idea status.
+  '/statuses/{id}':
+    delete:
+      parameters:
+      - description: |
+          The idea status ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Statuses
+      summary: Delete an idea status.
+    get:
+      parameters:
+      - description: |
+          The idea status ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Success
+      tags:
+      - Statuses
+      summary: Get a single idea status.
+    patch:
+      summary: Update an idea status.
+      tags:
+      - Statuses
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusPatch'
+        required: true
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Success
+  '/statuses/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The idea status ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Status'
+          description: Success
+      tags:
+      - Statuses
+      summary: Get editable fields for an idea status.
+components:
+  schemas:
+    Status:
+      properties:
+        statusID:
+          description: Unique numeric ID of a status.
+          type: integer
+          readOnly: true
+        name:
+          description: Label for the status.
+          minLength: 1
+          type: string
+        isDefault:
+          description: Is this the default status?
+          type: boolean
+        state:
+          description: The open/closed state of an idea.
+          enum:
+          - Open
+          - Closed
+          minLength: 1
+          type: string
+      required:
+      - statusID
+      - name
+      - state
+      - isDefault
+      type: object
+    StatusPatch:
+      type: object
+      properties:
+        name:
+          description: Label for the status.
+          minLength: 1
+          type: string
+        isDefault:
+          description: Is this the default status?
+          type: boolean
+        state:
+          description: The open/closed state of an idea.
+          enum:
+          - Open
+          - Closed
+          minLength: 1
+          type: string

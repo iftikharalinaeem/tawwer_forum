@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -9,6 +9,11 @@
  * Class Resolved2Plugin
  */
 class Resolved2Plugin extends Gdn_Plugin {
+
+    const UNRESOLVED_CACHE = 'plugin.resolved2.unresolved_count.%s';
+    const UNRESOLVED_CACHE_TTL = 3600;
+
+    const UNRESOLVED_RECALC = 'plugin.resolved2.recalculate.%s';
 
     /**
      * @var DiscussionModel
@@ -130,14 +135,63 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Get a hash of category permissions
+     *
+     * @return string
+     */
+    private function getPermissionHash() {
+        static $permissionHash;
+
+        if (is_null($permissionHash)) {
+            $permissions = DiscussionModel::categoryPermissions();
+            if ($permissions === true) {
+                $permissionHash = 'all';
+            } else {
+                $permissionHash = sha1(serialize(sort($permissions)));
+            }
+        }
+
+        return $permissionHash;
+    }
+
+    /**
      * Return the number of unresolved discussions.
      *
      * @return int
      */
     private function getUnresolvedDiscussionCount() {
-        return $this->discussionModel->getCount([
+        $permissionHash = $this->getPermissionHash();
+        $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+
+        $unresolved = Gdn::cache()->get($unresolvedKey);
+        if ($unresolved === Gdn_Cache::CACHEOP_FAILURE) {
+            $unresolved = $this->updateUnresolvedDiscussionCache($unresolvedKey);
+        }
+        return $unresolved;
+    }
+
+    /**
+     * Update count of unresolved discussions.
+     *
+     * @param string $unresolvedKey precaclculated permissions-based key
+     * @return int
+     */
+    private function updateUnresolvedDiscussionCache(string $unresolvedKey = null) {
+
+        if (is_null($unresolvedKey)) {
+            $permissionHash = $this->getPermissionHash();
+            $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+        }
+
+        $unresolved = $this->discussionModel->getCount([
             'Resolved' => 0,
         ]);
+
+        Gdn::cache()->store($unresolvedKey, $unresolved, [
+            Gdn_Cache::FEATURE_EXPIRY => self::UNRESOLVED_CACHE_TTL
+        ]);
+
+        return $unresolved;
     }
 
     /**
@@ -234,6 +288,12 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         $this->discussionModel->setField($discussion['DiscussionID'], $resolutionFields);
 
+        $permissionHash = $this->getPermissionHash();
+        $recalcKey = sprintf(self::UNRESOLVED_RECALC, $permissionHash);
+        Gdn::cache()->store($recalcKey, $permissionHash, [
+            Gdn_Cache::FEATURE_EXPIRY => 60
+        ]);
+
         // Force a trackEvent since we are calling update instead of DiscussionModel->save()
         if (class_exists('AnalyticsTracker')) {
             $type = 'discussion_edit';
@@ -276,6 +336,27 @@ class Resolved2Plugin extends Gdn_Plugin {
             ];
 
             $args['Data']['resolvedMetric'] = $resolvedMetric;
+        }
+    }
+
+    /**
+     * Hook into the Tick event for every real page load
+     *
+     * Look for a reason to update the unresolved count.
+     *
+     * @param Gdn_Statistics $sender
+     */
+    public function gdn_statistics_analyticsTick_handler($sender) {
+        $permissionHash = $this->getPermissionHash();
+        $recalcKey = sprintf(self::UNRESOLVED_RECALC, $permissionHash);
+
+        // Check is recalc flag is set
+        $recalcFlag = Gdn::cache()->get($recalcKey);
+        if ($recalcFlag) {
+            Gdn::cache()->remove($recalcKey);
+
+            $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
+            $this->updateUnresolvedDiscussionCache($unresolvedKey);
         }
     }
 
