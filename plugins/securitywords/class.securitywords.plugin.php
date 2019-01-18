@@ -271,7 +271,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      */
     public function setup() {
         // If no previous config, populate it with example security words.
-        touchConfig([
+        \Gdn::config()->touch([
             'Plugins.securitywords.words' => 'area51;mkultra;911',
             'Plugins.securitywords.notifyuser' => false
         ]);

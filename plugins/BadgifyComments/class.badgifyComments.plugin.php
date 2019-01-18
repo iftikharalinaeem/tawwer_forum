@@ -30,13 +30,13 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
             ->column('BadgeDiscussion', 'int', '0', ['index'])
             ->set();
 
-        touchConfig('Badgify.Default.Name', 'Commented in Discussion');
-        touchConfig('Badgify.Default.Slug', 'commented-in-discussion');
-        touchConfig('Badgify.Default.Description', 'Commented in a discussion flagged by admin to give badges. "%s"');
-        touchConfig('Badgify.Default.Points', '2');
-        touchConfig('Badgify.Default.BadgeClass', 'Commenter');
-        touchConfig('Badgify.Default.BadgeClassLevel', '1');
-        touchConfig('Badgify.Default.AwardManually', 'checked');
+        \Gdn::config()->touch('Badgify.Default.Name', 'Commented in Discussion');
+        \Gdn::config()->touch('Badgify.Default.Slug', 'commented-in-discussion');
+        \Gdn::config()->touch('Badgify.Default.Description', 'Commented in a discussion flagged by admin to give badges. "%s"');
+        \Gdn::config()->touch('Badgify.Default.Points', '2');
+        \Gdn::config()->touch('Badgify.Default.BadgeClass', 'Commenter');
+        \Gdn::config()->touch('Badgify.Default.BadgeClassLevel', '1');
+        \Gdn::config()->touch('Badgify.Default.AwardManually', 'checked');
     }
 
 
