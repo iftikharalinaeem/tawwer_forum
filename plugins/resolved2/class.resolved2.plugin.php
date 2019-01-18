@@ -164,7 +164,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         $unresolvedKey = sprintf(self::UNRESOLVED_CACHE, $permissionHash);
 
         $unresolved = Gdn::cache()->get($unresolvedKey);
-        if ($unresolved == Gdn_Cache::CACHEOP_FAILURE) {
+        if ($unresolved === Gdn_Cache::CACHEOP_FAILURE) {
             $unresolved = $this->updateUnresolvedDiscussionCache($unresolvedKey);
         }
         return $unresolved;
