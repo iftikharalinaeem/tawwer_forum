@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Test the /api/v2/knowledge-categories endpoint.
@@ -45,6 +46,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = false;
+
+    private static $preparedCategorySortData = [];
 
     /**
      * This method is called before the first test of this test class is run.
@@ -94,6 +97,55 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         return $record;
     }
 
+
+    /**
+     * Test knowledge categories "sort" field calculations.
+     *
+     * @param string $articleKey Key to find real data response
+     * @param int $sort Expected correct sort field value
+     *
+     * @dataProvider provideValidCategorySorts
+     */
+    public function testSortField(string $articleKey, int $sort) {
+
+        $data = $this->prepareCategorySortData();
+
+        if (substr($articleKey, 0, 7) === 'article') {
+            $r = $this->api()->get(
+                '/articles/'.$data[$articleKey]['articleID']
+            )->getBody();
+        } else {
+            $r = $this->api()->get(
+                $this->baseUrl.'/'.$data[$articleKey]['knowledgeCategoryID']
+            )->getBody();
+        }
+        $this->assertEquals($sort, $r['sort']);
+    }
+
+    /**
+     * Test knowledge categories "sort" field calculationswhen "help" center mode.
+     *
+     * @param string $articleKey Key to find real data response
+     * @param int $sort Expected correct sort field value
+     *
+     * @dataProvider provideValidCategoryHelpSorts
+     */
+    public function testSortFieldHelpMode(string $articleKey, int $sort) {
+
+        $data = $this->prepareCategorySortData(KnowledgeBaseModel::TYPE_HELP);
+
+        if (substr($articleKey, 0, 7) === 'article') {
+            $r = $this->api()->get(
+                '/articles/'.$data[$articleKey]['articleID']
+            )->getBody();
+        } else {
+            $r = $this->api()->get(
+                $this->baseUrl.'/'.$data[$articleKey]['knowledgeCategoryID']
+            )->getBody();
+        }
+
+        $this->assertEquals($sort, $r['sort']);
+    }
     /**
      * Test knowledge categories "count" fields calculations.
      *
@@ -182,6 +234,90 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
+    }
+
+    /**
+     * Generate few categories and attach few articles to them to have some variety of counts in DB for integrations tests.
+     *
+     * @param string $kbType Knowledge Base Type to generate "sort" data
+     * @return array Generated categories filled with few articles
+     */
+    protected function prepareCategorySortData(string $kbType = KnowledgeBaseModel::TYPE_GUIDE): array {
+
+        if (!isset(self::$preparedCategorySortData[$kbType])) {
+            $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+
+            $newKnowledgeBase = $this->api()->post('knowledge-bases', [
+                "name" => __FUNCTION__ . " Test Knowledge Base",
+                "description" => 'Some description',
+                "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+                "viewType" => $kbType
+            ])->getBody();
+
+            // Setup the test categories.
+            $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
+
+            $article1 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
+
+            $article2 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
+
+            $subCat1 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category",
+            ])->getBody();
+
+            $subCat2 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category 2",
+            ])->getBody();
+
+            $subCat3 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category 3",
+                'sort' => $subCat2['sort']
+            ])->getBody();
+
+
+            $article3 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article 3",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
+
+            $article4 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article 4",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+                "sort" => 1,
+            ])->getBody();
+
+            self::$preparedCategorySortData[$kbType] = [
+                'rootCategory' => $rootCategory,
+                'subCat1' => $subCat1,
+                'subCat2' => $subCat2,
+                'subCat3' => $subCat3,
+                'article1' => $article1,
+                'article2' => $article2,
+                'article3' => $article3,
+                'article4' => $article4,
+            ];
+        }
+
+
+
+        return self::$preparedCategorySortData[$kbType];
     }
 
     /**
@@ -300,7 +436,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             'childCategory2' => $childCategory2,
         ];
     }
-
 
     /**
      * Generate few categories and attach few articles to them same way as prepareCategoriesData
@@ -512,6 +647,79 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             ]
         ];
     }
+
+    /**
+     * @return array Data with expected correct Sort values
+     */
+    public function provideValidCategorySorts(): array {
+        return [
+            'article1' => [
+                'article1',
+                0
+            ],
+            'article2' => [
+                'article2',
+                2
+            ],
+            'subCat1' => [
+                'subCat1',
+                3
+            ],
+            'subCat2' => [
+                'subCat2',
+                5
+            ],
+            'subCat3' => [
+                'subCat3',
+                4
+            ],
+            'article3' => [
+                'article3',
+                6
+            ],
+            'article4' => [
+                'article4',
+                1
+            ]
+        ];
+    }
+
+    /**
+     * @return array Data with expected correct sort values Help center type KB
+     */
+    public function provideValidCategoryHelpSorts(): array {
+        return [
+            'article1' => [
+                'article1',
+                0
+            ],
+            'article2' => [
+                'article2',
+                0
+            ],
+            'subCat1' => [
+                'subCat1',
+                0
+            ],
+            'subCat2' => [
+                'subCat2',
+                2
+            ],
+            'subCat3' => [
+                'subCat3',
+                1
+            ],
+            'article3' => [
+                'article3',
+                0
+            ],
+            'article4' => [
+                'article4',
+                1
+            ]
+        ];
+    }
+
 
     /**
      * @return array Data with expected correct Count values

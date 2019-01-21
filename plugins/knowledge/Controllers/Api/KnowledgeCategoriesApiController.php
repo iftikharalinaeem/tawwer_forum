@@ -365,7 +365,26 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         }
         $body = $in->validate($body);
 
+
+        $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID']);
+        $maxSortIndex = $sortInfo['maxSort'];
+        if (!is_int($body['sort'] ?? false)) {
+            $body['sort'] = $maxSortIndex + 1;
+            $updateSorts = false;
+        } else {
+            $updateSorts = ($body['sort'] <= $maxSortIndex);
+        }
+
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
+
+        if ($updateSorts) {
+            $this->knowledgeCategoryModel->shiftSorts(
+                $body['parentID'],
+                $body['sort'],
+                $knowledgeCategoryID,
+                KnowledgeCategoryModel::SORT_TYPE_CATEGORY
+            );
+        }
         if (!empty($body['parentID']) && $body['parentID'] != -1) {
             $this->knowledgeCategoryModel->updateCounts($body['parentID']);
         }
