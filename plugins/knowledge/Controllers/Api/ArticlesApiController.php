@@ -624,11 +624,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $prevState = $this->articleModel->getID($articleID);
             $moveToAnotherCategory = ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
 
-            if (!($fields['sort'] ?? false)) {
+            if (!is_int($fields['sort'] ?? false)) {
                 if ($moveToAnotherCategory || !($prevState['sort'] ?? false)) {
-                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($fields['knowledgeCategoryID']);
+                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($article['knowledgeCategoryID']);
                     $maxSortIndex = $sortInfo['maxSort'];
-                    $fields['sort'] = $maxSortIndex + 1;
+                    $article['sort'] = $maxSortIndex + 1;
                     $updateSorts = false;
                 } else {
                     // if we don't change the categoryID and there is no $fields['sort']
@@ -637,7 +637,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 }
             } else {
                 //update sorts for other records only if 'sort' changed
-                $updateSorts = ($fields['sort'] != $prevState['sort']);
+                $updateSorts = ($article['sort'] != $prevState['sort']);
             }
             $this->articleModel->update($article, ["articleID" => $articleID]);
 
@@ -656,8 +656,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
-                    $fields['knowledgeCategoryID'],
-                    $fields['sort'],
+                    $article['knowledgeCategoryID'],
+                    $article['sort'],
                     $articleID,
                     KnowledgeCategoryModel::SORT_TYPE_ARTICLE
                 );

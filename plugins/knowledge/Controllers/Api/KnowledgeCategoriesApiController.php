@@ -327,11 +327,52 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $previousState = $this->knowledgeCategoryByID($id);
 
+        $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
+
+        if (!is_int($body['sort'] ?? false)) {
+            if ($moveToAnotherParent || !($previousState['sort'] ?? false)) {
+                $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID'] ?? $previousState['parentID']);
+                $maxSortIndex = $sortInfo['maxSort'];
+                $body['sort'] = $maxSortIndex + 1;
+                $updateSorts = false;
+            } else {
+                // if we don't change the parentID and there is no $fields['sort']
+                // then we don't need to update sorting
+                $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
+                $updateSorts = false;
+            }
+        } else {
+            //update sorts for other records only if 'sort' changed
+            $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
+            $updateSorts = ($body['sort'] != $previousState['sort']);
+        }
+
         $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
-        if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
+        if ($moveToAnotherParent) {
             $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
             $this->knowledgeCategoryModel->updateCounts($id);
         }
+
+        if (is_int($previousState['parentID']) && is_int($previousState['sort'])) {
+            //shift sorts down for source category when move one article to another category
+            $this->knowledgeCategoryModel->shiftSorts(
+                $previousState['parentID'],
+                $previousState['sort'],
+                $previousState['knowledgeCategoryID'],
+                KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
+                KnowledgeCategoryModel::SORT_DECREMENT
+            );
+        }
+
+        if ($updateSorts) {
+            $this->knowledgeCategoryModel->shiftSorts(
+                $body['parentID'],
+                $body['sort'],
+                $id,
+                KnowledgeCategoryModel::SORT_TYPE_CATEGORY
+            );
+        }
+
         $row = $this->knowledgeCategoryByID($id);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
