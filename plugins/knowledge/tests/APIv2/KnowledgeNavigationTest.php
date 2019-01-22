@@ -84,7 +84,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                         $knowledgeBase = $this->api()->post("knowledge-bases", [
                             "name" => $item["name"],
                             "description" => $item["name"],
-                            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
+                            "urlCode" => 'test-'.round(microtime(true) * 1000).rand(1, 1000),
                         ]);
                         $parentID = $knowledgeBase['rootCategoryID'];
                         $response = $this->api()->get("knowledge-categories/".$parentID);
@@ -212,6 +212,10 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "name" => "Root Category",
                 "children" => [
                     [
+                        "name" => "Article 1",
+                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    ],
+                    [
                         "name" => "Parent Category A",
                         "children" => [
                             [
@@ -251,6 +255,10 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                         "name" => "Parent Category C",
                         "children" => [
                             [
+                                "name" => "Article 5",
+                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                            ],
+                            [
                                 "name" => "Child Category D",
                                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
                             ],
@@ -258,17 +266,11 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                                 "name" => "Child Category E",
                                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
                             ],
-                            [
-                                "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
-                            ],
+
                         ],
                         "recordType" => Navigation::RECORD_TYPE_CATEGORY,
                     ],
-                    [
-                        "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
-                    ],
+
                 ],
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],

@@ -434,16 +434,21 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->get()->nextRow(DATASET_TYPE_ARRAY);
         if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
             && $knowledgeBase['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
-            $updateArticles = $this->sql()->update('article')
+            $query = $this->sql()->update('article')
                 ->set('sort'.($direction ? '+' : '-'), 1)
                 ->where(
                     [
                         'knowledgeCategoryID' => $knowledgeCategoryID,
                         'status' => ArticleModel::STATUS_PUBLISHED,
-                        'sort '.($direction ? '>=' : '>') => $idx,
-                        'articleID <>' => (($protectType === self::SORT_TYPE_ARTICLE) ? $protectedID : -2)
+                        'sort >=' => $idx
                     ]
-                )->put();
+                );
+
+            if ($protectType === self::SORT_TYPE_ARTICLE) {
+                $query->where('articleID <>', $protectedID);
+            }
+
+            $updateArticles = $query->put();
         } else {
             $updateArticles = true;
         }
@@ -453,13 +458,12 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->where(
                 [
                     'parentID' => $knowledgeCategoryID,
-                    'sort '.($direction ? '>=' : '>') => $idx
+                    'sort >=' => $idx
                 ]
             );
         if ($protectType === self::SORT_TYPE_CATEGORY) {
             $query->where('knowledgeCategoryID <>', $protectedID);
         }
-
         $updateCategories = $query->put();
 
         return ($updateArticles !== false && $updateCategories !== false);

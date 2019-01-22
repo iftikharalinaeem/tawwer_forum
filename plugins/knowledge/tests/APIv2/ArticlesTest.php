@@ -33,6 +33,8 @@ class ArticlesTest extends AbstractResourceTest {
     /** @var string The singular name of the resource. */
     protected $singular = "article";
 
+    private $defaultKB = [];
+
     /**
      * This method is called before the first test of this test class is run.
      */
@@ -111,7 +113,16 @@ class ArticlesTest extends AbstractResourceTest {
      * @dataProvider providePatchFields
      */
     public function testPatchSparse($field) {
+        if (empty($this->defaultKB)) {
+            $this->defaultKB = $this->api()->post('knowledge-bases', [
+                "name" => __FUNCTION__ . " KB #1",
+                "Description" => 'Test knowledge base description',
+                "urlCode" => 'test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000),
+            ])->getBody();
+        }
+
         $row = $this->testGetEdit();
+
         $patchRow = $this->modifyRow($row);
 
         $r = $this->api()->patch(
@@ -206,6 +217,7 @@ class ArticlesTest extends AbstractResourceTest {
         }
         $this->assertTrue($success, "Unable to limit index to articles in a specific category.");
     }
+
 
     /**
      * Test getting history of article revisions.

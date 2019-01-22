@@ -642,7 +642,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $this->articleModel->update($article, ["articleID" => $articleID]);
 
             if ($moveToAnotherCategory) {
-                if (!empty($prevState['knowledgeCategoryID'])) {
+                if (!empty($prevState['knowledgeCategoryID']) && !is_null($prevState['sort'])) {
                     $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
                     //shift sorts down for source category when move one article to another category
                     $this->knowledgeCategoryModel->shiftSorts(

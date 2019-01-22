@@ -353,15 +353,17 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             $this->knowledgeCategoryModel->updateCounts($id);
         }
 
-        if (is_int($previousState['parentID']) && is_int($previousState['sort'])) {
-            //shift sorts down for source category when move one article to another category
-            $this->knowledgeCategoryModel->shiftSorts(
-                $previousState['parentID'],
-                $previousState['sort'],
-                $previousState['knowledgeCategoryID'],
-                KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
-                KnowledgeCategoryModel::SORT_DECREMENT
-            );
+        if ($moveToAnotherParent) {
+            if (is_int($previousState['parentID']) && is_int($previousState['sort'])) {
+                //shift sorts down for source category when move one article to another category
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $previousState['parentID'],
+                    $previousState['sort'],
+                    $previousState['knowledgeCategoryID'],
+                    KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
+                    KnowledgeCategoryModel::SORT_DECREMENT
+                );
+            }
         }
 
         if ($updateSorts) {
@@ -417,7 +419,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         }
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
-
         if ($updateSorts) {
             $this->knowledgeCategoryModel->shiftSorts(
                 $body['parentID'],

@@ -130,7 +130,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      *
      * @dataProvider provideValidCategorySortsPatch
      */
-    public function testSortFieldPatrch(string $articleKey, int $sort) {
+    public function testSortFieldPatch(string $articleKey, int $sort) {
 
         $data = $this->prepareCategorySortPatchData();
 
@@ -147,7 +147,33 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test knowledge categories "sort" field calculationswhen "help" center mode.
+     * Test knowledge categories "sort" field calculations when patch existing articles and categories.
+     * (when KnowledgeBase is Help center type)
+     *
+     * @param string $articleKey Key to find real data response
+     * @param int $sort Expected correct sort field value
+     *
+     * @dataProvider provideValidCategorySortsPatchHelp
+     */
+    public function testSortFieldPatchHelpMode(string $articleKey, array $sort) {
+
+        $data = $this->prepareCategorySortPatchData(KnowledgeBaseModel::TYPE_HELP);
+
+        if (substr($articleKey, 0, 7) === 'article') {
+            $r = $this->api()->get(
+                '/articles/'.$data[$articleKey]['articleID']
+            )->getBody();
+        } else {
+            $r = $this->api()->get(
+                $this->baseUrl.'/'.$data[$articleKey]['knowledgeCategoryID']
+            )->getBody();
+        }
+        $this->assertEquals($sort[0], $r['sort']);
+    }
+
+
+    /**
+     * Test knowledge categories "sort" field calculations when "help" center mode.
      *
      * @param string $articleKey Key to find real data response
      * @param int $sort Expected correct sort field value
@@ -392,7 +418,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
                 "name" => "Sub Category 3"
             ])->getBody();
 
-
             $article3 = $this->api()->post($this->kbArticlesUrl, [
                 "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
                 "name" => "Primary Category Article 3",
@@ -411,6 +436,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
                 "sort" => 1,
                 "knowledgeCategoryID" => $article3["knowledgeCategoryID"],
             ])->getBody();
+
             $article2 = $this->api()->patch($this->kbArticlesUrl.'/'.$article2['articleID'], [
                 "knowledgeCategoryID" => $subCat3["knowledgeCategoryID"],
             ])->getBody();
@@ -418,14 +444,14 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             $subCat1 = $this->api()->patch($this->baseUrl.'/'.$subCat1['knowledgeCategoryID'], [
                 "parentID" => $subCat3["knowledgeCategoryID"]
             ])->getBody();
-//
+
             $subCat2 = $this->api()->patch($this->baseUrl.'/'.$subCat2['knowledgeCategoryID'], [
                 "parentID" => $subCat3["knowledgeCategoryID"],
                 "sort" => 1,
             ])->getBody();
-//
+
             $subCat3 = $this->api()->patch($this->baseUrl.'/'.$subCat3['knowledgeCategoryID'], [
-                "sort" => 1,
+                "sort" => 0,
             ])->getBody();
 
             self::$preparedCategorySortData[$index] = [
@@ -847,13 +873,35 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * This data relates on $this->prepareCategorySortPatchData(KnowledgeBaseModel::TYPE_GUIDE)
+     *
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * |          |  Init  |   Patch  |   Patch  |  Patch |      Patch     |   Patch  |
+     * |          | (post) | Article3 | Article2 |  Cat1  |      Cat2      |   Cat3   |
+     * |          |        | (sort=1) |  (move)  | (move) | (move; sort=1) | (sort=0) |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Article1 |    0   |     0    |     0    |    0   |        0       |     1    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Article2 |    1   |     2    |     0    |    0   |        0       |     0    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Cat1     |    2   |     3    |     2    |    1   |        2       |     2    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Cat2     |    3   |     4    |     3    |    2   |        1       |     1    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Cat3     |    4   |     5    |     4    |    3   |        2       |     0    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Article3 |    5   |     1    |     1    |    1   |        1       |     2    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     * | Article4 |    6   |     7    |     6    |    5   |        4       |     5    |
+     * +----------+--------+----------+----------+--------+----------------+----------+
+     *
      * @return array Data with expected correct Sort values
      */
     public function provideValidCategorySortsPatch(): array {
         return [
             'article1' => [
                 'article1',
-                0
+                1
             ],
             'article2' => [
                 'article2',
@@ -869,7 +917,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             ],
             'subCat3' => [
                 'subCat3',
-                1
+                0
             ],
             'article3' => [
                 'article3',
@@ -878,6 +926,65 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             'article4' => [
                 'article4',
                 5
+            ]
+        ];
+    }
+
+    /**
+     * This data relates on $this->prepareCategorySortPatchData(KnowledgeBaseModel::TYPE_HELP)
+     *
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * |           |  Init  |   Patch  |   Patch  |  Patch |      Patch     |   Patch  |
+     * |           | (post) | Article3 | Article2 |  Cat1  |      Cat2      |   Cat3   |
+     * |           |        | (sort=1) |  (move)  | (move) | (move; sort=1) | (sort=0) |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Article1  |  null  |   null   |   null   |  null  |      null      |   null   |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Article2  |  null  |   null   |   null   |  null  |      null      |   null   |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Category1 |    0   |     0    |     0    |    0   |        0       |     0    |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Category2 |    1   |     2    |     2    |    1   |        1       |     1    |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Category3 |    2   |     3    |     3    |    2   |        1       |     0    |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Article3  |  null  |     1    |     1    |    1   |        1       |     1    |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     * | Article4  |  null  |   null   |   null   |  null  |      null      |   null   |
+     * +-----------+--------+----------+----------+--------+----------------+----------+
+     *
+     * @return array Data with expected correct Sort values
+     */
+    public function provideValidCategorySortsPatchHelp(): array {
+
+        return [
+            'article1' => [
+                'article1',
+                [null]
+            ],
+            'article2' => [
+                'article2',
+                [null]
+            ],
+            'subCat1' => [
+                'subCat1',
+                [0]
+            ],
+            'subCat2' => [
+                'subCat2',
+                [1]
+            ],
+            'subCat3' => [
+                'subCat3',
+                [0]
+            ],
+            'article3' => [
+                'article3',
+                [1]
+            ],
+            'article4' => [
+                'article4',
+                [null]
             ]
         ];
     }
