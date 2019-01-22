@@ -12,6 +12,7 @@
     color: $metas_color;
     width: calc(100% + #{$meta_spacing * 2});
     overflow: hidden;
+    text-align: left;
 
     margin: {
         left: -#{$meta_spacing};
