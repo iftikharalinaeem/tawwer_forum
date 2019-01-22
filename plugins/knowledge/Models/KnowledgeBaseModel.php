@@ -117,7 +117,7 @@ MESSAGE
     }
 
     /**
-     * Recalculate and update articleCount, articleCountRecursive and childCategoryCount columns
+     * Recalculate and update countArticles and countCategories columns.
      *
      * @param int $knowledgeBaseID Knowledge Base id to update
      *
