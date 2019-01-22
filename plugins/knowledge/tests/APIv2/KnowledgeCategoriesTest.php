@@ -125,7 +125,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * @dataProvider provideValidCategoriesCountsAfterMoveUp
      */
     public function testCountFieldsAfterCategoryMove(string $categoryKey, array $correctCounts) {
-
         $data = $this->prepareCategoryMove();
 
         $categoryResponse = $this->api()->get(
@@ -135,6 +134,20 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $this->assertEquals($correctCounts['articleCount'], $categoryResponse['articleCount'], 'articleCount');
         $this->assertEquals($correctCounts['articleCountRecursive'], $categoryResponse['articleCountRecursive'], 'articleCountRecursive');
         $this->assertEquals($correctCounts['childCategoryCount'], $categoryResponse['childCategoryCount'], 'childCategoryCount');
+    }
+
+    /**
+     * Test knowledge base "count" fields calculations
+     */
+    public function testKnowledgeBaseCounts() {
+        $rootCategory = $this->prepareCategoryMove()['rootCategory'];
+
+        $r = $this->api()->get(
+            'knowledge-bases/'.$rootCategory['knowledgeBaseID']
+        )->getBody();
+
+        $this->assertEquals($rootCategory['articleCountRecursive'], $r['countArticles']);
+        $this->assertEquals(4, $r['countCategories']);
     }
 
     /**

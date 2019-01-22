@@ -117,6 +117,36 @@ MESSAGE
     }
 
     /**
+     * Recalculate and update countArticles and countCategories columns.
+     *
+     * @param int $knowledgeBaseID Knowledge Base id to update
+     *
+     * @return bool Return truu when record updated succesfully
+     */
+    public function updateCounts(int $knowledgeBaseID): bool {
+        $counts = $this->sql()
+            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
+            ->select('DISTINCT c.knowledgeCategoryID', 'COUNT', 'categoryCount')
+            ->from('knowledgeCategory c')
+            ->leftJoin('article a', 'c.knowledgeCategoryID = a.knowledgeCategoryID AND a.status = \''.ArticleModel::STATUS_PUBLISHED.'\'')
+            ->where('c.knowledgeBaseID', $knowledgeBaseID)
+            ->groupBy('c.knowledgeBaseID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        $res = $this->update(
+            [
+                'countArticles' => $counts['articleCount'],
+                'countCategories' => $counts['categoryCount']
+            ],
+            [
+                'knowledgeBaseID' => $knowledgeBaseID
+            ]
+        );
+
+        return $res;
+    }
+
+    /**
      * Get list of all knowledge base types
      *
      * @return array
