@@ -622,7 +622,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($articleID !== null) {
             // this means we patch existing Article
             $prevState = $this->articleModel->getID($articleID);
-            $moveToAnotherCategory = ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
+            $moveToAnotherCategory = (isset($article['knowledgeCategoryID']) && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
 
             if (!is_int($fields['sort'] ?? false)) {
                 if ($moveToAnotherCategory || !($prevState['sort'] ?? false)) {
