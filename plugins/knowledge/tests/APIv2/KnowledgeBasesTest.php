@@ -94,6 +94,37 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PATCH 'name' /knowledge-base
+     * if it automatically updates rootCategory name
+     */
+    public function testPatchName() {
+        $result = $this->api()->post(
+            $this->baseUrl,
+            $this->record(__FUNCTION__)
+        );
+
+        $body = $result->getBody();
+        // not ready yet - that is why "== 0" should be "> 0" in future!!!
+        $this->assertTrue($body['rootCategoryID'] > 0);
+
+        $rootCat = $this->api()->get(
+            'knowledge-categories/'.$body['rootCategoryID']
+        )->getBody();
+        $this->assertEquals(__FUNCTION__, $rootCat['name']);
+
+        $newName = 'New Patched Name for KnowledgeBase';
+        $updateKB = $this->api()->patch(
+            $this->baseUrl.'/'.$body['knowledgeBaseID'],
+            ['name' => $newName]
+        );
+
+        $rootCat = $this->api()->get(
+            'knowledge-categories/'.$body['rootCategoryID']
+        )->getBody();
+        $this->assertEquals($newName, $rootCat['name']);
+    }
+
+    /**
      * Test adding a category to a knowledge base that has not met or exceeded the article limits.
      */
     public function testAddCategoryToLimit() {
