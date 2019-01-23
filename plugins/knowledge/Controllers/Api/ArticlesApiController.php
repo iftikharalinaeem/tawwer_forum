@@ -656,7 +656,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
-                    $article['knowledgeCategoryID'],
+                    $article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
                     $article['sort'],
                     $articleID,
                     KnowledgeCategoryModel::SORT_TYPE_ARTICLE
