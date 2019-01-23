@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
 
@@ -174,7 +175,6 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
     /**
      * @inheritdoc
-     *
      */
     public function testDelete() {
 
@@ -193,8 +193,31 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             $this->assertEquals(404, $ex->getCode());
         }
 
+        try {
+            $this->api()->delete("{$this->baseUrl}/{$testData['rootCategory']['knowledgeCategoryID']}");
+        } catch (ClientException $ex) {
+            $this->assertEquals(409, $ex->getCode());
+        }
+
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
+    }
+
+    /**
+     * Test patch method over root category
+     */
+    public function testPatchRootCategory() {
+        $data = $this->prepareCategoryDelete();
+
+        try {
+            $this->api()->patch(
+                "{$this->baseUrl}/{$data['rootCategory']['knowledgeCategoryID']}",
+                ['name'=>'New Root Category Title']
+            );
+            $this->assertTrue(false, 'Root category not failed when PATCH called through API!');
+        } catch (ClientException $ex) {
+            $this->assertEquals(409, $ex->getCode());
+        }
     }
 
     /**

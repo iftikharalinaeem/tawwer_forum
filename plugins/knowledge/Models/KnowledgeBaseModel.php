@@ -147,6 +147,16 @@ MESSAGE
     }
 
     /**
+     * Check if Knowledge Category is a root category of any Knowledge Base
+     *
+     * @param int $knowledgeCategoryID
+     * @return bool
+     */
+    public function isRootCategory(int $knowledgeCategoryID): bool {
+        $kb = $this->get(['rootCategoryID' => $knowledgeCategoryID]);
+        return !empty($kb);
+    }
+    /**
      * Get list of all knowledge base types
      *
      * @return array

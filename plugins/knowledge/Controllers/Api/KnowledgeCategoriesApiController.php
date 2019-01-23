@@ -12,6 +12,7 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
@@ -25,6 +26,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -35,13 +39,16 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * KnowledgeCategoriesApiController constructor.
      *
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param ArticleModel $articleModel
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
+        KnowledgeBaseModel $knowledgeBaseModel,
         ArticleModel $articleModel
     ) {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->articleModel = $articleModel;
     }
 
@@ -62,15 +69,19 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeCategoryByID($id);
-        if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
-            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-            $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+        if (!$this->knowledgeBaseModel->isRootCategory($id)) {
+            if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
+                $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+                $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
 
-            if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
-                $this->knowledgeCategoryModel->updateCounts($row['parentID']);
+                if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
+                    $this->knowledgeCategoryModel->updateCounts($row['parentID']);
+                }
+            } else {
+                throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
             }
         } else {
-            throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
+            throw new \Garden\Web\Exception\ClientException("You can not delete root category.", 409);
         }
     }
 
@@ -323,18 +334,23 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $out = $this->schema($this->fullSchema(), "out");
 
-        $body = $in->validate($body, true);
+        if (!$this->knowledgeBaseModel->isRootCategory($id)) {
+            $body = $in->validate($body, true);
 
-        $previousState = $this->knowledgeCategoryByID($id);
+            $previousState = $this->knowledgeCategoryByID($id);
 
-        $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
-        if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
-            $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
-            $this->knowledgeCategoryModel->updateCounts($id);
+            $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
+            if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
+                $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
+                $this->knowledgeCategoryModel->updateCounts($id);
+            }
+            $row = $this->knowledgeCategoryByID($id);
+            $row = $this->normalizeOutput($row);
+            $result = $out->validate($row);
+        } else {
+            throw new \Garden\Web\Exception\ClientException("You can not patch root category.", 409);
         }
-        $row = $this->knowledgeCategoryByID($id);
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
+
         return $result;
     }
 
