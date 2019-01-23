@@ -147,7 +147,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $prevState = $this->knowledgeBaseByID($id);
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
-        if ($prevState['name'] !== $body['name']) {
+        if (isset($body['name']) && $prevState['name'] !== $body['name']) {
             $this->knowledgeCategoryModel->update(
                 ['name' => $body['name']],
                 ['knowledgeCategoryID' => $prevState['rootCategoryID']]
