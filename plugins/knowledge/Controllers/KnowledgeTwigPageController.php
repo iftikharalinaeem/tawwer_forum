@@ -43,10 +43,14 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var SiteMeta */
     protected $siteMeta;
 
-    /**
-     * @var mixed Gdn_Session
-     */
+    /** @var mixed Gdn_Session */
     protected $session;
+
+    /** @var KnowledgeCategoriesApiController */
+    protected $categoriesApi;
+
+    /** @var \UsersApiController */
+    protected $usersApi;
 
     /**
      * KnowledgeTwigPageController constructor.
@@ -56,21 +60,28 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
     }
 
+
     /**
      * Dependency Injection that we child controllers to need to implement.
      *
      * @param KnowledgeCategoryModel $categoryModel
+     * @param KnowledgeCategoriesApiController $categoriesApi
+     * @param \UsersApiController $usersApi
      * @param SiteMeta $siteMeta
      * @param \Gdn_Session $session
      * @param WebpackAssetProvider $assetProvider
      */
     public function setDependencies(
         KnowledgeCategoryModel $categoryModel,
+        KnowledgeCategoriesApiController $categoriesApi,
+        \UsersApiController $usersApi,
         SiteMeta $siteMeta,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider
     ) {
         $this->knowledgeCategoryModel =$categoryModel;
+        $this->categoriesApi = $categoriesApi;
+        $this->usersApi = $usersApi;
         $this->siteMeta = $siteMeta;
         $this->session = $session;
         $this->initAssets($assetProvider);
@@ -144,14 +155,10 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      * Preload redux actions that are present on every page.
      */
     private function addGlobalReduxActions() {
-        /** @var KnowledgeCategoriesApiController $categoriesApi */
-        $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
-        $categories = $categoriesApi->index();
+        $categories = $this->categoriesApi->index();
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($categories)));
 
-        /** @var \UsersApiController $usersApi */
-        $usersApi = $this->container->get(\UsersApiController::class);
-        $me = $usersApi->get_me([]);
+        $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me)));
     }
 
