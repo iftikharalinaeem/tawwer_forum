@@ -6,8 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Web\Exception\NotFoundException;
-use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
@@ -140,7 +138,6 @@ class CategoriesSortTest extends AbstractAPIv2Test {
         $this->assertEquals($sort, $r['sort']);
     }
 
-
     /**
      * Test knowledge categories "sort" field calculations when post new articles and categories.
      *
@@ -150,18 +147,7 @@ class CategoriesSortTest extends AbstractAPIv2Test {
      * @dataProvider provideCategorySorts
      */
     public function testPatchArticleSameSort(string $articleKey, int $sort) {
-
-        $data = $this->prepareFreshSortData();
-
-        $patched = $this->api()->patch(
-            '/articles/'.$data['article2']['articleID'],
-            ['sort' => $data['article2']['sort']]
-        )->getBody();
-
-        $patched = $this->api()->patch(
-            '/articles/'.$data['article3']['articleID'],
-            ['sort' => $data['article3']['sort']]
-        )->getBody();
+        $data = $this->prepareFreshSortData(KnowledgeBaseModel::TYPE_GUIDE, 'testPatchArticleSameSort');
 
         if (substr($articleKey, 0, 7) === 'article') {
             $r = $this->api()->get(
@@ -260,68 +246,79 @@ class CategoriesSortTest extends AbstractAPIv2Test {
      * Generate few categories and attach few articles to them to have some variety of counts in DB for integrations tests.
      *
      * @param string $kbType Knowledge Base Type to generate "sort" data
+     * @param string $tmpDataPrefix Prefix to store some data keys statically to avoid unnecessary api calls
      * @return array Generated categories filled with few articles
      */
-    protected function prepareFreshSortData(string $kbType = KnowledgeBaseModel::TYPE_GUIDE): array {
+    protected function prepareFreshSortData(string $kbType = KnowledgeBaseModel::TYPE_GUIDE, string $tmpDataPrefix = ''): array {
+        $index = $tmpDataPrefix.$kbType;
+        if (!isset(self::$preparedCategorySortData[$index])) {
+            $helloWorldBody = json_encode([["insert" => "Hello World"]]);
 
-        $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+            $newKnowledgeBase = $this->api()->post('knowledge-bases', [
+                "name" => __FUNCTION__ . " Test Knowledge Base",
+                "description" => 'Some description',
+                "urlCode" => 'test-Knowledge-Base-' . round(microtime(true) * 1000) . rand(1, 1000),
+                "viewType" => $kbType
+            ])->getBody();
 
-        $newKnowledgeBase = $this->api()->post('knowledge-bases', [
-            "name" => __FUNCTION__ . " Test Knowledge Base",
-            "description" => 'Some description',
-            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
-            "viewType" => $kbType
-        ])->getBody();
+            // Setup the test categories.
+            $rootCategory = $this->api()->get($this->baseUrl . '/' . $newKnowledgeBase['rootCategoryID'])->getBody();
 
-        // Setup the test categories.
-        $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
+            $article1 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
 
-        $article1 = $this->api()->post($this->kbArticlesUrl, [
-            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Primary Category Article",
-            "body" => $helloWorldBody,
-            "format" => "rich",
-        ])->getBody();
+            $article2 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
 
-        $article2 = $this->api()->post($this->kbArticlesUrl, [
-            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Primary Category Article",
-            "body" => $helloWorldBody,
-            "format" => "rich",
-        ])->getBody();
+            $subCat1 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category",
+            ])->getBody();
 
-        $subCat1 = $this->api()->post($this->baseUrl, [
-            "parentID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Sub Category",
-        ])->getBody();
+            $subCat2 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category 2",
+            ])->getBody();
 
-        $subCat2 = $this->api()->post($this->baseUrl, [
-            "parentID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Sub Category 2",
-        ])->getBody();
-
-        $subCat3 = $this->api()->post($this->baseUrl, [
-            "parentID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Sub Category 3",
-        ])->getBody();
-
-
-        $article3 = $this->api()->post($this->kbArticlesUrl, [
-            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Primary Category Article 3",
-            "body" => $helloWorldBody,
-            "format" => "rich",
-        ])->getBody();
-
-        $article4 = $this->api()->post($this->kbArticlesUrl, [
-            "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
-            "name" => "Primary Category Article 4",
-            "body" => $helloWorldBody,
-            "format" => "rich",
-        ])->getBody();
+            $subCat3 = $this->api()->post($this->baseUrl, [
+                "parentID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Sub Category 3",
+            ])->getBody();
 
 
-        return [
+            $article3 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article 3",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
+
+            $article4 = $this->api()->post($this->kbArticlesUrl, [
+                "knowledgeCategoryID" => $rootCategory["knowledgeCategoryID"],
+                "name" => "Primary Category Article 4",
+                "body" => $helloWorldBody,
+                "format" => "rich",
+            ])->getBody();
+
+            $patched = $this->api()->patch(
+                '/articles/'.$article2['articleID'],
+                ['sort' => $article2['sort']]
+            )->getBody();
+
+            $patched = $this->api()->patch(
+                '/articles/'.$article4['articleID'],
+                ['sort' => $article3['sort']]
+            )->getBody();
+
+            self::$preparedCategorySortData[$index] = [
                 'rootCategory' => $rootCategory,
                 'subCat1' => $subCat1,
                 'subCat2' => $subCat2,
@@ -330,7 +327,9 @@ class CategoriesSortTest extends AbstractAPIv2Test {
                 'article2' => $article2,
                 'article3' => $article3,
                 'article4' => $article4,
-                ];
+            ];
+        }
+        return self::$preparedCategorySortData[$index];
     }
     /**
      * Generate few categories and attach few articles to them to have some variety of counts in DB for integrations tests.
@@ -498,11 +497,11 @@ class CategoriesSortTest extends AbstractAPIv2Test {
             ],
             'article3' => [
                 'article3',
-                5
+                6
             ],
             'article4' => [
                 'article4',
-                6
+                5
             ]
         ];
     }
@@ -563,7 +562,7 @@ class CategoriesSortTest extends AbstractAPIv2Test {
      * +----------+--------+----------+----------+--------+----------------+----------+
      * | Article3 |    5   |     1    |     1    |    1   |        1       |     2    |
      * +----------+--------+----------+----------+--------+----------------+----------+
-     * | Article4 |    6   |     7    |     6    |    5   |        4       |     5    |
+     * | Article4 |    6   |     6    |     5    |    4   |        3       |     3    |
      * +----------+--------+----------+----------+--------+----------------+----------+
      *
      * @return array Data with expected correct Sort values
@@ -596,7 +595,7 @@ class CategoriesSortTest extends AbstractAPIv2Test {
             ],
             'article4' => [
                 'article4',
-                5
+                3
             ]
         ];
     }

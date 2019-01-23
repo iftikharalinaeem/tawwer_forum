@@ -454,13 +454,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         $query = $this->sql()->update('knowledgeCategory')
-            ->set('sort'.(($direction) ? '+' : '-'), 1)
+            ->set('sort'.($direction ? '+' : '-'), 1)
             ->where(
                 [
                     'parentID' => $knowledgeCategoryID,
                     'sort >=' => $idx
                 ]
             );
+
         if ($protectType === self::SORT_TYPE_CATEGORY) {
             $query->where('knowledgeCategoryID <>', $protectedID);
         }

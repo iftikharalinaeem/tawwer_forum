@@ -622,7 +622,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($articleID !== null) {
             // this means we patch existing Article
             $prevState = $this->articleModel->getID($articleID);
-            $moveToAnotherCategory = (isset($article['knowledgeCategoryID']) && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
+            $moveToAnotherCategory = (isset($article['knowledgeCategoryID'])
+                && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
 
             if (!is_int($fields['sort'] ?? false)) {
                 if ($moveToAnotherCategory || !($prevState['sort'] ?? false)) {
@@ -639,21 +640,31 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 //update sorts for other records only if 'sort' changed
                 $updateSorts = ($article['sort'] != $prevState['sort']);
             }
+
+            if (isset($article['sort'])
+                && isset($prevState['knowledgeCategoryID'])
+                && isset($prevState['sort'])
+                && $article['sort'] != $prevState['sort'] ) {
+                $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
+                //shift sorts down for source category when move one article to another category
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $prevState['knowledgeCategoryID'],
+                    $prevState['sort'],
+                    $prevState['articleID'],
+                    KnowledgeCategoryModel::SORT_TYPE_ARTICLE,
+                    KnowledgeCategoryModel::SORT_DECREMENT
+                );
+            }
+
             $this->articleModel->update($article, ["articleID" => $articleID]);
 
             if ($moveToAnotherCategory) {
-                if (!empty($prevState['knowledgeCategoryID']) && !is_null($prevState['sort'])) {
+                if (!empty($prevState['knowledgeCategoryID'])) {
                     $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
-                    //shift sorts down for source category when move one article to another category
-                    $this->knowledgeCategoryModel->shiftSorts(
-                        $prevState['knowledgeCategoryID'],
-                        $prevState['sort'],
-                        -1,
-                        KnowledgeCategoryModel::SORT_TYPE_ARTICLE,
-                        KnowledgeCategoryModel::SORT_DECREMENT
-                    );
                 }
             }
+
+
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
                     $article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
