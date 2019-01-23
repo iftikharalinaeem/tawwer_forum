@@ -16,6 +16,7 @@ import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import RouteReducer from "@knowledge/routes/RouteReducer";
 
 const knowledgeReducer = combineReducers({
     articles: new ArticleModel().reducer,
@@ -29,6 +30,7 @@ const knowledgeReducer = combineReducers({
     locationPicker: new LocationPickerModel().reducer,
     searchPage: new SearchPageModel().reducer,
     navigation: new NavigationModel().reducer,
+    route: new RouteReducer().reducer,
 });
 
 export default knowledgeReducer;

@@ -18,6 +18,7 @@ import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
 import { DeepPartial } from "redux";
 import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { IRouteState } from "@knowledge/routes/RouteReducer";
 
 export interface IStoreState extends IUsersStoreState {
     knowledge: {
@@ -32,6 +33,7 @@ export interface IStoreState extends IUsersStoreState {
         locationPicker: ILocationPickerState;
         searchPage: ISearchPageState;
         navigation: INavigationStoreState;
+        route: IRouteState;
     };
 }
 
