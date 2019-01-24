@@ -8,12 +8,49 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Container\Container;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Knowledge base controller for article view.
  */
 class KbRootController extends KnowledgeTwigPageController {
+
+    /** @var KnowledgeBasesApiController */
+    private $basesApi;
+
+    /** @var ArticlesPageController */
+    private $articlesPageController;
+
+    /** @var SearchPageController */
+    private $searchPageController;
+
+    /** @var KnowledgeNavigationApiController */
+    private $navigationApi;
+
+    /**
+     * Constructor for DI.
+     *
+     * @param KnowledgeBasesApiController $basesApi
+     * @param ArticlesPageController $articlesPageController
+     * @param SearchPageController $searchPageController
+     * @param KnowledgeNavigationApiController $navigationApi
+     */
+    public function __construct(
+        KnowledgeBasesApiController $basesApi,
+        ArticlesPageController $articlesPageController,
+        SearchPageController $searchPageController,
+        KnowledgeNavigationApiController $navigationApi
+    ) {
+        parent::__construct();
+        $this->basesApi = $basesApi;
+        $this->articlesPageController = $articlesPageController;
+        $this->searchPageController = $searchPageController;
+        $this->navigationApi = $navigationApi;
+    }
+
 
     /**
      * Gather the data array to render a page with.
@@ -31,14 +68,8 @@ class KbRootController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->setPageTitle(\Gdn::translate('Debug'));
-
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getViewData();
-        $data['page']['classes'][] = 'isLoading';
-        $data['template'] = 'seo/pages/home.twig';
-
-        return $this->twigInit()->render('default-master.twig', $data);
+        // Temporarily use the search page instead of the knowledge base homepage.
+        return $this->searchPageController->index();
     }
 
     /**
@@ -55,11 +86,36 @@ class KbRootController extends KnowledgeTwigPageController {
     }
 
     /**
+     * Render out a knowledge base homepage.
+     *
+     * Routing for /kb/:slug
+     *
+     * @param string $path The knowledge base slug.
+     *
+     * @return string
+     */
+    public function get(string $path): string {
+        $urlCode = ltrim($path, "/");
+        $knowledgeBase = $this->basesApi->get_byUrlCode(['urlCode' => $urlCode]);
+
+        switch ($knowledgeBase['viewType']) {
+            case KnowledgeBaseModel::TYPE_HELP:
+                // Temporarily use the search page instead of the knowledge base homepage.
+                return $this->searchPageController->index();
+            case KnowledgeBaseModel::TYPE_GUIDE:
+                // Temporarily hard-cdoed. Should be the default article in the knowledge base later on.
+                return $this->articlesPageController->index('/3');
+        }
+    }
+
+    /**
      * Render out the /kb/{id}/organize-categories page.
      *
      * @param int $id Knowledge base ID
+     *
+     * @return string
      */
-    public function get_organizeCategories(int $id) : string {
+    public function get_organizeCategories(int $id): string {
         $this->setPageTitle(\Gdn::translate('Organize Categories'));
 
         // We'll need to be able to set all of this dynamically in the future.
