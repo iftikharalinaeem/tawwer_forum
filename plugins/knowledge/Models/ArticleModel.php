@@ -63,6 +63,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         // Add optional revision fields to accommodate join operations.
         $schema = $schema->merge(Schema::parse([
+            "knowledgeBaseID?" => [
+                "type" => "integer",
+            ],
             "articleRevisionID?" => [
                 "allowNull" => true,
                 "type" => "integer",
@@ -174,12 +177,13 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $includeBody = $options["includeBody"] ?? true;
 
             $sql = $this->sql()
-                ->select("a.*")
+                ->select("a.*, c.knowledgeBaseID")
                 ->select("ar.articleRevisionID")
                 ->select("ar.name")
                 ->select("ar.locale")
                 ->from($this->getTable() . " as a")
                 ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
+                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left")
                 ->limit($limit, $offset);
 
             if ($includeBody) {
