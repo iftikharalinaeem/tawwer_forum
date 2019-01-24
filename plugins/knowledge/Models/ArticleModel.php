@@ -280,6 +280,32 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Given a list of knowledge category IDs, get the top X articles in each.
+     *
+     * @param array $knowledgeCategoryIDs
+     * @param string $orderField
+     * @param string $orderDirection
+     * @param int $limit
+     */
+    public function getTopPerCategory(array $knowledgeCategoryIDs, string $orderField, string $orderDirection, int $limit): array {
+        $result = [];
+
+        foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
+            $rows = $this->getExtended(
+                ["knowledgeCategoryID" => $knowledgeCategoryID],
+                [
+                    "limit" => $limit,
+                    "orderFields" => $orderField,
+                    "orderDirection" => $orderDirection,
+                ]
+            );
+            $result = array_merge($result, $rows);
+        }
+
+        return $result;
+    }
+
+    /**
      * Generate a URL to the provided article row with revision fields.
      *
      * @param array $article An article row, joined with fields from a revision. A standard article row will not work.
