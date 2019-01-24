@@ -22,6 +22,12 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const ORDER_DATE_ASC = 'dateInserted';
     const ORDER_DATE_DESC = 'dateInsertedDesc';
 
+    const SORT_CONFIGS = [
+        self::ORDER_MANUAL => ["sort", "asc"],
+        self::ORDER_NAME => ["name", "asc"],
+        self::ORDER_DATE_ASC => ["dateInserted", "asc"],
+        self::ORDER_DATE_DESC => ["dateInserted", "desc"],
+    ];
 
     /** @var Gdn_Session */
     private $session;
@@ -170,5 +176,19 @@ MESSAGE
             self::ORDER_DATE_ASC,
             self::ORDER_DATE_DESC,
         ];
+    }
+
+    /**
+     * Given a valid article sort slug, return the relevant sort field and direction.
+     *
+     * @param string $sortArticles
+     * @return array
+     */
+    public function articleSortConfig(string $sortArticles): array {
+        if (!array_key_exists($sortArticles, self::SORT_CONFIGS)) {
+            throw new \Exception("Invalid sortArticles value: $sortArticles");
+        }
+
+        return self::SORT_CONFIGS[$sortArticles];
     }
 }
