@@ -406,18 +406,16 @@ class KnowledgeApiController extends AbstractApiController {
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
-            $article["status"] = self::ARTICLE_STATUSES[$article["status"]];
-
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-            $article = array_merge($article, $this->results['matches'][$guid]['attrs']);
+
             if (in_array('category', $expand)) {
-                $article["knowledgeCategory"] = $this->results['kbCategories'][$article['categoryid']];
+                $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
             }
             if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$article['updateuserid']])) {
-                    $article["updateUser"] = $this->results['users'][$article['updateuserid']];
-                } elseif (isset($this->results['users'][$article['insertuserid']])) {
-                    $article["insertUser"] = $this->results['users'][$article['insertuserid']];
+                if (isset($this->results['users'][$article['updateUserID']])) {
+                    $article["updateUser"] = $this->results['users'][$article['updateUserID']];
+                } elseif (isset($this->results['users'][$article['insertUserID']])) {
+                    $article["insertUser"] = $this->results['users'][$article['insertUserID']];
                 }
             }
         }

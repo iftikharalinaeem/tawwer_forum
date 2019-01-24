@@ -5,9 +5,10 @@
  */
 
 import React from "react";
+import { t } from "@library/application";
 
 export default class KnowledgeBasePage extends React.Component {
     public render() {
-        return <div>Hello home</div>;
+        return <div>{t("Hello home")}</div>;
     }
 }
