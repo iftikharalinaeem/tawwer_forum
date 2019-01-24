@@ -10,6 +10,9 @@ import { IApiError } from "@library/@types/api";
 
 const actionCreator = actionCreatorFactory("@@knowledge-base/");
 
+/**
+ * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
+ */
 export default class KnowledgeBaseActions extends ReduxActions {
     public static readonly GET_ACS = actionCreator.async<undefined, IKnowledgeBase[], IApiError>("GET_ALL");
 

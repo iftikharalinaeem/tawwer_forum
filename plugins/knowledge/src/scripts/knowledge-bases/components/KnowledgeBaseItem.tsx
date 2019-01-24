@@ -14,6 +14,9 @@ interface IProps {
     url: string;
 }
 
+/**
+ * Component representing a single knowledge base.
+ */
 export default function KnowledgeBaseItem(props: IProps) {
     return (
         <SmartLink to={props.url}>

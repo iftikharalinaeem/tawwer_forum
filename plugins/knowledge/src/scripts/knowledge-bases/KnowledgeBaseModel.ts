@@ -11,9 +11,18 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import { createSelector } from "reselect";
 
+/**
+ * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
+ */
 export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesState> {
+    /**
+     * Selector for our own state.
+     */
     private static selectSelf = (state: IStoreState) => state.knowledge.knowledgeBases;
 
+    /**
+     * Selector for a list of loaded knowledge bases.
+     */
     public static selectKnowledgeBases = createSelector(
         [KnowledgeBaseModel.selectSelf],
         selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
@@ -27,11 +36,14 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
 
     public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
-            return this.mutableReducer(nextState, action);
+            return this.internalReducer(nextState, action);
         });
     };
 
-    private mutableReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
+    /**
+     * Reducer factory for knowledge base items.
+     */
+    private internalReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
         .case(KnowledgeBaseActions.GET_ACS.started, state => {
             state.knowledgeBasesByID.status = LoadStatus.LOADING;
             return state;
@@ -69,6 +81,9 @@ export enum KnowledgeBaseSortMode {
     DATE_INSERTED_DESC = "dateInsertedDesc",
 }
 
+/**
+ * Interface representing a knowledge base resource.
+ */
 export interface IKnowledgeBase {
     knowledgeBaseID: number;
     name: string;

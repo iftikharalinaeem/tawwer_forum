@@ -15,6 +15,15 @@ import KnowledgeBaseItem from "@knowledge/knowledge-bases/components/KnowledgeBa
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 
+/**
+ * Component representing a list of visible knowledge bases.
+ *
+ * Capable of handling:
+ * - Requesting data.
+ * - Displaying loading indicators during fetching.
+ * - Data with no items.
+ * - Data with items.
+ */
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
         const { knowledgeBases, loadStatus } = this.props;
@@ -47,6 +56,9 @@ class KnowledgeBaseList extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Fetch the data on mount if we don't already have it.
+     */
     public componentDidMount() {
         if (this.props.loadStatus === LoadStatus.PENDING) {
             this.props.requestKnowledgeBases();
