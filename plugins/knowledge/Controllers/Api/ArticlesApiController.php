@@ -312,9 +312,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $options["orderDirection"] = "asc";
         }
         $rows = $this->articleModel->getWithRevision(
-            ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
+            ["a.knowledgeCategoryID" => $query["knowledgeCategoryID"]],
             $options
         );
+
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
             if (!$includeExcerpts) {

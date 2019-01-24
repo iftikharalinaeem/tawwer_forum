@@ -139,6 +139,7 @@ trait ArticlesApiSchemes {
             $this->articleSimpleSchema = $this->schema(Schema::parse([
                 "articleID",
                 "knowledgeCategoryID",
+                "knowledgeBaseID",
                 "name",
                 "excerpt?",
                 "seoName",
@@ -270,6 +271,7 @@ trait ArticlesApiSchemes {
                 "allowNull" => true,
                 "Category the article belongs in.",
             ],
+            "knowledgeBaseID:i?" => "Knowledge Base the article belongs to.",
             "seoName:s" => [
                 "allowNull" => true,
                 "description" => "SEO-optimized name for the article.",
