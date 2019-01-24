@@ -103,8 +103,8 @@ class KbRootController extends KnowledgeTwigPageController {
                 // Temporarily use the search page instead of the knowledge base homepage.
                 return $this->searchPageController->index();
             case KnowledgeBaseModel::TYPE_GUIDE:
-                // Temporarily hard-cdoed to 1. Should be the first article in the knowledge base later on.
-                return $this->articlesPageController->index('3');
+                // Temporarily hard-cdoed. Should be the default article in the knowledge base later on.
+                return $this->articlesPageController->index('/3');
         }
     }
 
