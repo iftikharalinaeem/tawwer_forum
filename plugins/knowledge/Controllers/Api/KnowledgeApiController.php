@@ -288,6 +288,9 @@ class KnowledgeApiController extends AbstractApiController {
     protected function defineArticlesQuery() {
         $this->sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
         if (isset($this->query['statuses'])) {
+            if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
+                $this->permission("knowledge.articles.add");
+            };
             $statuses = array_map(
                 function ($status) {
                     return array_search($status, self::ARTICLE_STATUSES);
