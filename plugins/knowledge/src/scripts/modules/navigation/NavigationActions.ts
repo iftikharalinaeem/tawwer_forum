@@ -91,7 +91,7 @@ export default class NavigationActions extends ReduxActions {
     public patchNavigationFlat = (request: IPatchKBNavigationRequest) => {
         return this.dispatchApi<IPatchKbNavigationResponse>(
             "patch",
-            `/knowledge-navigation/flat`,
+            `/knowledge-navigation/1/flat`,
             NavigationActions.patchNavigationFlatACs,
             request,
             { transactionID: uniqueId("patchNav") },

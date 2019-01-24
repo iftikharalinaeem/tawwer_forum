@@ -348,6 +348,23 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     }
 
     /**
+     * Get a single knowledge base by its ID.
+     *
+     * @param int $knowledgeBaseID
+     * @return array
+     * @throws NotFoundException If the knowledge base could not be found.
+     */
+    public function knowledgeBaseByID(int $knowledgeBaseID): array {
+        try {
+            $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+        } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+            throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
+        }
+
+        return $result;
+    }
+
+    /**
      * Massage tree data for useful API output.
      *
      * @param array $rows
@@ -386,8 +403,10 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws ValidationException Throws an exception when input does not validate against the input schema.
      * @throws ValidationException Throws an exception when output does not validate against the output schema.
      */
-    public function patch_flat(array $body = []): array {
+    public function patch_flat(int $id, array $body = []): array {
         $this->permission("Garden.Settings.Manage");
+
+        $knowledgeBase = $this->knowledgeBaseByID($id);
 
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([
@@ -411,7 +430,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         }
 
         // Update categories.
-        $categories = $this->knowledgeCategoryModel->get();
+        $categories = $this->knowledgeCategoryModel->get(["knowledgeBaseID" => $id]);
         Navigation::updateAlteredRows(
             $categories,
             $navigation,
@@ -422,8 +441,12 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         );
 
         // Update articles.
+        $articles = $this->articleModel->get(
+            ["knowledgeCategoryID" => array_column($categories, "knowledgeCategoryID")],
+            ["limit" => false]
+        );
         Navigation::updateAlteredRows(
-            $this->articleModel->get([], ["limit" => false]),
+            $articles,
             $navigation,
             Navigation::RECORD_TYPE_ARTICLE,
             "articleID",
@@ -441,7 +464,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         }
 
         // Grab the new navigation state.
-        $navigation = $this->getNavigation(true);
+        $navigation = $this->knowledgeBaseNavigation($id, true);
         $result = $out->validate($navigation);
         return $result;
     }
