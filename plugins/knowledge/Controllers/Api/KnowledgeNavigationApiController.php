@@ -13,6 +13,7 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\Navigation;
 
@@ -21,8 +22,20 @@ use Vanilla\Knowledge\Models\Navigation;
  */
 class KnowledgeNavigationApiController extends AbstractApiController {
 
+    /** Filter value for limiting results to only knowledge categories. */
+    const FILTER_RECORD_TYPE_CATEGORY = "knowledgeCategory";
+
+    /** Filter value for allowing all record types. */
+    const FILTER_RECORD_TYPE_ALL = "all";
+
+    /** Default limit on the number of articles returned for a help center category. */
+    const HELP_CENTER_DEFAULT_ARTICLES_LIMIT = 5;
+
     /** @var ArticleModel */
     private $articleModel;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
 
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
@@ -38,13 +51,16 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param ArticleModel $articleModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
-        ArticleModel $articleModel
+        ArticleModel $articleModel,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
-        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->articleModel = $articleModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
     /**
@@ -108,13 +124,19 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema($this->defaultSchema(), "in")
+            ->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
         $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
 
-        //$query = $in->validate($query);
+        $query = $in->validate($query);
 
-        $tree = $this->getNavigation();
-        $result = $out->validate($tree);
+        if (array_key_exists("knowledgeCategoryID", $query)) {
+            $rows = $this->categoryNavigation($query["knowledgeCategoryID"], true, $query["recordType"]);
+        } else {
+            $rows = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"]);
+        }
+
+        $result = $out->validate($rows);
         return $result;
     }
 
@@ -139,26 +161,94 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     }
 
     /**
+     * Get navigation items for a particular category.
+     *
+     * @param integer $knowledgeCategoryID
+     * @param boolean $flat
+     * @param string $recordType
+     */
+    private function categoryNavigation(int $knowledgeCategoryID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
+        $categories = $this->knowledgeCategoryModel->get(["parentID" => $knowledgeCategoryID]);
+
+        if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
+            $articles = $this->articleModel->getExtended(
+                [
+                    'a.knowledgeCategoryID' => $knowledgeCategoryID,
+                    'a.status' => ArticleModel::STATUS_PUBLISHED
+                ],
+                ["limit" => false],
+                ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
+            );
+        } else {
+            $articles = [];
+        }
+
+        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        return $result;
+    }
+
+    /**
+     * Get navigation items for a knowledge base.
+     *
+     * @param integer $knowledgeBaseID
+     * @param boolean $flat
+     * @param string $recordType
+     */
+    private function knowledgeBaseNavigation(int $knowledgeBaseID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
+        try {
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+        } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+            throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
+        }
+
+        $categories = $this->knowledgeCategoryModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+
+        if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
+            $catIds = array_column($categories, 'knowledgeCategoryID');
+            if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
+                $articles = $this->articleModel->getExtended(
+                    [
+                        'a.knowledgeCategoryID' => $catIds,
+                        'a.status' => ArticleModel::STATUS_PUBLISHED
+                    ],
+                    ["limit" => false],
+                    ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
+                );
+            } else {
+                list($orderField, $orderDirection) = $this->knowledgeBaseModel->articleSortConfig($knowledgeBase["sortArticles"]);
+                $articles = $this->articleModel->getTopPerCategory(
+                    $catIds,
+                    "dateInserted",
+                    "desc",
+                    self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT
+                );
+            }
+        } else {
+            $articles = [];
+        }
+
+        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        return $result;
+    }
+
+    /**
      * Return navigation array of a section
      *
+     * @param array $categories
+     * @param array $articles
      * @param bool $flatMode Mode: flat or tree
+     * @param string $recordType
      * @return array
      */
-    private function getNavigation(bool $flatMode = true): array {
-
-        $categories = $this->knowledgeCategoryModel->get();
+    private function getNavigation(
+        array $categories,
+        array $articles,
+        bool $flatMode = true,
+        string $recordType = self::FILTER_RECORD_TYPE_ALL
+    ): array {
         $categories = $this->normalizeOutput($categories, Navigation::RECORD_TYPE_CATEGORY);
-
-        $catIds = array_column($categories, 'knowledgeCategoryID');
-        $articles = $this->articleModel->getExtended(
-            [
-                'a.knowledgeCategoryID' => $catIds,
-                'a.status' => ArticleModel::STATUS_PUBLISHED
-            ],
-            ["limit" => false],
-            ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
-        );
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);
+
         if ($flatMode) {
             return array_merge($categories, $articles);
         } else {
@@ -231,12 +321,23 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      */
     protected function defaultSchema() {
         return [
-//            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-//            "knowledgeCategoryID:i?" => "Unique ID of a knowledge category to get navigation for. Results will be relative to this value.",
-//            "maxDepth:i" => [
-//                "default" => 2,
-//                "description" => "The maximum depth results should be, relative to the target knowledge base or category."
-//            ]
+            "knowledgeBaseID?" => [
+                "description" => "Unique ID of a knowledge base. Only results in this knowledge base will be included.",
+                "type" => "integer",
+            ],
+            "knowledgeCategoryID?" => [
+                "description" => "Unique ID of a knowledge category to get navigation for. Only direct children of this category will be included.",
+                "type" => "integer",
+            ],
+            "recordType" => [
+                "default" => self::FILTER_RECORD_TYPE_ALL,
+                "description" => "The type of record to limit navigation results to.",
+                "enum" => [
+                    self::FILTER_RECORD_TYPE_CATEGORY,
+                    self::FILTER_RECORD_TYPE_ALL
+                ],
+                "type" => "string",
+            ],
         ];
     }
 
@@ -254,7 +355,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 $row["recordID"] = $row["knowledgeCategoryID"];
                 $row["recordType"] = Navigation::RECORD_TYPE_CATEGORY;
                 $row["url"] = $this->knowledgeCategoryModel->url($row);
-            } elseif ($recordType === Navigation::RECORD_TYPE_ARTICLE && $row["recordType"] == Navigation::RECORD_TYPE_ARTICLE) {
+            } elseif ($recordType === Navigation::RECORD_TYPE_ARTICLE) {
+                $row["recordType"] = Navigation::RECORD_TYPE_ARTICLE;
                 $row["parentID"] = $row["knowledgeCategoryID"];
                 $row["recordID"] = $row["articleID"];
                 $row["url"] = $this->articleModel->url($row);
