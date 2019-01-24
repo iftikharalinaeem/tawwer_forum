@@ -406,9 +406,7 @@ class KnowledgeApiController extends AbstractApiController {
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
-            //$article["status"] = self::ARTICLE_STATUSES[$article["status"]];
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-            //$article = array_merge($article, $this->results['matches'][$guid]['attrs']);
 
             if (in_array('category', $expand)) {
                 $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
