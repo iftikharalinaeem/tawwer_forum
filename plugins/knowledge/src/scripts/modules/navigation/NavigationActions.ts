@@ -58,7 +58,7 @@ export default class NavigationActions extends ReduxActions {
 
         return this.dispatchApi<IGetKbNavigationResponse>(
             "get",
-            `/knowledge-navigation/flat`,
+            `/knowledge-navigation/flat?knowledgeBaseID=1`,
             NavigationActions.getNavigationFlatACs,
             request,
         );
