@@ -221,7 +221,6 @@ class Reporting2Plugin extends Gdn_Plugin {
 if (!function_exists('formatQuote')):
 
     /**
-     * leaving this function in case it is used somewhere.
      *
      *@param $body the quote body.
      *@deprecated 25 Jan 2018
