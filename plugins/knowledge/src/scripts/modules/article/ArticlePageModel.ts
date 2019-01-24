@@ -4,16 +4,16 @@
  * @license Proprietary
  */
 
-import { IArticle, ArticleStatus, IKbCategoryFragment } from "@knowledge/@types/api";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import { IArticle } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { produce } from "immer";
-import { ICrumb } from "@library/components/Breadcrumbs";
-import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
+import ReduxReducer from "@library/state/ReduxReducer";
+import { produce } from "immer";
 
 export interface IArticlePageState {
     articleID: number | null;
@@ -28,6 +28,8 @@ export interface IInjectableArticlePageState {
     }>;
     restoreStatus: LoadStatus;
 }
+
+type ReducerType = KnowledgeReducer<IArticlePageState>;
 
 /**
  * Reducer for the article page.
@@ -66,10 +68,7 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
         restoreStatus: LoadStatus.PENDING,
     };
 
-    public reducer = (
-        state: IArticlePageState = this.initialState,
-        action: typeof ArticlePageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IArticlePageState => {
+    public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
             switch (action.type) {
                 case ArticlePageActions.INIT:
@@ -83,7 +82,7 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
                     return this.initialState;
             }
 
-            if (action.meta && action.meta.articleID && nextState.articleID === action.meta.articleID) {
+            if ("meta" in action && action.meta.articleID && nextState.articleID === action.meta.articleID) {
                 switch (action.type) {
                     case ArticleActions.GET_ARTICLE_REQUEST:
                         nextState.articleLoadable.status = LoadStatus.LOADING;

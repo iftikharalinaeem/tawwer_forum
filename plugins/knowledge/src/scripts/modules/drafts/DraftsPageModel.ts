@@ -3,14 +3,14 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
-import { ILoadable, LoadStatus } from "@library/@types/api";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
-import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
-import { IStoreState } from "@knowledge/state/model";
 
 export interface IDraftsPageState {
     userDrafts: ILoadable<number[]>;
@@ -21,6 +21,8 @@ export interface IInjectableDraftsPageProps {
     userDrafts: ILoadable<IResponseArticleDraft[]>;
     deleteDraft: ILoadable<never>;
 }
+
+type ReducerType = KnowledgeReducer<IDraftsPageState>;
 
 /**
  *
@@ -51,15 +53,12 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
         };
     }
 
-    public reducer = (
-        state: IDraftsPageState = this.initialState,
-        action: typeof DraftsPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IDraftsPageState => {
+    public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
             if (action.type === DraftsPageActions.RESET) {
                 return this.initialState;
             } else if (
-                action.meta &&
+                "meta" in action &&
                 "identifier" in action.meta &&
                 action.meta.identifier === DraftsPageActions.IDENTIFIER
             ) {
