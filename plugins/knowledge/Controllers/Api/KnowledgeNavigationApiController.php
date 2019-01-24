@@ -395,6 +395,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /**
      * Update the navigation structure of a knowledge base, using the flat format.
      *
+     * @param int $id The knowledge base ID
      * @param array $body Request body.
      * @return array Navigation items, arranged in a one-dimensional array.
      * @throws Exception If no session is available.
