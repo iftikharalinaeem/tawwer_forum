@@ -150,12 +150,18 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema($this->defaultSchema(), "in")
+            ->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
         $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
 
-        //$query = $in->validate($query);
+        $query = $in->validate($query);
 
-        $tree = $this->getNavigation(false);
+        if (array_key_exists("knowledgeCategoryID", $query)) {
+            $tree = $this->categoryNavigation($query["knowledgeCategoryID"], false, $query["recordType"]);
+        } else {
+            $tree = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"]);
+        }
+
         $result = $out->validate($tree);
         return $result;
     }

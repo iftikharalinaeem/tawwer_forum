@@ -273,7 +273,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],
         ];
-        $actual = $this->api()->get("knowledge-navigation/tree")->getBody();
+        $actual = $this->api()->get("knowledge-navigation/tree?knowledgeBaseID=1")->getBody();
 
         $this->assertTreesEqual($expected, $actual);
     }
