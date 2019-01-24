@@ -218,7 +218,21 @@ class Reporting2Plugin extends Gdn_Plugin {
 
 }
 
-if (!function_exists('FormatQuote')):
+if (!function_exists('formatQuote')):
+
+    /**
+     * leaving this function in case it is used somewhere.
+     *
+     *@param $body the quote body.
+     *@deprecated 25 Jan 2018
+     */
+    function formatQuote($body) {
+        deprecated('formatQuote', 'gdn_formatter_quote');
+        return gdn_formatter_quote($body);
+    }
+endif;
+
+if (!function_exists('gdn_formatter_quote')):
 
     /**
      * Build our flagged content quote for the new discussion.
@@ -226,7 +240,7 @@ if (!function_exists('FormatQuote')):
      * @param $body
      * @return string
      */
-    function formatQuote($body) {
+    function gdn_formatter_quote($body) {
         if (is_object($body)) {
             $body = (array)$body;
         } elseif (is_string($body)) {
