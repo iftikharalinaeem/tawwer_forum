@@ -31,7 +31,6 @@ import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import RouteActions from "@knowledge/routes/RouteActions";
-import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export type KNOWLEDGE_ACTION =
@@ -46,8 +45,7 @@ export type KNOWLEDGE_ACTION =
     | typeof SearchPageActions.ACTION_TYPES
     | typeof DraftsPageActions.ACTION_TYPES
     | typeof NavigationActions.ACTION_TYPES
-    | typeof RouteActions.ACTION_TYPES
-    | typeof KnowledgeBaseActions.ACTION_TYPES;
+    | typeof RouteActions.ACTION_TYPES;
 
 export type KnowledgeReducer<S> = Reducer<S, KNOWLEDGE_ACTION>;
 
