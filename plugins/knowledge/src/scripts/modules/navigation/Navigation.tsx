@@ -5,7 +5,7 @@
 
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
 import NavigationAdminLinks from "@knowledge/modules/navigation/NavigationAdminLinks";
-import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { INavigationStoreState, NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus, INavigationTreeItem } from "@library/@types/api";
@@ -15,7 +15,6 @@ import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { NavigationRecordType } from "@knowledge/@types/api";
 
 interface IProps extends INavigationStoreState {
     navActions: NavigationActions;
@@ -67,7 +66,7 @@ export class Navigation extends React.Component<IProps> {
      * Fetch navigation data when the component is mounted.
      */
     public componentDidMount() {
-        return this.props.navActions.getNavigationFlat({});
+        return this.props.navActions.getNavigationFlat(1);
     }
 }
 

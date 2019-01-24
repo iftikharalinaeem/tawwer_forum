@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import RouteHandler from "@knowledge/routes/RouteHandler";
@@ -15,13 +15,12 @@ import {
     IArticle,
     IRevisionFragment,
     IRevision,
-    IResponseArticleDraft,
     IKbCategoryFragment,
     IKbCategory,
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
-import { IKbNavigationItem } from "@knowledge/@types/api";
 import qs from "qs";
+import { IKbNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IEditorURLData {
     articleID?: number;

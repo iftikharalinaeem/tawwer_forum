@@ -3,9 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
+import { INormalizedNavigationItems, NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { NavigationRecordType } from "@knowledge/@types/api";
 import { INavigationTreeItem } from "@library/@types/api";
 
 export default class NavigationSelector {

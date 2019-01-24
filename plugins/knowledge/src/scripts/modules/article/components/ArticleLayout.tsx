@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { Devices } from "@library/components/DeviceChecker";
-import { IArticle, NavigationRecordType } from "@knowledge/@types/api";
+import { IArticle } from "@knowledge/@types/api";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
@@ -18,6 +18,7 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     article: IArticle;
