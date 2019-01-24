@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\InjectableInterface;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
 use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
@@ -39,6 +40,8 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var KnowledgeCategoryModel */
     protected $knowledgeCategoryModel;
 
+    /** @var KnowledgeBasesApiController $kbApi */
+    protected $kbApi;
 
     /** @var SiteMeta */
     protected $siteMeta;
@@ -66,6 +69,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      *
      * @param KnowledgeCategoryModel $categoryModel
      * @param KnowledgeCategoriesApiController $categoriesApi
+     * @param KnowledgeBasesApiController $kbApi
      * @param \UsersApiController $usersApi
      * @param SiteMeta $siteMeta
      * @param \Gdn_Session $session
@@ -74,13 +78,15 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     public function setDependencies(
         KnowledgeCategoryModel $categoryModel,
         KnowledgeCategoriesApiController $categoriesApi,
+        KnowledgeBasesApiController $kbApi,
         \UsersApiController $usersApi,
         SiteMeta $siteMeta,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider
     ) {
-        $this->knowledgeCategoryModel =$categoryModel;
+        $this->knowledgeCategoryModel = $categoryModel;
         $this->categoriesApi = $categoriesApi;
+        $this->kbApi = $kbApi;
         $this->usersApi = $usersApi;
         $this->siteMeta = $siteMeta;
         $this->session = $session;
@@ -151,6 +157,8 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         return new Data($this->twigInit()->render('default-master.twig', $data), $status);
     }
 
+    protected $knowledgeBases;
+
     /**
      * Preload redux actions that are present on every page.
      */
@@ -160,6 +168,13 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
 
         $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me)));
+
+        $this->knowledgeBases = $this->kbApi->index();
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ALL_KBS,
+            Data::box($this->knowledgeBases),
+            []
+        ));
     }
 
     /**

@@ -8,7 +8,7 @@ import { actionCreatorFactory } from "typescript-fsa";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api";
 
-const actionCreator = actionCreatorFactory("@@knowledge-base/");
+const actionCreator = actionCreatorFactory("@@knowledgeBases");
 
 /**
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
