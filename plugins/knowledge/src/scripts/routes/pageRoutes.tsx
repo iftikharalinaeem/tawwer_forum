@@ -129,7 +129,7 @@ export const HomeRoute = new RouteHandler(
 
 export const KnowledgeBasePage = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
-    "/kb/:slug(\\w+)",
+    "/kb/:slug([\\w\\d-]+)",
     (data: { slug: string }) => formatUrl(`/kb/${data.slug}`),
 );
 

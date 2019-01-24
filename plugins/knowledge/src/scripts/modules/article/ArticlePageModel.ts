@@ -82,7 +82,12 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
                     return this.initialState;
             }
 
-            if ("meta" in action && action.meta.articleID && nextState.articleID === action.meta.articleID) {
+            if (
+                "meta" in action &&
+                action.meta &&
+                action.meta.articleID &&
+                nextState.articleID === action.meta.articleID
+            ) {
                 switch (action.type) {
                     case ArticleActions.GET_ARTICLE_REQUEST:
                         nextState.articleLoadable.status = LoadStatus.LOADING;

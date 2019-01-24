@@ -5,10 +5,32 @@
  */
 
 import React from "react";
+import PanelLayout from "@library/components/layouts/PanelLayout";
+import Container from "@library/components/layouts/components/Container";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IDeviceProps } from "@library/components/DeviceChecker";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
+import KnowledgeBaseList from "@knowledge/knowledge-bases/KnowledgeBaseList";
+import DocumentTitle from "@library/components/DocumentTitle";
 import { t } from "@library/application";
 
-export default class KnowledgeBasePage extends React.Component {
+export class HomePage extends React.Component<IProps> {
     public render() {
-        return <div>{t("Hello home")}</div>;
+        return (
+            <Container>
+                <DocumentTitle title={t("Home")}>
+                    <VanillaHeader />
+                </DocumentTitle>
+                <PanelLayout device={this.props.device}>
+                    <PanelLayout.MiddleBottom>
+                        <KnowledgeBaseList />
+                    </PanelLayout.MiddleBottom>
+                </PanelLayout>
+            </Container>
+        );
     }
 }
+
+interface IProps extends IDeviceProps {}
+
+export default withDevice(HomePage);

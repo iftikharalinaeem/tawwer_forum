@@ -59,6 +59,7 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
                 return this.initialState;
             } else if (
                 "meta" in action &&
+                action.meta &&
                 "identifier" in action.meta &&
                 action.meta.identifier === DraftsPageActions.IDENTIFIER
             ) {

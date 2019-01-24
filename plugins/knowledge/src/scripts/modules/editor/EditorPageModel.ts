@@ -192,6 +192,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     private reduceInitialDraft: ReducerType = (nextState = this.initialState, action) => {
         if (
             "meta" in action &&
+            action.meta &&
             action.meta.tempID &&
             nextState.draft.data &&
             action.meta.tempID === nextState.draft.data.tempID
@@ -220,6 +221,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         // Initial draft handling data handling.
         if (
             "meta" in action &&
+            action.meta &&
             action.meta.draftID !== null &&
             nextState.draft.data &&
             action.meta.draftID === nextState.draft.data.draftID
@@ -249,7 +251,12 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         }
 
         // Normalized handling of revisions.
-        if ("meta" in action && action.meta.revisionID !== null && action.meta.revisionID === nextState.revision.data) {
+        if (
+            "meta" in action &&
+            action.meta &&
+            action.meta.revisionID !== null &&
+            action.meta.revisionID === nextState.revision.data
+        ) {
             switch (action.type) {
                 case ArticleActions.GET_REVISION_REQUEST:
                     nextState.revision.status = LoadStatus.LOADING;

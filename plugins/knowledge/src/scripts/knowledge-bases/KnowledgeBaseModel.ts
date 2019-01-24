@@ -4,17 +4,58 @@
  */
 
 import ReduxReducer from "@library/state/ReduxReducer";
-import { KnowledgeReducer } from "@knowledge/state/model";
+import { KnowledgeReducer, IStoreState } from "@knowledge/state/model";
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import produce from "immer";
+import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import { createSelector } from "reselect";
 
-export default class KnowledgeBaseModel extends ReduxReducer<IKnowledgeBasesState> {
-    public initialState: IKnowledgeBasesState = {};
+export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesState> {
+    private static selectSelf = (state: IStoreState) => state.knowledge.knowledgeBases;
+
+    public static selectKnowledgeBases = createSelector(
+        [KnowledgeBaseModel.selectSelf],
+        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
+    );
+
+    public initialState: IKnowledgeBasesState = {
+        knowledgeBasesByID: {
+            status: LoadStatus.PENDING,
+        },
+    };
 
     public reducer: ReducerType = (state = this.initialState, action) => {
-        return state;
+        return produce(state, nextState => {
+            return this.mutableReducer(nextState, action);
+        });
     };
+
+    private mutableReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
+        .case(KnowledgeBaseActions.GET_ACS.started, state => {
+            state.knowledgeBasesByID.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(KnowledgeBaseActions.GET_ACS.done, (state, payload) => {
+            const normalized: { [id: number]: IKnowledgeBase } = {};
+            for (const kb of payload.result) {
+                normalized[kb.knowledgeBaseID] = kb;
+            }
+            state.knowledgeBasesByID.status = LoadStatus.SUCCESS;
+            state.knowledgeBasesByID.data = normalized;
+            return state;
+        })
+        .case(KnowledgeBaseActions.GET_ACS.failed, (state, action) => {
+            state.knowledgeBasesByID.error = action.error;
+            return state;
+        });
 }
 
-export interface IKnowledgeBasesState {}
+export interface IKnowledgeBasesState {
+    knowledgeBasesByID: ILoadable<{
+        [id: number]: IKnowledgeBase;
+    }>;
+}
 
 export enum KnowledgeBaseDisplayType {
     HELP = "help",

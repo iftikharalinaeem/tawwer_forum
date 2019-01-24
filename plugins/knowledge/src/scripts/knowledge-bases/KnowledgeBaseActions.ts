@@ -3,16 +3,21 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/state/ReduxActions";
+import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { asyncFactory } from "typescript-fsa-redux-thunk";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IApiError } from "@library/@types/api";
 
 const actionCreator = actionCreatorFactory("@@knowledge-base/");
-const thunkCreator = asyncFactory(actionCreator);
 
-export default class KnowledgeBaseActions {
+export default class KnowledgeBaseActions extends ReduxActions {
+    public static readonly GET_ACS = actionCreator.async<undefined, IKnowledgeBase[], IApiError>("GET_ALL");
 
-    public static getKnowledgeBasesACs = 
-
-    public static readonly ACTION_TYPES;
+    public getAll = () => {
+        const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
+            const response = await this.api.get("/knowledge-bases");
+            return response.data;
+        })();
+        return this.dispatch(thunk);
+    };
 }
