@@ -335,7 +335,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "description" => "Unique ID of a knowledge category to get navigation for. Only direct children of this category will be included.",
                 "type" => "integer",
             ],
-            "recordType" => [
+            "recordType?" => [
                 "default" => self::FILTER_RECORD_TYPE_ALL,
                 "description" => "The type of record to limit navigation results to.",
                 "enum" => [
