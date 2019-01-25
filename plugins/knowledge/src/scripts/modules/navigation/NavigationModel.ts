@@ -3,35 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { NavigationRecordType, IPatchFlatItem, IKbNavigationItem } from "@knowledge/@types/api";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus, INavigationItem } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import reduceReducers from "reduce-reducers";
-
-export interface INormalizedNavigationItem extends IKbNavigationItem {
-    children: string[];
-    tempName?: string;
-    tempDeleted?: boolean;
-    error?: {
-        message: string;
-    };
-}
-export interface INormalizedNavigationItems {
-    [key: string]: INormalizedNavigationItem | undefined;
-}
-
-export interface INavigationStoreState {
-    navigationItems: INormalizedNavigationItems;
-    currentKnowledgeBase: ILoadable<{}>; // Needs to be replaced with an actual KB.
-    submitLoadable: ILoadable<never>;
-    fetchLoadable: ILoadable<never>;
-    patchTransactionID: string | null;
-}
+import { KnowledgeReducer } from "@knowledge/state/model";
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 
 /**
  * Model for managing and selection navigation data.
@@ -41,15 +22,11 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
     public initialState: INavigationStoreState = {
         navigationItems: {},
-        currentKnowledgeBase: {
-            status: LoadStatus.PENDING,
-        },
+        navigationItemsByKbID: {},
         submitLoadable: {
             status: LoadStatus.PENDING,
         },
-        fetchLoadable: {
-            status: LoadStatus.PENDING,
-        },
+        fetchLoadablesByKbID: [],
         patchTransactionID: null,
     };
 
@@ -58,17 +35,11 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
      *
      * Made up of multiple sub-reduceres.
      */
-    public reducer = (
-        state: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
+    public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
             return reduceReducers(
                 this.reduceGetNav,
-                this.reduceSortOrder,
+                this.reducePatchNav,
                 this.reduceDelete,
                 this.reduceRename,
                 this.reduceAdd,
@@ -79,72 +50,59 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     /**
      * Reduce actions related to fetching navigation.
      */
-    private reduceGetNav = (
-        nextState: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
-        switch (action.type) {
-            case NavigationActions.GET_NAVIGATION_FLAT_REQUEST:
-                nextState.fetchLoadable.status = LoadStatus.LOADING;
-                break;
-            case NavigationActions.GET_NAVIGATION_FLAT_RESPONSE:
-                nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
-                nextState.fetchLoadable.status = LoadStatus.SUCCESS;
-                break;
-            case NavigationActions.GET_NAVIGATION_FLAT_ERROR:
-                nextState.fetchLoadable.status = LoadStatus.ERROR;
-                nextState.fetchLoadable.error = action.payload;
-                break;
-        }
+    private reduceGetNav: ReducerType = reducerWithoutInitialState<INavigationStoreState>()
+        .case(NavigationActions.getNavigationFlatACs.started, (state, payload) => {
+            state.fetchLoadablesByKbID[payload.knowledgeBaseID] = { status: LoadStatus.LOADING };
+            return state;
+        })
+        .case(NavigationActions.getNavigationFlatACs.done, (state, payload) => {
+            const { knowledgeBaseID } = payload.params;
+            const normalizedItems = NavigationModel.normalizeData(payload.result);
+            state.navigationItems = {
+                ...state.navigationItems,
+                ...normalizedItems,
+            };
+            state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
+            state.fetchLoadablesByKbID[knowledgeBaseID] = { status: LoadStatus.SUCCESS };
+            return state;
+        })
+        .case(NavigationActions.getNavigationFlatACs.failed, (state, payload) => {
+            state.fetchLoadablesByKbID[payload.params.knowledgeBaseID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        });
 
-        return nextState;
-    };
-
-    /**
-     * Reduce actions related to updating navigation order.
-     */
-    private reduceSortOrder = (
-        nextState: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
-        switch (action.type) {
-            case NavigationActions.PATCH_NAVIGATION_FLAT_REQUEST:
-                nextState.patchTransactionID = action.meta.transactionID;
-                nextState.submitLoadable.status = LoadStatus.LOADING;
-                break;
-            case NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE:
-                // Use a transaction ID so that only that last request/response in a series of patches
-                // "finishes" the state updates.
-                if (nextState.patchTransactionID === action.meta.transactionID) {
-                    nextState.navigationItems = NavigationModel.normalizeData(action.payload.data);
-                    nextState.submitLoadable.status = LoadStatus.SUCCESS;
-                }
-                break;
-            case NavigationActions.PATCH_NAVIGATION_FLAT_ERROR:
-                nextState.submitLoadable.status = LoadStatus.SUCCESS;
-                nextState.submitLoadable.error = action.payload;
-                break;
-        }
-
-        return nextState;
-    };
+    private reducePatchNav: ReducerType = reducerWithoutInitialState<INavigationStoreState>()
+        .case(NavigationActions.patchNavigationFlatACs.started, (state, payload) => {
+            state.patchTransactionID = payload.transactionID;
+            state.submitLoadable.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(NavigationActions.patchNavigationFlatACs.done, (state, payload) => {
+            const { knowledgeBaseID } = payload.params;
+            if (state.patchTransactionID === payload.params.transactionID) {
+                const normalizedItems = NavigationModel.normalizeData(payload.result);
+                state.navigationItems = {
+                    ...state.navigationItems,
+                    ...normalizedItems,
+                };
+                state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
+                state.submitLoadable.status = LoadStatus.SUCCESS;
+            }
+            return state;
+        })
+        .case(NavigationActions.patchNavigationFlatACs.failed, (state, payload) => {
+            state.submitLoadable.status = LoadStatus.SUCCESS;
+            state.submitLoadable.error = payload.error;
+            return state;
+        });
 
     /**
      * Reduce actions related to renaming a single item.
      */
-    private reduceRename = (
-        nextState: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
+    private reduceRename: ReducerType = (nextState = this.initialState, action) => {
         /**
          * Utility for handling successfull rename action.
          */
@@ -210,13 +168,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     /**
      * Reduce actions related to adding new items.
      */
-    private reduceAdd = (
-        nextState: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
+    private reduceAdd: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 const article = action.payload.data;
@@ -245,13 +197,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     /**
      * Reduce actions related to the deletion of a navigation item.
      */
-    private reduceDelete = (
-        nextState: INavigationStoreState = this.initialState,
-        action:
-            | typeof NavigationActions.ACTION_TYPES
-            | typeof CategoryActions.ACTION_TYPES
-            | typeof ArticleActions.ACTION_TYPES,
-    ): INavigationStoreState => {
+    private reduceDelete: ReducerType = (nextState = this.initialState, action) => {
         /**
          * Utility for handling the initialization of a delete item request.
          *
@@ -455,4 +401,45 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             return compare(sortA, sortB)!;
         }
     }
+}
+
+export type ReducerType = KnowledgeReducer<INavigationStoreState>;
+
+export enum NavigationRecordType {
+    KNOWLEDGE_CATEGORY = "knowledgeCategory",
+    ARTICLE = "article",
+}
+
+export interface IKbNavigationItem<R extends NavigationRecordType = NavigationRecordType> extends INavigationItem {
+    recordType: R;
+    children?: string[];
+}
+
+export interface IPatchFlatItem {
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    recordType: NavigationRecordType;
+}
+
+export interface INormalizedNavigationItem extends IKbNavigationItem {
+    children: string[];
+    tempName?: string;
+    tempDeleted?: boolean;
+    error?: {
+        message: string;
+    };
+}
+export interface INormalizedNavigationItems {
+    [key: string]: INormalizedNavigationItem | undefined;
+}
+
+export interface INavigationStoreState {
+    navigationItems: INormalizedNavigationItems;
+    navigationItemsByKbID: {
+        [kbID: number]: string[];
+    };
+    submitLoadable: ILoadable<never>;
+    fetchLoadablesByKbID: Array<ILoadable<never>>;
+    patchTransactionID: string | null;
 }

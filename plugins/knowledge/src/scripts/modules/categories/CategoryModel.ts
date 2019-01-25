@@ -5,10 +5,11 @@
 
 import { LoadStatus, ILoadable, INavigationTreeItem } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import { IKbCategoryFragment, NavigationRecordType } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {

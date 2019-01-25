@@ -13,7 +13,7 @@ import Tree, {
     moveItemOnTree,
     mutateTree,
 } from "@atlaskit/tree";
-import { NavigationRecordType, ArticleStatus, IKbNavigationItem } from "@knowledge/@types/api";
+import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
@@ -24,6 +24,8 @@ import NavigationModel, {
     INavigationStoreState,
     INormalizedNavigationItem,
     INormalizedNavigationItems,
+    NavigationRecordType,
+    IKbNavigationItem,
 } from "@knowledge/modules/navigation/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
@@ -139,7 +141,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public async componentDidMount() {
         const { knowledgeBaseID } = this.props;
-        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID });
+        await this.props.navigationActions.getNavigationFlat(knowledgeBaseID);
     }
 
     /**
@@ -398,7 +400,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private onNewCategorySuccess = async () => {
         const { knowledgeBaseID } = this.props;
-        await this.props.navigationActions.getNavigationFlat({ knowledgeBaseID }, true);
+        await this.props.navigationActions.getNavigationFlat(knowledgeBaseID, true);
     };
 
     /**
@@ -568,7 +570,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 this.selectItem(item);
             },
         );
-        await this.props.navigationActions.patchNavigationFlat(this.calcPatchArray(newTree));
+        await this.props.navigationActions.patchNavigationFlat(1, this.calcPatchArray(newTree));
     };
 
     private onDragStart = (source: ITreeSourcePosition) => {
