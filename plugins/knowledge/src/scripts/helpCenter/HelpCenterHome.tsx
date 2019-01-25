@@ -32,7 +32,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            return <ErrorPage loadable={this.props} />;
+            return <ErrorPage error={this.props.error} />;
         }
 
         return (

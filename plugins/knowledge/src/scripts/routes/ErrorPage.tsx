@@ -69,7 +69,11 @@ export class ErrorPage extends React.Component<IProps> {
                 return {
                     message: "There are no knowledge bases",
                     description: t("No knowledge bases could be found. Please create one to get started."),
-                    actionItem: <LinkAsButton to={"/knowledge/settings/knowledge-bases"}>{t("Home")}</LinkAsButton>,
+                    actionItem: (
+                        <LinkAsButton to={"/knowledge/settings/knowledge-bases"}>
+                            {t("New Knowledge Base")}
+                        </LinkAsButton>
+                    ),
                 };
             }
             case DefaultError.NO_ARTICLES: {
@@ -80,13 +84,6 @@ export class ErrorPage extends React.Component<IProps> {
                     actionItem: knowledgeBaseID ? (
                         <EditorRoute.Link data={{ knowledgeBaseID }}>{t("New Article")}</EditorRoute.Link>
                     ) : null,
-                };
-            }
-            case DefaultError.NOT_FOUND: {
-                return {
-                    message: "There are no knowledge bases",
-                    description: t("No knowledge bases could be found. Please create one to get started."),
-                    actionItem: <LinkAsButton to={"/knowledge/settings/knowledge-bases"}>{t("Home")}</LinkAsButton>,
                 };
             }
             case DefaultError.GENERIC:

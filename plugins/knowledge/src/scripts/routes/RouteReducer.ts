@@ -12,7 +12,7 @@ import produce from "immer";
 export interface IRouteError {
     message: string;
     status: number;
-    description: string | null;
+    description?: string;
 }
 
 export interface IRouteState {
