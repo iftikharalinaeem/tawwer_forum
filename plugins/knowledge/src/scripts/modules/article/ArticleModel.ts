@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IRevision, IRevisionFragment, IResponseArticleDraft } from "@knowledge/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
+import { IArticle, IArticleFragment, IResponseArticleDraft, IRevision, IRevisionFragment } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
-import { IStoreState } from "@knowledge/state/model";
 
 export interface IArticleState {
     articlesByID: {
@@ -27,6 +27,8 @@ export interface IArticleState {
         [key: number]: IResponseArticleDraft;
     };
 }
+
+type ReducerType = KnowledgeReducer<IArticleState>;
 
 /**
  * Selectors and reducer for the article resources.
@@ -101,10 +103,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
 
-    public reducer = (
-        state: IArticleState = this.initialState,
-        action: typeof ArticleActions.ACTION_TYPES,
-    ): IArticleState => {
+    public reducer: ReducerType = (state = this.initialState, action): IArticleState => {
         return produce(state, nextState => {
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:

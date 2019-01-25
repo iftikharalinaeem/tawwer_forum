@@ -10,6 +10,8 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\InjectableInterface;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
 use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
@@ -27,7 +29,7 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
  *
  * This controller expects most content to come from api
  */
-abstract class KnowledgeTwigPageController extends PageController implements CustomExceptionHandler {
+abstract class KnowledgeTwigPageController extends PageController implements CustomExceptionHandler, InjectableInterface {
     use \Garden\TwigTrait;
 
     const API_PAGE_KEY = 'page';
@@ -38,32 +40,65 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var KnowledgeCategoryModel */
     protected $knowledgeCategoryModel;
 
-    /** @var Container */
-    protected $container;
+    /** @var KnowledgeBasesApiController $kbApi */
+    protected $kbApi;
 
     /** @var SiteMeta */
     protected $siteMeta;
 
-    /**
-     * @var mixed Gdn_Session
-     */
+    /** @var mixed Gdn_Session */
     protected $session;
+
+    /** @var KnowledgeCategoriesApiController */
+    protected $categoriesApi;
+
+    /** @var \UsersApiController */
+    protected $usersApi;
 
     /**
      * KnowledgeTwigPageController constructor.
-     *
-     * @param Container $container Interface to DI container.
      */
-    public function __construct(Container $container) {
+    public function __construct() {
         parent::__construct();
-        $this->container = $container;
-        $this->knowledgeCategoryModel = $container->get(KnowledgeCategoryModel::class);
-        $this->siteMeta = $container->get(SiteMeta::class);
-        $this->session = $this->container->get(\Gdn_Session::class);
-        /** @var WebpackAssetProvider $assetProvider */
-        $assetProvider = $this->container->get(WebpackAssetProvider::class);
-        self::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+        self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
+    }
 
+
+    /**
+     * Dependency Injection that we child controllers to need to implement.
+     *
+     * @param KnowledgeCategoryModel $categoryModel
+     * @param KnowledgeCategoriesApiController $categoriesApi
+     * @param KnowledgeBasesApiController $kbApi
+     * @param \UsersApiController $usersApi
+     * @param SiteMeta $siteMeta
+     * @param \Gdn_Session $session
+     * @param WebpackAssetProvider $assetProvider
+     */
+    public function setDependencies(
+        KnowledgeCategoryModel $categoryModel,
+        KnowledgeCategoriesApiController $categoriesApi,
+        KnowledgeBasesApiController $kbApi,
+        \UsersApiController $usersApi,
+        SiteMeta $siteMeta,
+        \Gdn_Session $session,
+        WebpackAssetProvider $assetProvider
+    ) {
+        $this->knowledgeCategoryModel = $categoryModel;
+        $this->categoriesApi = $categoriesApi;
+        $this->kbApi = $kbApi;
+        $this->usersApi = $usersApi;
+        $this->siteMeta = $siteMeta;
+        $this->session = $session;
+        $this->initAssets($assetProvider);
+    }
+
+    /**
+     * Initialize assets from the asset provide.
+     *
+     * @param WebpackAssetProvider $assetProvider
+     */
+    private function initAssets(WebpackAssetProvider $assetProvider) {
         $this->inlineScripts = [$assetProvider->getInlinePolyfillContents()];
 
         $mapAssetToPath = function (AssetInterface $asset) {
@@ -95,9 +130,10 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      */
     public function handle(\Throwable $e): Data {
         if ($e instanceof NotFoundException
-        || $e instanceof PermissionException) {
+            || $e instanceof PermissionException) {
             return $this->errorPage($e);
         }
+
         return new Data();
     }
 
@@ -117,22 +153,28 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         $data[self::API_PAGE_KEY]['status'] = $e->getCode();
         $data[self::API_PAGE_KEY]['message'] = $e->getMessage();
         $data['template'] = 'seo/pages/error.twig';
+
         return new Data($this->twigInit()->render('default-master.twig', $data), $status);
     }
+
+    protected $knowledgeBases;
 
     /**
      * Preload redux actions that are present on every page.
      */
     private function addGlobalReduxActions() {
-        /** @var KnowledgeCategoriesApiController $categoriesApi */
-        $categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
-        $categories = $categoriesApi->index();
+        $categories = $this->categoriesApi->index();
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($categories)));
 
-        /** @var \UsersApiController $usersApi */
-        $usersApi = $this->container->get(\UsersApiController::class);
-        $me = $usersApi->get_me([]);
+        $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me)));
+
+        $this->knowledgeBases = $this->kbApi->index();
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ALL_KBS,
+            Data::box($this->knowledgeBases),
+            []
+        ));
     }
 
     /**
@@ -187,6 +229,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      */
     protected function setCategoryID(int $categoryID): self {
         $this->categoryID = $categoryID;
+
         return $this;
     }
 
@@ -212,7 +255,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      *
      * @return array
      */
-    public function getWebViewResources() : array {
+    public function getWebViewResources(): array {
         return [
             'debug' => \Gdn::config('Debug'),
             'scripts' => $this->getScripts(),
@@ -222,6 +265,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
             'meta' => $this->meta->getPageMeta(),
         ];
     }
+
     /**
      * Gather the data array to render a page with.
      *

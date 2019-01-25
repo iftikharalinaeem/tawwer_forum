@@ -339,18 +339,63 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
             $previousState = $this->knowledgeCategoryByID($id);
 
+            $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
+
+            if (!isset($body['sort'])) {
+                if ($moveToAnotherParent || !($previousState['sort'] ?? false)) {
+                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID'] ?? $previousState['parentID']);
+                    $maxSortIndex = $sortInfo['maxSort'];
+                    $body['sort'] = $maxSortIndex + 1;
+                    $updateSorts = false;
+                } else {
+                    // if we don't change the parentID and there is no $fields['sort']
+                    // then we don't need to update sorting
+                    $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
+                    $updateSorts = false;
+                }
+            } else {
+                //update sorts for other records only if 'sort' changed
+                $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
+                $updateSorts = ($body['sort'] != $previousState['sort']);
+            }
+
+            if (isset($body['sort'])
+                && isset($previousState['parentID'])
+                && isset($previousState['sort'])
+                && $body['sort'] !== $previousState['sort']) {
+                //shift sorts down for source category when move one article to another category
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $previousState['parentID'],
+                    $previousState['sort'],
+                    $previousState['knowledgeCategoryID'],
+                    KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
+                    KnowledgeCategoryModel::SORT_DECREMENT
+                );
+            }
+
             $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
-            if (!empty($body['parentID']) && ($body['parentID'] != $previousState['parentID'])) {
+            if ($moveToAnotherParent) {
                 $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
                 $this->knowledgeCategoryModel->updateCounts($id);
             }
+
+
+
+            if ($updateSorts) {
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $body['parentID'],
+                    $body['sort'],
+                    $id,
+                    KnowledgeCategoryModel::SORT_TYPE_CATEGORY
+                );
+            }
+
             $row = $this->knowledgeCategoryByID($id);
             $row = $this->normalizeOutput($row);
             $result = $out->validate($row);
         } else {
             throw new \Garden\Web\Exception\ClientException("You can not patch root category.", 409);
         }
-
         return $result;
     }
 
@@ -381,7 +426,25 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         }
         $body = $in->validate($body);
 
+
+        $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID']);
+        $maxSortIndex = $sortInfo['maxSort'];
+        if (!is_int($body['sort'] ?? false)) {
+            $body['sort'] = $maxSortIndex + 1;
+            $updateSorts = false;
+        } else {
+            $updateSorts = ($body['sort'] <= $maxSortIndex);
+        }
+
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert($body);
+        if ($updateSorts) {
+            $this->knowledgeCategoryModel->shiftSorts(
+                $body['parentID'],
+                $body['sort'],
+                $knowledgeCategoryID,
+                KnowledgeCategoryModel::SORT_TYPE_CATEGORY
+            );
+        }
         if (!empty($body['parentID']) && $body['parentID'] != -1) {
             $this->knowledgeCategoryModel->updateCounts($body['parentID']);
         }

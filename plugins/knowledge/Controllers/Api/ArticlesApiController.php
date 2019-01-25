@@ -17,6 +17,7 @@ use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
 use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
@@ -312,9 +313,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $options["orderDirection"] = "asc";
         }
         $rows = $this->articleModel->getWithRevision(
-            ["knowledgeCategoryID" => $query["knowledgeCategoryID"]],
+            ["a.knowledgeCategoryID" => $query["knowledgeCategoryID"]],
             $options
         );
+
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
             if (!$includeExcerpts) {
@@ -619,17 +621,88 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         if ($articleID !== null) {
+            // this means we patch existing Article
             $prevState = $this->articleModel->getID($articleID);
+            $moveToAnotherCategory = (isset($article['knowledgeCategoryID'])
+                && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
+
+            if (!is_int($fields['sort'] ?? false)) {
+                if ($moveToAnotherCategory || !($prevState['sort'] ?? false)) {
+                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($article['knowledgeCategoryID']);
+                    $maxSortIndex = $sortInfo['maxSort'];
+                    $article['sort'] = $maxSortIndex + 1;
+                    $updateSorts = false;
+                } else {
+                    // if we don't change the categoryID and there is no $fields['sort']
+                    // then we don't need to update sorting
+                    $updateSorts = false;
+                }
+            } else {
+                //update sorts for other records only if 'sort' changed
+                $updateSorts = ($article['sort'] != $prevState['sort']);
+            }
+
+            if (isset($article['sort'])
+                && isset($prevState['knowledgeCategoryID'])
+                && isset($prevState['sort'])
+                && $article['sort'] != $prevState['sort'] ) {
+                $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
+                //shift sorts down for source category when move one article to another category
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $prevState['knowledgeCategoryID'],
+                    $prevState['sort'],
+                    $prevState['articleID'],
+                    KnowledgeCategoryModel::SORT_TYPE_ARTICLE,
+                    KnowledgeCategoryModel::SORT_DECREMENT
+                );
+            }
+
             $this->articleModel->update($article, ["articleID" => $articleID]);
-            if (isset($article['knowledgeCategoryID'])) {
-                if ($prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']) {
-                    if (!empty($prevState['knowledgeCategoryID'])) {
-                        $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
-                    }
+
+            if ($moveToAnotherCategory) {
+                if (!empty($prevState['knowledgeCategoryID'])) {
+                    $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
                 }
             }
+
+
+            if ($updateSorts) {
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
+                    $article['sort'],
+                    $articleID,
+                    KnowledgeCategoryModel::SORT_TYPE_ARTICLE
+                );
+            }
         } else {
+            // this means we insert a new Article
+            $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($fields['knowledgeCategoryID']);
+            $maxSortIndex = $sortInfo['maxSort'];
+            if (!is_int($fields['sort'] ?? false)) {
+                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
+                    && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+                    $fields['sort'] = $maxSortIndex + 1;
+                }
+                $updateSorts = false;
+            } else {
+                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
+                    && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+                    $updateSorts = ($fields['sort'] <= $maxSortIndex);
+                } else {
+                    // when KB is in Help center mode or KB is not in Manual sorting mode
+                    // we don't need to update sorting from Articles API
+                    $updateSorts = false;
+                }
+            }
             $articleID = $this->articleModel->insert($fields);
+            if ($updateSorts) {
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $fields['knowledgeCategoryID'],
+                    $fields['sort'],
+                    $articleID,
+                    KnowledgeCategoryModel::SORT_TYPE_ARTICLE
+                );
+            }
         }
         if (!empty($article['knowledgeCategoryID'])) {
             $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);

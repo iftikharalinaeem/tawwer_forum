@@ -25,28 +25,26 @@ class CategoriesPageController extends KnowledgeTwigPageController {
 
     /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
+
     /** @var ArticlesApiController */
     protected $articlesApi;
 
     /**
      * CategoriesPageController constructor.
-     * @param Container $container
+     *
+     * @param KnowledgeCategoriesApiController $categoriesApi
+     * @param ArticlesApiController $articlesApi
      */
-    public function __construct(Container $container) {
-        parent::__construct($container);
-        $this->categoriesApi = $this->container->get(KnowledgeCategoriesApiController::class);
-        $this->articlesApi = $this->container->get(ArticlesApiController::class);
+    public function __construct(KnowledgeCategoriesApiController $categoriesApi, ArticlesApiController $articlesApi) {
+        parent::__construct();
+        $this->categoriesApi = $categoriesApi;
+        $this->articlesApi = $articlesApi;
     }
 
     /**
      * @var $action view | edit | add | delete etc...
      */
     private $action;
-
-    /**
-     * @var int $articleId Article id of current action.
-     */
-    private $categoryId;
 
     /**
      * @inheritdoc

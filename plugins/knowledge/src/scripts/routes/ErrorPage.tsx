@@ -98,4 +98,4 @@ export class ErrorPage extends React.Component<IProps> {
 
 const withCurrentUser = connect(UsersModel.mapStateToProps);
 
-export default withCurrentUser(withDevice<IProps>(ErrorPage));
+export default withCurrentUser(withDevice(ErrorPage));

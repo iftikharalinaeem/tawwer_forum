@@ -113,13 +113,24 @@ export const SearchRoute = new RouteHandler(
     "/kb/search",
     (data?: undefined) => formatUrl("/kb/search"),
 );
-const SearchRedirect = () => <Redirect to={SearchRoute.url(undefined)} />;
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
     (data?: undefined) => formatUrl("/kb/drafts"),
     ModalLoader,
+);
+
+export const HomeRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/HomePage"),
+    "/kb",
+    (data?: undefined) => formatUrl("/kb"),
+);
+
+export const KnowledgeBasePage = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
+    "/kb/:slug([\\w\\d-]+)",
+    (data: { slug: string }) => formatUrl(`/kb/${data.slug}`),
 );
 
 export const OrganizeCategoriesRoute = new RouteHandler(
@@ -153,7 +164,8 @@ export function getPageRoutes() {
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
-        <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
+        KnowledgeBasePage.route,
+        HomeRoute.route,
         <Route component={NotFound} key={"not found"} />,
     ];
 }

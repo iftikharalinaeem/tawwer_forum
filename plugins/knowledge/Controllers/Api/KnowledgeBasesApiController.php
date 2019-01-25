@@ -10,6 +10,7 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
@@ -22,6 +23,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
+    /** @var KnowledgeNavigationApiController */
+    private $knowledgeNavigationApi;
+
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
@@ -29,10 +33,16 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * KnowledgeBaseApiController constructor.
      *
      * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      */
-    public function __construct(KnowledgeBaseModel $knowledgeBaseModel, KnowledgeCategoryModel $knowledgeCategoryModel) {
+    public function __construct(
+        KnowledgeBaseModel $knowledgeBaseModel,
+        KnowledgeNavigationApiController $knowledgeNavigationApi,
+        KnowledgeCategoryModel $knowledgeCategoryModel
+    ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
@@ -50,6 +60,41 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $row = $this->knowledgeBaseByID($id);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
+
+        return $result;
+    }
+
+    /**
+     * Get a knowledge base by it's URL code.
+     *
+     * @param array $query
+     *
+     * @return mixed
+     * @throws NotFoundException If the knowledge base could not be found.
+     * @throws ValidationException If the input or output was invalid.
+     * @throws \Garden\Web\Exception\HttpException If the user has been banned.
+     * @throws \Vanilla\Exception\PermissionException If the user did not have proper permission to view the resource.
+     */
+    public function get_byUrlCode(array $query) {
+        $this->permission('knowledge.kb.view');
+
+        // Schema
+        $in = $this->schema(Schema::parse([
+            'urlCode',
+        ])->add($this->fullSchema()), "in")->setDescription('Get a knowledge base, using its urlCode.');
+        $out = $this->schema($this->fullSchema(), 'out');
+        $query = $in->validate($query);
+
+        // Data fetching
+        $urlCode = $query['urlCode'];
+        $row = $this->knowledgeBaseModel->get(['urlCode' => $urlCode])[0] ?? null;
+        if (!$row) {
+            throw new NotFoundException('KnowledgeBase');
+        }
+
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+
         return $result;
     }
 
@@ -69,6 +114,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             return $this->normalizeOutput($row);
         }, $rows);
         $result = $out->validate($rows);
+
         return $result;
     }
 
@@ -82,7 +128,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema($this->knowledgeBasePostSchema())
-            ->setDescription("Create a new knowledge base.");
+            ->setDescription("Create a new knowledge base.")
+        ;
         $in = $this->applyUrlCodeValidator($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
@@ -90,13 +137,14 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert([
             'name' => $body['name'],
             'knowledgeBaseID' => $knowledgeBaseID,
-            'parentID' => -1
+            'parentID' => -1,
         ]);
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
+
         return $result;
     }
 
@@ -123,6 +171,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $row = $this->knowledgeBaseByID($id);
         $result = $out->validate($row);
+
         return $result;
     }
 
@@ -138,7 +187,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeBasePostSchema())
-            ->setDescription("Update an existing knowledge base.");
+            ->setDescription("Update an existing knowledge base.")
+        ;
         $in = $this->applyUrlCodeValidator($in, $id);
 
         $out = $this->schema($this->fullSchema(), "out");
@@ -157,6 +207,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $row = $this->knowledgeBaseByID($id);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
+
         return $result;
     }
 
@@ -190,6 +241,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $existingRow = $this->knowledgeBaseModel->get(['urlCode' => $urlCode])[0] ?? null;
         if ($existingRow && $existingRow['knowledgeBaseID'] !== $recordID) {
             $validationField->addError('The specified URL code is already in use by another knowledge base.');
+
             return false;
         }
 
@@ -223,13 +275,19 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param int $knowledgeBaseID
      * @return array
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge base could not be found.
+     * @throws NotFoundException If the knowledge base could not be found.
      */
     public function knowledgeBaseByID(int $knowledgeBaseID): array {
         try {
             $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
-            throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
+            throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
+        }
+
+        if ($result['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $result['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($knowledgeBaseID);
+        } else {
+            $result['defaultArticleID'] = null;
         }
         return $result;
     }
@@ -242,6 +300,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     private function normalizeOutput(array $record): array {
+        if (!isset($record['defaultArticleID'])) {
+            if ($record['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+                $record['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($record['knowledgeBaseID']);
+            } else {
+                $record['defaultArticleID'] = null;
+            }
+        }
         $record['url'] = $this->knowledgeBaseModel->url($record, true);
         return $record;
     }

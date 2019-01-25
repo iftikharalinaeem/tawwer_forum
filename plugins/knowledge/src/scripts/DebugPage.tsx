@@ -11,12 +11,12 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
 import { EditorRoute, SearchRoute, DraftsRoute, OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 
-export default class HomePage extends React.Component {
+export default class DebugPage extends React.Component {
     public render() {
         return (
             <div className="container">
                 <VanillaHomeHeader />
-                <DocumentTitle title={t("Home")} />
+                <DocumentTitle title={t("Debug")} />
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
                     <Link to="/kb/articles/1-article-one">{t("Article One")}</Link>

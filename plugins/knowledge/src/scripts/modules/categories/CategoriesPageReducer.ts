@@ -8,11 +8,14 @@ import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageA
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
+import { KnowledgeReducer } from "@knowledge/state/model";
 
 export interface ICategoriesPageState {
     articles: ILoadable<IArticleFragment[]>;
     category: IKbCategory | null;
 }
+
+type ReducerType = KnowledgeReducer<ICategoriesPageState>;
 
 /**
  * Reducer for the categories page.
@@ -25,10 +28,7 @@ export default class CategoriesPageReducer extends ReduxReducer<ICategoriesPageS
         category: null,
     };
 
-    public reducer = (
-        state: ICategoriesPageState = this.initialState,
-        action: typeof CategoriesPageActions.ACTION_TYPES,
-    ): ICategoriesPageState => {
+    public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, draft => {
             switch (action.type) {
                 case CategoriesPageActions.GET_ARTICLES_REQUEST:
