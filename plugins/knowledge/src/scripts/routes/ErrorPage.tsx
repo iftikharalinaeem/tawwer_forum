@@ -19,6 +19,8 @@ import Heading from "@library/components/Heading";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import Permission from "@library/users/Permission";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {
@@ -82,7 +84,11 @@ export class ErrorPage extends React.Component<IProps> {
                     message: "This knowledge base does not have any articles.",
                     description: "",
                     actionItem: knowledgeBaseID ? (
-                        <EditorRoute.Link data={{ knowledgeBaseID }}>{t("New Article")}</EditorRoute.Link>
+                        <Permission permission="articles.add">
+                            <EditorRoute.Link className={ButtonBaseClass.STANDARD} data={{ knowledgeBaseID }}>
+                                {t("New Article")}
+                            </EditorRoute.Link>
+                        </Permission>
                     ) : null,
                 };
             }

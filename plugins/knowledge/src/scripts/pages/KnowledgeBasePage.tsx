@@ -47,7 +47,9 @@ class KnowledgeBasePage extends React.Component<IProps> {
 
     private renderGuide(knowledgeBase: IKnowledgeBase): React.ReactNode {
         if (knowledgeBase.defaultArticleID === null) {
-            return <div>{t("No articles found. Go create one.")}</div>;
+            return (
+                <ErrorPage defaultError={DefaultError.NO_ARTICLES} knowledgeBaseID={knowledgeBase.knowledgeBaseID} />
+            );
         }
 
         const match = {
