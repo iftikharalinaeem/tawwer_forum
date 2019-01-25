@@ -6,8 +6,7 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import ErrorPage from "@knowledge/routes/ErrorPage";
-import { LoadStatus } from "@library/@types/api";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import RouteHandler from "@knowledge/routes/RouteHandler";
 import { ModalLoader } from "@library/components/modal";
 import {
@@ -27,6 +26,7 @@ interface IEditorURLData {
     articleRevisionID?: number;
     draftID?: number;
     knowledgeCategoryID?: number | null;
+    knowledgeBaseID?: number | null;
 }
 
 /**
@@ -48,8 +48,8 @@ function makeEditorUrl(data?: IEditorURLData) {
         baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
 
-    const { articleRevisionID, draftID, knowledgeCategoryID } = data;
-    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID });
+    const { articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID } = data;
+    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID });
 
     if (query) {
         baseUrl += `?${query}`;
@@ -140,7 +140,7 @@ export const OrganizeCategoriesRoute = new RouteHandler(
 );
 
 const NotFound = () => {
-    return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
+    return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
 };
 
 /**

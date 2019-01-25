@@ -16,7 +16,7 @@ import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
-import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import QueryString from "@library/components/navigation/QueryString";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
@@ -49,10 +49,7 @@ export class EditorPage extends React.PureComponent<IProps> {
                 elementToFocusOnExit={document.activeElement as HTMLElement}
                 isWholePage={true}
             >
-                <Permission
-                    permission="articles.add"
-                    fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
-                >
+                <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
                 </Permission>
