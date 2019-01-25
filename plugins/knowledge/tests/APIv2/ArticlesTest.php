@@ -33,6 +33,8 @@ class ArticlesTest extends AbstractResourceTest {
     /** @var string The singular name of the resource. */
     protected $singular = "article";
 
+    private $defaultKB = [];
+
     /**
      * This method is called before the first test of this test class is run.
      */
@@ -103,6 +105,41 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PATCH /resource/<id> with a a single field update.
+     *
+     * Patch endpoints should be able to update every field on its own.
+     *
+     * @param string $field The name of the field to patch.
+     * @dataProvider providePatchFields
+     */
+    public function testPatchSparse($field) {
+        if (empty($this->defaultKB)) {
+            $this->defaultKB = $this->api()->post('knowledge-bases', [
+                "name" => __FUNCTION__ . " KB #1",
+                "Description" => 'Test knowledge base description',
+                "urlCode" => 'test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000),
+            ])->getBody();
+        }
+
+        $row = $this->testGetEdit();
+
+        $patchRow = $this->modifyRow($row);
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            [
+                'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
+                $field => $patchRow[$field]
+            ]
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+
+        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $this->assertSame($patchRow[$field], $newRow[$field]);
+    }
+
+    /**
      * Test PATCH /articles/<id>/status.
      *
      * @param string $status
@@ -134,7 +171,7 @@ class ArticlesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post("knowledge-bases", [
             "name" => __FUNCTION__ . " KB #1",
             "description" => __FUNCTION__,
-            "urlCode" => KnowledgeBasesTest::getUniqueUrlCode(),
+            "urlCode" => 'kb-1'.round(microtime(true) * 1000).rand(1, 1000),
         ])->getBody();
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [
@@ -180,6 +217,7 @@ class ArticlesTest extends AbstractResourceTest {
         }
         $this->assertTrue($success, "Unable to limit index to articles in a specific category.");
     }
+
 
     /**
      * Test getting history of article revisions.
