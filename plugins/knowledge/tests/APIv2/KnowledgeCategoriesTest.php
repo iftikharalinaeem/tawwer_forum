@@ -129,7 +129,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      * Test patch method over root category
      */
     public function testPatchRootCategory() {
-        $data = $this->prepareCategoryDelete();
+        $data = $this->prepareCategoryToDelete();
 
         try {
             $this->api()->patch(
