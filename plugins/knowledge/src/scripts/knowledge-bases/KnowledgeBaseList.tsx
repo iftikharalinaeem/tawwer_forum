@@ -14,6 +14,7 @@ import { t } from "@library/application";
 import KnowledgeBaseItem from "@knowledge/knowledge-bases/components/KnowledgeBaseItem";
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
+import classNames from "classnames";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -26,7 +27,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
  */
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
-        const { knowledgeBases, loadStatus } = this.props;
+        const { knowledgeBases, loadStatus, className } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <FullPageLoader />;
@@ -34,25 +35,27 @@ class KnowledgeBaseList extends React.Component<IProps> {
 
         if (knowledgeBases.length < 1) {
             return (
-                <div>
+                <div className={classNames("kbList", className, "isEmpty")}>
                     <Paragraph>{t("No knowledge bases found.")}</Paragraph>
                 </div>
             );
         }
 
         return (
-            <ul>
-                {knowledgeBases.map(kb => (
-                    <li key={kb.knowledgeBaseID}>
-                        <KnowledgeBaseItem
-                            iconUrl={kb.icon}
-                            description={kb.description}
-                            title={kb.name}
-                            url={kb.url}
-                        />
-                    </li>
-                ))}
-            </ul>
+            <div className={classNames("kbList", className)}>
+                <ul className="kbList-items">
+                    {knowledgeBases.map(kb => (
+                        <li key={kb.knowledgeBaseID} className="kbList-item">
+                            <KnowledgeBaseItem
+                                icon={kb.icon}
+                                title={kb.name}
+                                description={kb.description}
+                                url={kb.url}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </div>
         );
     }
 
@@ -66,7 +69,9 @@ class KnowledgeBaseList extends React.Component<IProps> {
     }
 }
 
-interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
+    className?: string;
+}
 
 function mapStateToProps(state: IStoreState) {
     return {
