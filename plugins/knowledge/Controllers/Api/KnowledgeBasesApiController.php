@@ -23,6 +23,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
+    /** @var KnowledgeNavigationApiController */
+    private $knowledgeNavigationApi;
+
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
@@ -30,10 +33,16 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * KnowledgeBaseApiController constructor.
      *
      * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      */
-    public function __construct(KnowledgeBaseModel $knowledgeBaseModel, KnowledgeCategoryModel $knowledgeCategoryModel) {
+    public function __construct(
+        KnowledgeBaseModel $knowledgeBaseModel,
+        KnowledgeNavigationApiController $knowledgeNavigationApi,
+        KnowledgeCategoryModel $knowledgeCategoryModel
+    ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
@@ -268,6 +277,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
 
+        if ($result['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $result['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($knowledgeBaseID);
+        } else {
+            $result['defaultArticleID'] = null;
+        }
         return $result;
     }
 
@@ -279,8 +293,14 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     private function normalizeOutput(array $record): array {
+        if (!isset($record['defaultArticleID'])) {
+            if ($record['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+                $record['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($record['knowledgeBaseID']);
+            } else {
+                $record['defaultArticleID'] = null;
+            }
+        }
         $record['url'] = $this->knowledgeBaseModel->url($record, true);
-
         return $record;
     }
 }
