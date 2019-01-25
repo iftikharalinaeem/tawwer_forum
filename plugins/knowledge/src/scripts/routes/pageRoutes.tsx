@@ -128,8 +128,8 @@ export const HomeRoute = new RouteHandler(
 
 export const KnowledgeBasePage = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
-    "/kb/:slug([\\w\\d-]+)",
-    (data: { slug: string }) => formatUrl(`/kb/${data.slug}`),
+    "/kb/:urlCode([\\w\\d-]+)",
+    (data: { urlCode: string }) => formatUrl(`/kb/${data.urlCode}`),
 );
 
 export const OrganizeCategoriesRoute = new RouteHandler(

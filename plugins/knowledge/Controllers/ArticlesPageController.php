@@ -77,7 +77,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
         return $this->twigInit()->render('default-master.twig', $data);
     }
 
-
     /**
      * Render out the /kb/articles/{id}/editor path page.
      *

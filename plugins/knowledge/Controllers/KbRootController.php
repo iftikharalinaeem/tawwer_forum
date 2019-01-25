@@ -7,9 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Container\Container;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
@@ -27,28 +25,22 @@ class KbRootController extends KnowledgeTwigPageController {
     /** @var SearchPageController */
     private $searchPageController;
 
-    /** @var KnowledgeNavigationApiController */
-    private $navigationApi;
-
     /**
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $basesApi
      * @param ArticlesPageController $articlesPageController
      * @param SearchPageController $searchPageController
-     * @param KnowledgeNavigationApiController $navigationApi
      */
     public function __construct(
         KnowledgeBasesApiController $basesApi,
         ArticlesPageController $articlesPageController,
-        SearchPageController $searchPageController,
-        KnowledgeNavigationApiController $navigationApi
+        SearchPageController $searchPageController
     ) {
         parent::__construct();
         $this->basesApi = $basesApi;
         $this->articlesPageController = $articlesPageController;
         $this->searchPageController = $searchPageController;
-        $this->navigationApi = $navigationApi;
     }
 
 
@@ -103,9 +95,24 @@ class KbRootController extends KnowledgeTwigPageController {
                 // Temporarily use the search page instead of the knowledge base homepage.
                 return $this->searchPageController->index();
             case KnowledgeBaseModel::TYPE_GUIDE:
-                // Temporarily hard-cdoed. Should be the default article in the knowledge base later on.
-                return $this->articlesPageController->index('/3');
+                $articleID = $knowledgeBase['defaultArticleID'];
+                if ($articleID === null) {
+                    return $this->noArticlesPage();
+                } else {
+                    $articleController = $this->articlesPageController;
+                    $articleController->preloadNavigation($knowledgeBase['knowledgeBaseID']);
+                    return $articleController->index("/$articleID");
+                }
         }
+    }
+
+    /**
+     * No articles Page.
+     */
+    private function noArticlesPage() {
+        $this->setPageTitle('No Articles Created Yet');
+        $data = $this->getViewData();
+        $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**
