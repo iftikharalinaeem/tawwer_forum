@@ -20,6 +20,9 @@ import React from "react";
 import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
 
+/**
+ * Component representing the the full home page of a help center.
+ */
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, status, data } = this.props;
@@ -47,6 +50,9 @@ export class HelpCenterHome extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Request our data if it hasn't been provided yet.
+     */
     public componentDidMount() {
         const { status, requestData } = this.props;
         if (status === LoadStatus.PENDING) {

@@ -8,6 +8,9 @@ import { t } from "@library/application";
 import SmartLink from "@library/components/navigation/SmartLink";
 import React from "react";
 
+/**
+ * Component for rendering out a full set of knowledge base home data.
+ */
 export default class HelpCenterNavigation extends React.Component<IProps> {
     public render() {
         const { data } = this.props;
@@ -22,6 +25,9 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Render a single help center group of articles.
+     */
     private renderGroup = (group: IHelpGroup) => {
         const { category, articles } = group;
         return (
@@ -35,6 +41,9 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
         );
     };
 
+    /**
+     * Render a single article.
+     */
     private renderArticle = (article: NavArticle) => {
         return (
             <li key={article.recordID}>
