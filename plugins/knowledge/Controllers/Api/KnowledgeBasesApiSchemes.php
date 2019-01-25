@@ -99,6 +99,11 @@ trait KnowledgeBasesApiSchemes {
                 "description" => "Root knowledge category ID of knowledge base.",
                 "type" => "integer",
             ],
+            "defaultArticleID:i" => [
+                "description" => "Default article ID of knowledge base.",
+                "type" => "integer",
+                "allowNull" => true
+            ],
         ]);
     }
 

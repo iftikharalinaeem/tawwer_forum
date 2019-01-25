@@ -469,4 +469,37 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $result = $out->validate($navigation);
         return $result;
     }
+
+    /**
+     * Get default article id of knowledge base.
+     * Note: Should be called only when knowledge base is GUIDE.
+     *
+     * @param int $knowledgeBaseID
+     * @return int|null Returns int articleID when knowledge base is in GUIDE mode and has any article.
+     *                  In any other cases returns null
+     */
+    public function getDefaultArticleID(int $knowledgeBaseID) {
+        $tree = $this->knowledgeBaseNavigation($knowledgeBaseID, false, self::FILTER_RECORD_TYPE_ALL);
+        return $this->getArticleID($tree);
+    }
+
+    /**
+     * Recursive scan of the navigation tree to find first RECORD_TYPE_ARTICLE
+     *
+     * @param array $tree
+     * @return int|null
+     */
+    public function getArticleID(array $tree) {
+        foreach ($tree as $branch) {
+            if ($branch['recordType'] === Navigation::RECORD_TYPE_ARTICLE) {
+                return $branch['recordID'];
+            } elseif (isset($branch['children']) && !empty($branch['children'])) {
+                $articleID = $this->getArticleID($branch['children']);
+                if (null !== $articleID) {
+                    return $articleID;
+                }
+            }
+        }
+        return null;
+    }
 }
