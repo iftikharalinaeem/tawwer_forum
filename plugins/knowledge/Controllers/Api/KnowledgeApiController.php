@@ -337,7 +337,7 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['body']) && !empty(trim($this->query['body']))) {
             $this->sphinxQuery .= ' @body (' . $this->sphinx->escapeString($this->query['body']) . ')*';
         }
-        if (isset($query['all']) && !empty(trim($this->query['all']))) {
+        if (isset($this->query['all']) && !empty(trim($this->query['all']))) {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
     }
