@@ -40,6 +40,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             "body" => __FUNCTION__,
             "format" => "text",
             "locale" => "en",
+            "knowledgeCategoryID" => 1,
             "name" => uniqid(__FUNCTION__, true),
         ];
 
@@ -52,6 +53,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         // Use its unique name to pull the ID from the list of revisions.
         $revisionID = null;
         $revisions = $this->api()->get("articles/" . self::$articleID . "/revisions");
+
         foreach ($revisions->getBody() as $currentRevision) {
             if ($currentRevision["name"] === $row["name"]) {
                 $revisionID = $currentRevision["articleRevisionID"];
@@ -62,7 +64,9 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
 
         $response = $this->api()->get("article-revisions/{$revisionID}");
         $this->assertEquals(200, $response->getStatusCode());
+
         $body = $response->getBody();
+        unset($row['knowledgeCategoryID']);
         $this->assertRowsEqual($row, $body);
     }
 }
