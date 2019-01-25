@@ -33,7 +33,7 @@ export class NavigationBreadcrumbs extends React.Component<IProps> {
      * Fetch navigation data when the component is mounted.
      */
     public componentDidMount() {
-        void this.props.actions.getNavigationFlat({});
+        void this.props.actions.getNavigationFlat(1);
     }
 }
 

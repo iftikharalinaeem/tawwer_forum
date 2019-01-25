@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment, NavigationRecordType } from "@knowledge/@types/api";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/modules/navigation/Navigation";
@@ -21,6 +21,7 @@ import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/c
 import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;

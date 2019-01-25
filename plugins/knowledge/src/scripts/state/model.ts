@@ -44,7 +44,6 @@ export type KNOWLEDGE_ACTION =
     | typeof UsersActions.ACTION_TYPES
     | typeof SearchPageActions.ACTION_TYPES
     | typeof DraftsPageActions.ACTION_TYPES
-    | typeof NavigationActions.ACTION_TYPES
     | typeof RouteActions.ACTION_TYPES;
 
 export type KnowledgeReducer<S> = Reducer<S, KNOWLEDGE_ACTION>;

@@ -27,6 +27,12 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         Object.values(selfState.knowledgeBasesByID.data || {}),
     );
 
+    public static selectByUrlCode = (state: IStoreState, urlCode: string) => {
+        // We could index these by urlCode as well, but right now it doesn't seem necessary.
+        const selfState = KnowledgeBaseModel.selectKnowledgeBases(state);
+        return selfState.find(kb => kb.urlCode === urlCode) || null;
+    };
+
     public initialState: IKnowledgeBasesState = {
         knowledgeBasesByID: {
             status: LoadStatus.PENDING,
@@ -100,6 +106,7 @@ export interface IKnowledgeBase {
     sourceLocale: string;
     viewType: KnowledgeBaseDisplayType;
     rootCategoryID: number;
+    defaultArticleID: number | null;
 }
 
 type ReducerType = KnowledgeReducer<IKnowledgeBasesState>;

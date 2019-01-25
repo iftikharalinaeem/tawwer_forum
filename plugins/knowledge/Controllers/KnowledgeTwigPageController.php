@@ -12,6 +12,7 @@ use Garden\CustomExceptionHandler;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
 use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
@@ -52,6 +53,9 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
 
+    /** @var KnowledgeNavigationApiController */
+    protected $navigationApi;
+
     /** @var \UsersApiController */
     protected $usersApi;
 
@@ -70,6 +74,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      * @param KnowledgeCategoryModel $categoryModel
      * @param KnowledgeCategoriesApiController $categoriesApi
      * @param KnowledgeBasesApiController $kbApi
+     * @param KnowledgeNavigationApiController $navigationApi
      * @param \UsersApiController $usersApi
      * @param SiteMeta $siteMeta
      * @param \Gdn_Session $session
@@ -79,6 +84,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         KnowledgeCategoryModel $categoryModel,
         KnowledgeCategoriesApiController $categoriesApi,
         KnowledgeBasesApiController $kbApi,
+        KnowledgeNavigationApiController $navigationApi,
         \UsersApiController $usersApi,
         SiteMeta $siteMeta,
         \Gdn_Session $session,
@@ -87,6 +93,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         $this->knowledgeCategoryModel = $categoryModel;
         $this->categoriesApi = $categoriesApi;
         $this->kbApi = $kbApi;
+        $this->navigationApi = $navigationApi;
         $this->usersApi = $usersApi;
         $this->siteMeta = $siteMeta;
         $this->session = $session;
@@ -157,6 +164,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         return new Data($this->twigInit()->render('default-master.twig', $data), $status);
     }
 
+    /** @var array An array of all the knowledge bases of the site.*/
     protected $knowledgeBases;
 
     /**
@@ -174,6 +182,21 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
             ActionConstants::GET_ALL_KBS,
             Data::box($this->knowledgeBases),
             []
+        ));
+    }
+
+    /**
+     * Preload the a redux response for a knowledge bases navData.
+     *
+     * @param int $knowledgeBaseID
+     */
+    public function preloadNavigation(int $knowledgeBaseID) {
+        $options = ['knowledgeBaseID' => $knowledgeBaseID];
+        $navigation = $this->navigationApi->get_flat($options);
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_NAVIGATION_FLAT,
+            Data::box($navigation),
+            $options
         ));
     }
 
