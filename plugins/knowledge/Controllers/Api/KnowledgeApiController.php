@@ -250,8 +250,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     protected function sphinxSearch(): array {
         $this->sphinx = $this->sphinxClient();
-        $this->sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
-
+        $this->setLimits();
 
         if (($this->query['global'] ?? false)) {
             $this->defineGlobalQuery();
@@ -267,6 +266,18 @@ class KnowledgeApiController extends AbstractApiController {
                 $errorMessage = $this->sphinx->getLastWarning();
             }
             throw new ClientException($errorMessage);
+        }
+    }
+
+    /**
+     * Prepare offset and limit for Sphinx search.
+     */
+    protected function setLimits() {
+        if (isset($this->query['limit']) && isset($this->query['page'])) {
+            $offset = ($this->query['page'] - 1)* $this->query['limit'];
+            $this->sphinx->setLimits($offset, $this->query['limit']);
+        } else {
+            $this->sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
         }
     }
 
@@ -392,7 +403,9 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
+            $idx = 0;
             foreach ($searchResults['matches'] as $guid => $record) {
+                $this->results['matches'][$guid]['orderIndex'] = $idx++;
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -401,6 +414,12 @@ class KnowledgeApiController extends AbstractApiController {
                 array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype, $expand));
             }
         }
+        usort($results, function ($a, $b) {
+            if ($a['orderIndex'] == $b['orderIndex']) {
+                return 0;
+            }
+            return ($a['orderIndex'] < $b['orderIndex']) ? -1 : 1;
+        });
         return $results;
     }
 
@@ -425,7 +444,7 @@ class KnowledgeApiController extends AbstractApiController {
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-
+            $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             if (in_array('category', $expand)) {
                 $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
             }
@@ -462,6 +481,7 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $discussion["orderIndex"] = $this->results['matches'][$discussion["guid"]]['orderIndex'];
             $discussion["recordType"] = $type['recordType'];
             $discussion['url'] = discussionUrl($discussion);
             if (in_array('category', $expand)) {
@@ -498,6 +518,7 @@ class KnowledgeApiController extends AbstractApiController {
             $comment["name"] = $discussion['Name'];
             $comment["discussionID"] = $comment['DiscussionID'];
             $comment["guid"] = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $comment["orderIndex"] = $this->results['matches'][$comment["guid"]]['orderIndex'];
             $comment["recordType"] = $type['recordType'];
             $comment['url'] = \Gdn::request()->url(
                 '/discussion/' . urlencode($comment['DiscussionID']) . '/' . urlencode($discussion['Name']),
@@ -656,6 +677,18 @@ class KnowledgeApiController extends AbstractApiController {
             "body:s?" => "Keywords to search against article body.",
             "all:s?" => "Keywords to search against article name or body.",
             "global:b?" => "Global search flag. Default: false",
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => self::SPHINX_DEFAULT_LIMIT,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
         ];
     }
 }

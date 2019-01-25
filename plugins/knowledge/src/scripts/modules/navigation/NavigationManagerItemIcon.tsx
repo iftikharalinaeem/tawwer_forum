@@ -9,8 +9,8 @@ import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { article, folderClosed, folderOpen } from "@library/components/icons/navigationManager";
 import classNames from "classnames";
 import React from "react";
-import { NavigationRecordType } from "@knowledge/@types/api";
 import FlexSpacer from "@library/components/FlexSpacer";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps {
     expanded: boolean;

@@ -11,6 +11,10 @@ namespace Vanilla\Knowledge\Controllers\Api;
  * Constants used as redux actions for successful API responses.
  */
 abstract class ActionConstants {
+    // Knowledge Bases
+    const GET_ALL_KBS = "@@knowledgeBases/GET_ALL_DONE";
+    const GET_NAVIGATION_FLAT = "@@navigation/GET_NAVIGATION_FLAT_DONE";
+
     // Article page
     const GET_ARTICLE_RESPONSE = "@@articlePage/GET_ARTICLE_RESPONSE";
     const GET_ARTICLE_ERROR = "@@articlePage/GET_ARTICLE_ERROR";
