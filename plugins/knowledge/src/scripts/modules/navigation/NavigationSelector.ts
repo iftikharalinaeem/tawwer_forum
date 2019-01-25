@@ -3,9 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { INormalizedNavigationItems, NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import {
+    INormalizedNavigationItems,
+    NavigationRecordType,
+    IKbNavigationItem,
+} from "@knowledge/modules/navigation/NavigationModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import { INavigationTreeItem } from "@library/@types/api";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export default class NavigationSelector {
     /**
@@ -67,4 +72,53 @@ export default class NavigationSelector {
             children: NavigationSelector.selectChildren(navItems, rootKey),
         };
     }
+
+    public static selectHelpCenterNome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {
+        const rootNavItemID = NavigationRecordType.KNOWLEDGE_CATEGORY + knowledgeBase.rootCategoryID;
+        const treeData = NavigationSelector.selectNavTree(navItems, rootNavItemID);
+        const data: IHelpData = {
+            groups: [],
+            ungroupedArticles: [],
+        };
+
+        // Help center data only iterates through 2 levels of nav data.
+        for (const record of treeData.children) {
+            switch (record.recordType) {
+                case NavigationRecordType.ARTICLE: {
+                    const { children, ...article } = record;
+                    data.ungroupedArticles.push(article as NavArticle);
+                    break;
+                }
+                case NavigationRecordType.KNOWLEDGE_CATEGORY: {
+                    const { children, ...category } = record;
+                    const group: IHelpGroup = {
+                        category: category as NavCategory,
+                        articles: [],
+                    };
+                    for (const child of children) {
+                        if (child.recordType === NavigationRecordType.ARTICLE) {
+                            const { children: unused, ...article } = child;
+                            group.articles.push(article as NavArticle);
+                        }
+                    }
+                    data.groups.push(group);
+                    break;
+                }
+            }
+        }
+        return data;
+    }
+}
+
+type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
+type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;
+
+export interface IHelpGroup {
+    category: NavCategory;
+    articles: NavArticle[];
+}
+
+export interface IHelpData {
+    groups: IHelpGroup[];
+    ungroupedArticles: NavArticle[];
 }

@@ -106,10 +106,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "description" => "Sort weight.",
                 "type" => "integer",
             ],
-            "childCount" => [
-                'description' => "The total number of child records for the navigation item.",
-                "type" => "integer",
-            ],
             "recordType" => [
                 "description" => "Type of record represented by the navigation item.",
                 "enum" => [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE],
@@ -382,13 +378,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 $row["recordID"] = $row["knowledgeCategoryID"];
                 $row["recordType"] = Navigation::RECORD_TYPE_CATEGORY;
                 $row["url"] = $this->knowledgeCategoryModel->url($row);
-                $row["childCount"] = $row['articleCount'];
             } elseif ($recordType === Navigation::RECORD_TYPE_ARTICLE) {
                 $row["recordType"] = Navigation::RECORD_TYPE_ARTICLE;
                 $row["parentID"] = $row["knowledgeCategoryID"];
                 $row["recordID"] = $row["articleID"];
                 $row["url"] = $this->articleModel->url($row);
-                $row['childCount'] = 0;
             }
             if (!empty($row["children"])) {
                 $row["children"] = $this->normalizeOutput($row["children"]);

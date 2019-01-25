@@ -3,22 +3,22 @@
  * @license Proprietary
  */
 
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
+import NavigationSelector, { IHelpData } from "@knowledge/modules/navigation/NavigationSelector";
+import ErrorPage from "@knowledge/routes/ErrorPage";
+import { IStoreState } from "@knowledge/state/model";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import { Devices } from "@library/components/DeviceChecker";
+import DocumentTitle from "@library/components/DocumentTitle";
+import FullPageLoader from "@library/components/FullPageLoader";
+import VanillaHeader from "@library/components/headers/VanillaHeader";
+import Container from "@library/components/layouts/components/Container";
+import PanelLayout from "@library/components/layouts/PanelLayout";
 import React from "react";
 import { connect } from "react-redux";
-import { IStoreState } from "@knowledge/state/model";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
-import { NavigationRecordType, IKbNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
-import apiv2 from "@library/apiv2";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import DocumentTitle from "@library/components/DocumentTitle";
-import Container from "@library/components/layouts/components/Container";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import PanelLayout from "@library/components/layouts/PanelLayout";
-import { Devices } from "@library/components/DeviceChecker";
-import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
-import ErrorPage from "@knowledge/routes/ErrorPage";
+import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
 
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
@@ -39,7 +39,8 @@ export class HelpCenterHome extends React.Component<IProps> {
                 </DocumentTitle>
                 <PanelLayout device={Devices.DESKTOP}>
                     <PanelLayout.MiddleBottom>
-                        <h2>Hello {knowledgeBase.name}</h2>
+                        <h1>{knowledgeBase.name}</h1>
+                        <HelpCenterNavigation data={data!} />
                     </PanelLayout.MiddleBottom>
                 </PanelLayout>
             </Container>
@@ -60,58 +61,14 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
-type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;
-
-interface IHelpGroup {
-    category: NavCategory;
-    articles: NavArticle[];
-}
-
-interface IHelpData {
-    groups: IHelpGroup[];
-    ungroupedArticles: NavArticle[];
-}
-
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { knowledgeBaseID } = ownProps.knowledgeBase;
-    const rootNavItemID = NavigationRecordType.KNOWLEDGE_CATEGORY + ownProps.knowledgeBase.rootCategoryID;
     const knowledgeState = state.knowledge.navigation;
     const loadStatus = knowledgeState.fetchLoadablesByKbID[knowledgeBaseID] || { status: LoadStatus.PENDING };
 
     let data: IHelpData | undefined;
     if (loadStatus.status === LoadStatus.SUCCESS) {
-        const treeData = NavigationSelector.selectNavTree(knowledgeState.navigationItems, rootNavItemID);
-        data = {
-            groups: [],
-            ungroupedArticles: [],
-        };
-
-        // Help center data only iterates through 2 levels of nav data.
-        for (const record of treeData.children) {
-            switch (record.recordType) {
-                case NavigationRecordType.ARTICLE: {
-                    const { children, ...article } = record;
-                    data.ungroupedArticles.push(article as NavArticle);
-                    break;
-                }
-                case NavigationRecordType.KNOWLEDGE_CATEGORY: {
-                    const { children, ...category } = record;
-                    const group: IHelpGroup = {
-                        category: category as NavCategory,
-                        articles: [],
-                    };
-                    for (const child of children) {
-                        if (child.recordType === NavigationRecordType.ARTICLE) {
-                            const { children: unused, ...article } = child;
-                            group.articles.push(article as NavArticle);
-                        }
-                    }
-                    data.groups.push(group);
-                    break;
-                }
-            }
-        }
+        data = NavigationSelector.selectHelpCenterNome(knowledgeState.navigationItems, ownProps.knowledgeBase);
     }
 
     const loadable: ILoadable<IHelpData> = {
