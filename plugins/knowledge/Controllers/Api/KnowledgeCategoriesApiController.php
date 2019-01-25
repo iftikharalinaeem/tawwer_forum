@@ -12,6 +12,7 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
@@ -25,6 +26,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -35,13 +39,16 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * KnowledgeCategoriesApiController constructor.
      *
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param ArticleModel $articleModel
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
+        KnowledgeBaseModel $knowledgeBaseModel,
         ArticleModel $articleModel
     ) {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->articleModel = $articleModel;
     }
 
@@ -62,15 +69,19 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeCategoryByID($id);
-        if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
-            $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-            $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+        if (!$this->knowledgeBaseModel->isRootCategory($id)) {
+            if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
+                $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+                $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
 
-            if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
-                $this->knowledgeCategoryModel->updateCounts($row['parentID']);
+                if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
+                    $this->knowledgeCategoryModel->updateCounts($row['parentID']);
+                }
+            } else {
+                throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
             }
         } else {
-            throw new \Garden\Web\Exception\ClientException("Knowledge category is not empty.", 409);
+            throw new \Garden\Web\Exception\ClientException("You can not delete root category.", 409);
         }
     }
 
@@ -323,64 +334,68 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $out = $this->schema($this->fullSchema(), "out");
 
-        $body = $in->validate($body, true);
+        if (!$this->knowledgeBaseModel->isRootCategory($id)) {
+            $body = $in->validate($body, true);
 
-        $previousState = $this->knowledgeCategoryByID($id);
+            $previousState = $this->knowledgeCategoryByID($id);
 
-        $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
+            $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
 
-        if (!isset($body['sort'])) {
-            if ($moveToAnotherParent || !($previousState['sort'] ?? false)) {
-                $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID'] ?? $previousState['parentID']);
-                $maxSortIndex = $sortInfo['maxSort'];
-                $body['sort'] = $maxSortIndex + 1;
-                $updateSorts = false;
+            if (!isset($body['sort'])) {
+                if ($moveToAnotherParent || !($previousState['sort'] ?? false)) {
+                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID'] ?? $previousState['parentID']);
+                    $maxSortIndex = $sortInfo['maxSort'];
+                    $body['sort'] = $maxSortIndex + 1;
+                    $updateSorts = false;
+                } else {
+                    // if we don't change the parentID and there is no $fields['sort']
+                    // then we don't need to update sorting
+                    $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
+                    $updateSorts = false;
+                }
             } else {
-                // if we don't change the parentID and there is no $fields['sort']
-                // then we don't need to update sorting
+                //update sorts for other records only if 'sort' changed
                 $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
-                $updateSorts = false;
+                $updateSorts = ($body['sort'] != $previousState['sort']);
             }
+
+            if (isset($body['sort'])
+                && isset($previousState['parentID'])
+                && isset($previousState['sort'])
+                && $body['sort'] !== $previousState['sort']) {
+                //shift sorts down for source category when move one article to another category
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $previousState['parentID'],
+                    $previousState['sort'],
+                    $previousState['knowledgeCategoryID'],
+                    KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
+                    KnowledgeCategoryModel::SORT_DECREMENT
+                );
+            }
+
+            $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
+            if ($moveToAnotherParent) {
+                $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
+                $this->knowledgeCategoryModel->updateCounts($id);
+            }
+
+
+
+            if ($updateSorts) {
+                $this->knowledgeCategoryModel->shiftSorts(
+                    $body['parentID'],
+                    $body['sort'],
+                    $id,
+                    KnowledgeCategoryModel::SORT_TYPE_CATEGORY
+                );
+            }
+
+            $row = $this->knowledgeCategoryByID($id);
+            $row = $this->normalizeOutput($row);
+            $result = $out->validate($row);
         } else {
-            //update sorts for other records only if 'sort' changed
-            $body['parentID'] = $body['parentID'] ?? $previousState['parentID'];
-            $updateSorts = ($body['sort'] != $previousState['sort']);
+            throw new \Garden\Web\Exception\ClientException("You can not patch root category.", 409);
         }
-
-        if (isset($body['sort'])
-            && isset($previousState['parentID'])
-            && isset($previousState['sort'])
-            && $body['sort'] !== $previousState['sort']) {
-            //shift sorts down for source category when move one article to another category
-            $this->knowledgeCategoryModel->shiftSorts(
-                $previousState['parentID'],
-                $previousState['sort'],
-                $previousState['knowledgeCategoryID'],
-                KnowledgeCategoryModel::SORT_TYPE_CATEGORY,
-                KnowledgeCategoryModel::SORT_DECREMENT
-            );
-        }
-
-        $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
-        if ($moveToAnotherParent) {
-            $this->knowledgeCategoryModel->updateCounts($previousState['parentID']);
-            $this->knowledgeCategoryModel->updateCounts($id);
-        }
-
-
-
-        if ($updateSorts) {
-            $this->knowledgeCategoryModel->shiftSorts(
-                $body['parentID'],
-                $body['sort'],
-                $id,
-                KnowledgeCategoryModel::SORT_TYPE_CATEGORY
-            );
-        }
-
-        $row = $this->knowledgeCategoryByID($id);
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
         return $result;
     }
 
