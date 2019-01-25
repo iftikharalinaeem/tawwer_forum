@@ -89,21 +89,31 @@ class KbRootController extends KnowledgeTwigPageController {
     public function get(string $path): string {
         $urlCode = ltrim($path, "/");
         $knowledgeBase = $this->basesApi->get_byUrlCode(['urlCode' => $urlCode]);
+        $knowledgeBaseID = $knowledgeBase['knowledgeBaseID'];
 
         switch ($knowledgeBase['viewType']) {
             case KnowledgeBaseModel::TYPE_HELP:
-                // Temporarily use the search page instead of the knowledge base homepage.
-                return $this->searchPageController->index();
+                $this->preloadNavigation($knowledgeBaseID);
+                return $this->helpCenterHomePage($knowledgeBase);
             case KnowledgeBaseModel::TYPE_GUIDE:
                 $articleID = $knowledgeBase['defaultArticleID'];
                 if ($articleID === null) {
                     return $this->noArticlesPage();
                 } else {
                     $articleController = $this->articlesPageController;
-                    $articleController->preloadNavigation($knowledgeBase['knowledgeBaseID']);
+                    $articleController->preloadNavigation($knowledgeBaseID);
                     return $articleController->index("/$articleID");
                 }
         }
+    }
+
+    /**
+     * @param array $knowledgeBase
+     */
+    private function helpCenterHomePage(array $knowledgeBase): string {
+        $this->setPageTitle($knowledgeBase['name']);
+        $data = $this->getViewData();
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**

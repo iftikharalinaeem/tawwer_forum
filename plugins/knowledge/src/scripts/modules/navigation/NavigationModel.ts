@@ -22,15 +22,11 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
     public initialState: INavigationStoreState = {
         navigationItems: {},
-        currentKnowledgeBase: {
-            status: LoadStatus.PENDING,
-        },
+        navigationItemsByKbID: {},
         submitLoadable: {
             status: LoadStatus.PENDING,
         },
-        fetchLoadable: {
-            status: LoadStatus.PENDING,
-        },
+        fetchLoadablesByKbID: [],
         patchTransactionID: null,
     };
 
@@ -55,18 +51,26 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
      * Reduce actions related to fetching navigation.
      */
     private reduceGetNav: ReducerType = reducerWithoutInitialState<INavigationStoreState>()
-        .case(NavigationActions.getNavigationFlatACs.started, state => {
-            state.fetchLoadable.status = LoadStatus.LOADING;
+        .case(NavigationActions.getNavigationFlatACs.started, (state, payload) => {
+            state.fetchLoadablesByKbID[payload.knowledgeBaseID] = { status: LoadStatus.LOADING };
             return state;
         })
         .case(NavigationActions.getNavigationFlatACs.done, (state, payload) => {
-            state.navigationItems = NavigationModel.normalizeData(payload.result);
-            state.fetchLoadable.status = LoadStatus.SUCCESS;
+            const { knowledgeBaseID } = payload.params;
+            const normalizedItems = NavigationModel.normalizeData(payload.result);
+            state.navigationItems = {
+                ...state.navigationItems,
+                ...normalizedItems,
+            };
+            state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
+            state.fetchLoadablesByKbID[knowledgeBaseID] = { status: LoadStatus.SUCCESS };
             return state;
         })
         .case(NavigationActions.getNavigationFlatACs.failed, (state, payload) => {
-            state.fetchLoadable.status = LoadStatus.ERROR;
-            state.fetchLoadable.error = payload.error;
+            state.fetchLoadablesByKbID[payload.params.knowledgeBaseID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return state;
         });
 
@@ -77,8 +81,14 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             return state;
         })
         .case(NavigationActions.patchNavigationFlatACs.done, (state, payload) => {
+            const { knowledgeBaseID } = payload.params;
             if (state.patchTransactionID === payload.params.transactionID) {
-                state.navigationItems = NavigationModel.normalizeData(payload.result);
+                const normalizedItems = NavigationModel.normalizeData(payload.result);
+                state.navigationItems = {
+                    ...state.navigationItems,
+                    ...normalizedItems,
+                };
+                state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
                 state.submitLoadable.status = LoadStatus.SUCCESS;
             }
             return state;
@@ -400,8 +410,8 @@ export enum NavigationRecordType {
     ARTICLE = "article",
 }
 
-export interface IKbNavigationItem extends INavigationItem {
-    recordType: NavigationRecordType;
+export interface IKbNavigationItem<R extends NavigationRecordType = NavigationRecordType> extends INavigationItem {
+    recordType: R;
     children?: string[];
 }
 
@@ -426,8 +436,10 @@ export interface INormalizedNavigationItems {
 
 export interface INavigationStoreState {
     navigationItems: INormalizedNavigationItems;
-    currentKnowledgeBase: ILoadable<{}>; // Needs to be replaced with an actual KB.
+    navigationItemsByKbID: {
+        [kbID: number]: string[];
+    };
     submitLoadable: ILoadable<never>;
-    fetchLoadable: ILoadable<never>;
+    fetchLoadablesByKbID: Array<ILoadable<never>>;
     patchTransactionID: string | null;
 }

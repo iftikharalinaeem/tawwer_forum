@@ -17,6 +17,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
 import { t } from "@library/application";
 import ErrorPage from "@knowledge/routes/ErrorPage";
+import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {
@@ -41,7 +42,7 @@ class KnowledgeBasePage extends React.Component<IProps> {
             case KnowledgeBaseDisplayType.GUIDE:
                 return this.renderGuide(knowledgeBase);
             case KnowledgeBaseDisplayType.HELP:
-                return <div />;
+                return <HelpCenterHome knowledgeBase={knowledgeBase} />;
         }
     }
 

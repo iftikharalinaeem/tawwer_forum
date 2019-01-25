@@ -33,16 +33,14 @@ export class Navigation extends React.Component<IProps> {
      * @inheritdoc
      */
     public render(): React.ReactNode {
+        const loadable = this.props.fetchLoadablesByKbID[this.props.kbID] || { status: LoadStatus.PENDING };
+
         return (
             <SiteNav
                 title={this.props.title}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
-                bottomCTA={
-                    this.props.fetchLoadable.status === LoadStatus.SUCCESS && (
-                        <NavigationAdminLinks kbID={this.props.kbID} />
-                    )
-                }
+                bottomCTA={loadable.status === LoadStatus.SUCCESS && <NavigationAdminLinks kbID={this.props.kbID} />}
                 onItemHover={this.preloadItem}
             >
                 {NavigationSelector.selectChildren(

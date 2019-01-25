@@ -16,9 +16,11 @@ const createAction = actionCreatorFactory("@@navigation");
  * Redux actions for knowledge base navigation data.
  */
 export default class NavigationActions extends ReduxActions {
-    public static getNavigationFlatACs = createAction.async<number, IKbNavigationItem[], IApiError>(
-        "GET_NAVIGATION_FLAT",
-    );
+    public static getNavigationFlatACs = createAction.async<
+        { knowledgeBaseID: number },
+        IKbNavigationItem[],
+        IApiError
+    >("GET_NAVIGATION_FLAT");
 
     /**
      * Get navigation for a knowledge base in the flat format.
@@ -27,21 +29,21 @@ export default class NavigationActions extends ReduxActions {
      */
     public getNavigationFlat = (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState<IStoreState>();
-        const { fetchLoadable } = state.knowledge.navigation;
-        if (!forceUpdate && fetchLoadable.status === LoadStatus.SUCCESS) {
+        const fetchLoadable = state.knowledge.navigation.fetchLoadablesByKbID[knowledgeBaseID];
+        if (!forceUpdate && fetchLoadable && fetchLoadable.status === LoadStatus.SUCCESS) {
             return;
         }
 
         const apiThunk = bindThunkAction(NavigationActions.getNavigationFlatACs, async () => {
             const response = await this.api.get(`/knowledge-navigation/flat?knowledgeBaseID=${knowledgeBaseID}`);
             return response.data;
-        })(knowledgeBaseID);
+        })({ knowledgeBaseID });
 
         return this.dispatch(apiThunk);
     };
 
     public static patchNavigationFlatACs = createAction.async<
-        { patchItems: IPatchFlatItem[]; transactionID: string },
+        { knowledgeBaseID: number; patchItems: IPatchFlatItem[]; transactionID: string },
         IKbNavigationItem[],
         IApiError
     >("PATCH_NAVIGATION_FLAT");
@@ -55,6 +57,7 @@ export default class NavigationActions extends ReduxActions {
         const params = {
             transactionID: uniqueId("patchNav"),
             patchItems,
+            knowledgeBaseID,
         };
         const apiThunk = bindThunkAction(NavigationActions.patchNavigationFlatACs, async () => {
             const response = await this.api.patch(`/knowledge-navigation/${knowledgeBaseID}/flat`, patchItems);
