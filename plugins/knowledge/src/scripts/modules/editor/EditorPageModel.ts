@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
+import { IArticle, IResponseArticleDraft, IRevision } from "@knowledge/@types/api";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
-import { IArticle, IRevision, IResponseArticleDraft } from "@knowledge/@types/api";
-import ArticleActions from "../article/ArticleActions";
-import { IStoreState } from "@knowledge/state/model";
-import ArticleModel from "../article/ArticleModel";
 import { DeltaOperation } from "quill/core";
-import { createSelector } from "reselect";
 import reduceReducers from "reduce-reducers";
+import { createSelector } from "reselect";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 export interface IEditorPageForm {
     name: string;
@@ -45,6 +45,8 @@ export interface IInjectableEditorProps {
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
 }
+
+type ReducerType = KnowledgeReducer<IEditorPageState>;
 
 /**
  * Reducer for the article page.
@@ -154,10 +156,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     /**
      * Reducer implementation for the editor page.
      */
-    public reducer = (
-        state = this.initialState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    public reducer = (state = this.initialState, action) => {
         return produce(state, nextState => {
             return reduceReducers(
                 this.reduceCommon,
@@ -172,10 +171,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     /**
      * Simple non-specific reducer for the page.
      */
-    private reduceCommon = (
-        nextState: IEditorPageState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    private reduceCommon: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
             case EditorPageActions.UPDATE_FORM:
                 nextState.form = {
@@ -193,11 +189,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return nextState;
     };
 
-    private reduceInitialDraft = (
-        nextState: IEditorPageState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    private reduceInitialDraft: ReducerType = (nextState = this.initialState, action) => {
         if (
+            "meta" in action &&
             action.meta &&
             action.meta.tempID &&
             nextState.draft.data &&
@@ -218,10 +212,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return nextState;
     };
 
-    private reduceSavedDrafts = (
-        nextState: IEditorPageState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    private reduceSavedDrafts: ReducerType = (nextState = this.initialState, action) => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_INITIAL_DRAFT) {
             nextState.draft.data = action.payload;
@@ -229,6 +220,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
         // Initial draft handling data handling.
         if (
+            "meta" in action &&
             action.meta &&
             action.meta.draftID !== null &&
             nextState.draft.data &&
@@ -252,17 +244,19 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return nextState;
     };
 
-    private reduceRevision = (
-        nextState: IEditorPageState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    private reduceRevision: ReducerType = (nextState = this.initialState, action) => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_ACTIVE_REVISION) {
             nextState.revision.data = action.payload.revisionID;
         }
 
         // Normalized handling of revisions.
-        if (action.meta && action.meta.revisionID !== null && action.meta.revisionID === nextState.revision.data) {
+        if (
+            "meta" in action &&
+            action.meta &&
+            action.meta.revisionID !== null &&
+            action.meta.revisionID === nextState.revision.data
+        ) {
             switch (action.type) {
                 case ArticleActions.GET_REVISION_REQUEST:
                     nextState.revision.status = LoadStatus.LOADING;
@@ -278,10 +272,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return nextState;
     };
 
-    private reduceArticle = (
-        nextState: IEditorPageState,
-        action: typeof EditorPageActions.ACTION_TYPES | typeof ArticleActions.ACTION_TYPES,
-    ): IEditorPageState => {
+    private reduceArticle: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
             case ArticleActions.POST_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
