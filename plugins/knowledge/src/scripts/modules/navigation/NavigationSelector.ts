@@ -110,8 +110,8 @@ export default class NavigationSelector {
     }
 }
 
-type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
-type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;
+export type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
+export type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;
 
 export interface IHelpGroup {
     category: NavCategory;

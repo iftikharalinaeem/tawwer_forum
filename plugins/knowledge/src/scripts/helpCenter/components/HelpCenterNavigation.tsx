@@ -3,18 +3,21 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { IHelpData, IHelpGroup } from "@knowledge/modules/navigation/NavigationSelector";
+import { IHelpData, IHelpGroup, NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
 import { t } from "@library/application";
 import SmartLink from "@library/components/navigation/SmartLink";
+import React from "react";
 
 export default class HelpCenterNavigation extends React.Component<IProps> {
     public render() {
         const { data } = this.props;
         return (
             <div>
-                <h2>{t("groups")}</h2>
                 <div>{data.groups.map(this.renderGroup)}</div>
+                <div>
+                    <h2>{t("Ungrouped articles")}</h2>
+                    {data.ungroupedArticles.map(this.renderArticle)}
+                </div>
             </div>
         );
     }
@@ -27,14 +30,16 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
                     <SmartLink to={category.url} />
                     {category.name}
                 </h3>
-                <ul>
-                    {articles.map(article => (
-                        <li key={article.recordID}>
-                            <SmartLink to={article.url}>{article.name}</SmartLink>
-                        </li>
-                    ))}
-                </ul>
+                <ul>{articles.map(this.renderArticle)}</ul>
             </div>
+        );
+    };
+
+    private renderArticle = (article: NavArticle) => {
+        return (
+            <li key={article.recordID}>
+                <SmartLink to={article.url}>{article.name}</SmartLink>
+            </li>
         );
     };
 }
