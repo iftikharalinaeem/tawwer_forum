@@ -21,6 +21,7 @@ import SearchContext from "@library/contexts/SearchContext";
 import PagesContext from "@library/contexts/PagesContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
+import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 
 /*
  * Top level application component for knowledge.
@@ -42,18 +43,22 @@ export default class KnowledgeApp extends React.Component {
                 <PagesContext.Provider value={{ pages: this.pages }}>
                     <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
                         <LinkContext.Provider value={formatUrl("/kb", true)}>
-                            <React.Fragment>
-                                <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                                <DeviceContext.Provider
-                                    value={
-                                        this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP
-                                    }
-                                >
-                                    <BrowserRouter>
-                                        <Route component={KnowledgeRoutes} />
-                                    </BrowserRouter>
-                                </DeviceContext.Provider>
-                            </React.Fragment>
+                            <SiteNavProvider>
+                                <>
+                                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                                    <DeviceContext.Provider
+                                        value={
+                                            this.deviceChecker.current
+                                                ? this.deviceChecker.current.device
+                                                : Devices.DESKTOP
+                                        }
+                                    >
+                                        <BrowserRouter>
+                                            <Route component={KnowledgeRoutes} />
+                                        </BrowserRouter>
+                                    </DeviceContext.Provider>
+                                </>
+                            </SiteNavProvider>
                         </LinkContext.Provider>
                     </SearchContext.Provider>
                 </PagesContext.Provider>
