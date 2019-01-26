@@ -42,12 +42,13 @@ export class ArticleLayout extends React.Component<IProps> {
             <React.Fragment>
                 <Container>
                     <VanillaHeader
+                        isFixed={true}
                         title={article.name}
                         mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
                         }
                     />
-                    <PanelLayout device={this.props.device}>
+                    <PanelLayout device={this.props.device} isFixed={true}>
                         {this.props.device !== Devices.MOBILE && (
                             <PanelLayout.Breadcrumbs>
                                 <PanelWidget>
