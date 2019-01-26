@@ -60,7 +60,7 @@ export class ArticleLayout extends React.Component<IProps> {
                         }
                         leftBottom={
                             <PanelWidget>
-                                {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                                <Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />
                             </PanelWidget>
                         }
                         middleTop={

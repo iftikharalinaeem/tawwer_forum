@@ -8,8 +8,8 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import DeviceContext from "@library/contexts/DeviceContext";
-import DeviceChecker, { Devices } from "@library/components/DeviceChecker";
+import DeviceContext, { DeviceProvider } from "@library/contexts/DeviceContext";
+import { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
@@ -29,8 +29,6 @@ import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
  * This is made to mounted with ReactDOM.
  */
 export default class KnowledgeApp extends React.Component {
-    public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
-
     private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
     private store = getStore<IStoreState>();
@@ -47,18 +45,11 @@ export default class KnowledgeApp extends React.Component {
                             <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
                                 <LinkContext.Provider value={formatUrl("/kb", true)}>
                                     <React.Fragment>
-                                        <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                                        <DeviceContext.Provider
-                                            value={
-                                                this.deviceChecker.current
-                                                    ? this.deviceChecker.current.device
-                                                    : Devices.DESKTOP
-                                            }
-                                        >
+                                        <DeviceProvider>
                                             <BrowserRouter>
                                                 <Route component={KnowledgeRoutes} />
                                             </BrowserRouter>
-                                        </DeviceContext.Provider>
+                                        </DeviceProvider>
                                     </React.Fragment>
                                 </LinkContext.Provider>
                             </SearchContext.Provider>
@@ -79,16 +70,8 @@ export default class KnowledgeApp extends React.Component {
      * After the component mounts we need to update it so the results from the deviceChecker ref get passed through.
      */
     public componentDidMount() {
-        this.doUpdate();
         if (this.store.getState().knowledge.categories.status !== LoadStatus.SUCCESS) {
             void this.categoryActions.getAllCategories();
         }
     }
-
-    /**
-     * Function to force rerendering
-     */
-    private doUpdate = () => {
-        this.forceUpdate();
-    };
 }
