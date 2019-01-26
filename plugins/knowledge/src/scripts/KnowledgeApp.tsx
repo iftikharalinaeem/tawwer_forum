@@ -22,6 +22,7 @@ import PagesContext from "@library/contexts/PagesContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
+import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 
 /*
  * Top level application component for knowledge.
@@ -42,24 +43,26 @@ export default class KnowledgeApp extends React.Component {
             <Provider store={this.store}>
                 <PagesContext.Provider value={{ pages: this.pages }}>
                     <ScrollOffsetProvider scrollWatchingEnabled={true}>
-                        <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                            <LinkContext.Provider value={formatUrl("/kb", true)}>
-                                <React.Fragment>
-                                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
-                                    <DeviceContext.Provider
-                                        value={
-                                            this.deviceChecker.current
-                                                ? this.deviceChecker.current.device
-                                                : Devices.DESKTOP
-                                        }
-                                    >
-                                        <BrowserRouter>
-                                            <Route component={KnowledgeRoutes} />
-                                        </BrowserRouter>
-                                    </DeviceContext.Provider>
-                                </React.Fragment>
-                            </LinkContext.Provider>
-                        </SearchContext.Provider>
+                        <SiteNavProvider>
+                            <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                                <LinkContext.Provider value={formatUrl("/kb", true)}>
+                                    <React.Fragment>
+                                        <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                                        <DeviceContext.Provider
+                                            value={
+                                                this.deviceChecker.current
+                                                    ? this.deviceChecker.current.device
+                                                    : Devices.DESKTOP
+                                            }
+                                        >
+                                            <BrowserRouter>
+                                                <Route component={KnowledgeRoutes} />
+                                            </BrowserRouter>
+                                        </DeviceContext.Provider>
+                                    </React.Fragment>
+                                </LinkContext.Provider>
+                            </SearchContext.Provider>
+                        </SiteNavProvider>
                     </ScrollOffsetProvider>
                 </PagesContext.Provider>
             </Provider>

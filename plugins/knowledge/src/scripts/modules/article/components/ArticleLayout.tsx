@@ -48,20 +48,22 @@ export class ArticleLayout extends React.Component<IProps> {
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
                         }
                     />
-                    <PanelLayout device={this.props.device} isFixed={true}>
-                        {this.props.device !== Devices.MOBILE && (
-                            <PanelLayout.Breadcrumbs>
+                    <PanelLayout
+                        device={this.props.device}
+                        isFixed={true}
+                        breadcrumbs={
+                            this.props.device !== Devices.MOBILE && (
                                 <PanelWidget>
                                     <NavigationBreadcrumbs activeRecord={activeRecord} />
                                 </PanelWidget>
-                            </PanelLayout.Breadcrumbs>
-                        )}
-                        <PanelLayout.LeftBottom>
+                            )
+                        }
+                        leftBottom={
                             <PanelWidget>
                                 {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
                             </PanelWidget>
-                        </PanelLayout.LeftBottom>
-                        <PanelLayout.MiddleTop>
+                        }
+                        middleTop={
                             <PanelWidget>
                                 <PageTitle
                                     title={article.name}
@@ -83,20 +85,21 @@ export class ArticleLayout extends React.Component<IProps> {
                                 />
                                 {messages && <div className="messages">{messages}</div>}
                             </PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
+                        }
+                        middleBottom={
                             <PanelWidget>
                                 <UserContent content={article.body} />
                             </PanelWidget>
-                        </PanelLayout.MiddleBottom>
-                        {article.outline && article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
+                        }
+                        rightTop={
+                            article.outline &&
+                            article.outline.length > 0 && (
                                 <PanelWidget>
                                     <ArticleTOC items={article.outline} />
                                 </PanelWidget>
-                            </PanelLayout.RightTop>
-                        )}
-                    </PanelLayout>
+                            )
+                        }
+                    />
                 </Container>
             </React.Fragment>
         );
