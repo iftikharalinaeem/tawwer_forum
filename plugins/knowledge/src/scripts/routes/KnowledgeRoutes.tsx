@@ -8,7 +8,6 @@ import React from "react";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { getModalRoutes } from "@knowledge/routes/modalRoutes";
 import { ModalRouter } from "@library/components/modal";
-import { IRouteState } from "@knowledge/routes/RouteReducer";
 import { IStoreState } from "@knowledge/state/model";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
@@ -16,6 +15,9 @@ import { connect } from "react-redux";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
 import FullPageLoader from "@library/components/FullPageLoader";
+import { RouteComponentProps, withRouter } from "react-router";
+import RouteActions from "@knowledge/routes/RouteActions";
+import { UnregisterCallback } from "history";
 
 /**
  * Routing component for pages and modals in the /kb directory.
@@ -42,14 +44,22 @@ export class KnowledgeRoutes extends React.Component<IProps> {
         return <ModalRouter modalRoutes={getModalRoutes()} pageRoutes={getPageRoutes()} />;
     }
 
+    private unlisten: UnregisterCallback;
+
     public componentDidMount() {
         if (this.props.kbLoadable.status === LoadStatus.PENDING) {
             this.props.requestKnowledgeBases();
         }
+
+        this.props.history.listen(this.props.clearError);
+    }
+
+    public componentWillUnmount() {
+        this.unlisten && this.unlisten();
     }
 }
 
-interface IOwnProps {}
+interface IOwnProps extends RouteComponentProps<never> {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
@@ -64,7 +74,8 @@ function mapDispatchToProps(dispatch: any) {
     const kbActions = new KnowledgeBaseActions(dispatch, apiv2);
     return {
         requestKnowledgeBases: kbActions.getAll,
+        clearError: () => dispatch(RouteActions.resetAC()),
     };
 }
 
-export default connect(mapStateToProps)(KnowledgeRoutes);
+export default withRouter(connect(mapStateToProps)(KnowledgeRoutes));

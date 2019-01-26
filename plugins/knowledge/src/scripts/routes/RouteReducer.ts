@@ -4,10 +4,8 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
-import { Reducer } from "redux";
 import RouteActions from "@knowledge/routes/RouteActions";
-import produce from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IRouteError {
     message: string;
@@ -19,18 +17,15 @@ export interface IRouteState {
     error: IRouteError | null;
 }
 
-type ReducerType = Reducer<IRouteState, typeof RouteActions.ACTION_TYPES>;
+const INITIAL_STATE: IRouteState = {
+    error: null,
+};
 
-export default class RouteReducer implements ReduxReducer<IRouteState> {
-    public readonly initialState: IRouteState = {
-        error: null,
-    };
-
-    public reducer: ReducerType = (state = this.initialState, action) => {
-        return produce(state, nextState => {
-            if (action.type === RouteActions.ERROR) {
-                nextState.error = action.payload;
-            }
-        });
-    };
-}
+const routeReducer = reducerWithInitialState<IRouteState>(INITIAL_STATE)
+    .case(RouteActions.resetAC, () => INITIAL_STATE)
+    .case(RouteActions.errorAC, (state, payload) => {
+        return {
+            error: payload,
+        };
+    });
+export default routeReducer;
