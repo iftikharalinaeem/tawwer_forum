@@ -51,8 +51,12 @@ export class KnowledgeRoutes extends React.Component<IProps> {
             this.props.requestKnowledgeBases();
         }
 
-        this.props.history.listen(this.props.clearError);
+        this.props.history.listen(this.onChange);
     }
+
+    private onChange = () => {
+        this.props.clearError();
+    };
 
     public componentWillUnmount() {
         this.unlisten && this.unlisten();
@@ -78,4 +82,9 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default withRouter(connect(mapStateToProps)(KnowledgeRoutes));
+export default withRouter(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(KnowledgeRoutes),
+);
