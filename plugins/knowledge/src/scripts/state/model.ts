@@ -29,8 +29,6 @@ import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions
 import UsersActions from "@library/users/UsersActions";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import RouteActions from "@knowledge/routes/RouteActions";
 import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export type KNOWLEDGE_ACTION =
