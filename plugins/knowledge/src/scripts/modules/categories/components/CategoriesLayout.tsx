@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { IKbCategoryFragment, IKbCategory } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/modules/navigation/Navigation";
@@ -24,7 +24,7 @@ import * as React from "react";
 import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps extends IDeviceProps {
-    category: IKbCategoryFragment;
+    category: IKbCategory;
     results: IResult[];
     query?: string;
     kbID: number;
@@ -67,8 +67,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                 <Navigation
                                     collapsible={true}
                                     activeRecord={activeRecord}
-                                    kbID={1}
-                                    title={t("Subcategories")}
+                                    kbID={category.knowledgeBaseID}
                                 />
                             }
                         </PanelWidget>

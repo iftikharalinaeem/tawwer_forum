@@ -16,15 +16,6 @@ import React from "react";
 import { connect } from "react-redux";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 
-interface IProps extends INavigationStoreState {
-    navActions: NavigationActions;
-    articleActions: ArticleActions;
-    activeRecord: IActiveRecord;
-    collapsible: boolean;
-    kbID: number;
-    title?: string; // Title on top of navigation
-}
-
 /**
  * Data connect navigation component for knowledge base.
  */
@@ -34,10 +25,11 @@ export class Navigation extends React.Component<IProps> {
      */
     public render(): React.ReactNode {
         const loadable = this.props.fetchLoadablesByKbID[this.props.kbID] || { status: LoadStatus.PENDING };
+        const title = undefined;
 
         return (
             <SiteNav
-                title={this.props.title}
+                title={title}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={loadable.status === LoadStatus.SUCCESS && <NavigationAdminLinks kbID={this.props.kbID} />}
@@ -66,6 +58,14 @@ export class Navigation extends React.Component<IProps> {
     public componentDidMount() {
         return this.props.navActions.getNavigationFlat(1);
     }
+}
+
+interface IProps extends INavigationStoreState {
+    navActions: NavigationActions;
+    articleActions: ArticleActions;
+    activeRecord: IActiveRecord;
+    collapsible: boolean;
+    kbID: number;
 }
 
 function mapStateToProps(store: IStoreState) {

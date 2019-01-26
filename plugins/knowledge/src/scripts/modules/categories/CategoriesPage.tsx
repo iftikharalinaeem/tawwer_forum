@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticleFragment, IKbCategoryFragment } from "@knowledge/@types/api";
+import { IArticleFragment, IKbCategoryFragment, IKbCategory } from "@knowledge/@types/api";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
@@ -26,7 +26,7 @@ import { match } from "react-router";
 import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps extends IDeviceProps {
-    category: IKbCategoryFragment;
+    category: IKbCategory;
     categoriesPageState: ICategoriesPageState;
     categoriesPageActions: CategoriesPageActions;
     match: match<{
