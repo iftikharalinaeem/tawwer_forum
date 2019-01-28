@@ -38,71 +38,65 @@ export class ArticleLayout extends React.Component<IProps> {
         const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
 
         return (
-            <React.Fragment>
-                <Container>
-                    <VanillaHeader
-                        title={article.name}
-                        mobileDropDownContent={
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                        }
-                    />
-                    <PanelLayout device={this.props.device}>
-                        {this.props.device !== Devices.MOBILE && (
-                            <PanelLayout.Breadcrumbs>
-                                <PanelWidget>
-                                    <NavigationBreadcrumbs activeRecord={activeRecord} />
-                                </PanelWidget>
-                            </PanelLayout.Breadcrumbs>
-                        )}
-                        <PanelLayout.LeftBottom>
+            <Container>
+                <VanillaHeader
+                    isFixed={true}
+                    title={article.name}
+                    mobileDropDownContent={
+                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
+                    }
+                />
+                <PanelLayout
+                    breadcrumbs={
+                        this.props.device !== Devices.MOBILE && (
                             <PanelWidget>
-                                {
-                                    <Navigation
-                                        collapsible={true}
-                                        activeRecord={activeRecord}
-                                        kbID={article.knowledgeBaseID}
+                                <NavigationBreadcrumbs activeRecord={activeRecord} />
+                            </PanelWidget>
+                        )
+                    }
+                    leftBottom={
+                        <PanelWidget>
+                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
+                        </PanelWidget>
+                    }
+                    middleTop={
+                        <PanelWidget>
+                            <PageTitle
+                                title={article.name}
+                                actions={
+                                    <ArticleMenu
+                                        article={article}
+                                        buttonClassName="pageTitle-menu"
+                                        device={this.props.device}
                                     />
                                 }
-                            </PanelWidget>
-                        </PanelLayout.LeftBottom>
-                        <PanelLayout.MiddleTop>
+                                meta={
+                                    <ArticleMeta
+                                        updateUser={article.updateUser!}
+                                        dateUpdated={article.dateUpdated}
+                                        permaLink={article.url}
+                                    />
+                                }
+                                includeBackLink={this.props.device !== Devices.MOBILE}
+                            />
+                            {messages && <div className="messages">{messages}</div>}
+                        </PanelWidget>
+                    }
+                    middleBottom={
+                        <PanelWidget>
+                            <UserContent content={article.body} />
+                        </PanelWidget>
+                    }
+                    rightTop={
+                        article.outline &&
+                        article.outline.length > 0 && (
                             <PanelWidget>
-                                <PageTitle
-                                    title={article.name}
-                                    actions={
-                                        <ArticleMenu
-                                            article={article}
-                                            buttonClassName="pageTitle-menu"
-                                            device={this.props.device}
-                                        />
-                                    }
-                                    meta={
-                                        <ArticleMeta
-                                            updateUser={article.updateUser!}
-                                            dateUpdated={article.dateUpdated}
-                                            permaLink={article.url}
-                                        />
-                                    }
-                                    includeBackLink={this.props.device !== Devices.MOBILE}
-                                />
-                                {messages && <div className="messages">{messages}</div>}
+                                <ArticleTOC items={article.outline} />
                             </PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
-                            <PanelWidget>
-                                <UserContent content={article.body} />
-                            </PanelWidget>
-                        </PanelLayout.MiddleBottom>
-                        {article.outline && article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
-                                <PanelWidget>
-                                    <ArticleTOC items={article.outline} />
-                                </PanelWidget>
-                            </PanelLayout.RightTop>
-                        )}
-                    </PanelLayout>
-                </Container>
-            </React.Fragment>
+                        )
+                    }
+                />
+            </Container>
         );
     }
 }

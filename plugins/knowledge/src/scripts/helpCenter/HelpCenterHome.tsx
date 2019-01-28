@@ -40,12 +40,15 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <DocumentTitle title={knowledgeBase.name}>
                     <VanillaHeader />
                 </DocumentTitle>
-                <PanelLayout device={Devices.DESKTOP}>
-                    <PanelLayout.MiddleBottom>
-                        <h1>{knowledgeBase.name}</h1>
-                        <HelpCenterNavigation data={data!} />
-                    </PanelLayout.MiddleBottom>
-                </PanelLayout>
+                <PanelLayout
+                    device={Devices.DESKTOP}
+                    middleBottom={
+                        <>
+                            <h1>{knowledgeBase.name}</h1>
+                            <HelpCenterNavigation data={data!} />
+                        </>
+                    }
+                />
             </Container>
         );
     }

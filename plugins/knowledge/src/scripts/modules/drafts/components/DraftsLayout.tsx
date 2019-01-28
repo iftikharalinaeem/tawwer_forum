@@ -34,20 +34,20 @@ class DraftsLayout extends React.Component<IProps> {
             <React.Fragment>
                 <DraftHeader mobileDropDownTitle={isMobile ? t("Drafts") : undefined} />
                 <Container>
-                    <PanelLayout device={this.props.device} className="hasLargePadding">
-                        {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
-                        {!isMobile && (
-                            <PanelLayout.MiddleTop>
-                                <PageTitle smallPageTitle={true} includeBackLink={false} title={t("Drafts")} />
-                            </PanelLayout.MiddleTop>
-                        )}
-                        <PanelLayout.MiddleBottom>
+                    <PanelLayout
+                        device={this.props.device}
+                        className="hasLargePadding"
+                        leftTop={isFullWidth && <PanelEmptyColumn />}
+                        middleTop={
+                            !isMobile && <PageTitle smallPageTitle={true} includeBackLink={false} title={t("Drafts")} />
+                        }
+                        middleBottom={
                             <PanelWidgetVerticalPadding>
                                 <DraftList data={this.props.data} />
                             </PanelWidgetVerticalPadding>
-                        </PanelLayout.MiddleBottom>
-                        {isFullWidth && <PanelLayout.RightTop>{<PanelEmptyColumn />}</PanelLayout.RightTop>}
-                    </PanelLayout>
+                        }
+                        rightTop={isFullWidth && <PanelEmptyColumn />}
+                    />
                 </Container>
             </React.Fragment>
         );

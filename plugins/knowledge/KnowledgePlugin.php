@@ -161,6 +161,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countArticles", "int", "0")
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
+            ->column("defaultArticleID", "int", ['Null' => true])
             ->set();
     }
 }

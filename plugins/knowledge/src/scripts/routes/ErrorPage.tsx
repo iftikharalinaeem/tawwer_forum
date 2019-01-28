@@ -30,15 +30,16 @@ export class ErrorPage extends React.Component<IProps> {
             <DocumentTitle title={error.message}>
                 <VanillaHeader />
                 <Container>
-                    <PanelLayout device={this.props.device}>
-                        <PanelLayout.MiddleTop>
+                    <PanelLayout
+                        device={this.props.device}
+                        middleTop={
                             <div className="errorPage">
                                 <Heading depth={1} title={error.message} />
                                 {error.description && <Paragraph>{error.description}</Paragraph>}
                                 <div className="errorPage-cta">{error.actionItem}</div>
                             </div>
-                        </PanelLayout.MiddleTop>
-                    </PanelLayout>
+                        }
+                    />
                 </Container>
             </DocumentTitle>
         );
