@@ -43,6 +43,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
                     titleLevel={1}
                     hiddenTitle={true}
                     items={knowledgeBases}
+                    emptyMessage={t("No knowledge bases found.")}
                 />
             </WidgetContainer>
         );
