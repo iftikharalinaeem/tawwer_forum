@@ -23,6 +23,7 @@ import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
 import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -77,6 +78,9 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (loadable.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
+
+        // Preload the categories page. We may be navigating to it shortly.
+        CategoryRoute.preload();
     }
 
     /**
