@@ -39,6 +39,7 @@ trait KnowledgeBasesApiSchemes {
             "description" => [
                 "description" => "Description for the knowledge base.",
                 "minLength" => 1,
+                "maxLength" => 300,
                 "type" => "string",
             ],
             "sortArticles" => [
