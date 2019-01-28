@@ -48,55 +48,59 @@ class SearchForm extends React.Component<IProps> {
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
-                    <PanelLayout device={this.props.device} className="hasLargePadding">
-                        {isFullWidth && <PanelLayout.LeftTop>{<PanelEmptyColumn />}</PanelLayout.LeftTop>}
-                        <PanelLayout.MiddleTop>
-                            <PanelWidget>
-                                <SearchBar
-                                    placeholder={this.props.placeholder || t("Help")}
-                                    onChange={this.handleSearchChange}
-                                    loadOptions={this.props.searchOptionProvider.autocomplete}
-                                    value={this.props.form.query}
-                                    isBigInput={true}
-                                    onSearch={this.props.searchActions.search}
-                                    isLoading={this.props.results.status === LoadStatus.LOADING}
-                                    optionComponent={SearchOption}
-                                    triggerSearchOnClear={true}
-                                    title={t("Search")}
-                                    titleAsComponent={
-                                        <>
-                                            {t("Search")}
-                                            <LinkAsButton
-                                                to={`/kb/articles/add`}
-                                                className="searchBar-actionButton"
-                                                baseClass={ButtonBaseClass.ICON}
-                                                title={t("Compose")}
-                                            >
-                                                {compose()}
-                                            </LinkAsButton>
-                                        </>
-                                    }
-                                />
-                            </PanelWidget>
-                            {isMobile && (
-                                <Drawer title={t("Advanced Search")}>
-                                    <AdvancedSearch hideTitle={true} />
-                                </Drawer>
-                            )}
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
+                    <PanelLayout
+                        device={this.props.device}
+                        className="hasLargePadding"
+                        leftTop={isFullWidth && <PanelEmptyColumn />}
+                        middleTop={
+                            <>
+                                <PanelWidget>
+                                    <SearchBar
+                                        placeholder={this.props.placeholder || t("Help")}
+                                        onChange={this.handleSearchChange}
+                                        loadOptions={this.props.searchOptionProvider.autocomplete}
+                                        value={this.props.form.query}
+                                        isBigInput={true}
+                                        onSearch={this.props.searchActions.search}
+                                        isLoading={this.props.results.status === LoadStatus.LOADING}
+                                        optionComponent={SearchOption}
+                                        triggerSearchOnClear={true}
+                                        title={t("Search")}
+                                        titleAsComponent={
+                                            <>
+                                                {t("Search")}
+                                                <LinkAsButton
+                                                    to={`/kb/articles/add`}
+                                                    className="searchBar-actionButton"
+                                                    baseClass={ButtonBaseClass.ICON}
+                                                    title={t("Compose")}
+                                                >
+                                                    {compose()}
+                                                </LinkAsButton>
+                                            </>
+                                        }
+                                    />
+                                </PanelWidget>
+                                {isMobile && (
+                                    <Drawer title={t("Advanced Search")}>
+                                        <AdvancedSearch hideTitle={true} />
+                                    </Drawer>
+                                )}
+                            </>
+                        }
+                        middleBottom={
                             <PanelWidgetVerticalPadding>
                                 {<SearchResults results={this.unwrapResults()} />}
                             </PanelWidgetVerticalPadding>
-                        </PanelLayout.MiddleBottom>
-                        <PanelLayout.RightTop>
-                            {!isMobile && (
+                        }
+                        rightTop={
+                            !isMobile && (
                                 <PanelWidget>
                                     <AdvancedSearch />
                                 </PanelWidget>
-                            )}
-                        </PanelLayout.RightTop>
-                    </PanelLayout>
+                            )
+                        }
+                    />
                 </Container>
             </DocumentTitle>
         );

@@ -55,25 +55,19 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
                     }
                 />
-                <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
+                <PanelLayout
+                    device={this.props.device}
+                    breadcrumbs={
                         <PanelWidget>
                             <NavigationBreadcrumbs activeRecord={activeRecord} />
                         </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftBottom>
+                    }
+                    leftBottom={
                         <PanelWidget>
-                            {
-                                <Navigation
-                                    collapsible={true}
-                                    activeRecord={activeRecord}
-                                    kbID={1}
-                                    title={t("Subcategories")}
-                                />
-                            }
+                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
                         </PanelWidget>
-                    </PanelLayout.LeftBottom>
-                    <PanelLayout.MiddleTop>
+                    }
+                    middleTop={
                         <PanelWidget>
                             <SearchBar
                                 placeholder={t("Search")}
@@ -96,14 +90,14 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                 }
                             />
                         </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
+                    }
+                    middleBottom={
                         <PanelWidgetVerticalPadding>
                             <SearchResults results={this.props.results} />
                         </PanelWidgetVerticalPadding>
-                    </PanelLayout.MiddleBottom>
-                    {isFullWidth && <PanelLayout.RightTop>{}</PanelLayout.RightTop>}
-                </PanelLayout>
+                    }
+                    rightTop={isFullWidth && <></>}
+                />
             </Container>
         );
     }

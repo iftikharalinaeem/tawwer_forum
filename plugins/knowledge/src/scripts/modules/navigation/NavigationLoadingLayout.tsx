@@ -33,24 +33,25 @@ export function NavigationLoadingLayout(props: IProps) {
                 title={t("Loading")}
                 mobileDropDownContent={<Navigation activeRecord={props.activeRecord} collapsible={false} kbID={1} />}
             />
-            <PanelLayout device={props.device}>
-                <PanelLayout.Breadcrumbs>
+            <PanelLayout
+                device={props.device}
+                breadcrumbs={
                     <PanelWidget>
                         <NavigationBreadcrumbs activeRecord={props.activeRecord} />
                     </PanelWidget>
-                </PanelLayout.Breadcrumbs>
-                <PanelLayout.LeftBottom>
+                }
+                leftBottom={
                     <PanelWidget>
                         <Navigation activeRecord={props.activeRecord} collapsible={true} kbID={1} />
                     </PanelWidget>
-                </PanelLayout.LeftBottom>
-                <PanelLayout.MiddleBottom>
+                }
+                middleBottom={
                     <PanelWidget>
                         <FullPageLoader />
                     </PanelWidget>
-                </PanelLayout.MiddleBottom>
-                <PanelLayout.RightBottom />
-            </PanelLayout>
+                }
+                rightBottom={<></>}
+            />
         </Container>
     );
 }

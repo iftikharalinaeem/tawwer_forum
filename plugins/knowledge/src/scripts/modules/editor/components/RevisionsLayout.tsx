@@ -45,27 +45,25 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                     mobileDropDownContent={this.props.revisionList}
                 />
                 <Container className="richEditorRevisionsForm-body">
-                    <PanelLayout device={this.props.device} topPadding={this.props.device !== Devices.MOBILE}>
-                        {this.props.device !== Devices.MOBILE && (
-                            <PanelLayout.Breadcrumbs>
+                    <PanelLayout
+                        device={this.props.device}
+                        topPadding={this.props.device !== Devices.MOBILE}
+                        breadcrumbs={
+                            this.props.device !== Devices.MOBILE && (
                                 <PanelWidget>
                                     <Breadcrumbs children={crumbs} />
                                 </PanelWidget>
-                            </PanelLayout.Breadcrumbs>
-                        )}
-                        {isDesktop && <PanelLayout.LeftTop />}
-                        <PanelLayout.MiddleTop>
-                            <PanelWidget>{bodyHeading}</PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
-                            <PanelWidget>{bodyContent}</PanelWidget>
-                        </PanelLayout.MiddleBottom>
-                        {!isMobile && (
-                            <PanelLayout.RightTop>
+                            )
+                        }
+                        leftTop={isDesktop && <></>}
+                        middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}
+                        middleBottom={<PanelWidget>{bodyContent}</PanelWidget>}
+                        rightTop={
+                            !isMobile && (
                                 <PanelWidgetVerticalPadding>{this.props.revisionList}</PanelWidgetVerticalPadding>
-                            </PanelLayout.RightTop>
-                        )}
-                    </PanelLayout>
+                            )
+                        }
+                    />
                 </Container>
             </>
         );

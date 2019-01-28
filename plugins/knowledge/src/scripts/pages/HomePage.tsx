@@ -21,11 +21,7 @@ export class HomePage extends React.Component<IProps> {
                 <DocumentTitle title={t("Home")}>
                     <VanillaHeader />
                 </DocumentTitle>
-                <PanelLayout device={this.props.device}>
-                    <PanelLayout.MiddleBottom>
-                        <KnowledgeBaseList />
-                    </PanelLayout.MiddleBottom>
-                </PanelLayout>
+                <PanelLayout device={this.props.device} middleBottom={<KnowledgeBaseList />} />
             </Container>
         );
     }
