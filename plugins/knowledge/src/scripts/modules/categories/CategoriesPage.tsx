@@ -32,7 +32,6 @@ interface IProps extends IDeviceProps {
     match: match<{
         id: string;
     }>;
-    kbID: number;
 }
 
 /**
@@ -64,7 +63,6 @@ export class CategoriesPage extends React.Component<IProps> {
                         <CategoriesLayout
                             results={categoriesPageState.articles.data!.map(this.mapArticleToResult)}
                             category={category!}
-                            kbID={this.props.kbID}
                         />
                     </DocumentTitle>
                 ) : (
