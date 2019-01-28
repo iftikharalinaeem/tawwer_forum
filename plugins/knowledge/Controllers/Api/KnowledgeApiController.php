@@ -28,6 +28,7 @@ class KnowledgeApiController extends AbstractApiController {
     const SPHINX_DEFAULT_LIMIT = 100;
 
     const TYPE_ARTICLE = 5;
+    const TYPE_ARTICLE_DELETED = 6;
     const TYPE_DISCUSSION = 0;
     const TYPE_QUESTION = 1;
     const TYPE_POLL = 2;
@@ -96,6 +97,15 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticle', 'KnowledgeArticle_Delta'],
+        ],
+        self::TYPE_ARTICLE_DELETED => [
+            'model' => 'articleRevisionModel',
+            'recordType' => 'article',
+            'recordID' => 'articleID',
+            'offset' => 5,
+            'multiplier' => 10,
+            'getRecordsFunction' => 'getArticles',
+            'sphinxIndexName' => ['KnowledgeArticleDeleted', 'KnowledgeArticleDeleted_Delta'],
         ],
     ];
 
@@ -275,7 +285,7 @@ class KnowledgeApiController extends AbstractApiController {
      * Prepare Sphinx query when global search mode
      */
     protected function defineGlobalQuery() {
-        $this->sphinxIndexes = $this->getIndexes();
+        $this->sphinxIndexes = $this->getIndexes([], [self::TYPE_ARTICLE_DELETED]);
         if (isset($this->query['insertUserIDs'])) {
             $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
         }
@@ -297,8 +307,12 @@ class KnowledgeApiController extends AbstractApiController {
      * Prepare Sphinx query when Knowledge Base Articles search mode
      */
     protected function defineArticlesQuery() {
-        $this->sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
+        $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
+            if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
+                $this->permission("knowledge.articles.add");
+            };
+            $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
             $statuses = array_map(
                 function ($status) {
                     return array_search($status, self::ARTICLE_STATUSES);
@@ -309,7 +323,7 @@ class KnowledgeApiController extends AbstractApiController {
         } else {
             $this->sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
         }
-
+        $this->sphinxIndexes = $this->getIndexes($articleIndexes);
         if (isset($this->query['insertUserIDs'])) {
             $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
         }
@@ -343,13 +357,17 @@ class KnowledgeApiController extends AbstractApiController {
      * Get all full sphinx index names needed for current search
      *
      * @param array $typesRequired
+     * @param array $typesExclude
      * @return string
      */
-    protected function getIndexes(array $typesRequired = []):string {
+    protected function getIndexes(array $typesRequired = [], array $typesExclude = []):string {
         $sphinxIndexes = [];
         $all = empty($typesRequired);
         foreach (self::RECORD_TYPES as $key => $sphinxTypes) {
             if ($all || in_array($key, $typesRequired)) {
+                if (in_array($key, $typesExclude)) {
+                    continue;
+                }
                 $idxFullNames = [];
                 foreach ($sphinxTypes['sphinxIndexName'] as $idx) {
                     $idxFullNames[] = $this->sphinxIndexName($idx);
