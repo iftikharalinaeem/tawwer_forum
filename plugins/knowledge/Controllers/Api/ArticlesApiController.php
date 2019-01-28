@@ -627,7 +627,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
 
             if (!is_int($fields['sort'] ?? false)) {
-                if ($moveToAnotherCategory || !($prevState['sort'] ?? false)) {
+                if ($moveToAnotherCategory) {
                     $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($article['knowledgeCategoryID']);
                     $maxSortIndex = $sortInfo['maxSort'];
                     $article['sort'] = $maxSortIndex + 1;

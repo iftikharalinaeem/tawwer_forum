@@ -67,8 +67,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                         growMiddleBottom={true}
                         device={this.props.device}
                         topPadding={false}
-                    >
-                        <PanelLayout.MiddleBottom>
+                        middleBottom={
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
                                 <LocationInput
                                     initialCategoryID={form.knowledgeCategoryID}
@@ -100,8 +99,8 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     initialValue={form.body}
                                 />
                             </div>
-                        </PanelLayout.MiddleBottom>
-                    </PanelLayout>
+                        }
+                    />
                 </Container>
             </form>
         );
