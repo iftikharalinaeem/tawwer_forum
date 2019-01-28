@@ -85,20 +85,20 @@ export default class NavigationSelector {
         for (const record of treeData.children) {
             switch (record.recordType) {
                 case NavigationRecordType.ARTICLE: {
-                    const { children, ...article } = record;
-                    data.ungroupedItems.push(article as NavArticle);
+                    const { children, ...items } = record;
+                    data.ungroupedItems.push(items as NavArticle);
                     break;
                 }
                 case NavigationRecordType.KNOWLEDGE_CATEGORY: {
                     const { children, ...category } = record;
                     const group: ILinkGroup = {
                         category: category as NavCategory,
-                        articles: [],
+                        items: [],
                     };
                     for (const child of children) {
                         if (child.recordType === NavigationRecordType.ARTICLE) {
                             const { children: unused, ...article } = child;
-                            group.articles.push(article as NavArticle);
+                            group.items.push(article as NavArticle);
                         }
                     }
                     data.groups.push(group);
