@@ -9,7 +9,7 @@ import {
     IKbNavigationItem,
 } from "@knowledge/modules/navigation/NavigationModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { ILinkGroup, INavigat, ILinkGroupionTreeItem, ILinkListData, ILinkListData } from "@library/@types/api";
+import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export default class NavigationSelector {

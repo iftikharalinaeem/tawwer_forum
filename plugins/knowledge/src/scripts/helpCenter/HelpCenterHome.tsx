@@ -5,10 +5,10 @@
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationSelector, { IHelpData } from "@knowledge/modules/navigation/NavigationSelector";
+import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { Devices } from "@library/components/DeviceChecker";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -81,12 +81,12 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const knowledgeState = state.knowledge.navigation;
     const loadStatus = knowledgeState.fetchLoadablesByKbID[knowledgeBaseID] || { status: LoadStatus.PENDING };
 
-    let data: IHelpData | undefined;
+    let data: ILinkListData | undefined;
     if (loadStatus.status === LoadStatus.SUCCESS) {
         data = NavigationSelector.selectHelpCenterNome(knowledgeState.navigationItems, ownProps.knowledgeBase);
     }
 
-    const loadable: ILoadable<IHelpData> = {
+    const loadable: ILoadable<ILinkListData> = {
         ...loadStatus,
         data,
     };
