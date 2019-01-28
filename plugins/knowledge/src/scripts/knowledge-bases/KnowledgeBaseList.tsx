@@ -32,6 +32,10 @@ class KnowledgeBaseList extends React.Component<IProps> {
             return <FullPageLoader />;
         }
 
+        if (LoadStatus.SUCCESS === loadStatus) {
+            document.body.classList.remove("isLoading");
+        }
+
         return (
             <WidgetContainer>
                 <SubcommunityList
