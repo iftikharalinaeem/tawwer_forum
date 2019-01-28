@@ -16,7 +16,6 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
         const { data } = this.props;
         const ungroupedCount = data.ungroupedArticles || [];
         const groupedContent = data.groups || [];
-        // console.log("HelpCenterNavigation: ", data);
 
         if (ungroupedCount.length !== 0 || groupedContent.length !== 0) {
             return <NavLinksWithHeadings title={t("Browse Articles by Category")} linkGroups={data} />;
