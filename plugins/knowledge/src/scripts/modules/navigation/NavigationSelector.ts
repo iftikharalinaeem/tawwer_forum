@@ -91,7 +91,7 @@ export default class NavigationSelector {
                 }
                 case NavigationRecordType.KNOWLEDGE_CATEGORY: {
                     const { children, ...category } = record;
-                    const group: IHelpGroup = {
+                    const group: ILinkGroup = {
                         category: category as NavCategory,
                         articles: [],
                     };
@@ -113,12 +113,12 @@ export default class NavigationSelector {
 export type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
 export type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;
 
-export interface IHelpGroup {
+export interface ILinkGroup {
     category: NavCategory;
     articles: NavArticle[];
 }
 
 export interface IHelpData {
-    groups: IHelpGroup[];
+    groups: ILinkGroup[];
     ungroupedArticles: NavArticle[];
 }

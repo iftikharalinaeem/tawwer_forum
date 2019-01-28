@@ -19,6 +19,7 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import React from "react";
 import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
 
 /**
  * Component representing the the full home page of a help center.
@@ -40,11 +41,16 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <DocumentTitle title={knowledgeBase.name}>
                     <VanillaHeader />
                 </DocumentTitle>
+
+                {/*For Screen Readers / SEO*/}
+                <ScreenReaderContent>
+                    <h1>{knowledgeBase.name}</h1>
+                </ScreenReaderContent>
+
                 <PanelLayout
                     device={Devices.DESKTOP}
                     middleBottom={
                         <>
-                            <h1>{knowledgeBase.name}</h1>
                             <HelpCenterNavigation data={data!} />
                         </>
                     }
