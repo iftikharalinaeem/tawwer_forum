@@ -88,13 +88,14 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <UserContent content={article.body} />
                             </PanelWidget>
                         </PanelLayout.MiddleBottom>
-                        {article.outline && article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
-                                <PanelWidget>
-                                    <ArticleTOC items={article.outline} />
-                                </PanelWidget>
-                            </PanelLayout.RightTop>
-                        )}
+                        {article.outline &&
+                            article.outline.length > 0 && (
+                                <PanelLayout.RightTop>
+                                    <PanelWidget>
+                                        <ArticleTOC items={article.outline} />
+                                    </PanelWidget>
+                                </PanelLayout.RightTop>
+                            )}
                     </PanelLayout>
                 </Container>
             </React.Fragment>
