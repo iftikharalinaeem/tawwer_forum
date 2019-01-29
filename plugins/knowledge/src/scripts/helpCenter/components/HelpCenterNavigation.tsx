@@ -19,7 +19,7 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
         const groupedContent = data.groups || [];
 
         if (ungroupedCount.length !== 0 || groupedContent.length !== 0) {
-            return <NavLinksWithHeadings title={t("Browse Articles by Category")} data={data} />;
+            return <NavLinksWithHeadings title={t("Browse Articles by Category")} data={data} depth={2} />;
         } else {
             return null;
         }
