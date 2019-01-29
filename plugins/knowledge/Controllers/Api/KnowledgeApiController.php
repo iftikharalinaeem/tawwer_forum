@@ -460,7 +460,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $result = $this->discussionModel->get(
             null,
-            false,
+            self::SPHINX_DEFAULT_LIMIT,
             ['d.DiscussionID' => $ids]
         )->resultArray();
 
