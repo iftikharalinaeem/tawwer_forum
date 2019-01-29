@@ -105,6 +105,10 @@ trait KnowledgeBasesApiSchemes {
                 "type" => "integer",
                 "allowNull" => true
             ],
+            "status:s" => [
+                'description' => "Knowledge base status.",
+                'enum' => KnowledgeBaseModel::getAllStatuses(),
+            ],
         ]);
     }
 
@@ -124,6 +128,7 @@ trait KnowledgeBasesApiSchemes {
                     "sourceLocale?",
                     "viewType?",
                     "sortArticles?",
+                    "status?",
                     "urlCode",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"

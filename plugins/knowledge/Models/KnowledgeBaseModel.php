@@ -17,6 +17,9 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const TYPE_GUIDE = 'guide';
     const TYPE_HELP = 'help';
 
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_DELETED = 'deleted';
+
     const ORDER_MANUAL = 'manual';
     const ORDER_NAME = 'name';
     const ORDER_DATE_ASC = 'dateInserted';
@@ -200,5 +203,17 @@ MESSAGE
         }
 
         return self::SORT_CONFIGS[$sortArticles];
+    }
+
+    /**
+     * Return list of statuses for knowledge Base model
+     *
+     * @return array
+     */
+    public static function getAllStatuses(): array {
+        return [
+            self::STATUS_DELETED,
+            self::STATUS_PUBLISHED,
+        ];
     }
 }
