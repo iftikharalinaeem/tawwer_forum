@@ -35,6 +35,7 @@ abstract class PageController extends \Garden\Controller {
 
     /**
      * @var string $_CanonicalUrl
+     * @var string $canonicalUrl
      */
     protected $canonicalUrl;
 

@@ -64,8 +64,9 @@ export class ErrorPage extends React.Component<IProps> {
         return (
             <DocumentTitle title={(title as unknown) as string}>
                 <Container>
-                    <PanelLayout device={this.props.device}>
-                        <PanelLayout.MiddleTop>
+                    <PanelLayout
+                        device={this.props.device}
+                        middleTop={
                             <div className="errorPage">
                                 <Heading depth={1} title={title} />
                                 <Paragraph>{message}</Paragraph>
@@ -88,8 +89,8 @@ export class ErrorPage extends React.Component<IProps> {
                                     )}
                                 </div>
                             </div>
-                        </PanelLayout.MiddleTop>
-                    </PanelLayout>
+                        }
+                    />
                 </Container>
             </DocumentTitle>
         );
@@ -98,4 +99,4 @@ export class ErrorPage extends React.Component<IProps> {
 
 const withCurrentUser = connect(UsersModel.mapStateToProps);
 
-export default withCurrentUser(withDevice<IProps>(ErrorPage));
+export default withCurrentUser(withDevice(ErrorPage));

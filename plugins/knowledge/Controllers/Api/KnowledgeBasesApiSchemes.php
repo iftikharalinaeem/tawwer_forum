@@ -39,6 +39,7 @@ trait KnowledgeBasesApiSchemes {
             "description" => [
                 "description" => "Description for the knowledge base.",
                 "minLength" => 1,
+                "maxLength" => 300,
                 "type" => "string",
             ],
             "sortArticles" => [
@@ -98,6 +99,11 @@ trait KnowledgeBasesApiSchemes {
             "rootCategoryID:i" => [
                 "description" => "Root knowledge category ID of knowledge base.",
                 "type" => "integer",
+            ],
+            "defaultArticleID:i" => [
+                "description" => "Default article ID of knowledge base.",
+                "type" => "integer",
+                "allowNull" => true
             ],
         ]);
     }

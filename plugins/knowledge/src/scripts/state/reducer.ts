@@ -4,20 +4,23 @@
  * @license Proprietary
  */
 
-import { combineReducers } from "redux";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
-import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import ArticlePageModel from "@knowledge/modules/article/ArticlePageModel";
-import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
-import CategoriesPageReducer from "@knowledge/modules/categories/CategoriesPageReducer";
 import ArticleMenuModel from "@knowledge/modules/article/ArticleMenuModel";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
-import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import ArticlePageModel from "@knowledge/modules/article/ArticlePageModel";
+import CategoriesPageReducer from "@knowledge/modules/categories/CategoriesPageReducer";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
+import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
+import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
+import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import RouteReducer from "@knowledge/routes/RouteReducer";
+import { IKbState } from "@knowledge/state/model";
+import { combineReducers } from "redux";
+import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
-const knowledgeReducer = combineReducers({
+const knowledgeReducer = combineReducers<IKbState>({
     articles: new ArticleModel().reducer,
     articleMenu: new ArticleMenuModel().reducer,
     articlePage: new ArticlePageModel().reducer,
@@ -29,6 +32,8 @@ const knowledgeReducer = combineReducers({
     locationPicker: new LocationPickerModel().reducer,
     searchPage: new SearchPageModel().reducer,
     navigation: new NavigationModel().reducer,
+    route: new RouteReducer().reducer,
+    knowledgeBases: new KnowledgeBaseModel().reducer,
 });
 
 export default knowledgeReducer;

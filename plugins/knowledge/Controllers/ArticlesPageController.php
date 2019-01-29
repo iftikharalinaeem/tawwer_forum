@@ -33,17 +33,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
     protected $revisionsApi;
 
     /**
-     * ArticlesPageController constructor.
-     *
-     * @param Container $container
-     */
-    public function __construct(Container $container) {
-        parent::__construct($container);
-        $this->articlesApi = $this->container->get(ArticlesApiController::class);
-        $this->revisionsApi = $this->container->get(ArticleRevisionsApiController::class);
-    }
-
-    /**
      * @var $action view | editor | add etc...
      */
     private $action;
@@ -51,6 +40,18 @@ class ArticlesPageController extends KnowledgeTwigPageController {
      * @var int $articleId Article id of current action.
      */
     private $articleId;
+
+    /**
+     * Constructor for DI.
+     *
+     * @param ArticlesApiController $articlesApi
+     * @param ArticleRevisionsApiController $revisionsApi
+     */
+    public function __construct(ArticlesApiController $articlesApi, ArticleRevisionsApiController $revisionsApi) {
+        parent::__construct();
+        $this->articlesApi = $articlesApi;
+        $this->revisionsApi = $revisionsApi;
+    }
 
     /**
      * Render out the /kb/articles/title-slug-{id} :path page.
@@ -75,7 +76,6 @@ class ArticlesPageController extends KnowledgeTwigPageController {
 
         return $this->twigInit()->render('default-master.twig', $data);
     }
-
 
     /**
      * Render out the /kb/articles/{id}/editor path page.

@@ -3,98 +3,66 @@
  * @license GPL-2.0-only
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import {
-    IGetKbNavigationRequest,
-    IGetKbNavigationResponse,
-    IPatchKBNavigationRequest,
-    IPatchKbNavigationResponse,
-} from "@knowledge/@types/api";
+import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, IApiError } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
+import { actionCreatorFactory } from "typescript-fsa";
+import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/modules/navigation/NavigationModel";
+
+const createAction = actionCreatorFactory("@@navigation");
 
 /**
  * Redux actions for knowledge base navigation data.
  */
 export default class NavigationActions extends ReduxActions {
-    /**
-     * Union of all possible action types in this class.
-     */
-    public static readonly ACTION_TYPES:
-        | ActionsUnion<typeof NavigationActions.getNavigationFlatACs>
-        | ActionsUnion<typeof NavigationActions.patchNavigationFlatACs>;
-
-    /**
-     * GET /knowledge-navigation/flat
-     */
-
-    public static readonly GET_NAVIGATION_FLAT_REQUEST = "@@navigation/GET_NAVIGATION_FLAT_REQUEST";
-    public static readonly GET_NAVIGATION_FLAT_RESPONSE = "@@navigation/GET_NAVIGATION_FLAT_RESPONSE";
-    public static readonly GET_NAVIGATION_FLAT_ERROR = "@@navigation/GET_NAVIGATION_FLAT_ERROR";
-
-    /**
-     * Action creators for getting a knowledge base's navigation in the flat format.
-     */
-    private static getNavigationFlatACs = ReduxActions.generateApiActionCreators(
-        NavigationActions.GET_NAVIGATION_FLAT_REQUEST,
-        NavigationActions.GET_NAVIGATION_FLAT_RESPONSE,
-        NavigationActions.GET_NAVIGATION_FLAT_ERROR,
-        {} as IGetKbNavigationResponse,
-        {} as IGetKbNavigationRequest,
-    );
+    public static getNavigationFlatACs = createAction.async<
+        { knowledgeBaseID: number },
+        IKbNavigationItem[],
+        IApiError
+    >("GET_NAVIGATION_FLAT");
 
     /**
      * Get navigation for a knowledge base in the flat format.
      *
-     * @param request Parameters for the request.
+     * @param options Parameters for the request.
      */
-    public getNavigationFlat = (request: IGetKbNavigationRequest, forceUpdate = false) => {
+    public getNavigationFlat = (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState<IStoreState>();
-        const { fetchLoadable } = state.knowledge.navigation;
-        if (!forceUpdate && fetchLoadable.status === LoadStatus.SUCCESS) {
+        const fetchLoadable = state.knowledge.navigation.fetchLoadablesByKbID[knowledgeBaseID];
+        if (!forceUpdate && fetchLoadable && fetchLoadable.status === LoadStatus.SUCCESS) {
             return;
         }
 
-        return this.dispatchApi<IGetKbNavigationResponse>(
-            "get",
-            `/knowledge-navigation/flat`,
-            NavigationActions.getNavigationFlatACs,
-            request,
-        );
+        const apiThunk = bindThunkAction(NavigationActions.getNavigationFlatACs, async () => {
+            const response = await this.api.get(`/knowledge-navigation/flat?knowledgeBaseID=${knowledgeBaseID}`);
+            return response.data;
+        })({ knowledgeBaseID });
+
+        return this.dispatch(apiThunk);
     };
 
-    /**
-     * GET /knowledge-navigation/flat
-     */
-
-    public static readonly PATCH_NAVIGATION_FLAT_REQUEST = "@@navigation/PATCH_NAVIGATION_FLAT_REQUEST";
-    public static readonly PATCH_NAVIGATION_FLAT_RESPONSE = "@@navigation/PATCH_NAVIGATION_FLAT_RESPONSE";
-    public static readonly PATCH_NAVIGATION_FLAT_ERROR = "@@navigation/PATCH_NAVIGATION_FLAT_ERROR";
-
-    /**
-     * Action creators for patching a knowledge base's navigation using the flat format.
-     */
-    private static patchNavigationFlatACs = ReduxActions.generateApiActionCreators(
-        NavigationActions.PATCH_NAVIGATION_FLAT_REQUEST,
-        NavigationActions.PATCH_NAVIGATION_FLAT_RESPONSE,
-        NavigationActions.PATCH_NAVIGATION_FLAT_ERROR,
-        {} as IPatchKbNavigationResponse,
-        {} as IPatchKBNavigationRequest & { transactionID: string },
-    );
+    public static patchNavigationFlatACs = createAction.async<
+        { knowledgeBaseID: number; patchItems: IPatchFlatItem[]; transactionID: string },
+        IKbNavigationItem[],
+        IApiError
+    >("PATCH_NAVIGATION_FLAT");
 
     /**
      * Patch a knowlege base's navigation using the flat format.
      *
-     * @param request Patch request parameters.
+     * @param patchItems Patch request parameters.
      */
-    public patchNavigationFlat = (request: IPatchKBNavigationRequest) => {
-        return this.dispatchApi<IPatchKbNavigationResponse>(
-            "patch",
-            `/knowledge-navigation/flat`,
-            NavigationActions.patchNavigationFlatACs,
-            request,
-            { transactionID: uniqueId("patchNav") },
-        );
+    public patchNavigationFlat = (knowledgeBaseID: number, patchItems: IPatchFlatItem[]) => {
+        const params = {
+            transactionID: uniqueId("patchNav"),
+            patchItems,
+            knowledgeBaseID,
+        };
+        const apiThunk = bindThunkAction(NavigationActions.patchNavigationFlatACs, async () => {
+            const response = await this.api.patch(`/knowledge-navigation/${knowledgeBaseID}/flat`, patchItems);
+            return response.data;
+        })(params);
+        return this.dispatch(apiThunk);
     };
 }

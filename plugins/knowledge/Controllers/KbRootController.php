@@ -7,13 +7,42 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Garden\Container\Container;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Knowledge base controller for article view.
  */
 class KbRootController extends KnowledgeTwigPageController {
+
+    /** @var KnowledgeBasesApiController */
+    private $basesApi;
+
+    /** @var ArticlesPageController */
+    private $articlesPageController;
+
+    /** @var SearchPageController */
+    private $searchPageController;
+
+    /**
+     * Constructor for DI.
+     *
+     * @param KnowledgeBasesApiController $basesApi
+     * @param ArticlesPageController $articlesPageController
+     * @param SearchPageController $searchPageController
+     */
+    public function __construct(
+        KnowledgeBasesApiController $basesApi,
+        ArticlesPageController $articlesPageController,
+        SearchPageController $searchPageController
+    ) {
+        parent::__construct();
+        $this->basesApi = $basesApi;
+        $this->articlesPageController = $articlesPageController;
+        $this->searchPageController = $searchPageController;
+    }
+
 
     /**
      * Gather the data array to render a page with.
@@ -31,14 +60,8 @@ class KbRootController extends KnowledgeTwigPageController {
      * Render out the /kb page.
      */
     public function index() : string {
-        $this->setPageTitle(\Gdn::translate('Debug'));
-
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = $this->getViewData();
-        $data['page']['classes'][] = 'isLoading';
-        $data['template'] = 'seo/pages/home.twig';
-
-        return $this->twigInit()->render('default-master.twig', $data);
+        // Temporarily use the search page instead of the knowledge base homepage.
+        return $this->searchPageController->index();
     }
 
     /**
@@ -55,11 +78,61 @@ class KbRootController extends KnowledgeTwigPageController {
     }
 
     /**
+     * Render out a knowledge base homepage.
+     *
+     * Routing for /kb/:slug
+     *
+     * @param string $path The knowledge base slug.
+     *
+     * @return string
+     */
+    public function get(string $path): string {
+        $urlCode = ltrim($path, "/");
+        $knowledgeBase = $this->basesApi->get_byUrlCode(['urlCode' => $urlCode]);
+        $knowledgeBaseID = $knowledgeBase['knowledgeBaseID'];
+
+        switch ($knowledgeBase['viewType']) {
+            case KnowledgeBaseModel::TYPE_HELP:
+                $this->preloadNavigation($knowledgeBaseID);
+                return $this->helpCenterHomePage($knowledgeBase);
+            case KnowledgeBaseModel::TYPE_GUIDE:
+                $articleID = $knowledgeBase['defaultArticleID'];
+                if ($articleID === null) {
+                    return $this->noArticlesPage();
+                } else {
+                    $articleController = $this->articlesPageController;
+                    $articleController->preloadNavigation($knowledgeBaseID);
+                    return $articleController->index("/$articleID");
+                }
+        }
+    }
+
+    /**
+     * @param array $knowledgeBase
+     */
+    private function helpCenterHomePage(array $knowledgeBase): string {
+        $this->setPageTitle($knowledgeBase['name']);
+        $data = $this->getViewData();
+        return $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
+     * No articles Page.
+     */
+    private function noArticlesPage() {
+        $this->setPageTitle('No Articles Created Yet');
+        $data = $this->getViewData();
+        $this->twigInit()->render('default-master.twig', $data);
+    }
+
+    /**
      * Render out the /kb/{id}/organize-categories page.
      *
      * @param int $id Knowledge base ID
+     *
+     * @return string
      */
-    public function get_organizeCategories(int $id) : string {
+    public function get_organizeCategories(int $id): string {
         $this->setPageTitle(\Gdn::translate('Organize Categories'));
 
         // We'll need to be able to set all of this dynamically in the future.

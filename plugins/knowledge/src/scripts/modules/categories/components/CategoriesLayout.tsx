@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment, NavigationRecordType } from "@knowledge/@types/api";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/modules/navigation/Navigation";
@@ -21,6 +21,7 @@ import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/c
 import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;
@@ -54,25 +55,19 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
                     }
                 />
-                <PanelLayout device={this.props.device}>
-                    <PanelLayout.Breadcrumbs>
+                <PanelLayout
+                    device={this.props.device}
+                    breadcrumbs={
                         <PanelWidget>
                             <NavigationBreadcrumbs activeRecord={activeRecord} />
                         </PanelWidget>
-                    </PanelLayout.Breadcrumbs>
-                    <PanelLayout.LeftBottom>
+                    }
+                    leftBottom={
                         <PanelWidget>
-                            {
-                                <Navigation
-                                    collapsible={true}
-                                    activeRecord={activeRecord}
-                                    kbID={1}
-                                    title={t("Subcategories")}
-                                />
-                            }
+                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
                         </PanelWidget>
-                    </PanelLayout.LeftBottom>
-                    <PanelLayout.MiddleTop>
+                    }
+                    middleTop={
                         <PanelWidget>
                             <SearchBar
                                 placeholder={t("Search")}
@@ -95,14 +90,14 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                 }
                             />
                         </PanelWidget>
-                    </PanelLayout.MiddleTop>
-                    <PanelLayout.MiddleBottom>
+                    }
+                    middleBottom={
                         <PanelWidgetVerticalPadding>
                             <SearchResults results={this.props.results} />
                         </PanelWidgetVerticalPadding>
-                    </PanelLayout.MiddleBottom>
-                    {isFullWidth && <PanelLayout.RightTop>{}</PanelLayout.RightTop>}
-                </PanelLayout>
+                    }
+                    rightTop={isFullWidth && <></>}
+                />
             </Container>
         );
     }

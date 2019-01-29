@@ -28,6 +28,7 @@ class KnowledgeApiController extends AbstractApiController {
     const SPHINX_DEFAULT_LIMIT = 100;
 
     const TYPE_ARTICLE = 5;
+    const TYPE_ARTICLE_DELETED = 6;
     const TYPE_DISCUSSION = 0;
     const TYPE_QUESTION = 1;
     const TYPE_POLL = 2;
@@ -96,6 +97,15 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticle', 'KnowledgeArticle_Delta'],
+        ],
+        self::TYPE_ARTICLE_DELETED => [
+            'model' => 'articleRevisionModel',
+            'recordType' => 'article',
+            'recordID' => 'articleID',
+            'offset' => 5,
+            'multiplier' => 10,
+            'getRecordsFunction' => 'getArticles',
+            'sphinxIndexName' => ['KnowledgeArticleDeleted', 'KnowledgeArticleDeleted_Delta'],
         ],
     ];
 
@@ -240,8 +250,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     protected function sphinxSearch(): array {
         $this->sphinx = $this->sphinxClient();
-        $this->sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
-
+        $this->setLimits();
 
         if (($this->query['global'] ?? false)) {
             $this->defineGlobalQuery();
@@ -261,10 +270,22 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
+     * Prepare offset and limit for Sphinx search.
+     */
+    protected function setLimits() {
+        if (isset($this->query['limit']) && isset($this->query['page'])) {
+            $offset = ($this->query['page'] - 1)* $this->query['limit'];
+            $this->sphinx->setLimits($offset, $this->query['limit']);
+        } else {
+            $this->sphinx->setLimits(0, self::SPHINX_DEFAULT_LIMIT);
+        }
+    }
+
+    /**
      * Prepare Sphinx query when global search mode
      */
     protected function defineGlobalQuery() {
-        $this->sphinxIndexes = $this->getIndexes();
+        $this->sphinxIndexes = $this->getIndexes([], [self::TYPE_ARTICLE_DELETED]);
         if (isset($this->query['insertUserIDs'])) {
             $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
         }
@@ -286,8 +307,12 @@ class KnowledgeApiController extends AbstractApiController {
      * Prepare Sphinx query when Knowledge Base Articles search mode
      */
     protected function defineArticlesQuery() {
-        $this->sphinxIndexes = $this->getIndexes([self::TYPE_ARTICLE]);
+        $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
+            if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
+                $this->permission("knowledge.articles.add");
+            };
+            $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
             $statuses = array_map(
                 function ($status) {
                     return array_search($status, self::ARTICLE_STATUSES);
@@ -298,7 +323,7 @@ class KnowledgeApiController extends AbstractApiController {
         } else {
             $this->sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
         }
-
+        $this->sphinxIndexes = $this->getIndexes($articleIndexes);
         if (isset($this->query['insertUserIDs'])) {
             $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
         }
@@ -323,7 +348,7 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['body']) && !empty(trim($this->query['body']))) {
             $this->sphinxQuery .= ' @body (' . $this->sphinx->escapeString($this->query['body']) . ')*';
         }
-        if (isset($query['all']) && !empty(trim($this->query['all']))) {
+        if (isset($this->query['all']) && !empty(trim($this->query['all']))) {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
     }
@@ -332,13 +357,17 @@ class KnowledgeApiController extends AbstractApiController {
      * Get all full sphinx index names needed for current search
      *
      * @param array $typesRequired
+     * @param array $typesExclude
      * @return string
      */
-    protected function getIndexes(array $typesRequired = []):string {
+    protected function getIndexes(array $typesRequired = [], array $typesExclude = []):string {
         $sphinxIndexes = [];
         $all = empty($typesRequired);
         foreach (self::RECORD_TYPES as $key => $sphinxTypes) {
             if ($all || in_array($key, $typesRequired)) {
+                if (in_array($key, $typesExclude)) {
+                    continue;
+                }
                 $idxFullNames = [];
                 foreach ($sphinxTypes['sphinxIndexName'] as $idx) {
                     $idxFullNames[] = $this->sphinxIndexName($idx);
@@ -374,7 +403,9 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
+            $idx = 0;
             foreach ($searchResults['matches'] as $guid => $record) {
+                $this->results['matches'][$guid]['orderIndex'] = $idx++;
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -383,6 +414,12 @@ class KnowledgeApiController extends AbstractApiController {
                 array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype, $expand));
             }
         }
+        usort($results, function ($a, $b) {
+            if ($a['orderIndex'] == $b['orderIndex']) {
+                return 0;
+            }
+            return ($a['orderIndex'] < $b['orderIndex']) ? -1 : 1;
+        });
         return $results;
     }
 
@@ -406,18 +443,16 @@ class KnowledgeApiController extends AbstractApiController {
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
-            $article["status"] = self::ARTICLE_STATUSES[$article["status"]];
-
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-            $article = array_merge($article, $this->results['matches'][$guid]['attrs']);
+            $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             if (in_array('category', $expand)) {
-                $article["knowledgeCategory"] = $this->results['kbCategories'][$article['categoryid']];
+                $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
             }
             if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$article['updateuserid']])) {
-                    $article["updateUser"] = $this->results['users'][$article['updateuserid']];
-                } elseif (isset($this->results['users'][$article['insertuserid']])) {
-                    $article["insertUser"] = $this->results['users'][$article['insertuserid']];
+                if (isset($this->results['users'][$article['updateUserID']])) {
+                    $article["updateUser"] = $this->results['users'][$article['updateUserID']];
+                } elseif (isset($this->results['users'][$article['insertUserID']])) {
+                    $article["insertUser"] = $this->results['users'][$article['insertUserID']];
                 }
             }
         }
@@ -446,6 +481,7 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $discussion["orderIndex"] = $this->results['matches'][$discussion["guid"]]['orderIndex'];
             $discussion["recordType"] = $type['recordType'];
             $discussion['url'] = discussionUrl($discussion);
             if (in_array('category', $expand)) {
@@ -482,6 +518,7 @@ class KnowledgeApiController extends AbstractApiController {
             $comment["name"] = $discussion['Name'];
             $comment["discussionID"] = $comment['DiscussionID'];
             $comment["guid"] = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $comment["orderIndex"] = $this->results['matches'][$comment["guid"]]['orderIndex'];
             $comment["recordType"] = $type['recordType'];
             $comment['url'] = \Gdn::request()->url(
                 '/discussion/' . urlencode($comment['DiscussionID']) . '/' . urlencode($discussion['Name']),
@@ -640,6 +677,18 @@ class KnowledgeApiController extends AbstractApiController {
             "body:s?" => "Keywords to search against article body.",
             "all:s?" => "Keywords to search against article name or body.",
             "global:b?" => "Global search flag. Default: false",
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => self::SPHINX_DEFAULT_LIMIT,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
         ];
     }
 }

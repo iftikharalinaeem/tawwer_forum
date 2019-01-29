@@ -5,16 +5,19 @@
 
 import { LoadStatus, ILoadable, INavigationTreeItem } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
-import { IKbCategoryFragment, NavigationRecordType } from "@knowledge/@types/api";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import { IStoreState } from "@knowledge/state/model";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 export type IKbCategoriesState = ILoadable<{
     categoriesByID: {
         [id: number]: IKbCategoryFragment;
     };
 }>;
+
+type ReducerType = KnowledgeReducer<IKbCategoriesState>;
 
 export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     public static readonly ROOT_CATEGORY: INavigationTreeItem = {
@@ -141,10 +144,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
         status: LoadStatus.PENDING,
     };
 
-    public reducer = (
-        state: IKbCategoriesState = this.initialState,
-        action: typeof CategoryActions.ACTION_TYPES,
-    ): IKbCategoriesState => {
+    public reducer: ReducerType = (state = this.initialState, action) => {
         switch (action.type) {
             case CategoryActions.GET_ALL_REQUEST:
                 return {

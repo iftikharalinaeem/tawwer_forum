@@ -25,6 +25,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /** @var int Root-level category ID. */
     const ROOT_ID = -1;
 
+    const SORT_INCREMNENT = true;
+
+    const SORT_DECREMENT = false;
+
+    const SORT_TYPE_ARTICLE = 'article';
+
+    const SORT_TYPE_CATEGORY = 'knowledgeCategory';
+
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
@@ -321,6 +329,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                     $res = $this->updateCounts($parent['knowledgeCategoryID'], false);
                     $cat = $parent;
                 }
+                if ($updateParents) {
+                    $this->knowledgeBaseModel->updateCounts($cat['knowledgeBaseID']);
+                }
                 return $res;
             } else {
                 return $res;
@@ -353,5 +364,112 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Get max sort among all direct childre of category (including sub categories and articles)
+     *
+     * @param int $knowledgeCategoryID
+     * @return array [maxSort => int, viewType => guide|help, sortArticles => manual|...]
+     */
+    public function getMaxSortIdx(int $knowledgeCategoryID): array {
+
+        $sortInfo = $this->sql()
+            ->select('sub.sort', 'MAX', 'maxSort')
+            //->select('DISTINCT c.knowledgeCategoryID', 'COUNT', 'children')
+            ->select('kb.viewType')
+            ->select('kb.sortArticles')
+            ->from('knowledgeCategory c')
+            ->where([
+                'c.knowledgeCategoryID' => $knowledgeCategoryID
+            ])
+            ->join('knowledgeBase kb', 'kb.knowledgeBaseID = c.knowledgeBaseID')
+            ->leftJoin('knowledgeCategory sub', 'sub.parentID = c.knowledgeCategoryID')
+            ->groupBy('c.knowledgeCategoryID, kb.knowledgeBaseID, kb.viewType, kb.sortArticles')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
+            && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+            //only check articles sort if knowledgeBase is Guide + manual
+            $maxArticlesSort = $this->sql()
+                ->select('a.sort', 'MAX', 'maxSort')
+                ->from('article a')
+                ->where([
+                    'a.knowledgeCategoryID' => $knowledgeCategoryID,
+                    'a.status' => ArticleModel::STATUS_PUBLISHED
+                ])
+                ->groupBy('a.knowledgeCategoryID')
+                ->get()->nextRow(DATASET_TYPE_ARRAY);
+        } else {
+            $maxArticlesSort['maxSort'] = -1;
+        }
+        $sortInfo['maxSort'] = max(-1, $maxArticlesSort['maxSort'], $sortInfo['maxSort']);
+
+        return $sortInfo;
+    }
+
+    /**
+     * Shift all sort values higher than $idx
+     * Up (when direction self::SORT_INCREMNENT)
+     * or Down (when direction self::SORT_DECREMENT)
+     *
+     * @param int $knowledgeCategoryID
+     * @param int $idx
+     * @param int $protectedID
+     * @param string $protectType
+     * @param bool $direction
+     * @return bool
+     */
+    public function shiftSorts(
+        int $knowledgeCategoryID,
+        int $idx,
+        int $protectedID = -1,
+        string $protectType = self::SORT_TYPE_ARTICLE,
+        bool $direction = self::SORT_INCREMNENT
+    ): bool {
+        $knowledgeBase = $this->sql()
+            ->select('kb.knowledgeBaseID, kb.viewType, kb.sortArticles')
+            ->from('knowledgeCategory c')
+            ->where([
+                'c.knowledgeCategoryID' => $knowledgeCategoryID
+            ])
+            ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = c.knowledgeBaseID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+        if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
+            && $knowledgeBase['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+            $query = $this->sql()->update('article')
+                ->set('sort'.($direction ? '+' : '-'), 1)
+                ->where(
+                    [
+                        'knowledgeCategoryID' => $knowledgeCategoryID,
+                        'status' => ArticleModel::STATUS_PUBLISHED,
+                        'sort >=' => $idx
+                    ]
+                );
+
+            if ($protectType === self::SORT_TYPE_ARTICLE) {
+                $query->where('articleID <>', $protectedID);
+            }
+
+            $updateArticles = $query->put();
+        } else {
+            $updateArticles = true;
+        }
+
+        $query = $this->sql()->update('knowledgeCategory')
+            ->set('sort'.($direction ? '+' : '-'), 1)
+            ->where(
+                [
+                    'parentID' => $knowledgeCategoryID,
+                    'sort >=' => $idx
+                ]
+            );
+
+        if ($protectType === self::SORT_TYPE_CATEGORY) {
+            $query->where('knowledgeCategoryID <>', $protectedID);
+        }
+        $updateCategories = $query->put();
+
+        return ($updateArticles !== false && $updateCategories !== false);
     }
 }

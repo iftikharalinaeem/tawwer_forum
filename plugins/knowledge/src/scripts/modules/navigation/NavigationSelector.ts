@@ -3,10 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { INormalizedNavigationItems } from "@knowledge/modules/navigation/NavigationModel";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import {
+    IKbNavigationItem,
+    INormalizedNavigationItems,
+    NavigationRecordType,
+} from "@knowledge/modules/navigation/NavigationModel";
+import { ILinkGroup, ILinkListData, INavigationItem, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { NavigationRecordType } from "@knowledge/@types/api";
-import { INavigationTreeItem, INavigationItem } from "@library/@types/api";
 
 export default class NavigationSelector {
     /**
@@ -74,8 +78,50 @@ export default class NavigationSelector {
      * @param knowledgeCategoryID - Unique ID of the knowledge category to select.
      * @param navItems - An collection of INormalizedNavigationItems elements, indexed by their type and ID.
      */
-    public static selectCategory(knowledgeCategoryID: number, navItems: INormalizedNavigationItems): INavigationItem | undefined {
+    public static selectCategory(
+        knowledgeCategoryID: number,
+        navItems: INormalizedNavigationItems,
+    ): INavigationItem | undefined {
         const key = `knowledgeCategory${knowledgeCategoryID}`;
         return navItems[key];
     }
+
+    public static selectHelpCenterNome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {
+        const rootNavItemID = NavigationRecordType.KNOWLEDGE_CATEGORY + knowledgeBase.rootCategoryID;
+        const treeData = NavigationSelector.selectNavTree(navItems, rootNavItemID);
+        const data: ILinkListData = {
+            groups: [],
+            ungroupedItems: [],
+        };
+
+        // Help center data only iterates through 2 levels of nav data.
+        for (const record of treeData.children) {
+            switch (record.recordType) {
+                case NavigationRecordType.ARTICLE: {
+                    const { children, ...items } = record;
+                    data.ungroupedItems.push(items as NavArticle);
+                    break;
+                }
+                case NavigationRecordType.KNOWLEDGE_CATEGORY: {
+                    const { children, ...category } = record;
+                    const group: ILinkGroup = {
+                        category: category as NavCategory,
+                        items: [],
+                    };
+                    for (const child of children) {
+                        if (child.recordType === NavigationRecordType.ARTICLE) {
+                            const { children: unused, ...article } = child;
+                            group.items.push(article as NavArticle);
+                        }
+                    }
+                    data.groups.push(group);
+                    break;
+                }
+            }
+        }
+        return data;
+    }
 }
+
+export type NavArticle = IKbNavigationItem<NavigationRecordType.ARTICLE>;
+export type NavCategory = IKbNavigationItem<NavigationRecordType.KNOWLEDGE_CATEGORY>;

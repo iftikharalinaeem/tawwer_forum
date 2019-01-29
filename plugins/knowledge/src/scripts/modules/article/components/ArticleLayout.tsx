@@ -3,13 +3,14 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-import { IArticle, NavigationRecordType } from "@knowledge/@types/api";
+import { IArticle } from "@knowledge/@types/api";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { INavigationItem } from "@library/@types/api";
@@ -48,65 +49,65 @@ export class ArticleLayout extends React.Component<IProps> {
         }
 
         return (
-            <React.Fragment>
-                <Container>
-                    <VanillaHeader
-                        title={title}
-                        mobileDropDownContent={
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
-                        }
-                    />
-                    <PanelLayout device={this.props.device}>
-                        {this.props.device !== Devices.MOBILE && (
-                            <PanelLayout.Breadcrumbs>
-                                <PanelWidget>
-                                    <NavigationBreadcrumbs activeRecord={activeRecord} />
-                                </PanelWidget>
-                            </PanelLayout.Breadcrumbs>
-                        )}
-                        <PanelLayout.LeftBottom>
+            <Container>
+                <VanillaHeader
+                    isFixed={true}
+                    title={article.name}
+                    mobileDropDownContent={
+                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
+                    }
+                />
+                <PanelLayout
+                    breadcrumbs={
+                        this.props.device !== Devices.MOBILE && (
                             <PanelWidget>
-                                {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                                <NavigationBreadcrumbs activeRecord={activeRecord} />
                             </PanelWidget>
-                        </PanelLayout.LeftBottom>
-                        <PanelLayout.MiddleTop>
+                        )
+                    }
+                    leftBottom={
+                        <PanelWidget>
+                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />
+                        </PanelWidget>
+                    }
+                    middleTop={
+                        <PanelWidget>
+                            <PageTitle
+                                title={article.name}
+                                actions={
+                                    <ArticleMenu
+                                        article={article}
+                                        buttonClassName="pageTitle-menu"
+                                        device={this.props.device}
+                                    />
+                                }
+                                meta={
+                                    <ArticleMeta
+                                        updateUser={article.updateUser!}
+                                        dateUpdated={article.dateUpdated}
+                                        permaLink={article.url}
+                                    />
+                                }
+                                includeBackLink={this.props.device !== Devices.MOBILE}
+                            />
+                            {messages && <div className="messages">{messages}</div>}
+                        </PanelWidget>
+                    }
+                    middleBottom={
+                        <PanelWidget>
+                            <UserContent content={article.body} />
+                        </PanelWidget>
+                    }
+                    rightTop={
+                        article.outline &&
+                        article.outline.length > 0 && (
                             <PanelWidget>
-                                <PageTitle
-                                    title={article.name}
-                                    actions={
-                                        <ArticleMenu
-                                            article={article}
-                                            buttonClassName="pageTitle-menu"
-                                            device={this.props.device}
-                                        />
-                                    }
-                                    meta={
-                                        <ArticleMeta
-                                            updateUser={article.updateUser!}
-                                            dateUpdated={article.dateUpdated}
-                                            permaLink={article.url}
-                                        />
-                                    }
-                                    includeBackLink={this.props.device !== Devices.MOBILE}
-                                />
-                                {messages && <div className="messages">{messages}</div>}
+                                <ArticleTOC items={article.outline} />
                             </PanelWidget>
-                        </PanelLayout.MiddleTop>
-                        <PanelLayout.MiddleBottom>
-                            <PanelWidget>
-                                <UserContent content={article.body} />
-                            </PanelWidget>
-                        </PanelLayout.MiddleBottom>
-                        {article.outline && article.outline.length > 0 && (
-                            <PanelLayout.RightTop>
-                                <PanelWidget>
-                                    <ArticleTOC items={article.outline} />
-                                </PanelWidget>
-                            </PanelLayout.RightTop>
-                        )}
-                    </PanelLayout>
-                </Container>
-            </React.Fragment>
+                        )
+                    }
+                />
+            </Container>
         );
     }
 }

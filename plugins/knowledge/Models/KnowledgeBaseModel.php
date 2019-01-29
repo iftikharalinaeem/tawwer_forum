@@ -22,6 +22,12 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const ORDER_DATE_ASC = 'dateInserted';
     const ORDER_DATE_DESC = 'dateInsertedDesc';
 
+    const SORT_CONFIGS = [
+        self::ORDER_MANUAL => ["sort", "asc"],
+        self::ORDER_NAME => ["name", "asc"],
+        self::ORDER_DATE_ASC => ["dateInserted", "asc"],
+        self::ORDER_DATE_DESC => ["dateInserted", "desc"],
+    ];
 
     /** @var Gdn_Session */
     private $session;
@@ -117,6 +123,46 @@ MESSAGE
     }
 
     /**
+     * Recalculate and update countArticles and countCategories columns.
+     *
+     * @param int $knowledgeBaseID Knowledge Base id to update
+     *
+     * @return bool Return truu when record updated succesfully
+     */
+    public function updateCounts(int $knowledgeBaseID): bool {
+        $counts = $this->sql()
+            ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
+            ->select('DISTINCT c.knowledgeCategoryID', 'COUNT', 'categoryCount')
+            ->from('knowledgeCategory c')
+            ->leftJoin('article a', 'c.knowledgeCategoryID = a.knowledgeCategoryID AND a.status = \''.ArticleModel::STATUS_PUBLISHED.'\'')
+            ->where('c.knowledgeBaseID', $knowledgeBaseID)
+            ->groupBy('c.knowledgeBaseID')
+            ->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        $res = $this->update(
+            [
+                'countArticles' => $counts['articleCount'],
+                'countCategories' => $counts['categoryCount']
+            ],
+            [
+                'knowledgeBaseID' => $knowledgeBaseID
+            ]
+        );
+
+        return $res;
+    }
+
+    /**
+     * Check if Knowledge Category is a root category of any Knowledge Base
+     *
+     * @param int $knowledgeCategoryID
+     * @return bool
+     */
+    public function isRootCategory(int $knowledgeCategoryID): bool {
+        $kb = $this->get(['rootCategoryID' => $knowledgeCategoryID]);
+        return !empty($kb);
+    }
+    /**
      * Get list of all knowledge base types
      *
      * @return array
@@ -140,5 +186,19 @@ MESSAGE
             self::ORDER_DATE_ASC,
             self::ORDER_DATE_DESC,
         ];
+    }
+
+    /**
+     * Given a valid article sort slug, return the relevant sort field and direction.
+     *
+     * @param string $sortArticles
+     * @return array
+     */
+    public function articleSortConfig(string $sortArticles): array {
+        if (!array_key_exists($sortArticles, self::SORT_CONFIGS)) {
+            throw new \Exception("Invalid sortArticles value: $sortArticles");
+        }
+
+        return self::SORT_CONFIGS[$sortArticles];
     }
 }

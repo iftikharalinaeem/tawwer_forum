@@ -89,8 +89,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
-            ->column("status", ["enum", Models\ArticleModel::getAllStatuses(),
-            ], ['Null' => false, 'Default' => Models\ArticleModel::STATUS_PUBLISHED])
+            ->column(
+                "status",
+                ["enum", Models\ArticleModel::getAllStatuses()],
+                ['Null' => false, 'Default' => Models\ArticleModel::STATUS_PUBLISHED],
+                'index'
+            )
             ->set()
         ;
 
@@ -157,6 +161,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countArticles", "int", "0")
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
+            ->column("defaultArticleID", "int", ['Null' => true])
             ->set();
     }
 }

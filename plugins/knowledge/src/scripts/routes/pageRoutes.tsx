@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import RouteHandler from "@knowledge/routes/RouteHandler";
@@ -15,13 +15,12 @@ import {
     IArticle,
     IRevisionFragment,
     IRevision,
-    IResponseArticleDraft,
     IKbCategoryFragment,
     IKbCategory,
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
-import { IKbNavigationItem } from "@knowledge/@types/api";
 import qs from "qs";
+import { IKbNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
 
 interface IEditorURLData {
     articleID?: number;
@@ -113,13 +112,24 @@ export const SearchRoute = new RouteHandler(
     "/kb/search",
     (data?: undefined) => formatUrl("/kb/search"),
 );
-const SearchRedirect = () => <Redirect to={SearchRoute.url(undefined)} />;
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
     (data?: undefined) => formatUrl("/kb/drafts"),
     ModalLoader,
+);
+
+export const HomeRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/HomePage"),
+    "/kb",
+    (data?: undefined) => formatUrl("/kb"),
+);
+
+export const KnowledgeBasePage = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
+    "/kb/:urlCode([\\w\\d-]+)",
+    (data: { urlCode: string }) => formatUrl(`/kb/${data.urlCode}`),
 );
 
 export const OrganizeCategoriesRoute = new RouteHandler(
@@ -153,7 +163,8 @@ export function getPageRoutes() {
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
-        <Route exact path="/kb" component={SearchRedirect} key={"search redirect"} />,
+        KnowledgeBasePage.route,
+        HomeRoute.route,
         <Route component={NotFound} key={"not found"} />,
     ];
 }
