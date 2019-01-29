@@ -9,11 +9,11 @@ import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IStoreState } from "@knowledge/state/model";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
-import Paragraph from "@library/components/Paragraph";
 import { t } from "@library/application";
-import KnowledgeBaseItem from "@knowledge/knowledge-bases/components/KnowledgeBaseItem";
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
+import SubcommunityList from "@library/components/subcommunities/subcommunityList";
+import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -26,33 +26,26 @@ import FullPageLoader from "@library/components/FullPageLoader";
  */
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
-        const { knowledgeBases, loadStatus } = this.props;
+        const { knowledgeBases, loadStatus, className } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <FullPageLoader />;
         }
 
-        if (knowledgeBases.length < 1) {
-            return (
-                <div>
-                    <Paragraph>{t("No knowledge bases found.")}</Paragraph>
-                </div>
-            );
+        if (LoadStatus.SUCCESS === loadStatus) {
+            document.body.classList.remove("isLoading");
         }
 
         return (
-            <ul>
-                {knowledgeBases.map(kb => (
-                    <li key={kb.knowledgeBaseID}>
-                        <KnowledgeBaseItem
-                            iconUrl={kb.icon}
-                            description={kb.description}
-                            title={kb.name}
-                            url={kb.url}
-                        />
-                    </li>
-                ))}
-            </ul>
+            <WidgetContainer>
+                <SubcommunityList
+                    title={t("Choose a subcommunity")}
+                    titleLevel={1}
+                    hiddenTitle={true}
+                    items={knowledgeBases}
+                    emptyMessage={t("No knowledge bases found.")}
+                />
+            </WidgetContainer>
         );
     }
 
@@ -66,7 +59,9 @@ class KnowledgeBaseList extends React.Component<IProps> {
     }
 }
 
-interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {}
+interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
+    className?: string;
+}
 
 function mapStateToProps(state: IStoreState) {
     return {
