@@ -30,7 +30,7 @@ export class SearchResultMeta extends React.Component<IProps> {
         const resultType = deleted ? (
             <span className="meta-inline isDeleted">{t("Deleted")}</span>
         ) : (
-            capitalizeFirstLetter(type)
+            capitalizeFirstLetter(type || "")
         );
         return (
             <React.Fragment>
