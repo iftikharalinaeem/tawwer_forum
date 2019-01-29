@@ -460,7 +460,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $result = $this->discussionModel->get(
             null,
-            '',
+            self::SPHINX_DEFAULT_LIMIT,
             ['d.DiscussionID' => $ids]
         )->resultArray();
 
@@ -632,7 +632,9 @@ class KnowledgeApiController extends AbstractApiController {
 
         $result = [];
         foreach ($this->discussionModel->get(
-            ['DiscussionID' => array_keys($discussions)]
+            null,
+            self::SPHINX_DEFAULT_LIMIT,
+            ['d.DiscussionID' => array_keys($discussions)]
         )->resultArray() as $discussion) {
             $result[$discussion['DiscussionID']] = $discussion;
         }
