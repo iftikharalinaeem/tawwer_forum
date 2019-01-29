@@ -14,6 +14,7 @@ import { t } from "@library/application";
 interface IProps {
     className?: string;
     kbID: number;
+    showDivider: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ export default class NavigationAdminLinks extends React.Component<IProps> {
         return (
             <Permission permission="articles.add">
                 <ul className={classNames("siteNavAdminLinks", this.props.className)}>
-                    <hr className="siteNavAdminLinks-divider" />
+                    {this.props.showDivider && <hr className="siteNavAdminLinks-divider" />}
                     <h3 className="sr-only">{t("Admin Links")}</h3>
                     <li className="siteNavAdminLinks-item">
                         {organize()}
