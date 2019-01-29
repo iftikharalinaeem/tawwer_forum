@@ -13,15 +13,14 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/application";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import SearchBar from "@library/components/forms/select/SearchBar";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import { compose } from "@library/components/icons/common";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
-import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
 import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import Heading from "@library/components/Heading";
 
 interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;
@@ -69,26 +68,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                     middleTop={
                         <PanelWidget>
-                            <SearchBar
-                                placeholder={t("Search")}
-                                onChange={this.setQuery}
-                                value={this.state.query || ""}
-                                title={category.name}
-                                titleAsComponent={
-                                    <>
-                                        {category.name}
-                                        <LinkAsButton
-                                            to={EditorRoute.url(category)}
-                                            onMouseOver={EditorRoute.preload}
-                                            className="searchBar-actionButton"
-                                            baseClass={ButtonBaseClass.ICON}
-                                            title={t("Compose")}
-                                        >
-                                            {compose()}
-                                        </LinkAsButton>
-                                    </>
-                                }
-                            />
+                            <Heading depth={1} className="searchBar-heading pageSmallTitle" title={this.props.title}>
+                                <label className="searchBar-label">{category.name}</label>
+                            </Heading>
                         </PanelWidget>
                     }
                     middleBottom={
