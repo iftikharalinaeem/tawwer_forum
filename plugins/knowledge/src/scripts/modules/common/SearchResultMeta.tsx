@@ -27,8 +27,6 @@ export class SearchResultMeta extends React.Component<IProps> {
         const deleted = status === ArticleStatus.DELETED;
         const user = updateUser;
 
-        console.log("this.props: ", this.props);
-
         const resultType = deleted ? (
             <span className="meta-inline isDeleted">{t("Deleted")}</span>
         ) : (
