@@ -439,11 +439,13 @@ class KnowledgeApiController extends AbstractApiController {
                 'articleRevisionID' => $iDs,
                 'status' => ArticleModel::STATUS_PUBLISHED
         ]);
+        $statuses = $this->articleModel->getStatuses(array_column($result, 'articleID'));
 
         $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
         foreach ($result as &$article) {
             $article["recordID"] = $article[$type['recordID']];
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
+            $article["status"] = $statuses[$article['recordID']];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];

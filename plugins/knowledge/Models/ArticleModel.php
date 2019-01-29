@@ -233,6 +233,23 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get articles current status.
+     *
+     * @param array $articleIDs
+     * @return array
+     */
+    public function getStatuses(array $articleIDs): array {
+        $result = $this->sql()
+            ->select("a.articleID, a.status")
+            ->where(["a.articleID" => $articleIDs])
+            ->get($this->getTable() . " a")
+            ->resultArray();
+
+        $result = array_combine(array_column($result, 'articleID'), array_column($result, 'status'));
+        return $result;
+    }
+
+    /**
      * Return extended article records joined with article revisions
      * Note: it only returns articles with published revisions.
      *       if there is no any - will not return those articles
