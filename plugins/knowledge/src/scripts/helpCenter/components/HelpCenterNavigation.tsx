@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IHelpData, IHelpGroup, NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
+import { IHelpData, IHelpGroup, NavArticle } from "@knowledge/navigation/state/NavigationSelector";
 import { t } from "@library/application";
 import SmartLink from "@library/components/navigation/SmartLink";
 import React from "react";

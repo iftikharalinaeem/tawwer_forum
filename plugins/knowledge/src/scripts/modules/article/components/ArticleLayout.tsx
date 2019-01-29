@@ -16,9 +16,9 @@ import UserContent from "@library/components/UserContent";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
-import Navigation from "@knowledge/modules/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import Navigation from "@knowledge/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps {
     article: IArticle;

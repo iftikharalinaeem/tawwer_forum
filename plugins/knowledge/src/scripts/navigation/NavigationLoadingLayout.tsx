@@ -3,8 +3,8 @@
  * @license Proprietary
  */
 
-import Navigation from "@knowledge/modules/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import Navigation from "@knowledge/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 import { t } from "@library/application";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import FullPageLoader from "@library/components/FullPageLoader";

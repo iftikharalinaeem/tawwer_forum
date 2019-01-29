@@ -21,8 +21,8 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
-import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {

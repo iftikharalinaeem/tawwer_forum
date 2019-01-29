@@ -17,7 +17,7 @@ import { IUsersStoreState } from "@library/users/UsersModel";
 import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
 import { DeepPartial, Reducer } from "redux";
-import { INavigationStoreState } from "@knowledge/modules/navigation/NavigationModel";
+import { INavigationStoreState } from "@knowledge/navigation/state/NavigationModel";
 import { IRouteState } from "@knowledge/routes/RouteReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";

@@ -3,14 +3,14 @@
  * @license GPL-2.0-only
  */
 
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import {
+    IKbNavigationItem,
     INormalizedNavigationItems,
     NavigationRecordType,
-    IKbNavigationItem,
-} from "@knowledge/modules/navigation/NavigationModel";
+} from "@knowledge/navigation/state/NavigationModel";
+import { INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { INavigationTreeItem, INavigationItem } from "@library/@types/api";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export default class NavigationSelector {
     /**

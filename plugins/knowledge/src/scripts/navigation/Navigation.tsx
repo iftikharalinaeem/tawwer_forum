@@ -3,21 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationAdminLinks from "@knowledge/modules/navigation/NavigationAdminLinks";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { IKnowledgeBase, KnowledgeBaseDisplayType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api";
+import { ILoadable, INavigationTreeItem, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
+import { t } from "@library/application";
 import SiteNav from "@library/components/siteNav/SiteNav";
 import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IKnowledgeBase, KnowledgeBaseDisplayType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { t } from "@library/application";
 
 /**
  * Data connect navigation component for knowledge base.

@@ -13,7 +13,7 @@ import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import NavigationModel from "@knowledge/navigation/state/NavigationModel";
 import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 import { IKbState } from "@knowledge/state/model";
 import { combineReducers } from "redux";

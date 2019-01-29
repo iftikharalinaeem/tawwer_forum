@@ -11,7 +11,7 @@ import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
-import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
+import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
@@ -23,7 +23,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;

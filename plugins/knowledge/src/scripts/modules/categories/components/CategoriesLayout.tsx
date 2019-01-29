@@ -7,8 +7,8 @@
 import { IKbCategory } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
-import Navigation from "@knowledge/modules/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
+import Navigation from "@knowledge/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/application";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
@@ -21,7 +21,7 @@ import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/c
 import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;

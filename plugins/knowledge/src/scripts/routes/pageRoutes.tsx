@@ -19,7 +19,7 @@ import {
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
 import qs from "qs";
-import { IKbNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
+import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
 interface IEditorURLData {
     articleID?: number;

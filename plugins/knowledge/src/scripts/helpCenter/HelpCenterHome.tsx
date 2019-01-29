@@ -4,8 +4,8 @@
  */
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationSelector, { IHelpData } from "@knowledge/modules/navigation/NavigationSelector";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import NavigationSelector, { IHelpData } from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";

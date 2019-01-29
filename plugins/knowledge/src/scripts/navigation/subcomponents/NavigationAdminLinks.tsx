@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import classNames from "classnames";
-import * as React from "react";
-import { organize } from "@library/components/icons/navigationManager";
-import Permission from "@library/users/Permission";
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/application";
+import { organize } from "@library/components/icons/navigationManager";
+import Permission from "@library/users/Permission";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
     className?: string;
