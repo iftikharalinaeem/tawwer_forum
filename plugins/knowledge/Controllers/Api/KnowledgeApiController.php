@@ -439,20 +439,21 @@ class KnowledgeApiController extends AbstractApiController {
                 'articleRevisionID' => $iDs,
                 'status' => ArticleModel::STATUS_PUBLISHED
         ]);
-        $statuses = $this->articleModel->getStatuses(array_column($result, 'articleID'));
 
         $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
         foreach ($result as &$article) {
+
             $article["recordID"] = $article[$type['recordID']];
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
-            $article["status"] = $statuses[$article['recordID']];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
+
             $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             if (in_array('category', $expand)) {
                 $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
             }
+            $article["status"] = self::ARTICLE_STATUSES[$this->results['matches'][$guid]['attrs']['status']];
             if (in_array('user', $expand)) {
                 if (isset($this->results['users'][$article['updateUserID']])) {
                     $article["updateUser"] = $this->results['users'][$article['updateUserID']];
