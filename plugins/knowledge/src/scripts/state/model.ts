@@ -34,7 +34,6 @@ import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseMo
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
     | typeof CategoryActions.ACTION_TYPES
-    | typeof LocationPickerActions.ACTION_TYPES
     | typeof ArticlePageActions.ACTION_TYPES
     | typeof CategoriesPageActions.ACTION_TYPES
     | typeof ArticleActions.ACTION_TYPES

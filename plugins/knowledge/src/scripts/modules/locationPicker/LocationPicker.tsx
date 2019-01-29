@@ -6,28 +6,22 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
 import { newFolder } from "@library/components/icons/common";
 import LocationContents from "@knowledge/modules/locationPicker/components/LocationContents";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
-import { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
-import { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
-
-interface IProps extends ILPActionsProps, ILPConnectedData {
-    className?: string;
-    onCloseClick: () => void;
-    onChoose: () => void;
-}
-
-interface IState {
-    showNewCategoryModal: boolean;
-}
+import { IStoreState } from "@knowledge/state/model";
+import { connect } from "react-redux";
+import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import apiv2 from "@library/apiv2";
 
 /**
  * Component for choosing a location for a new article.
  */
-export default class LocationPicker extends React.Component<IProps, IState> {
+class LocationPicker extends React.Component<IProps, IState> {
     private newFolderButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public state = {
         showNewCategoryModal: false,
@@ -94,7 +88,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
      */
     private goBack = () => {
         if (this.canNavigateBack) {
-            void this.props.actions.navigateToCategory(this.props.navigatedCategory!.parentID);
+            void this.props.actions.navigateToCategory({ categoryID: this.props.navigatedCategory!.parentID });
         }
     };
 
@@ -122,7 +116,7 @@ export default class LocationPicker extends React.Component<IProps, IState> {
 
     private handleChoose = () => {
         if (this.canChoose) {
-            this.props.actions.chooseCategory(this.props.selectedCategory!.knowledgeCategoryID);
+            this.props.actions.chooseCategory({ categoryID: this.props.selectedCategory!.knowledgeCategoryID });
             this.props.onChoose();
         }
     };
@@ -131,3 +125,49 @@ export default class LocationPicker extends React.Component<IProps, IState> {
         this.forceUpdate();
     }
 }
+
+interface IOwnProps {
+    className?: string;
+    onCloseClick: () => void;
+    onChoose: () => void;
+}
+
+interface IState {
+    showNewCategoryModal: boolean;
+}
+
+interface IOwnProps {}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { navigatedCategoryID, selectedCategoryID, chosenCategoryID } = state.knowledge.locationPicker;
+    const navigatedCategory =
+        navigatedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID) : null;
+    const selectedCategory =
+        selectedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, selectedCategoryID) : null;
+    const choosenCategory =
+        chosenCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, chosenCategoryID) : null;
+
+    // Category ID's less than 0 (eg. -1) represents the true root of the forum.
+    return {
+        pageContents: LocationPickerModel.selectPageContents(state),
+        locationBreadcrumb:
+            chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
+        navigatedCategory,
+        selectedCategory,
+        choosenCategory,
+        ...state.knowledge.locationPicker,
+    };
+}
+
+function mapDispatchToProps(dispatch: any) {
+    return {
+        actions: new LocationPickerActions(dispatch, apiv2),
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(LocationPicker);
