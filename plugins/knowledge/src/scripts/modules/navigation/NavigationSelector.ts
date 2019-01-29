@@ -3,14 +3,14 @@
  * @license GPL-2.0-only
  */
 
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import {
+    IKbNavigationItem,
     INormalizedNavigationItems,
     NavigationRecordType,
-    IKbNavigationItem,
 } from "@knowledge/modules/navigation/NavigationModel";
+import { ILinkGroup, ILinkListData, INavigationItem, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export default class NavigationSelector {
     /**
@@ -71,6 +71,19 @@ export default class NavigationSelector {
             ...item,
             children: NavigationSelector.selectChildren(navItems, rootKey),
         };
+    }
+
+    /**
+     * Select a single category, by its ID, from an INormalizedNavigationItems collection.
+     * @param knowledgeCategoryID - Unique ID of the knowledge category to select.
+     * @param navItems - An collection of INormalizedNavigationItems elements, indexed by their type and ID.
+     */
+    public static selectCategory(
+        knowledgeCategoryID: number,
+        navItems: INormalizedNavigationItems,
+    ): INavigationItem | undefined {
+        const key = `knowledgeCategory${knowledgeCategoryID}`;
+        return navItems[key];
     }
 
     public static selectHelpCenterNome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {

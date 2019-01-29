@@ -12,9 +12,9 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
-import SubcommunityList from "@library/components/subcommunities/subcommunityList";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
+import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
 
 /**
  * Component representing a list of visible knowledge bases.

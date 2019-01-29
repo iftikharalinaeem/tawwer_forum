@@ -225,7 +225,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function get_search(array $query = []): array {
+    public function get_search(array $query = []): \Garden\Web\Data {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema($this->defaultSchema(), "in")
@@ -240,7 +240,10 @@ class KnowledgeApiController extends AbstractApiController {
         $results = $this->getNormalizedData($searchResults);
 
         $result = $out->validate($results);
-        return $result;
+
+        return new \Garden\Web\Data($result, [
+            'paging' => \Vanilla\ApiUtils::numberedPagerInfo($searchResults['total_found'], '/api/v2/knowledge/search', $this->query, $in)
+        ]);
     }
 
     /**
