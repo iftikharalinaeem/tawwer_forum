@@ -14,6 +14,7 @@ import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import SubcommunityList from "@library/components/subcommunities/subcommunityList";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
+import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -37,7 +38,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
         }
 
         return (
-            <WidgetContainer>
+            <WidgetContainer size={WidgetContainerSize.LARGE}>
                 <SubcommunityList
                     title={t("Choose a subcommunity")}
                     titleLevel={1}
