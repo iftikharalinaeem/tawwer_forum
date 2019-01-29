@@ -147,8 +147,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(
                 "viewType",
-                ["enum", Models\KnowledgeBaseModel::getAllTypes()],
-                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE]
+                Models\KnowledgeBaseModel::getAllTypes(),
+                Models\KnowledgeBaseModel::TYPE_GUIDE
             )
             ->column(
                 "sortArticles",
