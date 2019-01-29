@@ -68,7 +68,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                     middleTop={
                         <PanelWidget>
-                            <Heading depth={1} className="searchBar-heading pageSmallTitle" title={this.props.title}>
+                            <Heading depth={1} className="searchBar-heading pageSmallTitle" title={category.name}>
                                 <label className="searchBar-label">{category.name}</label>
                             </Heading>
                         </PanelWidget>
