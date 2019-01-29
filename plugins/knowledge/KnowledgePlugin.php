@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge;
 
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -146,8 +147,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(
                 "viewType",
-                ["enum", Models\KnowledgeBaseModel::getAllTypes()],
-                ['Null' => false, 'Default' => Models\KnowledgeBaseModel::TYPE_GUIDE]
+                Models\KnowledgeBaseModel::getAllTypes(),
+                Models\KnowledgeBaseModel::TYPE_GUIDE
             )
             ->column(
                 "sortArticles",
@@ -162,6 +163,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
             ->column("defaultArticleID", "int", ['Null' => true])
+            ->column(
+                "status",
+                KnowledgeBaseModel::getAllStatuses(),
+                KnowledgeBaseModel::STATUS_PUBLISHED,
+                'index'
+            )
             ->set();
     }
 }
