@@ -54,17 +54,17 @@ export default class LocationPickerActions extends ReduxActions {
      *
      * @param article The article to init from.
      */
-    public initLocationPickerFromArticle(article: { knowledgeCategoryID?: number | null }) {
+    public initLocationPickerFromArticle = (article: { knowledgeCategoryID?: number | null }) => {
         if (article.knowledgeCategoryID != null) {
             const { knowledgeCategoryID } = article;
             this.initLocationPickerFromCategoryID(knowledgeCategoryID);
         }
-    }
+    };
 
-    public initLocationPickerFromCategoryID(categoryID: number) {
+    public initLocationPickerFromCategoryID = (categoryID: number) => {
         const category = CategoryModel.selectKbCategoryFragment(this.getState(), categoryID);
         if (category) {
             this.init({ categoryID: category.knowledgeCategoryID, parentID: category.parentID });
         }
-    }
+    };
 }
