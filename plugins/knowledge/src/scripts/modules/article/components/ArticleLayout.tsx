@@ -52,7 +52,7 @@ export class ArticleLayout extends React.Component<IProps> {
             <Container>
                 <VanillaHeader
                     isFixed={true}
-                    title={article.name}
+                    title={title}
                     mobileDropDownContent={
                         <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
                     }
