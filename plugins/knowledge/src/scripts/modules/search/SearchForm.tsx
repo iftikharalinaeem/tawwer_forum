@@ -15,7 +15,7 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import QueryString from "@library/components/navigation/QueryString";
 import qs from "qs";
@@ -57,7 +57,7 @@ class SearchForm extends React.Component<IProps> {
                                     <SearchBar
                                         placeholder={this.props.placeholder || t("Help")}
                                         onChange={this.handleSearchChange}
-                                        loadOptions={this.props.searchOptionProvider.autocomplete}
+                                        loadOptions={this.autocomplete}
                                         value={this.props.form.query}
                                         isBigInput={true}
                                         onSearch={this.props.searchActions.search}
@@ -148,6 +148,12 @@ class SearchForm extends React.Component<IProps> {
      */
     private handleSearchChange = (value: string) => {
         this.props.searchActions.updateForm({ query: value });
+    };
+
+    private autocomplete = (query: string) => {
+        return this.props.searchOptionProvider.autocomplete(query, {
+            global: this.props.form.domain === SearchDomain.EVERYWHERE,
+        });
     };
 
     /**

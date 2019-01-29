@@ -18,11 +18,12 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     /**
      * Simple data loading function for the search bar/react-select.
      */
-    private fetchSearch = async (value: string): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
+    private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
         const queryObj: ISearchRequestBody = {
             all: value,
             statuses: [ArticleStatus.PUBLISHED],
             expand: ["user", "category"],
+            ...options,
         };
         const query = qs.stringify(queryObj);
         const response: AxiosResponse<ISearchResult[]> = await apiv2.get(`/knowledge/search?${query}`);
@@ -54,12 +55,12 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
      *
      * @see https://github.com/JedWatson/react-select/issues/614#issuecomment-380763225
      */
-    public autocomplete = (query: string) => {
+    public autocomplete = (query: string, options = {}) => {
         if (query === "") {
             return Promise.resolve([]);
         }
 
-        return this.debounceFetchSearch(query);
+        return this.debounceFetchSearch(query, options);
     };
 
     public makeSearchUrl(query: string): string {
