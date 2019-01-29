@@ -447,10 +447,12 @@ class KnowledgeApiController extends AbstractApiController {
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
+
             $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             if (in_array('category', $expand)) {
                 $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
             }
+            $article["status"] = self::ARTICLE_STATUSES[$this->results['matches'][$guid]['attrs']['status']];
             if (in_array('user', $expand)) {
                 if (isset($this->results['users'][$article['updateUserID']])) {
                     $article["updateUser"] = $this->results['users'][$article['updateUserID']];
