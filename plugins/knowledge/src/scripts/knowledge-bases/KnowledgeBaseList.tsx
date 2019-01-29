@@ -13,6 +13,7 @@ import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
+import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
 
 /**
@@ -37,7 +38,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
         }
 
         return (
-            <WidgetContainer>
+            <WidgetContainer size={WidgetContainerSize.LARGE}>
                 <SubcommunityList
                     title={t("Choose a subcommunity")}
                     titleLevel={1}
