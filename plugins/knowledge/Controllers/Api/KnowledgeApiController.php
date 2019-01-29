@@ -181,8 +181,7 @@ class KnowledgeApiController extends AbstractApiController {
                 ],
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "insertUser?" => $this->getUserFragmentSchema(),
-                "knowledgeCategory?" => $this->categoryFragmentSchema(),
-                "forumCategory?" => $this->forumCategoryFragmentSchema(),
+                "category?" => $this->categoryFragmentSchema(),
             ],
             "searchResultSchema"
         );
@@ -195,28 +194,13 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function categoryFragmentSchema(): Schema {
         return $this->schema([
-            'knowledgeCategoryID:i' => 'Knowledge category ID.',
+            'categoryID:i' => 'Knowledge category ID or Community category ID.',
             'breadcrumbs:a' => Schema::parse([
                 "name:s" => "Breadcrumb element name.",
                 "url:s" => "Breadcrumb element url.",
             ]),
 
         ], 'CategoryBreadcrumbsFragment');
-    }
-
-    /**
-     * Get category breadcrumbs fragment schema.
-     *
-     * @return Schema
-     */
-    public function forumCategoryFragmentSchema(): Schema {
-        return $this->schema([
-            'CategoryID:i' => 'Forum category ID.',
-            'breadcrumbs:a' => Schema::parse([
-                "name:s" => "Breadcrumb element name.",
-                "url:s" => "Breadcrumb element url.",
-            ]),
-        ], 'ForumCategoryBreadcrumbsFragment');
     }
 
     /**
@@ -447,18 +431,18 @@ class KnowledgeApiController extends AbstractApiController {
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-
+            $sphinxItem = $this->results['matches'][$guid]['attrs'];
             $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             if (in_array('category', $expand)) {
-                $article["knowledgeCategory"] = $this->results['kbCategories'][$this->results['matches'][$guid]['attrs']['categoryid']];
+                $article["category"] = $this->results['kbCategories'][$sphinxItem['categoryid']];
             }
-            $article["status"] = self::ARTICLE_STATUSES[$this->results['matches'][$guid]['attrs']['status']];
+            $article["status"] = self::ARTICLE_STATUSES[$sphinxItem['status']];
             if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$article['updateUserID']])) {
-                    $article["updateUser"] = $this->results['users'][$article['updateUserID']];
-                } elseif (isset($this->results['users'][$article['insertUserID']])) {
-                    $article["insertUser"] = $this->results['users'][$article['insertUserID']];
-                }
+                if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
+                    $article["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
+                };
+                $article["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
+                $article["updateUser"] = $article["updateUser"] ?? $article["insertUser"];
             }
         }
         return $result;
@@ -490,7 +474,7 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["recordType"] = $type['recordType'];
             $discussion['url'] = discussionUrl($discussion);
             if (in_array('category', $expand)) {
-                $discussion["forumCategory"] = $this->results['categories'][$discussion['CategoryID']];
+                $discussion["category"] = $this->results['categories'][$discussion['CategoryID']];
             }
             if (in_array('user', $expand)) {
                 if (isset($this->results['users'][$discussion['UpdateUserID']])) {
@@ -589,7 +573,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         foreach ($categories as $categoryID => $drop) {
             $categoryResults[$categoryID] = [
-                'knowledgeCategoryID' => $categoryID,
+                'categoryID' => $categoryID,
                 'breadcrumbs' => array_map(
                     function (Breadcrumb $breadcrumb) {
                         return $breadcrumb->asArray();
