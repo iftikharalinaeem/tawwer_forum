@@ -442,7 +442,6 @@ class KnowledgeApiController extends AbstractApiController {
 
         $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
         foreach ($result as &$article) {
-
             $article["recordID"] = $article[$type['recordID']];
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
             $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
