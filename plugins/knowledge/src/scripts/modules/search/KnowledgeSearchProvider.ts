@@ -28,7 +28,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
         const response: AxiosResponse<ISearchResult[]> = await apiv2.get(`/knowledge/search?${query}`);
         return response.data.map(result => {
             const data: ISearchOptionData = {
-                crumbs: result.knowledgeCategory!.breadcrumbs,
+                crumbs: result.category!.breadcrumbs,
                 name: result.name,
                 dateUpdated: result.dateUpdated,
                 url: result.url,

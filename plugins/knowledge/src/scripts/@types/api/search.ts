@@ -21,11 +21,7 @@ export interface ISearchResult {
     recordID: number;
     recordType: string;
     updateUser?: IUserFragment;
-    knowledgeCategory?: {
-        knowledgeCategoryID: number;
-        breadcrumbs: ICrumb[];
-    };
-    forumCategory?: {
+    category?: {
         categoryID: number;
         breadcrumbs: ICrumb[];
     };

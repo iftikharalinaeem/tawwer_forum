@@ -41,7 +41,6 @@ class SearchForm extends React.Component<IProps> {
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
@@ -169,7 +168,7 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
-        const categoryData = searchResult.knowledgeCategory || searchResult.forumCategory;
+        const categoryData = searchResult.category;
         const crumbs = categoryData ? categoryData.breadcrumbs : [];
         return {
             name: searchResult.name,
