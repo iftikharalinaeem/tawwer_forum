@@ -29,7 +29,6 @@ interface IProps {
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    kbID: number;
     currentNavigationCategory?: INavigationItem;
 }
 
