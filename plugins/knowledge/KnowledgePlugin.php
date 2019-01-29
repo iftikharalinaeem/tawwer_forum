@@ -166,7 +166,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column(
                 "status",
                 ["enum", KnowledgeBaseModel::getAllStatuses()],
-                ['Null' => false, 'Default' => KnowledgeBaseModel::STATUS_PUBLISHED],
+                KnowledgeBaseModel::STATUS_PUBLISHED,
                 'index'
             )
             ->set();
