@@ -5,10 +5,10 @@
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
-import NavigationSelector, { IHelpData } from "@knowledge/navigation/state/NavigationSelector";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { Devices } from "@library/components/DeviceChecker";
 import DocumentTitle from "@library/components/DocumentTitle";
@@ -19,6 +19,7 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import React from "react";
 import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
 
 /**
  * Component representing the the full home page of a help center.
@@ -40,11 +41,16 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <DocumentTitle title={knowledgeBase.name}>
                     <VanillaHeader />
                 </DocumentTitle>
+
+                {/*For Screen Readers / SEO*/}
+                <ScreenReaderContent>
+                    <h1>{knowledgeBase.name}</h1>
+                </ScreenReaderContent>
+
                 <PanelLayout
                     device={Devices.DESKTOP}
                     middleBottom={
                         <>
-                            <h1>{knowledgeBase.name}</h1>
                             <HelpCenterNavigation data={data!} />
                         </>
                     }
@@ -75,12 +81,12 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const knowledgeState = state.knowledge.navigation;
     const loadStatus = knowledgeState.fetchLoadablesByKbID[knowledgeBaseID] || { status: LoadStatus.PENDING };
 
-    let data: IHelpData | undefined;
+    let data: ILinkListData | undefined;
     if (loadStatus.status === LoadStatus.SUCCESS) {
         data = NavigationSelector.selectHelpCenterNome(knowledgeState.navigationItems, ownProps.knowledgeBase);
     }
 
-    const loadable: ILoadable<IHelpData> = {
+    const loadable: ILoadable<ILinkListData> = {
         ...loadStatus,
         data,
     };
