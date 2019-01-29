@@ -31,6 +31,7 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
+import { search } from "library/src/scripts/components/icons/header";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -176,7 +177,8 @@ class SearchForm extends React.Component<IProps> {
             excerpt: searchResult.body,
             meta: (
                 <SearchResultMeta
-                    deleted={searchResult.status === ArticleStatus.DELETED}
+                    status={searchResult.status}
+                    type={searchResult.recordType}
                     updateUser={searchResult.updateUser!}
                     dateUpdated={searchResult.dateUpdated}
                     crumbs={crumbs}
