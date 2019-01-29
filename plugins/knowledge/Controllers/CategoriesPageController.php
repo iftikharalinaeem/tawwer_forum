@@ -90,7 +90,9 @@ class CategoriesPageController extends KnowledgeTwigPageController {
 
         // Put together pre-loaded redux actions.
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_CATEGORY_RESPONSE, Data::box($this->data[self::CATEGORY_API_RESPONSE])));
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLES_RESPONSE, Data::box($this->data[self::API_PAGE_KEY])));
+
+        // Re-add this when we can properly include pagination header (Link).
+        //$this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLES_RESPONSE, Data::box($this->data[self::API_PAGE_KEY])));
 
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getViewData();

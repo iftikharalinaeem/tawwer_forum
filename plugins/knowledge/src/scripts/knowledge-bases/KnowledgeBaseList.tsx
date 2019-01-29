@@ -12,7 +12,7 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
-import SubcommunityList from "@library/components/subcommunities/subcommunityList";
+import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 
 /**

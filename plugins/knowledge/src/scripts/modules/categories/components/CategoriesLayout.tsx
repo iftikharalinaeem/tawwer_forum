@@ -22,12 +22,15 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
 import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import SimplePager from "@library/simplePager/SimplePager";
+import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;
     results: IResult[];
     query?: string;
     kbID: number;
+    pages: ILinkPages;
 }
 
 interface IState {
@@ -40,7 +43,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { category, device } = this.props;
+        const { category, device, pages } = this.props;
         const activeRecord = {
             recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             recordID: category.knowledgeCategoryID,
@@ -94,6 +97,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     middleBottom={
                         <PanelWidgetVerticalPadding>
                             <SearchResults results={this.props.results} />
+                            <SimplePager url={category.url + "/p:page:"} pages={pages} />
                         </PanelWidgetVerticalPadding>
                     }
                     rightTop={isFullWidth && <></>}
