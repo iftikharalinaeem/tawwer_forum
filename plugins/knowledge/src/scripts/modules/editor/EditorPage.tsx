@@ -86,7 +86,7 @@ export class EditorPage extends React.PureComponent<IProps> {
 
         // Only push a new draft query string if publish is not loading, because submitting/saving a draft can cause a race condition where we redirect to the article URL & where we "redirect" to the draft URL.
         if (submit.status !== LoadStatus.LOADING && saveDraft.status === LoadStatus.SUCCESS && draft.data) {
-            return <QueryString value={{ draftID: draft.data.draftID }} />;
+            return <QueryString value={{ draftID: draft.data.draftID }} syncOnFirstMount={true} />;
         } else {
             return null;
         }

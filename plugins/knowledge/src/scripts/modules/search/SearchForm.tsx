@@ -15,7 +15,7 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import QueryString from "@library/components/navigation/QueryString";
 import qs from "qs";
@@ -31,6 +31,10 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
+import { search } from "library/src/scripts/components/icons/header";
+import SearchPagination from "./components/SearchPagination";
+import FullPageLoader from "@library/components/FullPageLoader";
+
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -41,8 +45,8 @@ class SearchForm extends React.Component<IProps> {
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
@@ -58,7 +62,7 @@ class SearchForm extends React.Component<IProps> {
                                     <SearchBar
                                         placeholder={this.props.placeholder || t("Help")}
                                         onChange={this.handleSearchChange}
-                                        loadOptions={this.props.searchOptionProvider.autocomplete}
+                                        loadOptions={this.autocomplete}
                                         value={this.props.form.query}
                                         isBigInput={true}
                                         onSearch={this.props.searchActions.search}
@@ -89,9 +93,7 @@ class SearchForm extends React.Component<IProps> {
                             </>
                         }
                         middleBottom={
-                            <PanelWidgetVerticalPadding>
-                                {<SearchResults results={this.unwrapResults()} />}
-                            </PanelWidgetVerticalPadding>
+                            <PanelWidgetVerticalPadding>{this.renderSearchResults()}</PanelWidgetVerticalPadding>
                         }
                         rightTop={
                             !isMobile && (
@@ -151,15 +153,44 @@ class SearchForm extends React.Component<IProps> {
         this.props.searchActions.updateForm({ query: value });
     };
 
+    private autocomplete = (query: string) => {
+        return this.props.searchOptionProvider.autocomplete(query, {
+            global: this.props.form.domain === SearchDomain.EVERYWHERE,
+        });
+    };
+
     /**
      * Unwrap loaded results and map them into the proper shape.
      */
-    private unwrapResults(): IResult[] {
-        const { results } = this.props;
-        if (results.data) {
-            return results.data.map(this.mapResult);
-        } else {
-            return [];
+    private renderSearchResults(): React.ReactNode {
+        switch (this.props.results.status) {
+            case LoadStatus.PENDING:
+            case LoadStatus.LOADING:
+                return <FullPageLoader />;
+            case LoadStatus.ERROR:
+                return null;
+            case LoadStatus.SUCCESS:
+                const { next, prev } = this.props.pages;
+                let paginationNextClick: React.MouseEventHandler | undefined;
+                let paginationPreviousClick: React.MouseEventHandler | undefined;
+
+                if (next) {
+                    paginationNextClick = e => {
+                        void this.props.searchActions.search(next);
+                    };
+                }
+                if (prev) {
+                    paginationPreviousClick = e => {
+                        void this.props.searchActions.search(prev);
+                    };
+                }
+
+                return (
+                    <>
+                        <SearchResults results={this.props.results.data!.map(this.mapResult)} />
+                        <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
+                    </>
+                );
         }
     }
 
@@ -169,14 +200,15 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
-        const categoryData = searchResult.knowledgeCategory || searchResult.forumCategory;
+        const categoryData = searchResult.category;
         const crumbs = categoryData ? categoryData.breadcrumbs : [];
         return {
             name: searchResult.name,
             excerpt: searchResult.body,
             meta: (
                 <SearchResultMeta
-                    deleted={searchResult.status === ArticleStatus.DELETED}
+                    status={searchResult.status}
+                    type={searchResult.recordType}
                     updateUser={searchResult.updateUser!}
                     dateUpdated={searchResult.dateUpdated}
                     crumbs={crumbs}
