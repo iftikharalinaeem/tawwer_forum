@@ -4,8 +4,8 @@
  */
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
@@ -15,11 +15,11 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import FullPageLoader from "@library/components/FullPageLoader";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
-import PanelLayout from "@library/components/layouts/PanelLayout";
 import React from "react";
 import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
+import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 
 /**
  * Component representing the the full home page of a help center.
@@ -33,7 +33,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            return <ErrorPage loadable={this.props} />;
+            return <ErrorPage error={this.props.error} />;
         }
 
         return (
@@ -46,15 +46,9 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <ScreenReaderContent>
                     <h1>{knowledgeBase.name}</h1>
                 </ScreenReaderContent>
-
-                <PanelLayout
-                    device={Devices.DESKTOP}
-                    middleBottom={
-                        <>
-                            <HelpCenterNavigation data={data!} />
-                        </>
-                    }
-                />
+                <WidgetContainer>
+                    <HelpCenterNavigation data={data!} />
+                </WidgetContainer>
             </Container>
         );
     }

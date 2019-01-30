@@ -5,107 +5,66 @@
  */
 
 import ReduxActions from "@library/state/ReduxActions";
-import apiv2 from "@library/apiv2";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import actionCreatorFactory from "typescript-fsa";
 
-export interface ILPActionsProps {
-    actions: LocationPickerActions;
-}
+const createAction = actionCreatorFactory("@@loationPicker");
 
 /**
  * Actions for the article page.
  */
 export default class LocationPickerActions extends ReduxActions {
-    // Action constants.
-    public static readonly NAVIGATE_TO_CATEGORY = "@@locationPicker/NAVIGATE_TO_CATEGORY";
-    public static readonly SELECT_CATEGORY = "@@locationPicker/SELECT_CATEGORY";
-    public static readonly CHOOSE_CATEGORY = "@@locationPicker/CHOOSE_CATEGORY";
-    public static readonly INIT = "@@locationPicker/INIT";
-
-    /**
-     * Union of all possible action types in this class.
-     */
-    public static ACTION_TYPES:
-        | ReturnType<typeof LocationPickerActions.createInitAction>
-        | ReturnType<typeof LocationPickerActions.createNavigateAction>
-        | ReturnType<typeof LocationPickerActions.createChooseAction>
-        | ReturnType<typeof LocationPickerActions.createSelectAction>;
-
-    public static mapDispatchToProps(dispatch: any): ILPActionsProps {
-        return {
-            actions: new LocationPickerActions(dispatch, apiv2),
-        };
-    }
-
     /**
      * Initialize the state from a category.
      *
      * @param categoryID The categoryID to initialize with.
      * @param parentID The parent ID of the category.
      */
-    private static createInitAction(categoryID: number, parentID: number) {
-        return LocationPickerActions.createAction(LocationPickerActions.INIT, { categoryID, parentID });
-    }
+    public static initAC = createAction<{ categoryID: number; parentID: number }>("init");
 
     /**
      * Set the navigated category.
      *
      * @param categoryID
      */
-    private static createNavigateAction(categoryID: number) {
-        return LocationPickerActions.createAction(LocationPickerActions.NAVIGATE_TO_CATEGORY, { categoryID });
-    }
+    public static navigateAC = createAction<{ categoryID: number }>("navigate");
 
     /**
      * Set the selected category.
      *
      * @param categoryID
      */
-    private static createSelectAction(categoryID: number) {
-        return LocationPickerActions.createAction(LocationPickerActions.SELECT_CATEGORY, { categoryID });
-    }
+    public static selectAC = createAction<{ categoryID: number }>("select");
 
     /**
-     * Set the choosen category.
+     * Set the chosen category.
      *
      * @param categoryID
      */
-    private static createChooseAction(categoryID: number) {
-        return LocationPickerActions.createAction(LocationPickerActions.CHOOSE_CATEGORY, { categoryID });
-    }
+    public static chooseAC = createAction<{ categoryID: number }>("choose");
 
     // Bind dispatch the simpler action creators instead of rewriting their function signatures.
-    public selectCategory = this.bindDispatch(LocationPickerActions.createSelectAction);
-    public chooseCategory = this.bindDispatch(LocationPickerActions.createChooseAction);
-    public init = this.bindDispatch(LocationPickerActions.createInitAction);
+    public selectCategory = this.bindDispatch(LocationPickerActions.selectAC);
+    public chooseCategory = this.bindDispatch(LocationPickerActions.chooseAC);
+    public navigateToCategory = this.bindDispatch(LocationPickerActions.navigateAC);
+    public init = this.bindDispatch(LocationPickerActions.initAC);
 
     /**
      * Initialize location picker actions from an article.
      *
      * @param article The article to init from.
      */
-    public initLocationPickerFromArticle(article: { knowledgeCategoryID?: number | null }) {
+    public initLocationPickerFromArticle = (article: { knowledgeCategoryID?: number | null }) => {
         if (article.knowledgeCategoryID != null) {
             const { knowledgeCategoryID } = article;
             this.initLocationPickerFromCategoryID(knowledgeCategoryID);
         }
-    }
+    };
 
-    public initLocationPickerFromCategoryID(categoryID: number) {
+    public initLocationPickerFromCategoryID = (categoryID: number) => {
         const category = CategoryModel.selectKbCategoryFragment(this.getState(), categoryID);
         if (category) {
-            this.init(category.knowledgeCategoryID, category.parentID);
+            this.init({ categoryID: category.knowledgeCategoryID, parentID: category.parentID });
         }
-    }
-
-    /**
-     * Navigate to a particular category.
-     *
-     * Immediately navigates in one level, then requests the data for the next level deeper.
-     *
-     * @param categoryID
-     */
-    public navigateToCategory = (categoryID: number) => {
-        this.dispatch(LocationPickerActions.createNavigateAction(categoryID));
     };
 }

@@ -20,9 +20,10 @@ import ArticleDeletedMessage from "@knowledge/modules/article/components/Article
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
 import Permission from "@library/users/Permission";
-import ErrorPage from "@knowledge/routes/ErrorPage";
-import NavigationLoadingLayout from "@knowledge/modules/navigation/NavigationLoadingLayout";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
     match: match<{
@@ -48,24 +49,24 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const id = this.articleID;
         const hasData = loadable.status === LoadStatus.SUCCESS && loadable.data && id;
         const activeRecord = { recordID: id!, recordType: NavigationRecordType.ARTICLE };
+
+        if (loadable.status === LoadStatus.ERROR) {
+            return <ErrorPage error={loadable.error} />;
+        }
         return (
-            <>
-                <ErrorPage loadable={loadable} />
-                <PageLoader status={LoadStatus.SUCCESS}>
-                    {hasData ? (
-                        <DocumentTitle title={loadable.data!.article.seoName || loadable.data!.article.name}>
-                            <ArticleLayout
-                                article={loadable.data!.article}
-                                breadcrumbData={loadable.data!.breadcrumbs}
-                                messages={this.renderMessages()}
-                                kbID={1}
-                            />
-                        </DocumentTitle>
-                    ) : (
-                        <NavigationLoadingLayout activeRecord={activeRecord} />
-                    )}
-                </PageLoader>
-            </>
+            <PageLoader status={LoadStatus.SUCCESS}>
+                {hasData ? (
+                    <DocumentTitle title={loadable.data!.article.seoName || loadable.data!.article.name}>
+                        <ArticleLayout
+                            article={loadable.data!.article}
+                            breadcrumbData={loadable.data!.breadcrumbs}
+                            messages={this.renderMessages()}
+                        />
+                    </DocumentTitle>
+                ) : (
+                    <NavigationLoadingLayout activeRecord={activeRecord} />
+                )}
+            </PageLoader>
         );
     }
 
@@ -77,6 +78,9 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (loadable.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
+
+        // Preload the categories page. We may be navigating to it shortly.
+        CategoryRoute.preload();
     }
 
     /**

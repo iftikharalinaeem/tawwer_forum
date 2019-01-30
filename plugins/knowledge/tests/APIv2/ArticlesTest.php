@@ -8,13 +8,21 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * Test the /api/v2/articles endpoint.
  */
 class ArticlesTest extends AbstractResourceTest {
 
-    /** @var string The resource route. */
+    /** @var int */
+    private static $knowledgeBaseID;
+
+    /** @var int */
+    private static $knowledgeCategoryID;
+
+        /** @var string The resource route. */
     protected $baseUrl = "/articles";
 
     /** @var array Fields to be checked with get/<id>/edit */
@@ -41,6 +49,22 @@ class ArticlesTest extends AbstractResourceTest {
     public static function setupBeforeClass() {
         self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
+
+        /** @var KnowledgeBaseModel $knowledgeBaseModel */
+        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
+        self::$knowledgeBaseID = $knowledgeBaseModel->insert([
+            "name" => __CLASS__,
+            "description" => "Basic knowledge base for testing.",
+            "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
+        ]);
+
+        /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
+        self::$knowledgeCategoryID = $knowledgeCategoryModel->insert([
+            "name" => __CLASS__,
+            "parentID" => -1,
+            "knowledgeBaseID" => self::$knowledgeBaseID,
+        ]);
     }
 
     /**
@@ -54,7 +78,6 @@ class ArticlesTest extends AbstractResourceTest {
 
         $row["body"] = md5($row["body"]);
         $row["format"] = $row["body"] === "markdown" ? "text" : "markdown";
-        $row["knowledgeCategoryID"]++;
         $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
         $row["name"] = md5($row["name"]);
         $row["sort"]++;
@@ -85,7 +108,7 @@ class ArticlesTest extends AbstractResourceTest {
         $record = [
             "body" => "Hello. I am a test for articles.",
             "format" => "markdown",
-            "knowledgeCategoryID" => 1,
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
             "locale" => "en",
             "name" => "Example Article",
             "sort" => 1,

@@ -122,7 +122,7 @@ class KbRootController extends KnowledgeTwigPageController {
     private function noArticlesPage() {
         $this->setPageTitle('No Articles Created Yet');
         $data = $this->getViewData();
-        $this->twigInit()->render('default-master.twig', $data);
+        return $this->twigInit()->render('default-master.twig', $data);
     }
 
     /**

@@ -5,8 +5,8 @@
  */
 
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import NavigationManager from "@knowledge/modules/navigation/NavigationManager";
-import NavigationManagerMenu from "@knowledge/modules/navigation/NavigationManagerMenu";
+import NavigationManager from "@knowledge/navigation/NavigationManager";
+import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";

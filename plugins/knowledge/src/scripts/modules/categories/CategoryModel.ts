@@ -8,7 +8,7 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 export type IKbCategoriesState = ILoadable<{
