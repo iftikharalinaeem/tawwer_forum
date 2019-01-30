@@ -186,6 +186,29 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 }
                 break;
         }
+        switch (action.type) {
+            case CategoryActions.POST_CATEGORY_RESPONSE:
+                const category = action.payload.data;
+                const stringID = KbRecordType.CATEGORY + category.knowledgeCategoryID;
+                const parentStringID = KbRecordType.CATEGORY + category.parentID;
+                nextState.navigationItems[stringID] = {
+                    name: category.name,
+                    url: category.url,
+                    parentID: category.parentID,
+                    recordID: category.knowledgeCategoryID,
+                    sort: category.sort,
+                    knowledgeBaseID: category.knowledgeBaseID,
+                    recordType: KbRecordType.CATEGORY,
+                    children: [],
+                };
+
+                const parentItem = nextState.navigationItems[parentStringID];
+                if (parentItem) {
+                    parentItem.children.push(stringID);
+                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
+                }
+                break;
+        }
         return nextState;
     };
 
