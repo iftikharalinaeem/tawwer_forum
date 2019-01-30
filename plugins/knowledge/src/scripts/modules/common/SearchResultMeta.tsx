@@ -12,31 +12,40 @@ import BreadCrumbString, { ICrumbString } from "@library/components/BreadCrumbSt
 import { t } from "@library/application";
 import { ArticleStatus } from "@knowledge/@types/api";
 import { capitalizeFirstLetter } from "@library/utility";
+import classNames from "classnames";
 
 interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
     crumbs?: ICrumbString[];
-    status: ArticleStatus;
-    type: string;
+    status?: ArticleStatus;
+    type?: string;
 }
 
 export class SearchResultMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, updateUser, crumbs, status, type } = this.props;
-        const deleted = status === ArticleStatus.DELETED;
-        const user = updateUser;
-
-        const resultType = deleted ? (
-            <span className="meta-inline isDeleted">{t("Deleted")}</span>
-        ) : (
-            capitalizeFirstLetter(type || "")
-        );
+        const isDeleted = status === ArticleStatus.DELETED;
+        console.log("this.props: ", this.props);
         return (
             <React.Fragment>
-                <span className="meta">
-                    <Translate source="<0/> by <1/>" c0={resultType} c1={user.name} />
-                </span>
+                {updateUser &&
+                    updateUser.name && (
+                        <span className={classNames("meta")}>
+                            {isDeleted ? (
+                                <span className={classNames("meta-inline", "isDeleted")}>
+                                    <Translate source="Deleted <0/>" c0={type} />
+                                </span>
+                            ) : (
+                                <Translate
+                                    source="<0/> by <1/>"
+                                    c0={type ? t(capitalizeFirstLetter(type)) : undefined}
+                                    c1={updateUser.name}
+                                />
+                            )}
+                        </span>
+                    )}
+
                 <span className="meta">
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
