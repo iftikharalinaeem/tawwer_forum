@@ -16,12 +16,15 @@ import Heading from "@library/components/Heading";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
+import SimplePager from "@library/simplePager/SimplePager";
+import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import * as React from "react";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
     results: IResult[];
     query?: string;
+    pages: ILinkPages;
 }
 
 interface IState {
@@ -34,7 +37,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { category, device } = this.props;
+        const { category, device, pages } = this.props;
         const activeRecord = {
             recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             recordID: category.knowledgeCategoryID,
@@ -75,6 +78,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     middleBottom={
                         <PanelWidgetVerticalPadding>
                             <SearchResults results={this.props.results} />
+                            <SimplePager url={category.url + "/p:page:"} pages={pages} />
                         </PanelWidgetVerticalPadding>
                     }
                     rightTop={isFullWidth && <></>}
