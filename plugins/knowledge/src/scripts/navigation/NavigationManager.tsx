@@ -36,7 +36,7 @@ import Translate from "@library/components/translation/Translate";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -630,8 +630,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * - Preserves existing expand state if it exists.
      */
     private calcTree() {
+        const { knowledgeBase } = this.props;
         const data: ITreeData<INormalizedNavigationItem> = {
-            rootId: KbRecordType.CATEGORY + this.props.knowledgeBase.rootCategoryID,
+            rootId: KbRecordType.CATEGORY + knowledgeBase.rootCategoryID,
             items: {},
         };
 
@@ -640,12 +641,22 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 continue;
             }
 
+            if (knowledgeBase.viewType !== KbViewType.GUIDE && itemValue.recordType === KbRecordType.ARTICLE) {
+                continue;
+            }
+
             let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
             if (this.state && this.state.treeData.items[itemID]) {
                 stateValue = this.state.treeData.items[itemID];
             }
 
-            const children = itemValue.children;
+            const children = itemValue.children.filter(child => {
+                if (knowledgeBase.viewType !== KbViewType.GUIDE && child.startsWith(KbRecordType.ARTICLE)) {
+                    return false;
+                }
+
+                return true;
+            });
             data.items[itemID] = {
                 parentID: KbRecordType.CATEGORY + itemValue.parentID,
                 id: itemID,
