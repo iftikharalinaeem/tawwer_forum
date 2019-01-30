@@ -6,8 +6,7 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import ErrorPage from "@knowledge/routes/ErrorPage";
-import { LoadStatus } from "@library/@types/api";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import RouteHandler from "@knowledge/routes/RouteHandler";
 import { ModalLoader } from "@library/components/modal";
 import {
@@ -20,13 +19,14 @@ import {
 } from "@knowledge/@types/api";
 import { formatUrl } from "@library/application";
 import qs from "qs";
-import { IKbNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
+import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
 interface IEditorURLData {
     articleID?: number;
     articleRevisionID?: number;
     draftID?: number;
     knowledgeCategoryID?: number | null;
+    knowledgeBaseID?: number | null;
 }
 
 /**
@@ -48,8 +48,8 @@ function makeEditorUrl(data?: IEditorURLData) {
         baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
 
-    const { articleRevisionID, draftID, knowledgeCategoryID } = data;
-    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID });
+    const { articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID } = data;
+    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID });
 
     if (query) {
         baseUrl += `?${query}`;
@@ -101,10 +101,21 @@ export const DebugRoute = new RouteHandler(
     () => formatUrl("/kb/debug"),
 );
 
+const CATEGORIES_KEY = "CategoriesPageKey";
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
     (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
+    undefined,
+    CATEGORIES_KEY,
+);
+
+export const CategoryPagedRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
+    "/kb/categories/:id(\\d+)(-[^/]+)?/p:page(\\d+)",
+    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
+    undefined,
+    CATEGORIES_KEY,
 );
 
 export const SearchRoute = new RouteHandler(
@@ -140,7 +151,7 @@ export const OrganizeCategoriesRoute = new RouteHandler(
 );
 
 const NotFound = () => {
-    return <ErrorPage loadable={{ status: LoadStatus.ERROR, error: { status: 404, message: "Page not found." } }} />;
+    return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
 };
 
 /**
@@ -160,6 +171,7 @@ export function getPageRoutes() {
         ArticleRoute.route,
         DebugRoute.route,
         CategoryRoute.route,
+        CategoryPagedRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,

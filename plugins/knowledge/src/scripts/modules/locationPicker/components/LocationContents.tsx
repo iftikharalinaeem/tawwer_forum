@@ -5,16 +5,18 @@
  */
 
 import * as React from "react";
-import { getRequiredID, uniqueIDFromPrefix } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import LocationPickerItem from "./LocationPickerItem";
 import LocationPickerItemList from "./LocationPickerItemList";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import { t } from "@library/application";
 import { INavigationTreeItem } from "@library/@types/api";
 
+type CategoryAction = (payload: { categoryID: number }) => void;
+
 interface IProps {
-    onCategoryNavigate: (categoryID: number) => void;
-    onItemSelect: (categoryID: number) => void;
+    onCategoryNavigate: CategoryAction;
+    onItemSelect: CategoryAction;
     selectedCategory: IKbCategoryFragment | null;
     navigatedCategory: IKbCategoryFragment | null;
     chosenCategory: IKbCategoryFragment | null;
@@ -34,8 +36,8 @@ export default class LocationContents extends React.Component<IProps> {
 
         const contents = items.map((item, index) => {
             const isSelected = !!selectedCategory && selectedCategory.knowledgeCategoryID === item.recordID;
-            const navigateCallback = () => this.props.onCategoryNavigate(item.recordID);
-            const selectCallback = () => this.props.onItemSelect(item.recordID);
+            const navigateCallback = () => this.props.onCategoryNavigate({ categoryID: item.recordID });
+            const selectCallback = () => this.props.onItemSelect({ categoryID: item.recordID });
             return (
                 <LocationPickerItem
                     key={index}

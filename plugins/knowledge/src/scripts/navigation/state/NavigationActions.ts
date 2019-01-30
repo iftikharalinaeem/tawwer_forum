@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
+import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus, IApiError } from "@library/@types/api";
+import { IApiError, LoadStatus } from "@library/@types/api";
+import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/modules/navigation/NavigationModel";
 
 const createAction = actionCreatorFactory("@@navigation");
 

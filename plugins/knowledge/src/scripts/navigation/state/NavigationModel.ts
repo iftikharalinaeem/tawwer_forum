@@ -3,15 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import { ILoadable, LoadStatus, INavigationItem } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
-import { produce } from "immer";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import { compare } from "@library/utility";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import reduceReducers from "reduce-reducers";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KnowledgeReducer } from "@knowledge/state/model";
+import { ILoadable, INavigationItem, LoadStatus } from "@library/@types/api";
+import ReduxReducer from "@library/state/ReduxReducer";
+import { compare } from "@library/utility";
+import { produce } from "immer";
+import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 
 /**
