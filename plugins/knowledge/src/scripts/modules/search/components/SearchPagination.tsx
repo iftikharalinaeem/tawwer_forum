@@ -4,15 +4,13 @@
  */
 
 import { t } from "@library/application";
-import { ILinkPages } from "@library/simplePager/SimplePagerModel";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import * as React from "react";
-import SearchPageActions from "../SearchPageActions";
-import Button from "@library/components/forms/Button";
 
 interface IProps {
-    searchActions: SearchPageActions;
-    pages: ILinkPages;
+    onNextClick?: React.MouseEventHandler;
+    onPreviousClick?: React.MouseEventHandler;
 }
 
 /**
@@ -20,28 +18,24 @@ interface IProps {
  */
 export default class SearchPagination extends React.Component<IProps> {
     public render() {
-        const { next, prev } = this.props.pages;
+        const { onNextClick, onPreviousClick } = this.props;
 
-        const isSingle = (prev && !next) || (!prev && next);
+        const isSingle = (onNextClick && !onPreviousClick) || (!onNextClick && onPreviousClick);
 
         return (
             <div className="simplePager">
-                {prev && (
+                {onPreviousClick && (
                     <Button
                         className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
-                        onClick={e => {
-                            this.props.searchActions.search(prev);
-                        }}
+                        onClick={onPreviousClick}
                     >
                         {t("Previous")}
                     </Button>
                 )}
-                {next && (
+                {onNextClick && (
                     <Button
                         className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
-                        onClick={e => {
-                            this.props.searchActions.search(next);
-                        }}
+                        onClick={onNextClick}
                     >
                         {t("Next")}
                     </Button>
