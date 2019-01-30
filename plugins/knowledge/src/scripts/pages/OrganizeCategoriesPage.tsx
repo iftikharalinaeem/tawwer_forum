@@ -12,14 +12,22 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";
 import Heading from "@library/components/Heading";
 import React from "react";
+import { match } from "react-router";
 
-interface IProps {}
+interface IProps {
+    match: match<{
+        id: string;
+        page?: number;
+    }>;
+}
 
 export default class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
 
     public render() {
+        const id = parseInt(this.props.match.params.id, 10);
         const pageTitle = t("Navigation Manager");
+
         return (
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
@@ -37,7 +45,7 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
                                     />
                                 </DocumentTitle>
                                 <div className="inheritHeight">
-                                    <NavigationManager knowledgeBaseID={1} rootNavigationItemID="knowledgeCategory1" />
+                                    <NavigationManager knowledgeBaseID={id} rootNavigationItemID="knowledgeCategory1" />
                                 </div>
                             </div>
                         </div>
