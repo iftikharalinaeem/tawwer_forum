@@ -87,18 +87,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             </Container>
         );
     }
-
-    private setQuery = value => {
-        let newValue = "";
-        if (typeof value === "string") {
-            newValue = value;
-        } else if (value.data) {
-            newValue = value.data;
-        }
-        this.setState({
-            query: newValue,
-        });
-    };
 }
 
 export default withDevice<IProps>(CategoriesLayout);
