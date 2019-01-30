@@ -40,8 +40,8 @@ export default class CategoriesPageReducer extends ReduxReducer<ICategoriesPageS
                 case CategoriesPageActions.GET_ARTICLES_RESPONSE:
                     draft.articles.status = LoadStatus.SUCCESS;
                     draft.articles.data = action.payload.data;
-                    if (action.payload.headers && action.payload.headers["link"]) {
-                        draft.pages = SimplePagerModel.parseLinkHeader(action.payload.headers["link"], "page", "limit");
+                    if (action.payload.headers && action.payload.headers.link) {
+                        draft.pages = SimplePagerModel.parseLinkHeader(action.payload.headers.link, "page", "limit");
                     } else {
                         draft.pages = {};
                     }
