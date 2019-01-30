@@ -15,7 +15,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
-import { knowledgeBaseNoIcon } from "@library/components/icons";
+import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 
 /**
  * Component representing a list of visible knowledge bases.
