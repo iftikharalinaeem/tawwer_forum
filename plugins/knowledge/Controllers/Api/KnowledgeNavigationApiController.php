@@ -209,7 +209,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         try {
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
-            throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
+            throw new NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
         }
 
         $categories = $this->knowledgeCategoryModel->get(["knowledgeBaseID" => $knowledgeBaseID]);

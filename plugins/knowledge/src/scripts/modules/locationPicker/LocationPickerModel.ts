@@ -53,6 +53,26 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         },
     );
 
+    public static selectNavigatedCategory = createSelector(
+        (state: IStoreState) => state.knowledge.locationPicker.navigatedRecord,
+        (state: IStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+        NavigationSelector.selectNavigationItems,
+        (navigatedRecord, knowledgeBasesByID, navItems) => {
+            if (!navigatedRecord) {
+                return null;
+            }
+
+            if (navigatedRecord.recordType === KbRecordType.KB) {
+                if (knowledgeBasesByID.data && knowledgeBasesByID.data[navigatedRecord.recordID]) {
+                    const kb = knowledgeBasesByID.data[navigatedRecord.recordID];
+                    return navItems[KbRecordType.CATEGORY + kb.rootCategoryID];
+                }
+            }
+
+            return navigatedRecord;
+        },
+    );
+
     public static selectNavigatedTitle = createSelector(
         LocationPickerModel.stateSlice,
         NavigationSelector.selectNavigationItems,
