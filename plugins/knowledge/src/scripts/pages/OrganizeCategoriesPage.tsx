@@ -17,7 +17,6 @@ import { match } from "react-router";
 interface IProps {
     match: match<{
         id: string;
-        page?: number;
     }>;
 }
 
