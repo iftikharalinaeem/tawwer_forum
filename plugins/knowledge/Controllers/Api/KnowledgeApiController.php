@@ -388,7 +388,6 @@ class KnowledgeApiController extends AbstractApiController {
                     foreach (explode(',', $this->sphinxIndexName($idx)) as $sphinxIndex) {
                         $this->sphinxIndexWeights[$sphinxIndex] = $sphinxTypes['sphinxIndexWeight'];
                     }
-
                 }
                 $sphinxIndexes = array_merge($sphinxIndexes, $idxFullNames);
             }
