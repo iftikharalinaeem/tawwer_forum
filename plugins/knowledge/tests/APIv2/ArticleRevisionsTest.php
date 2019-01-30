@@ -7,6 +7,8 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
  * Test the /api/v2/article-revisions endpoint.
@@ -16,6 +18,12 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     /** @var int */
     private static $articleID;
 
+    /** @var int */
+    private static $knowledgeBaseID;
+
+    /** @var int */
+    private static $knowledgeCategoryID;
+
     /**
      * This method is called before the first test of this test class is run.
      */
@@ -23,11 +31,26 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
 
-        // We're going to need at least one article to associate these revisions with.
+        /** @var KnowledgeBaseModel $knowledgeBaseModel */
+        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
+        self::$knowledgeBaseID = $knowledgeBaseModel->insert([
+            "name" => __CLASS__,
+            "description" => "Basic knowledge base for testing.",
+            "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
+        ]);
+
+        /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
+        self::$knowledgeCategoryID = $knowledgeCategoryModel->insert([
+            "name" => __CLASS__,
+            "parentID" => -1,
+            "knowledgeBaseID" => self::$knowledgeBaseID,
+        ]);
+
         /** @var ArticleModel $articleModel */
         $articleModel = self::container()->get(ArticleModel::class);
         self::$articleID = $articleModel->insert([
-            "knowledgeCategoryID" => 1,
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
             "sort" => 1,
         ]);
     }

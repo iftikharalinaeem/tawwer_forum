@@ -5,15 +5,14 @@
  */
 
 import { ITreeItem } from "@atlaskit/tree";
-import NavigationManagerItemIcon from "@knowledge/modules/navigation/NavigationManagerItemIcon";
-import { INormalizedNavigationItem } from "@knowledge/modules/navigation/NavigationModel";
+import { INormalizedNavigationItem } from "@knowledge/navigation/state/NavigationModel";
+import NavigationManagerItemIcon from "@knowledge/navigation/subcomponents/NavigationManagerItemIcon";
+import NavigationManagerNameForm from "@knowledge/navigation/subcomponents/NavigationManagerNameForm";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import NavigationManagerNameForm from "@knowledge/modules/navigation/NavigationManagerNameForm";
-import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps {
     className?: string;

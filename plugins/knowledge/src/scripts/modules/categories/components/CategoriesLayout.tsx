@@ -4,12 +4,12 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { IKbCategory } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
-import Navigation from "@knowledge/modules/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
+import Navigation from "@knowledge/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Heading from "@library/components/Heading";
@@ -21,10 +21,9 @@ import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import * as React from "react";
 
 interface IProps extends IDeviceProps {
-    category: IKbCategoryFragment;
+    category: IKbCategory;
     results: IResult[];
     query?: string;
-    kbID: number;
     pages: ILinkPages;
 }
 
@@ -50,7 +49,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 <VanillaHeader
                     title={category.name}
                     mobileDropDownContent={
-                        <Navigation collapsible={false} activeRecord={activeRecord} kbID={this.props.kbID} />
+                        <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
                     }
                 />
                 <PanelLayout
@@ -62,7 +61,11 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                     leftBottom={
                         <PanelWidget>
-                            {<Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />}
+                            <Navigation
+                                collapsible={true}
+                                activeRecord={activeRecord}
+                                kbID={category.knowledgeBaseID}
+                            />
                         </PanelWidget>
                     }
                     middleTop={

@@ -49,6 +49,7 @@ export interface IOutlineItem {
 
 interface IArticleServerManagedData extends IExpandedInsertUpdate {
     articleID: number;
+    knowledgeBaseID: number;
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource

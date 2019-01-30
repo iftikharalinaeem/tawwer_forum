@@ -16,15 +16,15 @@ import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
-import ErrorPage, { DefaultErrors } from "@knowledge/routes/ErrorPage";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import QueryString from "@library/components/navigation/QueryString";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {}
+        id?: string;
+    }> {}
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
@@ -49,10 +49,7 @@ export class EditorPage extends React.PureComponent<IProps> {
                 elementToFocusOnExit={document.activeElement as HTMLElement}
                 isWholePage={true}
             >
-                <Permission
-                    permission="articles.add"
-                    fallback={<ErrorPage loadable={DefaultErrors.PERMISSION_LOADABLE} />}
-                >
+                <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
                 </Permission>
@@ -91,7 +88,7 @@ export class EditorPage extends React.PureComponent<IProps> {
 
         // Only push a new draft query string if publish is not loading, because submitting/saving a draft can cause a race condition where we redirect to the article URL & where we "redirect" to the draft URL.
         if (submit.status !== LoadStatus.LOADING && saveDraft.status === LoadStatus.SUCCESS && draft.data) {
-            return <QueryString value={{ draftID: draft.data.draftID }} />;
+            return <QueryString value={{ draftID: draft.data.draftID }} syncOnFirstMount={true} />;
         } else {
             return null;
         }

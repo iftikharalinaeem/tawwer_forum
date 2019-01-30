@@ -25,17 +25,24 @@ export default class ArticleTOC extends React.Component<IProps> {
             return null;
         }
 
-        const contents = this.props.items.map(item => {
-            const href = "#" + item.ref;
-            const isActive = window.location.hash === href;
-            return (
-                <li className={classNames("panelList-item", "tableOfContents-item", { isActive })} key={item.ref}>
-                    <a href={href} onClick={this.forceHashChange} className="tableOfContents-link" title={item.text}>
-                        {item.text}
-                    </a>
-                </li>
-            );
-        });
+        const contents = this.props.items
+            .filter(item => item.level === 2)
+            .map(item => {
+                const href = "#" + item.ref;
+                const isActive = window.location.hash === href;
+                return (
+                    <li className={classNames("panelList-item", "tableOfContents-item", { isActive })} key={item.ref}>
+                        <a
+                            href={href}
+                            onClick={this.forceHashChange}
+                            className="tableOfContents-link"
+                            title={item.text}
+                        >
+                            {item.text}
+                        </a>
+                    </li>
+                );
+            });
 
         return (
             <nav className="panelList tableOfContents">
