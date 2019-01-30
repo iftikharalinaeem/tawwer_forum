@@ -20,6 +20,7 @@ import {
 import { formatUrl } from "@library/application";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
+import { logWarning } from "@library/utility";
 
 interface IEditorURLData {
     articleID?: number;
@@ -48,7 +49,14 @@ function makeEditorUrl(data?: IEditorURLData) {
         baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
     }
 
-    const { articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID } = data;
+    let { knowledgeCategoryID } = data;
+    const { articleRevisionID, draftID, knowledgeBaseID } = data;
+    if (knowledgeCategoryID !== undefined && knowledgeBaseID === undefined) {
+        logWarning(
+            "Attempted to initialize an editor with a categoryID but no knowledgeBaseID. They must both be provided",
+        );
+        knowledgeCategoryID = undefined;
+    }
     const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID });
 
     if (query) {

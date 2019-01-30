@@ -70,7 +70,7 @@ export class Navigation extends React.Component<IProps> {
      */
     public componentDidMount() {
         if (this.props.navItems.status === LoadStatus.PENDING) {
-            this.props.requestNavigation();
+            void this.props.requestNavigation();
         }
 
         if (this.props.knowledgeBase.status === LoadStatus.PENDING) {

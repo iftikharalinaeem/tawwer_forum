@@ -59,7 +59,7 @@ export class HelpCenterHome extends React.Component<IProps> {
     public componentDidMount() {
         const { status, requestData } = this.props;
         if (status === LoadStatus.PENDING) {
-            requestData();
+            void requestData();
         }
     }
 }

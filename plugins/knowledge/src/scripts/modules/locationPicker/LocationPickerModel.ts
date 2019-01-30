@@ -27,15 +27,7 @@ export interface ILPConnectedData extends ILocationPickerState {
  * Reducer for the article page.
  */
 export default class LocationPickerModel extends ReduxReducer<ILocationPickerState> {
-    private static selectState = (state: IStoreState) => state;
     private static stateSlice = (state: IStoreState) => state.knowledge.locationPicker;
-    public static selectPageContents = createSelector(
-        LocationPickerModel.selectState,
-        (state): IKbNavigationItem[] => {
-            return [];
-            // return CategoryModel.selectMixedRecordTree(state, navID).children!;
-        },
-    );
 
     public static selectParentRecord = createSelector(
         LocationPickerModel.stateSlice,

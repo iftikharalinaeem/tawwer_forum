@@ -18,13 +18,11 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import QueryString from "@library/components/navigation/QueryString";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { IDeviceProps } from "@library/components/DeviceChecker";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {}
+        id?: string;
+    }> {}
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;

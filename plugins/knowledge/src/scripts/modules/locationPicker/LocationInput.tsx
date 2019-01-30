@@ -18,6 +18,9 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import classNames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
+import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import isEqual from "lodash/isEqual";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -83,8 +86,8 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
     }
 
     public componentDidMount() {
-        if (this.props.initialCategoryID !== null) {
-            this.props.initLocationPickerFromCategoryID(this.props.initialCategoryID);
+        if (this.props.initialRecord) {
+            void this.props.initLocationPickerFromRecord(this.props.initialRecord);
         }
     }
 
@@ -114,14 +117,18 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
         if (prevState.showLocationPicker !== this.state.showLocationPicker) {
             this.forceUpdate();
         }
+
+        if (!isEqual(this.props.chosenRecord, prevProps.chosenRecord) && this.props.onChange) {
+            this.props.onChange(this.props.chosenCategoryID);
+        }
     }
 }
 
 interface IOwnProps {
     className?: string;
-    initialCategoryID: number | null;
+    initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
-    onChange?: (categoryID: number) => void;
+    onChange?: (categoryID: number | null) => void;
 }
 
 interface IState {
@@ -131,19 +138,37 @@ interface IState {
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
     const { chosenRecord } = state.knowledge.locationPicker;
     const { navigationItems } = state.knowledge.navigation;
+    let chosenCategoryID: number | null = null;
+    if (chosenRecord) {
+        if (chosenRecord.recordType === KbRecordType.CATEGORY) {
+            chosenCategoryID = chosenRecord.recordID;
+        }
+
+        if (
+            chosenRecord.recordType === KbRecordType.KB &&
+            knowledgeBasesByID.data &&
+            knowledgeBasesByID.data[chosenRecord.recordID]
+        ) {
+            chosenCategoryID = knowledgeBasesByID.data[chosenRecord.recordID].rootCategoryID;
+        }
+    }
     return {
-        locationBreadcrumb: chosenRecord
-            ? NavigationSelector.selectBreadcrumb(navigationItems, chosenRecord.recordType + chosenRecord.recordID)
-            : null,
+        chosenRecord,
+        chosenCategoryID,
+        locationBreadcrumb:
+            chosenCategoryID !== null
+                ? NavigationSelector.selectBreadcrumb(navigationItems, KbRecordType.CATEGORY + chosenCategoryID)
+                : null,
     };
 }
 
 function mapDispatchToProps(dispatch: any) {
     const lpActions = new LocationPickerActions(dispatch, apiv2);
     return {
-        initLocationPickerFromCategoryID: lpActions.initLocationPickerFromCategoryID,
+        initLocationPickerFromRecord: lpActions.initLocationPickerFromRecord,
     };
 }
 

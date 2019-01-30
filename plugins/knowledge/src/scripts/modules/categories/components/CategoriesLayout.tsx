@@ -19,6 +19,12 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import SimplePager from "@library/simplePager/SimplePager";
 import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import * as React from "react";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import LinkAsButton from "@library/components/LinkAsButton";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { ButtonBaseClass } from "@library/components/forms/Button";
+import { t } from "@library/application";
+import { compose } from "@library/components/icons";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -70,9 +76,23 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                     middleTop={
                         <PanelWidget>
-                            <Heading depth={1} className="searchBar-heading pageSmallTitle" title={category.name}>
+                            <PageTitle
+                                className="searchBar-heading pageSmallTitle"
+                                title={category.name}
+                                actions={
+                                    <LinkAsButton
+                                        to={EditorRoute.url(category)}
+                                        onMouseOver={EditorRoute.preload}
+                                        className="searchBar-actionButton"
+                                        baseClass={ButtonBaseClass.ICON}
+                                        title={t("Compose")}
+                                    >
+                                        {compose()}
+                                    </LinkAsButton>
+                                }
+                            >
                                 <label className="searchBar-label">{category.name}</label>
-                            </Heading>
+                            </PageTitle>
                         </PanelWidget>
                     }
                     middleBottom={

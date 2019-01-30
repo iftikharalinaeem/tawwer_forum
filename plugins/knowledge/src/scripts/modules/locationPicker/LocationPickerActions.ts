@@ -12,6 +12,8 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
+import { IArticle, IKbCategory } from "@knowledge/@types/api";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 
@@ -25,7 +27,10 @@ export default class LocationPickerActions extends ReduxActions {
      * @param categoryID The categoryID to initialize with.
      * @param parentID The parent ID of the category.
      */
-    public static initAC = createAction<{ selected: ILocationPickerRecord; parent: ILocationPickerRecord }>("init");
+    public static initAC = createAction<{
+        selected: ILocationPickerRecord | null;
+        parent: ILocationPickerRecord | null;
+    }>("init");
 
     /**
      * Set the navigated category.
@@ -69,7 +74,7 @@ export default class LocationPickerActions extends ReduxActions {
         const requestNavigation = async () => {
             const { navigatedRecord } = locationPicker;
             if (navigatedRecord && !navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID]) {
-                this.navActions.getNavigationFlat(navigatedRecord.knowledgeBaseID);
+                await this.navActions.getNavigationFlat(navigatedRecord.knowledgeBaseID);
             }
         };
 
@@ -81,17 +86,26 @@ export default class LocationPickerActions extends ReduxActions {
      *
      * @param article The article to init from.
      */
-    public initLocationPickerFromArticle = (article: { knowledgeCategoryID?: number | null }) => {
-        if (article.knowledgeCategoryID != null) {
-            const { knowledgeCategoryID } = article;
-            this.initLocationPickerFromCategoryID(knowledgeCategoryID);
-        }
-    };
+    public initLocationPickerFromRecord = async (record: ILocationPickerRecord) => {
+        if (record) {
+            const { navigation } = this.getState<IStoreState>().knowledge;
+            const { recordID, recordType, knowledgeBaseID } = record;
 
-    public initLocationPickerFromCategoryID = (categoryID: number) => {
-        const category = CategoryModel.selectKbCategoryFragment(this.getState(), categoryID);
-        if (category) {
-            // this.init({ categoryID: category.knowledgeCategoryID, parentID: category.parentID });
+            if (
+                !navigation.fetchLoadablesByKbID[knowledgeBaseID] ||
+                navigation.fetchLoadablesByKbID[knowledgeBaseID].status !== LoadStatus.SUCCESS
+            ) {
+                await this.navActions.getNavigationFlat(knowledgeBaseID);
+            }
+
+            const { navigationItems } = this.getState<IStoreState>().knowledge.navigation;
+            const ownFullRecord = navigationItems[recordType + recordID];
+            if (!ownFullRecord) {
+                return;
+            }
+
+            const parentRecord = navigationItems[KbRecordType.CATEGORY + ownFullRecord.parentID] || null;
+            this.init({ selected: ownFullRecord, parent: parentRecord });
         }
     };
 }
