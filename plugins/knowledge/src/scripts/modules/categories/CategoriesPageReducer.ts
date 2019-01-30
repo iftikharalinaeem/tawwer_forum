@@ -9,10 +9,12 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
 import { KnowledgeReducer } from "@knowledge/state/model";
+import SimplePagerModel, { ILinkPages } from "@library/simplePager/SimplePagerModel";
 
 export interface ICategoriesPageState {
     articles: ILoadable<IArticleFragment[]>;
     category: IKbCategory | null;
+    pages: ILinkPages;
 }
 
 type ReducerType = KnowledgeReducer<ICategoriesPageState>;
@@ -26,6 +28,7 @@ export default class CategoriesPageReducer extends ReduxReducer<ICategoriesPageS
             status: LoadStatus.PENDING,
         },
         category: null,
+        pages: {},
     };
 
     public reducer: ReducerType = (state = this.initialState, action) => {
@@ -37,6 +40,11 @@ export default class CategoriesPageReducer extends ReduxReducer<ICategoriesPageS
                 case CategoriesPageActions.GET_ARTICLES_RESPONSE:
                     draft.articles.status = LoadStatus.SUCCESS;
                     draft.articles.data = action.payload.data;
+                    if (action.payload.headers && action.payload.headers.link) {
+                        draft.pages = SimplePagerModel.parseLinkHeader(action.payload.headers.link, "page", "limit");
+                    } else {
+                        draft.pages = {};
+                    }
                     break;
                 case CategoriesPageActions.GET_ARTICLES_ERROR:
                     draft.articles.status = LoadStatus.ERROR;
