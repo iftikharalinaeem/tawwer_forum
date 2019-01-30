@@ -6,13 +6,11 @@
 
 import ReduxActions from "@library/state/ReduxActions";
 import { IRouteError } from "@knowledge/routes/RouteReducer";
+import actionCreatorFactory from "typescript-fsa";
 
-export default class RouteActions extends ReduxActions {
-    public static readonly ERROR = "@@kbPage/ERROR";
+const createAction = actionCreatorFactory("@@navigation");
 
-    public static readonly ACTION_TYPES: ReturnType<typeof RouteActions.errorAC>;
-
-    public static errorAC(pageError: IRouteError) {
-        return RouteActions.createAction(RouteActions.ERROR, pageError);
-    }
+export default class RouteActions {
+    public static errorAC = createAction<IRouteError>("ERROR");
+    public static resetAC = createAction("RESET");
 }

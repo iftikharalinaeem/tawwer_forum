@@ -4,13 +4,13 @@
  */
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import {
-    IKbNavigationItem,
-    INormalizedNavigationItems,
-    NavigationRecordType,
-} from "@knowledge/modules/navigation/NavigationModel";
 import { ILinkGroup, ILinkListData, INavigationItem, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import {
+    NavigationRecordType,
+    INormalizedNavigationItems,
+    IKbNavigationItem,
+} from "@knowledge/navigation/state/NavigationModel";
 
 export default class NavigationSelector {
     /**
@@ -53,7 +53,31 @@ export default class NavigationSelector {
         if (!item) {
             return [];
         }
+
         return item.children.map(itemID => NavigationSelector.selectNavTree(navItems, itemID));
+    }
+
+    /**
+     * Select an array of direct child categories.
+     *
+     * @param navItems The navigation data.
+     * @param key The parent's unique id.
+     */
+    public static selectSubcategories(navItems: INormalizedNavigationItems, parentKey: string): INavigationTreeItem[] {
+        const rootItem = navItems[parentKey];
+        if (!rootItem) {
+            return [];
+        }
+
+        return rootItem.children
+            .map(itemID => navItems[itemID])
+            .filter(item => item !== undefined && item.recordType === NavigationRecordType.KNOWLEDGE_CATEGORY)
+            .map(item => {
+                return {
+                    ...item!,
+                    children: [],
+                } as INavigationTreeItem;
+            });
     }
 
     /**

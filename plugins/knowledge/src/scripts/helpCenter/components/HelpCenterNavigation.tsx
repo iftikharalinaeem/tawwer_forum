@@ -3,7 +3,6 @@
  * @license Proprietary
  */
 
-import { NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
 import { t } from "@library/application";
 import React from "react";
 import NavLinksWithHeadings from "@library/components/NavLinksWithHeadings";

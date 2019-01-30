@@ -8,18 +8,13 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import produce from "immer";
-import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api";
-import { IStoreState } from "@knowledge/state/model";
+import { IKbCategoryFragment } from "@knowledge/@types/api";
+import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import { createSelector } from "reselect";
 import { INavigationTreeItem } from "@library/@types/api";
-
-export interface ILocationPickerState {
-    navigatedCategoryID: number; // What page the user is on in the picker.
-    selectedCategoryID: number; // What category is selected (still not chosen).
-    chosenCategoryID: number; // What category is chosen (input closes after a selection)
-}
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 
 export interface ILPConnectedData extends ILocationPickerState {
     pageContents: INavigationTreeItem[];
@@ -33,32 +28,11 @@ export interface ILPConnectedData extends ILocationPickerState {
  * Reducer for the article page.
  */
 export default class LocationPickerModel extends ReduxReducer<ILocationPickerState> {
-    /**
-     * Static utility for mapping store state to the location picker props.
-     */
-    public static mapStateToProps(state: IStoreState): ILPConnectedData {
-        const { navigatedCategoryID, selectedCategoryID, chosenCategoryID } = state.knowledge.locationPicker;
-
-        // Category ID's less than 0 (eg. -1) represents the true root of the forum.
-        return {
-            pageContents: LocationPickerModel.selectPageContents(state),
-            locationBreadcrumb:
-                chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
-            navigatedCategory:
-                navigatedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID) : null,
-            selectedCategory:
-                selectedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, selectedCategoryID) : null,
-            choosenCategory:
-                chosenCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, chosenCategoryID) : null,
-            ...state.knowledge.locationPicker,
-        };
-    }
-
     private static selectState = (state: IStoreState) => state;
     private static stateSlice = (state: IStoreState) => state.knowledge.locationPicker;
-    private static selectNavigateCategoryID = (state: IStoreState) =>
+    public static selectNavigateCategoryID = (state: IStoreState) =>
         LocationPickerModel.stateSlice(state).navigatedCategoryID;
-    private static selectPageContents = createSelector(
+    public static selectPageContents = createSelector(
         LocationPickerModel.selectState,
         LocationPickerModel.selectNavigateCategoryID,
         (state, navID) => {
@@ -75,29 +49,36 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
     /**
      * @inheritDoc
      */
-    public reducer = (
-        state = this.initialState,
-        action: typeof LocationPickerActions.ACTION_TYPES | typeof CategoryActions.ACTION_TYPES,
-    ): ILocationPickerState => {
-        return produce(state, draft => {
-            switch (action.type) {
-                case LocationPickerActions.NAVIGATE_TO_CATEGORY:
-                    draft.navigatedCategoryID = action.payload.categoryID;
-                    break;
-                case LocationPickerActions.SELECT_CATEGORY:
-                    draft.selectedCategoryID = action.payload.categoryID;
-                    break;
-                case LocationPickerActions.CHOOSE_CATEGORY:
-                    draft.chosenCategoryID = action.payload.categoryID;
-                    break;
-                case LocationPickerActions.INIT: {
-                    const { categoryID, parentID } = action.payload;
-                    draft.navigatedCategoryID = categoryID === -1 ? categoryID : parentID;
-                    draft.selectedCategoryID = categoryID;
-                    draft.chosenCategoryID = categoryID;
-                    break;
-                }
-            }
-        });
+    public reducer: ReducerType = (state = this.initialState, action) => {
+        return produce(state, nextState => this.reduceSelf(nextState, action));
     };
+
+    public reduceSelf: ReducerType = reducerWithoutInitialState<ILocationPickerState>()
+        .case(LocationPickerActions.initAC, (state, payload) => {
+            const { categoryID, parentID } = payload;
+            state.navigatedCategoryID = categoryID === -1 ? categoryID : parentID;
+            state.selectedCategoryID = categoryID;
+            state.chosenCategoryID = categoryID;
+            return state;
+        })
+        .case(LocationPickerActions.chooseAC, (state, payload) => {
+            state.chosenCategoryID = payload.categoryID;
+            return state;
+        })
+        .case(LocationPickerActions.selectAC, (state, payload) => {
+            state.selectedCategoryID = payload.categoryID;
+            return state;
+        })
+        .case(LocationPickerActions.navigateAC, (state, payload) => {
+            state.navigatedCategoryID = payload.categoryID;
+            return state;
+        });
 }
+
+export interface ILocationPickerState {
+    navigatedCategoryID: number; // What page the user is on in the picker.
+    selectedCategoryID: number; // What category is selected (still not chosen).
+    chosenCategoryID: number; // What category is chosen (input closes after a selection)
+}
+
+export type ReducerType = KnowledgeReducer<ILocationPickerState>;

@@ -13,31 +13,20 @@ import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import LocationPickerModel, { ILPConnectedData } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import LocationPickerActions, { ILPActionsProps } from "@knowledge/modules/locationPicker/LocationPickerActions";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { connect } from "react-redux";
 import { plusCircle, categoryIcon } from "@library/components/icons/common";
-
-export interface ILocationInputProps extends ILPActionsProps, ILPConnectedData {
-    className?: string;
-    initialCategoryID: number | null;
-    disabled?: boolean;
-    onChange?: (categoryID: number) => void;
-}
-
-interface IState {
-    showLocationPicker: boolean;
-}
+import { IStoreState } from "@knowledge/state/model";
+import apiv2 from "@library/apiv2";
+import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 /**
  * This component allows to display and edit the location of the current page.
  * Creates a location picker in a modal when activated.
  */
-export class LocationInput extends React.PureComponent<ILocationInputProps, IState> {
+export class LocationInput extends React.PureComponent<IProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
-
-    private ignoreChange = false;
 
     public state: IState = {
         showLocationPicker: false,
@@ -96,9 +85,7 @@ export class LocationInput extends React.PureComponent<ILocationInputProps, ISta
 
     public componentDidMount() {
         if (this.props.initialCategoryID !== null) {
-            this.ignoreChange = true;
-            this.props.actions.initLocationPickerFromCategoryID(this.props.initialCategoryID);
-            this.ignoreChange = false;
+            this.props.initLocationPickerFromCategoryID(this.props.initialCategoryID);
         }
     }
 
@@ -132,9 +119,36 @@ export class LocationInput extends React.PureComponent<ILocationInputProps, ISta
     }
 }
 
-const withRedux = connect(
-    LocationPickerModel.mapStateToProps,
-    LocationPickerActions.mapDispatchToProps,
-);
+interface IOwnProps {
+    className?: string;
+    initialCategoryID: number | null;
+    disabled?: boolean;
+    onChange?: (categoryID: number) => void;
+}
 
-export default withRedux(LocationInput);
+interface IState {
+    showLocationPicker: boolean;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { chosenCategoryID, selectedCategoryID } = state.knowledge.locationPicker;
+    return {
+        selectedCategoryID,
+        locationBreadcrumb:
+            chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
+    };
+}
+
+function mapDispatchToProps(dispatch: any) {
+    const lpActions = new LocationPickerActions(dispatch, apiv2);
+    return {
+        initLocationPickerFromCategoryID: lpActions.initLocationPickerFromCategoryID,
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(LocationInput);

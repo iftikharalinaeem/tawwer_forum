@@ -8,10 +8,10 @@ import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
-import Navigation from "@knowledge/modules/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import Navigation from "@knowledge/navigation/Navigation";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
+import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { INavigationItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -29,7 +29,6 @@ interface IProps {
     device: Devices;
     breadcrumbData: ICrumb[];
     messages?: React.ReactNode;
-    kbID: number;
     currentNavigationCategory?: INavigationItem;
 }
 
@@ -54,7 +53,7 @@ export class ArticleLayout extends React.Component<IProps> {
                     isFixed={true}
                     title={title}
                     mobileDropDownContent={
-                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={this.props.kbID} />
+                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
                     }
                 />
                 <PanelLayout
@@ -67,7 +66,7 @@ export class ArticleLayout extends React.Component<IProps> {
                     }
                     leftBottom={
                         <PanelWidget>
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={1} />
+                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
                         </PanelWidget>
                     }
                     middleTop={

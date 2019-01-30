@@ -104,6 +104,7 @@ trait ArticlesApiSchemes {
             $this->articleSchema = $this->schema(Schema::parse([
                 "articleID",
                 "knowledgeCategoryID",
+                "knowledgeBaseID",
                 "name",
                 "body",
                 "outline",

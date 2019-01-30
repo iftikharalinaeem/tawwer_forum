@@ -62,6 +62,7 @@ describe("EditorPageActions", () => {
     const dummyArticle: IArticle = {
         articleID: 1,
         knowledgeCategoryID: 4,
+        knowledgeBaseID: 1,
         sort: 0,
         seoName: "",
         seoDescription: "",
