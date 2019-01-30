@@ -15,6 +15,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
+import { knowledgeBaseNoIcon } from "@library/components/icons";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -45,6 +46,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
                     hiddenTitle={true}
                     items={knowledgeBases}
                     emptyMessage={t("No knowledge bases found.")}
+                    fallbackIcon={knowledgeBaseNoIcon("subcommunityList-fallbackIcon")}
                 />
             </WidgetContainer>
         );
