@@ -11,7 +11,6 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
-
 /**
  * Test the /api/v2/articles endpoint.
  */
