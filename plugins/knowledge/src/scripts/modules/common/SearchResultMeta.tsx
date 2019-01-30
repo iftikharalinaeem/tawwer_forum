@@ -26,7 +26,6 @@ export class SearchResultMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, updateUser, crumbs, status, type } = this.props;
         const isDeleted = status === ArticleStatus.DELETED;
-        console.log("this.props: ", this.props);
         return (
             <React.Fragment>
                 {updateUser &&
