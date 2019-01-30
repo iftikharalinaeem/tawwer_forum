@@ -4,29 +4,37 @@
  * @license Proprietary
  */
 
+import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";
+import FullPageLoader from "@library/components/FullPageLoader";
 import Heading from "@library/components/Heading";
 import React from "react";
+import { connect } from "react-redux";
 import { match } from "react-router";
 
-interface IProps {
-    match: match<{
-        id: string;
-        page?: number;
-    }>;
-}
-
-export default class OrganizeCategoriesPage extends React.Component<IProps> {
+class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
 
     public render() {
-        const id = parseInt(this.props.match.params.id, 10);
+        const { knowledgeBase } = this.props;
         const pageTitle = t("Navigation Manager");
+
+        if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
+            return <FullPageLoader />;
+        }
+
+        if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
+            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+        }
 
         return (
             <>
@@ -45,7 +53,10 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
                                     />
                                 </DocumentTitle>
                                 <div className="inheritHeight">
-                                    <NavigationManager knowledgeBaseID={id} rootNavigationItemID="knowledgeCategory1" />
+                                    <NavigationManager
+                                        knowledgeBase={knowledgeBase.data}
+                                        rootNavigationItemID="knowledgeCategory1"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -54,4 +65,46 @@ export default class OrganizeCategoriesPage extends React.Component<IProps> {
             </>
         );
     }
+
+    public componentDidMount() {
+        if (this.props.knowledgeBase.status === LoadStatus.PENDING) {
+            this.props.requestData();
+        }
+    }
 }
+
+interface IOwnProps {
+    match: match<{
+        id: string;
+        page?: number;
+    }>;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
+    const kbID = parseInt(ownProps.match.params.id, 10);
+
+    const knowledgeBase = {
+        ...knowledgeBasesByID,
+        data: knowledgeBasesByID.data ? knowledgeBasesByID.data[kbID] : undefined,
+    };
+
+    return {
+        knowledgeBase,
+    };
+}
+
+function mapDispatchToProps(dispatch: any) {
+    const kbActions = new KnowledgeBaseActions(dispatch, apiv2);
+
+    return {
+        requestData: () => kbActions.getAll(),
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(OrganizeCategoriesPage);
