@@ -98,7 +98,7 @@ export default class EditorPageActions extends ReduxActions {
 
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
-    private locationActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api);
+    private locationActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api, this.getState);
 
     /**
      * Initialize the add page.

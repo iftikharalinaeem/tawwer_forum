@@ -20,7 +20,7 @@ import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
     public static readonly ROOT_ID = -1;
 
-    public initialState: INavigationStoreState = {
+    public static DEFAULT_STATE = {
         navigationItems: {},
         navigationItemsByKbID: {},
         submitLoadable: {
@@ -29,6 +29,8 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchLoadablesByKbID: [],
         patchTransactionID: null,
     };
+
+    public initialState: INavigationStoreState = NavigationModel.DEFAULT_STATE;
 
     /**
      * Main reducer function for the navigation model.

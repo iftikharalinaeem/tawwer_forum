@@ -59,8 +59,8 @@ export default class LocationPickerActions extends ReduxActions {
     public navigateToRecord = this.bindDispatch(LocationPickerActions.navigateAC);
     public init = this.bindDispatch(LocationPickerActions.initAC);
 
-    private navActions = new NavigationActions(this.dispatch, this.api);
-    private kbActions = new KnowledgeBaseActions(this.dispatch, this.api);
+    private navActions = new NavigationActions(this.dispatch, this.api, this.getState);
+    private kbActions = new KnowledgeBaseActions(this.dispatch, this.api, this.getState);
 
     public requestData = async () => {
         const state = this.getState<IStoreState>();

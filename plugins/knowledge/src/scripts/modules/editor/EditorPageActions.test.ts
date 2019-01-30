@@ -16,6 +16,13 @@ import { DeepPartial } from "redux";
 import { LoadStatus } from "@library/@types/api";
 import { Format, IArticle, ArticleStatus } from "@knowledge/@types/api";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import NavigationModel from "@knowledge/navigation/state/NavigationModel";
+
+const DEFAULT_KB_STATE = {
+    articles: ArticleModel.INITIAL_STATE,
+    navigation: NavigationModel.DEFAULT_STATE,
+    editorPage: EditorPageModel.INITIAL_STATE,
+};
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -24,7 +31,13 @@ describe("EditorPageActions", () => {
 
     beforeEach(() => {
         mockApi = new MockAdapter(apiv2);
-        initWithState({ knowledge: { articles: ArticleModel.INITIAL_STATE } });
+        initWithState({
+            knowledge: {
+                articles: ArticleModel.INITIAL_STATE,
+                navigation: NavigationModel.DEFAULT_STATE,
+                editorPage: EditorPageModel.INITIAL_STATE,
+            },
+        });
     });
 
     const mockGetEditAPI = () => {
@@ -226,7 +239,7 @@ describe("EditorPageActions", () => {
             mockGetEditAPI();
             mockApi.onGet("/api/v2/article-revisions/6").replyOnce(200, dummyRevision);
 
-            initWithState({ knowledge: { articles: { revisionsByID: {}, articlesByID: {} } } });
+            initWithState({ knowledge: { ...DEFAULT_KB_STATE, articles: { revisionsByID: {}, articlesByID: {} } } });
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -241,6 +254,7 @@ describe("EditorPageActions", () => {
 
             initWithState({
                 knowledge: {
+                    ...DEFAULT_KB_STATE,
                     articles: {
                         revisionsByID: {
                             6: dummyRevision,
