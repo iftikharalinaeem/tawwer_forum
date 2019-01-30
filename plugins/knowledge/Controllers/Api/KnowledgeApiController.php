@@ -421,9 +421,8 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
-            $idx = 0;
             foreach ($searchResults['matches'] as $guid => $record) {
-                $this->results['matches'][$guid]['orderIndex'] = $idx++;
+                $this->results['matches'][$guid]['orderIndex'] = $record['weight'];
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -436,7 +435,7 @@ class KnowledgeApiController extends AbstractApiController {
             if ($a['orderIndex'] == $b['orderIndex']) {
                 return 0;
             }
-            return ($a['orderIndex'] < $b['orderIndex']) ? -1 : 1;
+            return ($a['orderIndex'] > $b['orderIndex']) ? -1 : 1;
         });
         return $results;
     }
