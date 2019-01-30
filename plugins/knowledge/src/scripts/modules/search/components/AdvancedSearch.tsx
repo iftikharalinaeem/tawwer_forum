@@ -4,25 +4,23 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { t } from "@library/application";
-import Heading from "@library/components/Heading";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import Checkbox from "@library/components/forms/Checkbox";
-import Button from "@library/components/forms/Button";
-import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
-import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import DateRange from "@knowledge/modules/search/components/DateRange";
-import MultiUserInput from "@library/users/MultiUserInput";
-import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-import ButtonLoader from "@library/components/ButtonLoader";
+import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
+import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import { LoadStatus } from "@library/@types/api";
-import Permission from "@library/users/Permission";
-import classNames from "classnames";
-import TabContext from "library/src/scripts/contexts/TabContext";
+import { t } from "@library/application";
+import ButtonLoader from "@library/components/ButtonLoader";
+import Button from "@library/components/forms/Button";
+import Checkbox from "@library/components/forms/Checkbox";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import Heading from "@library/components/Heading";
 import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
 import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
+import MultiUserInput from "@library/users/MultiUserInput";
+import Permission from "@library/users/Permission";
+import * as React from "react";
+import { connect } from "react-redux";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
