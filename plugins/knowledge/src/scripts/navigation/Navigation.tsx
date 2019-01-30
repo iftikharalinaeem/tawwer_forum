@@ -4,11 +4,11 @@
  */
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { IKnowledgeBase, KnowledgeBaseDisplayType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, INavigationTreeItem, LoadStatus } from "@library/@types/api";
@@ -39,7 +39,7 @@ export class Navigation extends React.Component<IProps> {
         }
 
         const title =
-            knowledgeBase.data.viewType === KnowledgeBaseDisplayType.HELP && navItems.data.length > 0
+            knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0
                 ? t("Subcategories")
                 : undefined;
 
@@ -60,7 +60,7 @@ export class Navigation extends React.Component<IProps> {
      * Preload a navigation item from the API.
      */
     private preloadItem = (item: INavigationTreeItem) => {
-        if (item.recordType === NavigationRecordType.ARTICLE) {
+        if (item.recordType === KbRecordType.ARTICLE) {
             void this.props.preloadArticle(item.recordID);
         }
     };
@@ -103,16 +103,18 @@ function mapStateToProps(store: IStoreState, ownProps: IOwnProps) {
     if (knowledgeBase.data && navItems.status === LoadStatus.SUCCESS) {
         const items = navigation.navigationItems;
         switch (knowledgeBase.data.viewType) {
-            case KnowledgeBaseDisplayType.GUIDE:
+            case KbViewType.GUIDE:
                 {
                     // Guides always display from the root of the knowledge base..
-                    const rootID = NavigationRecordType.KNOWLEDGE_CATEGORY + knowledgeBase.data.rootCategoryID;
+                    const rootID = KbRecordType.CATEGORY + knowledgeBase.data.rootCategoryID;
                     navItems.data = NavigationSelector.selectChildren(items, rootID);
                 }
                 break;
-            case KnowledgeBaseDisplayType.HELP: {
+            case KbViewType.HELP: {
                 const rootID = ownProps.activeRecord.recordType + ownProps.activeRecord.recordID;
-                navItems.data = NavigationSelector.selectSubcategories(items, rootID);
+                navItems.data = NavigationSelector.selectDirectChildren(items, rootID, [KbRecordType.CATEGORY]).map(
+                    item => ({ ...item, children: [] }),
+                );
             }
         }
     }

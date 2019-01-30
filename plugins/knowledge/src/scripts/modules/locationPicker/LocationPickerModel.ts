@@ -4,21 +4,20 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import produce from "immer";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
-import { ICrumb } from "@library/components/Breadcrumbs";
-import { createSelector } from "reselect";
 import { INavigationTreeItem } from "@library/@types/api";
+import { t } from "@library/application";
+import ReduxReducer from "@library/state/ReduxReducer";
+import produce from "immer";
+import { createSelector } from "reselect";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 
 export interface ILPConnectedData extends ILocationPickerState {
     pageContents: INavigationTreeItem[];
-    locationBreadcrumb: ICrumb[] | null;
     navigatedCategory: IKbCategoryFragment | null; // What page the user is on in the picker.
     selectedCategory: IKbCategoryFragment | null; // What category is selected (still not chosen).
     choosenCategory: IKbCategoryFragment | null; // What category is chosen (input closes after a selection)
@@ -30,20 +29,61 @@ export interface ILPConnectedData extends ILocationPickerState {
 export default class LocationPickerModel extends ReduxReducer<ILocationPickerState> {
     private static selectState = (state: IStoreState) => state;
     private static stateSlice = (state: IStoreState) => state.knowledge.locationPicker;
-    public static selectNavigateCategoryID = (state: IStoreState) =>
-        LocationPickerModel.stateSlice(state).navigatedCategoryID;
     public static selectPageContents = createSelector(
         LocationPickerModel.selectState,
-        LocationPickerModel.selectNavigateCategoryID,
-        (state, navID) => {
-            return CategoryModel.selectMixedRecordTree(state, navID).children!;
+        (state): IKbNavigationItem[] => {
+            return [];
+            // return CategoryModel.selectMixedRecordTree(state, navID).children!;
+        },
+    );
+
+    public static selectParentRecord = createSelector(
+        LocationPickerModel.stateSlice,
+        NavigationSelector.selectNavigationItems,
+        (lpState, navItems): ILocationPickerRecord | null => {
+            const { navigatedRecord } = lpState;
+            if (!navigatedRecord) {
+                return null;
+            }
+
+            // Check if we have a knowledgeBase parent.
+            const fullNavItem = navItems[navigatedRecord.recordType + navigatedRecord.recordID];
+            if (!fullNavItem) {
+                return null;
+            }
+
+            const fullParent = navItems[KbRecordType.CATEGORY + fullNavItem.parentID];
+            if (fullParent) {
+                return fullParent;
+            }
+
+            return null;
+        },
+    );
+
+    public static selectNavigatedTitle = createSelector(
+        LocationPickerModel.stateSlice,
+        NavigationSelector.selectNavigationItems,
+        (lpState, navItems): string => {
+            const { navigatedRecord } = lpState;
+            if (!navigatedRecord) {
+                return t("Knowledge Bases");
+            }
+
+            // Check if we have a knowledgeBase parent.
+            const fullNavItem = navItems[navigatedRecord.recordType + navigatedRecord.recordID];
+            if (!fullNavItem) {
+                return t("Knowledge Bases");
+            }
+
+            return fullNavItem.name;
         },
     );
 
     public initialState: ILocationPickerState = {
-        selectedCategoryID: -1,
-        navigatedCategoryID: -1,
-        chosenCategoryID: -1,
+        selectedRecord: null,
+        navigatedRecord: null,
+        chosenRecord: null,
     };
 
     /**
@@ -55,30 +95,36 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
 
     public reduceSelf: ReducerType = reducerWithoutInitialState<ILocationPickerState>()
         .case(LocationPickerActions.initAC, (state, payload) => {
-            const { categoryID, parentID } = payload;
-            state.navigatedCategoryID = categoryID === -1 ? categoryID : parentID;
-            state.selectedCategoryID = categoryID;
-            state.chosenCategoryID = categoryID;
+            const { selected, parent } = payload;
+            state.navigatedRecord = parent;
+            state.selectedRecord = selected;
+            state.chosenRecord = selected;
             return state;
         })
         .case(LocationPickerActions.chooseAC, (state, payload) => {
-            state.chosenCategoryID = payload.categoryID;
+            state.chosenRecord = payload;
             return state;
         })
         .case(LocationPickerActions.selectAC, (state, payload) => {
-            state.selectedCategoryID = payload.categoryID;
+            state.selectedRecord = payload;
             return state;
         })
         .case(LocationPickerActions.navigateAC, (state, payload) => {
-            state.navigatedCategoryID = payload.categoryID;
+            state.navigatedRecord = payload;
             return state;
         });
 }
 
+export interface ILocationPickerRecord {
+    recordType: KbRecordType;
+    recordID: number;
+    knowledgeBaseID: number;
+}
+
 export interface ILocationPickerState {
-    navigatedCategoryID: number; // What page the user is on in the picker.
-    selectedCategoryID: number; // What category is selected (still not chosen).
-    chosenCategoryID: number; // What category is chosen (input closes after a selection)
+    navigatedRecord: ILocationPickerRecord | null; // What page the user is on in the picker.
+    selectedRecord: ILocationPickerRecord | null; // What category is selected (still not chosen).
+    chosenRecord: ILocationPickerRecord | null; // What category is chosen (input closes after a selection)
 }
 
 export type ReducerType = KnowledgeReducer<ILocationPickerState>;

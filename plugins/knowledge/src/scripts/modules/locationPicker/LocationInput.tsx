@@ -4,21 +4,20 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import classNames from "classnames";
 import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
-import Button from "@library/components/forms/Button";
-import { t } from "@library/application";
-import { Modal } from "@library/components/modal";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import ModalSizes from "@library/components/modal/ModalSizes";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import { connect } from "react-redux";
-import { plusCircle, categoryIcon } from "@library/components/icons/common";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
+import { t } from "@library/application";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { categoryIcon, plusCircle } from "@library/components/icons/common";
+import { Modal } from "@library/components/modal";
+import ModalSizes from "@library/components/modal/ModalSizes";
+import classNames from "classnames";
+import * as React from "react";
+import { connect } from "react-redux";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -73,7 +72,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >
                         <LocationPicker
-                            onChoose={this.handleChoose}
+                            afterChoose={this.handleChoose}
                             onCloseClick={this.hideLocationPicker}
                             {...passThrough}
                         />
@@ -90,7 +89,6 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
     }
 
     private handleChoose = () => {
-        this.props.onChange && this.props.onChange(this.props.selectedCategoryID!);
         this.hideLocationPicker();
     };
 
@@ -133,11 +131,12 @@ interface IState {
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
-    const { chosenCategoryID, selectedCategoryID } = state.knowledge.locationPicker;
+    const { chosenRecord } = state.knowledge.locationPicker;
+    const { navigationItems } = state.knowledge.navigation;
     return {
-        selectedCategoryID,
-        locationBreadcrumb:
-            chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
+        locationBreadcrumb: chosenRecord
+            ? NavigationSelector.selectBreadcrumb(navigationItems, chosenRecord.recordType + chosenRecord.recordID)
+            : null,
     };
 }
 

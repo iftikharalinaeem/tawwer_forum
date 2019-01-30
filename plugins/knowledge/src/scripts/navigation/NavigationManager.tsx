@@ -23,7 +23,7 @@ import NavigationModel, {
     INavigationStoreState,
     INormalizedNavigationItem,
     INormalizedNavigationItems,
-    NavigationRecordType,
+    KbRecordType,
 } from "@knowledge/navigation/state/NavigationModel";
 import NavigationManagerContent from "@knowledge/navigation/subcomponents/NavigationManagerContent";
 import NavigationManagerToolBar from "@knowledge/navigation/subcomponents/NavigationManagerToolBar";
@@ -280,7 +280,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
     }
 
     private calcParentID(item: ITreeItem<INormalizedNavigationItem>): string {
-        return NavigationRecordType.KNOWLEDGE_CATEGORY + item.data.parentID;
+        return KbRecordType.CATEGORY + item.data.parentID;
     }
 
     private selectItemByID = (itemID: string) => {
@@ -330,10 +330,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private handleRename = (item: IKbNavigationItem, newName: string) => {
         switch (item.recordType) {
-            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+            case KbRecordType.CATEGORY:
                 void this.props.categoryActions.patchCategory({ knowledgeCategoryID: item.recordID, name: newName });
                 break;
-            case NavigationRecordType.ARTICLE:
+            case KbRecordType.ARTICLE:
                 void this.props.articleActions.patchArticle({ articleID: item.recordID, name: newName });
                 break;
         }
@@ -370,7 +370,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
             return this.props.knowledgeBaseID;
         }
 
-        if (selectedItem.data.recordType === NavigationRecordType.ARTICLE) {
+        if (selectedItem.data.recordType === KbRecordType.ARTICLE) {
             return selectedItem.data.parentID;
         } else {
             return selectedItem.data.recordID;
@@ -460,10 +460,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
         if (deleteItem) {
             const { recordType, recordID } = deleteItem.data;
             switch (recordType) {
-                case NavigationRecordType.ARTICLE:
+                case KbRecordType.ARTICLE:
                     await this.props.articleActions.patchStatus({ articleID: recordID, status: ArticleStatus.DELETED });
                     break;
-                case NavigationRecordType.KNOWLEDGE_CATEGORY:
+                case KbRecordType.CATEGORY:
                     await this.props.categoryActions.deleteCategory(recordID);
                     break;
             }
@@ -501,9 +501,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private getItemTypeLabel(item: INormalizedNavigationItem): string {
         const { recordType } = item;
         switch (recordType) {
-            case NavigationRecordType.ARTICLE:
+            case KbRecordType.ARTICLE:
                 return t("article");
-            case NavigationRecordType.KNOWLEDGE_CATEGORY:
+            case KbRecordType.CATEGORY:
                 return t("category");
             default:
                 return recordType;
@@ -646,7 +646,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
             const children = itemValue.children;
             data.items[itemID] = {
-                parentID: NavigationRecordType.KNOWLEDGE_CATEGORY + itemValue.parentID,
+                parentID: KbRecordType.CATEGORY + itemValue.parentID,
                 id: itemID,
                 hasChildren: children.length > 0,
                 children,

@@ -4,19 +4,18 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import { FramePanel, FrameFooter, FrameBody, FrameHeader, Frame } from "@library/components/frame";
-import { newFolder } from "@library/components/icons/common";
 import LocationContents from "@knowledge/modules/locationPicker/components/LocationContents";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
-import { IStoreState } from "@knowledge/state/model";
-import { connect } from "react-redux";
-import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
+import { t } from "@library/application";
+import Button from "@library/components/forms/Button";
+import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
+import { newFolder } from "@library/components/icons/common";
+import * as React from "react";
+import { connect } from "react-redux";
 
 /**
  * Component for choosing a location for a new article.
@@ -28,27 +27,17 @@ class LocationPicker extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { actions } = this.props;
-        const title = this.props.navigatedCategory ? this.props.navigatedCategory.name : t("Knowledge Bases");
-
         return (
             <React.Fragment>
                 <Frame>
                     <FrameHeader
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
                         closeFrame={this.props.onCloseClick}
-                        title={title}
+                        title={this.props.title}
                     />
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <LocationContents
-                                onCategoryNavigate={actions.navigateToCategory}
-                                onItemSelect={actions.selectCategory}
-                                selectedCategory={this.props.selectedCategory}
-                                navigatedCategory={this.props.navigatedCategory}
-                                chosenCategory={this.props.choosenCategory}
-                                items={this.props.pageContents}
-                            />
+                            <LocationContents />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
@@ -65,10 +54,10 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal && (
+                {this.state.showNewCategoryModal && this.props.navigatedRecord && (
                     <NewCategoryForm
                         exitHandler={this.hideNewFolderModal}
-                        parentCategoryID={this.props.navigatedCategoryID}
+                        parentCategoryID={this.props.navigatedRecord.recordID}
                         buttonRef={this.newFolderButtonRef}
                     />
                 )}
@@ -80,7 +69,7 @@ class LocationPicker extends React.Component<IProps, IState> {
      * If the current navigated category has a valid parent we can navigate back to it.
      */
     private get canNavigateBack(): boolean {
-        return this.props.navigatedCategory !== null;
+        return !!this.props.navigatedRecord;
     }
 
     /**
@@ -88,7 +77,7 @@ class LocationPicker extends React.Component<IProps, IState> {
      */
     private goBack = () => {
         if (this.canNavigateBack) {
-            void this.props.actions.navigateToCategory({ categoryID: this.props.navigatedCategory!.parentID });
+            void this.props.navigateToRecord(this.props.parentRecord!);
         }
     };
 
@@ -111,13 +100,13 @@ class LocationPicker extends React.Component<IProps, IState> {
     };
 
     private get canChoose(): boolean {
-        return this.props.selectedCategory !== null;
+        return this.props.selectedRecord !== null;
     }
 
     private handleChoose = () => {
         if (this.canChoose) {
-            this.props.actions.chooseCategory({ categoryID: this.props.selectedCategory!.knowledgeCategoryID });
-            this.props.onChoose();
+            this.props.chooseRecord(this.props.selectedRecord!);
+            this.props.afterChoose && this.props.afterChoose();
         }
     };
 
@@ -128,8 +117,8 @@ class LocationPicker extends React.Component<IProps, IState> {
 
 interface IOwnProps {
     className?: string;
+    afterChoose: () => void;
     onCloseClick: () => void;
-    onChoose: () => void;
 }
 
 interface IState {
@@ -141,29 +130,18 @@ interface IOwnProps {}
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
-    const { navigatedCategoryID, selectedCategoryID, chosenCategoryID } = state.knowledge.locationPicker;
-    const navigatedCategory =
-        navigatedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, navigatedCategoryID) : null;
-    const selectedCategory =
-        selectedCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, selectedCategoryID) : null;
-    const choosenCategory =
-        chosenCategoryID > 0 ? CategoryModel.selectKbCategoryFragment(state, chosenCategoryID) : null;
-
-    // Category ID's less than 0 (eg. -1) represents the true root of the forum.
-    return {
-        pageContents: LocationPickerModel.selectPageContents(state),
-        locationBreadcrumb:
-            chosenCategoryID > 0 ? CategoryModel.selectKbCategoryBreadcrumb(state, chosenCategoryID) : null,
-        navigatedCategory,
-        selectedCategory,
-        choosenCategory,
-        ...state.knowledge.locationPicker,
-    };
+    const { selectedRecord, navigatedRecord } = state.knowledge.locationPicker;
+    const parentRecord = LocationPickerModel.selectParentRecord(state);
+    const title = LocationPickerModel.selectNavigatedTitle(state);
+    return { selectedRecord, parentRecord, navigatedRecord, title };
 }
 
 function mapDispatchToProps(dispatch: any) {
+    const lpActions = new LocationPickerActions(dispatch, apiv2);
+
     return {
-        actions: new LocationPickerActions(dispatch, apiv2),
+        navigateToRecord: lpActions.navigateToRecord,
+        chooseRecord: lpActions.chooseRecord,
     };
 }
 

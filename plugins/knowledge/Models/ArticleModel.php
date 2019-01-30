@@ -244,7 +244,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
-        $selectColumns = $options["columns"] ?? 'a.*, ar.name';
+        $selectColumns = $options["columns"] ?? 'a.*, ar.name, c.knowledgeBaseID';
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
@@ -258,7 +258,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $sql = $this->sql()
             ->from('article a')
             ->select($selectColumns)
-            ->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID');
+            ->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID')
+            ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
         foreach ($pseudoFields as $field => $val) {
             $sql->select('"' . $val . '" as ' . $field);
         }
@@ -296,7 +297,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
             $rows = $this->getExtended(
-                ["knowledgeCategoryID" => $knowledgeCategoryID],
+                ["a.knowledgeCategoryID" => $knowledgeCategoryID],
                 [
                     "limit" => $limit,
                     "orderFields" => $orderField,

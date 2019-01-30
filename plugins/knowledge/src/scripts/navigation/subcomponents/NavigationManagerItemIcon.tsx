@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import FlexSpacer from "@library/components/FlexSpacer";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
@@ -18,7 +18,7 @@ interface IProps {
     collapseItem: () => void;
     itemId: string;
     disabled?: boolean;
-    type: NavigationRecordType;
+    type: KbRecordType;
     className?: string;
     hasChildren: boolean;
 }
@@ -26,7 +26,7 @@ interface IProps {
 export default class NavigationManagerItemIcon extends React.Component<IProps> {
     public render() {
         const spacerClassName = classNames("navigationManager-toggleSpacer");
-        if (this.props.type === NavigationRecordType.KNOWLEDGE_CATEGORY) {
+        if (this.props.type === KbRecordType.CATEGORY) {
             const className = classNames("navigationManager-toggleFolder", this.props.className);
             if (this.props.hasChildren) {
                 return (

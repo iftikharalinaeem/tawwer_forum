@@ -9,7 +9,7 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Heading from "@library/components/Heading";
@@ -36,7 +36,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     public render() {
         const { category, device } = this.props;
         const activeRecord = {
-            recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
+            recordType: KbRecordType.CATEGORY,
             recordID: category.knowledgeCategoryID,
         };
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop

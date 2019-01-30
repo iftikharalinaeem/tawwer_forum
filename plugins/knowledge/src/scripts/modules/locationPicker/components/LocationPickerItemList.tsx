@@ -4,10 +4,9 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import classNames from "classnames";
 import { t } from "@library/application";
-import { getRequiredID } from "@library/componentIDs";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
     categoryName: string;
