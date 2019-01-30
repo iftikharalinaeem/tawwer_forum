@@ -9,12 +9,13 @@
  */
 class BadgesModule extends Gdn_Module {
 
-    public $Limit = false;
+    public $Limit;
 
     /**
      * Create the module instance.
      *
      * @param string $sender
+     * @param int $limit
      */
     public function __construct($sender = '', $limit = false) {
         // Default to current user if none is set
