@@ -63,7 +63,6 @@ export class CategoriesPage extends React.Component<IProps> {
                         <CategoriesLayout
                             results={categoriesPageState.articles.data!.map(this.mapArticleToResult)}
                             category={category!}
-                            kbID={this.props.category.knowledgeBaseID}
                             pages={categoriesPageState.pages}
                         />
                     </DocumentTitle>

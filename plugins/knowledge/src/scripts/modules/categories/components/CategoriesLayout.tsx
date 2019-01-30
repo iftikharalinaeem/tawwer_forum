@@ -24,7 +24,6 @@ interface IProps extends IDeviceProps {
     category: IKbCategory;
     results: IResult[];
     query?: string;
-    kbID: number;
     pages: ILinkPages;
 }
 
