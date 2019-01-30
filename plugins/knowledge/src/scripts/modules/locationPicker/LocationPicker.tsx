@@ -16,6 +16,7 @@ import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library
 import { newFolder } from "@library/components/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 /**
  * Component for choosing a location for a new article.
@@ -27,8 +28,9 @@ class LocationPicker extends React.Component<IProps, IState> {
     };
 
     public render() {
+        const { navigatedRecord } = this.props;
         return (
-            <React.Fragment>
+            <>
                 <Frame>
                     <FrameHeader
                         onBackClick={this.canNavigateBack ? this.goBack : undefined}
@@ -41,14 +43,16 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button
-                            title={t("New Category")}
-                            className="buttonNoBorder isSquare button-pushLeft"
-                            onClick={this.showNewCategoryModal}
-                            buttonRef={this.newFolderButtonRef}
-                        >
-                            {newFolder()}
-                        </Button>
+                        {navigatedRecord && (
+                            <Button
+                                title={t("New Category")}
+                                className="buttonNoBorder isSquare button-pushLeft"
+                                onClick={this.showNewCategoryModal}
+                                buttonRef={this.newFolderButtonRef}
+                            >
+                                {newFolder()}
+                            </Button>
+                        )}
                         <Button onClick={this.handleChoose} disabled={!this.canChoose} className="buttonPrimary">
                             {t("Choose")}
                         </Button>
@@ -61,7 +65,7 @@ class LocationPicker extends React.Component<IProps, IState> {
                         buttonRef={this.newFolderButtonRef}
                     />
                 )}
-            </React.Fragment>
+            </>
         );
     }
 
