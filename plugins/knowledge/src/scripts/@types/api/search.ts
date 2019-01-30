@@ -46,6 +46,8 @@ export interface ISearchRequestBody {
     knowledgeBaseID?: number;
     statuses?: ArticleStatus[];
     expand?: string[];
+    page?: number;
+    limit?: number;
 }
 
 export type ISearchResponseBody = ISearchResult[];

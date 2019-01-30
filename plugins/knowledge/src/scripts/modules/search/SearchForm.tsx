@@ -31,6 +31,7 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
+import SearchPagination from "./components/SearchPagination";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -43,6 +44,7 @@ class SearchForm extends React.Component<IProps> {
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
@@ -91,6 +93,7 @@ class SearchForm extends React.Component<IProps> {
                         middleBottom={
                             <PanelWidgetVerticalPadding>
                                 {<SearchResults results={this.unwrapResults()} />}
+                                <SearchPagination searchActions={this.props.searchActions} pages={this.props.pages} />
                             </PanelWidgetVerticalPadding>
                         }
                         rightTop={

@@ -12,6 +12,7 @@ import produce from "immer";
 import { IStoreState } from "@knowledge/state/model";
 import { ISearchResponseBody } from "@knowledge/@types/api";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import SimplePagerModel, { ILinkPages } from "@library/simplePager/SimplePagerModel";
 
 export enum SearchDomain {
     ARTICLES = "articles",
@@ -48,6 +49,7 @@ export interface ISearchFormState {
 export interface ISearchPageState {
     form: ISearchFormState;
     results: ILoadable<ISearchResponseBody>;
+    pages: ILinkPages;
 }
 
 export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
@@ -80,6 +82,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
             status: LoadStatus.PENDING,
         },
         form: SearchPageModel.INITIAL_FORM,
+        pages: {},
     };
 
     public reducer = (
@@ -100,6 +103,14 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
                 case SearchPageActions.GET_SEARCH_RESPONSE:
                     next.results.status = LoadStatus.SUCCESS;
                     next.results.data = action.payload.data;
+
+                    if (action.payload.headers) {
+                        const { link } = action.payload.headers;
+                        if (link) {
+                            next.pages = SimplePagerModel.parseLinkHeader(link, "page");
+                        }
+                    }
+
                     break;
                 case SearchPageActions.RESET:
                     return this.initialState;
