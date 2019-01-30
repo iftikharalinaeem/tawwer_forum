@@ -16,6 +16,8 @@ export default class CategoriesPageActions extends ReduxActions {
 
     public static readonly RESET = "@@kbCategoriesPage/RESET";
 
+    private static readonly ARTICLES_LIMIT = 10;
+
     public static ACTION_TYPES:
         | ActionsUnion<typeof CategoriesPageActions.getArticlesACs>
         | ReturnType<typeof CategoriesPageActions.createResetAction>;
@@ -42,10 +44,13 @@ export default class CategoriesPageActions extends ReduxActions {
      */
     public reset = this.bindDispatch(CategoriesPageActions.createResetAction);
 
-    public getArticles(id: number) {
+    public getArticles(id: number, page?: number, limit?: number) {
+        page = page || 1;
+        limit = limit || CategoriesPageActions.ARTICLES_LIMIT;
+
         return this.dispatchApi(
             "get",
-            `/articles?knowledgeCategoryID=${id}&expand=excerpt`,
+            `/articles?knowledgeCategoryID=${id}&expand=excerpt&limit=${limit}&page=${page}`,
             CategoriesPageActions.getArticlesACs,
             {},
         );

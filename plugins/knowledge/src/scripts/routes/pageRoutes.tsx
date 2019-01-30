@@ -101,10 +101,21 @@ export const DebugRoute = new RouteHandler(
     () => formatUrl("/kb/debug"),
 );
 
+const CATEGORIES_KEY = "CategoriesPageKey";
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
     (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
+    undefined,
+    CATEGORIES_KEY,
+);
+
+export const CategoryPagedRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
+    "/kb/categories/:id(\\d+)(-[^/]+)?/p:page(\\d+)",
+    (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
+    undefined,
+    CATEGORIES_KEY,
 );
 
 export const SearchRoute = new RouteHandler(
@@ -160,6 +171,7 @@ export function getPageRoutes() {
         ArticleRoute.route,
         DebugRoute.route,
         CategoryRoute.route,
+        CategoryPagedRoute.route,
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,

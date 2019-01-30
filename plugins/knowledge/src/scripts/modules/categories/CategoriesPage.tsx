@@ -31,6 +31,7 @@ interface IProps extends IDeviceProps {
     categoriesPageActions: CategoriesPageActions;
     match: match<{
         id: string;
+        page?: number;
     }>;
     kbID: number;
 }
@@ -56,7 +57,6 @@ export class CategoriesPage extends React.Component<IProps> {
         const hasData = categoriesPageState.articles.status === LoadStatus.SUCCESS && categoriesPageState.articles.data;
 
         // Render either a loading layout or a full layout.
-
         return (
             <PageLoader {...categoriesPageState.articles} status={LoadStatus.SUCCESS}>
                 {hasData ? (
@@ -65,6 +65,7 @@ export class CategoriesPage extends React.Component<IProps> {
                             results={categoriesPageState.articles.data!.map(this.mapArticleToResult)}
                             category={category!}
                             kbID={this.props.kbID}
+                            pages={categoriesPageState.pages}
                         />
                     </DocumentTitle>
                 ) : (
@@ -88,7 +89,9 @@ export class CategoriesPage extends React.Component<IProps> {
      * If we the id of the page changes we need to re-fetch the data.
      */
     public componentDidUpdate(prevProps: IProps) {
-        if (this.props.match.params.id !== prevProps.match.params.id) {
+        const { id, page } = this.props.match.params;
+
+        if (id !== prevProps.match.params.id || page !== prevProps.match.params.page) {
             return this.fetchCategoryData();
         }
     }
@@ -99,12 +102,13 @@ export class CategoriesPage extends React.Component<IProps> {
     private fetchCategoryData() {
         const { categoriesPageActions } = this.props;
         const id = this.categoryID;
+        const { page } = this.props.match.params;
 
         if (id === null) {
             return;
         }
 
-        return categoriesPageActions.getArticles(id);
+        return categoriesPageActions.getArticles(id, page);
     }
 
     /**

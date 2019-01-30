@@ -9,24 +9,23 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/modules/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/modules/navigation/NavigationBreadcrumbs";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/application";
+import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
-import { compose } from "@library/components/icons/common";
+import Heading from "@library/components/Heading";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
+import SimplePager from "@library/simplePager/SimplePager";
+import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import * as React from "react";
-import { NavigationRecordType } from "@knowledge/modules/navigation/NavigationModel";
-import Heading from "@library/components/Heading";
 
 interface IProps extends IDeviceProps {
     category: IKbCategoryFragment;
     results: IResult[];
     query?: string;
     kbID: number;
+    pages: ILinkPages;
 }
 
 interface IState {
@@ -39,7 +38,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { category, device } = this.props;
+        const { category, device, pages } = this.props;
         const activeRecord = {
             recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
             recordID: category.knowledgeCategoryID,
@@ -76,6 +75,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     middleBottom={
                         <PanelWidgetVerticalPadding>
                             <SearchResults results={this.props.results} />
+                            <SimplePager url={category.url + "/p:page:"} pages={pages} />
                         </PanelWidgetVerticalPadding>
                     }
                     rightTop={isFullWidth && <></>}
