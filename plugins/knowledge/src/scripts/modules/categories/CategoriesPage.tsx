@@ -12,7 +12,6 @@ import CategoriesLayout from "@knowledge/modules/categories/components/Categorie
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
@@ -24,6 +23,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -43,7 +43,7 @@ export class CategoriesPage extends React.Component<IProps> {
         const { categoriesPageState, category } = this.props;
         const id = this.categoryID;
 
-        const activeRecord = { recordID: id!, recordType: NavigationRecordType.KNOWLEDGE_CATEGORY };
+        const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
         const noCategoryID = id === null;
         const categoryNotFound =
             categoriesPageState.articles.status === LoadStatus.ERROR &&

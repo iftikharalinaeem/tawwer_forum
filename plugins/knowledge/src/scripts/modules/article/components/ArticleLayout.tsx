@@ -10,7 +10,7 @@ import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { INavigationItem } from "@library/@types/api";
@@ -40,7 +40,7 @@ export class ArticleLayout extends React.Component<IProps> {
         const { article, currentNavigationCategory, messages } = this.props;
         const { articleID } = article;
 
-        const activeRecord = { recordID: articleID, recordType: NavigationRecordType.ARTICLE };
+        const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
 
         let title = "";
         if (currentNavigationCategory) {

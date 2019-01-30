@@ -81,7 +81,8 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItem>
                         <EditorRoute.Link
                             data={{
-                                knowledgeCategoryID: this.props.article.knowledgeCategoryID!,
+                                knowledgeCategoryID: this.props.article.knowledgeCategoryID,
+                                knowledgeBaseID: this.props.article.knowledgeBaseID,
                             }}
                             className={DropDownItemLink.CSS_CLASS}
                         >

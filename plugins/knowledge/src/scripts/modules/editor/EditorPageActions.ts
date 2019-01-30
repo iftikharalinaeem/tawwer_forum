@@ -24,6 +24,9 @@ import { LoadStatus } from "@library/@types/api";
 import uniqueId from "lodash/uniqueId";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import isEqual from "lodash/isEqual";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 
 export default class EditorPageActions extends ReduxActions {
     // API actions
@@ -95,6 +98,7 @@ export default class EditorPageActions extends ReduxActions {
 
     /** Article page actions instance. */
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
+    private locationActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api, this.getState);
 
     /**
      * Initialize the add page.
@@ -108,9 +112,18 @@ export default class EditorPageActions extends ReduxActions {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const initialCategoryID =
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
+        const initialKbID = "knowledgeBaseID" ? parseInt(queryParams.knowledgeBaseID, 10) : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
         if (!draftLoaded && initialCategoryID !== null) {
             this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
+        }
+
+        if (initialCategoryID !== null && initialKbID !== null) {
+            await this.locationActions.initLocationPickerFromRecord({
+                recordType: KbRecordType.CATEGORY,
+                recordID: initialCategoryID,
+                knowledgeBaseID: initialKbID,
+            });
         }
     }
 
@@ -139,6 +152,30 @@ export default class EditorPageActions extends ReduxActions {
         } else {
             await this.fetchArticleForEdit(history, articleID);
         }
+
+        const initialRecord = this.getInitialRecordForEdit();
+        if (initialRecord) {
+            await this.locationActions.initLocationPickerFromRecord(initialRecord);
+        }
+    }
+
+    private getInitialRecordForEdit(): ILocationPickerRecord | null {
+        const { article, form } = this.getState<IStoreState>().knowledge.editorPage;
+        const kbID = article.data ? article.data.knowledgeBaseID : null;
+        if (kbID == null) {
+            return null;
+        }
+
+        const categoryID = form.knowledgeCategoryID || null;
+        if (categoryID == null) {
+            return null;
+        }
+
+        return {
+            knowledgeBaseID: kbID,
+            recordID: categoryID,
+            recordType: KbRecordType.CATEGORY,
+        };
     }
 
     private pushDraftToForm(draft: IResponseArticleDraft) {

@@ -9,7 +9,7 @@ import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/navigation/Navigation";
 import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Heading from "@library/components/Heading";
@@ -19,6 +19,12 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import SimplePager from "@library/simplePager/SimplePager";
 import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import * as React from "react";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import LinkAsButton from "@library/components/LinkAsButton";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { ButtonBaseClass } from "@library/components/forms/Button";
+import { t } from "@library/application";
+import { compose } from "@library/components/icons";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -39,7 +45,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     public render() {
         const { category, device, pages } = this.props;
         const activeRecord = {
-            recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
+            recordType: KbRecordType.CATEGORY,
             recordID: category.knowledgeCategoryID,
         };
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
@@ -70,9 +76,23 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                     middleTop={
                         <PanelWidget>
-                            <Heading depth={1} className="searchBar-heading pageSmallTitle" title={category.name}>
+                            <PageTitle
+                                className="searchBar-heading pageSmallTitle"
+                                title={category.name}
+                                actions={
+                                    <LinkAsButton
+                                        to={EditorRoute.url(category)}
+                                        onMouseOver={EditorRoute.preload}
+                                        className="searchBar-actionButton"
+                                        baseClass={ButtonBaseClass.ICON}
+                                        title={t("Compose")}
+                                    >
+                                        {compose()}
+                                    </LinkAsButton>
+                                }
+                            >
                                 <label className="searchBar-label">{category.name}</label>
-                            </Heading>
+                            </PageTitle>
                         </PanelWidget>
                     }
                     middleBottom={
@@ -86,18 +106,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             </Container>
         );
     }
-
-    private setQuery = value => {
-        let newValue = "";
-        if (typeof value === "string") {
-            newValue = value;
-        } else if (value.data) {
-            newValue = value.data;
-        }
-        this.setState({
-            query: newValue,
-        });
-    };
 }
 
 export default withDevice<IProps>(CategoriesLayout);

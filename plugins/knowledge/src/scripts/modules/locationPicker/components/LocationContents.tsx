@@ -4,59 +4,62 @@
  * @license Proprietary
  */
 
-import * as React from "react";
+import KnowledgeBaseModel, { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
+import { IStoreState } from "@knowledge/state/model";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
+import FullPageLoader from "@library/components/FullPageLoader";
+import isEqual from "lodash/isEqual";
+import * as React from "react";
+import { connect } from "react-redux";
 import LocationPickerItem from "./LocationPickerItem";
 import LocationPickerItemList from "./LocationPickerItemList";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
-import { t } from "@library/application";
-import { INavigationTreeItem } from "@library/@types/api";
-
-type CategoryAction = (payload: { categoryID: number }) => void;
-
-interface IProps {
-    onCategoryNavigate: CategoryAction;
-    onItemSelect: CategoryAction;
-    selectedCategory: IKbCategoryFragment | null;
-    navigatedCategory: IKbCategoryFragment | null;
-    chosenCategory: IKbCategoryFragment | null;
-    items: INavigationTreeItem[];
-}
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-export default class LocationContents extends React.Component<IProps> {
+class LocationContents extends React.Component<IProps> {
     private legendRef = React.createRef<HTMLLegendElement>();
     private listID = uniqueIDFromPrefix("navigationItemList");
 
     public render() {
-        const { selectedCategory, items, navigatedCategory, chosenCategory } = this.props;
-        const title = navigatedCategory ? navigatedCategory.name : t("Knowledge Bases");
+        const { selectedRecord, childRecords, chosenRecord, title } = this.props;
 
-        const contents = items.map((item, index) => {
-            const isSelected = !!selectedCategory && selectedCategory.knowledgeCategoryID === item.recordID;
-            const navigateCallback = () => this.props.onCategoryNavigate({ categoryID: item.recordID });
-            const selectCallback = () => this.props.onItemSelect({ categoryID: item.recordID });
-            return (
-                <LocationPickerItem
-                    key={index}
-                    isInitialSelection={!!chosenCategory && item.recordID === chosenCategory.knowledgeCategoryID}
-                    isSelected={isSelected}
-                    name={this.radioName}
-                    value={item}
-                    onNavigate={navigateCallback}
-                    onSelect={selectCallback}
-                />
+        const contents =
+            childRecords.status === LoadStatus.SUCCESS && childRecords.data ? (
+                childRecords.data.map(item => {
+                    const isSelected =
+                        !!selectedRecord &&
+                        item.recordType === selectedRecord.recordType &&
+                        item.recordID === selectedRecord.recordID;
+                    const isChosen =
+                        !!chosenRecord &&
+                        item.recordType === chosenRecord.recordType &&
+                        item.recordID === chosenRecord.recordID;
+                    const navigateHandler = () => this.props.navigateToRecord(item);
+                    const selectHandler = () => this.props.selectRecord(item);
+                    return (
+                        <LocationPickerItem
+                            key={item.recordType + item.recordID}
+                            isInitialSelection={isChosen}
+                            isSelected={isSelected}
+                            name={this.radioName}
+                            value={item}
+                            onNavigate={navigateHandler}
+                            onSelect={selectHandler}
+                        />
+                    );
+                })
+            ) : (
+                <FullPageLoader />
             );
-        });
         return (
-            <LocationPickerItemList
-                id={this.listID}
-                legendRef={this.legendRef}
-                categoryName={title}
-                key={navigatedCategory ? navigatedCategory.knowledgeCategoryID : undefined}
-            >
+            <LocationPickerItemList id={this.listID} legendRef={this.legendRef} categoryName={title}>
                 {contents}
             </LocationPickerItemList>
         );
@@ -74,15 +77,109 @@ export default class LocationContents extends React.Component<IProps> {
      * @inheritdoc
      */
     public componentDidMount() {
-        this.setFocusOnLegend();
+        this.init();
     }
 
     /**
      * @inheritdoc
      */
     public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.navigatedCategory !== this.props.navigatedCategory) {
-            this.setFocusOnLegend();
+        if (!isEqual(prevProps.navigatedRecord, this.props.navigatedRecord)) {
+            this.init();
+        }
+    }
+
+    private init() {
+        this.setFocusOnLegend();
+        if (this.props.childRecords.status === LoadStatus.PENDING) {
+            void this.props.requestData();
         }
     }
 }
+
+interface IOwnProps {}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+interface IMapResult {
+    title: string;
+    navigatedRecord: ILocationPickerRecord | null;
+    selectedRecord: ILocationPickerRecord | null;
+    chosenRecord: ILocationPickerRecord | null;
+    childRecords: ILoadable<IKbNavigationItem[]>;
+}
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
+    const { locationPicker, knowledgeBases, navigation } = state.knowledge;
+    const { navigatedRecord, selectedRecord, chosenRecord } = locationPicker;
+    const title = LocationPickerModel.selectNavigatedTitle(state);
+    const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title };
+
+    // If nothing is selected we are at the root of the nav picker.
+    if (
+        !navigatedRecord ||
+        knowledgeBases.knowledgeBasesByID.status !== "SUCCESS" ||
+        !knowledgeBases.knowledgeBasesByID.data
+    ) {
+        const kbNavItems = KnowledgeBaseModel.selectKnowledgeBasesAsNavItems(state);
+
+        return {
+            ...commonReturn,
+            childRecords: {
+                ...knowledgeBases.knowledgeBasesByID,
+                data: kbNavItems,
+            },
+        };
+    }
+
+    const knowledgeBase = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
+    const navLoadStatus = navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID] || {
+        status: LoadStatus.PENDING,
+    };
+
+    if (navLoadStatus.status === LoadStatus.SUCCESS) {
+        let recordKey = navigatedRecord.recordType + navigatedRecord.recordID;
+        if (navigatedRecord.recordType === KbRecordType.KB) {
+            recordKey = KbRecordType.CATEGORY + knowledgeBase.rootCategoryID;
+        }
+        const fullNavigatedRecord = navigation.navigationItems[recordKey];
+        const recordTypes: KbRecordType[] =
+            knowledgeBase.viewType === KbViewType.GUIDE
+                ? [KbRecordType.ARTICLE, KbRecordType.CATEGORY]
+                : [KbRecordType.CATEGORY];
+        if (!fullNavigatedRecord) {
+            throw new Error("Attempting to navigate to a record that doesn't exits");
+        }
+
+        return {
+            ...commonReturn,
+            childRecords: {
+                ...navLoadStatus,
+                data: NavigationSelector.selectDirectChildren(navigation.navigationItems, recordKey, recordTypes),
+            },
+        };
+    } else {
+        return {
+            ...commonReturn,
+            childRecords: {
+                ...navLoadStatus,
+            },
+        };
+    }
+}
+
+function mapDispatchToProps(dispatch: any) {
+    const lpActions = new LocationPickerActions(dispatch, apiv2);
+
+    return {
+        requestData: lpActions.requestData,
+        chooseRecord: lpActions.chooseRecord,
+        selectRecord: lpActions.selectRecord,
+        navigateToRecord: lpActions.navigateToRecord,
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(LocationContents);

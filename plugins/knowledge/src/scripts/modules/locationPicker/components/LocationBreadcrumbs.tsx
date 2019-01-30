@@ -4,9 +4,9 @@
  * @license Proprietary
  */
 
-import * as React from "react";
 import { t } from "@library/application";
 import { ICrumb } from "@library/components/Breadcrumbs";
+import * as React from "react";
 
 interface IProps {
     locationData: ICrumb[];

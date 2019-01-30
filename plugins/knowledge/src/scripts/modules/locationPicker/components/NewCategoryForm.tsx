@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";

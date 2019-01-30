@@ -5,10 +5,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
-import KnowledgeBaseModel, {
-    KnowledgeBaseDisplayType,
-    IKnowledgeBase,
-} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import KnowledgeBaseModel, { KbViewType, IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { RouteComponentProps } from "react-router";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
@@ -32,9 +29,9 @@ class KnowledgeBasePage extends React.Component<IProps> {
         }
 
         switch (knowledgeBase.viewType) {
-            case KnowledgeBaseDisplayType.GUIDE:
+            case KbViewType.GUIDE:
                 return this.renderGuide(knowledgeBase);
-            case KnowledgeBaseDisplayType.HELP:
+            case KbViewType.HELP:
                 return <HelpCenterHome knowledgeBase={knowledgeBase} />;
         }
     }

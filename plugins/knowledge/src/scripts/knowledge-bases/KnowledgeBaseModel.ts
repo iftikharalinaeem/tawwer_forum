@@ -10,6 +10,7 @@ import produce from "immer";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import { createSelector } from "reselect";
+import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
@@ -23,8 +24,27 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for a list of loaded knowledge bases.
      */
-    public static selectKnowledgeBases = createSelector([KnowledgeBaseModel.selectSelf], selfState =>
-        Object.values(selfState.knowledgeBasesByID.data || {}),
+    public static selectKnowledgeBases = createSelector(
+        [KnowledgeBaseModel.selectSelf],
+        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
+    );
+
+    public static selectKnowledgeBasesAsNavItems = createSelector(
+        [KnowledgeBaseModel.selectKnowledgeBases],
+        (kbs): IKbNavigationItem[] => {
+            return kbs.map(kb => {
+                const navItem: IKbNavigationItem = {
+                    recordType: KbRecordType.KB,
+                    recordID: kb.knowledgeBaseID,
+                    knowledgeBaseID: kb.knowledgeBaseID,
+                    name: kb.name,
+                    url: kb.url,
+                    parentID: -1,
+                    sort: null,
+                };
+                return navItem;
+            });
+        },
     );
 
     public static selectByUrlCode = (state: IStoreState, urlCode: string) => {
@@ -74,7 +94,7 @@ export interface IKnowledgeBasesState {
     }>;
 }
 
-export enum KnowledgeBaseDisplayType {
+export enum KbViewType {
     HELP = "help",
     GUIDE = "guide",
 }
@@ -104,7 +124,7 @@ export interface IKnowledgeBase {
     url: string;
     icon: string;
     sourceLocale: string;
-    viewType: KnowledgeBaseDisplayType;
+    viewType: KbViewType;
     rootCategoryID: number;
     defaultArticleID: number | null;
 }
