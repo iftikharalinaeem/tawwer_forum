@@ -486,6 +486,7 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $sphinxItem = $this->results['matches'][$discussion["guid"]]['attrs'];
             $discussion["orderIndex"] = $this->results['matches'][$discussion["guid"]]['orderIndex'];
             $discussion["recordType"] = $type['recordType'];
             $discussion['url'] = discussionUrl($discussion);
@@ -493,10 +494,12 @@ class KnowledgeApiController extends AbstractApiController {
                 $discussion["category"] = $this->results['categories'][$discussion['CategoryID']];
             }
             if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$discussion['UpdateUserID']])) {
-                    $discussion["updateUser"] = $this->results['users'][$discussion['UpdateUserID']];
-                } elseif (isset($this->results['users'][$discussion['InsertUserID']])) {
-                    $discussion["insertUser"] = $this->results['users'][$discussion['InsertUserID']];
+                if (in_array('user', $expand)) {
+                    if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
+                        $discussion["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
+                    };
+                    $discussion["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
+                    $discussion["updateUser"] = $discussion["updateUser"] ?? $discussion["insertUser"];
                 }
             }
         }
@@ -522,7 +525,8 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion = $this->results['discussions'][$comment['DiscussionID']];
             $comment["name"] = $discussion['Name'];
             $comment["discussionID"] = $comment['DiscussionID'];
-            $comment["guid"] = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $comment["guid"] = $comment['CommentID'] * $type['multiplier'] + $type['offset'];
+            $sphinxItem = $this->results['matches'][$comment["guid"]]['attrs'];
             $comment["orderIndex"] = $this->results['matches'][$comment["guid"]]['orderIndex'];
             $comment["recordType"] = $type['recordType'];
             $comment['url'] = \Gdn::request()->url(
@@ -538,11 +542,11 @@ class KnowledgeApiController extends AbstractApiController {
                 };
             }
             if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$comment['UpdateUserID']])) {
-                    $comment["updateUser"] = $this->results['users'][$comment['UpdateUserID']];
-                } elseif (isset($this->results['users'][$comment['InsertUserID']])) {
-                    $comment["insertUser"] = $this->results['users'][$comment['InsertUserID']];
-                }
+                if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
+                    $comment["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
+                };
+                $comment["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
+                $comment["updateUser"] = $comment["updateUser"] ?? $comment["insertUser"];
             }
         }
         return $result;
@@ -560,7 +564,8 @@ class KnowledgeApiController extends AbstractApiController {
             foreach ($this->results['matches'] as $key => $article) {
                 if ($article['attrs']['updateuserid'] ?? false) {
                     $users[$article['attrs']['updateuserid']] = true;
-                } else {
+                };
+                if ($article['attrs']['insertuserid'] ?? false) {
                     $users[$article['attrs']['insertuserid']] = true;
                 }
             };
