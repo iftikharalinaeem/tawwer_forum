@@ -24,11 +24,6 @@ import TabContext from "library/src/scripts/contexts/TabContext";
 import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
 import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
 
-export enum ISearchDomain {
-    ARTICLES = "articles",
-    EVERYWHERE = "everywhere",
-}
-
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
 }
@@ -49,11 +44,11 @@ export class AdvancedSearch extends React.Component<IProps> {
                     accessibleTitle={t("Search in:")}
                     prefix="advancedSearchDomain"
                     setData={this.handleDomainChange}
-                    defaultTab={this.props.form.domain || ISearchDomain.EVERYWHERE}
+                    activeTab={this.props.form.domain || SearchDomain.EVERYWHERE}
                     childClass="advancedSearchDomain-tab"
                 >
-                    <RadioButtonTab label={t("Articles")} data={ISearchDomain.ARTICLES} />
-                    <RadioButtonTab label={t("Everywhere")} data={ISearchDomain.EVERYWHERE} />
+                    <RadioButtonTab label={t("Articles")} data={SearchDomain.ARTICLES} />
+                    <RadioButtonTab label={t("Everywhere")} data={SearchDomain.EVERYWHERE} />
                 </RadioButtonsAsTabs>
                 <InputTextBlock
                     label={t("Title")}
