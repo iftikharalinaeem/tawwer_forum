@@ -15,7 +15,7 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import QueryString from "@library/components/navigation/QueryString";
 import qs from "qs";
@@ -41,7 +41,6 @@ class SearchForm extends React.Component<IProps> {
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
-        const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
@@ -58,7 +57,7 @@ class SearchForm extends React.Component<IProps> {
                                     <SearchBar
                                         placeholder={this.props.placeholder || t("Help")}
                                         onChange={this.handleSearchChange}
-                                        loadOptions={this.props.searchOptionProvider.autocomplete}
+                                        loadOptions={this.autocomplete}
                                         value={this.props.form.query}
                                         isBigInput={true}
                                         onSearch={this.props.searchActions.search}
@@ -151,6 +150,12 @@ class SearchForm extends React.Component<IProps> {
         this.props.searchActions.updateForm({ query: value });
     };
 
+    private autocomplete = (query: string) => {
+        return this.props.searchOptionProvider.autocomplete(query, {
+            global: this.props.form.domain === SearchDomain.EVERYWHERE,
+        });
+    };
+
     /**
      * Unwrap loaded results and map them into the proper shape.
      */
@@ -169,7 +174,7 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
-        const categoryData = searchResult.knowledgeCategory || searchResult.forumCategory;
+        const categoryData = searchResult.category;
         const crumbs = categoryData ? categoryData.breadcrumbs : [];
         return {
             name: searchResult.name,
