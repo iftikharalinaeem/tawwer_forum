@@ -31,6 +31,10 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
+import { search } from "library/src/scripts/components/icons/header";
+import SearchPagination from "./components/SearchPagination";
+import FullPageLoader from "@library/components/FullPageLoader";
+
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -42,6 +46,7 @@ class SearchForm extends React.Component<IProps> {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} showSearchIcon={false} />
@@ -88,9 +93,7 @@ class SearchForm extends React.Component<IProps> {
                             </>
                         }
                         middleBottom={
-                            <PanelWidgetVerticalPadding>
-                                {<SearchResults results={this.unwrapResults()} />}
-                            </PanelWidgetVerticalPadding>
+                            <PanelWidgetVerticalPadding>{this.renderSearchResults()}</PanelWidgetVerticalPadding>
                         }
                         rightTop={
                             !isMobile && (
@@ -159,12 +162,35 @@ class SearchForm extends React.Component<IProps> {
     /**
      * Unwrap loaded results and map them into the proper shape.
      */
-    private unwrapResults(): IResult[] {
-        const { results } = this.props;
-        if (results.data) {
-            return results.data.map(this.mapResult);
-        } else {
-            return [];
+    private renderSearchResults(): React.ReactNode {
+        switch (this.props.results.status) {
+            case LoadStatus.PENDING:
+            case LoadStatus.LOADING:
+                return <FullPageLoader />;
+            case LoadStatus.ERROR:
+                return null;
+            case LoadStatus.SUCCESS:
+                const { next, prev } = this.props.pages;
+                let paginationNextClick: React.MouseEventHandler | undefined;
+                let paginationPreviousClick: React.MouseEventHandler | undefined;
+
+                if (next) {
+                    paginationNextClick = e => {
+                        void this.props.searchActions.search(next);
+                    };
+                }
+                if (prev) {
+                    paginationPreviousClick = e => {
+                        void this.props.searchActions.search(prev);
+                    };
+                }
+
+                return (
+                    <>
+                        <SearchResults results={this.props.results.data!.map(this.mapResult)} />
+                        <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
+                    </>
+                );
         }
     }
 
@@ -181,7 +207,8 @@ class SearchForm extends React.Component<IProps> {
             excerpt: searchResult.body,
             meta: (
                 <SearchResultMeta
-                    deleted={searchResult.status === ArticleStatus.DELETED}
+                    status={searchResult.status}
+                    type={searchResult.recordType}
                     updateUser={searchResult.updateUser!}
                     dateUpdated={searchResult.dateUpdated}
                     crumbs={crumbs}

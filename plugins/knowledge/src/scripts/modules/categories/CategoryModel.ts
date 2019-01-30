@@ -8,7 +8,7 @@ import ReduxReducer from "@library/state/ReduxReducer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 export type IKbCategoriesState = ILoadable<{
@@ -23,7 +23,7 @@ export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
     public static readonly ROOT_CATEGORY: INavigationTreeItem = {
         name: "Root Category",
         recordID: -1,
-        recordType: NavigationRecordType.KNOWLEDGE_CATEGORY,
+        recordType: KbRecordType.CATEGORY,
         parentID: -1,
         url: "#",
         sort: null,

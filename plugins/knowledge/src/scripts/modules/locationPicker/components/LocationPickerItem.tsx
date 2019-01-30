@@ -4,18 +4,19 @@
  * @license Proprietary
  */
 
-import React from "react";
-import classNames from "classnames";
-import { rightChevron, categoryIcon, checkCompact } from "@library/components/icons/common";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { t } from "@library/application";
-import { INavigationTreeItem } from "@library/@types/api";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { article } from "@library/components/icons";
+import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps {
     isInitialSelection: boolean;
     isSelected: boolean;
     name: string;
-    value: INavigationTreeItem;
+    value: IKbNavigationItem;
     onNavigate: () => void;
     onSelect: (event: React.SyntheticEvent) => void;
 }
@@ -26,7 +27,7 @@ interface IProps {
 export default class LocationPickerItem extends React.Component<IProps> {
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
-        const isCategory = value.recordType === "knowledgeCategory";
+        const isNavigable = [KbRecordType.CATEGORY, KbRecordType.KB].includes(value.recordType);
         return (
             <li className={classNames("folderContents-item", { isActive: isSelected })}>
                 <label className="folderContents-folder">
@@ -37,6 +38,7 @@ export default class LocationPickerItem extends React.Component<IProps> {
                         value={value.recordID}
                         checked={isSelected}
                         onChange={onSelect}
+                        disabled={!isNavigable}
                     />
                     <span className="folderContents-content">
                         <span
@@ -47,12 +49,12 @@ export default class LocationPickerItem extends React.Component<IProps> {
                             })}
                             aria-hidden={true}
                         >
-                            {isSelected ? checkCompact() : categoryIcon()}
+                            {isSelected ? checkCompact() : this.typeIcon}
                         </span>
                         <span className="folderContents-label">{value.name}</span>
                     </span>
                 </label>
-                {isCategory && (
+                {isNavigable && (
                     <Button
                         onClick={this.props.onNavigate}
                         baseClass={ButtonBaseClass.ICON}
@@ -64,5 +66,15 @@ export default class LocationPickerItem extends React.Component<IProps> {
                 )}
             </li>
         );
+    }
+
+    private get typeIcon(): React.ReactNode {
+        switch (this.props.value.recordType) {
+            case KbRecordType.ARTICLE:
+                return article();
+            case KbRecordType.CATEGORY:
+            case KbRecordType.KB:
+                return categoryIcon();
+        }
     }
 }

@@ -52,6 +52,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
+            'sphinxIndexWeight' => 1,
         ],
         self::TYPE_QUESTION => [
             'model' => 'discussion',
@@ -61,6 +62,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
+            'sphinxIndexWeight' => 1,
         ],
         self::TYPE_POLL => [
             'model' => 'discussion',
@@ -70,6 +72,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getDiscussions',
             'sphinxIndexName' => ['Discussion', 'Discussion_Delta'],
+            'sphinxIndexWeight' => 1,
         ],
         self::TYPE_COMMENT => [
             'model' => 'comment',
@@ -79,6 +82,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
+            'sphinxIndexWeight' => 1,
         ],
         self::TYPE_ANSWER => [
             'model' => 'comment',
@@ -88,6 +92,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
+            'sphinxIndexWeight' => 1,
         ],
         self::TYPE_ARTICLE => [
             'model' => 'articleRevisionModel',
@@ -97,6 +102,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticle', 'KnowledgeArticle_Delta'],
+            'sphinxIndexWeight' => 3,
         ],
         self::TYPE_ARTICLE_DELETED => [
             'model' => 'articleRevisionModel',
@@ -106,6 +112,7 @@ class KnowledgeApiController extends AbstractApiController {
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticleDeleted', 'KnowledgeArticleDeleted_Delta'],
+            'sphinxIndexWeight' => 3,
         ],
     ];
 
@@ -127,6 +134,9 @@ class KnowledgeApiController extends AbstractApiController {
 
     /** @var string */
     private $sphinxIndexes = '';
+
+    /** @var array */
+    private $sphinxIndexWeights = [];
 
     /**
      * Knowledge API controller constructor.
@@ -244,6 +254,9 @@ class KnowledgeApiController extends AbstractApiController {
         } else {
             $this->defineArticlesQuery();
         }
+        if (!empty($this->sphinxIndexWeights)) {
+            $this->sphinx->setIndexWeights($this->sphinxIndexWeights);
+        }
 
         if ($sphinxRes = $this->sphinx->query($this->sphinxQuery, $this->sphinxIndexes)) {
             return $sphinxRes;
@@ -348,6 +361,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @return string
      */
     protected function getIndexes(array $typesRequired = [], array $typesExclude = []):string {
+        $this->sphinxIndexWeights = [];
         $sphinxIndexes = [];
         $all = empty($typesRequired);
         foreach (self::RECORD_TYPES as $key => $sphinxTypes) {
@@ -358,6 +372,9 @@ class KnowledgeApiController extends AbstractApiController {
                 $idxFullNames = [];
                 foreach ($sphinxTypes['sphinxIndexName'] as $idx) {
                     $idxFullNames[] = $this->sphinxIndexName($idx);
+                    foreach (explode(',', $this->sphinxIndexName($idx)) as $sphinxIndex) {
+                        $this->sphinxIndexWeights[$sphinxIndex] = $sphinxTypes['sphinxIndexWeight'];
+                    }
                 }
                 $sphinxIndexes = array_merge($sphinxIndexes, $idxFullNames);
             }
@@ -390,9 +407,8 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
-            $idx = 0;
             foreach ($searchResults['matches'] as $guid => $record) {
-                $this->results['matches'][$guid]['orderIndex'] = $idx++;
+                $this->results['matches'][$guid]['orderIndex'] = $record['weight'];
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -405,7 +421,7 @@ class KnowledgeApiController extends AbstractApiController {
             if ($a['orderIndex'] == $b['orderIndex']) {
                 return 0;
             }
-            return ($a['orderIndex'] < $b['orderIndex']) ? -1 : 1;
+            return ($a['orderIndex'] > $b['orderIndex']) ? -1 : 1;
         });
         return $results;
     }

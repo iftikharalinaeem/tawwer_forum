@@ -20,7 +20,7 @@ import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
     public static readonly ROOT_ID = -1;
 
-    public initialState: INavigationStoreState = {
+    public static DEFAULT_STATE = {
         navigationItems: {},
         navigationItemsByKbID: {},
         submitLoadable: {
@@ -29,6 +29,8 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchLoadablesByKbID: [],
         patchTransactionID: null,
     };
+
+    public initialState: INavigationStoreState = NavigationModel.DEFAULT_STATE;
 
     /**
      * Main reducer function for the navigation model.
@@ -138,28 +140,22 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
         switch (action.type) {
             case CategoryActions.PATCH_CATEGORY_REQUEST:
-                handleRenameRequest(
-                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                    action.meta.name,
-                );
+                handleRenameRequest(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID, action.meta.name);
                 break;
             case ArticleActions.PATCH_ARTICLE_REQUEST:
-                handleRenameRequest(NavigationRecordType.ARTICLE + action.meta.articleID, action.meta.name);
+                handleRenameRequest(KbRecordType.ARTICLE + action.meta.articleID, action.meta.name);
                 break;
             case CategoryActions.PATCH_CATEGORY_ERROR:
-                handleRenameError(
-                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                    action.payload.message,
-                );
+                handleRenameError(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID, action.payload.message);
                 break;
             case ArticleActions.PATCH_ARTICLE_ERROR:
-                handleRenameError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                handleRenameError(KbRecordType.ARTICLE + action.meta.articleID, action.payload.message);
                 break;
             case CategoryActions.PATCH_CATEGORY_RESPONSE:
-                handleRenameSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                handleRenameSuccess(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID);
                 break;
             case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                handleRenameSuccess(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.data.name);
+                handleRenameSuccess(KbRecordType.ARTICLE + action.meta.articleID, action.payload.data.name);
                 break;
         }
         return nextState;
@@ -172,15 +168,39 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         switch (action.type) {
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 const article = action.payload.data;
-                const stringID = NavigationRecordType.ARTICLE + article.articleID;
-                const parentStringID = NavigationRecordType.KNOWLEDGE_CATEGORY + article.knowledgeCategoryID;
+                const stringID = KbRecordType.ARTICLE + article.articleID;
+                const parentStringID = KbRecordType.CATEGORY + article.knowledgeCategoryID;
                 nextState.navigationItems[stringID] = {
                     name: article.name,
                     url: article.url,
                     parentID: article.knowledgeCategoryID!,
                     recordID: article.articleID,
                     sort: article.sort,
-                    recordType: NavigationRecordType.ARTICLE,
+                    knowledgeBaseID: article.knowledgeBaseID,
+                    recordType: KbRecordType.ARTICLE,
+                    children: [],
+                };
+
+                const parentItem = nextState.navigationItems[parentStringID];
+                if (parentItem) {
+                    parentItem.children.push(stringID);
+                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
+                }
+                break;
+        }
+        switch (action.type) {
+            case CategoryActions.POST_CATEGORY_RESPONSE:
+                const category = action.payload.data;
+                const stringID = KbRecordType.CATEGORY + category.knowledgeCategoryID;
+                const parentStringID = KbRecordType.CATEGORY + category.parentID;
+                nextState.navigationItems[stringID] = {
+                    name: category.name,
+                    url: category.url,
+                    parentID: category.parentID,
+                    recordID: category.knowledgeCategoryID,
+                    sort: category.sort,
+                    knowledgeBaseID: category.knowledgeBaseID,
+                    recordType: KbRecordType.CATEGORY,
                     children: [],
                 };
 
@@ -212,7 +232,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 delete item.error;
 
                 // Remove the item from it's parent
-                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                const parentItem = nextState.navigationItems[KbRecordType.CATEGORY + item.parentID];
                 if (parentItem) {
                     parentItem.children = parentItem.children.filter(childKey => childKey !== key);
                 }
@@ -230,7 +250,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 delete nextState.navigationItems[key];
 
                 // Remove the item from it's parent
-                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                const parentItem = nextState.navigationItems[KbRecordType.CATEGORY + item.parentID];
                 if (parentItem) {
                     parentItem.children = parentItem.children.filter(childKey => childKey !== key);
                 }
@@ -251,7 +271,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 delete item.tempDeleted;
 
                 // Put the item back on its parent.
-                const parentItem = nextState.navigationItems[NavigationRecordType.KNOWLEDGE_CATEGORY + item.parentID];
+                const parentItem = nextState.navigationItems[KbRecordType.CATEGORY + item.parentID];
                 if (parentItem) {
                     parentItem.children.push(key);
                 }
@@ -260,25 +280,22 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
         switch (action.type) {
             case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
-                handleDeleteRequest(NavigationRecordType.ARTICLE + action.meta.articleID);
+                handleDeleteRequest(KbRecordType.ARTICLE + action.meta.articleID);
                 break;
             case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                handleDeleteSuccess(NavigationRecordType.ARTICLE + action.meta.articleID);
+                handleDeleteSuccess(KbRecordType.ARTICLE + action.meta.articleID);
                 break;
             case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
-                handleDeleteError(NavigationRecordType.ARTICLE + action.meta.articleID, action.payload.message);
+                handleDeleteError(KbRecordType.ARTICLE + action.meta.articleID, action.payload.message);
                 break;
             case CategoryActions.DELETE_CATEGORY_REQUEST:
-                handleDeleteRequest(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                handleDeleteRequest(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID);
                 break;
             case CategoryActions.DELETE_CATEGORY_RESPONSE:
-                handleDeleteSuccess(NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID);
+                handleDeleteSuccess(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID);
                 break;
             case CategoryActions.DELETE_CATEGORY_ERROR:
-                handleDeleteError(
-                    NavigationRecordType.KNOWLEDGE_CATEGORY + action.meta.knowledgeCategoryID,
-                    action.payload.message,
-                );
+                handleDeleteError(KbRecordType.CATEGORY + action.meta.knowledgeCategoryID, action.payload.message);
                 break;
         }
         return nextState;
@@ -389,7 +406,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 return compare(nameA, nameB)!;
             }
             // Articles rank lower than categories.
-            return typeA === NavigationRecordType.ARTICLE ? 1 : -1;
+            return typeA === KbRecordType.ARTICLE ? 1 : -1;
         } else if (sortA === null) {
             // If they're not the same, and A is null, then B must not be null. B should rank higher.
             return 1;
@@ -405,13 +422,15 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
 export type ReducerType = KnowledgeReducer<INavigationStoreState>;
 
-export enum NavigationRecordType {
-    KNOWLEDGE_CATEGORY = "knowledgeCategory",
+export enum KbRecordType {
+    CATEGORY = "knowledgeCategory",
     ARTICLE = "article",
+    KB = "knowledgeBase",
 }
 
-export interface IKbNavigationItem<R extends NavigationRecordType = NavigationRecordType> extends INavigationItem {
+export interface IKbNavigationItem<R extends KbRecordType = KbRecordType> extends INavigationItem {
     recordType: R;
+    knowledgeBaseID: number;
     children?: string[];
 }
 
@@ -419,7 +438,7 @@ export interface IPatchFlatItem {
     parentID: number;
     recordID: number;
     sort: number | null;
-    recordType: NavigationRecordType;
+    recordType: KbRecordType;
 }
 
 export interface INormalizedNavigationItem extends IKbNavigationItem {

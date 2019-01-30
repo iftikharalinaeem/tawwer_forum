@@ -25,12 +25,15 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
     className?: string;
     titleID?: string;
     mobileDropDownTitle?: string;
+    kbID?: number;
 }
 
 /**
@@ -69,12 +72,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                         topPadding={false}
                         middleBottom={
                             <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
-                                <LocationInput
-                                    initialCategoryID={form.knowledgeCategoryID}
-                                    key={form.knowledgeCategoryID || undefined}
-                                    disabled={this.isLoading}
-                                    onChange={this.locationPickerChangeHandler}
-                                />
+                                <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
                                 </div>

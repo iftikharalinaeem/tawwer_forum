@@ -23,6 +23,8 @@ export default class SearchPageActions extends ReduxActions {
     public static readonly GET_SEARCH_ERROR = "@@searchPage/GET_SEARCH_ERROR";
     public static readonly UPDATE_FORM = "@@searchPage/UPDATE_FORM";
 
+    private static readonly LIMIT_DEFAULT = 10;
+
     // Sum of all action types.
     public static readonly ACTION_TYPES:
         | ReturnType<typeof SearchPageActions.updateFormAC>
@@ -74,7 +76,7 @@ export default class SearchPageActions extends ReduxActions {
     /**
      * Perform a search with the values in the form.
      */
-    public search = async () => {
+    public search = async (page?: number, limit?: number) => {
         const form = SearchPageModel.stateSlice(this.getState()).form;
 
         const statuses = [ArticleStatus.PUBLISHED];
@@ -118,13 +120,16 @@ export default class SearchPageActions extends ReduxActions {
             expand: ["user", "category"],
         };
 
-        return await this.getSearch(requestOptions);
+        return await this.getSearch(requestOptions, page, limit);
     };
 
     /**
      * Thunk for performing a search.
      */
-    private getSearch(request: ISearchRequestBody) {
+    private getSearch(request: ISearchRequestBody, page?: number, limit?: number) {
+        request.page = page || 1;
+        request.limit = limit || SearchPageActions.LIMIT_DEFAULT;
+
         return this.dispatchApi<ISearchResponseBody>(
             "get",
             "/knowledge/search",

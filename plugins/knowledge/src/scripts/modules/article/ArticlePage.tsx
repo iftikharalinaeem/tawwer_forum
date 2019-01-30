@@ -22,7 +22,7 @@ import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageMode
 import Permission from "@library/users/Permission";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
-import { NavigationRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 
 interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
@@ -48,7 +48,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
         const id = this.articleID;
         const hasData = loadable.status === LoadStatus.SUCCESS && loadable.data && id;
-        const activeRecord = { recordID: id!, recordType: NavigationRecordType.ARTICLE };
+        const activeRecord = { recordID: id!, recordType: KbRecordType.ARTICLE };
 
         if (loadable.status === LoadStatus.ERROR) {
             return <ErrorPage error={loadable.error} />;

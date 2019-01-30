@@ -27,7 +27,7 @@ export default class NavigationActions extends ReduxActions {
      *
      * @param options Parameters for the request.
      */
-    public getNavigationFlat = (knowledgeBaseID: number, forceUpdate = false) => {
+    public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState<IStoreState>();
         const fetchLoadable = state.knowledge.navigation.fetchLoadablesByKbID[knowledgeBaseID];
         if (!forceUpdate && fetchLoadable && fetchLoadable.status === LoadStatus.SUCCESS) {
@@ -39,7 +39,7 @@ export default class NavigationActions extends ReduxActions {
             return response.data;
         })({ knowledgeBaseID });
 
-        return this.dispatch(apiThunk);
+        return await this.dispatch(apiThunk);
     };
 
     public static patchNavigationFlatACs = createAction.async<

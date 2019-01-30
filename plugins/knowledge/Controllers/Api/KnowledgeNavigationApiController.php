@@ -11,6 +11,7 @@ use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -105,6 +106,10 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 "allowNull" => true,
                 "description" => "Sort weight.",
                 "type" => "integer",
+            ],
+            "knowledgeBaseID" => [
+                "type" => "integer",
+                "description" => "ID of the knowledge base the record belongs to.",
             ],
             "recordType" => [
                 "description" => "Type of record represented by the navigation item.",
@@ -224,8 +229,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 list($orderField, $orderDirection) = $this->knowledgeBaseModel->articleSortConfig($knowledgeBase["sortArticles"]);
                 $articles = $this->articleModel->getTopPerCategory(
                     $catIds,
-                    "dateInserted",
-                    "desc",
+                    $orderField,
+                    $orderDirection,
                     self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT
                 );
             }
