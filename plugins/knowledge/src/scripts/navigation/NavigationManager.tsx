@@ -17,25 +17,25 @@ import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationManagerContent from "@knowledge/modules/navigation/NavigationManagerContent";
-import NavigationManagerToolBar from "@knowledge/modules/navigation/NavigationManagerToolBar";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationModel, {
+    IKbNavigationItem,
     INavigationStoreState,
     INormalizedNavigationItem,
     INormalizedNavigationItems,
     NavigationRecordType,
-    IKbNavigationItem,
-} from "@knowledge/modules/navigation/NavigationModel";
+} from "@knowledge/navigation/state/NavigationModel";
+import NavigationManagerContent from "@knowledge/navigation/subcomponents/NavigationManagerContent";
+import NavigationManagerToolBar from "@knowledge/navigation/subcomponents/NavigationManagerToolBar";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
+import { t } from "@library/application";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
+import { ModalConfirm } from "@library/components/modal";
+import Translate from "@library/components/translation/Translate";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { ModalConfirm } from "@library/components/modal";
-import Translate from "@library/components/translation/Translate";
-import { t } from "@library/application";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;

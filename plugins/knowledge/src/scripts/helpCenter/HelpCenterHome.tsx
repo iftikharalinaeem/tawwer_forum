@@ -4,8 +4,8 @@
  */
 
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import NavigationActions from "@knowledge/modules/navigation/NavigationActions";
-import NavigationSelector from "@knowledge/modules/navigation/NavigationSelector";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
@@ -33,7 +33,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            return <ErrorPage loadable={this.props} />;
+            return <ErrorPage error={this.props.error} />;
         }
 
         return (

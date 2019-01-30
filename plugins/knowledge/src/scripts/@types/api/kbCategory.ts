@@ -27,6 +27,7 @@ interface IKbCategoryDefaultedData {
 
 interface IKbCategoryServerManagedData {
     knowledgeCategoryID: number; // The id.
+    knowledgeBaseID: number;
     dateInserted: string;
     dateUpdated: string;
     insertUserID: number; // The user that inserted the article

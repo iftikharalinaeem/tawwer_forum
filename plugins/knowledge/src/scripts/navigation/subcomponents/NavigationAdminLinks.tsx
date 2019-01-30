@@ -4,16 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import classNames from "classnames";
-import * as React from "react";
-import { organize } from "@library/components/icons/navigationManager";
-import Permission from "@library/users/Permission";
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/application";
+import { organize } from "@library/components/icons/navigationManager";
+import Permission from "@library/users/Permission";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
     className?: string;
     kbID: number;
+    showDivider: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ export default class NavigationAdminLinks extends React.Component<IProps> {
         return (
             <Permission permission="articles.add">
                 <ul className={classNames("siteNavAdminLinks", this.props.className)}>
-                    <hr className="siteNavAdminLinks-divider" />
+                    {this.props.showDivider && <hr className="siteNavAdminLinks-divider" />}
                     <h3 className="sr-only">{t("Admin Links")}</h3>
                     <li className="siteNavAdminLinks-item">
                         {organize()}

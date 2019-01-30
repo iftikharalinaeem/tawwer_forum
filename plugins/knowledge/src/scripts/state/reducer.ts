@@ -13,12 +13,12 @@ import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import NavigationModel from "@knowledge/modules/navigation/NavigationModel";
+import NavigationModel from "@knowledge/navigation/state/NavigationModel";
 import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
-import RouteReducer from "@knowledge/routes/RouteReducer";
 import { IKbState } from "@knowledge/state/model";
 import { combineReducers } from "redux";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import routeReducer from "@knowledge/routes/RouteReducer";
 
 const knowledgeReducer = combineReducers<IKbState>({
     articles: new ArticleModel().reducer,
@@ -32,7 +32,7 @@ const knowledgeReducer = combineReducers<IKbState>({
     locationPicker: new LocationPickerModel().reducer,
     searchPage: new SearchPageModel().reducer,
     navigation: new NavigationModel().reducer,
-    route: new RouteReducer().reducer,
+    route: routeReducer,
     knowledgeBases: new KnowledgeBaseModel().reducer,
 });
 

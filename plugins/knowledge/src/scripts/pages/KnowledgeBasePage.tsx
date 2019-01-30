@@ -16,7 +16,7 @@ import { LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
 import { t } from "@library/application";
-import ErrorPage from "@knowledge/routes/ErrorPage";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
 
 class KnowledgeBasePage extends React.Component<IProps> {
@@ -28,14 +28,7 @@ class KnowledgeBasePage extends React.Component<IProps> {
         }
 
         if (knowledgeBase === null) {
-            return (
-                <ErrorPage
-                    loadable={{
-                        status: LoadStatus.ERROR,
-                        error: { message: t("KnowledgeBase Not Found"), status: 404 },
-                    }}
-                />
-            );
+            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
 
         switch (knowledgeBase.viewType) {
@@ -54,7 +47,9 @@ class KnowledgeBasePage extends React.Component<IProps> {
 
     private renderGuide(knowledgeBase: IKnowledgeBase): React.ReactNode {
         if (knowledgeBase.defaultArticleID === null) {
-            return <div>{t("No articles found. Go create one.")}</div>;
+            return (
+                <ErrorPage defaultError={DefaultError.NO_ARTICLES} knowledgeBaseID={knowledgeBase.knowledgeBaseID} />
+            );
         }
 
         const match = {
