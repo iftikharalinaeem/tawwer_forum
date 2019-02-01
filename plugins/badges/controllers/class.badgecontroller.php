@@ -323,6 +323,7 @@ class BadgeController extends BadgesAppController {
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
+        Gdn_Theme::section('Badge');
 
         // Get badge data or 404
         $this->Badge = $this->BadgeModel->getID($badgeID);
