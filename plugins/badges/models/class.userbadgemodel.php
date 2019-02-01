@@ -211,23 +211,18 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public function getBadges($userID = '', $limit = false) {
-        $sql = Gdn::sql();
-
-        $sql->select('b.*')
+    public function getBadges($userID = '', int $limit = null) {
+        return Gdn::sql()->select('b.*')
             ->select('ub.Reason')
             ->select('ub.ShowReason')
             ->select('ub.DateCompleted')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
             ->where('ub.UserID', $userID)
-            ->where('ub.DateCompleted is not null');
-        if ($limit) {
-           $sql->limit($limit);
-        }
-        $sql->orderBy('ub.DateCompleted', 'desc');
-
-        return $sql->get();
+            ->where('ub.DateCompleted is not null')
+            ->limit($limit ?? false)
+            ->orderBy('ub.DateCompleted', 'desc')
+            ->get();
     }
 
     /**

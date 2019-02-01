@@ -9,6 +9,8 @@
  */
 class BadgesModule extends Gdn_Module {
 
+    /** @var int Max number of badges to retrieve. */
+    /* public for the sake of backwards compatibility with Smarty. */
     public $Limit;
 
     /**
@@ -17,27 +19,35 @@ class BadgesModule extends Gdn_Module {
      * @param string $sender
      * @param int $limit
      */
-    public function __construct($sender = '', $limit = false) {
+    public function __construct($sender = '', $aplicationFolder = "", int $limit = null) {
         // Default to current user if none is set
         $this->User = Gdn::controller()->data('Profile', Gdn::session()->User);
-
-        $this->Limit = $limit;
 
         if (!$this->User) {
             return;
         }
 
+        $this->Limit = $limit;
+
+        parent::__construct($sender, 'plugins/badges');
+    }
+
+    /**
+     * Set Limit
+     *
+     * @return boolean
+     */
+    public function prepare() {
         // Get badge list
         $userBadgeModel = new UserBadgeModel();
-        $this->Badges = $userBadgeModel->getBadges(val('UserID', $this->User), $this->Limit)->resultArray();
+        $this->Badges = $userBadgeModel->getBadges(val("UserID", $this->User), $this->Limit)->resultArray();
 
         // Optionally only show highest badge in each class
         if (c('Reputation.Badges.FilterModuleByClass')) {
             $this->Badges = BadgeModel::filterByClass($this->Badges);
         }
 
-
-        parent::__construct($sender, 'plugins/badges');
+        return true;
     }
 
     /**
@@ -52,7 +62,7 @@ class BadgesModule extends Gdn_Module {
     /**
      * Render the module.
      *
-     * @return string|void
+     * @return bool|string HTML view
      */
     public function toString() {
         if (!$this->User) {
