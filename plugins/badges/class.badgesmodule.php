@@ -9,17 +9,17 @@
  */
 class BadgesModule extends Gdn_Module {
 
-    /** @var int Max number of badges to retrieve. */
-    /* public for the sake of backwards compatibility with Smarty. */
+    /** @var int Max number of badges to retrieve. public for the sake of backwards compatibility with Smarty. */
     public $Limit;
 
     /**
      * Create the module instance.
      *
      * @param string $sender
+     * @param string $aplicationFolder required due to compatibility with Gdn_Theme
      * @param int $limit
      */
-    public function __construct($sender = '', $aplicationFolder = "", int $limit = null) {
+    public function __construct($sender = '', $applicationFolder = "", int $limit = null) {
         // Default to current user if none is set
         $this->User = Gdn::controller()->data('Profile', Gdn::session()->User);
 
@@ -33,9 +33,9 @@ class BadgesModule extends Gdn_Module {
     }
 
     /**
-     * Set Limit
+     * Compiles the data for the badges module.
      *
-     * @return boolean
+     * @return bool whether to render the module or not.
      */
     public function prepare() {
         // Get badge list

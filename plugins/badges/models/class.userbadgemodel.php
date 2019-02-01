@@ -210,6 +210,9 @@ class UserBadgeModel extends Gdn_Model {
      *
      * @since 1.0.0
      * @access public
+     *
+     * @param string $userID
+     * @param int $limit
      */
     public function getBadges($userID = '', int $limit = null) {
         return Gdn::sql()->select('b.*')
