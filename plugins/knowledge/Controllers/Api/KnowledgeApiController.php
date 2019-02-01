@@ -455,7 +455,7 @@ class KnowledgeApiController extends AbstractApiController {
         foreach ($result as &$article) {
             $article["recordID"] = $article[$type['recordID']];
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
-            $article["body"] = htmlspecialchars_decode(strip_tags($article["bodyRendered"]), ENT_QUOTES);
+            $article["body"] = $article["excerpt"];
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
             $sphinxItem = $this->results['matches'][$guid]['attrs'];
