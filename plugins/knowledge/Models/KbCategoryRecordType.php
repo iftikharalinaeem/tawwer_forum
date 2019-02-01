@@ -11,7 +11,7 @@
  /**
   * An instance of a knowledge category.
   */
-class KnowledgeCategoryRecord implements RecordInterface {
+class KbCategoryRecordType implements RecordInterface {
 
     /** @var int */
     private $knowledgeCategoryID;
@@ -21,7 +21,7 @@ class KnowledgeCategoryRecord implements RecordInterface {
      *
      * @param int $knowledgeCategoryID
      */
-    public function __construction(int $knowledgeCategoryID) {
+    public function __construct(int $knowledgeCategoryID) {
         $this->knowledgeCategoryID = $knowledgeCategoryID;
     }
 
@@ -29,7 +29,7 @@ class KnowledgeCategoryRecord implements RecordInterface {
      * @inheritDoc
      */
     public function getRecordID(): int {
-        return $this->recordID;
+        return $this->knowledgeCategoryID;
     }
 
     /**
