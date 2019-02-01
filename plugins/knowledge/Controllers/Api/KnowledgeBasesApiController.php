@@ -176,25 +176,44 @@ class KnowledgeBasesApiController extends AbstractApiController {
     }
 
     /**
-     * Proxy GET method for KnowledgeNavigationApiController->(flat|tree).
+     * Proxy GET method for KnowledgeNavigationApiController->tree.
      *
      * @param int $id
-     * @param string $path
      * @param array $query
      * @return array
      */
-    public function get_navigation(int $id, string $path, array $query = []): array {
+    public function get_navigationTree(int $id, array $query = []): array {
+        $this->permission("knowledge.kb.view");
+        $this->idParamSchema();
+        $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
+            ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
+        $query = $in->validate($query);
         $query['knowledgeBaseID'] = $id;
-        switch (ltrim($path, '/')) {
-            case 'flat':
-                $result = $this->knowledgeNavigationApi->flat($query);
-                break;
-            case 'tree':
-                $result = $this->knowledgeNavigationApi->tree($query);
-                break;
-            default:
-                $result = [];
-        }
+        $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->schemaWithChildren()], "out");
+        $rows = $this->knowledgeNavigationApi->tree($query);
+        $result = $out->validate($rows);
+        return $result ?? [];
+    }
+
+    /**
+     * Proxy GET method for KnowledgeNavigationApiController->flat.
+     *
+     * @param int $id
+     * @param array $query
+     * @return array
+     */
+    public function get_navigationFlat(int $id, array $query = []): array {
+        $this->permission("knowledge.kb.view");
+        $this->idParamSchema();
+        $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
+            ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
+        $query = $in->validate($query);
+        $query['knowledgeBaseID'] = $id;
+        $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->categoryNavigationFragment()], "out");
+
+        $rows = $this->knowledgeNavigationApi->flat($query);
+        $result = $out->validate($rows);
+
         return $result;
     }
 
@@ -202,18 +221,33 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * Proxy PATCH method for KnowledgeNavigationApiController->patchFlat.
      *
      * @param int $id
-     * @param string $path
      * @param array $body
      * @return array
      */
-    public function patch_navigation(int $id, string $path, array $body = []): array {
-        switch (ltrim($path, '/')) {
-            case 'flat':
-                $result = $this->knowledgeNavigationApi->patchFlat($id, $body);
-                break;
-            default:
-                $result = [];
-        }
+    public function patch_navigationFlat(int $id, array $body = []): array {
+        $this->permission("Garden.Settings.Manage");
+        $this->idParamSchema();
+        $patchSchema = Schema::parse([
+            ":a" => Schema::parse([
+                "recordType",
+                "recordID",
+                "parentID",
+                "sort",
+            ])->add(Schema::parse($this->knowledgeNavigationApi->getFragmentSchema()))
+        ]);
+        $in = $this->knowledgeNavigationApi->schema($patchSchema, "in")
+            ->setDescription("Update the navigation structure of a knowledge base, using the flat format.");
+        $out = $this->knowledgeNavigationApi->schema(
+            [":a" => $this->knowledgeNavigationApi->categoryNavigationFragment()],
+            "out"
+        );
+
+        // Prep the input.
+        $body = $in->validate($body);
+
+        $navigation = $this->knowledgeNavigationApi->patchFlat($id, $body);
+
+        $result = $out->validate($navigation);
         return $result;
     }
 
