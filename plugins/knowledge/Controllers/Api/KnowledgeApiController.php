@@ -14,14 +14,13 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
-use Vanilla\Knowledge\Models\Breadcrumb;
-use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use DiscussionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use CommentModel;
-use Vanilla\Knowledge\Models\KnowledgeCategoryRecord;
-use Vanilla\Knowledge\Models\CategoryBreadcrumbProvider;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -120,9 +119,6 @@ class KnowledgeApiController extends AbstractApiController {
         ],
     ];
 
-    /** @var BreadcrumbModel */
-    private $breadcrumbModel;
-
     /** @var Schema */
     private $searchResultSchema;
 
@@ -144,16 +140,41 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var array */
     private $sphinxIndexWeights = [];
 
+    /** @var ArticleRevisionModel */
+    private $articleRevisionModel;
+
+    /** @var ArticleModel */
+    private $articleModel;
+
+    /** @var \UserModel */
+    private $userModel;
+
+    /** @var KnowledgeCategoryModel */
+    private $knowledgeCategoryModel;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var CommentModel */
+    private $commentModel;
+
+    /** @var \CategoryCollection */
+    private $categoryCollection;
+
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
-     * Knowledge API controller constructor.
+     * DI.
      *
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
-     * @param UserModel $userModel
-     * @param knowledgeCategoryModel $knowledgeCategoryModel
+     * @param \UserModel $userModel
+     * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param DiscussionModel $discussionModel
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         ArticleRevisionModel $articleRevisionModel,
@@ -163,8 +184,7 @@ class KnowledgeApiController extends AbstractApiController {
         DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
-        BreadcrumbModel $breadcrumbModel,
-        CategoryBreadcrumbProvider $categoryBreadcrumbProvider
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
@@ -172,10 +192,8 @@ class KnowledgeApiController extends AbstractApiController {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
-        $this->categoryCollectionModel = $categoryCollection;
-
+        $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
-        $this->breadcrumbModel->addProvider($categoryBreadcrumbProvider);
     }
 
     /**
@@ -216,11 +234,7 @@ class KnowledgeApiController extends AbstractApiController {
     public function categoryFragmentSchema(): Schema {
         return $this->schema([
             'categoryID:i' => 'Knowledge category ID or Community category ID.',
-            'breadcrumbs:a' => Schema::parse([
-                "name:s" => "Breadcrumb element name.",
-                "url:s" => "Breadcrumb element url.",
-            ]),
-
+            'breadcrumbs:a' => new InstanceValidatorSchema(Breadcrumb::class),
         ], 'CategoryBreadcrumbsFragment');
     }
 
@@ -601,7 +615,7 @@ class KnowledgeApiController extends AbstractApiController {
             $categoryID = $article['attrs']['categoryid'];
             if ($article['attrs']['dtype'] === self::TYPE_ARTICLE && !array_key_exists($categoryID, $categories)) {
                 $categories[$categoryID] = true;
-                $categoryRecord = new KnowledgeCategoryRecord($categoryID);
+                $categoryRecord = new KbCategoryRecordType($categoryID);
                 $categoryResults[$categoryID] = [
                     'categoryID' => $categoryID,
                     'breadcrumbs' => $this->breadcrumbModel->getForRecord($categoryRecord),
