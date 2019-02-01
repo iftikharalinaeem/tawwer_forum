@@ -8,7 +8,7 @@
 namespace Vanilla\Knowledge\Controllers;
 
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
-use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
@@ -157,7 +157,7 @@ class KbRootController extends KnowledgeTwigPageController {
             ->setSeo('title', $this->data['title'] ?? 'Knowledge')
             ->setSeo('description', $this->data['description'] ?? 'Knowledge Base')
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
+            ->setSeo('breadcrumb', $this->breadcrumbModel->crumbsAsJsonLD($this->getBreadcrumbs()));
         return $this;
     }
 

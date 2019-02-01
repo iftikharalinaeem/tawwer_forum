@@ -13,16 +13,17 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\InjectableInterface;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ReduxErrorAction;
 use Vanilla\Exception\PermissionException;
 use Garden\Web\Data;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
-use Vanilla\Knowledge\Models\Breadcrumb;
-use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Knowledge\Models\ReduxAction;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 
 /**
@@ -38,8 +39,8 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var int Category of the current page. Used for breadcrumbs. */
     private $categoryID;
 
-    /** @var KnowledgeCategoryModel */
-    protected $knowledgeCategoryModel;
+    /** @var BreadcrumbModel */
+    protected $breadcrumbModle;
 
     /** @var KnowledgeBasesApiController $kbApi */
     protected $kbApi;
@@ -59,6 +60,9 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /** @var \UsersApiController */
     protected $usersApi;
 
+    /** @var BreadcrumbModel */
+    protected $breadcrumbModel;
+
     /**
      * KnowledgeTwigPageController constructor.
      */
@@ -71,7 +75,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
     /**
      * Dependency Injection that we child controllers to need to implement.
      *
-     * @param KnowledgeCategoryModel $categoryModel
+     * @param BreadcrumbModel $breadcrumbModel
      * @param KnowledgeCategoriesApiController $categoriesApi
      * @param KnowledgeBasesApiController $kbApi
      * @param KnowledgeNavigationApiController $navigationApi
@@ -81,7 +85,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      * @param WebpackAssetProvider $assetProvider
      */
     public function setDependencies(
-        KnowledgeCategoryModel $categoryModel,
+        BreadcrumbModel $breadcrumbModel,
         KnowledgeCategoriesApiController $categoriesApi,
         KnowledgeBasesApiController $kbApi,
         KnowledgeNavigationApiController $navigationApi,
@@ -90,7 +94,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider
     ) {
-        $this->knowledgeCategoryModel = $categoryModel;
+        $this->breadcrumbModel = $breadcrumbModel;
         $this->categoriesApi = $categoriesApi;
         $this->kbApi = $kbApi;
         $this->navigationApi = $navigationApi;
@@ -218,21 +222,8 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      * @throws \Exception If attempting to generate a URL for an invalid category row.
      */
     protected function breadcrumbs(): array {
-        $categoryID = $this->getCategoryID();
-        $result = [];
-
-        if ($categoryID) {
-            $categories = $this->knowledgeCategoryModel->selectWithAncestors($categoryID);
-            $index = 1;
-            foreach ($categories as $category) {
-                $result[$index++] = new Breadcrumb(
-                    $category["name"],
-                    $this->knowledgeCategoryModel->url($category)
-                );
-            }
-        }
-
-        return $result;
+        $categoryRecordType = new KbCategoryRecordType($this->getCategoryID());
+        return $this->breadcrumbModel->getForRecord($categoryRecordType);
     }
 
     /**

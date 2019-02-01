@@ -7,7 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Navigation\Breadcrumb;
 
 /**
  * Knowledge base controller for search page.
@@ -52,7 +52,7 @@ class SearchPageController extends KnowledgeTwigPageController {
         $this->meta
             ->setSeo('description', $this->data['description'] ?? 'Knowledge Base')
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->getBreadcrumbs()));
+            ->setSeo('breadcrumb', $this->breadcrumbModel->crumbsAsJsonLD($this->getBreadcrumbs()));
         return $this;
     }
 

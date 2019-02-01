@@ -14,7 +14,7 @@ use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\ReduxAction;
-use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Navigation\Breadcrumb;
 
 /*
  * Knowledge base Categories controller for article view.
@@ -153,7 +153,7 @@ class CategoriesPageController extends KnowledgeTwigPageController {
         }
         $this->meta
             ->setSeo('locale', \Gdn::locale()->current())
-            ->setSeo('breadcrumb', Breadcrumb::crumbsAsJsonLD($this->breadcrumbs()));
+            ->setSeo('breadcrumb', $this->breadcrumbModel->crumbsAsJsonLD($this->breadcrumbs()));
         return $this;
     }
 
