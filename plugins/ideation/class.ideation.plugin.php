@@ -831,7 +831,7 @@ EOT
                 default:
                     // Recalculate the discussion score when an idea is converted back to a reaction.
                     $reactionModel = new ReactionModel();
-                    $reactionModel->recalculateTotals();
+                    $reactionModel->recalculateRecordTotal($discussionID, $type);
 
                     // Prune away any ideation status attachments, since this isn't an idea.
                     AttachmentModel::instance()->delete([
