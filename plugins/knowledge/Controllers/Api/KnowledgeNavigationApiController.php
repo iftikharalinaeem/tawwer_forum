@@ -125,7 +125,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $query Request query.
      * @return array Navigation items, arranged hierarchically.
      */
-    public function get_flat(array $query = []): array {
+    public function flat(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema($this->defaultSchema(), "in")
@@ -151,7 +151,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $query Request query.
      * @return array Navigation items, arranged hierarchically.
      */
-    public function get_tree(array $query = []): array {
+    public function tree(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
         $in = $this->schema($this->defaultSchema(), "in")
@@ -194,7 +194,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
-        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        $result = $this->getNavigation($categories, $articles, $flat, $knowledgeCategoryID);
         return $result;
     }
 
@@ -238,7 +238,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
-        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        $result = $this->getNavigation($categories, $articles, $flat);
         return $result;
     }
 
@@ -248,14 +248,15 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $categories
      * @param array $articles
      * @param bool $flatMode Mode: flat or tree
-     * @param string $recordType
+     * @param string $rootCategoryID Category ID to start from
+     *
      * @return array
      */
     private function getNavigation(
         array $categories,
         array $articles,
         bool $flatMode = true,
-        string $recordType = self::FILTER_RECORD_TYPE_ALL
+        int $rootCategoryID = KnowledgeCategoryModel::ROOT_ID
     ): array {
         $categories = $this->normalizeOutput($categories, Navigation::RECORD_TYPE_CATEGORY);
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);
@@ -263,7 +264,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($flatMode) {
             return array_merge($categories, $articles);
         } else {
-            return $this->makeNavigationTree(KnowledgeCategoryModel::ROOT_ID, $categories, $articles);
+            return $this->makeNavigationTree($rootCategoryID, $categories, $articles);
         }
     }
 
@@ -409,7 +410,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws ValidationException Throws an exception when input does not validate against the input schema.
      * @throws ValidationException Throws an exception when output does not validate against the output schema.
      */
-    public function patch_flat(int $id, array $body = []): array {
+    public function patchFlat(int $id, array $body = []): array {
         $this->permission("Garden.Settings.Manage");
 
         $knowledgeBase = $this->knowledgeBaseByID($id);

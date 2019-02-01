@@ -192,7 +192,7 @@ abstract class KnowledgeTwigPageController extends PageController implements Cus
      */
     public function preloadNavigation(int $knowledgeBaseID) {
         $options = ['knowledgeBaseID' => $knowledgeBaseID];
-        $navigation = $this->navigationApi->get_flat($options);
+        $navigation = $this->navigationApi->flat($options);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_NAVIGATION_FLAT,
             Data::box($navigation),

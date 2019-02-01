@@ -176,6 +176,48 @@ class KnowledgeBasesApiController extends AbstractApiController {
     }
 
     /**
+     * Proxy GET method for KnowledgeNavigationApiController->(flat|tree).
+     *
+     * @param int $id
+     * @param string $path
+     * @param array $query
+     * @return array
+     */
+    public function get_navigation(int $id, string $path, array $query = []): array {
+        $query['knowledgeBaseID'] = $id;
+        switch (ltrim($path, '/')) {
+            case 'flat':
+                $result = $this->knowledgeNavigationApi->flat($query);
+                break;
+            case 'tree':
+                $result = $this->knowledgeNavigationApi->tree($query);
+                break;
+            default:
+                $result = [];
+        }
+        return $result;
+    }
+
+    /**
+     * Proxy PATCH method for KnowledgeNavigationApiController->patchFlat.
+     *
+     * @param int $id
+     * @param string $path
+     * @param array $body
+     * @return array
+     */
+    public function patch_navigation(int $id, string $path, array $body = []): array {
+        switch (ltrim($path, '/')) {
+            case 'flat':
+                $result = $this->knowledgeNavigationApi->patchFlat($id, $body);
+                break;
+            default:
+                $result = [];
+        }
+        return $result;
+    }
+
+    /**
      * Update an existing knowledge base.
      *
      * @param int $id
