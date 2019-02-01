@@ -15,9 +15,13 @@ use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\Breadcrumb;
+use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Navigation\BreadcrumbModel;
 use DiscussionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use \CommentModel;
+use CommentModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryRecord;
+use Vanilla\Knowledge\Models\CategoryBreadcrumbProvider;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -116,6 +120,8 @@ class KnowledgeApiController extends AbstractApiController {
         ],
     ];
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
 
     /** @var Schema */
     private $searchResultSchema;
@@ -156,7 +162,9 @@ class KnowledgeApiController extends AbstractApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         DiscussionModel $discussionModel,
         \CommentModel $commentModel,
-        \CategoryCollection $categoryCollection
+        \CategoryCollection $categoryCollection,
+        BreadcrumbModel $breadcrumbModel,
+        CategoryBreadcrumbProvider $categoryBreadcrumbProvider
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
@@ -165,6 +173,9 @@ class KnowledgeApiController extends AbstractApiController {
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->categoryCollectionModel = $categoryCollection;
+
+        $this->breadcrumbModel = $breadcrumbModel;
+        $this->breadcrumbModel->addProvider($categoryBreadcrumbProvider);
     }
 
     /**
@@ -587,22 +598,16 @@ class KnowledgeApiController extends AbstractApiController {
 
         $categories = [];
         foreach ($this->results['matches'] as $key => $article) {
-            if ($article['attrs']['dtype'] === self::TYPE_ARTICLE) {
-                $categories[$article['attrs']['categoryid']] = true;
+            $categoryID = $article['attrs']['categoryid'];
+            if ($article['attrs']['dtype'] === self::TYPE_ARTICLE && !array_key_exists($categoryID, $categories)) {
+                $categories[$categoryID] = true;
+                $categoryRecord = new KnowledgeCategoryRecord($categoryID);
+                $categoryResults[$categoryID] = [
+                    'categoryID' => $categoryID,
+                    'breadcrumbs' => $this->breadcrumbModel->getForRecord($categoryRecord),
+                ];
             }
         };
-
-        foreach ($categories as $categoryID => $drop) {
-            $categoryResults[$categoryID] = [
-                'categoryID' => $categoryID,
-                'breadcrumbs' => array_map(
-                    function (Breadcrumb $breadcrumb) {
-                        return $breadcrumb->asArray();
-                    },
-                    array_values($this->knowledgeCategoryModel->buildBreadcrumbs($categoryID))
-                )
-            ];
-        }
 
         return $categoryResults;
     }
