@@ -50,10 +50,10 @@ class CategoryPage extends KbPage {
         $this
             ->setSeoRequired(false)
             ->setSeoTitle($category['name'] ?? "")
-            ->setSeoContent('seo/pages/flatCategories.twig', [
+            ->setSeoContent($this->renderKbView('seo/pages/flatCategories.twig', [
                 'category' => $category,
                 'articles' => $articles
-            ])
+            ]))
             ->setCanonicalUrl($category['url'])
         ;
 

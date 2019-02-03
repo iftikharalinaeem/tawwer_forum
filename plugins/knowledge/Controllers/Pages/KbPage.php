@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers\Pages;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -30,6 +31,9 @@ abstract class KbPage extends Page {
     /** @var KnowledgeNavigationApiController */
     protected $navApi;
 
+    /** @var KnowledgeCategoriesApiController */
+    protected $categoriesApi;
+
     /**
      * @inheritdoc
      */
@@ -40,12 +44,14 @@ abstract class KbPage extends Page {
         WebpackAssetProvider $assetProvider,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
-        KnowledgeNavigationApiController $navApi = null // Default needed for method extensions
+        KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
+        KnowledgeCategoriesApiController $categoriesApi = null  // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
+        $this->categoriesApi = $categoriesApi;
 
         // Shared initialization.
         $this->initAssets();
@@ -77,6 +83,10 @@ abstract class KbPage extends Page {
             Data::box($this->knowledgeBases),
             []
         ));
+
+        // This is here as a stopgap. The frontend needs to not rely on this.
+        $allCategories = $this->categoriesApi->index();
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($allCategories)));
     }
 
     /**
@@ -93,6 +103,19 @@ abstract class KbPage extends Page {
             $options
         ));
     }
+
+    /**
+     * Render a twig template from the knowledge base views directory.
+     *
+     * @param string $path The view path.
+     * @param array $data Data to render the view with.
+     *
+     * @return string The rendered view.
+     */
+    protected function renderKbView(string $path, array $data): string {
+        return $this->renderTwig('plugins/knowledge/views/' . $path, $data);
+    }
+
 
     /**
      * Parse an ID out of a path with the formulation /:id-:slug.

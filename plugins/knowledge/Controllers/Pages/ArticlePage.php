@@ -36,9 +36,9 @@ class ArticlePage extends KbPage {
     public function initialize(string $path = null) {
         $article = $this->getArticleForPath($path);
         $this
-            ->setSeoTitle($article['articleRevision']['name'] ?? "")
+            ->setSeoTitle($article['name'] ?? "")
             ->setSeoDescription($article['articleRevision']['excerpt'] ?? "")
-            ->setSeoContent('seo/pages/article.twig', ['article' => $article])
+            ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
             ->setSeoBreadcrumbs([])
             ->setCanonicalUrl($article['url'])
         ;
