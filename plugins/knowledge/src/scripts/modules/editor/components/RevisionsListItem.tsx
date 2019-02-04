@@ -40,6 +40,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                             to={url}
                             className={classNames("revisionsList-link", "panelList-link", { isSelected })}
                             tabIndex={-1}
+                            replace
                         >
                             <div className="revisionsList-photoFrame">
                                 <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
