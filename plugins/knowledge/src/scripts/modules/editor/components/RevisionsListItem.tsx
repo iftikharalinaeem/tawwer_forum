@@ -18,6 +18,7 @@ import {
     revisionStatus_deleted,
 } from "@library/components/icons/revision";
 import Hoverable from "@library/utils/Hoverable";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -36,7 +37,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
             <Hoverable onHover={this.props.onHover} duration={50}>
                 {provided => (
                     <li {...provided} className="revisionsList-item">
-                        <Link
+                        <SmartLink
                             to={url}
                             className={classNames("revisionsList-link", "panelList-link", { isSelected })}
                             tabIndex={-1}
@@ -55,7 +56,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                                     {this.icon(status)}
                                 </div>
                             )}
-                        </Link>
+                        </SmartLink>
                     </li>
                 )}
             </Hoverable>
