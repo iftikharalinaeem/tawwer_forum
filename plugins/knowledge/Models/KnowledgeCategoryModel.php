@@ -40,22 +40,17 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
-    /** @var \Gdn_Cache */
-    private $cache;
-
     /**
      * KnowledgeCategoryModel constructor.
      *
      * @param Gdn_Session $session
      * @param KnowledgeBaseModel $knowledgeBaseModel
-     * @param \Gdn_Cache $cache
      */
-    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel, \Gdn_Cache $cache) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel) {
         parent::__construct("knowledgeCategory");
 
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
-        $this->cache = $cache;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -105,47 +100,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Generate a cache key for caching category fragments by knowledge base.
-     *
-     * @param int $knowledgeBaseID
-     * @return string
-     */
-    private function generateFragmentCacheKey(int $knowledgeBaseID): string {
-        return "KnowledgeBase-$knowledgeBaseID-CategoryFragments";
-    }
-
-    /**
-     * Get all of the category fragments for a particular knowledge base.
-     *
-     * Pulls from the cache if available.
-     *
-     * @param int $knowledgeBaseID
-     * @return KbCategoryFragment[]
-     */
-    private function getAllCachedFragments(int $knowledgeBaseID): array {
-        $cKey = $this->generateFragmentCacheKey($knowledgeBaseID);
-        $cachedFragments = $this->cache->get($cKey);
-        if ($cachedFragments) {
-            return $cachedFragments;
-        } else {
-            $fragments = $this->selectFragments(['knowledgeBaseID' => $knowledgeBaseID]);
-            $this->cache->add($cKey, $fragments, [\Gdn_Cache::FEATURE_EXPIRY => 300]);
-
-            return $fragments;
-        }
-    }
-
-    /**
-     * Clear the fragment cache for a particular knowledge base ID.
-     *
-     * @param int $knowledgeBaseID
-     */
-    private function clearCachedFragmentsForKB(int $knowledgeBaseID) {
-        $cKey = $this->generateFragmentCacheKey($knowledgeBaseID);
-        $this->cache->remove($cKey);
-    }
-
-    /**
      * Given a category ID, get its root-level parent in the knowledge base.
      *
      * @param int $knowledgeCategoryID
@@ -181,40 +135,10 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $result = [];
 
         do {
-            $row = $this->selectSingleFragment(["knowledgeCategoryID" => $categoryID]);
+            $row = $this->selectFragment(["knowledgeCategoryID" => $categoryID]);
             array_unshift($result, $row);
             $categoryID = $row->getParentID();
         } while ($categoryID > 0);
-
-        return $result;
-    }
-
-    private const FRAGMENT_FIELDS = 'knowledgeCategoryID, knowledgeBaseID, parentID, sort, name';
-
-    /**
-     * Select a KbCategoryFragment for a given id.
-     *
-     * @param array $where Conditions for the select query.
-     *
-     * @return KbCategoryFragment[]
-     *
-     * @throws ValidationException If the data from the DB was corrupted.
-     */
-    private function selectFragments(array $where): array {
-        $rows = $this->sql()
-            ->select(self::FRAGMENT_FIELDS)
-            ->getWhere($this->getTable(), $where, null, null, false)
-            ->resultArray()
-        ;
-
-        $result = [];
-        foreach ($rows as $row) {
-            // Normalize the fragment.
-            $url = $this->url($row);
-            $row['url'] = $url;
-
-            $result[] = new KbCategoryFragment($row);
-        }
 
         return $result;
     }
@@ -229,9 +153,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectSingleFragment(array $where): KbCategoryFragment {
+    public function selectFragment(array $where): KbCategoryFragment {
         $rows = $this->sql()
-            ->select(self::FRAGMENT_FIELDS)
+            ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
             ->getWhere($this->getTable(), $where, null, null, 1)
             ->resultArray()
         ;
@@ -257,42 +181,13 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return bool True.
      */
     public function update(array $set, array $where): bool {
-        $categoryID = $where['knowledgeCategoryID'] ?? null;
-        $oldFragment = $categoryID ? $this->selectSingleFragment($categoryID) : null;
-
-        $updateParentID = $set['parentID'] ?? null;
-        if ($categoryID && $updateParentID) {
-            if ($updateParentID === $categoryID) {
+        if (array_key_exists("parentID", $set) && array_key_exists("knowledgeCategoryID", $where)) {
+            if ($set["parentID"] === $where["knowledgeCategoryID"]) {
                 throw new \Garden\Web\Exception\ClientException("Cannot set the parent of a knowledge category to itself.");
             }
         }
 
-        $result = parent::update($set, $where);
-
-        // TODO: It's impossible to determine if what IDs were affected with the current where structure.
-        // This is surely to lead to bugs and will need to be revisited. Discuss with @ryan before continuting.
-        if ($categoryID) {
-            $newFragment = $this->selectSingleFragment($categoryID);
-
-            // Clear the fragment cache for both the new and the old keys.
-            $this->clearCachedFragmentsForKB($newFragment->getKnowledgeBaseID());
-            $this->clearCachedFragmentsForKB($oldFragment->getKnowledgeBaseID());
-        }
-
-        return $result;
-    }
-
-    /**
-     * @inheritdoc
-     * Overridden to clear caches on insert.
-     */
-    public function insert(array $set) {
-        $id = parent::insert($set);
-        $record = $this->get($id);
-        $knowledgeBaseID = $record['knowledgeBaseID'];
-        $this->clearCachedFragmentsForKB($knowledgeBaseID);
-
-        return $id;
+        return parent::update($set, $where);
     }
 
     /**
@@ -320,8 +215,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             $validationField->getValidation()->addError(
                 $validationField->getName(),
                 "The article maximum has been reached for this knowledge base."
-            )
-            ;
+            );
 
             return false;
         }
@@ -353,8 +247,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             $validationField->getValidation()->addError(
                 $validationField->getName(),
                 "The category maximum has been reached for this knowledge base."
-            )
-            ;
+            );
 
             return false;
         }
@@ -417,32 +310,22 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function buildBreadcrumbs(int $knowledgeCategoryID): array {
-        $category = $this->selectSingleFragment(['knowledgeCategoryID' => $knowledgeCategoryID]);
-        $kbID = $category->getKnowledgeBaseID();
-        $kb = $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $kbID]);
-        $rootCategoryID = $kb['rootCategoryID'];
-
-        $fragmentsByID = [];
-        foreach ($this->getAllCachedFragments($kbID) as $fragment) {
-            $fragmentsByID[$fragment->getKnowledgeCategoryID()] = $fragment;
+        $result = [];
+        if ($knowledgeCategoryID) {
+            $categories = $this->selectWithAncestors($knowledgeCategoryID);
+            foreach ($categories as $index => $category) {
+                if ($index === 0) {
+                    // The first category crumb is supposed to map up to a knowledge base.
+                    $kbID = $category->getKnowledgeBaseID();
+                    $kb = $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $kbID]);
+                    $result[] = new Breadcrumb($kb['name'], $this->knowledgeBaseModel->url($kb));
+                } else {
+                    $result[] = $category->asBreadcrumb();
+                }
+            }
         }
 
-        $crumbs = [];
-        $currentFragment = $category;
-
-        do {
-            if ($currentFragment->getKnowledgeCategoryID() === $rootCategoryID) {
-                $crumbs[] = new Breadcrumb($kb['name'], $this->knowledgeBaseModel->url($kb));
-                $currentFragment = null;
-            } else {
-                /** @var KbCategoryFragment $newFragment */
-                $crumbs[] = $currentFragment->asBreadcrumb();
-                $newFragment = $fragmentsByID[$currentFragment->getParentID()];
-                $currentFragment = $newFragment;
-            }
-        } while ($currentFragment !== null);
-
-        return array_reverse($crumbs);
+        return $result;
     }
 
     /**
@@ -616,8 +499,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                         'status' => ArticleModel::STATUS_PUBLISHED,
                         'sort >=' => $idx,
                     ]
-                )
-            ;
+                );
 
             if ($protectType === self::SORT_TYPE_ARTICLE) {
                 $query->where('articleID <>', $protectedID);
