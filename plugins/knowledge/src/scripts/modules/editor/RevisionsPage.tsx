@@ -85,7 +85,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
             <PageTitle
                 title={selectedRevision.data.name}
-                includeBackLink={device === Devices.DESKTOP}
+                includeBackLink={false}
                 meta={
                     <ArticleMeta
                         updateUser={selectedRevision.data.insertUser!}

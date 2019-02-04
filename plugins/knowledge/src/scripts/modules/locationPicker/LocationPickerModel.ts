@@ -53,6 +53,30 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         },
     );
 
+    /**
+     * Get the selected category based on the currently-navigated item. If the item is a knowledge base,
+     * use its root category ID. Otherwise, use the navigated category.
+     */
+    public static selectNavigatedCategory = createSelector(
+        (state: IStoreState) => state.knowledge.locationPicker.navigatedRecord,
+        (state: IStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+        NavigationSelector.selectNavigationItems,
+        (navigatedRecord, knowledgeBasesByID, navItems) => {
+            if (!navigatedRecord) {
+                return null;
+            }
+
+            if (navigatedRecord.recordType === KbRecordType.KB) {
+                if (knowledgeBasesByID.data && knowledgeBasesByID.data[navigatedRecord.recordID]) {
+                    const kb = knowledgeBasesByID.data[navigatedRecord.recordID];
+                    return navItems[KbRecordType.CATEGORY + kb.rootCategoryID];
+                }
+            }
+
+            return navigatedRecord;
+        },
+    );
+
     public static selectNavigatedTitle = createSelector(
         LocationPickerModel.stateSlice,
         NavigationSelector.selectNavigationItems,

@@ -95,8 +95,8 @@ abstract class KbPage extends Page {
      * @param int $knowledgeBaseID
      */
     protected function preloadNavigation(int $knowledgeBaseID) {
-        $options = ['knowledgeBaseID' => $knowledgeBaseID];
-        $navigation = $this->navigationApi->get_flat($options);
+        $options = ['knowledgeBaseID' => $knowledgeBaseID, "recordType" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL];
+        $navigation = $this->navApi->flat($options);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_NAVIGATION_FLAT,
             Data::box($navigation),
