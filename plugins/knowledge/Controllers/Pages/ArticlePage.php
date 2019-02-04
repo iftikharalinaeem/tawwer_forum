@@ -66,4 +66,3 @@ class ArticlePage extends KbPage {
         return $this->articlesApi->get($id, ["expand" => "all"]);
     }
 }
-
