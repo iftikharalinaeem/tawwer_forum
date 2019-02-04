@@ -144,6 +144,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             // Size of this cannot be larger than 191 UT8-mb4 to be an index.
             ->column("urlCode", "varchar(191)", false, 'unique.urlCode')
             ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
+            ->column("bannerImage", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
             ->column(
                 "viewType",

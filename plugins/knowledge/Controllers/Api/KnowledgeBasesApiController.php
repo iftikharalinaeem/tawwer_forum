@@ -164,6 +164,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'description',
             'viewType',
             'icon',
+            'bannerImage',
             'sortArticles',
             'sourceLocale',
             'urlCode',
