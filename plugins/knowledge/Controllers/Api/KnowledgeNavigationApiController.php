@@ -83,7 +83,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @return array
      */
-    protected function getFragmentSchema(): array {
+    public function getFragmentSchema(): array {
         return [
             "name" => [
                 "allowNull" => true,
@@ -123,52 +123,32 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * Get a navigation-friendly record hierarchy of categories and articles in flat mode.
      *
      * @param array $query Request query.
+     *
      * @return array Navigation items, arranged hierarchically.
      */
-    public function get_flat(array $query = []): array {
-        $this->permission("knowledge.kb.view");
-
-        $in = $this->schema($this->defaultSchema(), "in")
-            ->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
-            ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
-        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
-
-        $query = $in->validate($query);
-
+    public function flat(array $query = []): array {
         if (array_key_exists("knowledgeCategoryID", $query)) {
             $rows = $this->categoryNavigation($query["knowledgeCategoryID"], true, $query["recordType"]);
         } else {
             $rows = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"]);
         }
-
-        $result = $out->validate($rows);
-        return $result;
+        return $rows;
     }
 
     /**
      * Get a navigation-friendly record hierarchy of categories and articles in tree mode.
      *
      * @param array $query Request query.
+     *
      * @return array Navigation items, arranged hierarchically.
      */
-    public function get_tree(array $query = []): array {
-        $this->permission("knowledge.kb.view");
-
-        $in = $this->schema($this->defaultSchema(), "in")
-            ->requireOneOf(["knowledgeBaseID", "knowledgeCategoryID"])
-            ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
-        $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
-
-        $query = $in->validate($query);
-
+    public function tree(array $query): array {
         if (array_key_exists("knowledgeCategoryID", $query)) {
             $tree = $this->categoryNavigation($query["knowledgeCategoryID"], false, $query["recordType"]);
         } else {
             $tree = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"]);
         }
-
-        $result = $out->validate($tree);
-        return $result;
+        return $tree;
     }
 
     /**
@@ -194,7 +174,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
-        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        $result = $this->getNavigation($categories, $articles, $flat, $knowledgeCategoryID);
         return $result;
     }
 
@@ -209,7 +189,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         try {
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
-            throw new \Garden\Web\Exception\NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
+            throw new NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
         }
 
         $categories = $this->knowledgeCategoryModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
@@ -238,7 +218,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
-        $result = $this->getNavigation($categories, $articles, $flat, $recordType);
+        $result = $this->getNavigation($categories, $articles, $flat);
         return $result;
     }
 
@@ -248,14 +228,15 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $categories
      * @param array $articles
      * @param bool $flatMode Mode: flat or tree
-     * @param string $recordType
+     * @param string $rootCategoryID Category ID to start from
+     *
      * @return array
      */
     private function getNavigation(
         array $categories,
         array $articles,
         bool $flatMode = true,
-        string $recordType = self::FILTER_RECORD_TYPE_ALL
+        int $rootCategoryID = KnowledgeCategoryModel::ROOT_ID
     ): array {
         $categories = $this->normalizeOutput($categories, Navigation::RECORD_TYPE_CATEGORY);
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);
@@ -263,7 +244,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($flatMode) {
             return array_merge($categories, $articles);
         } else {
-            return $this->makeNavigationTree(KnowledgeCategoryModel::ROOT_ID, $categories, $articles);
+            return $this->makeNavigationTree($rootCategoryID, $categories, $articles);
         }
     }
 
@@ -330,12 +311,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @return array
      */
-    protected function defaultSchema() {
+    public function defaultSchema() {
         return [
-            "knowledgeBaseID?" => [
-                "description" => "Unique ID of a knowledge base. Only results in this knowledge base will be included.",
-                "type" => "integer",
-            ],
             "knowledgeCategoryID?" => [
                 "description" => "Unique ID of a knowledge category to get navigation for. Only direct children of this category will be included.",
                 "type" => "integer",
@@ -409,24 +386,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws ValidationException Throws an exception when input does not validate against the input schema.
      * @throws ValidationException Throws an exception when output does not validate against the output schema.
      */
-    public function patch_flat(int $id, array $body = []): array {
-        $this->permission("Garden.Settings.Manage");
-
+    public function patchFlat(int $id, array $body = []): array {
         $knowledgeBase = $this->knowledgeBaseByID($id);
-
-        $patchSchema = Schema::parse([
-            ":a" => Schema::parse([
-                "recordType",
-                "recordID",
-                "parentID",
-                "sort",
-            ])->add(Schema::parse($this->getFragmentSchema()))
-        ]);
-        $in = $this->schema($patchSchema, "in")->setDescription("Update the navigation structure of a knowledge base, using the flat format.");
-        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
-
-        // Prep the input.
-        $body = $in->validate($body);
 
         // Add a basic index.
         $navigation = [];
@@ -471,8 +432,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         // Grab the new navigation state.
         $navigation = $this->knowledgeBaseNavigation($id, true);
-        $result = $out->validate($navigation);
-        return $result;
+
+        return $navigation;
     }
 
     /**

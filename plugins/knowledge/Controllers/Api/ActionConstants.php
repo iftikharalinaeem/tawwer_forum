@@ -31,5 +31,4 @@ abstract class ActionConstants {
     // Category page
     const GET_ARTICLES_RESPONSE = "@@kbCategoriesPage/GET_ARTICLES_RESPONSE";
     const GET_ARTICLES_ERROR = "@@kbCategoriesPage/GET_ARTICLES_ERROR";
-    const PAGE_ERROR = "@@kbPage/ERROR";
 }
