@@ -43,7 +43,7 @@ class ArticlesPageController extends PageDispatchController {
         return $this
             ->useSimplePage(\Gdn::translate('Editor'))
             ->blockRobots()
-            ->requiresSession("/kb/articles/add")
+            ->requiresSession("/kb/articles/$id/editor")
             ->render()
         ;
     }
