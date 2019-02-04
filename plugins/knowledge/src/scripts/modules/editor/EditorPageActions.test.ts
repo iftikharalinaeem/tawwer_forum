@@ -235,7 +235,7 @@ describe("EditorPageActions", () => {
 
         it("initializes with a revision ID", async () => {
             const history = createMemoryHistory();
-            history.push("/kb/articles/1/editor?revisionID=6");
+            history.push("/kb/articles/1/editor?articleRevisionID=6");
             mockGetEditAPI();
             mockApi.onGet("/api/v2/article-revisions/6").replyOnce(200, dummyRevision);
 
@@ -249,7 +249,7 @@ describe("EditorPageActions", () => {
 
         it("initializes with a revision ID from a cached revision", async () => {
             const history = createMemoryHistory();
-            history.push("/kb/articles/1/editor?revisionID=6");
+            history.push("/kb/articles/1/editor?articleRevisionID=6");
             mockGetEditAPI();
 
             initWithState({
@@ -276,7 +276,7 @@ describe("EditorPageActions", () => {
 
         it("ignores the article and revision when loading a draft", async () => {
             const history = createMemoryHistory();
-            history.push("/kb/articles/1/editor?revisionID=6&draftID=1");
+            history.push("/kb/articles/1/editor?articleRevisionID=6&draftID=1");
             mockApi.onGet("/api/v2/articles/drafts/1").replyOnce(200, dummyDraft);
 
             void (await editorPageActions.initializeEditPage(history, 1));
