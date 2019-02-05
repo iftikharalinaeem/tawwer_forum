@@ -146,8 +146,8 @@ export default class EditorPageActions extends ReduxActions {
     public async initializeEditPage(history: History, articleID: number) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
 
-        if (queryParams.revisionID) {
-            const revisionID = parseInt(queryParams.revisionID, 10);
+        if (queryParams.articleRevisionID) {
+            const revisionID = parseInt(queryParams.articleRevisionID, 10);
             await this.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
         } else {
             await this.fetchArticleForEdit(history, articleID);

@@ -23,7 +23,7 @@ const INITIAL_STATE: IRouteState = {
 
 const routeReducer = reducerWithInitialState<IRouteState>(INITIAL_STATE)
     .case(RouteActions.resetAC, () => INITIAL_STATE)
-    .case(RouteActions.errorAC, (state, payload) => {
+    .cases([RouteActions.errorAC, RouteActions.serverErrorAC], (state, payload) => {
         return {
             error: payload,
         };

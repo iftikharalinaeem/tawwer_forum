@@ -4,13 +4,14 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/state/ReduxActions";
 import { IRouteError } from "@knowledge/routes/RouteReducer";
 import actionCreatorFactory from "typescript-fsa";
 
-const createAction = actionCreatorFactory("@@navigation");
+const createNavAction = actionCreatorFactory("@@navigation");
+const createServerPageAction = actionCreatorFactory("@@serverPage");
 
 export default class RouteActions {
-    public static errorAC = createAction<IRouteError>("ERROR");
-    public static resetAC = createAction("RESET");
+    public static serverErrorAC = createServerPageAction<IRouteError>("Error");
+    public static errorAC = createNavAction<IRouteError>("ERROR");
+    public static resetAC = createNavAction("RESET");
 }

@@ -2,19 +2,18 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
+import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
+import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import ArticlePage from "@knowledge/modules/article/ArticlePage";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import FullPageLoader from "@library/components/FullPageLoader";
 import React from "react";
 import { connect } from "react-redux";
-import { IStoreState } from "@knowledge/state/model";
-import KnowledgeBaseModel, { KbViewType, IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { RouteComponentProps } from "react-router";
-import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import apiv2 from "@library/apiv2";
-import { LoadStatus } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
-import ArticlePage from "@knowledge/modules/article/ArticlePage";
-import { t } from "@library/application";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
-import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {

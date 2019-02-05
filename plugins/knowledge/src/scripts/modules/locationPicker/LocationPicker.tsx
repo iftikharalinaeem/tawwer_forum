@@ -58,14 +58,13 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal &&
-                    this.props.navigatedRecord && (
-                        <NewCategoryForm
-                            exitHandler={this.hideNewFolderModal}
-                            parentCategoryID={this.props.navigatedRecord.recordID}
-                            buttonRef={this.newFolderButtonRef}
-                        />
-                    )}
+                {this.state.showNewCategoryModal && this.props.navigatedCategory && (
+                    <NewCategoryForm
+                        exitHandler={this.hideNewFolderModal}
+                        parentCategoryID={this.props.navigatedCategory.recordID}
+                        buttonRef={this.newFolderButtonRef}
+                    />
+                )}
             </>
         );
     }
@@ -136,9 +135,10 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { selectedRecord, navigatedRecord } = state.knowledge.locationPicker;
+    const navigatedCategory = LocationPickerModel.selectNavigatedCategory(state);
     const parentRecord = LocationPickerModel.selectParentRecord(state);
     const title = LocationPickerModel.selectNavigatedTitle(state);
-    return { selectedRecord, parentRecord, navigatedRecord, title };
+    return { selectedRecord, navigatedCategory, parentRecord, navigatedRecord, title };
 }
 
 function mapDispatchToProps(dispatch: any) {

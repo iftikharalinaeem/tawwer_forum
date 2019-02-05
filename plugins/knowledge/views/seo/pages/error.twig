@@ -1,8 +1,0 @@
-
-<main>
-    {{ page.status }} - {{ page.message }}
-    <article>
-        {% include 'seo/components/title.twig' with {'title': page.name} %}
-        {{ page.bodyRendered|raw }}
-    </article>
-</main>
