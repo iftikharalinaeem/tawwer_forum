@@ -13,6 +13,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Page;
@@ -42,12 +43,13 @@ abstract class KbPage extends Page {
         \Gdn_Request $request,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
+        BreadcrumbModel $breadcrumbModel,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null  // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
