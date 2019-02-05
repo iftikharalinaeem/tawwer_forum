@@ -58,13 +58,14 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal && this.props.navigatedRecord && (
-                    <NewCategoryForm
-                        exitHandler={this.hideNewFolderModal}
-                        parentCategoryID={this.props.navigatedRecord.recordID}
-                        buttonRef={this.newFolderButtonRef}
-                    />
-                )}
+                {this.state.showNewCategoryModal &&
+                    this.props.navigatedRecord && (
+                        <NewCategoryForm
+                            exitHandler={this.hideNewFolderModal}
+                            parentCategoryID={this.props.navigatedRecord.recordID}
+                            buttonRef={this.newFolderButtonRef}
+                        />
+                    )}
             </>
         );
     }
