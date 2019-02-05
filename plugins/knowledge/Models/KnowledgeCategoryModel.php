@@ -106,12 +106,12 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     private function selectRootCategory(int $knowledgeCategoryID): array {
-        $category = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+        $category = $this->selectSingleFragment($knowledgeCategoryID);
 
         if ($category["parentID"] !== self::ROOT_ID) {
             try {
                 $category = $this->selectSingle([
-                    "knowledgeBaseID" => $category["knowledgeBaseID"],
+                    "knowledgeBaseID" => $category->getKnowledgeBaseID(),
                     "parentID" => self::ROOT_ID,
                 ]);
             } catch (NoResultsException $e) {
@@ -135,7 +135,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $result = [];
 
         do {
-            $row = $this->selectFragment(["knowledgeCategoryID" => $categoryID]);
+            $row = $this->selectSingleFragment($categoryID);
             array_unshift($result, $row);
             $categoryID = $row->getParentID();
         } while ($categoryID > 0);
@@ -146,22 +146,22 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /**
      * Select a KbCategoryFragment for a given id.
      *
-     * @param array $where Conditions for the select query.
+     * @param int $categoryID Conditions for the select query.
      *
      * @return KbCategoryFragment
      *
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectFragment(array $where): KbCategoryFragment {
+    public function selectSingleFragment(int $categoryID): KbCategoryFragment {
         $rows = $this->sql()
             ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
-            ->getWhere($this->getTable(), $where, null, null, 1)
+            ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)
             ->resultArray()
         ;
 
         if (empty($rows)) {
-            throw new NoResultsException("No rows matched the provided criteria.");
+            throw new NoResultsException("Could not find category fragment for id $categoryID");
         }
         $result = reset($rows);
 
@@ -233,15 +233,13 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      */
     public function validateKBCategoriesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
         try {
-            $category = $this->selectSingle([
-                "knowledgeCategoryID" => $knowledgeCategoryID,
-            ]);
+            $category = $this->selectSingleFragment($knowledgeCategoryID);
         } catch (NoResultsException $e) {
             // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }
 
-        $total = $this->getTotalInKnowledgeBase($category["knowledgeBaseID"]);
+        $total = $this->getTotalInKnowledgeBase($category->getKnowledgeBaseID());
 
         if ($total >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
             $validationField->getValidation()->addError(
@@ -267,7 +265,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         if ($parentID !== self::ROOT_ID) {
             try {
                 $this->selectSingle(["knowledgeCategoryID" => $parentID]);
-            } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+            } catch (NoResultsException $e) {
                 $validationField->getValidation()->addError(
                     $validationField->getName(),
                     "Parent category does not exist."
@@ -299,31 +297,6 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
         $result = \Gdn::request()->url("/kb/categories/" . $slug, $withDomain);
-
-        return $result;
-    }
-
-    /**
-     * Build breadcrumbs array for particular knowledge category
-     *
-     * @param int $knowledgeCategoryID
-     * @return array
-     */
-    public function buildBreadcrumbs(int $knowledgeCategoryID): array {
-        $result = [];
-        if ($knowledgeCategoryID) {
-            $categories = $this->selectWithAncestors($knowledgeCategoryID);
-            foreach ($categories as $index => $category) {
-                if ($index === 0) {
-                    // The first category crumb is supposed to map up to a knowledge base.
-                    $kbID = $category->getKnowledgeBaseID();
-                    $kb = $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $kbID]);
-                    $result[] = new Breadcrumb($kb['name'], $this->knowledgeBaseModel->url($kb));
-                } else {
-                    $result[] = $category->asBreadcrumb();
-                }
-            }
-        }
 
         return $result;
     }
