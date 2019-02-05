@@ -6,7 +6,7 @@
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import ErrorPage from "@knowledge/routes/ErrorPage";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
@@ -34,6 +34,16 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         if (status === LoadStatus.ERROR) {
             return <ErrorPage error={this.props.error} />;
+        }
+
+        if (knowledgeBase.countArticles === 0) {
+            return (
+                <ErrorPage
+                    defaultError={DefaultError.NO_ARTICLES}
+                    knowledgeBaseID={knowledgeBase.knowledgeBaseID}
+                    knowledgeCategoryID={knowledgeBase.rootCategoryID}
+                />
+            );
         }
 
         return (
