@@ -641,7 +641,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
         };
         foreach ($categories as $categoryID => $drop) {
-            $ancestors = $this->categoryCollectionModel->getAncestors($categoryID);
+            $ancestors = $this->categoryCollection->getAncestors($categoryID);
             $breadcrumbs = [];
             foreach ($ancestors as $category) {
                 $breadcrumbs[] = (new Breadcrumb(
