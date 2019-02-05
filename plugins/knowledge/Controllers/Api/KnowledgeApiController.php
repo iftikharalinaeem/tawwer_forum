@@ -430,7 +430,7 @@ class KnowledgeApiController extends AbstractApiController {
      * Get records from articleRevisionModel model
      *
      * @param array $iDs
-     * @param int $type
+     * @param int $dtype
      * @param array $expand
      * @return array
      */
