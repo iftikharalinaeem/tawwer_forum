@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbProviderInterface;
 use Vanilla\Contracts\RecordInterface;
 
@@ -20,8 +21,11 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
     /** @var KnowledgeBaseModel */
     private $kbModel;
 
+    /** @var int */
+    private $knowledgeBaseCount;
+
     /**
-     *DI.
+     * DI.
      *
      * @param KnowledgeCategoryModel $kbCategoryModel
      * @param KnowledgeBaseModel $kbModel
@@ -29,21 +33,57 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
     public function __construct(KnowledgeCategoryModel $kbCategoryModel, KnowledgeBaseModel $kbModel) {
         $this->kbCategoryModel = $kbCategoryModel;
         $this->kbModel = $kbModel;
+        $this->knowledgeBaseCount = $kbModel->selectActiveKBCount();
     }
 
     /**
      * @inheritdoc
      */
     public function getForRecord(RecordInterface $record): array {
-        $categoryCrumbs = $this->kbCategoryModel->buildBreadcrumbs($record->getRecordID());
+        if (!$record instanceof KbCategoryRecordType) {
+            return [];
+        }
 
-        return $categoryCrumbs;
+        $categoryID = $record->getRecordID();
+        $knowledgeBase = $this->kbModel->selectFragmentForCategoryID($categoryID);
+        $categories = [];
+        if ($knowledgeBase->getViewType() === KnowledgeBaseModel::TYPE_HELP) {
+            // Guide type knowledge bases display their category lists.
+            $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
+        }
+
+        $result = [
+            new Breadcrumb(\Gdn::translate('Home'), \Gdn::request()->url('/', true)),
+            new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true)),
+        ];
+        foreach ($categories as $index => $category) {
+            $isRootCategory = $category->getKnowledgeCategoryID() === KnowledgeCategoryModel::ROOT_ID;
+            if ($isRootCategory && $this->knowledgeBaseCount > 1) {
+                // We are in knowledge base categoryID. We need to push
+                $result[] = $knowledgeBase->asBreadcrumb();
+            } else {
+                $result[] = $category->asBreadcrumb();
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the category crumbs from a particular category ID.
+     *
+     * @param int $knowledgeCategoryID
+     *
+     * @return Breadcrumb[]
+     */
+    private function getCategoryCrumbs(int $knowledgeCategoryID): array {
+
     }
 
     /**
      * @inheritdoc
      */
-    public static function getRecordType(): string {
-        return Navigation::RECORD_TYPE_CATEGORY;
+    public static function getValidRecordTypes(): array {
+        return [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE];
     }
 }
