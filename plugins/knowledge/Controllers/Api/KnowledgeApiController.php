@@ -108,7 +108,7 @@ class KnowledgeApiController extends AbstractApiController {
             'model' => 'articleRevisionModel',
             'recordType' => 'article',
             'recordID' => 'articleID',
-            'offset' => 5,
+            'offset' => 6,
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticleDeleted', 'KnowledgeArticleDeleted_Delta'],
@@ -434,16 +434,16 @@ class KnowledgeApiController extends AbstractApiController {
      * @param array $expand
      * @return array
      */
-    public function getArticles(array $iDs, int $type, array $expand = []): array {
+    public function getArticles(array $iDs, int $dtype, array $expand = []): array {
         $result = $this->articleRevisionModel->get([
                 'articleRevisionID' => $iDs,
                 'status' => ArticleModel::STATUS_PUBLISHED
         ]);
 
-        $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
+        $type = self::RECORD_TYPES[$dtype];
         foreach ($result as &$article) {
             $article["recordID"] = $article[$type['recordID']];
-            $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
+            $article["recordType"] = $type['recordType'];
             $article["body"] = $article["excerpt"];
             $article["url"] = $this->articleModel->url($article);
             $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
