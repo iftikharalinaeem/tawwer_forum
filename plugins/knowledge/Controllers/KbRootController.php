@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Controllers\Pages\CategoryPage;
+use Vanilla\Knowledge\Controllers\Pages\HomePage;
 use Vanilla\Knowledge\Controllers\Pages\KnowledgeBasePage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
 use Vanilla\Web\PageDispatchController;
@@ -25,7 +26,9 @@ class KbRootController extends PageDispatchController {
      * Render out the /kb page.
      */
     public function index(): Data {
-        return $this->useSimplePage('Help')->render();
+        $page = $this->usePage(HomePage::class);
+        $page->initialize();
+        return $page->render();
     }
 
     /**
