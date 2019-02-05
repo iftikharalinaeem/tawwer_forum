@@ -73,7 +73,7 @@ export class ErrorPage extends React.Component<IProps> {
                     message: "There are no knowledge bases",
                     description: t("No knowledge bases could be found. Please create one to get started."),
                     actionItem: (
-                        <LinkAsButton to={"/knowledge/settings/knowledge-bases"}>
+                        <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
                             {t("New Knowledge Base")}
                         </LinkAsButton>
                     ),
