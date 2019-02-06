@@ -27,13 +27,6 @@ export class NavigationBreadcrumbs extends React.Component<IProps> {
         const recordKey = activeRecord.recordType + activeRecord.recordID;
         return <Breadcrumbs>{NavigationSelector.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
     }
-
-    /**
-     * Fetch navigation data when the component is mounted.
-     */
-    public componentDidMount() {
-        void this.props.actions.getNavigationFlat(1);
-    }
 }
 
 function mapStateToProps(store: IStoreState) {

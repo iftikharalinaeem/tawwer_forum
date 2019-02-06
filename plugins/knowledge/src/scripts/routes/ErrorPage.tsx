@@ -80,13 +80,16 @@ export class ErrorPage extends React.Component<IProps> {
                 };
             }
             case DefaultError.NO_ARTICLES: {
-                const { knowledgeBaseID } = this.props;
+                const { knowledgeBaseID, knowledgeCategoryID } = this.props;
                 return {
                     message: "This knowledge base does not have any articles.",
                     description: "",
                     actionItem: knowledgeBaseID ? (
                         <Permission permission="articles.add">
-                            <EditorRoute.Link className={ButtonBaseClass.STANDARD} data={{ knowledgeBaseID }}>
+                            <EditorRoute.Link
+                                className={ButtonBaseClass.STANDARD}
+                                data={{ knowledgeBaseID, knowledgeCategoryID }}
+                            >
                                 {t("New Article")}
                             </EditorRoute.Link>
                         </Permission>
@@ -126,6 +129,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
     defaultError?: DefaultError;
     error?: Partial<IError>;
     knowledgeBaseID?: number;
+    knowledgeCategoryID?: number;
 }
 
 interface IError {
