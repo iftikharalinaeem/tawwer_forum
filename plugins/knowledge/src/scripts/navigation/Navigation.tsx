@@ -95,8 +95,10 @@ function mapStateToProps(store: IStoreState, ownProps: IOwnProps) {
         data: kbsByID.status === LoadStatus.SUCCESS && kbsByID.data ? kbsByID.data[ownProps.kbID] : undefined,
     };
 
+    const fetchLoadable = navigation.fetchLoadablesByKbID[ownProps.kbID] || { status: LoadStatus.PENDING };
+
     const navItems: ILoadable<INavigationTreeItem[]> = {
-        ...navigation.fetchLoadablesByKbID[ownProps.kbID],
+        ...fetchLoadable,
         data: undefined,
     };
 

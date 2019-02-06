@@ -279,7 +279,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],
         ];
-        $actual = $this->api()->get("knowledge-navigation/tree?knowledgeBaseID=1")->getBody();
+        $actual = $this->api()->get("knowledge-bases/1/navigation-tree")->getBody();
 
         $this->assertTreesEqual($expected, $actual);
     }
@@ -289,7 +289,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
      */
     public function testMultipleMove() {
         $this->api()->patch(
-            "knowledge-navigation/{$this->knowledgeBase['knowledgeBaseID']}/flat",
+            'knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat',
             [
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
@@ -436,7 +436,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],
         ];
-        $actual = $this->api()->get("knowledge-navigation/tree?knowledgeBaseID=".$this->knowledgeBase["knowledgeBaseID"])->getBody();
+        $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
 
         $this->assertTreesEqual($expected, $actual);
 
@@ -497,7 +497,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
      */
     public function testSimpleSorting() {
         $this->api()->patch(
-            "knowledge-navigation/{$this->knowledgeBase['knowledgeBaseID']}/flat",
+            'knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat',
             [
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
@@ -646,7 +646,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],
         ];
-        $actual = $this->api()->get("knowledge-navigation/tree?knowledgeBaseID=".$this->knowledgeBase['knowledgeBaseID'])->getBody();
+        $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
 
         $this->assertTreesEqual($expected, $actual);
 
@@ -728,7 +728,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
      */
     public function testPartialSorting() {
         $this->api()->patch(
-            "knowledge-navigation/{$this->knowledgeBase['knowledgeBaseID']}/flat",
+            'knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat',
             [
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
@@ -829,7 +829,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "recordType" => Navigation::RECORD_TYPE_CATEGORY,
             ],
         ];
-        $actual = $this->api()->get("knowledge-navigation/tree?knowledgeBaseID=".$this->knowledgeBase['knowledgeBaseID'])->getBody();
+        $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
 
         $this->assertTreesEqual($expected, $actual);
     }

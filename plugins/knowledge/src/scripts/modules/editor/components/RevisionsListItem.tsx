@@ -4,20 +4,20 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { t } from "@library/application";
 import { IRevisionFragment } from "@knowledge/@types/api";
-import { Link } from "react-router-dom";
+import { t } from "@library/application";
 import DateTime from "@library/components/DateTime";
-import classNames from "classnames";
 import {
-    revisionStatus_revision,
+    revisionStatus_deleted,
     revisionStatus_draft,
     revisionStatus_pending,
     revisionStatus_published,
-    revisionStatus_deleted,
+    revisionStatus_revision,
 } from "@library/components/icons/revision";
+import SmartLink from "@library/components/navigation/SmartLink";
 import Hoverable from "@library/utils/Hoverable";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -36,10 +36,11 @@ export default class RevisionsListItem extends React.Component<IProps> {
             <Hoverable onHover={this.props.onHover} duration={50}>
                 {provided => (
                     <li {...provided} className="revisionsList-item">
-                        <Link
+                        <SmartLink
                             to={url}
                             className={classNames("revisionsList-link", "panelList-link", { isSelected })}
                             tabIndex={-1}
+                            replace
                         >
                             <div className="revisionsList-photoFrame">
                                 <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
@@ -55,7 +56,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                                     {this.icon(status)}
                                 </div>
                             )}
-                        </Link>
+                        </SmartLink>
                     </li>
                 )}
             </Hoverable>

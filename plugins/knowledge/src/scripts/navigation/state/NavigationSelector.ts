@@ -155,7 +155,10 @@ export default class NavigationSelector {
                             group.items.push(article as NavArticle);
                         }
                     }
-                    data.groups.push(group);
+
+                    if (group.items.length > 0) {
+                        data.groups.push(group);
+                    }
                     break;
                 }
             }

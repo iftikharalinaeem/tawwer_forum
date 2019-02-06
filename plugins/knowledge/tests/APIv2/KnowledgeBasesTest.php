@@ -65,6 +65,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             'description' => 'Test Knowledge Base DESCRIPTION',
             'viewType' => 'guide',
             'icon' => '',
+            'bannerImage' => '',
             'sortArticles' => 'manual',
             'sourceLocale' => '',
             'urlCode' => self::getUniqueUrlCode(),

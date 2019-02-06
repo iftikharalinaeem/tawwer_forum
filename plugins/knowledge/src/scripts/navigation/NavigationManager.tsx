@@ -36,11 +36,12 @@ import Translate from "@library/components/translation/Translate";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
     navigationItems: INormalizedNavigationItems;
-    knowledgeBaseID: number;
+    knowledgeBase: IKnowledgeBase;
     describedBy?: string;
     rootNavigationItemID: string;
 }
@@ -140,7 +141,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @inheritdoc
      */
     public async componentDidMount() {
-        const { knowledgeBaseID } = this.props;
+        const { knowledgeBaseID } = this.props.knowledgeBase;
         await this.props.navigationActions.getNavigationFlat(knowledgeBaseID);
     }
 
@@ -367,7 +368,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
         if (!selectedItem) {
             // This should be the category assosciated with the knowledge base once hooked up.
-            return this.props.knowledgeBaseID;
+            return this.props.knowledgeBase.rootCategoryID;
         }
 
         if (selectedItem.data.recordType === KbRecordType.ARTICLE) {
@@ -399,7 +400,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * - Re-fetches the navigation tree.
      */
     private onNewCategorySuccess = async () => {
-        const { knowledgeBaseID } = this.props;
+        const { knowledgeBaseID } = this.props.knowledgeBase;
         await this.props.navigationActions.getNavigationFlat(knowledgeBaseID, true);
     };
 
@@ -629,8 +630,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * - Preserves existing expand state if it exists.
      */
     private calcTree() {
+        const { knowledgeBase } = this.props;
         const data: ITreeData<INormalizedNavigationItem> = {
-            rootId: "knowledgeCategory1",
+            rootId: KbRecordType.CATEGORY + knowledgeBase.rootCategoryID,
             items: {},
         };
 
@@ -639,12 +641,22 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 continue;
             }
 
+            if (knowledgeBase.viewType !== KbViewType.GUIDE && itemValue.recordType === KbRecordType.ARTICLE) {
+                continue;
+            }
+
             let stateValue: ITreeItem<INormalizedNavigationItem> | null = null;
             if (this.state && this.state.treeData.items[itemID]) {
                 stateValue = this.state.treeData.items[itemID];
             }
 
-            const children = itemValue.children;
+            const children = itemValue.children.filter(child => {
+                if (knowledgeBase.viewType !== KbViewType.GUIDE && child.startsWith(KbRecordType.ARTICLE)) {
+                    return false;
+                }
+
+                return true;
+            });
             data.items[itemID] = {
                 parentID: KbRecordType.CATEGORY + itemValue.parentID,
                 id: itemID,

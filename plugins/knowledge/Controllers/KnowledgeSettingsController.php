@@ -10,7 +10,7 @@ use Garden\Schema\ValidationException;
 use Vanilla\Utility\ModelUtils;
 
 /**
- * Controller for serving the /knowledge/settings pages.
+ * Controller for serving the /knowledge-settings pages.
  */
 class KnowledgeSettingsController extends SettingsController {
     use \Garden\TwigTrait;
@@ -38,7 +38,7 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Main entry function for all /knowledge/settings/knowledge-bases routes.
+     * Main entry function for all /knowledge-settings/knowledge-bases routes.
      *
      * @return void
      */
@@ -61,7 +61,7 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Render the /knowledge/settings/knowledge-categories page.
+     * Render the /knowledge-settings/knowledge-categories page.
      */
     private function knowledgeBasesIndex() {
         $this->permission('Garden.Settings.Manage');
@@ -73,8 +73,8 @@ class KnowledgeSettingsController extends SettingsController {
     /**
      * Render the add & edit pages for the knowledge base.
      *
-     * - /knowledge/settings/knowledge-bases/add
-     * - /knowledge/settings/knowledge-bases/:id/edit
+     * - /knowledge-settings/knowledge-bases/add
+     * - /knowledge-settings/knowledge-bases/:id/edit
      *
      * @param string|int|null $knowledgeBaseID The ID of the KB being edited.
      *

@@ -35,7 +35,7 @@ export default class NavigationActions extends ReduxActions {
         }
 
         const apiThunk = bindThunkAction(NavigationActions.getNavigationFlatACs, async () => {
-            const response = await this.api.get(`/knowledge-navigation/flat?knowledgeBaseID=${knowledgeBaseID}`);
+            const response = await this.api.get(`/knowledge-bases/${knowledgeBaseID}/navigation-flat`);
             return response.data;
         })({ knowledgeBaseID });
 
@@ -60,7 +60,7 @@ export default class NavigationActions extends ReduxActions {
             knowledgeBaseID,
         };
         const apiThunk = bindThunkAction(NavigationActions.patchNavigationFlatACs, async () => {
-            const response = await this.api.patch(`/knowledge-navigation/${knowledgeBaseID}/flat`, patchItems);
+            const response = await this.api.patch(`/knowledge-bases/${knowledgeBaseID}/navigation-flat`, patchItems);
             return response.data;
         })(params);
         return this.dispatch(apiThunk);
