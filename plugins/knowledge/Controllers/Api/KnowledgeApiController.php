@@ -13,7 +13,6 @@ use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Knowledge\Models\ArticleModel;
-use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use DiscussionModel;
@@ -48,7 +47,6 @@ class KnowledgeApiController extends AbstractApiController {
 
     const RECORD_TYPES = [
         self::TYPE_DISCUSSION => [
-            'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
             'offset' => 1,
@@ -58,7 +56,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 1,
         ],
         self::TYPE_QUESTION => [
-            'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
             'offset' => 1,
@@ -68,7 +65,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 1,
         ],
         self::TYPE_POLL => [
-            'model' => 'discussion',
             'recordType' => 'discussion',
             'recordID' => 'DiscussionID',
             'offset' => 1,
@@ -78,7 +74,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 1,
         ],
         self::TYPE_COMMENT => [
-            'model' => 'comment',
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
             'offset' => 2,
@@ -88,7 +83,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 1,
         ],
         self::TYPE_ANSWER => [
-            'model' => 'comment',
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
             'offset' => 2,
@@ -98,7 +92,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 1,
         ],
         self::TYPE_ARTICLE => [
-            'model' => 'articleRevisionModel',
             'recordType' => 'article',
             'recordID' => 'articleID',
             'offset' => 5,
@@ -108,7 +101,6 @@ class KnowledgeApiController extends AbstractApiController {
             'sphinxIndexWeight' => 3,
         ],
         self::TYPE_ARTICLE_DELETED => [
-            'model' => 'articleRevisionModel',
             'recordType' => 'article',
             'recordID' => 'articleID',
             'offset' => 5,
@@ -140,9 +132,6 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var array */
     private $sphinxIndexWeights = [];
 
-    /** @var ArticleRevisionModel */
-    private $articleRevisionModel;
-
     /** @var ArticleModel */
     private $articleModel;
 
@@ -167,7 +156,6 @@ class KnowledgeApiController extends AbstractApiController {
     /**
      * DI.
      *
-     * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param \UserModel $userModel
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
@@ -177,7 +165,6 @@ class KnowledgeApiController extends AbstractApiController {
      * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
-        ArticleRevisionModel $articleRevisionModel,
         ArticleModel $articleModel,
         \UserModel $userModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
@@ -186,7 +173,6 @@ class KnowledgeApiController extends AbstractApiController {
         \CategoryCollection $categoryCollection,
         BreadcrumbModel $breadcrumbModel
     ) {
-        $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
@@ -428,7 +414,7 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
-     * Get records from articleRevisionModel model
+     * Get records from article model
      *
      * @param array $iDs
      * @param int $type
