@@ -21,8 +21,8 @@ import QueryString from "@library/components/navigation/QueryString";
 
 interface IOwnProps
     extends RouteComponentProps<{
-        id?: string;
-    }> {}
+            id?: string;
+        }> {}
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;

@@ -73,20 +73,23 @@ export class ErrorPage extends React.Component<IProps> {
                     message: "There are no knowledge bases",
                     description: t("No knowledge bases could be found. Please create one to get started."),
                     actionItem: (
-                        <LinkAsButton to={"/knowledge/settings/knowledge-bases"}>
+                        <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
                             {t("New Knowledge Base")}
                         </LinkAsButton>
                     ),
                 };
             }
             case DefaultError.NO_ARTICLES: {
-                const { knowledgeBaseID } = this.props;
+                const { knowledgeBaseID, knowledgeCategoryID } = this.props;
                 return {
                     message: "This knowledge base does not have any articles.",
                     description: "",
                     actionItem: knowledgeBaseID ? (
                         <Permission permission="articles.add">
-                            <EditorRoute.Link className={ButtonBaseClass.STANDARD} data={{ knowledgeBaseID }}>
+                            <EditorRoute.Link
+                                className={ButtonBaseClass.STANDARD}
+                                data={{ knowledgeBaseID, knowledgeCategoryID }}
+                            >
                                 {t("New Article")}
                             </EditorRoute.Link>
                         </Permission>
@@ -126,6 +129,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
     defaultError?: DefaultError;
     error?: Partial<IError>;
     knowledgeBaseID?: number;
+    knowledgeCategoryID?: number;
 }
 
 interface IError {

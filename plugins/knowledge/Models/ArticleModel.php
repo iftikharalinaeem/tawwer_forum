@@ -297,7 +297,10 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
             $rows = $this->getExtended(
-                ["a.knowledgeCategoryID" => $knowledgeCategoryID],
+                [
+                    "a.knowledgeCategoryID" => $knowledgeCategoryID,
+                    "a.status" => self::STATUS_PUBLISHED,
+                ],
                 [
                     "limit" => $limit,
                     "orderFields" => $orderField,

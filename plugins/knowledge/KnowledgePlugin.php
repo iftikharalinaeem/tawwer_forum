@@ -77,7 +77,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
     private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
         $navCollection
             ->addItem(self::NAV_SECTION, t('Knowledge'), 'Garden.Settings.Manage')
-            ->addLink(self::NAV_SECTION, t('Knowledge Bases'), '/knowledge/settings/knowledge-bases', 'Garden.Settings.Manage');
+            ->addLink(self::NAV_SECTION, t('Knowledge Bases'), '/knowledge-settings/knowledge-bases', 'Garden.Settings.Manage');
     }
 
     /**
