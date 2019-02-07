@@ -436,34 +436,33 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function getArticles(array $iDs, int $type, array $expand = []): array {
-        $result = $this->articleRevisionModel->get([
-            'articleRevisionID' => $iDs,
-            'status' => ArticleModel::STATUS_PUBLISHED
+        $articles = $this->articleModel->getWithRevision([
+            'ar.articleRevisionID' => $iDs,
         ]);
 
         $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
-        foreach ($result as &$article) {
-            $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-            $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
-            $article["recordID"] = $article[$type['recordID']];
-            $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
-            $article["body"] = $article["excerpt"];
-            $article["url"] = $this->articleModel->url($article);
+        foreach ($articles as &$articleWithRevision) {
+            $guid = $articleWithRevision['articleRevisionID'] * $type['multiplier'] + $type['offset'];
+
+            $articleWithRevision["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
+            $articleWithRevision["recordID"] = $articleWithRevision[$type['recordID']];
+            $articleWithRevision["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
+            $articleWithRevision["body"] = $articleWithRevision["excerpt"];
+            $articleWithRevision["url"] = $this->articleModel->url($articleWithRevision);
 
             if ($this->isExpandField('breadcrumbs', $expand)) {
-                $sphinxItem = $this->results['matches'][$guid]['attrs'];
                 // Casing and naming here is due to sphinx normalization.
+                $sphinxItem = $this->results['matches'][$guid]['attrs'];
                 $knowledgeCategoryID = $sphinxItem['categoryid'];
-
                 $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
                 $article['breadcrumbs'] = $crumbs;
             }
         }
 
         if ($this->isExpandField('users', $expand)) {
-            $this->userModel->expandUsers($result, ['insertUserID', 'updateUserID']);
+            $this->userModel->expandUsers($articles, ['insertUserID', 'updateUserID']);
         }
-        return $result;
+        return $articles;
     }
 
     /**
@@ -489,13 +488,13 @@ class KnowledgeApiController extends AbstractApiController {
 
             $result = [
                 "name" => $discussion['Name'],
-                "body?" => \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']),
+                "body" => \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']),
                 "url" => $discussion['Url'],
                 "insertUserID" => $discussion['InsertUserID'],
-                "updateUserID?" => $discussion['UpdateUserID'],
+                "updateUserID" => $discussion['UpdateUserID'] ?? $discussion['InsertUserID'],
                 "recordID" => $discussion['DiscussionID'],
                 "dateInserted" => $discussion['DateInserted'],
-                "dateUpdated?" => $discussion['DateUpdated'],
+                "dateUpdated" => $discussion['DateUpdated'],
                 "recordType" => $type['recordType'],
                 // Sphinx fields
                 "guid" => $guid,
@@ -531,13 +530,13 @@ class KnowledgeApiController extends AbstractApiController {
 
             $result = [
                 "name" => "Comment. Make this name later.",
-                "body?" => \Gdn_Format::excerpt($comment['Body'], $comment['Format']),
+                "body" => \Gdn_Format::excerpt($comment['Body'], $comment['Format']),
                 "url" => commentUrl($comment),
                 "insertUserID" => $comment['InsertUserID'],
-                "updateUserID?" => $comment['UpdateUserID'],
+                "updateUserID" => $comment['UpdateUserID'] ?? $comment['InsertUserID'],
                 "recordID" => $comment['DiscussionID'],
                 "dateInserted" => $comment['DateInserted'],
-                "dateUpdated?" => $comment['DateUpdated'],
+                "dateUpdated" => $comment['DateUpdated'],
                 "recordType" => $type['recordType'],
                 // Sphinx fields
                 "guid" => $guid,
