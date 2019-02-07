@@ -22,7 +22,7 @@ final class KbCategoryFragment {
     /** @var $knowledgeCategoryID */
     private $knowledgeCategoryID;
 
-    /** @var string */
+    /** @var int */
     private $parentID;
 
     /** @var string */
@@ -93,9 +93,9 @@ final class KbCategoryFragment {
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getParentID(): string {
+    public function getParentID(): int {
         return $this->parentID;
     }
 
