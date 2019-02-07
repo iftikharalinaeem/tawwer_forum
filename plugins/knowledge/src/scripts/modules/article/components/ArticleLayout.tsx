@@ -14,7 +14,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { INavigationItem } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
 import { Devices } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
@@ -58,9 +58,10 @@ export class ArticleLayout extends React.Component<IProps> {
                 />
                 <PanelLayout
                     breadcrumbs={
-                        this.props.device !== Devices.MOBILE && (
+                        this.props.device !== Devices.MOBILE &&
+                        article.breadcrumbs && (
                             <PanelWidget>
-                                <NavigationBreadcrumbs activeRecord={activeRecord} />
+                                <Breadcrumbs children={article.breadcrumbs} />
                             </PanelWidget>
                         )
                     }

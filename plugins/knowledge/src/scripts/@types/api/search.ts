@@ -21,10 +21,7 @@ export interface ISearchResult {
     recordID: number;
     recordType: string;
     updateUser?: IUserFragment;
-    category?: {
-        categoryID: number;
-        breadcrumbs: ICrumb[];
-    };
+    breadcrumbs: ICrumb[];
 }
 
 export interface ISearchRequestBody {

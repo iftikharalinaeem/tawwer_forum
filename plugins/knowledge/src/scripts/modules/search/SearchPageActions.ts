@@ -117,7 +117,7 @@ export default class SearchPageActions extends ReduxActions {
             global: form.domain === SearchDomain.EVERYWHERE,
             statuses,
             dateUpdated,
-            expand: ["user", "category"],
+            expand: ["users", "breadcrumbs"],
         };
 
         return await this.getSearch(requestOptions, page, limit);
