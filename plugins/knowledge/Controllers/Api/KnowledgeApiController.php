@@ -436,8 +436,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function getArticles(array $iDs, int $dtype, array $expand = []): array {
         $result = $this->articleRevisionModel->get([
-                'articleRevisionID' => $iDs,
-                'status' => ArticleModel::STATUS_PUBLISHED
+                'articleRevisionID' => $iDs
         ]);
 
         $type = self::RECORD_TYPES[$dtype];
