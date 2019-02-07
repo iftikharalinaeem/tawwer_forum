@@ -54,11 +54,16 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
 
         $result = [
             new Breadcrumb(\Gdn::translate('Home'), \Gdn::request()->url('/', true)),
-            new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true)),
         ];
+
+        // We only add the knowledge base "home" crumb when we have multiple knowledge bases.
+        if ($this->knowledgeBaseCount > 1) {
+            $record[] = new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true));
+        }
+
         foreach ($categories as $index => $category) {
-            $isRootCategory = $category->getKnowledgeCategoryID() === KnowledgeCategoryModel::ROOT_ID;
-            if ($isRootCategory && $this->knowledgeBaseCount > 1) {
+            $isKbRoot = $category->getParentID() === KnowledgeCategoryModel::ROOT_ID;
+            if ($isKbRoot) {
                 // We are in knowledge base categoryID. We need to push
                 $result[] = $knowledgeBase->asBreadcrumb();
             } else {
