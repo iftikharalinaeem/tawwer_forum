@@ -19,7 +19,7 @@ import Container from "@library/components/layouts/components/Container";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import Splash from "library/src/scripts/components/splash/Splash";
+import Splash from "@library/components/splash/Splash";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
@@ -38,7 +38,7 @@ export class HomePage extends React.Component<IProps> {
                 <DocumentTitle title={t("Home")}>
                     <VanillaHeader />
                 </DocumentTitle>
-                <Splash title={t("How can we help you")} styles={{}} />
+                {/*<Splash />*/}
                 <KnowledgeBaseList />
             </Container>
         );
