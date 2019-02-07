@@ -38,7 +38,7 @@ export class HomePage extends React.Component<IProps> {
                 <DocumentTitle title={t("Home")}>
                     <VanillaHeader />
                 </DocumentTitle>
-                {/*<Splash />*/}
+                <Splash title={t("How can we help you?")} />
                 <KnowledgeBaseList />
             </Container>
         );
