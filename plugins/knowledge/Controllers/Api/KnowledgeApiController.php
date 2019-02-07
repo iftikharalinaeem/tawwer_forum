@@ -12,6 +12,7 @@ use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
 use Vanilla\DateFilterSphinxSchema;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -482,10 +483,19 @@ class KnowledgeApiController extends AbstractApiController {
                 "dateInserted" => $discussion['DateInserted'],
                 "dateUpdated" => $discussion['DateUpdated'],
                 "recordType" => $type['recordType'],
+
                 // Sphinx fields
                 "guid" => $guid,
                 "orderIndex" => $this->results['matches'][$guid]['orderIndex'],
             ];
+
+            if ($this->isExpandField('breadcrumbs', $expand)) {
+                // Casing and naming here is due to sphinx normalization.
+                $sphinxItem = $this->results['matches'][$guid]['attrs'];
+                $categoryID = $sphinxItem['categoryid'];
+                $crumbs = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($categoryID));
+                $result['breadcrumbs'] = $crumbs;
+            }
 
             $results[] = $result;
         }
@@ -513,6 +523,10 @@ class KnowledgeApiController extends AbstractApiController {
         $results = [];
         foreach ($comments as $comment) {
             $guid = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
+            $sphinxItem = $this->results['matches'][$guid]['attrs'];
+            if (!$sphinxItem) {
+                continue;
+            }
 
             $result = [
                 "name" => "Comment. Make this name later.",
@@ -529,12 +543,20 @@ class KnowledgeApiController extends AbstractApiController {
                 "orderIndex" => $this->results['matches'][$guid]['orderIndex'],
             ];
 
+            if ($this->isExpandField('breadcrumbs', $expand)) {
+                // Casing and naming here is due to sphinx normalization.
+                $categoryID = $sphinxItem['categoryid'];
+                $crumbs = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($categoryID));
+                $result['breadcrumbs'] = $crumbs;
+            }
+
             $results[] = $result;
         }
 
         if ($this->isExpandField('users', $expand)) {
             $this->userModel->expandUsers($results, ['insertUserID', 'updateUserID']);
         }
+
         return $results;
     }
 
