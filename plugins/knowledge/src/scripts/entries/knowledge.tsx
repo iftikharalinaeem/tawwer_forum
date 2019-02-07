@@ -23,6 +23,7 @@ import ConversationsModel from "@library/conversations/ConversationsModel";
 import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
 import { initAllUserContent } from "@library/user-content";
+import { forceRenderStyles } from "typestyle";
 
 debug(getMeta("context.debug"));
 
@@ -33,4 +34,5 @@ onReady(() => {
     registerReducer("conversations", new ConversationsModel().reducer);
     const app = document.querySelector("#app");
     ReactDOM.render(<KnowledgeApp />, app);
+    forceRenderStyles();
 });
