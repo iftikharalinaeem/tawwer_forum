@@ -220,22 +220,10 @@ class KnowledgeApiController extends AbstractApiController {
                 ],
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "insertUser?" => $this->getUserFragmentSchema(),
-                "category?" => $this->categoryFragmentSchema(),
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ],
             "searchResultSchema"
         );
-    }
-
-    /**
-     * Get category breadcrumbs fragment schema.
-     *
-     * @return Schema
-     */
-    public function categoryFragmentSchema(): Schema {
-        return $this->schema([
-            'categoryID:i' => 'Knowledge category ID or Community category ID.',
-            'breadcrumbs:a' => new InstanceValidatorSchema(Breadcrumb::class),
-        ], 'CategoryBreadcrumbsFragment');
     }
 
     /**
@@ -247,7 +235,7 @@ class KnowledgeApiController extends AbstractApiController {
     public function get_search(array $query = []): \Garden\Web\Data {
         $this->permission("knowledge.kb.view");
 
-        $in = $this->schema($this->defaultSchema(), "in")
+        $in = $this->schema($this->inputSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
 
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
@@ -418,14 +406,6 @@ class KnowledgeApiController extends AbstractApiController {
         $results = [];
         $this->results['matches'] = $searchResults['matches'];
 
-        if (in_array('category', $expand)) {
-            $this->results['kbCategories'] = $this->getCategoriesData();
-        }
-        if ($this->query['global'] ?? false) {
-            $this->results['categories'] = $this->getForumCategoriesData();
-            $this->results['discussions'] = $this->getForumDiscussionsData();
-        }
-
         if (in_array('user', $expand)) {
             $this->results['users'] = $this->getUsersData();
         }
@@ -461,29 +441,30 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function getArticles(array $iDs, int $type, array $expand = []): array {
         $result = $this->articleRevisionModel->get([
-                'articleRevisionID' => $iDs,
-                'status' => ArticleModel::STATUS_PUBLISHED
+            'articleRevisionID' => $iDs,
+            'status' => ArticleModel::STATUS_PUBLISHED
         ]);
 
         $type = self::RECORD_TYPES[self::TYPE_ARTICLE];
         foreach ($result as &$article) {
+            $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
+            $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             $article["recordID"] = $article[$type['recordID']];
             $article["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
             $article["body"] = $article["excerpt"];
             $article["url"] = $this->articleModel->url($article);
-            $guid = $article['articleRevisionID'] * $type['multiplier'] + $type['offset'];
-            $sphinxItem = $this->results['matches'][$guid]['attrs'];
-            $article["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
-            if (in_array('category', $expand)) {
-                $article["category"] = $this->results['kbCategories'][$sphinxItem['categoryid']];
+
+            if ($this->isExpandField('user', $expand)) {
+                $this->userModel->expandUsers($article, ['insertUserID', 'updateUserID']);
             }
-            $article["status"] = self::ARTICLE_STATUSES[$sphinxItem['status']];
-            if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
-                    $article["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
-                };
-                $article["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
-                $article["updateUser"] = $article["updateUser"] ?? $article["insertUser"];
+
+            if ($this->isExpandField('breadcrumbs', $expand)) {
+                $sphinxItem = $this->results['matches'][$guid]['attrs'];
+                // Casing and naming here is due to sphinx normalization.
+                $knowledgeCategoryID = $sphinxItem['categoryid'];
+
+                $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
+                $article['breadcrumbs'] = $crumbs;
             }
         }
         return $result;
@@ -511,21 +492,11 @@ class KnowledgeApiController extends AbstractApiController {
             $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
             $discussion["recordID"] = $discussion[$type['recordID']];
             $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
-            $sphinxItem = $this->results['matches'][$discussion["guid"]]['attrs'];
             $discussion["orderIndex"] = $this->results['matches'][$discussion["guid"]]['orderIndex'];
             $discussion["recordType"] = $type['recordType'];
             $discussion['url'] = discussionUrl($discussion);
-            if (in_array('category', $expand)) {
-                $discussion["category"] = $this->results['categories'][$discussion['CategoryID']];
-            }
-            if (in_array('user', $expand)) {
-                if (in_array('user', $expand)) {
-                    if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
-                        $discussion["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
-                    };
-                    $discussion["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
-                    $discussion["updateUser"] = $discussion["updateUser"] ?? $discussion["insertUser"];
-                }
+            if ($this->isExpandField('user', $expand)) {
+                $this->userModel->expandUsers($discussion, ['insertUserID', 'updateUserID']);
             }
         }
         return $result;
@@ -551,27 +522,14 @@ class KnowledgeApiController extends AbstractApiController {
             $comment["name"] = $discussion['Name'];
             $comment["discussionID"] = $comment['DiscussionID'];
             $comment["guid"] = $comment['CommentID'] * $type['multiplier'] + $type['offset'];
-            $sphinxItem = $this->results['matches'][$comment["guid"]]['attrs'];
             $comment["orderIndex"] = $this->results['matches'][$comment["guid"]]['orderIndex'];
             $comment["recordType"] = $type['recordType'];
             $comment['url'] = \Gdn::request()->url(
                 '/discussion/' . urlencode($comment['DiscussionID']) . '/' . urlencode($discussion['Name']),
                 true
             );
-            if (in_array('category', $expand)) {
-                $cat = ($this->results['categories'][$discussion['CategoryID']] ?? false);
-                if ($cat) {
-                    $comment["forumCategory"] = $cat;
-                } else {
-                    ;
-                };
-            }
-            if (in_array('user', $expand)) {
-                if (isset($this->results['users'][$sphinxItem['updateuserid']])) {
-                    $comment["updateUser"] = $this->results['users'][$sphinxItem['updateuserid']];
-                };
-                $comment["insertUser"] = $this->results['users'][$sphinxItem['insertuserid']];
-                $comment["updateUser"] = $comment["updateUser"] ?? $comment["insertUser"];
+            if ($this->isExpandField('user', $expand)) {
+                $this->userModel->expandUsers($discussion, ['insertUserID', 'updateUserID']);
             }
         }
         return $result;
@@ -600,30 +558,6 @@ class KnowledgeApiController extends AbstractApiController {
             }
         }
         return $userResults;
-    }
-
-    /**
-     * Check if need to expand category and return categories data.
-     *
-     * @return array
-     */
-    protected function getCategoriesData(): array {
-        $categoryResults = [];
-
-        $categories = [];
-        foreach ($this->results['matches'] as $key => $article) {
-            $categoryID = $article['attrs']['categoryid'];
-            if ($article['attrs']['dtype'] === self::TYPE_ARTICLE && !array_key_exists($categoryID, $categories)) {
-                $categories[$categoryID] = true;
-                $categoryRecord = new KbCategoryRecordType($categoryID);
-                $categoryResults[$categoryID] = [
-                    'categoryID' => $categoryID,
-                    'breadcrumbs' => $this->breadcrumbModel->getForRecord($categoryRecord),
-                ];
-            }
-        };
-
-        return $categoryResults;
     }
 
     /**
@@ -686,20 +620,14 @@ class KnowledgeApiController extends AbstractApiController {
      *
      * @return array
      */
-    protected function defaultSchema() {
+    protected function inputSchema() {
         return [
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryIDs:a?" => "Knowledge category ID to filter results.",
             "categoryIDs:a?" => "Forum category IDs to filter results. Applies only when 'global' = true.",
             "insertUserIDs:a?" => "Array of insertUserIDs (authors of article) to filter results.",
             "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
-            "expand:a?" => [
-                "description" => "Expand data for: user, category.",
-                'items' => [
-                    'enum' => ["user", "category"],
-                    'type' => 'string'
-                ]
-            ],
+            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["users", "breadcrumbs"]),
             'dateUpdated?' => new DateFilterSphinxSchema([
                 'description' => 'Filter by date when the article was updated.',
             ]),
