@@ -185,11 +185,6 @@ if (!function_exists('WriteImageItem')):
       $title = FALSE;
       $body = getValue('Body', $record, '');
 
-      // A little kludge for my test data where the serialized array was put
-      // directly inside the body.
-      if (!$image && is_array(dbdecode($body)))
-         $image = dbdecode($body);
-
       $recordID = getValue('RecordID', $record); // Explicitly defined?
       if ($recordID) {
          $type = $record['RecordType'];

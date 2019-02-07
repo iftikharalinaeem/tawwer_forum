@@ -213,7 +213,7 @@ class ReactionsController extends DashboardController {
      * @param $iD
      * @throws Exception
      */
-    public function log($type, $iD) {
+    public function logged($type, $iD) {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'], false);
         $type = ucfirst($type);
 

@@ -1158,6 +1158,72 @@ class ReactionModel extends Gdn_Model {
     }
 
     /**
+     * Recalculate a single records total.
+     *
+     * @param string|int $discussionID Identifier of the discussion.
+     * @param string $type The record type.
+     */
+    public function recalculateRecordTotal($discussionID, $type) {
+        $this->SQL
+            ->whereIn('RecordType', ['Discussion-Total', 'Comment-Total'])
+            ->delete('UserTag', ['RecordID' => $discussionID]);
+
+        $sql = "insert ignore GDN_UserTag (
+            RecordType,
+            RecordID,
+            TagID,
+            UserID,
+            DateInserted,
+            Total
+         )
+         select
+            '{$type}-Total',
+            ut.RecordID,
+            ut.TagID,
+            t.InsertUserID,
+            min(ut.DateInserted),
+            sum(ut.Total) as SumTotal
+         from GDN_UserTag ut
+         join GDN_{$type} t
+         	on ut.RecordID = t.{$type}ID
+         where ut.RecordType = 'Discussion' and ut.RecordID = {$discussionID}
+         group by
+            RecordType,
+            RecordID,
+            TagID,
+            t.InsertUserID";
+        $this->SQL->query($sql);
+
+        $this->SQL->delete('UserTag', ['UserID' => self::USERID_OTHER, 'RecordID' => $discussionID]);
+
+        $sql = "insert ignore GDN_UserTag (
+         RecordType,
+         RecordID,
+         TagID,
+         UserID,
+         DateInserted,
+         Total
+      )
+      select
+         'User',
+         ut.UserID,
+         ut.TagID,
+         -1,
+         min(ut.DateInserted),
+         sum(ut.Total) as SumTotal
+      from GDN_UserTag ut
+      where ut.RecordType = '{$type}-Total' and ut.RecordID = {$discussionID} 
+      group by
+         ut.UserID,
+         ut.TagID";
+
+        $this->SQL->query($sql);
+
+        $options['recordID'] = $discussionID;
+        $this->recalculateRecordCache(false, $options);
+    }
+    /**
+     *
      *
      *
      * @throws Exception
@@ -1226,13 +1292,19 @@ class ReactionModel extends Gdn_Model {
     }
 
     /**
+     * Recalculate record total cache.
      *
-     *
-     * @param bool $day
+     * @param bool $day Specific day to recalculate.
+     * @param array $options Optional parameters to modify query.
      * @return int
      */
-    public function recalculateRecordCache($day = FALSE) {
+    public function recalculateRecordCache($day = FALSE, array $options = []) {
         $where = ['RecordType' => ['Discussion-Total', 'Comment-Total']];
+
+        if (array_key_exists('recordID', $options)) {
+            $where['RecordID'] = $options['recordID'];
+        }
+
 
         if ($day) {
             $day = Gdn_Format::toTimestamp($day);
