@@ -406,10 +406,6 @@ class KnowledgeApiController extends AbstractApiController {
         $results = [];
         $this->results['matches'] = $searchResults['matches'];
 
-        if (in_array('user', $expand)) {
-            $this->results['users'] = $this->getUsersData();
-        }
-
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
             foreach ($searchResults['matches'] as $guid => $record) {
@@ -454,10 +450,6 @@ class KnowledgeApiController extends AbstractApiController {
             $article["body"] = $article["excerpt"];
             $article["url"] = $this->articleModel->url($article);
 
-            if ($this->isExpandField('user', $expand)) {
-                $this->userModel->expandUsers($article, ['insertUserID', 'updateUserID']);
-            }
-
             if ($this->isExpandField('breadcrumbs', $expand)) {
                 $sphinxItem = $this->results['matches'][$guid]['attrs'];
                 // Casing and naming here is due to sphinx normalization.
@@ -466,6 +458,10 @@ class KnowledgeApiController extends AbstractApiController {
                 $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
                 $article['breadcrumbs'] = $crumbs;
             }
+        }
+
+        if ($this->isExpandField('users', $expand)) {
+            $this->userModel->expandUsers($result, ['insertUserID', 'updateUserID']);
         }
         return $result;
     }
@@ -480,26 +476,39 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function getDiscussions(array $ids, int $type, array $expand = []): array {
 
-        $result = $this->discussionModel->get(
+        $discussions = $this->discussionModel->get(
             null,
             self::SPHINX_DEFAULT_LIMIT,
             ['d.DiscussionID' => $ids]
         )->resultArray();
 
-
         $type = self::RECORD_TYPES[$type];
-        foreach ($result as &$discussion) {
-            $discussion["body"] = \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']);
-            $discussion["recordID"] = $discussion[$type['recordID']];
-            $discussion["guid"] = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
-            $discussion["orderIndex"] = $this->results['matches'][$discussion["guid"]]['orderIndex'];
-            $discussion["recordType"] = $type['recordType'];
-            $discussion['url'] = discussionUrl($discussion);
-            if ($this->isExpandField('user', $expand)) {
-                $this->userModel->expandUsers($discussion, ['insertUserID', 'updateUserID']);
-            }
+        $results = [];
+        foreach ($discussions as $discussion) {
+            $guid = $discussion[$type['recordID']] * $type['multiplier'] + $type['offset'];
+
+            $result = [
+                "name" => $discussion['Name'],
+                "body?" => \Gdn_Format::excerpt($discussion['Body'], $discussion['Format']),
+                "url" => $discussion['Url'],
+                "insertUserID" => $discussion['InsertUserID'],
+                "updateUserID?" => $discussion['UpdateUserID'],
+                "recordID" => $discussion['DiscussionID'],
+                "dateInserted" => $discussion['DateInserted'],
+                "dateUpdated?" => $discussion['DateUpdated'],
+                "recordType" => $type['recordType'],
+                // Sphinx fields
+                "guid" => $guid,
+                "orderIndex" => $this->results['matches'][$guid]['orderIndex'],
+            ];
+
+            $results[] = $result;
         }
-        return $result;
+
+        if ($this->isExpandField('users', $expand)) {
+            $this->userModel->expandUsers($results, ['insertUserID', 'updateUserID']);
+        }
+        return $results;
     }
 
     /**
@@ -511,84 +520,37 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function getComments(array $ids, int $type, array $expand = []): array {
-        $result = $this->commentModel->getWhere(
+        $comments = $this->commentModel->getWhere(
             ['CommentID' => $ids]
         )->resultArray();
         $type = self::RECORD_TYPES[$type];
-        foreach ($result as &$comment) {
-            $comment["body"] = \Gdn_Format::excerpt($comment['Body'], $comment['Format']);
-            $comment["recordID"] = $comment[$type['recordID']];
-            $discussion = $this->results['discussions'][$comment['DiscussionID']];
-            $comment["name"] = $discussion['Name'];
-            $comment["discussionID"] = $comment['DiscussionID'];
-            $comment["guid"] = $comment['CommentID'] * $type['multiplier'] + $type['offset'];
-            $comment["orderIndex"] = $this->results['matches'][$comment["guid"]]['orderIndex'];
-            $comment["recordType"] = $type['recordType'];
-            $comment['url'] = \Gdn::request()->url(
-                '/discussion/' . urlencode($comment['DiscussionID']) . '/' . urlencode($discussion['Name']),
-                true
-            );
-            if ($this->isExpandField('user', $expand)) {
-                $this->userModel->expandUsers($discussion, ['insertUserID', 'updateUserID']);
-            }
-        }
-        return $result;
-    }
 
-    /**
-     * Check if need to expand user fragment and return users data.
-     *
-     * @return array
-     */
-    protected function getUsersData(): array {
-        $userResults = [];
-        if (in_array('user', $this->query['expand'])) {
-            $users = [];
-            foreach ($this->results['matches'] as $key => $article) {
-                if ($article['attrs']['updateuserid'] ?? false) {
-                    $users[$article['attrs']['updateuserid']] = true;
-                };
-                if ($article['attrs']['insertuserid'] ?? false) {
-                    $users[$article['attrs']['insertuserid']] = true;
-                }
-            };
-            $userResults = $this->userModel->getIDs(array_keys($users));
-            foreach ($userResults as $id => &$user) {
-                $user['photoUrl'] = $user['Photo'] ?? \UserModel::getDefaultAvatarUrl($user);
-            }
-        }
-        return $userResults;
-    }
+        $results = [];
+        foreach ($comments as $comment) {
+            $guid = $comment[$type['recordID']] * $type['multiplier'] + $type['offset'];
 
-    /**
-     * Check if need to expand category and return categories data.
-     *
-     * @return array
-     */
-    protected function getForumCategoriesData(): array {
-        $categoryResults = [];
-
-        $categories = [];
-        foreach ($this->results['matches'] as $key => $article) {
-            if ($article['attrs']['dtype'] !== self::TYPE_ARTICLE) {
-                $categories[$article['attrs']['categoryid']] = true;
-            }
-        };
-        foreach ($categories as $categoryID => $drop) {
-            $ancestors = $this->categoryCollection->getAncestors($categoryID);
-            $breadcrumbs = [];
-            foreach ($ancestors as $category) {
-                $breadcrumbs[] = (new Breadcrumb(
-                    $category["Name"],
-                    \CategoryModel::categoryUrl($category['UrlCode'])
-                ))->asArray();
-            }
-            $categoryResults[$categoryID] = [
-                'categoryID' => $categoryID,
-                'breadcrumbs' => $breadcrumbs,
+            $result = [
+                "name" => "Comment. Make this name later.",
+                "body?" => \Gdn_Format::excerpt($comment['Body'], $comment['Format']),
+                "url" => commentUrl($comment),
+                "insertUserID" => $comment['InsertUserID'],
+                "updateUserID?" => $comment['UpdateUserID'],
+                "recordID" => $comment['DiscussionID'],
+                "dateInserted" => $comment['DateInserted'],
+                "dateUpdated?" => $comment['DateUpdated'],
+                "recordType" => $type['recordType'],
+                // Sphinx fields
+                "guid" => $guid,
+                "orderIndex" => $this->results['matches'][$guid]['orderIndex'],
             ];
+
+            $results[] = $result;
         }
-        return $categoryResults;
+
+        if ($this->isExpandField('users', $expand)) {
+            $this->userModel->expandUsers($results, ['insertUserID', 'updateUserID']);
+        }
+        return $results;
     }
 
     /**
