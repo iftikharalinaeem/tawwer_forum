@@ -41,12 +41,12 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         parent::__construct("article");
         $this->session = $session;
 
-        $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
+        $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
             ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
 
-        $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor = new Operation\CurrentUserFieldProcessor($this->session);
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
