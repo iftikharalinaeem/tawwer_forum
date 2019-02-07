@@ -34,13 +34,15 @@ export class HomePage extends React.Component<IProps> {
         }
 
         return (
-            <Container>
-                <DocumentTitle title={t("Home")}>
-                    <VanillaHeader />
-                </DocumentTitle>
+            <>
                 <Splash title={t("How can we help you?")} />
-                <KnowledgeBaseList />
-            </Container>
+                <Container>
+                    <DocumentTitle title={t("Home")}>
+                        <VanillaHeader />
+                    </DocumentTitle>
+                    <KnowledgeBaseList />
+                </Container>
+            </>
         );
     }
 }
