@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Vanilla\Knowledge\Controllers\Pages\KnowledgeBasePage;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbProviderInterface;
 use Vanilla\Contracts\RecordInterface;
@@ -46,11 +47,7 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
 
         $categoryID = $record->getRecordID();
         $knowledgeBase = $this->kbModel->selectFragmentForCategoryID($categoryID);
-        $categories = [];
-        if ($knowledgeBase->getViewType() === KnowledgeBaseModel::TYPE_HELP) {
-            // Guide type knowledge bases display their category lists.
-            $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
-        }
+        $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
 
         $result = [
             new Breadcrumb(\Gdn::translate('Home'), \Gdn::request()->url('/', true)),
