@@ -29,8 +29,6 @@ import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
  * This is made to mounted with ReactDOM.
  */
 export default class KnowledgeApp extends React.Component {
-    private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
-
     private store = getStore<IStoreState>();
 
     /**
@@ -64,14 +62,5 @@ export default class KnowledgeApp extends React.Component {
         return {
             search: SearchRoute,
         };
-    }
-
-    /**
-     * After the component mounts we need to update it so the results from the deviceChecker ref get passed through.
-     */
-    public componentDidMount() {
-        if (this.store.getState().knowledge.categories.status !== LoadStatus.SUCCESS) {
-            void this.categoryActions.getAllCategories();
-        }
     }
 }
