@@ -17,7 +17,7 @@ import { newFolder } from "@library/components/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * Component for choosing a location for a new article.
@@ -55,7 +55,11 @@ class LocationPicker extends React.Component<IProps, IState> {
                                 {newFolder()}
                             </Button>
                         )}
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className={buttons.primary}>
+                        <Button
+                            onClick={this.handleChoose}
+                            disabled={!this.canChoose}
+                            className={buttons(ButtonTypes.PRIMARY)}
+                        >
                             {t("Choose")}
                         </Button>
                     </FrameFooter>

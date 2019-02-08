@@ -17,7 +17,7 @@ import { Modal } from "@library/components/modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import getStore from "@library/state/getStore";
 import * as React from "react";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 
 interface IProps {
@@ -84,7 +84,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                className={classNames("locationPicker-newFolder", buttons.primary)}
+                                className={classNames("locationPicker-newFolder", buttons(ButtonTypes.PRIMARY))}
                                 disabled={!this.state.valid}
                                 type="submit"
                             >
