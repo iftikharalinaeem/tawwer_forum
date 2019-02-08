@@ -20,7 +20,7 @@ final class KbCategoryFragment {
     private $knowledgeBaseID;
 
     /** @var $knowledgeCategoryID */
-    private $knowledgeCategoryID;
+    public $knowledgeCategoryID;
 
     /** @var int */
     private $parentID;

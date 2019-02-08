@@ -55,7 +55,7 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
 
         // We only add the knowledge base "home" crumb when we have multiple knowledge bases.
         if ($this->knowledgeBaseCount > 1) {
-            $record[] = new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true));
+            $result[] = new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true));
         }
 
         foreach ($categories as $index => $category) {

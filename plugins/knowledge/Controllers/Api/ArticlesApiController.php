@@ -483,6 +483,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body, true);
         $this->save($body, $id);
         $row = $this->articleByID($id, true);
+
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
+
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
@@ -559,6 +563,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleByID($id, true);
         $row = $this->normalizeOutput($row);
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
         return $result;
     }
@@ -584,6 +590,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $row = $this->normalizeOutput($row);
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
         return $result;
     }

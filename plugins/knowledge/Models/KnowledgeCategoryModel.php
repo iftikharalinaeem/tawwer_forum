@@ -106,12 +106,12 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     private function selectRootCategory(int $knowledgeCategoryID): array {
-        $category = $this->selectSingleFragment($knowledgeCategoryID);
+        $category = $this->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
 
         if ($category["parentID"] !== self::ROOT_ID) {
             try {
                 $category = $this->selectSingle([
-                    "knowledgeBaseID" => $category->getKnowledgeBaseID(),
+                    "knowledgeBaseID" => $category['knowledgeBaseID'],
                     "parentID" => self::ROOT_ID,
                 ]);
             } catch (NoResultsException $e) {
@@ -343,15 +343,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             );
             if ($res && $updateParents) {
                 $categories = $this->selectWithAncestors($knowledgeCategoryID);
-                $ids = array_column($categories, 'knowledgeCategoryID');
-                $categories = array_combine($ids, $categories);
+                $categories = array_column($categories, null, 'knowledgeCategoryID');
                 $cat = $categories[$knowledgeCategoryID];
-                while ($parent = ($categories[$cat['parentID']] ?? false)) {
-                    $res = $this->updateCounts($parent['knowledgeCategoryID'], false);
+                while ($parent = ($categories[$cat->getParentID()] ?? false)) {
+                    $res = $this->updateCounts($parent->getKnowledgeCategoryID(), false);
                     $cat = $parent;
                 }
                 if ($updateParents) {
-                    $this->knowledgeBaseModel->updateCounts($cat['knowledgeBaseID']);
+                    $this->knowledgeBaseModel->updateCounts($cat->getKnowledgeBaseID());
                 }
 
                 return $res;
