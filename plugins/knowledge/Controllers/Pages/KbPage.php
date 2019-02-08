@@ -12,6 +12,7 @@ use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -85,10 +86,6 @@ abstract class KbPage extends Page {
             Data::box($this->knowledgeBases),
             []
         ));
-
-        // This is here as a stopgap. The frontend needs to not rely on this.
-        $allCategories = $this->categoriesApi->index();
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($allCategories)));
     }
 
     /**
@@ -104,6 +101,19 @@ abstract class KbPage extends Page {
             Data::box($navigation),
             $options
         ));
+    }
+
+    /**
+     * Set the SEO breadcrumbs based off of our knowledge base ID.
+     *
+     * @param int $knowledgeBaseID
+     *
+     * @return $this Own instance for chaining.
+     */
+    protected function setSeoCrumbsForCategory(int $knowledgeBaseID): self {
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeBaseID));
+        $this->setSeoBreadcrumbs($crumbs);
+        return $this;
     }
 
     /**
