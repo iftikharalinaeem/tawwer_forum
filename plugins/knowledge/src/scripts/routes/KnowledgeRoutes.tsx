@@ -18,6 +18,7 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import { RouteComponentProps, withRouter } from "react-router";
 import RouteActions from "@knowledge/routes/RouteActions";
 import { UnregisterCallback } from "history";
+import PageLoader from "@library/components/PageLoader";
 
 /**
  * Routing component for pages and modals in the /kb directory.
@@ -41,7 +42,11 @@ export class KnowledgeRoutes extends React.Component<IProps> {
             return <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />;
         }
 
-        return <ModalRouter modalRoutes={getModalRoutes()} pageRoutes={getPageRoutes()} />;
+        return (
+            <PageLoader status={LoadStatus.SUCCESS}>
+                <ModalRouter modalRoutes={getModalRoutes()} pageRoutes={getPageRoutes()} />
+            </PageLoader>
+        );
     }
 
     private unlisten: UnregisterCallback;
