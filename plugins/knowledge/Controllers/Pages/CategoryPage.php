@@ -49,6 +49,7 @@ class CategoryPage extends KbPage {
         ]);
         $this
             ->setSeoRequired(false)
+            ->setSeoCrumbsForCategory($category['knowledgeCategoryID'])
             ->setSeoTitle($category['name'] ?? "")
             ->setSeoContent($this->renderKbView('seo/pages/flatCategories.twig', [
                 'category' => $category,
