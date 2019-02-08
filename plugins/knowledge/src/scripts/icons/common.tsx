@@ -7,6 +7,35 @@ import React from "react";
 import { t } from "@library/application";
 import classNames from "classnames";
 
+export function knowldedgeBaseItem(className?: string) {
+    const title = t("Knowledge Base Item");
+    return (
+        <svg
+            viewBox="-3 -4 24 24"
+            xmlns="http://www.w3.org/1999/xlink"
+            className={classNames("icon", "icon-knowledgeBase", className)}
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g transform="translate(-68.000000, -835.000000)" stroke="#777A80">
+                    <g transform="translate(69.000000, 836.000000)">
+                        <g stroke-width="0.9">
+                            <path d="M1.81818182e-05,14.9164047 C1.81818182e-05,14.4680588 -0.0300727273,13.7245374 2.11883636,13.7173336 L2.11883636,0.0900113744" />
+                            <path d="M2.1188,13.7147403 C2.1188,13.7147403 8.77443636,13.7230246 11.4805273,13.7230246 C14.1865273,13.7230246 14.9302545,13.8291005 14.9302545,11.3313659" />
+                            <polygon points="3.7066 13.7230066 3.7066 17.9942009 4.71669091 17.2977551 5.72687273 17.9942009 5.72687273 13.7230066" />
+                            <path d="M12.4972447,14 L12.5027553,15.9999924" />
+                            <path d="M6.06144545,16.0693659 L14.0306396,16.0693659 C14.7363669,16.0693659 14.9302636,15.5912398 14.9302636,15.0015059 L14.9302636,1.1578841 C14.9302636,0.568150122 14.7363669,0.0899393365 14.0306396,0.0899393365 L1.02539063,0.0899393365 C0.319663352,0.0899393365 -9.09090909e-06,0.568150122 -9.09090909e-06,1.1578841 L-9.09090909e-06,15.0015059 C-9.09090909e-06,15.5912398 0.319663352,16.0693659 1.02539063,16.0693659 L3.3719,16.0693659" />
+                        </g>
+                        <path d="M5,4.5 L12,4.5" stroke-linecap="square" />
+                        <path d="M5,6.5 L12,6.5" stroke-linecap="square" />
+                    </g>
+                </g>
+            </g>
+        </svg>
+    );
+}
+
 export function knowledgeBaseNoIcon(className?: string) {
     const title = t("Knowledge Base");
     return (
