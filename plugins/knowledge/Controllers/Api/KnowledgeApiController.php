@@ -483,7 +483,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
 
             $result = [
-                "name" => $record['Name'] ?? 'Comment (Record Name Not Found)',
+                "name" => $record['Name'] ?? 'Comment (Record Name Not Implemented)',
                 "body" => \Gdn_Format::excerpt($record['Body'], $record['Format']),
                 "url" => $url,
                 "insertUserID" => $record['InsertUserID'],
