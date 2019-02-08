@@ -39,7 +39,7 @@ class ArticlePage extends KbPage {
             ->setSeoTitle($article['name'] ?? "")
             ->setSeoDescription($article['articleRevision']['excerpt'] ?? "")
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
-            ->setSeoBreadcrumbs([])
+            ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
         ;
 
