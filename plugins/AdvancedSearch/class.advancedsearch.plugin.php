@@ -480,7 +480,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         /// Discussion ///
         if (isset($search['discussionid'])) {
-            $cwhere['d.DiscussionID'] = $search['discussionid'];
+            $cwhere['d.DiscussionID'] = (int)$search['discussionid'];
         }
 
         /// Category ///
