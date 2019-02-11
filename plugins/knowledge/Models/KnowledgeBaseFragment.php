@@ -35,6 +35,8 @@ final class KnowledgeBaseFragment {
     private $name;
 
     /**
+     * KnowledgeBaseFragment constructor.
+     *
      * @param array $arr The data to create the instance from.
      *
      * @throws ValidationException If invalid data was provided.
