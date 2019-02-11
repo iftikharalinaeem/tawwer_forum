@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge;
 
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
@@ -96,6 +97,17 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 ['Null' => false, 'Default' => Models\ArticleModel::STATUS_PUBLISHED],
                 'index'
             )
+            ->set()
+        ;
+        $this->database->structure()
+            ->table("articleReaction")
+            ->primaryKey("articleReactionID")
+            ->column("articleID", "int", true, "index")
+            ->column("reactionType", 'varchar(64)', ArticleReactionModel::TYPE_HELPFUL)
+            ->column("positiveCount", "int", "0")
+            ->column("negativeCount", "int", "0")
+            ->column("neutralCount", "int", "0")
+            ->column("allCount", "int", "0")
             ->set()
         ;
 

@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleReactionModel;
 
 /**
  * ArticlesApiController schemes
@@ -122,6 +123,7 @@ trait ArticlesApiSchemes {
                 "dateUpdated",
                 "insertUser?",
                 "updateUser?",
+                "reactions?",
                 "status",
                 "locale",
             ])->add($this->fullSchema()), "Article");
@@ -310,6 +312,12 @@ trait ArticlesApiSchemes {
                 'ref:s' => 'Heading blot reference id. Ex: #title',
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
+            ]),
+            "reaction:a?" => Schema::parse([
+                'reactionType:s' => ['enum' => ArticleReactionModel::getReactionTypes()],
+                'yes:i' => 'Positive reactions count of reaction type',
+                'no:i' => 'Negative reactions count of reaction type',
+                'total:i' => 'Total reactions count of reaction type',
             ]),
         ]);
     }

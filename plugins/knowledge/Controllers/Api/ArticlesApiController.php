@@ -17,6 +17,7 @@ use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
 use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
@@ -27,6 +28,7 @@ use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Models\ReactionModel;
 
 /**
  * API controller for managing the articles resource.
@@ -43,11 +45,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
+    /** @var ArticleReactionModel */
+    private $articleReactionModel;
+
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
     /** @var DraftModel */
     private $draftModel;
+
+    /** @var ReactionModel */
+    private $reactionModel;
 
     /** @var Schema */
     private $idParamSchema;
@@ -63,8 +71,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
+     * @param ArticleReactionModel $articleReactionModel
      * @param UserModel $userModel
      * @param DraftModel $draftModel
+     * @param ReactionModel $reactionModel
      * @param Parser $parser
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param FormatService $formatService
@@ -74,8 +84,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function __construct(
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
+        ArticleReactionModel $articleReactionModel,
         UserModel $userModel,
         DraftModel $draftModel,
+        ReactionModel $reactionModel,
         Parser $parser,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         FormatService $formatService,
@@ -84,8 +96,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
+        $this->articleReactionModel = $articleReactionModel;
         $this->userModel = $userModel;
         $this->draftModel = $draftModel;
+        $this->reactionModel = $reactionModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->parser = $parser;
 
@@ -552,6 +566,51 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         return $result;
     }
 
+    /**
+     * POST reaction on article ('helpful').
+     *
+     * @param int $id ArticleID
+     * @param array $body Incoming json array with 'reaction' key.
+     *        Possible values: , deleted, etc
+     *
+     * @return array Data array Article record/item
+     * @throws Exception If no session is available.
+     * @throws HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws PermissionException If the user does not have the specified permission(s).
+     */
+    public function post_reaction(int $id, array $body): array {
+        $this->permission("knowledge.kb.view");
+
+        $this->idParamSchema();
+        $in = $this->schema([
+            "helpful:s" => [
+                "description" => "Article 'Was it Helpful?' reaction.",
+                "enum" => ["yes", "no"],
+            ],
+        ], "in")->setDescription("Reaction about an article.");
+        $out = $this->articleSchema("out");
+        $body = $in->validate($body);
+
+        $article = $this->articleByID($id);
+
+        $reactionValue = array_search($body['helpful'], ArticleReactionModel::getHelpfulReactions());
+        $fields = ArticleReactionModel::getReactionFields($id, 'helpful', $reactionValue);
+
+        $this->reactionModel->insert($fields);
+
+        $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
+
+        $row = $this->articleByID($id, true);
+        $row['reactions'][]  = [
+            'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+            'yes' => (int)$reactionCounts['positiveCount'],
+            'no' => (int)$reactionCounts['neutralCount'],
+            'total' => (int)$reactionCounts['allCount'],
+        ];
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
     /**
      * Create a new article.
      *
