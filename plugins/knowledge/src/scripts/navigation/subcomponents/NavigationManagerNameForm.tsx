@@ -9,6 +9,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import classNames from "classnames";
 import React from "react";
+import { nextTick } from "process";
 
 interface IProps {
     className?: string;
@@ -68,7 +69,9 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
     public componentDidMount() {
         const input = this.inputRef.current;
         if (input) {
-            input.select();
+            nextTick(() => {
+                input.select();
+            });
         }
     }
 
