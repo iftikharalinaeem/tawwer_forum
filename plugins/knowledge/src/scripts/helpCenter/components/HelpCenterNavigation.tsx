@@ -7,7 +7,6 @@ import { t } from "@library/application";
 import React from "react";
 import NavLinksWithHeadings from "@library/components/NavLinksWithHeadings";
 import { ILinkListData } from "@library/@types/api";
-import NavLinks from "library/src/scripts/components/NavLinks";
 
 /**
  * Component for rendering out a full set of knowledge base home data.

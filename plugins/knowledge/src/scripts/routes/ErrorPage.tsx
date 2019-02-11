@@ -22,22 +22,65 @@ import Permission from "@library/users/Permission";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { searchError } from "@library/components/icons";
 import { style } from "typestyle";
-import { globalVariables } from "library/src/scripts/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { inheritHeightClass, flexHelper } from "@library/styles/styleHelpers";
+import classNames from "classnames";
+import { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import { percent, px, viewHeight } from "csx";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {
+        const vars = globalVariables();
         const error = this.getError();
+        const flexClasses = flexHelper();
+        const debug = debugHelper("errorPage");
+        const classes = {
+            inheritHeight: inheritHeightClass(),
+            root: style({
+                ...flexClasses.middle(),
+                maxWidth: percent(100),
+                width: px(400),
+                margin: "auto",
+                marginBottom: viewHeight(25),
+                ...debug.name(),
+            }),
+            title: style({
+                fontSize: px(vars.fonts.size.smallTitle),
+                lineHeight: vars.lineHeights.condensed,
+                fontWeight: vars.fonts.weights.semiBold,
+                textAlign: "center",
+                ...debug.name("title"),
+            }),
+            description: style({
+                textAlign: "center",
+                fontSize: px(vars.fonts.size.large),
+                marginTop: px(12),
+                ...debug.name("description"),
+            }),
+            cta: style({
+                marginTop: px(21),
+                ...debug.name("cta"),
+            }),
+        };
 
         return (
             <DocumentTitle title={error.message}>
                 <VanillaHeader />
-                <Container className="inheritHeight">
-                    <div className="errorPage inheritHeight">
-                        {error.icon}
-                        <Heading depth={1} title={error.message} />
-                        {error.description && <Paragraph>{error.description}</Paragraph>}
-                        {error.actionItem && <div className="errorPage-cta">{error.actionItem}</div>}
-                    </div>
+                <Container className={classes.inheritHeight}>
+                    <PanelWidgetVerticalPadding className={classes.inheritHeight}>
+                        <PanelWidget className={classes.inheritHeight}>
+                            <div className={classNames(classes.root, classes.inheritHeight)}>
+                                {error.icon}
+                                <Heading depth={1} className={classes.title} title={error.message} />
+                                {error.description && (
+                                    <Paragraph className={classes.description}>{error.description}</Paragraph>
+                                )}
+                                {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
+                            </div>
+                        </PanelWidget>
+                    </PanelWidgetVerticalPadding>
                 </Container>
             </DocumentTitle>
         );
@@ -52,7 +95,16 @@ export class ErrorPage extends React.Component<IProps> {
 
     private parseDefaultError(): IError {
         const globalVars = globalVariables();
-        const errorIconClass = style({});
+        const debug = debugHelper("errorPage");
+        const errorIconClass = style({
+            display: "block",
+            color: globalVars.mainColors.primary.toString(),
+            height: px(85),
+            width: px(85),
+            marginBottom: px(12),
+            ...debug.name("icon"),
+        });
+        const buttons = buttonClasses();
 
         switch (this.props.defaultError) {
             case DefaultError.PERMISSION: {
@@ -69,7 +121,11 @@ export class ErrorPage extends React.Component<IProps> {
                 return {
                     message,
                     description: t("The page you were looking for could not be found."),
-                    actionItem: <LinkAsButton to={"/kb"}>{t("Home")}</LinkAsButton>,
+                    actionItem: (
+                        <LinkAsButton className={buttons(ButtonTypes.PRIMARY)} to={"/kb"}>
+                            {t("Back to home page")}
+                        </LinkAsButton>
+                    ),
                     icon: searchError(message, errorIconClass),
                 };
             }
@@ -79,7 +135,7 @@ export class ErrorPage extends React.Component<IProps> {
                     message,
                     description: t("No knowledge bases could be found. Please create one to get started."),
                     actionItem: (
-                        <Permission permission="articles.add">
+                        <Permission permission="Garden.Settings.Manage">
                             <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
                                 {t("New Knowledge Base")}
                             </LinkAsButton>

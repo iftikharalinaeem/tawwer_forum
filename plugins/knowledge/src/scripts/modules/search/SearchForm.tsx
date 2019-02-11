@@ -31,7 +31,6 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
-import { search } from "library/src/scripts/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import FullPageLoader from "@library/components/FullPageLoader";
 
