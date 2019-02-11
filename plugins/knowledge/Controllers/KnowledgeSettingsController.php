@@ -38,6 +38,31 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
+     * General Appearance
+     */
+    public function generalAppearance() {
+        $this->permission("Garden.Settings.Manage");
+
+        $configurationModule = new ConfigurationModule($this);
+        $configurationModule->initialize([
+            "Knowledge.DefaultBannerImage" => [
+                "Control" => "imageupload",
+                "LabelCode" => "Banner Image",
+                "Options" => [
+                    "RemoveConfirmText" => sprintf(t("Are you sure you want to delete your %s?"), t("banner image"))
+                ],
+            ],
+            "Knowledge.ChooserTitle" => [
+                "LabelCode" => "Knowledge Base Chooser Title",
+                "Control" => "textbox",
+            ],
+        ]);
+
+        $this->setData("ConfigurationModule", $configurationModule);
+        $this->render();
+    }
+
+    /**
      * Main entry function for all /knowledge-settings/knowledge-bases routes.
      *
      * @return void
