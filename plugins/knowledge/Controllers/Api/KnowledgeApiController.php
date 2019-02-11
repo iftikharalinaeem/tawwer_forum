@@ -104,7 +104,7 @@ class KnowledgeApiController extends AbstractApiController {
         self::TYPE_ARTICLE_DELETED => [
             'recordType' => 'article',
             'recordID' => 'articleID',
-            'offset' => 5,
+            'offset' => 6,
             'multiplier' => 10,
             'getRecordsFunction' => 'getArticles',
             'sphinxIndexName' => ['KnowledgeArticleDeleted', 'KnowledgeArticleDeleted_Delta'],
@@ -421,27 +421,34 @@ class KnowledgeApiController extends AbstractApiController {
      * Get records from article model
      *
      * @param array $iDs
+     * @param int $dtype
+     * @param array $expand
      * @return array
      */
-    public function getArticles(array $iDs): array {
+    public function getArticles(array $iDs, int $dtype, array $expand = []): array {
         $articles = $this->articleModel->getWithRevision([
             'ar.articleRevisionID' => $iDs,
         ]);
         $expand = $this->query['expand'];
-        $typeData = self::RECORD_TYPES[self::TYPE_ARTICLE];
+        $typeData = self::RECORD_TYPES[$dtype];
 
         foreach ($articles as &$articleWithRevision) {
             $guid = $articleWithRevision['articleRevisionID'] * $typeData['multiplier'] + $typeData['offset'];
+            $sphinxItem = $this->results['matches'][$guid]['attrs'];
 
             $articleWithRevision["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             $articleWithRevision["recordID"] = $articleWithRevision[$typeData['recordID']];
-            $articleWithRevision["recordType"] = self::RECORD_TYPES[self::TYPE_ARTICLE]['recordType'];
+            $articleWithRevision["recordType"] = $typeData['recordType'];
             $articleWithRevision["body"] = $articleWithRevision["excerpt"];
             $articleWithRevision["url"] = $this->articleModel->url($articleWithRevision);
+            $articleWithRevision["status"] = self::ARTICLE_STATUSES[$sphinxItem['status']];
+
+            if ($this->isExpandField('category', $expand)) {
+                $articleWithRevision["category"] = $this->results['kbCategories'][$sphinxItem['categoryid']];
+            }
 
             if ($this->isExpandField('breadcrumbs', $expand)) {
                 // Casing and naming here is due to sphinx normalization.
-                $sphinxItem = $this->results['matches'][$guid]['attrs'];
                 $knowledgeCategoryID = $sphinxItem['categoryid'];
                 $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
                 $articleWithRevision['breadcrumbs'] = $crumbs;

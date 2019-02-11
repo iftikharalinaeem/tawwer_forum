@@ -13,6 +13,7 @@ html {
     background-color: $global-body_bg;
     width: 100%;
     word-break: break-word;
+    overscroll-behavior: none;
 }
 
 *,

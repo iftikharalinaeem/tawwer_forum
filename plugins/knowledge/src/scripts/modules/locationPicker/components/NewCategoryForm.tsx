@@ -17,6 +17,8 @@ import { Modal } from "@library/components/modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import getStore from "@library/state/getStore";
 import * as React from "react";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import classNames from "classnames";
 
 interface IProps {
     exitHandler: (e: React.SyntheticEvent) => void;
@@ -50,6 +52,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     private inputRef = React.createRef<InputTextBlock>();
 
     public render() {
+        const buttons = buttonClasses();
         return (
             <Modal
                 titleID={this.titleID}
@@ -81,7 +84,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                className="locationPicker-newFolder buttonPrimary"
+                                className={classNames("locationPicker-newFolder", buttons(ButtonTypes.PRIMARY))}
                                 disabled={!this.state.valid}
                                 type="submit"
                             >
