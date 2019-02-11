@@ -61,6 +61,9 @@ class KnowledgeBasePage extends KbPage {
     private function renderHelpCenterHomepage(): Data {
         $this->preloadNavigation($this->knowledgeBase['knowledgeBaseID']);
         $this->setSeoRequired(false)
+            ->setSeoDescription($this->knowledgeBase['description'])
+            ->setSeoCrumbsForCategory($this->knowledgeBase['rootCategoryID'])
+            ->setCanonicalUrl($this->knowledgeBase['url'])
             ->setSeoTitle($this->knowledgeBase['name']);
         return parent::render();
     }

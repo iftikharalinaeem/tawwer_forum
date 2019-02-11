@@ -11,13 +11,20 @@ import {
     IPatchKbCategoryResponseBody,
     IPatchKbCategoryRequestBody,
 } from "@knowledge/@types/api";
-import ReduxActions from "@library/state/ReduxActions";
-import { IDeleteKbCategoryRequest } from "@knowledge/@types/api/kbCategory";
+import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
+import {
+    IDeleteKbCategoryRequest,
+    IGetKbCategoryRequestBody,
+    IGetKbCategoryResponseBody,
+} from "@knowledge/@types/api/kbCategory";
+import actionCreatorFactory from "typescript-fsa";
+import { IApiError } from "@library/@types/api";
+
+const createAction = actionCreatorFactory("@@category");
 
 export default class CategoryActions extends ReduxActions {
     public static ACTION_TYPES:
         | ActionsUnion<typeof CategoryActions.deleteCategoryACs>
-        | ActionsUnion<typeof CategoryActions.getAllCategoriesACs>
         | ActionsUnion<typeof CategoryActions.patchCategoryACs>
         | ActionsUnion<typeof CategoryActions.postCategoryACs>;
 
@@ -42,23 +49,18 @@ export default class CategoryActions extends ReduxActions {
         });
     }
 
-    public static readonly GET_ALL_REQUEST = "@@kbCategories/GET_ALL_REQUEST";
-    public static readonly GET_ALL_RESPONSE = "@@kbCategories/GET_ALL_RESPONSE";
-    public static readonly GET_ALL_ERROR = "@@kbCategories/GET_ALL_ERROR";
-
-    // Raw actions for getting all knowledge categories
-    private static getAllCategoriesACs = ReduxActions.generateApiActionCreators(
-        CategoryActions.GET_ALL_REQUEST,
-        CategoryActions.GET_ALL_RESPONSE,
-        CategoryActions.GET_ALL_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IKbCategory[],
-        {},
+    public static getCategoryACs = createAction.async<IGetKbCategoryRequestBody, IGetKbCategoryResponseBody, IApiError>(
+        "GET_CATEGORY",
     );
 
-    // Usable action for getting a list of all categories.
-    public getAllCategories() {
-        return this.dispatchApi("get", "/knowledge-categories", CategoryActions.getAllCategoriesACs, {});
+    // Usable action for deleting a category.
+    public getCategory(request: IGetKbCategoryRequestBody) {
+        const { id } = request;
+        const apiThunk = bindThunkAction(CategoryActions.getCategoryACs, async () => {
+            const response = await this.api.get(`/knowledge-categories/${id}?expand=all`);
+            return response.data;
+        })(request);
+        return this.dispatch(apiThunk);
     }
 
     public static readonly POST_CATEGORY_REQUEST = "@@kbCategories/POST_CATEGORY_REQUEST";

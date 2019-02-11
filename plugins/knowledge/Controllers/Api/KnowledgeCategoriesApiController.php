@@ -12,8 +12,12 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * Endpoint for the knowledge category resource.
@@ -35,21 +39,27 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     /** @var Schema */
     private $knowledgeCategoryPostSchema;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * KnowledgeCategoriesApiController constructor.
      *
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param ArticleModel $articleModel
+     * @param BreadcrumbModel $breadcrumModel
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        ArticleModel $articleModel
+        ArticleModel $articleModel,
+        BreadcrumbModel $breadcrumModel
     ) {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->articleModel = $articleModel;
+        $this->breadcrumbModel = $breadcrumModel;
     }
 
     /**
@@ -96,6 +106,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
                 "description" => "Unique knowledge category ID.",
                 "type" => "integer",
             ],
+            "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             "name" => [
                 "description" => "Name for the category.",
                 "length" => 255,
@@ -186,6 +197,10 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->knowledgeCategoryByID($id);
+
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
+
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;

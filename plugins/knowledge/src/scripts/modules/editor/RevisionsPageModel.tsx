@@ -13,7 +13,6 @@ import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 
 export interface IRevisionsPageState {
     articleID: number | null;
@@ -25,10 +24,7 @@ export interface IRevisionsPageState {
 }
 
 export interface IInjectableRevisionsState {
-    article: ILoadable<null | {
-        article: IArticle;
-        crumbs: ICrumb[];
-    }>;
+    article: ILoadable<IArticle>;
     revisions: ILoadable<IRevisionFragment[]>;
     selectedRevision: ILoadable<IRevision | null>;
     selectedRevisionID: number | null;
@@ -90,14 +86,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
             },
             article: {
                 ...articleStatus,
-                data: article
-                    ? {
-                          article,
-                          crumbs: article.knowledgeCategoryID
-                              ? CategoryModel.selectKbCategoryBreadcrumb(state, article.knowledgeCategoryID)
-                              : [],
-                      }
-                    : null,
+                data: article || undefined,
             },
             selectedRevision: {
                 ...selectedRevisionStatus,

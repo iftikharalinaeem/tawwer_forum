@@ -8,11 +8,9 @@ import { IKbCategory } from "@knowledge/@types/api";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
-import Heading from "@library/components/Heading";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
@@ -25,6 +23,7 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { compose } from "@library/components/icons";
+import Breadcrumbs from "@library/components/Breadcrumbs";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -61,9 +60,11 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 <PanelLayout
                     device={this.props.device}
                     breadcrumbs={
-                        <PanelWidget>
-                            <NavigationBreadcrumbs activeRecord={activeRecord} />
-                        </PanelWidget>
+                        category.breadcrumbs && (
+                            <PanelWidget>
+                                <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
+                            </PanelWidget>
+                        )
                     }
                     leftBottom={
                         <PanelWidget>

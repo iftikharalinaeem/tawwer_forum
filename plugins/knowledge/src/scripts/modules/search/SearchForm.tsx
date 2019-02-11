@@ -198,8 +198,7 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
-        const categoryData = searchResult.category;
-        const crumbs = categoryData ? categoryData.breadcrumbs : [];
+        const crumbs = searchResult.breadcrumbs || [];
         return {
             name: searchResult.name,
             excerpt: searchResult.body,

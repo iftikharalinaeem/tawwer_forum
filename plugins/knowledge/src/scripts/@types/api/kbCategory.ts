@@ -7,6 +7,7 @@
 import { IUserFragment } from "@library/@types/api";
 import { IArticleFragment } from "@knowledge/@types/api";
 import { MultiTypeRecord } from "@library/@types/api";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 export enum KbCategorySortMode {
     NAME = "name",
@@ -28,6 +29,7 @@ interface IKbCategoryDefaultedData {
 interface IKbCategoryServerManagedData {
     knowledgeCategoryID: number; // The id.
     knowledgeBaseID: number;
+    breadcrumbs?: ICrumb[];
     dateInserted: string;
     dateUpdated: string;
     insertUserID: number; // The user that inserted the article

@@ -5,71 +5,61 @@
  */
 
 import { IArticleFragment, IKbCategory } from "@knowledge/@types/api";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
-import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import { IDeviceProps } from "@library/components/DeviceChecker";
 import DocumentTitle from "@library/components/DocumentTitle";
-import NotFoundPage from "@library/components/navigation/NotFoundPage";
-import PageLoader from "@library/components/PageLoader";
-import { withDevice } from "@library/contexts/DeviceContext";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-
-interface IProps extends IDeviceProps {
-    category: IKbCategory;
-    categoriesPageState: ICategoriesPageState;
-    categoriesPageActions: CategoriesPageActions;
-    match: match<{
-        id: string;
-        page?: number;
-    }>;
-}
 
 /**
  * Page component for a flat category list.
  */
 export class CategoriesPage extends React.Component<IProps> {
     public render() {
-        const { categoriesPageState, category } = this.props;
+        const { articles, category, pages } = this.props;
         const id = this.categoryID;
 
-        const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
-        const noCategoryID = id === null;
-        const categoryNotFound =
-            categoriesPageState.articles.status === LoadStatus.ERROR &&
-            !!categoriesPageState.articles.error &&
-            categoriesPageState.articles.error.status === 404;
-        if (noCategoryID || categoryNotFound) {
-            return <NotFoundPage type="Page" />;
+        // Handle errors
+        if (id === null) {
+            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
 
-        const hasData = categoriesPageState.articles.status === LoadStatus.SUCCESS && categoriesPageState.articles.data;
+        const articlesError = articles.status === LoadStatus.ERROR && articles.error;
+        if (articlesError) {
+            return <ErrorPage apiError={articles.error} />;
+        }
+
+        const categoryError = category.status === LoadStatus.ERROR && category.error;
+        if (categoryError) {
+            return <ErrorPage apiError={category.error} />;
+        }
+
+        // Handle loading statuses
+        const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
+
+        if (!category.data || !articles.data) {
+            return <NavigationLoadingLayout activeRecord={activeRecord} />;
+        }
 
         // Render either a loading layout or a full layout.
         return (
-            <PageLoader {...categoriesPageState.articles} status={LoadStatus.SUCCESS}>
-                {hasData ? (
-                    <DocumentTitle title={category.name}>
-                        <CategoriesLayout
-                            results={categoriesPageState.articles.data!.map(this.mapArticleToResult)}
-                            category={category!}
-                            pages={categoriesPageState.pages}
-                        />
-                    </DocumentTitle>
-                ) : (
-                    <NavigationLoadingLayout activeRecord={activeRecord} />
-                )}
-            </PageLoader>
+            <DocumentTitle title={category.data!.name}>
+                <CategoriesLayout
+                    results={articles.data.map(this.mapArticleToResult)}
+                    category={category.data}
+                    pages={pages}
+                />
+            </DocumentTitle>
         );
     }
 
@@ -77,10 +67,7 @@ export class CategoriesPage extends React.Component<IProps> {
      * If the component mounts without preloaded data we need to request it.
      */
     public componentDidMount() {
-        const { categoriesPageState } = this.props;
-        if (categoriesPageState.articles.status === LoadStatus.PENDING) {
-            return this.fetchCategoryData();
-        }
+        this.fetchCategoryData();
     }
 
     /**
@@ -90,7 +77,7 @@ export class CategoriesPage extends React.Component<IProps> {
         const { id, page } = this.props.match.params;
 
         if (id !== prevProps.match.params.id || page !== prevProps.match.params.page) {
-            return this.fetchCategoryData();
+            this.fetchCategoryData();
         }
     }
 
@@ -98,7 +85,7 @@ export class CategoriesPage extends React.Component<IProps> {
      * Use our passed in action to fetch category.
      */
     private fetchCategoryData() {
-        const { categoriesPageActions } = this.props;
+        const { requestArticles, articles, category, requestCategory } = this.props;
         const id = this.categoryID;
         const { page } = this.props.match.params;
 
@@ -106,7 +93,13 @@ export class CategoriesPage extends React.Component<IProps> {
             return;
         }
 
-        return categoriesPageActions.getArticles(id, page);
+        if (articles.status === LoadStatus.PENDING) {
+            void requestArticles(id, page);
+        }
+
+        if (category.status === LoadStatus.PENDING) {
+            void requestCategory(id);
+        }
     }
 
     /**
@@ -125,7 +118,7 @@ export class CategoriesPage extends React.Component<IProps> {
      * Cleanup the page contents.
      */
     public componentWillUnmount() {
-        this.props.categoriesPageActions.reset();
+        this.props.onReset();
     }
 
     /**
@@ -143,14 +136,31 @@ export class CategoriesPage extends React.Component<IProps> {
     }
 }
 
+interface IOwnProps {
+    match: match<{
+        id: string;
+        page?: number;
+    }>;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
 /**
  * Map in the state from the redux store.
  */
-function mapStateToProps(state: IStoreState, ownProps: IProps) {
-    const { id } = ownProps.match.params;
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { categoriesPage, categories } = state.knowledge;
+    const categoryID = parseInt(ownProps.match.params.id, 10);
+
+    const category = {
+        ...categoriesPage.categoryLoadStatus,
+        data: categories.categoriesByID[categoryID],
+    };
+
     return {
-        categoriesPageState: state.knowledge.categoriesPage,
-        category: CategoryModel.selectKbCategoryFragment(state, parseInt(id, 10)),
+        category,
+        articles: categoriesPage.articles,
+        pages: categoriesPage.pages,
     };
 }
 
@@ -158,14 +168,17 @@ function mapStateToProps(state: IStoreState, ownProps: IProps) {
  * Map in action dispatchable action creators from the store.
  */
 function mapDispatchToProps(dispatch) {
+    const categoriesPageActions = new CategoriesPageActions(dispatch, apiv2);
+    const articleActions = new ArticleActions(dispatch, apiv2);
+
     return {
-        categoriesPageActions: new CategoriesPageActions(dispatch, apiv2),
+        requestCategory: categoriesPageActions.initForCategoryID,
+        requestArticles: articleActions.getArticles,
+        onReset: categoriesPageActions.reset,
     };
 }
 
-const withRedux = connect(
+export default connect(
     mapStateToProps,
     mapDispatchToProps,
-);
-
-export default withRedux(withDevice(CategoriesPage));
+)(CategoriesPage);
