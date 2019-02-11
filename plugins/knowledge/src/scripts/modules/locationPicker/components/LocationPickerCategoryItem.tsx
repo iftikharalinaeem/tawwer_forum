@@ -12,6 +12,7 @@ import { categoryIcon, checkCompact, rightChevron } from "@library/components/ic
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
+import ConditionalWrap from "library/src/scripts/components/ConditionalWrap";
 
 interface IProps {
     isInitialSelection: boolean;
@@ -20,27 +21,31 @@ interface IProps {
     value: IKbNavigationItem;
     onNavigate: () => void;
     onSelect: (event: React.SyntheticEvent) => void;
+    selectable?: boolean;
 }
 
 /**
  * Component representing a single navigation item in a list of navigation items.
  */
-export default class LocationPickerItem extends React.Component<IProps> {
+export default class LocationPickerCategoryItem extends React.Component<IProps> {
     public render() {
-        const { value, name, isSelected, isInitialSelection, onSelect } = this.props;
+        const { value, name, isSelected, isInitialSelection, onSelect, selectable } = this.props;
         const isNavigable = [KbRecordType.CATEGORY, KbRecordType.KB].includes(value.recordType);
+        const CategoryWrap = `${selectable ? "span" : "label"}`;
         return (
             <li className={classNames("folderContents-item", { isActive: isSelected })}>
-                <label className="folderContents-folder">
-                    <input
-                        type="radio"
-                        className={classNames("folderContents-input", "sr-only")}
-                        name={name}
-                        value={value.recordID}
-                        checked={isSelected}
-                        onChange={onSelect}
-                        disabled={!isNavigable}
-                    />
+                <CategoryWrap className="folderContents-folder">
+                    {selectable && (
+                        <input
+                            type="radio"
+                            className={classNames("folderContents-input", "sr-only")}
+                            name={name}
+                            value={value.recordID}
+                            checked={isSelected}
+                            onChange={onSelect}
+                            disabled={!isNavigable}
+                        />
+                    )}
                     <span className="folderContents-content">
                         <span
                             className={classNames("folderContents-icon", {
@@ -54,7 +59,7 @@ export default class LocationPickerItem extends React.Component<IProps> {
                         </span>
                         <span className="folderContents-label">{value.name}</span>
                     </span>
-                </label>
+                </CategoryWrap>
                 {isNavigable && (
                     <Button
                         onClick={this.props.onNavigate}
@@ -71,8 +76,6 @@ export default class LocationPickerItem extends React.Component<IProps> {
 
     private get typeIcon(): React.ReactNode {
         switch (this.props.value.recordType) {
-            case KbRecordType.ARTICLE:
-                return article();
             case KbRecordType.CATEGORY:
                 return categoryIcon();
             case KbRecordType.KB:

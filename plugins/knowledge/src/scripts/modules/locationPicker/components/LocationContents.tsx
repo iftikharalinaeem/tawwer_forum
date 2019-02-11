@@ -17,8 +17,13 @@ import FullPageLoader from "@library/components/FullPageLoader";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
-import LocationPickerItem from "./LocationPickerItem";
+import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
+import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/components/LocationPickerInsertArticle";
+import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { style } from "typestyle";
+import classNames from "classnames";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -30,9 +35,27 @@ class LocationContents extends React.Component<IProps> {
     public render() {
         const { selectedRecord, childRecords, chosenRecord, title } = this.props;
 
-        const contents =
-            childRecords.status === LoadStatus.SUCCESS && childRecords.data ? (
-                childRecords.data.map(item => {
+        const currentKBID =
+            childRecords && childRecords.data && childRecords.data.length > 0
+                ? childRecords.data[0].knowledgeBaseID
+                : null;
+        const currentKB = currentKBID
+            ? {
+                  kbViewStyle: "guide", // not sure how to get this
+              }
+            : null;
+        const pickArticleLocation = currentKB && currentKB.kbViewStyle === "guide";
+
+        const setArticleFirstPosition = () => {
+            this.setArticleLocation("0");
+        };
+
+        let contents;
+        if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
+            if (childRecords.data.length === 0) {
+                contents = <LocationPickerInsertArticle onClick={setArticleFirstPosition} key="potentialLocation-0" />;
+            } else {
+                contents = childRecords.data.map((item, index) => {
                     const isSelected =
                         !!selectedRecord &&
                         item.recordType === selectedRecord.recordType &&
@@ -43,21 +66,56 @@ class LocationContents extends React.Component<IProps> {
                         item.recordID === chosenRecord.recordID;
                     const navigateHandler = () => this.props.navigateToRecord(item);
                     const selectHandler = () => this.props.selectRecord(item);
-                    return (
-                        <LocationPickerItem
-                            key={item.recordType + item.recordID}
-                            isInitialSelection={isChosen}
-                            isSelected={isSelected}
-                            name={this.radioName}
-                            value={item}
-                            onNavigate={navigateHandler}
-                            onSelect={selectHandler}
-                        />
-                    );
-                })
-            ) : (
-                <FullPageLoader />
+                    const itemKey = item.recordType + item.recordID;
+                    const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
+
+                    const setArticlePosition = () => {
+                        this.setArticleLocation(index.toString());
+                    };
+
+                    const insertArticleFirst =
+                        pickArticleLocation && index === 0 ? (
+                            <LocationPickerInsertArticle onClick={setArticleFirstPosition} key="potentialLocation-0" />
+                        ) : null;
+
+                    if (item.recordType === KbRecordType.ARTICLE) {
+                        return (
+                            <>
+                                {insertArticleFirst}
+                                <LocationPickerArticleItem key={itemKey} name={item.name} />
+                                <LocationPickerInsertArticle onClick={setArticlePosition} key={insertArticleKey} />
+                            </>
+                        );
+                    } else {
+                        return (
+                            <>
+                                {insertArticleFirst}
+                                <LocationPickerCategoryItem
+                                    key={itemKey}
+                                    isInitialSelection={isChosen}
+                                    isSelected={isSelected}
+                                    name={this.radioName}
+                                    value={item}
+                                    onNavigate={navigateHandler}
+                                    onSelect={selectHandler}
+                                    selectable={!pickArticleLocation}
+                                />
+                                {pickArticleLocation && (
+                                    <LocationPickerInsertArticle onClick={setArticlePosition} key={insertArticleKey} />
+                                )}
+                            </>
+                        );
+                    }
+                });
+            }
+        } else {
+            contents = (
+                <li className={classNames(inheritHeightClass())}>
+                    <FullPageLoader />
+                </li>
             );
+        }
+
         return (
             <LocationPickerItemList id={this.listID} legendRef={this.legendRef} categoryName={title}>
                 {contents}
@@ -94,6 +152,10 @@ class LocationContents extends React.Component<IProps> {
         if (this.props.childRecords.status === LoadStatus.PENDING) {
             void this.props.requestData();
         }
+    }
+
+    private setArticleLocation(position: string) {
+        alert("Article location: " + position);
     }
 }
 
