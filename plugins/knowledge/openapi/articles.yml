@@ -42,9 +42,8 @@ paths:
           - dateInserted
           - dateUpdated
           - sort
-      - description: >
-          <p>Page number. See <a rel="nofollow"
-          href="https://docs.vanillaforums.com/apiv2/#pagination">Pagination</a>.</p>
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
         in: query
         name: page
         schema:
