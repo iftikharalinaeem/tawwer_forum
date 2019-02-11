@@ -72,17 +72,6 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
     }
 
     /**
-     * Get the category crumbs from a particular category ID.
-     *
-     * @param int $knowledgeCategoryID
-     *
-     * @return Breadcrumb[]
-     */
-    private function getCategoryCrumbs(int $knowledgeCategoryID): array {
-
-    }
-
-    /**
      * @inheritdoc
      */
     public static function getValidRecordTypes(): array {

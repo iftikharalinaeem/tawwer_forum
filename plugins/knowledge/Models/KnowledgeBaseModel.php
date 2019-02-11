@@ -175,7 +175,7 @@ MESSAGE
     /**
      * Select a KnowledgeBaseFragment from it's root category ID.
      *
-     * @param int $rootCategoryID Conditions for the select query.
+     * @param int $categoryID Conditions for the select query.
      *
      * @return KnowledgeBaseFragment
      *

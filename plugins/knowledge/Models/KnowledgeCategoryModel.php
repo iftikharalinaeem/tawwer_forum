@@ -269,8 +269,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 $validationField->getValidation()->addError(
                     $validationField->getName(),
                     "Parent category does not exist."
-                )
-                ;
+                );
 
                 return false;
             }
