@@ -51,7 +51,7 @@ export class RevisionsLayout extends React.Component<IProps> {
                         breadcrumbs={
                             this.props.device !== Devices.MOBILE && (
                                 <PanelWidget>
-                                    <Breadcrumbs children={crumbs} />
+                                    <Breadcrumbs children={crumbs} forceDisplay={false} />
                                 </PanelWidget>
                             )
                         }

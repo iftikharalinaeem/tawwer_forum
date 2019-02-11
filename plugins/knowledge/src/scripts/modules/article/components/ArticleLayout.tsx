@@ -61,7 +61,7 @@ export class ArticleLayout extends React.Component<IProps> {
                         this.props.device !== Devices.MOBILE &&
                         article.breadcrumbs && (
                             <PanelWidget>
-                                <Breadcrumbs children={article.breadcrumbs} />
+                                <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
                             </PanelWidget>
                         )
                     }

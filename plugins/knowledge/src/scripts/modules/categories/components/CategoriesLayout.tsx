@@ -62,7 +62,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     breadcrumbs={
                         category.breadcrumbs && (
                             <PanelWidget>
-                                <Breadcrumbs children={category.breadcrumbs} />
+                                <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
                             </PanelWidget>
                         )
                     }
