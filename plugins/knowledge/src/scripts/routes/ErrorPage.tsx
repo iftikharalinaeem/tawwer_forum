@@ -4,8 +4,7 @@
  * @license Proprietary
  */
 
-import React from "react";
-import PanelLayout from "@library/components/layouts/PanelLayout";
+import React, { ReactNode } from "react";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import Paragraph from "@library/components/Paragraph";
@@ -21,6 +20,9 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/users/Permission";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import { searchError } from "@library/components/icons";
+import { style } from "typestyle";
+import { globalVariables } from "library/src/scripts/styles/globalStyleVars";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {
@@ -29,17 +31,13 @@ export class ErrorPage extends React.Component<IProps> {
         return (
             <DocumentTitle title={error.message}>
                 <VanillaHeader />
-                <Container>
-                    <PanelLayout
-                        device={this.props.device}
-                        middleTop={
-                            <div className="errorPage">
-                                <Heading depth={1} title={error.message} />
-                                {error.description && <Paragraph>{error.description}</Paragraph>}
-                                <div className="errorPage-cta">{error.actionItem}</div>
-                            </div>
-                        }
-                    />
+                <Container className="inheritHeight">
+                    <div className="errorPage inheritHeight">
+                        {error.icon}
+                        <Heading depth={1} title={error.message} />
+                        {error.description && <Paragraph>{error.description}</Paragraph>}
+                        {error.actionItem && <div className="errorPage-cta">{error.actionItem}</div>}
+                    </div>
                 </Container>
             </DocumentTitle>
         );
@@ -53,36 +51,48 @@ export class ErrorPage extends React.Component<IProps> {
     }
 
     private parseDefaultError(): IError {
+        const globalVars = globalVariables();
+        const errorIconClass = style({});
+
         switch (this.props.defaultError) {
             case DefaultError.PERMISSION: {
+                const message = t("No Permission");
                 return {
-                    message: t("No Permission"),
+                    message,
                     description: t("You don't have permission to view this resource."),
                     actionItem: this.renderSignin(),
+                    icon: searchError(message, errorIconClass),
                 };
             }
             case DefaultError.NOT_FOUND: {
+                const message = t("Page not found");
                 return {
-                    message: "Page not found",
+                    message,
                     description: t("The page you were looking for could not be found."),
                     actionItem: <LinkAsButton to={"/kb"}>{t("Home")}</LinkAsButton>,
+                    icon: searchError(message, errorIconClass),
                 };
             }
             case DefaultError.NO_KNOWLEDGE_BASE: {
+                const message = t("There are no knowledge bases");
                 return {
-                    message: "There are no knowledge bases",
+                    message,
                     description: t("No knowledge bases could be found. Please create one to get started."),
                     actionItem: (
-                        <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
-                            {t("New Knowledge Base")}
-                        </LinkAsButton>
+                        <Permission permission="articles.add">
+                            <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
+                                {t("New Knowledge Base")}
+                            </LinkAsButton>
+                        </Permission>
                     ),
+                    icon: searchError(message, errorIconClass),
                 };
             }
             case DefaultError.NO_ARTICLES: {
                 const { knowledgeBaseID, knowledgeCategoryID } = this.props;
+                const message = t("This knowledge base does not have any articles.");
                 return {
-                    message: "This knowledge base does not have any articles.",
+                    message,
                     description: "",
                     actionItem: knowledgeBaseID ? (
                         <Permission permission="articles.add">
@@ -94,14 +104,17 @@ export class ErrorPage extends React.Component<IProps> {
                             </EditorRoute.Link>
                         </Permission>
                     ) : null,
+                    icon: searchError(message, errorIconClass),
                 };
             }
             case DefaultError.GENERIC:
             default: {
+                const message = t("There was an error");
                 return {
-                    message: t("There was an error"),
+                    message,
                     description: t("Please try again later."),
                     actionItem: <LinkAsButton to={"/kb"}>{t("Home")}</LinkAsButton>,
+                    icon: searchError(message, errorIconClass),
                 };
             }
         }
@@ -136,6 +149,7 @@ interface IError {
     message: string;
     description: string;
     actionItem: React.ReactNode;
+    icon?: ReactNode;
 }
 
 export enum DefaultError {
