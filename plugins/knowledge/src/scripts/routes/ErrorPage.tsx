@@ -133,10 +133,15 @@ export class ErrorPage extends React.Component<IProps> {
                 const message = t("There are no knowledge bases");
                 return {
                     message,
-                    description: t("No knowledge bases could be found. Please create one to get started."),
+                    description: (
+                        <Permission permission="Garden.Settings.Manage">{t("Create one to get started!")}</Permission>
+                    ),
                     actionItem: (
                         <Permission permission="Garden.Settings.Manage">
-                            <LinkAsButton to={"/knowledge-settings/knowledge-bases"}>
+                            <LinkAsButton
+                                className={buttons(ButtonTypes.PRIMARY)}
+                                to={"/knowledge-settings/knowledge-bases"}
+                            >
                                 {t("New Knowledge Base")}
                             </LinkAsButton>
                         </Permission>
@@ -149,11 +154,13 @@ export class ErrorPage extends React.Component<IProps> {
                 const message = t("This knowledge base does not have any articles.");
                 return {
                     message,
-                    description: "",
+                    description: knowledgeBaseID ? (
+                        <Permission permission="articles.add">{t("Create one to get started!")}</Permission>
+                    ) : null,
                     actionItem: knowledgeBaseID ? (
                         <Permission permission="articles.add">
                             <EditorRoute.Link
-                                className={ButtonBaseClass.STANDARD}
+                                className={buttons(ButtonTypes.PRIMARY)}
                                 data={{ knowledgeBaseID, knowledgeCategoryID }}
                             >
                                 {t("New Article")}
@@ -169,7 +176,11 @@ export class ErrorPage extends React.Component<IProps> {
                 return {
                     message,
                     description: t("Please try again later."),
-                    actionItem: <LinkAsButton to={"/kb"}>{t("Home")}</LinkAsButton>,
+                    actionItem: (
+                        <LinkAsButton className={buttons(ButtonTypes.PRIMARY)} to={"/kb"}>
+                            {t("Back to Home")}
+                        </LinkAsButton>
+                    ),
                     icon: searchError(message, errorIconClass),
                 };
             }
@@ -203,8 +214,8 @@ interface IProps extends IDeviceProps, IInjectableUserState {
 
 interface IError {
     message: string;
-    description: string;
-    actionItem: React.ReactNode;
+    description: ReactNode;
+    actionItem: ReactNode;
     icon?: ReactNode;
 }
 
