@@ -27,7 +27,7 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
 /**
  * Implements the article's layout
  */
-export class ArticleRevisionsLayout extends React.Component<IProps> {
+export class RevisionsLayout extends React.Component<IProps> {
     public render() {
         const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
         const isDesktop = device === Devices.DESKTOP;
@@ -51,7 +51,7 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
                         breadcrumbs={
                             this.props.device !== Devices.MOBILE && (
                                 <PanelWidget>
-                                    <Breadcrumbs children={crumbs} />
+                                    <Breadcrumbs children={crumbs} forceDisplay={false} />
                                 </PanelWidget>
                             )
                         }
@@ -70,4 +70,4 @@ export class ArticleRevisionsLayout extends React.Component<IProps> {
     }
 }
 
-export default withRouter(withDevice<IProps>(ArticleRevisionsLayout));
+export default withRouter(withDevice(RevisionsLayout));

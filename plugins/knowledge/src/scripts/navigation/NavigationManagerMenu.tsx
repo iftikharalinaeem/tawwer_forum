@@ -9,6 +9,11 @@ import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/lay
 import BackLink from "@library/components/navigation/BackLink";
 import classNames from "classnames";
 import React from "react";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { style } from "typestyle";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { px } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 interface IProps {
     className?: string;
@@ -19,14 +24,27 @@ interface IProps {
  */
 export default class NavigationManagerMenu extends React.Component<IProps> {
     public render() {
+        const debug = debugHelper("navigationManagerMenu");
+        const headerVars = vanillaHeaderVariables();
+        const mediaQueries = layoutVariables().mediaQueries();
+        const heightStyle = style(
+            { height: px(headerVars.sizing.height), ...debug.name("items") },
+            mediaQueries.oneColumn({
+                height: px(headerVars.sizing.mobile.height),
+            }),
+        );
+
         return (
             <nav className={classNames("navigationManagerMenu", "modal-pageHeader", this.props.className)}>
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
-                            <ul className="navigationManagerMenu-items">
-                                <li className="navigationManagerMenu-item isPullLeft">
-                                    <BackLink visibleLabel={true} className="navigationManagerMenu-backLink" />
+                            <ul className={classNames("navigationManagerMenu-items", heightStyle)}>
+                                <li className={classNames("navigationManagerMenu-item", "isPullLeft", heightStyle)}>
+                                    <BackLink
+                                        visibleLabel={true}
+                                        className={classNames("navigationManagerMenu-backLink", heightStyle)}
+                                    />
                                 </li>
                             </ul>
                         </PanelWidgetHorizontalPadding>

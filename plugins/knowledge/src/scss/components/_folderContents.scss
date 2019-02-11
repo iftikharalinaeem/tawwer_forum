@@ -22,22 +22,11 @@ $folderContents_minHeight: 396px;
 }
 
 .folderContents-item {
+    position: relative;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: stretch;
     flex-wrap: nowrap;
-    border-bottom: {
-        style: solid;
-        width: $formElement-borderWidth;
-        color: $folderContents_borderColor;
-    }
-
-    &:hover,
-    &.isActive {
-        .folderContents-subFolder {
-            border-left-color: $overlay-border_color;
-        }
-    }
 }
 
 .folderContents-folder {
@@ -73,6 +62,7 @@ $folderContents_minHeight: 396px;
 
 .folderContents-label {
     flex-grow: 1;
+    max-width: calc(100% - #{$icon-default_size + 4px});
 }
 
 .folderContents-icon {
@@ -92,15 +82,13 @@ $folderContents_minHeight: 396px;
     color: $global-color_primary;
 }
 
-
-.icon-selectedCategory {
-
-}
-
 .folderContents-subFolder {
-    height: $folderContents-item_minHeight;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    min-height: $folderContents-item_minHeight;
     width: $folderContents-itemAction_width;
-    border-left: solid 1px transparent;
 
     &:focus,
     &:hover {

@@ -6,6 +6,7 @@
 
 import { IUserFragment } from "@library/@types/api";
 import { Omit } from "@library/@types/utils";
+import { ICrumb } from "@library/components/Breadcrumbs";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -50,6 +51,7 @@ export interface IOutlineItem {
 interface IArticleServerManagedData extends IExpandedInsertUpdate {
     articleID: number;
     knowledgeBaseID: number;
+    breadcrumbs?: ICrumb[];
     score: number; // The article score based on helpful reactions.
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource

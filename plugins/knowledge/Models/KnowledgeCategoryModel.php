@@ -6,10 +6,11 @@
 
 namespace Vanilla\Knowledge\Models;
 
-use DateTimeImmutable;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Navigation\Breadcrumb;
 
 /**
  * A model for managing knowledge categories.
@@ -53,12 +54,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
-            ->setUpdateFields(["dateUpdated"]);
+            ->setUpdateFields(["dateUpdated"])
+        ;
         $this->addPipelineProcessor($dateProcessor);
 
         $userProcessor = new \Vanilla\Database\Operation\CurrentUserFieldProcessor($this->session);
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
-            ->setUpdateFields(["updateUserID"]);
+            ->setUpdateFields(["updateUserID"])
+        ;
         $this->addPipelineProcessor($userProcessor);
     }
 
@@ -71,6 +74,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     protected function configureWriteSchema(Schema $schema): Schema {
         $schema = parent::configureWriteSchema($schema);
         $schema->addValidator("parentID", [$this, "validateParentID"]);
+
         return $schema;
     }
 
@@ -89,7 +93,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 "parentID <>" => self::ROOT_ID, // Don't include the knowledge base root as part of the categories in a knowledge base.
             ])
             ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
+            ->firstRow(DATASET_TYPE_ARRAY)
+        ;
+
         return $result["total"] ?? 0;
     }
 
@@ -100,16 +106,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     private function selectRootCategory(int $knowledgeCategoryID): array {
-        $category = $this->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+        $category = $this->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
 
         if ($category["parentID"] !== self::ROOT_ID) {
             try {
                 $category = $this->selectSingle([
-                    "knowledgeBaseID" => $category["knowledgeBaseID"],
+                    "knowledgeBaseID" => $category['knowledgeBaseID'],
                     "parentID" => self::ROOT_ID,
                 ]);
-            } catch (\Vanilla\Exception\Database\NoResultsException $e) {
-                throw new \Vanilla\Exception\Database\NoResultsException("Root category not found.");
+            } catch (NoResultsException $e) {
+                throw new NoResultsException("Root category not found.");
             }
         }
 
@@ -120,7 +126,8 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * Given a category ID, get the row and the rows of all its ancestors in order.
      *
      * @param int $categoryID
-     * @return array
+     * @return KbCategoryFragment[]
+     *
      * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
      * @throws \Vanilla\Exception\Database\NoResultsException If the target category or its ancestors cannot be found.
      */
@@ -128,12 +135,41 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         $result = [];
 
         do {
-            $row = $this->selectSingle(["knowledgeCategoryID" => $categoryID]);
+            $row = $this->selectSingleFragment($categoryID);
             array_unshift($result, $row);
-            $categoryID = $row["parentID"];
+            $categoryID = $row->getParentID();
         } while ($categoryID > 0);
 
         return $result;
+    }
+
+    /**
+     * Select a KbCategoryFragment for a given id.
+     *
+     * @param int $categoryID Conditions for the select query.
+     *
+     * @return KbCategoryFragment
+     *
+     * @throws ValidationException If the data from the DB was corrupted.
+     * @throws NoResultsException If no record was found for the given ID.
+     */
+    public function selectSingleFragment(int $categoryID): KbCategoryFragment {
+        $rows = $this->sql()
+            ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
+            ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)
+            ->resultArray()
+        ;
+
+        if (empty($rows)) {
+            throw new NoResultsException("Could not find category fragment for id $categoryID");
+        }
+        $result = reset($rows);
+
+        // Normalize the fragment.
+        $url = $this->url($result);
+        $result['url'] = $url;
+
+        return new KbCategoryFragment($result);
     }
 
     /**
@@ -180,6 +216,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 $validationField->getName(),
                 "The article maximum has been reached for this knowledge base."
             );
+
             return false;
         }
 
@@ -196,21 +233,20 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      */
     public function validateKBCategoriesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
         try {
-            $category = $this->selectSingle([
-                "knowledgeCategoryID" => $knowledgeCategoryID,
-            ]);
+            $category = $this->selectSingleFragment($knowledgeCategoryID);
         } catch (NoResultsException $e) {
             // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }
 
-        $total = $this->getTotalInKnowledgeBase($category["knowledgeBaseID"]);
+        $total = $this->getTotalInKnowledgeBase($category->getKnowledgeBaseID());
 
         if ($total >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
             $validationField->getValidation()->addError(
                 $validationField->getName(),
                 "The category maximum has been reached for this knowledge base."
             );
+
             return false;
         }
 
@@ -229,14 +265,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         if ($parentID !== self::ROOT_ID) {
             try {
                 $this->selectSingle(["knowledgeCategoryID" => $parentID]);
-            } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+            } catch (NoResultsException $e) {
                 $validationField->getValidation()->addError(
                     $validationField->getName(),
                     "Parent category does not exist."
                 );
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -257,28 +295,8 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
-        $result = \Gdn::request()->url("/kb/categories/".$slug, $withDomain);
-        return $result;
-    }
+        $result = \Gdn::request()->url("/kb/categories/" . $slug, $withDomain);
 
-    /**
-     * Build breadcrumbs array for particular knowledge category
-     *
-     * @param int $knowledgeCategoryID
-     * @return array
-     */
-    public function buildBreadcrumbs(int $knowledgeCategoryID) {
-        $result = [];
-        if ($knowledgeCategoryID) {
-            $categories = $this->selectWithAncestors($knowledgeCategoryID);
-            $index = 1;
-            foreach ($categories as $category) {
-                $result[$index++] = new Breadcrumb(
-                    $category["name"],
-                    $this->url($category)
-                );
-            }
-        }
         return $result;
     }
 
@@ -299,17 +317,19 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
             ->where('c.knowledgeCategoryID', $knowledgeCategoryID)
             ->groupBy('c.knowledgeCategoryID')
-            ->get()->nextRow(DATASET_TYPE_ARRAY);
+            ->get()->nextRow(DATASET_TYPE_ARRAY)
+        ;
         $countArticles = $this->sql()
             ->select('c.knowledgeCategoryID')
             ->select('DISTINCT a.articleID', 'COUNT', 'articleCount')
             ->from('knowledgeCategory c')
-            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID AND a.status = \''.ArticleModel::STATUS_PUBLISHED.'\'')
+            ->leftJoin('article a', 'a.knowledgeCategoryID = c.knowledgeCategoryID AND a.status = \'' . ArticleModel::STATUS_PUBLISHED . '\'')
             ->where(['c.knowledgeCategoryID' => $knowledgeCategoryID])
             ->groupBy('c.knowledgeCategoryID')
-            ->get()->nextRow(DATASET_TYPE_ARRAY);
+            ->get()->nextRow(DATASET_TYPE_ARRAY)
+        ;
 
-        if (is_array($countCategories)  && is_array($countArticles)) {
+        if (is_array($countCategories) && is_array($countArticles)) {
             $res = $this->update(
                 [
                     'articleCount' => $countArticles['articleCount'],
@@ -317,21 +337,21 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                     'childCategoryCount' => $countCategories['childrenCount'],
                 ],
                 [
-                    'knowledgeCategoryID' => $knowledgeCategoryID
+                    'knowledgeCategoryID' => $knowledgeCategoryID,
                 ]
             );
             if ($res && $updateParents) {
                 $categories = $this->selectWithAncestors($knowledgeCategoryID);
-                $ids = array_column($categories, 'knowledgeCategoryID');
-                $categories = array_combine($ids, $categories);
+                $categories = array_column($categories, null, 'knowledgeCategoryID');
                 $cat = $categories[$knowledgeCategoryID];
-                while ($parent = ($categories[$cat['parentID']] ?? false)) {
-                    $res = $this->updateCounts($parent['knowledgeCategoryID'], false);
+                while ($parent = ($categories[$cat->getParentID()] ?? false)) {
+                    $res = $this->updateCounts($parent->getKnowledgeCategoryID(), false);
                     $cat = $parent;
                 }
                 if ($updateParents) {
-                    $this->knowledgeBaseModel->updateCounts($cat['knowledgeBaseID']);
+                    $this->knowledgeBaseModel->updateCounts($cat->getKnowledgeBaseID());
                 }
+
                 return $res;
             } else {
                 return $res;
@@ -355,11 +375,13 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->leftJoin('knowledgeCategory children', 'children.parentID = c.knowledgeCategoryID')
             ->where('c.knowledgeBaseID', $knowledgeBaseID)
             ->where('children.knowledgeCategoryID', null)
-            ->get()->resultArray();
+            ->get()->resultArray()
+        ;
         if (is_array($notParent)) {
             foreach ($notParent as $cat) {
                 $this->updateCounts($cat['knowledgeCategoryID']);
             }
+
             return true;
         } else {
             return false;
@@ -381,12 +403,13 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->select('kb.sortArticles')
             ->from('knowledgeCategory c')
             ->where([
-                'c.knowledgeCategoryID' => $knowledgeCategoryID
+                'c.knowledgeCategoryID' => $knowledgeCategoryID,
             ])
             ->join('knowledgeBase kb', 'kb.knowledgeBaseID = c.knowledgeBaseID')
             ->leftJoin('knowledgeCategory sub', 'sub.parentID = c.knowledgeCategoryID')
             ->groupBy('c.knowledgeCategoryID, kb.knowledgeBaseID, kb.viewType, kb.sortArticles')
-            ->get()->nextRow(DATASET_TYPE_ARRAY);
+            ->get()->nextRow(DATASET_TYPE_ARRAY)
+        ;
 
         if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
             && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
@@ -396,10 +419,11 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 ->from('article a')
                 ->where([
                     'a.knowledgeCategoryID' => $knowledgeCategoryID,
-                    'a.status' => ArticleModel::STATUS_PUBLISHED
+                    'a.status' => ArticleModel::STATUS_PUBLISHED,
                 ])
                 ->groupBy('a.knowledgeCategoryID')
-                ->get()->nextRow(DATASET_TYPE_ARRAY);
+                ->get()->nextRow(DATASET_TYPE_ARRAY)
+            ;
         } else {
             $maxArticlesSort['maxSort'] = -1;
         }
@@ -431,19 +455,20 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->select('kb.knowledgeBaseID, kb.viewType, kb.sortArticles')
             ->from('knowledgeCategory c')
             ->where([
-                'c.knowledgeCategoryID' => $knowledgeCategoryID
+                'c.knowledgeCategoryID' => $knowledgeCategoryID,
             ])
             ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = c.knowledgeBaseID')
-            ->get()->nextRow(DATASET_TYPE_ARRAY);
+            ->get()->nextRow(DATASET_TYPE_ARRAY)
+        ;
         if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
             && $knowledgeBase['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
             $query = $this->sql()->update('article')
-                ->set('sort'.($direction ? '+' : '-'), 1)
+                ->set('sort' . ($direction ? '+' : '-'), 1)
                 ->where(
                     [
                         'knowledgeCategoryID' => $knowledgeCategoryID,
                         'status' => ArticleModel::STATUS_PUBLISHED,
-                        'sort >=' => $idx
+                        'sort >=' => $idx,
                     ]
                 );
 
@@ -457,13 +482,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         $query = $this->sql()->update('knowledgeCategory')
-            ->set('sort'.($direction ? '+' : '-'), 1)
+            ->set('sort' . ($direction ? '+' : '-'), 1)
             ->where(
                 [
                     'parentID' => $knowledgeCategoryID,
-                    'sort >=' => $idx
+                    'sort >=' => $idx,
                 ]
-            );
+            )
+        ;
 
         if ($protectType === self::SORT_TYPE_CATEGORY) {
             $query->where('knowledgeCategoryID <>', $protectedID);

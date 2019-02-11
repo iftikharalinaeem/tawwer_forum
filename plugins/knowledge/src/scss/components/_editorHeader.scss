@@ -9,6 +9,11 @@
     flex-wrap: nowrap;
     justify-content: flex-end;
     align-items: center;
+    height: $vanillaHeader_height;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
 }
 
 .editorHeader-item {

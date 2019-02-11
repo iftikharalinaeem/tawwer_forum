@@ -6,32 +6,69 @@
 import React from "react";
 import { t } from "@library/application";
 import classNames from "classnames";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { style } from "typestyle";
+import { px } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
+
+const debug = debugHelper("knowledgeBaseIcons");
 
 export function knowldedgeBaseItem(className?: string) {
     const title = t("Knowledge Base Item");
+    const globalVars = globalVariables();
+
     return (
         <svg
-            viewBox="-3 -4 24 24"
+            viewBox="0 0 15.836 21.596"
             xmlns="http://www.w3.org/1999/xlink"
-            className={classNames("icon", "icon-knowledgeBase", className)}
+            className={classNames(
+                className,
+                style({
+                    ...debug.name("knowledgeBaseIcon"),
+                    width: px(16),
+                    height: px(24.55),
+                    transform: "translateY(3.5px)",
+                    color: globalVars.mainColors.fg.toString(),
+                }),
+            )}
             aria-hidden="true"
         >
             <title>{title}</title>
-            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g transform="translate(-68.000000, -835.000000)" stroke="#777A80">
-                    <g transform="translate(69.000000, 836.000000)">
-                        <g stroke-width="0.9">
-                            <path d="M1.81818182e-05,14.9164047 C1.81818182e-05,14.4680588 -0.0300727273,13.7245374 2.11883636,13.7173336 L2.11883636,0.0900113744" />
-                            <path d="M2.1188,13.7147403 C2.1188,13.7147403 8.77443636,13.7230246 11.4805273,13.7230246 C14.1865273,13.7230246 14.9302545,13.8291005 14.9302545,11.3313659" />
-                            <polygon points="3.7066 13.7230066 3.7066 17.9942009 4.71669091 17.2977551 5.72687273 17.9942009 5.72687273 13.7230066" />
-                            <path d="M12.4972447,14 L12.5027553,15.9999924" />
-                            <path d="M6.06144545,16.0693659 L14.0306396,16.0693659 C14.7363669,16.0693659 14.9302636,15.5912398 14.9302636,15.0015059 L14.9302636,1.1578841 C14.9302636,0.568150122 14.7363669,0.0899393365 14.0306396,0.0899393365 L1.02539063,0.0899393365 C0.319663352,0.0899393365 -9.09090909e-06,0.568150122 -9.09090909e-06,1.1578841 L-9.09090909e-06,15.0015059 C-9.09090909e-06,15.5912398 0.319663352,16.0693659 1.02539063,16.0693659 L3.3719,16.0693659" />
-                        </g>
-                        <path d="M5,4.5 L12,4.5" stroke-linecap="square" />
-                        <path d="M5,6.5 L12,6.5" stroke-linecap="square" />
-                    </g>
-                </g>
-            </g>
+
+            <path
+                d="M.45,15.276c0-.448-.03-1.191,2.119-1.2V.45"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M2.569,14.075s6.655.008,9.362.008,3.449.106,3.449-2.392"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <polygon
+                points="4.162 14.085 4.162 18.356 5.172 17.66 6.182 18.356 6.182 14.085 4.162 14.085"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M12.95,14.36l.006,2"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M6.511,16.429h7.97c.705,0,.9-.478.9-1.067V1.518c0-.59-.194-1.068-.9-1.068H1.475a.967.967,0,0,0-1.028.9.9.9,0,0,0,0,.164V15.36a.968.968,0,0,0,.862,1.064.986.986,0,0,0,.163,0H3.822"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M5.45,4.86h7"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeLinecap: "square" }}
+            />
+            <path
+                d="M5.45,6.86h7"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeLinecap: "square" }}
+            />
         </svg>
     );
 }

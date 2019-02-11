@@ -59,7 +59,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     <DocumentTitle title={loadable.data!.article.seoName || loadable.data!.article.name}>
                         <ArticleLayout
                             article={loadable.data!.article}
-                            breadcrumbData={loadable.data!.breadcrumbs}
+                            breadcrumbData={loadable.data!.article.breadcrumbs!}
                             messages={this.renderMessages()}
                         />
                     </DocumentTitle>
