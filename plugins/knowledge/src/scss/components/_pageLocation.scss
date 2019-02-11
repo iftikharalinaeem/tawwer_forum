@@ -35,7 +35,7 @@ $pageLocation-icon_opacity: .8;
         top: $pageLocation-picker_verticalPadding;
         right: $pageLocation_spacer;
         bottom: $pageLocation-picker_verticalPadding;
-        left: $pageLocation_spacer;
+        left: $pageLocation_spacer / 1.5;
     }
 
     &:active,
