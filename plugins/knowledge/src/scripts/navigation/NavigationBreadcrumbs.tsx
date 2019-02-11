@@ -25,7 +25,11 @@ export class NavigationBreadcrumbs extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { activeRecord, navigationItems } = this.props;
         const recordKey = activeRecord.recordType + activeRecord.recordID;
-        return <Breadcrumbs>{NavigationSelector.selectBreadcrumb(navigationItems, recordKey)}</Breadcrumbs>;
+        return (
+            <Breadcrumbs forceDisplay={false}>
+                {NavigationSelector.selectBreadcrumb(navigationItems, recordKey)}
+            </Breadcrumbs>
+        );
     }
 }
 

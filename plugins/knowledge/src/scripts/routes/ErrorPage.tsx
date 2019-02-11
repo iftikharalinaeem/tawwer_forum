@@ -11,7 +11,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import Paragraph from "@library/components/Paragraph";
 import Container from "@library/components/layouts/components/Container";
 import { formatUrl, t } from "@library/application";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, IApiError } from "@library/@types/api";
 import DocumentTitle from "@library/components/DocumentTitle";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
@@ -53,7 +53,9 @@ export class ErrorPage extends React.Component<IProps> {
     }
 
     private parseDefaultError(): IError {
-        switch (this.props.defaultError) {
+        const errorCode = this.props.apiError ? this.props.apiError.status : null;
+        switch (errorCode || this.props.defaultError) {
+            case 403:
             case DefaultError.PERMISSION: {
                 return {
                     message: t("No Permission"),
@@ -61,6 +63,7 @@ export class ErrorPage extends React.Component<IProps> {
                     actionItem: this.renderSignin(),
                 };
             }
+            case 404:
             case DefaultError.NOT_FOUND: {
                 return {
                     message: "Page not found",
@@ -128,6 +131,7 @@ export class ErrorPage extends React.Component<IProps> {
 interface IProps extends IDeviceProps, IInjectableUserState {
     defaultError?: DefaultError;
     error?: Partial<IError>;
+    apiError?: IApiError;
     knowledgeBaseID?: number;
     knowledgeCategoryID?: number;
 }

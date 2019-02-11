@@ -9,7 +9,7 @@ import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IArticlePageState } from "@knowledge/modules/article/ArticlePageModel";
-import { ICategoriesPageState } from "@knowledge/modules/categories/CategoriesPageReducer";
+import { ICategoriesPageState } from "@knowledge/modules/categories/categoryPageReducer";
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { IArticleState } from "@knowledge/modules/article/ArticleModel";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
@@ -21,9 +21,7 @@ import { INavigationStoreState } from "@knowledge/navigation/state/NavigationMod
 import { IRouteState } from "@knowledge/routes/RouteReducer";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import UsersActions from "@library/users/UsersActions";
@@ -35,7 +33,6 @@ export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
     | typeof CategoryActions.ACTION_TYPES
     | typeof ArticlePageActions.ACTION_TYPES
-    | typeof CategoriesPageActions.ACTION_TYPES
     | typeof ArticleActions.ACTION_TYPES
     | typeof RevisionsPageActions.ACTION_TYPES
     | typeof UsersActions.ACTION_TYPES

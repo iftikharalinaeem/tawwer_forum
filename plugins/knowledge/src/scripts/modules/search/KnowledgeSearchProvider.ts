@@ -22,14 +22,15 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
         const queryObj: ISearchRequestBody = {
             all: value,
             statuses: [ArticleStatus.PUBLISHED],
-            expand: ["user", "category"],
+            limit: 10,
+            expand: ["breadcrumbs"],
             ...options,
         };
         const query = qs.stringify(queryObj);
         const response: AxiosResponse<ISearchResult[]> = await apiv2.get(`/knowledge/search?${query}`);
         return response.data.map(result => {
             const data: ISearchOptionData = {
-                crumbs: result.category!.breadcrumbs,
+                crumbs: result.breadcrumbs,
                 name: result.name,
                 dateUpdated: result.dateUpdated,
                 url: result.url,

@@ -49,24 +49,25 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render() {
+        const { article, history, revisions, selectedRevision } = this.props;
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
-                exitHandler={this.props.history.goBack}
+                exitHandler={history.goBack}
                 label={t("Article Revisions")}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
-                <PageLoader status={this.props.revisions.status}>
+                <PageLoader status={revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
                             <RevisionsLayout
                                 bodyHeading={this.renderTitle()}
                                 bodyContent={
-                                    this.props.selectedRevision.data && (
-                                        <UserContent content={this.props.selectedRevision.data.bodyRendered} />
+                                    selectedRevision.data && (
+                                        <UserContent content={selectedRevision.data.bodyRendered} />
                                     )
                                 }
-                                crumbs={this.props.article.data ? this.props.article.data.crumbs : []}
+                                crumbs={article.data && article.data.breadcrumbs ? article.data.breadcrumbs : []}
                                 revisionList={this.renderList()}
                                 canSubmit={this.canSubmit}
                             />

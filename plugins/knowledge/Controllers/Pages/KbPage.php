@@ -12,7 +12,9 @@ use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Page;
@@ -42,12 +44,13 @@ abstract class KbPage extends Page {
         \Gdn_Request $request,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
+        BreadcrumbModel $breadcrumbModel,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null  // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
@@ -83,10 +86,6 @@ abstract class KbPage extends Page {
             Data::box($this->knowledgeBases),
             []
         ));
-
-        // This is here as a stopgap. The frontend needs to not rely on this.
-        $allCategories = $this->categoriesApi->index();
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ALL_CATEGORIES, Data::box($allCategories)));
     }
 
     /**
@@ -102,6 +101,19 @@ abstract class KbPage extends Page {
             Data::box($navigation),
             $options
         ));
+    }
+
+    /**
+     * Set the SEO breadcrumbs based off of our knowledge base ID.
+     *
+     * @param int $knowledgeBaseID
+     *
+     * @return $this Own instance for chaining.
+     */
+    protected function setSeoCrumbsForCategory(int $knowledgeBaseID): self {
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeBaseID));
+        $this->setSeoBreadcrumbs($crumbs);
+        return $this;
     }
 
     /**
