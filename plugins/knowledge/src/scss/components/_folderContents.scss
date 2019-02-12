@@ -34,6 +34,7 @@ $folderContents_minHeight: 396px;
     display: block;
     width: 100%;
     max-width: calc(100% - #{$folderContents-itemAction_width});
+    cursor: pointer;
 }
 
 .folderContents-input {
