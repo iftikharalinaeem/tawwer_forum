@@ -46,6 +46,7 @@ export class Navigation extends React.Component<IProps> {
         return (
             <SiteNav
                 title={title}
+                hiddenTitle={true}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={<NavigationAdminLinks kbID={this.props.kbID} showDivider={navItems.data!.length > 0} />}
