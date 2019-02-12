@@ -147,7 +147,6 @@ class KnowledgeSettingsController extends SettingsController {
      * @param string|null $knowledgeBaseID The ID of the edit page or null for an add page.
      */
     private function post_addEdit($knowledgeBaseID = null) {
-
         $values = $this->Form->formValues();
         if ($values['icon_New']) {
             $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
