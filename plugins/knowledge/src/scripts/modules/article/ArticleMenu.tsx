@@ -72,14 +72,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItem>
                         <EditorRoute.Link
-                            data={{ articleID: this.props.article.articleID }}
-                            className={DropDownItemLink.CSS_CLASS}
-                        >
-                            {t("Edit article")}
-                        </EditorRoute.Link>
-                    </DropDownItem>
-                    <DropDownItem>
-                        <EditorRoute.Link
                             data={{
                                 knowledgeCategoryID: this.props.article.knowledgeCategoryID,
                                 knowledgeBaseID: this.props.article.knowledgeBaseID,
@@ -87,6 +79,15 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                             className={DropDownItemLink.CSS_CLASS}
                         >
                             {t("New Article")}
+                        </EditorRoute.Link>
+                    </DropDownItem>
+                    <DropDownItemSeparator />
+                    <DropDownItem>
+                        <EditorRoute.Link
+                            data={{ articleID: this.props.article.articleID }}
+                            className={DropDownItemLink.CSS_CLASS}
+                        >
+                            {t("Edit")}
                         </EditorRoute.Link>
                     </DropDownItem>
                     <DropDownItem>

@@ -9,7 +9,6 @@ import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
-import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
@@ -37,7 +36,7 @@ interface IProps {
  */
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
-        const { article, currentNavigationCategory, messages } = this.props;
+        const { article, currentNavigationCategory, messages, device } = this.props;
         const { articleID } = article;
 
         const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
@@ -100,7 +99,9 @@ export class ArticleLayout extends React.Component<IProps> {
                     }
                     rightTop={
                         article.outline &&
-                        article.outline.length > 0 && (
+                        article.outline.length > 0 &&
+                        device !== Devices.MOBILE &&
+                        device !== Devices.TABLET && (
                             <PanelWidget>
                                 <ArticleTOC items={article.outline} />
                             </PanelWidget>
