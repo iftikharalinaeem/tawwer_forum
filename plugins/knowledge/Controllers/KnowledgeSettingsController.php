@@ -139,6 +139,10 @@ class KnowledgeSettingsController extends SettingsController {
                 'LabelCode' => 'Icon',
                 'Control' => 'imageuploadpreview',
             ],
+            "bannerImage" => [
+                "Control" => "imageuploadpreview",
+                "LabelCode" => "Banner Image",
+            ],
             'viewType' => [
                 'LabelCode' => 'View Type',
                 'Control' => 'dropdown',
@@ -175,6 +179,9 @@ class KnowledgeSettingsController extends SettingsController {
         $values = $this->Form->formValues();
         if ($values['icon_New']) {
             $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
+        }
+        if ($values["bannerImage_New"]) {
+            $values["bannerImage"] = $this->handleFormMediaUpload($values["bannerImage_New"]);
         }
 
         if ($knowledgeBaseID) {
