@@ -31,21 +31,19 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect, selectable } = this.props;
         const isNavigable = [KbRecordType.CATEGORY, KbRecordType.KB].includes(value.recordType);
-        const CategoryWrap = `${selectable ? "span" : "label"}`;
+
         return (
             <li className={classNames("folderContents-item", { isActive: isSelected })}>
-                <CategoryWrap className="folderContents-folder">
-                    {selectable && (
-                        <input
-                            type="radio"
-                            className={classNames("folderContents-input", "sr-only", { isSelectable: selectable })}
-                            name={name}
-                            value={value.recordID}
-                            checked={isSelected}
-                            onChange={onSelect}
-                            disabled={!isNavigable}
-                        />
-                    )}
+                <label className="folderContents-folder">
+                    <input
+                        type="radio"
+                        className={classNames("folderContents-input", "sr-only", { isSelectable: selectable })}
+                        name={name}
+                        value={value.recordID}
+                        checked={isSelected}
+                        onChange={onSelect}
+                        disabled={!isNavigable}
+                    />
                     <span className="folderContents-content">
                         <span
                             className={classNames("folderContents-icon", {
@@ -59,7 +57,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                         </span>
                         <span className="folderContents-label">{value.name}</span>
                     </span>
-                </CategoryWrap>
+                </label>
                 {isNavigable && (
                     <Button
                         onClick={this.props.onNavigate}
