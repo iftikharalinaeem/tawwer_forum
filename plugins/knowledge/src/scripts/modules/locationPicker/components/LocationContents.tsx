@@ -23,6 +23,7 @@ import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/compo
 import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
+import LocationPickerInstructions from "@knowledge/modules/locationPicker/components/LocationPickerInstructions";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -56,14 +57,18 @@ class LocationContents extends React.Component<IProps, IState> {
         let contents;
         if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
             const recordCount = childRecords.data.length;
+            const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
                 contents = (
-                    <LocationPickerInsertArticle
-                        onClick={setArticleFirstPosition}
-                        key="potentialLocation-0"
-                        className="isFirst"
-                        isSelected={!!this.state.activeItemID}
-                    />
+                    <>
+                        {message}
+                        <LocationPickerInsertArticle
+                            onClick={setArticleFirstPosition}
+                            key="potentialLocation-0"
+                            className="isFirst"
+                            isSelected={!!this.state.activeItemID}
+                        />
+                    </>
                 );
             } else {
                 contents = childRecords.data.map((item, index) => {
@@ -94,12 +99,15 @@ class LocationContents extends React.Component<IProps, IState> {
 
                     const insertArticleFirst =
                         pickArticleLocation && index === 0 ? (
-                            <LocationPickerInsertArticle
-                                onClick={setArticleFirstPosition}
-                                key="potentialLocation-0"
-                                className="isFirst"
-                                isSelected={this.state.activeItemID === "0"} // first one is exception
-                            />
+                            <>
+                                {message}
+                                <LocationPickerInsertArticle
+                                    onClick={setArticleFirstPosition}
+                                    key="potentialLocation-0"
+                                    className="isFirst"
+                                    isSelected={this.state.activeItemID === "0"} // first one is exception
+                                />
+                            </>
                         ) : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {

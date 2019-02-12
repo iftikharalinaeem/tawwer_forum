@@ -20,6 +20,7 @@ export default function locationPickerClasses(theme?: object) {
     });
 
     const articlePlaceholder = style({
+        ...debug.name("articlePlaceholder"),
         display: "block",
         width: percent(100),
         height: px(24),
@@ -50,8 +51,17 @@ export default function locationPickerClasses(theme?: object) {
         },
     });
 
+    const instructions = style({
+        ...debug.name("instructions"),
+        fontSize: px(globalVars.fonts.size.medium),
+        padding: `${px(8)} ${px(12)}`,
+        borderBottom: `solid 1px ${globalVars.mixBgAndFg(0.15)}`,
+        width: percent(100),
+    });
+
     return {
         root,
         articlePlaceholder,
+        instructions,
     };
 }
