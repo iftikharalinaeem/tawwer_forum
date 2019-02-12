@@ -323,6 +323,20 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             default:
                 $options["orderDirection"] = "asc";
         }
+
+        $knowledgeCategory = $this->knowledgeCategoryByID($query["knowledgeCategoryID"]);
+        $paging = \Vanilla\ApiUtils::numberedPagerInfo(
+            $knowledgeCategory["articleCount"],
+            "/api/v2/articles",
+            $query,
+            $in
+        );
+
+        // A page beyond our bounds is expected to return a not-found (404) response.
+        if ($query["page"] > $paging["pageCount"]) {
+            throw new NotFoundException();
+        }
+
         $rows = $this->articleModel->getWithRevision(
             ["a.knowledgeCategoryID" => $query["knowledgeCategoryID"]],
             $options
@@ -340,9 +354,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
 
         $result = $out->validate($rows);
-        return new \Garden\Web\Data($result, [
-            'paging' => \Vanilla\ApiUtils::morePagerInfo($result, "/api/v2/articles", $query, $in)
-        ]);
+        return new \Garden\Web\Data($result, ["paging" => $paging]);
     }
 
     /**
@@ -432,6 +444,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $result = $out->validate($revisions);
         return $result;
+    }
+
+    /**
+     * Get an knowledge category by its numeric ID.
+     *
+     * @param int $id Knowledge category ID.
+     * @return array
+     * @throws NotFoundException If the knowledge category could not be found.
+     * @throws ValidationException If the result fails schema validation.
+     */
+    private function knowledgeCategoryByID(int $id): array {
+        try {
+            $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Knowledge Category");
+        }
+        return $knowledgeCategory;
     }
 
     /**
