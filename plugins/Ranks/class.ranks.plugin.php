@@ -317,7 +317,8 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function profileController_usernameMeta_handler($sender) {
         $user = $sender->data('Profile');
-        if ($user) {
+        $rank = RankModel::ranks($sender->data('Profile.RankID'));
+        if ($user && $rank['Label'] !== $sender->User->Title) {
             echo rankTag($user, '', ' '.Gdn_Theme::bulletItem('Rank').' ');
         }
     }
