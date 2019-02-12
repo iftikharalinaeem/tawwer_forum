@@ -1,7 +1,7 @@
 {
     "name": "Who&rsquo;s Online",
     "description": "Adds a list of users currently browsing your site to the sidebar.",
-    "version": "1.5.1",
+    "version": "1.6",
     "icon": "whos_online.png",
     "registerPermissions": [
         "Plugins.WhosOnline.ViewHidden"
@@ -12,6 +12,7 @@
     ],
     "key": "whosonline",
     "type": "addon",
+    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Gary Mardell",
