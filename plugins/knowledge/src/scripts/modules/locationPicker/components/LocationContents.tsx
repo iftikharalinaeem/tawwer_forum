@@ -52,8 +52,15 @@ class LocationContents extends React.Component<IProps> {
 
         let contents;
         if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
-            if (childRecords.data.length === 0) {
-                contents = <LocationPickerInsertArticle onClick={setArticleFirstPosition} key="potentialLocation-0" />;
+            const recordCount = childRecords.data.length;
+            if (recordCount === 0) {
+                contents = (
+                    <LocationPickerInsertArticle
+                        onClick={setArticleFirstPosition}
+                        key="potentialLocation-0"
+                        className="isFirst"
+                    />
+                );
             } else {
                 contents = childRecords.data.map((item, index) => {
                     const isSelected =
@@ -68,6 +75,7 @@ class LocationContents extends React.Component<IProps> {
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
                     const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
+                    const isLast = recordCount === index + 1;
 
                     const setArticlePosition = () => {
                         this.setArticleLocation(index.toString());
@@ -75,7 +83,11 @@ class LocationContents extends React.Component<IProps> {
 
                     const insertArticleFirst =
                         pickArticleLocation && index === 0 ? (
-                            <LocationPickerInsertArticle onClick={setArticleFirstPosition} key="potentialLocation-0" />
+                            <LocationPickerInsertArticle
+                                onClick={setArticleFirstPosition}
+                                key="potentialLocation-0"
+                                className="isFirst"
+                            />
                         ) : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
@@ -83,7 +95,11 @@ class LocationContents extends React.Component<IProps> {
                             <>
                                 {insertArticleFirst}
                                 <LocationPickerArticleItem key={itemKey} name={item.name} />
-                                <LocationPickerInsertArticle onClick={setArticlePosition} key={insertArticleKey} />
+                                <LocationPickerInsertArticle
+                                    onClick={setArticlePosition}
+                                    key={insertArticleKey}
+                                    className={classNames({ isLast })}
+                                />
                             </>
                         );
                     } else {
@@ -101,7 +117,11 @@ class LocationContents extends React.Component<IProps> {
                                     selectable={!pickArticleLocation}
                                 />
                                 {pickArticleLocation && (
-                                    <LocationPickerInsertArticle onClick={setArticlePosition} key={insertArticleKey} />
+                                    <LocationPickerInsertArticle
+                                        onClick={setArticlePosition}
+                                        key={insertArticleKey}
+                                        className={classNames({ isLast })}
+                                    />
                                 )}
                             </>
                         );
@@ -110,7 +130,7 @@ class LocationContents extends React.Component<IProps> {
             }
         } else {
             contents = (
-                <li className={classNames(inheritHeightClass())}>
+                <li className={classNames(inheritHeightClass())} key="potentialLocation-loader">
                     <FullPageLoader />
                 </li>
             );

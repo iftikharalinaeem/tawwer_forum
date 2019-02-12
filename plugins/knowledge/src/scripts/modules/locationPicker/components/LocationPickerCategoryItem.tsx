@@ -38,7 +38,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                     {selectable && (
                         <input
                             type="radio"
-                            className={classNames("folderContents-input", "sr-only")}
+                            className={classNames("folderContents-input", "sr-only", { isSelectable: selectable })}
                             name={name}
                             value={value.recordID}
                             checked={isSelected}

@@ -12,9 +12,12 @@ import { categoryIcon, checkCompact, rightChevron } from "@library/components/ic
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
+import locationPickerClasses from "@knowledge/styles/locationPickerStyles";
 
 interface IProps {
     onClick: (position: string) => void;
+    isSelected?: boolean;
+    className?: string;
 }
 
 /**
@@ -22,12 +25,18 @@ interface IProps {
  */
 export default class LocationPickerInsertArticle extends React.Component<IProps> {
     public render() {
-        const { onClick } = this.props;
+        const { onClick, isSelected, className } = this.props;
+        const title = t("Insert Article Here");
+        const classes = locationPickerClasses();
         return (
             <li className={classNames("folderContents-item")}>
-                <Button onClick={onClick} baseClass={ButtonBaseClass.CUSTOM} className="">
-                    <span className="sr-only">{t("Sub folder")}</span>
-                    {t("INSERT ARTICLE")}
+                <Button
+                    title={title}
+                    onClick={onClick}
+                    baseClass={ButtonBaseClass.CUSTOM}
+                    className={classNames(classes.articlePlaceholder, { isActive: isSelected }, className)}
+                >
+                    <span className="sr-only">{title}</span>
                 </Button>
             </li>
         );

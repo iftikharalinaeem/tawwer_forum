@@ -27,6 +27,7 @@ $folderContents_minHeight: 396px;
     justify-content: flex-start;
     align-items: stretch;
     flex-wrap: nowrap;
+    width: 100%;
 }
 
 .folderContents-folder {
@@ -49,14 +50,17 @@ $folderContents_minHeight: 396px;
     align-items: center;
     flex-wrap: nowrap;
     flex-grow: 1;
-    cursor: pointer;
     min-height: $folderContents-item_minHeight;
     padding: {
         left: $folderContents-item_spacing;
         right: $folderContents-item_spacing;
     }
-    &:hover {
-        background-color: $state-hover_color;
+
+    &.isSelectable {
+        cursor: pointer;
+        &:hover {
+            background-color: $state-hover_color;
+        }
     }
 }
 
