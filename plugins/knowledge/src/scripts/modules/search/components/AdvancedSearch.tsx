@@ -36,7 +36,7 @@ export class AdvancedSearch extends React.Component<IProps> {
         return (
             <form className="advancedSearch" onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
-                    <Heading className="advancedSearch-title pageSubTitle" title={t("Advanced Search")} />
+                    <Heading className="advancedSearch-title pageSubTitle" title={t("Filter Results")} />
                 )}
                 <RadioButtonsAsTabs
                     accessibleTitle={t("Search in:")}
@@ -71,7 +71,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                     />
                 </Permission>
                 <Button type="submit" className="advancedSearch-submit" prefix="submitButton">
-                    {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Search")}
+                    {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Filter")}
                 </Button>
             </form>
         );

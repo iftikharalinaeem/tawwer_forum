@@ -47,7 +47,7 @@ class SearchForm extends React.Component<IProps> {
 
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} showSearchIcon={false} />
+                <VanillaHeader title={t("Search")} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
                     <PanelLayout
@@ -58,7 +58,7 @@ class SearchForm extends React.Component<IProps> {
                             <>
                                 <PanelWidget>
                                     <SearchBar
-                                        placeholder={this.props.placeholder || t("Help")}
+                                        placeholder={this.props.placeholder}
                                         onChange={this.handleSearchChange}
                                         loadOptions={this.autocomplete}
                                         value={this.props.form.query}
@@ -68,23 +68,12 @@ class SearchForm extends React.Component<IProps> {
                                         optionComponent={SearchOption}
                                         triggerSearchOnClear={true}
                                         title={t("Search")}
-                                        titleAsComponent={
-                                            <>
-                                                {t("Search")}
-                                                <LinkAsButton
-                                                    to={`/kb/articles/add`}
-                                                    className="searchBar-actionButton"
-                                                    baseClass={ButtonBaseClass.ICON}
-                                                    title={t("Compose")}
-                                                >
-                                                    {compose()}
-                                                </LinkAsButton>
-                                            </>
-                                        }
+                                        titleAsComponent={t("Search")}
+                                        autocomplete={false}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
-                                    <Drawer title={t("Advanced Search")}>
+                                    <Drawer title={t("Filter Results")}>
                                         <AdvancedSearch hideTitle={true} />
                                     </Drawer>
                                 )}
