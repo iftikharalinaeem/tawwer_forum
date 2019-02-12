@@ -80,6 +80,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         title={t("Search")}
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
+                                        disableAutocomplete={true}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
