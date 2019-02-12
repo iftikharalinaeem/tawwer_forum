@@ -156,7 +156,6 @@ class KnowledgeSettingsController extends SettingsController {
         if ($knowledgeBaseID) {
             $this->apiController->patch($knowledgeBaseID, $values);
         } else {
-
             $this->apiController->post($values);
         }
 
