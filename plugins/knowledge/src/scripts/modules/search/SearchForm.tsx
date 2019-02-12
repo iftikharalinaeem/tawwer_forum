@@ -28,18 +28,29 @@ import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
-import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import FullPageLoader from "@library/components/FullPageLoader";
+import debounce from "lodash/debounce";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
     device: Devices;
 }
 
-class SearchForm extends React.Component<IProps> {
+interface IState {
+    lastQuery: string | null;
+}
+
+class SearchForm extends React.Component<IProps, IState> {
+    public constructor(props) {
+        super(props);
+        this.state = {
+            lastQuery: null,
+        };
+    }
+
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
@@ -60,7 +71,6 @@ class SearchForm extends React.Component<IProps> {
                                     <SearchBar
                                         placeholder={this.props.placeholder}
                                         onChange={this.handleSearchChange}
-                                        loadOptions={this.autocomplete}
                                         value={this.props.form.query}
                                         isBigInput={true}
                                         onSearch={this.props.searchActions.search}
@@ -69,7 +79,7 @@ class SearchForm extends React.Component<IProps> {
                                         triggerSearchOnClear={true}
                                         title={t("Search")}
                                         titleAsComponent={t("Search")}
-                                        autocomplete={false}
+                                        handleOnKeyDown={this.handleKeyDown}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
@@ -138,12 +148,7 @@ class SearchForm extends React.Component<IProps> {
      */
     private handleSearchChange = (value: string) => {
         this.props.searchActions.updateForm({ query: value });
-    };
-
-    private autocomplete = (query: string) => {
-        return this.props.searchOptionProvider.autocomplete(query, {
-            global: this.props.form.domain === SearchDomain.EVERYWHERE,
-        });
+        this.searchOnDebounce();
     };
 
     /**
@@ -204,6 +209,21 @@ class SearchForm extends React.Component<IProps> {
             location: crumbs,
         };
     }
+
+    private searchOnDebounce = () => {
+        if (this.props.form.query !== this.state.lastQuery) {
+            const delayer = debounce(() => {
+                this.props.searchActions.search();
+            }, 1000);
+            delayer();
+        }
+    };
+
+    private handleKeyDown = e => {
+        if (e.key === "Enter") {
+            this.props.searchActions.search();
+        }
+    };
 }
 
 const withRedux = connect(
