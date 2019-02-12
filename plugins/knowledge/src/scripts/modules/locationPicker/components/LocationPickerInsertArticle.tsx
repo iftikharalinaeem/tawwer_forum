@@ -16,7 +16,7 @@ import locationPickerClasses from "@knowledge/styles/locationPickerStyles";
 
 interface IProps {
     onClick: (position: string) => void;
-    isSelected?: boolean;
+    isSelected: boolean;
     className?: string;
 }
 

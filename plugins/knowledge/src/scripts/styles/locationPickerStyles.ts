@@ -28,10 +28,10 @@ export default function locationPickerClasses(theme?: object) {
         borderRadius: px(2),
         $nest: {
             "&:hover": {
-                backgroundColor: globalVars.mainColors.primary.fade(0.5).toString(),
+                backgroundColor: globalVars.mainColors.primary.fade(0.1).toString(),
             },
             "&:focus": {
-                backgroundColor: globalVars.mainColors.primary.fade(0.5).toString(),
+                backgroundColor: globalVars.mainColors.primary.fade(0.1).toString(),
             },
             "&.focus-visible": {
                 backgroundColor: globalVars.mainColors.primary.fade(0.8).toString(),

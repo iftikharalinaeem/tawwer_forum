@@ -22,15 +22,18 @@ import LocationPickerItemList from "./LocationPickerItemList";
 import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/components/LocationPickerInsertArticle";
 import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import classNames from "classnames";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-class LocationContents extends React.Component<IProps> {
+class LocationContents extends React.Component<IProps, IState> {
     private legendRef = React.createRef<HTMLLegendElement>();
     private listID = uniqueIDFromPrefix("navigationItemList");
+
+    public state = {
+        activeItemID: null,
+    };
 
     public render() {
         const { selectedRecord, childRecords, chosenRecord, title } = this.props;
@@ -59,6 +62,7 @@ class LocationContents extends React.Component<IProps> {
                         onClick={setArticleFirstPosition}
                         key="potentialLocation-0"
                         className="isFirst"
+                        isSelected={!!this.state.activeItemID}
                     />
                 );
             } else {
@@ -71,14 +75,21 @@ class LocationContents extends React.Component<IProps> {
                         !!chosenRecord &&
                         item.recordType === chosenRecord.recordType &&
                         item.recordID === chosenRecord.recordID;
-                    const navigateHandler = () => this.props.navigateToRecord(item);
+                    const navigateHandler = () => {
+                        this.setState({
+                            activeItemID: null,
+                        });
+                        this.props.navigateToRecord(item);
+                    };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
                     const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
                     const isLast = recordCount === index + 1;
+                    const isCurrentLocation =
+                        !!this.state.activeItemID && this.state.activeItemID === (index + 1).toString();
 
                     const setArticlePosition = () => {
-                        this.setArticleLocation(index.toString());
+                        this.setArticleLocation((index + 1).toString());
                     };
 
                     const insertArticleFirst =
@@ -87,6 +98,7 @@ class LocationContents extends React.Component<IProps> {
                                 onClick={setArticleFirstPosition}
                                 key="potentialLocation-0"
                                 className="isFirst"
+                                isSelected={this.state.activeItemID === "0"} // first one is exception
                             />
                         ) : null;
 
@@ -99,6 +111,7 @@ class LocationContents extends React.Component<IProps> {
                                     onClick={setArticlePosition}
                                     key={insertArticleKey}
                                     className={classNames({ isLast })}
+                                    isSelected={isCurrentLocation}
                                 />
                             </>
                         );
@@ -121,6 +134,7 @@ class LocationContents extends React.Component<IProps> {
                                         onClick={setArticlePosition}
                                         key={insertArticleKey}
                                         className={classNames({ isLast })}
+                                        isSelected={isCurrentLocation}
                                     />
                                 )}
                             </>
@@ -175,13 +189,24 @@ class LocationContents extends React.Component<IProps> {
     }
 
     private setArticleLocation(position: string) {
-        alert("Article location: " + position);
+        this.setState(
+            {
+                activeItemID: position,
+            },
+            () => {
+                alert("Article location: " + position);
+            },
+        );
     }
 }
 
 interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+interface IState {
+    activeItemID: string | null;
+}
 
 interface IMapResult {
     title: string;

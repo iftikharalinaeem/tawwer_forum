@@ -41,7 +41,7 @@ class LocationPicker extends React.Component<IProps, IState> {
                     />
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <LocationContents />
+                            <LocationContents key={`contents-${navigatedRecord}`} />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
