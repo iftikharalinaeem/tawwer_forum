@@ -7,8 +7,10 @@
 namespace Vanilla\Knowledge\Models;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
+use Vanilla\Exception\Database\NoResultsException;
 
 /**
  * A model for managing knowledge bases.
@@ -123,6 +125,84 @@ MESSAGE
         }
 
         return $validation->isValid();
+    }
+
+    /**
+     * Get the total count of published knowledge bases.
+     *
+     * @return int
+     */
+    public function selectActiveKBCount(): int {
+        $result = $this->sql()
+            ->select('DISTINCT knowledgeBaseID', 'COUNT', 'count')
+            ->from('knowledgeBase')
+            ->where('status', self::STATUS_PUBLISHED)
+            ->get()->nextRow(DATASET_TYPE_ARRAY)
+        ;
+
+        return $result['count'];
+    }
+
+    /**
+     * Select a KnowledgeBaseFragment for a given id.
+     *
+     * @param int $knowledgeBaseID Conditions for the select query.
+     *
+     * @return KnowledgeBaseFragment
+     *
+     * @throws ValidationException If the data from the DB was corrupted.
+     * @throws NoResultsException If no record was found for the given ID.
+     */
+    public function selectSingleFragment(int $knowledgeBaseID): KnowledgeBaseFragment {
+        $rows = $this->sql()
+            ->select('knowledgeBaseID, rootCategoryID, name, urlCode, viewType, status')
+            ->getWhere($this->getTable(), ['knowledgeBaseID' => $knowledgeBaseID], null, null, 1)
+            ->resultArray()
+        ;
+
+        if (empty($rows)) {
+            throw new NoResultsException("Could not find knowledge base fragment for knowledgeBaseID $knowledgeBaseID.");
+        }
+        $result = reset($rows);
+
+        // Normalize the fragment.
+        $url = $this->url($result);
+        $result['url'] = $url;
+
+        return new KnowledgeBaseFragment($result);
+    }
+
+    /**
+     * Select a KnowledgeBaseFragment from it's root category ID.
+     *
+     * @param int $categoryID Conditions for the select query.
+     *
+     * @return KnowledgeBaseFragment
+     *
+     * @throws ValidationException If the data from the DB was corrupted.
+     * @throws NoResultsException If no record was found for the given ID.
+     */
+    public function selectFragmentForCategoryID(int $categoryID) {
+        $rows = $this->sql()
+            ->select('kb.knowledgeBaseID, kb.rootCategoryID, kb.name, kb.urlCode, kb.viewType, kb.status')
+            ->from('knowledgeCategory kc')
+            ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = kc.knowledgeBaseID')
+            ->where('kc.knowledgeCategoryID', $categoryID)
+            ->limit(1)
+            ->get()
+            ->resultArray()
+        ;
+
+        if (empty($rows)) {
+            throw new NoResultsException("Could not find knowledge base fragment for rootCategoryID $rootCategoryID.");
+        }
+        $result = reset($rows);
+
+        // Normalize the fragment.
+        $url = $this->url($result);
+        $result['url'] = $url;
+
+        return new KnowledgeBaseFragment($result);
     }
 
     /**

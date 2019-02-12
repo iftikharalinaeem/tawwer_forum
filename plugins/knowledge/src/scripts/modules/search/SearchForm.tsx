@@ -31,7 +31,6 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
-import { search } from "library/src/scripts/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import FullPageLoader from "@library/components/FullPageLoader";
 
@@ -199,8 +198,7 @@ class SearchForm extends React.Component<IProps> {
      * @param searchResult The API search result to map.
      */
     private mapResult(searchResult: ISearchResult): IResult {
-        const categoryData = searchResult.category;
-        const crumbs = categoryData ? categoryData.breadcrumbs : [];
+        const crumbs = searchResult.breadcrumbs || [];
         return {
             name: searchResult.name,
             excerpt: searchResult.body,

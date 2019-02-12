@@ -17,6 +17,7 @@ use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
 use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\DraftModel;
@@ -28,6 +29,7 @@ use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
 
 /**
@@ -66,6 +68,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var Parser */
     private $parser;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * ArticlesApiController constructor.
      *
@@ -80,6 +85,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param FormatService $formatService
      * @param MediaModel $mediaModel
      * @param SessionInterface $sessionInterface
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -92,7 +98,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         FormatService $formatService,
         MediaModel $mediaModel,
-        SessionInterface $sessionInterface
+        SessionInterface $sessionInterface,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -102,6 +109,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->reactionModel = $reactionModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->parser = $parser;
+        $this->breadcrumbModel = $breadcrumbModel;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -205,6 +213,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $article,
             ["insertUserID", "updateUserID"]
         );
+
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']));
+        $article['breadcrumbs'] = $crumbs;
 
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
@@ -486,6 +497,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body, true);
         $this->save($body, $id);
         $row = $this->articleByID($id, true);
+
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
+
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
@@ -562,6 +577,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleByID($id, true);
         $row = $this->normalizeOutput($row);
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
         return $result;
     }
@@ -632,6 +649,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $row = $this->normalizeOutput($row);
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
         return $result;
     }

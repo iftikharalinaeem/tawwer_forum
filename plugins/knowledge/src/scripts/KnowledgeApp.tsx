@@ -15,7 +15,6 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { LinkContext } from "@library/components/navigation/SmartLink";
 import { formatUrl } from "@library/application";
 import SearchContext from "@library/contexts/SearchContext";
 import PagesContext from "@library/contexts/PagesContext";
@@ -23,14 +22,13 @@ import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchPr
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
 import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
+import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
 
 /*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
 export default class KnowledgeApp extends React.Component {
-    private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
-
     private store = getStore<IStoreState>();
 
     /**
@@ -43,15 +41,13 @@ export default class KnowledgeApp extends React.Component {
                     <ScrollOffsetProvider scrollWatchingEnabled={true}>
                         <SiteNavProvider>
                             <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                                <LinkContext.Provider value={formatUrl("/kb", true)}>
-                                    <React.Fragment>
-                                        <DeviceProvider>
-                                            <BrowserRouter>
-                                                <Route component={KnowledgeRoutes} />
-                                            </BrowserRouter>
-                                        </DeviceProvider>
-                                    </React.Fragment>
-                                </LinkContext.Provider>
+                                <DeviceProvider>
+                                    <BrowserRouter>
+                                        <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                            <Route component={KnowledgeRoutes} />
+                                        </LinkContextProvider>
+                                    </BrowserRouter>
+                                </DeviceProvider>{" "}
                             </SearchContext.Provider>
                         </SiteNavProvider>
                     </ScrollOffsetProvider>
@@ -64,14 +60,5 @@ export default class KnowledgeApp extends React.Component {
         return {
             search: SearchRoute,
         };
-    }
-
-    /**
-     * After the component mounts we need to update it so the results from the deviceChecker ref get passed through.
-     */
-    public componentDidMount() {
-        if (this.store.getState().knowledge.categories.status !== LoadStatus.SUCCESS) {
-            void this.categoryActions.getAllCategories();
-        }
     }
 }

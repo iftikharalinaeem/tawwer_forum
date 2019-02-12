@@ -7,9 +7,12 @@
 
 namespace Vanilla\Knowledge;
 
+use Garden\Container\Reference;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -36,7 +39,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(\Garden\Web\Dispatcher::class)
-            ->addCall('addRoute', ['route' => new \Garden\Container\Reference(KbPageRoutes::class), 'kb-page'])
+            ->addCall('addRoute', ['route' => new Reference(KbPageRoutes::class), 'kb-page'])
+            ->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(KbBreadcrumbProvider::class)])
         ;
     }
 

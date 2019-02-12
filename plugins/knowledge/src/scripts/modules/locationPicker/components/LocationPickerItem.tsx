@@ -11,6 +11,7 @@ import { article } from "@library/components/icons";
 import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
 import classNames from "classnames";
 import React from "react";
+import { knowldedgeBaseItem } from "@knowledge/icons/common";
 
 interface IProps {
     isInitialSelection: boolean;
@@ -73,8 +74,9 @@ export default class LocationPickerItem extends React.Component<IProps> {
             case KbRecordType.ARTICLE:
                 return article();
             case KbRecordType.CATEGORY:
-            case KbRecordType.KB:
                 return categoryIcon();
+            case KbRecordType.KB:
+                return knowldedgeBaseItem();
         }
     }
 }

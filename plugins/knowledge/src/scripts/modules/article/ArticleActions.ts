@@ -28,6 +28,7 @@ import {
     IPatchArticleResponseBody,
     IPostArticleResponseBody,
     IPostArticleRequestBody,
+    IArticleFragment,
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
@@ -42,9 +43,38 @@ export interface IArticleActionsProps {
  * Actions for the article page.
  */
 export default class ArticleActions extends ReduxActions {
+    private static readonly DEFAULT_ARTICLES_LIMIT = 10;
+
     public static readonly GET_ARTICLE_REQUEST = "@@article/GET_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     public static readonly GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_ERROR";
+
+    public static readonly GET_ARTICLES_REQUEST = "@@article/GET_ARTICLES_REQUEST";
+    public static readonly GET_ARTICLES_RESPONSE = "@@article/GET_ARTICLES_RESPONSE";
+    public static readonly GET_ARTICLES_ERROR = "@@article/GET_ARTICLES_ERROR";
+
+    // Raw actions for getting a knowledge category
+    private static getArticlesACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.GET_ARTICLES_REQUEST,
+        ArticleActions.GET_ARTICLES_RESPONSE,
+        ArticleActions.GET_ARTICLES_ERROR,
+        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
+        [] as IArticleFragment[],
+        {},
+    );
+
+    public getArticles = (
+        categoryID: number,
+        page: number = 1,
+        limit: number = ArticleActions.DEFAULT_ARTICLES_LIMIT,
+    ) => {
+        return this.dispatchApi(
+            "get",
+            `/articles?knowledgeCategoryID=${categoryID}&expand=excerpt&limit=${limit}&page=${page}`,
+            ArticleActions.getArticlesACs,
+            {},
+        );
+    };
 
     public static readonly PATCH_ARTICLE_STATUS_REQUEST = "@@article/PATCH_ARTICLE_STATUS_REQUEST";
     public static readonly PATCH_ARTICLE_STATUS_RESPONSE = "@@article/PATCH_ARTICLE_STATUS_RESPONSE";
@@ -82,6 +112,7 @@ export default class ArticleActions extends ReduxActions {
      * Union of all possible action types in this class.
      */
     public static readonly ACTION_TYPES:
+        | ActionsUnion<typeof ArticleActions.getArticlesACs>
         | ActionsUnion<typeof ArticleActions.postArticleACs>
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.patchArticleACs>

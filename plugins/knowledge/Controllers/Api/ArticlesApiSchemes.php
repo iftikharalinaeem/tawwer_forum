@@ -10,6 +10,8 @@ use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * ArticlesApiController schemes
@@ -105,6 +107,7 @@ trait ArticlesApiSchemes {
             $this->articleSchema = $this->schema(Schema::parse([
                 "articleID",
                 "knowledgeCategoryID",
+                "breadcrumbs",
                 "knowledgeBaseID",
                 "name",
                 "body",
@@ -274,6 +277,7 @@ trait ArticlesApiSchemes {
                 "allowNull" => true,
                 "Category the article belongs in.",
             ],
+            "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             "knowledgeBaseID:i?" => "Knowledge Base the article belongs to.",
             "seoName:s" => [
                 "allowNull" => true,

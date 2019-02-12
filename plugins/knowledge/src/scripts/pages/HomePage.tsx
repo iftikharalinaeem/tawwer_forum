@@ -19,6 +19,7 @@ import Container from "@library/components/layouts/components/Container";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
+import Splash from "@library/components/splash/Splash";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
@@ -33,12 +34,15 @@ export class HomePage extends React.Component<IProps> {
         }
 
         return (
-            <Container>
-                <DocumentTitle title={t("Home")}>
-                    <VanillaHeader />
-                </DocumentTitle>
-                <KnowledgeBaseList />
-            </Container>
+            <>
+                <Splash title={t("How can we help you?")} />
+                <Container>
+                    <DocumentTitle title={t("Home")}>
+                        <VanillaHeader />
+                    </DocumentTitle>
+                    <KnowledgeBaseList />
+                </Container>
+            </>
         );
     }
 }

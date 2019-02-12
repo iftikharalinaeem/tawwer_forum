@@ -6,6 +6,72 @@
 import React from "react";
 import { t } from "@library/application";
 import classNames from "classnames";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { style } from "typestyle";
+import { px } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
+
+const debug = debugHelper("knowledgeBaseIcons");
+
+export function knowldedgeBaseItem(className?: string) {
+    const title = t("Knowledge Base Item");
+    const globalVars = globalVariables();
+
+    return (
+        <svg
+            viewBox="0 0 15.836 21.596"
+            xmlns="http://www.w3.org/1999/xlink"
+            className={classNames(
+                className,
+                style({
+                    ...debug.name("knowledgeBaseIcon"),
+                    width: px(16),
+                    height: px(24.55),
+                    transform: "translateY(3.5px)",
+                    color: globalVars.mainColors.fg.toString(),
+                }),
+            )}
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+
+            <path
+                d="M.45,15.276c0-.448-.03-1.191,2.119-1.2V.45"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M2.569,14.075s6.655.008,9.362.008,3.449.106,3.449-2.392"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <polygon
+                points="4.162 14.085 4.162 18.356 5.172 17.66 6.182 18.356 6.182 14.085 4.162 14.085"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M12.95,14.36l.006,2"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M6.511,16.429h7.97c.705,0,.9-.478.9-1.067V1.518c0-.59-.194-1.068-.9-1.068H1.475a.967.967,0,0,0-1.028.9.9.9,0,0,0,0,.164V15.36a.968.968,0,0,0,.862,1.064.986.986,0,0,0,.163,0H3.822"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "0.9px" }}
+            />
+            <path
+                d="M5.45,4.86h7"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeLinecap: "square" }}
+            />
+            <path
+                d="M5.45,6.86h7"
+                transform="translate(0.005 0.002)"
+                style={{ fill: "none", stroke: "currentColor", strokeLinecap: "square" }}
+            />
+        </svg>
+    );
+}
 
 export function knowledgeBaseNoIcon(className?: string) {
     const title = t("Knowledge Base");

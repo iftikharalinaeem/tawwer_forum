@@ -3,56 +3,33 @@
  * @license Proprietary
  */
 
-import { IArticleFragment } from "@knowledge/@types/api";
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import ReduxActions from "@library/state/ReduxActions";
+import actionCreatorFactory from "typescript-fsa";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+
+const createAction = actionCreatorFactory("@@categoryPage");
 
 /**
  * Actions for the categories page.
  */
 export default class CategoriesPageActions extends ReduxActions {
-    public static readonly GET_ARTICLES_REQUEST = "@@kbCategoriesPage/GET_ARTICLES_REQUEST";
-    public static readonly GET_ARTICLES_RESPONSE = "@@kbCategoriesPage/GET_ARTICLES_RESPONSE";
-    public static readonly GET_ARTICLES_ERROR = "@@kbCategoriesPage/GET_ARTICLES_ERROR";
+    public static resetAction = createAction("reset");
 
-    public static readonly RESET = "@@kbCategoriesPage/RESET";
-
-    private static readonly ARTICLES_LIMIT = 10;
-
-    public static ACTION_TYPES:
-        | ActionsUnion<typeof CategoriesPageActions.getArticlesACs>
-        | ReturnType<typeof CategoriesPageActions.createResetAction>;
-
-    // Raw actions for getting a knowledge category
-    private static getArticlesACs = ReduxActions.generateApiActionCreators(
-        CategoriesPageActions.GET_ARTICLES_REQUEST,
-        CategoriesPageActions.GET_ARTICLES_RESPONSE,
-        CategoriesPageActions.GET_ARTICLES_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IArticleFragment[],
-        {},
-    );
-
-    /**
-     * Create a reset action
-     */
-    private static createResetAction() {
-        return CategoriesPageActions.createAction(CategoriesPageActions.RESET);
-    }
+    public static setCategoryIDAction = createAction<number>("SET_CATEGORY_ID");
 
     /**
      * Reset the page state.
      */
-    public reset = this.bindDispatch(CategoriesPageActions.createResetAction);
+    public reset = this.bindDispatch(CategoriesPageActions.resetAction);
+    public setCategoryID = this.bindDispatch(CategoriesPageActions.setCategoryIDAction);
 
-    public getArticles(id: number, page?: number, limit?: number) {
-        page = page || 1;
-        limit = limit || CategoriesPageActions.ARTICLES_LIMIT;
+    private categoriesPageActions = new CategoryActions(this.dispatch, this.api, this.getState);
 
-        return this.dispatchApi(
-            "get",
-            `/articles?knowledgeCategoryID=${id}&expand=excerpt&limit=${limit}&page=${page}`,
-            CategoriesPageActions.getArticlesACs,
-            {},
-        );
-    }
+    /**
+     * Set the active category and request the data for it to be fetched from the server.
+     */
+    public initForCategoryID = async (categoryID: number) => {
+        this.setCategoryID(categoryID);
+        await this.categoriesPageActions.getCategory({ id: categoryID });
+    };
 }

@@ -20,6 +20,8 @@ import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
+import Splash from "@library/components/splash/Splash";
+import { t } from "@library/application";
 
 /**
  * Component representing the the full home page of a help center.
@@ -47,19 +49,22 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         return (
-            <Container>
-                <DocumentTitle title={knowledgeBase.name}>
-                    <VanillaHeader />
-                </DocumentTitle>
+            <>
+                <Splash title={t("How can we help you?")} />
+                <Container>
+                    <DocumentTitle title={knowledgeBase.name}>
+                        <VanillaHeader />
+                    </DocumentTitle>
 
-                {/*For Screen Readers / SEO*/}
-                <ScreenReaderContent>
-                    <h1>{knowledgeBase.name}</h1>
-                </ScreenReaderContent>
-                <WidgetContainer>
-                    <HelpCenterNavigation data={data!} />
-                </WidgetContainer>
-            </Container>
+                    {/*For Screen Readers / SEO*/}
+                    <ScreenReaderContent>
+                        <h1>{knowledgeBase.name}</h1>
+                    </ScreenReaderContent>
+                    <WidgetContainer>
+                        <HelpCenterNavigation data={data!} />
+                    </WidgetContainer>
+                </Container>
+            </>
         );
     }
 

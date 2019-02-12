@@ -8,7 +8,6 @@ import { IArticle } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
@@ -24,7 +23,6 @@ export interface IArticlePageState {
 export interface IInjectableArticlePageState {
     loadable: ILoadable<{
         article: IArticle;
-        breadcrumbs: ICrumb[];
     }>;
     restoreStatus: LoadStatus;
 }
@@ -40,14 +38,11 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
 
         if (articleLoadable.status === LoadStatus.SUCCESS && articleID !== null) {
             const article = ArticleModel.selectArticle(state, articleID)!;
-            const breadcrumbs = CategoryModel.selectKbCategoryBreadcrumb(state, article.knowledgeCategoryID || 1);
-
             return {
                 restoreStatus,
                 loadable: {
                     status: LoadStatus.SUCCESS,
                     data: {
-                        breadcrumbs,
                         article,
                     },
                 },
