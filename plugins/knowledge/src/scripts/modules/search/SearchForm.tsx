@@ -217,6 +217,7 @@ class SearchForm extends React.Component<IProps, IState> {
                 this.props.searchActions.search();
             }, 1000);
             delayer();
+            return delayer;
         }
     };
 
