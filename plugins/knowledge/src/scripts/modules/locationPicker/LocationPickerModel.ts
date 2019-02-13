@@ -100,7 +100,6 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         selectedRecord: null,
         navigatedRecord: null,
         chosenRecord: null,
-        selectedSort: null,
     };
 
     /**
@@ -116,7 +115,6 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
             state.navigatedRecord = parent;
             state.selectedRecord = selected;
             state.chosenRecord = selected;
-            state.selectedSort = null;
             return state;
         })
         .case(LocationPickerActions.chooseAC, (state, payload) => {
@@ -125,17 +123,10 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         })
         .case(LocationPickerActions.selectAC, (state, payload) => {
             state.selectedRecord = payload;
-            state.selectedSort = null;
-            return state;
-        })
-        .case(LocationPickerActions.selectSortAC, (state, payload) => {
-            state.selectedRecord = null;
-            state.selectedSort = payload;
             return state;
         })
         .case(LocationPickerActions.navigateAC, (state, payload) => {
             state.navigatedRecord = payload;
-            state.selectedSort = null;
             return state;
         });
 }
@@ -144,16 +135,13 @@ export interface ILocationPickerRecord {
     recordType: KbRecordType;
     recordID: number;
     knowledgeBaseID: number;
-    sort: number;
+    position?: number;
 }
-
-export interface ILocationPickerSort extends ILocationPickerRecord {}
 
 export interface ILocationPickerState {
     navigatedRecord: ILocationPickerRecord | null; // What page the user is on in the picker.
     selectedRecord: ILocationPickerRecord | null; // What category is selected (still not chosen).
     chosenRecord: ILocationPickerRecord | null; // What category is chosen (input closes after a selection)
-    selectedSort: ILocationPickerSort | null; // What sort position was selected in a category?
 }
 
 export type ReducerType = KnowledgeReducer<ILocationPickerState>;

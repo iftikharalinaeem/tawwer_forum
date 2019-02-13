@@ -5,13 +5,13 @@
  */
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { ILocationPickerRecord, ILocationPickerSort } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 
@@ -45,13 +45,6 @@ export default class LocationPickerActions extends ReduxActions {
     public static selectAC = createAction<ILocationPickerRecord>("select");
 
     /**
-     * Set the sort for an article.
-     *
-     * @param sort
-     */
-    public static selectSortAC = createAction<ILocationPickerSort>("selectSort");
-
-    /**
      * Set the chosen category.
      *
      * @param categoryID
@@ -60,7 +53,6 @@ export default class LocationPickerActions extends ReduxActions {
 
     // Bind dispatch the simpler action creators instead of rewriting their function signatures.
     public selectRecord = this.bindDispatch(LocationPickerActions.selectAC);
-    public selectSort = this.bindDispatch(LocationPickerActions.selectSortAC);
     public chooseRecord = this.bindDispatch(LocationPickerActions.chooseAC);
     public navigateToRecord = this.bindDispatch(LocationPickerActions.navigateAC);
     public init = this.bindDispatch(LocationPickerActions.initAC);

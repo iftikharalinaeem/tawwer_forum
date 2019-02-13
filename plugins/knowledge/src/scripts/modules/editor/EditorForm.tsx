@@ -150,8 +150,8 @@ export class EditorForm extends React.PureComponent<IProps> {
     /**
      * Handle changes in the location picker.
      */
-    private locationPickerChangeHandler = (categoryID: number, sort: number) => {
-        this.handleFormChange({ knowledgeCategoryID: categoryID, sort: sort || undefined });
+    private locationPickerChangeHandler = (categoryID: number, sort?: number) => {
+        this.handleFormChange({ knowledgeCategoryID: categoryID, sort });
     };
 
     /**

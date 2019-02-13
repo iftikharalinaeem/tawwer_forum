@@ -4,12 +4,12 @@
  * @license Proprietary
  */
 
-import KnowledgeBaseModel, { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import KnowledgeBaseModel, { KbViewType, IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
+import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/components/LocationPickerInsertArticle";
+import LocationPickerInstructions from "@knowledge/modules/locationPicker/components/LocationPickerInstructions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import LocationPickerModel, {
-    ILocationPickerRecord,
-    ILocationPickerSort,
-} from "@knowledge/modules/locationPicker/LocationPickerModel";
+import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
@@ -17,16 +17,13 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import FullPageLoader from "@library/components/FullPageLoader";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import classNames from "classnames";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
 import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
-import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/components/LocationPickerInsertArticle";
-import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
-import classNames from "classnames";
-import LocationPickerInstructions from "@knowledge/modules/locationPicker/components/LocationPickerInstructions";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -36,25 +33,17 @@ class LocationContents extends React.Component<IProps> {
     private listID = uniqueIDFromPrefix("navigationItemList");
 
     public render() {
-        const { childRecords, chosenRecord, navigatedRecord, selectedRecord, selectedSort, title } = this.props;
+        const { childRecords, chosenRecord, navigatedRecord, navigatedKB, selectedRecord, title } = this.props;
 
-        const currentKBID =
-            childRecords && childRecords.data && childRecords.data.length > 0
-                ? childRecords.data[0].knowledgeBaseID
-                : null;
-        const currentKB = currentKBID
-            ? {
-                  kbViewStyle: "guide", // not sure how to get this
-              }
-            : null;
         const currentSort =
             navigatedRecord &&
             navigatedRecord.recordType === KbRecordType.CATEGORY &&
-            selectedSort &&
-            navigatedRecord.recordID === selectedSort.recordID
-                ? selectedSort.sort
+            selectedRecord &&
+            selectedRecord.recordType === KbRecordType.CATEGORY &&
+            navigatedRecord.recordID === selectedRecord.recordID
+                ? selectedRecord.position
                 : null;
-        const pickArticleLocation = currentKB && currentKB.kbViewStyle === "guide";
+        const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
 
         const setArticleFirstPosition = () => {
             this.setArticleLocation(0);
@@ -201,9 +190,9 @@ class LocationContents extends React.Component<IProps> {
     private setArticleLocation(position: number) {
         const { navigatedRecord } = this.props;
         if (navigatedRecord) {
-            this.props.selectSort({
+            this.props.selectRecord({
                 ...navigatedRecord,
-                sort: position,
+                position,
             });
         }
     }
@@ -216,15 +205,15 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 interface IMapResult {
     title: string;
     navigatedRecord: ILocationPickerRecord | null;
+    navigatedKB: IKnowledgeBase | null;
     selectedRecord: ILocationPickerRecord | null;
     chosenRecord: ILocationPickerRecord | null;
     childRecords: ILoadable<IKbNavigationItem[]>;
-    selectedSort: ILocationPickerSort | null;
 }
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord, selectedSort } = locationPicker;
+    const { navigatedRecord, selectedRecord, chosenRecord } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
     const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title };
 
@@ -242,11 +231,11 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
                 ...knowledgeBases.knowledgeBasesByID,
                 data: kbNavItems,
             },
-            selectedSort,
+            navigatedKB: null,
         };
     }
 
-    const knowledgeBase = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
+    const navigatedKB = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
     const navLoadStatus = navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID] || {
         status: LoadStatus.PENDING,
     };
@@ -254,11 +243,11 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
     if (navLoadStatus.status === LoadStatus.SUCCESS) {
         let recordKey = navigatedRecord.recordType + navigatedRecord.recordID;
         if (navigatedRecord.recordType === KbRecordType.KB) {
-            recordKey = KbRecordType.CATEGORY + knowledgeBase.rootCategoryID;
+            recordKey = KbRecordType.CATEGORY + navigatedKB.rootCategoryID;
         }
         const fullNavigatedRecord = navigation.navigationItems[recordKey];
         const recordTypes: KbRecordType[] =
-            knowledgeBase.viewType === KbViewType.GUIDE
+            navigatedKB.viewType === KbViewType.GUIDE
                 ? [KbRecordType.ARTICLE, KbRecordType.CATEGORY]
                 : [KbRecordType.CATEGORY];
         if (!fullNavigatedRecord) {
@@ -271,7 +260,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
                 ...navLoadStatus,
                 data: NavigationSelector.selectDirectChildren(navigation.navigationItems, recordKey, recordTypes),
             },
-            selectedSort,
+            navigatedKB,
         };
     } else {
         return {
@@ -279,7 +268,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
             childRecords: {
                 ...navLoadStatus,
             },
-            selectedSort,
+            navigatedKB,
         };
     }
 }
@@ -291,7 +280,6 @@ function mapDispatchToProps(dispatch: any) {
         requestData: lpActions.requestData,
         chooseRecord: lpActions.chooseRecord,
         selectRecord: lpActions.selectRecord,
-        selectSort: lpActions.selectSort,
         navigateToRecord: lpActions.navigateToRecord,
     };
 }

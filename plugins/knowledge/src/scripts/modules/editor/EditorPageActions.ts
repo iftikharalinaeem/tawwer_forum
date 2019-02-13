@@ -252,7 +252,7 @@ export default class EditorPageActions extends ReduxActions {
                 body: !isEqual(prevBody, body) ? body : undefined,
                 name: prevName !== name ? name : undefined,
                 knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
-                sort: sort || undefined,
+                sort,
             };
 
             return this.updateArticle(patchRequest, history);

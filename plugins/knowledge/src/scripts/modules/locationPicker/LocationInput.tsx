@@ -122,7 +122,8 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             const categoryChanged = !isEqual(this.props.chosenRecord, prevProps.chosenRecord);
 
             if (categoryChanged) {
-                this.props.onChange(this.props.chosenCategoryID, this.props.chosenSort);
+                const sort = this.props.chosenSort !== null ? this.props.chosenSort : undefined;
+                this.props.onChange(this.props.chosenCategoryID, sort);
             }
         }
     }
@@ -132,7 +133,7 @@ interface IOwnProps {
     className?: string;
     initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
-    onChange?: (categoryID: number | null, sort: number | null) => void;
+    onChange?: (categoryID: number | null, sort?: number) => void;
 }
 
 interface IState {
@@ -150,8 +151,8 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     if (chosenRecord) {
         if (chosenRecord.recordType === KbRecordType.CATEGORY) {
             chosenCategoryID = chosenRecord.recordID;
-            if (chosenRecord.sort) {
-                chosenSort = chosenRecord.sort;
+            if (chosenRecord.position !== undefined) {
+                chosenSort = chosenRecord.position;
             }
         }
 

@@ -110,13 +110,12 @@ class LocationPicker extends React.Component<IProps, IState> {
     };
 
     private get canChoose(): boolean {
-        return this.props.selectedRecord !== null || this.props.selectedSort !== null;
+        return this.props.selectedRecord !== null;
     }
 
     private handleChoose = () => {
         if (this.canChoose) {
-            const choice = this.props.selectedRecord! || this.props.selectedSort!;
-            this.props.chooseRecord(choice);
+            this.props.chooseRecord(this.props.selectedRecord!);
             this.props.afterChoose && this.props.afterChoose();
         }
     };
@@ -141,11 +140,11 @@ interface IOwnProps {}
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
-    const { selectedRecord, selectedSort, navigatedRecord } = state.knowledge.locationPicker;
+    const { selectedRecord, navigatedRecord } = state.knowledge.locationPicker;
     const navigatedCategory = LocationPickerModel.selectNavigatedCategory(state);
     const parentRecord = LocationPickerModel.selectParentRecord(state);
     const title = LocationPickerModel.selectNavigatedTitle(state);
-    return { selectedRecord, navigatedCategory, parentRecord, navigatedRecord, selectedSort, title };
+    return { selectedRecord, navigatedCategory, parentRecord, navigatedRecord, title };
 }
 
 function mapDispatchToProps(dispatch: any) {
