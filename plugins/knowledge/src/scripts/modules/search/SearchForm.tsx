@@ -33,6 +33,7 @@ import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import FullPageLoader from "@library/components/FullPageLoader";
 import debounce from "lodash/debounce";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -55,7 +56,7 @@ class SearchForm extends React.Component<IProps, IState> {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
+        const buttons = buttonClasses();
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} />
@@ -81,6 +82,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
                                         disableAutocomplete={true}
+                                        buttonClassName={buttons.primary}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
@@ -213,16 +215,16 @@ class SearchForm extends React.Component<IProps, IState> {
 
     private searchOnDebounce = () => {
         if (this.props.form.query !== this.state.lastQuery) {
-            const delayer = debounce(() => {
+            debounce(() => {
+                // tslint:disable-next-line:no-floating-promises
                 this.props.searchActions.search();
-            }, 1000);
-            delayer();
-            return delayer;
+            }, 800);
         }
     };
 
     private handleKeyDown = e => {
         if (e.key === "Enter") {
+            // tslint:disable-next-line:no-floating-promises
             this.props.searchActions.search();
         }
     };

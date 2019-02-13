@@ -146,20 +146,6 @@ button {
 }
 
 
-.buttonLoader {
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-
-    &::after {
-        @include spinnerLoader($buttonLoader-size, $buttonLoader-thickness);
-        content: ' ';
-    }
-}
-
 .buttonPrimary {
     @include generateButtonClass($buttonPrimary);
 

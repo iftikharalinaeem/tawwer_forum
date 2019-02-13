@@ -21,6 +21,9 @@ import MultiUserInput from "@library/users/MultiUserInput";
 import Permission from "@library/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import classNames from "classnames";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -32,7 +35,8 @@ export interface IProps extends ISearchFormActionProps, ISearchPageState {
 export class AdvancedSearch extends React.Component<IProps> {
     public render() {
         const formData = this.props.form;
-
+        const vars = globalVariables();
+        const buttons = buttonClasses();
         return (
             <form className="advancedSearch" onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
@@ -70,7 +74,11 @@ export class AdvancedSearch extends React.Component<IProps> {
                         className="inputBlock"
                     />
                 </Permission>
-                <Button type="submit" className="advancedSearch-submit" prefix="submitButton">
+                <Button
+                    type="submit"
+                    className={classNames("advancedSearch-submit", buttons.standard)}
+                    prefix="submitButton"
+                >
                     {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Filter")}
                 </Button>
             </form>
