@@ -28,26 +28,38 @@ import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
-import LinkAsButton from "@library/components/LinkAsButton";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import FullPageLoader from "@library/components/FullPageLoader";
+import debounce from "lodash/debounce";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
     device: Devices;
 }
 
-class SearchForm extends React.Component<IProps> {
+interface IState {
+    lastQuery: string | null;
+}
+
+class SearchForm extends React.Component<IProps, IState> {
+    public constructor(props) {
+        super(props);
+        this.state = {
+            lastQuery: null,
+        };
+    }
+
     public render() {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
+        const buttons = buttonClasses();
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} showSearchIcon={false} />
+                <VanillaHeader title={t("Search")} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
                     <PanelLayout
@@ -58,9 +70,8 @@ class SearchForm extends React.Component<IProps> {
                             <>
                                 <PanelWidget>
                                     <SearchBar
-                                        placeholder={this.props.placeholder || t("Help")}
+                                        placeholder={this.props.placeholder}
                                         onChange={this.handleSearchChange}
-                                        loadOptions={this.autocomplete}
                                         value={this.props.form.query}
                                         isBigInput={true}
                                         onSearch={this.props.searchActions.search}
@@ -68,23 +79,14 @@ class SearchForm extends React.Component<IProps> {
                                         optionComponent={SearchOption}
                                         triggerSearchOnClear={true}
                                         title={t("Search")}
-                                        titleAsComponent={
-                                            <>
-                                                {t("Search")}
-                                                <LinkAsButton
-                                                    to={`/kb/articles/add`}
-                                                    className="searchBar-actionButton"
-                                                    baseClass={ButtonBaseClass.ICON}
-                                                    title={t("Compose")}
-                                                >
-                                                    {compose()}
-                                                </LinkAsButton>
-                                            </>
-                                        }
+                                        titleAsComponent={t("Search")}
+                                        handleOnKeyDown={this.handleKeyDown}
+                                        disableAutocomplete={true}
+                                        buttonClassName={buttons.primary}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
-                                    <Drawer title={t("Advanced Search")}>
+                                    <Drawer title={t("Filter Results")}>
                                         <AdvancedSearch hideTitle={true} />
                                     </Drawer>
                                 )}
@@ -149,12 +151,7 @@ class SearchForm extends React.Component<IProps> {
      */
     private handleSearchChange = (value: string) => {
         this.props.searchActions.updateForm({ query: value });
-    };
-
-    private autocomplete = (query: string) => {
-        return this.props.searchOptionProvider.autocomplete(query, {
-            global: this.props.form.domain === SearchDomain.EVERYWHERE,
-        });
+        this.searchOnDebounce();
     };
 
     /**
@@ -215,6 +212,22 @@ class SearchForm extends React.Component<IProps> {
             location: crumbs,
         };
     }
+
+    private searchOnDebounce = () => {
+        if (this.props.form.query !== this.state.lastQuery) {
+            debounce(() => {
+                // tslint:disable-next-line:no-floating-promises
+                this.props.searchActions.search();
+            }, 800);
+        }
+    };
+
+    private handleKeyDown = e => {
+        if (e.key === "Enter") {
+            // tslint:disable-next-line:no-floating-promises
+            this.props.searchActions.search();
+        }
+    };
 }
 
 const withRedux = connect(

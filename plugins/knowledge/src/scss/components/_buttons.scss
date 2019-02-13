@@ -17,12 +17,10 @@ button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
     @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
-    @include outlineStyling;
     display: inline-block;
     position: relative;
     text-align: center;
     white-space: nowrap;
-    outline: 0;
     vertical-align: middle;
     touch-action: manipulation;
     min-width: $global-button_minWidth;
@@ -67,6 +65,18 @@ button {
 
     .icon {
         display: block;
+    }
+
+    &.isLarge {
+        height: $formElement_largeInput_height;
+    }
+
+    &:not(.focus-visible) {
+        &:hover,
+        &:focus,
+        &:active {
+            outline: 0;
+        }
     }
 }
 
@@ -135,20 +145,6 @@ button {
     }
 }
 
-
-.buttonLoader {
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-
-    &::after {
-        @include spinnerLoader($buttonLoader-size, $buttonLoader-thickness);
-        content: ' ';
-    }
-}
 
 .buttonPrimary {
     @include generateButtonClass($buttonPrimary);

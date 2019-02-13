@@ -38,14 +38,13 @@ export class Navigation extends React.Component<IProps> {
             return null;
         }
 
-        const title =
-            knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0
-                ? t("Subcategories")
-                : undefined;
+        const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
+        const title = hasTitle ? t("Subcategories") : undefined;
 
         return (
             <SiteNav
                 title={title}
+                hiddenTitle={hasTitle}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
                 bottomCTA={<NavigationAdminLinks kbID={this.props.kbID} showDivider={navItems.data!.length > 0} />}
