@@ -118,8 +118,12 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             this.forceUpdate();
         }
 
-        if (!isEqual(this.props.chosenRecord, prevProps.chosenRecord) && this.props.onChange) {
-            this.props.onChange(this.props.chosenCategoryID);
+        if (this.props.onChange) {
+            const categoryChanged = !isEqual(this.props.chosenRecord, prevProps.chosenRecord);
+
+            if (categoryChanged) {
+                this.props.onChange(this.props.chosenCategoryID, this.props.chosenSort);
+            }
         }
     }
 }
@@ -128,7 +132,7 @@ interface IOwnProps {
     className?: string;
     initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
-    onChange?: (categoryID: number | null) => void;
+    onChange?: (categoryID: number | null, sort: number | null) => void;
 }
 
 interface IState {
@@ -142,9 +146,13 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { chosenRecord } = state.knowledge.locationPicker;
     const { navigationItems } = state.knowledge.navigation;
     let chosenCategoryID: number | null = null;
+    let chosenSort: number | null = null;
     if (chosenRecord) {
         if (chosenRecord.recordType === KbRecordType.CATEGORY) {
             chosenCategoryID = chosenRecord.recordID;
+            if (chosenRecord.sort) {
+                chosenSort = chosenRecord.sort;
+            }
         }
 
         if (
@@ -157,6 +165,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     }
     return {
         chosenRecord,
+        chosenSort,
         chosenCategoryID,
         locationBreadcrumb:
             chosenCategoryID !== null

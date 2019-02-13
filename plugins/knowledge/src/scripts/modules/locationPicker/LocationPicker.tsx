@@ -64,14 +64,13 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal &&
-                    this.props.navigatedCategory && (
-                        <NewCategoryForm
-                            exitHandler={this.hideNewFolderModal}
-                            parentCategoryID={this.props.navigatedCategory.recordID}
-                            buttonRef={this.newFolderButtonRef}
-                        />
-                    )}
+                {this.state.showNewCategoryModal && this.props.navigatedCategory && (
+                    <NewCategoryForm
+                        exitHandler={this.hideNewFolderModal}
+                        parentCategoryID={this.props.navigatedCategory.recordID}
+                        buttonRef={this.newFolderButtonRef}
+                    />
+                )}
             </>
         );
     }
@@ -111,12 +110,13 @@ class LocationPicker extends React.Component<IProps, IState> {
     };
 
     private get canChoose(): boolean {
-        return this.props.selectedRecord !== null;
+        return this.props.selectedRecord !== null || this.props.selectedSort !== null;
     }
 
     private handleChoose = () => {
         if (this.canChoose) {
-            this.props.chooseRecord(this.props.selectedRecord!);
+            const choice = this.props.selectedRecord! || this.props.selectedSort!;
+            this.props.chooseRecord(choice);
             this.props.afterChoose && this.props.afterChoose();
         }
     };
@@ -141,11 +141,11 @@ interface IOwnProps {}
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
-    const { selectedRecord, navigatedRecord } = state.knowledge.locationPicker;
+    const { selectedRecord, selectedSort, navigatedRecord } = state.knowledge.locationPicker;
     const navigatedCategory = LocationPickerModel.selectNavigatedCategory(state);
     const parentRecord = LocationPickerModel.selectParentRecord(state);
     const title = LocationPickerModel.selectNavigatedTitle(state);
-    return { selectedRecord, navigatedCategory, parentRecord, navigatedRecord, title };
+    return { selectedRecord, navigatedCategory, parentRecord, navigatedRecord, selectedSort, title };
 }
 
 function mapDispatchToProps(dispatch: any) {

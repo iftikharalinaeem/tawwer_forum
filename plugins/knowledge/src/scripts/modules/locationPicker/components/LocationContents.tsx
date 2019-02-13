@@ -6,7 +6,10 @@
 
 import KnowledgeBaseModel, { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import LocationPickerModel, {
+    ILocationPickerRecord,
+    ILocationPickerSort,
+} from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
@@ -28,16 +31,12 @@ import LocationPickerInstructions from "@knowledge/modules/locationPicker/compon
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
  */
-class LocationContents extends React.Component<IProps, IState> {
+class LocationContents extends React.Component<IProps> {
     private legendRef = React.createRef<HTMLLegendElement>();
     private listID = uniqueIDFromPrefix("navigationItemList");
 
-    public state = {
-        activeItemID: null,
-    };
-
     public render() {
-        const { selectedRecord, childRecords, chosenRecord, title } = this.props;
+        const { childRecords, chosenRecord, navigatedRecord, selectedRecord, selectedSort, title } = this.props;
 
         const currentKBID =
             childRecords && childRecords.data && childRecords.data.length > 0
@@ -48,10 +47,17 @@ class LocationContents extends React.Component<IProps, IState> {
                   kbViewStyle: "guide", // not sure how to get this
               }
             : null;
+        const currentSort =
+            navigatedRecord &&
+            navigatedRecord.recordType === KbRecordType.CATEGORY &&
+            selectedSort &&
+            navigatedRecord.recordID === selectedSort.recordID
+                ? selectedSort.sort
+                : null;
         const pickArticleLocation = currentKB && currentKB.kbViewStyle === "guide";
 
         const setArticleFirstPosition = () => {
-            this.setArticleLocation("0");
+            this.setArticleLocation(0);
         };
 
         let contents;
@@ -66,7 +72,7 @@ class LocationContents extends React.Component<IProps, IState> {
                             onClick={setArticleFirstPosition}
                             key="potentialLocation-0"
                             className="isFirst"
-                            isSelected={!!this.state.activeItemID}
+                            isSelected={currentSort === 0}
                         />
                     </>
                 );
@@ -81,20 +87,16 @@ class LocationContents extends React.Component<IProps, IState> {
                         item.recordType === chosenRecord.recordType &&
                         item.recordID === chosenRecord.recordID;
                     const navigateHandler = () => {
-                        this.setState({
-                            activeItemID: null,
-                        });
                         this.props.navigateToRecord(item);
                     };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
                     const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
                     const isLast = recordCount === index + 1;
-                    const isCurrentLocation =
-                        !!this.state.activeItemID && this.state.activeItemID === (index + 1).toString();
+                    const isCurrentLocation = currentSort === index + 1;
 
                     const setArticlePosition = () => {
-                        this.setArticleLocation((index + 1).toString());
+                        this.setArticleLocation(index + 1);
                     };
 
                     const insertArticleFirst =
@@ -105,7 +107,7 @@ class LocationContents extends React.Component<IProps, IState> {
                                     onClick={setArticleFirstPosition}
                                     key="potentialLocation-0"
                                     className="isFirst"
-                                    isSelected={this.state.activeItemID === "0"} // first one is exception
+                                    isSelected={currentSort === 0} // first one is exception
                                 />
                             </>
                         ) : null;
@@ -196,15 +198,14 @@ class LocationContents extends React.Component<IProps, IState> {
         }
     }
 
-    private setArticleLocation(position: string) {
-        this.setState(
-            {
-                activeItemID: position,
-            },
-            () => {
-                alert("Article location: " + position);
-            },
-        );
+    private setArticleLocation(position: number) {
+        const { navigatedRecord } = this.props;
+        if (navigatedRecord) {
+            this.props.selectSort({
+                ...navigatedRecord,
+                sort: position,
+            });
+        }
     }
 }
 
@@ -212,21 +213,18 @@ interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-interface IState {
-    activeItemID: string | null;
-}
-
 interface IMapResult {
     title: string;
     navigatedRecord: ILocationPickerRecord | null;
     selectedRecord: ILocationPickerRecord | null;
     chosenRecord: ILocationPickerRecord | null;
     childRecords: ILoadable<IKbNavigationItem[]>;
+    selectedSort: ILocationPickerSort | null;
 }
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord } = locationPicker;
+    const { navigatedRecord, selectedRecord, chosenRecord, selectedSort } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
     const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title };
 
@@ -244,6 +242,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
                 ...knowledgeBases.knowledgeBasesByID,
                 data: kbNavItems,
             },
+            selectedSort,
         };
     }
 
@@ -272,6 +271,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
                 ...navLoadStatus,
                 data: NavigationSelector.selectDirectChildren(navigation.navigationItems, recordKey, recordTypes),
             },
+            selectedSort,
         };
     } else {
         return {
@@ -279,6 +279,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
             childRecords: {
                 ...navLoadStatus,
             },
+            selectedSort,
         };
     }
 }
@@ -290,6 +291,7 @@ function mapDispatchToProps(dispatch: any) {
         requestData: lpActions.requestData,
         chooseRecord: lpActions.chooseRecord,
         selectRecord: lpActions.selectRecord,
+        selectSort: lpActions.selectSort,
         navigateToRecord: lpActions.navigateToRecord,
     };
 }
