@@ -98,12 +98,11 @@ export class ArticleLayout extends React.Component<IProps> {
                         </PanelWidget>
                     }
                     rightTop={
-                        article.outline &&
-                        article.outline.length > 0 &&
                         device !== Devices.MOBILE &&
                         device !== Devices.TABLET && (
                             <PanelWidget>
-                                <ArticleTOC items={article.outline} />
+                                {article.outline &&
+                                    article.outline.length > 0 && <ArticleTOC items={article.outline} />}
                             </PanelWidget>
                         )
                     }
