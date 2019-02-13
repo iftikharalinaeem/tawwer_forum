@@ -166,6 +166,47 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
      */
     private reduceAdd: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
+            case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                const patchedArticle = action.payload.data;
+                const patchedArticleID = KbRecordType.ARTICLE + patchedArticle.articleID;
+                const patchedArticleParentStringID = KbRecordType.CATEGORY + patchedArticle.knowledgeCategoryID;
+                const originalNavigationItem = nextState.navigationItems[patchedArticleID];
+
+                // If moved out of the original category, remove it from that navigation item's children.
+                if (originalNavigationItem) {
+                    const { parentID } = originalNavigationItem;
+                    if (parentID && parentID !== patchedArticle.knowledgeCategoryID) {
+                        const originalArticleParentStringID = KbRecordType.CATEGORY + parentID;
+                        if (nextState.navigationItems[originalArticleParentStringID]) {
+                            nextState.navigationItems[
+                                originalArticleParentStringID
+                            ]!.children = nextState.navigationItems[originalArticleParentStringID]!.children.filter(
+                                item => item !== patchedArticleID,
+                            );
+                        }
+                    }
+                }
+
+                nextState.navigationItems[patchedArticleID] = {
+                    name: patchedArticle.name,
+                    url: patchedArticle.url,
+                    parentID: patchedArticle.knowledgeCategoryID!,
+                    recordID: patchedArticle.articleID,
+                    sort: patchedArticle.sort,
+                    knowledgeBaseID: patchedArticle.knowledgeBaseID,
+                    recordType: KbRecordType.ARTICLE,
+                    children: [],
+                };
+
+                // Add to the children of its parent, if it isn't already there.
+                if (!originalNavigationItem || originalNavigationItem.parentID !== patchedArticle.knowledgeCategoryID) {
+                    const patchedParentItem = nextState.navigationItems[patchedArticleParentStringID];
+                    if (patchedParentItem) {
+                        patchedParentItem.children.push(patchedArticleID);
+                        NavigationModel.sortItemChildren(nextState.navigationItems, patchedArticleParentStringID);
+                    }
+                }
+                break;
             case ArticleActions.POST_ARTICLE_RESPONSE:
                 const article = action.payload.data;
                 const stringID = KbRecordType.ARTICLE + article.articleID;
