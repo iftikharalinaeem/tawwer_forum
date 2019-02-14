@@ -668,7 +668,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'no' => (int)$reactionCounts['neutralCount'],
             'total' => (int)$reactionCounts['allCount'],
         ];
-        //die(print_r($row));
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
