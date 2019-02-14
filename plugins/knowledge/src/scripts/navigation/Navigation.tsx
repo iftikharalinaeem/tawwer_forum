@@ -39,7 +39,7 @@ export class Navigation extends React.Component<IProps> {
         }
 
         const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
-        const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.HELP;
+        const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
         const title = hasTitle ? t("Subcategories") : undefined;
 
         return (
