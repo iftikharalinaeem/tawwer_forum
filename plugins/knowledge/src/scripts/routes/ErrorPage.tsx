@@ -124,7 +124,7 @@ export class ErrorPage extends React.Component<IProps> {
                     message,
                     description: t("The page you were looking for could not be found."),
                     actionItem: (
-                        <LinkAsButton className={buttons(ButtonTypes.PRIMARY)} to={"/kb"}>
+                        <LinkAsButton className={buttons.primary} to={"/kb"}>
                             {t("Back to home page")}
                         </LinkAsButton>
                     ),
@@ -140,10 +140,7 @@ export class ErrorPage extends React.Component<IProps> {
                     ),
                     actionItem: (
                         <Permission permission="Garden.Settings.Manage">
-                            <LinkAsButton
-                                className={buttons(ButtonTypes.PRIMARY)}
-                                to={"/knowledge-settings/knowledge-bases"}
-                            >
+                            <LinkAsButton className={buttons.primary} to={"/knowledge-settings/knowledge-bases"}>
                                 {t("New Knowledge Base")}
                             </LinkAsButton>
                         </Permission>
@@ -162,7 +159,7 @@ export class ErrorPage extends React.Component<IProps> {
                     actionItem: knowledgeBaseID ? (
                         <Permission permission="articles.add">
                             <EditorRoute.Link
-                                className={buttons(ButtonTypes.PRIMARY)}
+                                className={buttons.primary}
                                 data={{ knowledgeBaseID, knowledgeCategoryID }}
                             >
                                 {t("New Article")}
@@ -179,7 +176,7 @@ export class ErrorPage extends React.Component<IProps> {
                     message,
                     description: t("Please try again later."),
                     actionItem: (
-                        <LinkAsButton className={buttons(ButtonTypes.PRIMARY)} to={"/kb"}>
+                        <LinkAsButton className={buttons.primary} to={"/kb"}>
                             {t("Back to Home")}
                         </LinkAsButton>
                     ),

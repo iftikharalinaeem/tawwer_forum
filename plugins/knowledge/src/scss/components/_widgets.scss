@@ -117,7 +117,6 @@ $widget-titleBar_viewMoreColor        : mix($global-color_fg, $global-color_fg, 
 
 
 .widget-viewAllLabel {
-    @include outlineStyling;
     vertical-align: middle;
     font-size: $global-small_fontSize;
     color: $widget-titleBar_viewMoreColor;

@@ -5,7 +5,7 @@
  */
 
 $Definition['Untitled'] = 'Untitled';
-$Definition['Published on <0/> by <1/>'] = 'Published on <0/> by <1/>';
+$Definition['Published <0/> by <1/>'] = 'Published <0/> by <1/>';
 $Definition['Updated on <0/> by <1/>'] = 'Updated on <0/> by <1/>';
 $Definition['Customize SEO'] = 'Customize SEO';
 $Definition['Move'] = 'Move';

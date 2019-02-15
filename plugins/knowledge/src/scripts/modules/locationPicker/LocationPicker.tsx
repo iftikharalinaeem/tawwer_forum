@@ -55,11 +55,7 @@ class LocationPicker extends React.Component<IProps, IState> {
                                 {newFolder()}
                             </Button>
                         )}
-                        <Button
-                            onClick={this.handleChoose}
-                            disabled={!this.canChoose}
-                            className={buttons(ButtonTypes.PRIMARY)}
-                        >
+                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className={buttons.primary}>
                             {t("Choose")}
                         </Button>
                     </FrameFooter>
