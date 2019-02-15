@@ -22,6 +22,7 @@ import UserContent from "@library/components/UserContent";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
 import { connect } from "react-redux";
+import NextPrevious from "@library/components/nextPrevious/nextPrevious";
 
 interface IProps {
     article: IArticle;
@@ -93,9 +94,21 @@ export class ArticleLayout extends React.Component<IProps> {
                         </PanelWidget>
                     }
                     middleBottom={
-                        <PanelWidget>
-                            <UserContent content={article.body} />
-                        </PanelWidget>
+                        <>
+                            <PanelWidget>
+                                <UserContent content={article.body} />
+                            </PanelWidget>
+                            {device === Devices.MOBILE && (
+                                <PanelWidget>
+                                    <NextPrevious
+                                        previousTitle={"Advanced Site Apperance Settings Advanced Site Apperance"}
+                                        previousTo={"#"}
+                                        nextTitle={"Handeling special requests efficiently Advanced"}
+                                        nextTo={"#"}
+                                    />
+                                </PanelWidget>
+                            )}
+                        </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
