@@ -78,7 +78,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /**
      * ArticlesApiController constructor
      *
-     * @param SessionInterface $session
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleReactionModel $articleReactionModel
@@ -93,7 +92,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
-        SessionInterface $session,
         ArticleModel $articleModel,
         ArticleRevisionModel $articleRevisionModel,
         ArticleReactionModel $articleReactionModel,
@@ -107,7 +105,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         SessionInterface $sessionInterface,
         BreadcrumbModel $breadcrumbModel
     ) {
-        $this->session = $session;
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleReactionModel = $articleReactionModel;
@@ -633,7 +630,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function post_reaction(int $id, array $body): array {
         $this->permission("knowledge.kb.view");
-        if (!$this->session->isValid()) {
+        if (!$this->sessionInterface->isValid()) {
             throw new ClientException('User must be signed in to post reaction.');
         }
 
@@ -653,7 +650,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        if ($this->articleReactionModel->userReactionCount(ArticleReactionModel::TYPE_HELPFUL, $id, $this->session->UserID) > 0) {
+        if ($this->articleReactionModel->userReactionCount(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
             throw new ClientException('You already reacted on this article before.');
         }
         $this->reactionModel->insert($fields);
