@@ -47,8 +47,8 @@ export class ArticleLayout extends React.Component<IProps> {
             title = currentNavigationCategory.name;
         }
 
-        const prevPageLink = "#"; // Temporary for next/prev component
-        const nextPageLink = "#$"; // Temporary for next/prev component
+        const prevPageLink = undefined; // Temporary for next/prev component
+        const nextPageLink = undefined; // Temporary for next/prev component
 
         return (
             <Container>
