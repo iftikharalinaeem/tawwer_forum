@@ -39,6 +39,7 @@ export class Navigation extends React.Component<IProps> {
         }
 
         const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
+        const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
         const title = hasTitle ? t("Subcategories") : undefined;
 
         return (
@@ -49,6 +50,7 @@ export class Navigation extends React.Component<IProps> {
                 activeRecord={this.props.activeRecord}
                 bottomCTA={<NavigationAdminLinks kbID={this.props.kbID} showDivider={navItems.data!.length > 0} />}
                 onItemHover={this.preloadItem}
+                clickableCategoryLabels={clickableCategoryLabels}
             >
                 {navItems.data}
             </SiteNav>
