@@ -47,6 +47,9 @@ export class ArticleLayout extends React.Component<IProps> {
             title = currentNavigationCategory.name;
         }
 
+        const prevPageLink = "#"; // Temporary for next/prev component
+        const nextPageLink = "#$"; // Temporary for next/prev component
+
         return (
             <Container>
                 <VanillaHeader
@@ -98,16 +101,17 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <UserContent content={article.body} />
                             </PanelWidget>
-                            {device === Devices.MOBILE && (
-                                <PanelWidget>
-                                    <NextPrevious
-                                        previousTitle={"Advanced Site Apperance Settings Advanced Site Apperance"}
-                                        previousTo={"#"}
-                                        nextTitle={"Handeling special requests efficiently Advanced"}
-                                        nextTo={"#"}
-                                    />
-                                </PanelWidget>
-                            )}
+                            {device === Devices.MOBILE &&
+                                (!!prevPageLink || !!nextPageLink) && (
+                                    <PanelWidget>
+                                        <NextPrevious
+                                            previousTitle={"Advanced Site Apperance Settings Advanced Site Apperance"}
+                                            previousTo={prevPageLink}
+                                            nextTitle={"Handeling special requests efficiently Advanced"}
+                                            nextTo={nextPageLink}
+                                        />
+                                    </PanelWidget>
+                                )}
                         </>
                     }
                     rightTop={
