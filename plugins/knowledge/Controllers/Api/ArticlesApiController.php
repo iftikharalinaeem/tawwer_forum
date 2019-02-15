@@ -42,9 +42,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     use UpdateMediaTrait;
 
-    /** @var \Gdn_Session */
-    private $session;
-
     /** @var ArticleModel */
     private $articleModel;
 
