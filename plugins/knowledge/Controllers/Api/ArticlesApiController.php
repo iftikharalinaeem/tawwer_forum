@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Exception;
+use Garden\Web\Exception\ClientException;
 use Gdn_Session as SessionInterface;
 use MediaModel;
 use Garden\Schema\Schema;
@@ -41,6 +42,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     use UpdateMediaTrait;
 
+    /** @var \Gdn_Session */
+    private $session;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -72,7 +76,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     private $breadcrumbModel;
 
     /**
-     * ArticlesApiController constructor.
+     * ArticlesApiController constructor
      *
      * @param ArticleModel $articleModel
      * @param ArticleRevisionModel $articleRevisionModel
@@ -626,6 +630,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function post_reaction(int $id, array $body): array {
         $this->permission("knowledge.kb.view");
+        if (!$this->sessionInterface->isValid()) {
+            throw new ClientException('User must be signed in to post reaction.');
+        }
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -637,16 +644,21 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
 
+        // This is just check if article exists
         $article = $this->articleByID($id);
 
-        $reactionValue = array_search($body['helpful'], ArticleReactionModel::getHelpfulReactions());
-        $fields = ArticleReactionModel::getReactionFields($id, 'helpful', $reactionValue);
+        $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
+        $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
+        if ($this->articleReactionModel->userReactionCount(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
+            throw new ClientException('You already reacted on this article before.');
+        }
         $this->reactionModel->insert($fields);
-
         $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
         $row = $this->articleByID($id, true);
+
+        $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['reactions'][]  = [
             'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
             'yes' => (int)$reactionCounts['positiveCount'],

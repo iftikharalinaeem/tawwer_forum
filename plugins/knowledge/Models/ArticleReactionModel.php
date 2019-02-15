@@ -85,6 +85,33 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get number of reactions of specific type for user
+     *
+     * @param string $reactionType
+     * @param int $articleID
+     * @param int $userID
+     * @return int
+     */
+    public function userReactionCount(string $reactionType, int $articleID, int $userID): int {
+        $sql = $this->sql()
+            ->from('reaction r')
+            ->select('reactionID', 'COUNT', 'count')
+            ->where([
+                'ownerType' => self::OWNER_TYPE,
+                'reactionType' => $reactionType,
+                'recordType' => self::RECORD_TYPE,
+                'recordID' => $articleID,
+                'insertUserID' => $userID
+            ])
+            ->groupBy([
+                'insertUserID'
+            ]);
+        $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        return is_array($res) ? $res['count'] : 0;
+    }
+
+    /**
      * Return all possible statuses for article record/item
      *
      * @return array
