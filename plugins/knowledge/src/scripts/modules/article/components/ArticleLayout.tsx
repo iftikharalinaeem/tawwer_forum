@@ -22,7 +22,7 @@ import UserContent from "@library/components/UserContent";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
 import { connect } from "react-redux";
-import NextPrevious from "@library/components/nextPrevious/nextPrevious";
+import NextPrevious from "@library/components/nextPrevious/NextPrevious";
 
 interface IProps {
     article: IArticle;
