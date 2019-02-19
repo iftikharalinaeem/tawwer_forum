@@ -218,6 +218,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']));
         $article['breadcrumbs'] = $crumbs;
 
+        $reactionCounts = $this->articleReactionModel->getReactionCount($id);
+        $article['reactions'][]  = [
+            'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+            'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
+            'no' => (int)$reactionCounts['neutralCount'] ?? 0,
+            'total' => (int)$reactionCounts['allCount'] ?? 0,
+            'userReacted' => $this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID)
+        ];
+
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
@@ -661,6 +670,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'yes' => (int)$reactionCounts['positiveCount'],
             'no' => (int)$reactionCounts['neutralCount'],
             'total' => (int)$reactionCounts['allCount'],
+            'userReacted' => true
         ];
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
