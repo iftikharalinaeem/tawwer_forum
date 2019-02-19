@@ -8,7 +8,7 @@ about: Create a report to help us improve
 A clear and concise description of what the bug is.
 
 **Vanilla info**
-1. Are you sure this is a core Vanilla problem and not caused by any addon you are using?
+1. Are you sure this is a knowledge base problem and not caused by an addon you are using or core Vanilla?
 2. Did you follow our generic troubleshooting steps already?
 3. What Vanilla version are you using?
 4. When did the issue start?
