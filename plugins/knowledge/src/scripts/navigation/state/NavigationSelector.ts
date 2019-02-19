@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import KnowledgeBaseModel, { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import NavigationModel, {
@@ -41,16 +41,37 @@ export default class NavigationSelector {
         },
     );
 
+    /**
+     * Select a flat list of sorted article positons.
+     *
+     * This is useful for guides where we want to navigate left and right in the tree while walking up and down categories.
+     */
     public static selectSortedArticleData = createSelector(
-        [(state: IStoreState) => state.knowledge.navigation.navigationItems],
-        navItems => {
+        [
+            (state: IStoreState) => state.knowledge.navigation.navigationItems,
+            (state: IStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+        ],
+        (navItems, knowledgeBasesByID) => {
             const root = NavigationModel.SYNTHETIC_ROOT;
             const sortedTree = NavigationSelector.selectNavTree(navItems, root.recordType + root.recordID);
             const articles = NavigationSelector.selectAllRecursiveArticles(sortedTree);
             const result: { [articleID: number]: ISortedNavItem } = {};
             for (const [index, article] of articles.entries()) {
+                const knowledgeBase = knowledgeBasesByID.data
+                    ? knowledgeBasesByID.data[article.knowledgeBaseID]
+                    : undefined;
+                if (!knowledgeBase) {
+                    continue;
+                }
+
+                if (knowledgeBase.viewType !== KbViewType.GUIDE) {
+                    // Only guide type knowledge bases have this type of navigaiton.
+                    continue;
+                }
+
                 const prev = articles[index - 1];
                 const next = articles[index + 1];
+
                 result[article.recordID] = {
                     ownID: article.recordType + article.recordID,
                     nextID: next ? next.recordType + next.recordID : null,
@@ -61,12 +82,16 @@ export default class NavigationSelector {
         },
     );
 
+    /**
+     * Select all articles recursively out of a navigation into a flat ordered array.
+     */
     private static selectAllRecursiveArticles(navItems: INavigationTreeItem) {
-        const results: INavigationTreeItem[] = [];
+        const results: IKbNavigationItem[] = [];
         for (const item of navItems.children) {
             switch (item.recordType) {
                 case KbRecordType.ARTICLE:
-                    results.push(item);
+                    // Typescript still doesn't feel this is narrowed enough but at this point it's definitely the article.
+                    results.push((item as unknown) as IKbNavigationItem<KbRecordType.ARTICLE>);
                     break;
                 case KbRecordType.CATEGORY:
                     results.push(...NavigationSelector.selectAllRecursiveArticles(item));

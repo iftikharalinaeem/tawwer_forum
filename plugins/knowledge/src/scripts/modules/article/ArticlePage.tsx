@@ -166,8 +166,8 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
             categoryID !== null
                 ? NavigationSelector.selectCategory(categoryID, state.knowledge.navigation.navigationItems) || null
                 : null,
-        nextNavArticle: ArticlePageSelector.selectNextArticle(state),
-        prevNavArticle: ArticlePageSelector.selectPrevArticle(state),
+        nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
+        prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
     };
 }
 

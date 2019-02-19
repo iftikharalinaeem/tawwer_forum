@@ -9,6 +9,9 @@ import NavigationSelector, { ISortedNavItem } from "@knowledge/navigation/state/
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
 export default class ArticlePageSelector {
+    /**
+     * Select the article of the current page.
+     */
     public static selectArticle = createSelector(
         [
             (state: IStoreState) => state.knowledge.articlePage,
@@ -23,6 +26,9 @@ export default class ArticlePageSelector {
         },
     );
 
+    /**
+     * Select the sort data related to the current article.
+     */
     private static selectCurrentArticleSortData = createSelector(
         [ArticlePageSelector.selectArticle, NavigationSelector.selectSortedArticleData],
         (article, articleSortData): ISortedNavItem | null => {
@@ -33,7 +39,10 @@ export default class ArticlePageSelector {
         },
     );
 
-    public static selectNextArticle = createSelector(
+    /**
+     * Select the next article from our navigation data if possible.
+     */
+    public static selectNextNavArticle = createSelector(
         [
             (state: IStoreState) => state.knowledge.navigation.navigationItems,
             ArticlePageSelector.selectCurrentArticleSortData,
@@ -47,7 +56,10 @@ export default class ArticlePageSelector {
         },
     );
 
-    public static selectPrevArticle = createSelector(
+    /**
+     * Select the previous article from our navigation data if possible.
+     */
+    public static selectPrevNavArticle = createSelector(
         [
             (state: IStoreState) => state.knowledge.navigation.navigationItems,
             ArticlePageSelector.selectCurrentArticleSortData,
