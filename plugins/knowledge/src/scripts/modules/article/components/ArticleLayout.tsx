@@ -22,6 +22,7 @@ import UserContent from "@library/components/UserContent";
 import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
 import { connect } from "react-redux";
+import NextPrevious from "@library/components/nextPrevious/NextPrevious";
 
 interface IProps {
     article: IArticle;
@@ -45,6 +46,9 @@ export class ArticleLayout extends React.Component<IProps> {
         if (currentNavigationCategory) {
             title = currentNavigationCategory.name;
         }
+
+        const prevPageLink = undefined; // Temporary for next/prev component
+        const nextPageLink = undefined; // Temporary for next/prev component
 
         return (
             <Container>
@@ -93,9 +97,22 @@ export class ArticleLayout extends React.Component<IProps> {
                         </PanelWidget>
                     }
                     middleBottom={
-                        <PanelWidget>
-                            <UserContent content={article.body} />
-                        </PanelWidget>
+                        <>
+                            <PanelWidget>
+                                <UserContent content={article.body} />
+                            </PanelWidget>
+                            {device === Devices.MOBILE &&
+                                (!!prevPageLink || !!nextPageLink) && (
+                                    <PanelWidget>
+                                        <NextPrevious
+                                            previousTitle={"Advanced Site Apperance Settings Advanced Site Apperance"}
+                                            previousTo={prevPageLink}
+                                            nextTitle={"Handeling special requests efficiently Advanced"}
+                                            nextTo={nextPageLink}
+                                        />
+                                    </PanelWidget>
+                                )}
+                        </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
