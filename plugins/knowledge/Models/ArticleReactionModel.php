@@ -25,6 +25,13 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     const COUNT_NEGATIVE = 2;
     const COUNT_ZERO = 3;
 
+    const EMPTY_RESULT = [
+        'positiveCount' => 0,
+        'negativeCount' => 0,
+        'neutralCount' => 0,
+        'allCount' => 0
+        ];
+
     /** Reaction 'helpful' po. */
     const HELPFUL_POSITIVE = 1;
 
@@ -80,6 +87,27 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
             }
         } else {
             throw new ClientException('No reactions found for article '.$articleID);
+        }
+        return $res;
+    }
+
+    /**
+     * Get reaction counts
+     *
+     * @param int $articleID
+     * @param string $reactionType
+     *
+     * @return array Array of all counts updated
+     *
+     * @throws ClientException If no reactions found for particular articleID and reactionType then throws an exception.
+     */
+    public function getReactionCount(int $articleID, string $reactionType = self::TYPE_HELPFUL): array {
+        $reactionParams = ['articleID' => $articleID, 'reactionType' => $reactionType];
+        $res = $this->get($reactionParams);
+        if (empty($res)) {
+            $res = array_merge($reactionParams, self::EMPTY_RESULT);
+        } else {
+            $res = $res[0];
         }
         return $res;
     }
@@ -143,8 +171,8 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
      */
     public static function getHelpfulReactions(): array {
         return [
+            "no",
             "yes",
-            "no"
         ];
     }
 

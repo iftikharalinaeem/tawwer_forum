@@ -322,6 +322,7 @@ trait ArticlesApiSchemes {
                 'yes:i' => 'Positive reactions count of reaction type',
                 'no:i' => 'Negative reactions count of reaction type',
                 'total:i' => 'Total reactions count of reaction type',
+                'userReacted:b' => 'Flag if current user already reacted on this article',
             ]),
         ]);
     }
