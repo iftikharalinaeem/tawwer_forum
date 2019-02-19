@@ -13,12 +13,28 @@ import { compare } from "@library/utility";
 import { produce } from "immer";
 import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { formatUrl } from "@library/application";
+
+export enum KbRecordType {
+    CATEGORY = "knowledgeCategory",
+    ARTICLE = "article",
+    KB = "knowledgeBase",
+}
 
 /**
  * Model for managing and selection navigation data.
  */
 export default class NavigationModel implements ReduxReducer<INavigationStoreState> {
-    public static readonly ROOT_ID = -1;
+    public static readonly SYNTHETIC_ROOT: INormalizedNavigationItem = {
+        recordType: KbRecordType.CATEGORY,
+        knowledgeBaseID: -1,
+        recordID: -1,
+        name: "Synthetic Root",
+        url: formatUrl("/kb"),
+        parentID: -2,
+        sort: null,
+        children: [],
+    };
 
     public static DEFAULT_STATE = {
         navigationItems: {},
@@ -348,7 +364,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     public static normalizeData(data: IKbNavigationItem[]) {
         data = data.sort(this.sortNavigationItems);
 
-        const normalizedByID: { [id: string]: INormalizedNavigationItem } = {};
+        const normalizedByID: { [id: string]: INormalizedNavigationItem } = {
+            [NavigationModel.SYNTHETIC_ROOT.recordType +
+            NavigationModel.SYNTHETIC_ROOT.recordID]: NavigationModel.SYNTHETIC_ROOT,
+        };
         // Loop through once to generate normalizedIDs
         for (const item of data) {
             const id = item.recordType + item.recordID;
@@ -421,12 +440,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 }
 
 export type ReducerType = KnowledgeReducer<INavigationStoreState>;
-
-export enum KbRecordType {
-    CATEGORY = "knowledgeCategory",
-    ARTICLE = "article",
-    KB = "knowledgeBase",
-}
 
 export interface IKbNavigationItem<R extends KbRecordType = KbRecordType> extends INavigationItem {
     recordType: R;

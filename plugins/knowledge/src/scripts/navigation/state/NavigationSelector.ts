@@ -6,7 +6,7 @@
 import KnowledgeBaseModel, { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ILinkGroup, ILinkListData, INavigationItem, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
-import {
+import NavigationModel, {
     KbRecordType,
     INormalizedNavigationItems,
     IKbNavigationItem,
@@ -41,7 +41,7 @@ export default class NavigationSelector {
      */
     public static selectBreadcrumb(navItems: INormalizedNavigationItems, rootKey: string): ICrumb[] {
         const item = navItems[rootKey];
-        if (!item) {
+        if (!item || item === NavigationModel.SYNTHETIC_ROOT) {
             return [];
         }
 
