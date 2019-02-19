@@ -172,7 +172,7 @@ class SphinxPlugin extends Gdn_Plugin {
      * @return array
      */
     public function discussionsApiController_get_search(DiscussionsApiController $sender, array $query) {
-        $sender->permission('Garden.SignIn.Allow');
+        $sender->permission();
 
         $in = $sender
             ->schema([
