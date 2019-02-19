@@ -112,6 +112,31 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Check if user already reacted on article.
+     *
+     * @param string $reactionType
+     * @param int $articleID
+     * @param int $userID
+     * @return int
+     */
+    public function userReacted(string $reactionType, int $articleID, int $userID): int {
+        $sql = $this->sql()
+            ->from('reaction r')
+            ->select('reactionID')
+            ->where([
+                'ownerType' => self::OWNER_TYPE,
+                'reactionType' => $reactionType,
+                'recordType' => self::RECORD_TYPE,
+                'recordID' => $articleID,
+                'insertUserID' => $userID
+            ])
+            ->limit(1);
+        $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        return is_array($res);
+    }
+
+    /**
      * Return all possible statuses for article record/item
      *
      * @return array

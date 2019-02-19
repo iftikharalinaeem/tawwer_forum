@@ -647,7 +647,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        if ($this->articleReactionModel->userReactionCount(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
+        if ($this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
             throw new ClientException('You already reacted on this article before.');
         }
         $this->reactionModel->insert($fields);
