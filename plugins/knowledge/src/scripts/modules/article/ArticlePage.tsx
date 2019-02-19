@@ -4,33 +4,27 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { match } from "react-router";
-import { connect } from "react-redux";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import { LoadStatus } from "@library/@types/api";
-import { withDevice } from "@library/contexts/DeviceContext";
-import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
-import PageLoader from "@library/components/PageLoader";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import apiv2 from "@library/apiv2";
-import DocumentTitle from "@library/components/DocumentTitle";
 import { ArticleStatus } from "@knowledge/@types/api";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import ArticlePageSelector from "@knowledge/modules/article/ArticlePageSelector";
 import ArticleDeletedMessage from "@knowledge/modules/article/components/ArticleDeletedMessage";
-import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
-import ArticlePageModel, { IInjectableArticlePageState } from "./ArticlePageModel";
-import Permission from "@library/users/Permission";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
-
-interface IProps extends IDeviceProps, IArticleActionsProps, IInjectableArticlePageState {
-    match: match<{
-        id: string;
-    }>;
-    articlePageActions: ArticlePageActions;
-}
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import { IDeviceProps } from "@library/components/DeviceChecker";
+import DocumentTitle from "@library/components/DocumentTitle";
+import { withDevice } from "@library/contexts/DeviceContext";
+import Permission from "@library/users/Permission";
+import React from "react";
+import { connect } from "react-redux";
+import { match } from "react-router";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -44,29 +38,32 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render(): React.ReactNode {
-        const { loadable } = this.props;
-
-        const id = this.articleID;
-        const hasData = loadable.status === LoadStatus.SUCCESS && loadable.data && id;
-        const activeRecord = { recordID: id!, recordType: KbRecordType.ARTICLE };
-
-        if (loadable.status === LoadStatus.ERROR) {
-            return <ErrorPage error={loadable.error} />;
+        const { article } = this.props;
+        const articleID = this.articleID;
+        if (!articleID) {
+            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
+
+        if (article.status === LoadStatus.ERROR) {
+            return <ErrorPage error={article.error} />;
+        }
+
+        const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
+
+        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) || !article.data) {
+            return <NavigationLoadingLayout activeRecord={activeRecord} />;
+        }
+
         return (
-            <PageLoader status={LoadStatus.SUCCESS}>
-                {hasData ? (
-                    <DocumentTitle title={loadable.data!.article.seoName || loadable.data!.article.name}>
-                        <ArticleLayout
-                            article={loadable.data!.article}
-                            breadcrumbData={loadable.data!.article.breadcrumbs!}
-                            messages={this.renderMessages()}
-                        />
-                    </DocumentTitle>
-                ) : (
-                    <NavigationLoadingLayout activeRecord={activeRecord} />
-                )}
-            </PageLoader>
+            <DocumentTitle title={article.data.seoName || article.data.name}>
+                <ArticleLayout
+                    article={article.data}
+                    prevNavArticle={this.props.prevNavArticle}
+                    nextNavArticle={this.props.nextNavArticle}
+                    currentNavCategory={this.props.currentNavCategory}
+                    messages={this.renderMessages()}
+                />
+            </DocumentTitle>
         );
     }
 
@@ -74,8 +71,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * If the component mounts without data we need to intialize it.
      */
     public componentDidMount() {
-        const { loadable } = this.props;
-        if (loadable.status === LoadStatus.PENDING) {
+        const { article } = this.props;
+        if (article.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
 
@@ -100,29 +97,27 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     private renderMessages(): React.ReactNode {
-        const { loadable } = this.props;
+        const { article } = this.props;
         let messages: React.ReactNode;
 
-        if (loadable.data) {
-            if (loadable.data.article.status === ArticleStatus.DELETED) {
-                messages = (
-                    <Permission permission="articles.add">
-                        <ArticleDeletedMessage
-                            onRestoreClick={this.handleRestoreClick}
-                            isLoading={this.props.restoreStatus === LoadStatus.LOADING}
-                        />
-                    </Permission>
-                );
-            }
+        if (article.data && article.data.status === ArticleStatus.DELETED) {
+            messages = (
+                <Permission permission="articles.add">
+                    <ArticleDeletedMessage
+                        onRestoreClick={this.handleRestoreClick}
+                        isLoading={this.props.restoreStatus === LoadStatus.LOADING}
+                    />
+                </Permission>
+            );
         }
 
         return messages;
     }
 
     private handleRestoreClick = async () => {
-        const { articleActions, loadable } = this.props;
+        const { articleActions, article } = this.props;
         await articleActions.patchStatus({
-            articleID: loadable.data!.article.articleID,
+            articleID: article.data!.articleID,
             status: ArticleStatus.PUBLISHED,
         });
     };
@@ -151,10 +146,35 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 }
 
+interface IOwnProps extends IDeviceProps {
+    match: match<{
+        id: string;
+    }>;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { restoreStatus } = state.knowledge.articlePage;
+    const article = ArticlePageSelector.selectArticle(state);
+    const categoryID = article.data ? article.data.knowledgeCategoryID : null;
+
+    return {
+        article,
+        restoreStatus,
+        currentNavCategory:
+            categoryID !== null
+                ? NavigationSelector.selectCategory(categoryID, state.knowledge.navigation.navigationItems) || null
+                : null,
+        nextNavArticle: ArticlePageSelector.selectNextArticle(state),
+        prevNavArticle: ArticlePageSelector.selectPrevArticle(state),
+    };
+}
+
 /**
  * Map in action dispatchable action creators from the store.
  */
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     return {
         articlePageActions: new ArticlePageActions(dispatch, apiv2),
         ...ArticleActions.mapDispatchToProps(dispatch),
@@ -162,8 +182,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 const withRedux = connect(
-    ArticlePageModel.getInjectableState,
+    mapStateToProps,
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice<IProps>(ArticlePage));
+export default withRedux(withDevice(ArticlePage));

@@ -37,7 +37,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     };
 
     public static DEFAULT_STATE = {
-        navigationItems: {},
+        navigationItems: {
+            [NavigationModel.SYNTHETIC_ROOT.recordType +
+            NavigationModel.SYNTHETIC_ROOT.recordID]: NavigationModel.SYNTHETIC_ROOT,
+        },
         navigationItemsByKbID: {},
         submitLoadable: {
             status: LoadStatus.PENDING,
@@ -380,9 +383,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
 
         // Loop through again to gather the children.
         for (const [itemID, itemValue] of Object.entries(normalizedByID)) {
-            if (itemValue.parentID > 0) {
-                const lookupID = "knowledgeCategory" + itemValue.parentID;
-                normalizedByID[lookupID].children.push(itemID);
+            const lookupID = "knowledgeCategory" + itemValue.parentID;
+            const parent = normalizedByID[lookupID];
+            if (parent) {
+                parent.children.push(itemID);
             }
         }
 

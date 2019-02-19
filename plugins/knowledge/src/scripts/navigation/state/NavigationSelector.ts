@@ -4,7 +4,7 @@
  */
 
 import KnowledgeBaseModel, { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { ILinkGroup, ILinkListData, INavigationItem, INavigationTreeItem } from "@library/@types/api";
+import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import NavigationModel, {
     KbRecordType,
@@ -14,10 +14,18 @@ import NavigationModel, {
 import { createSelector } from "reselect";
 import { IStoreState } from "@knowledge/state/model";
 
+export interface ISortedNavItem {
+    ownID: string;
+    prevID: string | null;
+    nextID: string | null;
+}
+
 export default class NavigationSelector {
     public static selectNavigationItems = createSelector(
-        (state: IStoreState) => state.knowledge.navigation.navigationItems,
-        KnowledgeBaseModel.selectKnowledgeBasesAsNavItems,
+        [
+            (state: IStoreState) => state.knowledge.navigation.navigationItems,
+            KnowledgeBaseModel.selectKnowledgeBasesAsNavItems,
+        ],
         (navItems, kbNavItems): INormalizedNavigationItems => {
             const items = {
                 ...navItems,
@@ -32,6 +40,42 @@ export default class NavigationSelector {
             return items;
         },
     );
+
+    public static selectSortedArticleData = createSelector(
+        [(state: IStoreState) => state.knowledge.navigation.navigationItems],
+        navItems => {
+            const root = NavigationModel.SYNTHETIC_ROOT;
+            const sortedTree = NavigationSelector.selectNavTree(navItems, root.recordType + root.recordID);
+            const articles = NavigationSelector.selectAllRecursiveArticles(sortedTree);
+            const result: { [articleID: number]: ISortedNavItem } = {};
+            for (const [index, article] of articles.entries()) {
+                const prev = articles[index - 1];
+                const next = articles[index + 1];
+                result[article.recordID] = {
+                    ownID: article.recordType + article.recordID,
+                    nextID: next ? next.recordType + next.recordID : null,
+                    prevID: prev ? prev.recordType + prev.recordID : null,
+                };
+            }
+            return result;
+        },
+    );
+
+    private static selectAllRecursiveArticles(navItems: INavigationTreeItem) {
+        const results: INavigationTreeItem[] = [];
+        for (const item of navItems.children) {
+            switch (item.recordType) {
+                case KbRecordType.ARTICLE:
+                    results.push(item);
+                    break;
+                case KbRecordType.CATEGORY:
+                    results.push(...NavigationSelector.selectAllRecursiveArticles(item));
+                    break;
+            }
+        }
+
+        return results;
+    }
 
     /**
      * Select the array of breadcrumbs from a set of normalized navigation data.
@@ -119,12 +163,9 @@ export default class NavigationSelector {
      * @param knowledgeCategoryID - Unique ID of the knowledge category to select.
      * @param navItems - An collection of INormalizedNavigationItems elements, indexed by their type and ID.
      */
-    public static selectCategory(
-        knowledgeCategoryID: number,
-        navItems: INormalizedNavigationItems,
-    ): INavigationItem | undefined {
+    public static selectCategory(knowledgeCategoryID: number, navItems: INormalizedNavigationItems) {
         const key = `knowledgeCategory${knowledgeCategoryID}`;
-        return navItems[key];
+        return navItems[key] as IKbNavigationItem<KbRecordType.CATEGORY> | undefined;
     }
 
     public static selectHelpCenterNome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {
