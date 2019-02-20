@@ -10,7 +10,6 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
 

@@ -9,46 +9,32 @@ import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IStoreState } from "@knowledge/state/model";
-import { INavigationItem } from "@library/@types/api";
-import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
-import { Devices } from "@library/components/DeviceChecker";
+import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
+import Breadcrumbs from "@library/components/Breadcrumbs";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
 import UserContent from "@library/components/UserContent";
-import { withDevice } from "@library/contexts/DeviceContext";
 import * as React from "react";
-import { connect } from "react-redux";
 import NextPrevious from "@library/components/nextPrevious/NextPrevious";
-
-interface IProps {
-    article: IArticle;
-    device: Devices;
-    breadcrumbData: ICrumb[];
-    messages?: React.ReactNode;
-    currentNavigationCategory?: INavigationItem;
-}
+import { t } from "@library/application";
+import { withDevice } from "@library/contexts/DeviceContext";
 
 /**
  * Implements the article's layout
  */
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
-        const { article, currentNavigationCategory, messages, device } = this.props;
+        const { article, currentNavCategory, messages, device, nextNavArticle, prevNavArticle } = this.props;
         const { articleID } = article;
 
         const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
 
         let title = "";
-        if (currentNavigationCategory) {
-            title = currentNavigationCategory.name;
+        if (currentNavCategory) {
+            title = currentNavCategory.name;
         }
-
-        const prevPageLink = undefined; // Temporary for next/prev component
-        const nextPageLink = undefined; // Temporary for next/prev component
 
         return (
             <Container>
@@ -101,25 +87,24 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <UserContent content={article.body} />
                             </PanelWidget>
-                            {device === Devices.MOBILE &&
-                                (!!prevPageLink || !!nextPageLink) && (
-                                    <PanelWidget>
-                                        <NextPrevious
-                                            previousTitle={"Advanced Site Apperance Settings Advanced Site Apperance"}
-                                            previousTo={prevPageLink}
-                                            nextTitle={"Handeling special requests efficiently Advanced"}
-                                            nextTo={nextPageLink}
-                                        />
-                                    </PanelWidget>
-                                )}
+                            {device === Devices.MOBILE && (!!prevNavArticle || !!nextNavArticle) && (
+                                <PanelWidget>
+                                    <NextPrevious
+                                        accessibleTitle={t("More Articles")}
+                                        prevItem={prevNavArticle}
+                                        nextItem={nextNavArticle}
+                                    />
+                                </PanelWidget>
+                            )}
                         </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
                         device !== Devices.TABLET && (
                             <PanelWidget>
-                                {article.outline &&
-                                    article.outline.length > 0 && <ArticleTOC items={article.outline} />}
+                                {article.outline && article.outline.length > 0 && (
+                                    <ArticleTOC items={article.outline} />
+                                )}
                             </PanelWidget>
                         )
                     }
@@ -129,27 +114,12 @@ export class ArticleLayout extends React.Component<IProps> {
     }
 }
 
-/**
- * Injectable props from the application state.
- */
-interface IInjectableStoreState {
-    currentNavigationCategory?: INavigationItem;
+interface IProps extends IDeviceProps {
+    article: IArticle;
+    messages?: React.ReactNode;
+    prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
+    nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
+    currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
 }
 
-/**
- * Map elements in the application state to this component's properties.
- * @param state - The full, current state of the application.
- * @param ownProps - Current component instance props.
- */
-function mapStateToProps(state: IStoreState, ownProps: IProps): IInjectableStoreState {
-    const { article } = ownProps;
-    const { knowledgeCategoryID } = article;
-
-    return {
-        currentNavigationCategory: knowledgeCategoryID
-            ? NavigationSelector.selectCategory(knowledgeCategoryID, state.knowledge.navigation.navigationItems)
-            : undefined,
-    };
-}
-
-export default withDevice(connect(mapStateToProps)(ArticleLayout));
+export default withDevice(ArticleLayout);
