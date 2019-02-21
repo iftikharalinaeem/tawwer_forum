@@ -6,13 +6,10 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
-use Exception;
 use Garden\Web\Exception\ClientException;
 use Gdn_Session as SessionInterface;
 use MediaModel;
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
-use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
@@ -23,7 +20,6 @@ use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
@@ -634,7 +630,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function post_reaction(int $id, array $body): array {
+    public function put_react(int $id, array $body): array {
         $this->permission("knowledge.kb.view");
         if (!$this->sessionInterface->isValid()) {
             throw new ClientException('User must be signed in to post reaction.');
