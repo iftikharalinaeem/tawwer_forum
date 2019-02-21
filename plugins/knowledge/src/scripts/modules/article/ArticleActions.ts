@@ -29,6 +29,7 @@ import {
     IPostArticleResponseBody,
     IPostArticleRequestBody,
     IArticleFragment,
+    IArticle,
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
@@ -52,7 +53,7 @@ interface IHelpfulParams {
 export default class ArticleActions extends ReduxActions {
     private static readonly DEFAULT_ARTICLES_LIMIT = 10;
 
-    public static putReactACs = createAction.async<IHelpfulParams, IApiError>("PUT_REACT");
+    public static putReactACs = createAction.async<IHelpfulParams, IArticle, IApiError>("PUT_REACT");
 
     public reactHelpful = (params: IHelpfulParams) => {
         const { articleID, ...body } = params;

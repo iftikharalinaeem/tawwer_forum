@@ -17,15 +17,18 @@ import Button from "@library/components/forms/Button";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
+import ButtonLoader from "@library/components/ButtonLoader";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import classNames from "classnames";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api";
+import { checkCompact } from "@library/components/icons";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { important } from "csx";
 
 export function ArticleReactions(props: IProps) {
+    const { isNoSubmitting, isYesSubmitting } = props;
     const classes = reactionStyles();
-
-    const signInLinkCallback = content => (
-        <SmartLink to={`/entry/signin?target=${window.location.pathname}`} className={classes.link}>
-            {content}
-        </SmartLink>
-    );
 
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
@@ -33,7 +36,8 @@ export function ArticleReactions(props: IProps) {
         return null;
     }
 
-    const { yes, total, userReacted } = helpfulReactions;
+    // Build the text view.
+    const { yes, total, userReaction } = helpfulReactions;
 
     const resultText =
         total < 1 ? (
@@ -42,26 +46,86 @@ export function ArticleReactions(props: IProps) {
             <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
         );
 
-    const title = userReacted ? t("Thanks for your feedback!") : t("Was this article helpful?");
+    const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
+
+    // Build the buttons for the view.
+    const buttonStyles = buttonClasses();
+    const isDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null;
+
+    const noClasses = classNames(
+        {
+            [buttonStyles.primary]: isNoSubmitting || userReaction === "no",
+            [classes.checkedButton]: userReaction === "no",
+        },
+        classes.votingButton,
+    );
+    let noContent: React.ReactNode = t("No");
+    if (userReaction === "no") {
+        noContent = <span className={classes.checkedButtonContent}>{checkCompact()}</span>;
+    }
+    if (isNoSubmitting) {
+        noContent = <ButtonLoader />;
+    }
+    const noButton = (
+        <Button disabled={isDisabled} className={noClasses} onClick={props.onNoClick}>
+            {noContent}
+        </Button>
+    );
+
+    let yesContent: React.ReactNode = t("Yes");
+    if (userReaction === "yes") {
+        yesContent = <span className={classes.checkedButtonContent}>{checkCompact()}</span>;
+    }
+    if (isYesSubmitting) {
+        yesContent = <ButtonLoader />;
+    }
+    const yesClasses = classNames(
+        {
+            [buttonStyles.primary]: isYesSubmitting || userReaction === "yes",
+            [classes.checkedButton]: userReaction === "yes",
+        },
+        classes.votingButton,
+    );
+    const yesButton = (
+        <Button disabled={isDisabled} className={yesClasses} onClick={props.onYesClick}>
+            {yesContent}
+        </Button>
+    );
 
     return (
         <section className={classes.frame}>
             <Heading title={title} className={classes.title} />
             <div className={classes.votingButtons}>
-                <Button className={classes.votingButton} onClick={props.onNoClick}>
-                    {t("No")}
-                </Button>
-                <Button className={classes.votingButton} onClick={props.onYesClick}>
-                    {t("Yes")}
-                </Button>
+                {noButton}
+                {yesButton}
             </div>
-            {!props.isSignedIn && (
-                <Paragraph className={classes.signInText}>
-                    <Translate source={"You need to <0>Sign In</0> to vote on this article"} c0={signInLinkCallback} />
-                </Paragraph>
-            )}
+            <SignInLink isSignedIn={props.isSignedIn} />
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
+    );
+}
+
+/**
+ * Small subcomponent for rendering a sign in prompt for signed out users.
+ */
+function SignInLink(props: { isSignedIn: boolean }) {
+    if (props.isSignedIn) {
+        return null;
+    }
+
+    const classes = reactionStyles();
+
+    // Signin Link
+    const signInLinkCallback = content => (
+        <SmartLink to={`/entry/signin?target=${window.location.pathname}`} className={classes.link}>
+            {content}
+        </SmartLink>
+    );
+
+    return (
+        <Paragraph className={classes.signInText}>
+            <Translate source={"You need to <0>Sign In</0> to vote on this article"} c0={signInLinkCallback} />
+        </Paragraph>
     );
 }
 
@@ -80,7 +144,17 @@ function reactionStyles(theme?: object) {
     });
 
     const votingButton = style({
+        textAlign: "center",
         margin: 8,
+    });
+
+    const checkedButtonContent = style({
+        ...flexHelper().middle(),
+        width: "100%",
+    });
+
+    const checkedButton = style({
+        opacity: important(1) as any,
     });
 
     const votingButtons = style({
@@ -101,7 +175,17 @@ function reactionStyles(theme?: object) {
         fontWeight: vars.fonts.weights.bold,
     });
 
-    return { link, title, frame, votingButton, votingButtons, resultText, signInText };
+    return {
+        link,
+        title,
+        frame,
+        votingButton,
+        checkedButtonContent,
+        checkedButton,
+        votingButtons,
+        resultText,
+        signInText,
+    };
 }
 
 interface IOwnProps {
@@ -111,13 +195,23 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IUsersStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IUsersStoreState & IStoreState, ownProps: IOwnProps) {
+    const currentUser = state.users.current;
+    const reactionLoadable = state.knowledge.articlePage.reactionLoadable;
     let isSignedIn = false;
-    if (state.users.current.data && state.users.current.data.userID !== UsersModel.GUEST_ID) {
+    if (currentUser.data && currentUser.data.userID !== UsersModel.GUEST_ID) {
         isSignedIn = true;
     }
     return {
         isSignedIn,
+        isYesSubmitting:
+            reactionLoadable.status === LoadStatus.LOADING &&
+            reactionLoadable.data &&
+            reactionLoadable.data.reaction === "yes",
+        isNoSubmitting:
+            reactionLoadable.status === LoadStatus.LOADING &&
+            reactionLoadable.data &&
+            reactionLoadable.data.reaction === "no",
     };
 }
 

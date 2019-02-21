@@ -57,7 +57,7 @@ export interface IArticleReaction {
     yes: number;
     no: number;
     total: number;
-    userReacted: boolean;
+    userReaction: "yes" | "no" | null;
 }
 
 interface IArticleServerManagedData extends IExpandedInsertUpdate {
