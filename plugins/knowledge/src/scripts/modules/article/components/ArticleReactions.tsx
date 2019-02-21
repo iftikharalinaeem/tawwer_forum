@@ -14,6 +14,9 @@ import Paragraph from "@library/components/Paragraph";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
 import Button from "@library/components/forms/Button";
+import { IArticle, ArticleReactionType } from "@knowledge/@types/api";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import apiv2 from "@library/apiv2";
 
 function ArticleReactions(props: IProps) {
     const classes = reactionStyles();
@@ -24,12 +27,26 @@ function ArticleReactions(props: IProps) {
         </SmartLink>
     );
 
+    const helpfulReactions = props.article.reactions.find(
+        article => article.reactionType === ArticleReactionType.HELPFUL,
+    );
+
+    if (!helpfulReactions) {
+        return null;
+    }
+
+    const { yes, total, userReacted } = helpfulReactions;
+
     return (
         <section className={classes.frame}>
             <Heading title={t("Was this article helpful?")} className={classes.title} />
             <div className={classes.votingButtons}>
-                <Button className={classes.votingButton}>{t("No")}</Button>
-                <Button className={classes.votingButton}>{t("Yes")}</Button>
+                <Button className={classes.votingButton} onClick={props.onNoClick}>
+                    {t("No")}
+                </Button>
+                <Button className={classes.votingButton} onClick={props.onYesClick}>
+                    {t("Yes")}
+                </Button>
             </div>
             {!props.user ||
                 (props.user.userID === UsersModel.GUEST_ID && (
@@ -40,7 +57,9 @@ function ArticleReactions(props: IProps) {
                         />
                     </Paragraph>
                 ))}
-            <Paragraph className={classes.resultText}>{t("5 out of 6 people found this helpful")}</Paragraph>
+            <Paragraph className={classes.resultText}>
+                <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
+            </Paragraph>
         </section>
     );
 }
@@ -84,9 +103,11 @@ function reactionStyles(theme?: object) {
     return { link, title, frame, votingButton, votingButtons, resultText, signInText };
 }
 
-interface IOwnProps {}
+interface IOwnProps {
+    article: IArticle;
+}
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps>;
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IUsersStoreState, ownProps: IOwnProps) {
     return {
@@ -94,4 +115,25 @@ function mapStateToProps(state: IUsersStoreState, ownProps: IOwnProps) {
     };
 }
 
-export default connect(mapStateToProps)(ArticleReactions);
+function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
+    const { articleID } = ownProps.article;
+    const articleActions = new ArticleActions(dispatch, apiv2);
+
+    return {
+        onYesClick: () =>
+            articleActions.reactHelpful({
+                articleID,
+                helpful: "yes",
+            }),
+        onNoClick: () =>
+            articleActions.reactHelpful({
+                articleID,
+                helpful: "yes",
+            }),
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(ArticleReactions);

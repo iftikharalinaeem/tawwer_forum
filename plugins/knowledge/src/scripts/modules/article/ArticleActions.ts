@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/state/ReduxActions";
 import {
     IPatchArticleStatusResponseBody,
     IPatchArticleStatusRequestBody,
@@ -32,10 +32,18 @@ import {
 } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
-import { IApiResponse } from "@library/@types/api";
+import { IApiResponse, IApiError } from "@library/@types/api";
+import actionCreatorFactory from "typescript-fsa";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
+}
+
+const createAction = actionCreatorFactory("@@article");
+
+interface IHelpfulParams {
+    articleID: number;
+    helpful: "yes" | "no";
 }
 
 /**
@@ -43,6 +51,21 @@ export interface IArticleActionsProps {
  */
 export default class ArticleActions extends ReduxActions {
     private static readonly DEFAULT_ARTICLES_LIMIT = 10;
+
+    public static putReactACs = createAction.async<IHelpfulParams, IApiError>("PUT_REACT");
+
+    public reactHelpful = (params: IHelpfulParams) => {
+        const { articleID, ...body } = params;
+        const apiThunk = bindThunkAction(ArticleActions.putReactACs, async () => {
+            const response = await this.api.put(`/articles/${articleID}/react`, body);
+            return response.data;
+        })(params);
+        return this.dispatch(apiThunk);
+    };
+
+    // FSA actions.
+
+    // Old style actions
 
     public static readonly GET_ARTICLE_REQUEST = "@@article/GET_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";

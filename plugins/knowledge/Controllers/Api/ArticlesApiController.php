@@ -619,7 +619,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * POST reaction on article ('helpful').
+     * PUT reaction on article ('helpful').
      *
      * @param int $id ArticleID
      * @param array $body Incoming json array with 'reaction' key.

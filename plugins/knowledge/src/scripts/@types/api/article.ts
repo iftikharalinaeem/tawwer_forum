@@ -48,12 +48,12 @@ export interface IOutlineItem {
     text: string; // The text content of the heading.
 }
 
-enum ReactionType {
+export enum ArticleReactionType {
     HELPFUL = "helpful",
 }
 
 export interface IArticleReaction {
-    reactionType: ReactionType;
+    reactionType: ArticleReactionType;
     yes: number;
     no: number;
     total: number;
