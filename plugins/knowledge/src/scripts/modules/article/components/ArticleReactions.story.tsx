@@ -6,21 +6,10 @@
 
 import React from "react";
 import { storiesOf } from "@storybook/react";
-import { select, date } from "@storybook/addon-knobs";
 import { ArticleReactions } from "@knowledge/modules/article/components/ArticleReactions";
 import { ArticleReactionType } from "@knowledge/@types/api";
 
 storiesOf("KnowledgeBase/Articles", module).add("Reactions", () => {
-    // const mode = select(
-    //     "mode",
-    //     {
-    //         fixed: "fixed",
-    //         relative: "relative",
-    //     },
-    //     "fixed",
-    // );
-
-    // const day = date("timestamp", new Date("Jan 20 2017"));
     const noop = () => {
         return;
     };
@@ -42,6 +31,4 @@ storiesOf("KnowledgeBase/Articles", module).add("Reactions", () => {
             onNoClick={noop}
         />
     );
-
-    // return <DateTime timestamp={new Date(day).toISOString()} mode={mode} />;
 });

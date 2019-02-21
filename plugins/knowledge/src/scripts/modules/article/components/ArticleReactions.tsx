@@ -14,7 +14,7 @@ import Paragraph from "@library/components/Paragraph";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
 import Button from "@library/components/forms/Button";
-import { IArticle, ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
+import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 
