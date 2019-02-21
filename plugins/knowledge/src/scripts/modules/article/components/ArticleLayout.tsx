@@ -89,7 +89,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <UserContent content={article.body} />
                             </PanelWidget>
                             <PanelWidget>
-                                <ArticleReactions article={article} />
+                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
                             </PanelWidget>
                             {device === Devices.MOBILE && (!!prevNavArticle || !!nextNavArticle) && (
                                 <PanelWidget>

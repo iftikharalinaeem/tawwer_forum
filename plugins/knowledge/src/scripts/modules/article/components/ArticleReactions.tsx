@@ -35,9 +35,18 @@ export function ArticleReactions(props: IProps) {
 
     const { yes, total, userReacted } = helpfulReactions;
 
+    const resultText =
+        total < 1 ? (
+            t("Be the first one to vote!")
+        ) : (
+            <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
+        );
+
+    const title = userReacted ? t("Thanks for your feedback!") : t("Was this article helpful?");
+
     return (
         <section className={classes.frame}>
-            <Heading title={t("Was this article helpful?")} className={classes.title} />
+            <Heading title={title} className={classes.title} />
             <div className={classes.votingButtons}>
                 <Button className={classes.votingButton} onClick={props.onNoClick}>
                     {t("No")}
@@ -51,9 +60,7 @@ export function ArticleReactions(props: IProps) {
                     <Translate source={"You need to <0>Sign In</0> to vote on this article"} c0={signInLinkCallback} />
                 </Paragraph>
             )}
-            <Paragraph className={classes.resultText}>
-                <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
-            </Paragraph>
+            <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
     );
 }
@@ -127,7 +134,7 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
         onNoClick: () =>
             articleActions.reactHelpful({
                 articleID,
-                helpful: "yes",
+                helpful: "no",
             }),
     };
 }
