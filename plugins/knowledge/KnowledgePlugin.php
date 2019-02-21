@@ -99,7 +99,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param mixed $sender Sender object.
      */
     public function base_afterDiscussionFilters_handler($sender) {
-        echo '<li class="Knowledge">'.anchor(sprite('Knowledge').' '.t('Help'), '/kb').'</li> ';
+        echo '<li class="Knowledge">'.anchor(t('Help'), '/kb').'</li> ';
     }
 
     /**
