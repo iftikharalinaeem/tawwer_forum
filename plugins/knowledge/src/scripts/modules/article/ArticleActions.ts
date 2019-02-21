@@ -33,7 +33,6 @@ import {
 import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
 import { IApiResponse } from "@library/@types/api";
-import { IStoreState } from "@knowledge/state/model";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
