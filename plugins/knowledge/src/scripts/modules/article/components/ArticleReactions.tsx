@@ -14,11 +14,11 @@ import Paragraph from "@library/components/Paragraph";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
 import Button from "@library/components/forms/Button";
-import { IArticle, ArticleReactionType } from "@knowledge/@types/api";
+import { IArticle, ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 
-function ArticleReactions(props: IProps) {
+export function ArticleReactions(props: IProps) {
     const classes = reactionStyles();
 
     const signInLinkCallback = content => (
@@ -27,9 +27,7 @@ function ArticleReactions(props: IProps) {
         </SmartLink>
     );
 
-    const helpfulReactions = props.article.reactions.find(
-        article => article.reactionType === ArticleReactionType.HELPFUL,
-    );
+    const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
     if (!helpfulReactions) {
         return null;
@@ -48,15 +46,11 @@ function ArticleReactions(props: IProps) {
                     {t("Yes")}
                 </Button>
             </div>
-            {!props.user ||
-                (props.user.userID === UsersModel.GUEST_ID && (
-                    <Paragraph className={classes.signInText}>
-                        <Translate
-                            source={"You need to <0>Sign In</0> to vote on this article"}
-                            c0={signInLinkCallback}
-                        />
-                    </Paragraph>
-                ))}
+            {!props.isSignedIn && (
+                <Paragraph className={classes.signInText}>
+                    <Translate source={"You need to <0>Sign In</0> to vote on this article"} c0={signInLinkCallback} />
+                </Paragraph>
+            )}
             <Paragraph className={classes.resultText}>
                 <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
             </Paragraph>
@@ -104,19 +98,24 @@ function reactionStyles(theme?: object) {
 }
 
 interface IOwnProps {
-    article: IArticle;
+    articleID: number;
+    reactions: IArticleReaction[];
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IUsersStoreState, ownProps: IOwnProps) {
+    let isSignedIn = false;
+    if (state.users.current.data && state.users.current.data.userID !== UsersModel.GUEST_ID) {
+        isSignedIn = true;
+    }
     return {
-        user: state.users.current.data,
+        isSignedIn,
     };
 }
 
 function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
-    const { articleID } = ownProps.article;
+    const { articleID } = ownProps;
     const articleActions = new ArticleActions(dispatch, apiv2);
 
     return {
