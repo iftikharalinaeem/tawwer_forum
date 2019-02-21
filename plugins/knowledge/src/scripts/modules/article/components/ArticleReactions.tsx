@@ -3,28 +3,25 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { t } from "@library/application";
-import Translate from "@library/components/translation/Translate";
-import SmartLink from "@library/components/navigation/SmartLink";
-import { connect } from "react-redux";
-import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
-import Heading from "@library/components/Heading";
-import Paragraph from "@library/components/Paragraph";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { style } from "typestyle";
-import Button from "@library/components/forms/Button";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import apiv2 from "@library/apiv2";
-import ButtonLoader from "@library/components/ButtonLoader";
-import { buttonClasses } from "@library/styles/buttonStyles";
-import classNames from "classnames";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import { t } from "@library/application";
+import ButtonLoader from "@library/components/ButtonLoader";
+import Button from "@library/components/forms/Button";
+import Heading from "@library/components/Heading";
 import { checkCompact } from "@library/components/icons";
-import { flexHelper } from "@library/styles/styleHelpers";
-import { important } from "csx";
+import SmartLink from "@library/components/navigation/SmartLink";
+import Paragraph from "@library/components/Paragraph";
+import Translate from "@library/components/translation/Translate";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
+import classNames from "classnames";
+import React from "react";
+import { connect } from "react-redux";
+import { reactionStyles } from "@knowledge/modules/article/components/articleReactionStyles";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting } = props;
@@ -32,11 +29,12 @@ export function ArticleReactions(props: IProps) {
 
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
+    // If we don't have reaction data bail out early.
     if (!helpfulReactions) {
         return null;
     }
 
-    // Build the text view.
+    // Build the text for the view.
     const { yes, total, userReaction } = helpfulReactions;
 
     const resultText =
@@ -48,60 +46,73 @@ export function ArticleReactions(props: IProps) {
 
     const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
 
-    // Build the buttons for the view.
-    const buttonStyles = buttonClasses();
-    const isDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null;
-
-    const noClasses = classNames(
-        {
-            [buttonStyles.primary]: isNoSubmitting || userReaction === "no",
-            [classes.checkedButton]: userReaction === "no",
-        },
-        classes.votingButton,
-    );
-    let noContent: React.ReactNode = t("No");
-    if (userReaction === "no") {
-        noContent = <span className={classes.checkedButtonContent}>{checkCompact()}</span>;
-    }
-    if (isNoSubmitting) {
-        noContent = <ButtonLoader />;
-    }
-    const noButton = (
-        <Button disabled={isDisabled} className={noClasses} onClick={props.onNoClick}>
-            {noContent}
-        </Button>
-    );
-
-    let yesContent: React.ReactNode = t("Yes");
-    if (userReaction === "yes") {
-        yesContent = <span className={classes.checkedButtonContent}>{checkCompact()}</span>;
-    }
-    if (isYesSubmitting) {
-        yesContent = <ButtonLoader />;
-    }
-    const yesClasses = classNames(
-        {
-            [buttonStyles.primary]: isYesSubmitting || userReaction === "yes",
-            [classes.checkedButton]: userReaction === "yes",
-        },
-        classes.votingButton,
-    );
-    const yesButton = (
-        <Button disabled={isDisabled} className={yesClasses} onClick={props.onYesClick}>
-            {yesContent}
-        </Button>
-    );
+    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || !props.isSignedIn;
 
     return (
         <section className={classes.frame}>
             <Heading title={title} className={classes.title} />
             <div className={classes.votingButtons}>
-                {noButton}
-                {yesButton}
+                <ReactionButton
+                    reactionData={helpfulReactions}
+                    isSignedIn={props.isSignedIn}
+                    title={t("Yes")}
+                    reactionValue="yes"
+                    isSubmitting={!!isYesSubmitting}
+                    isDisabled={buttonsDisabled}
+                    onClick={props.onYesClick}
+                />
+                <ReactionButton
+                    reactionData={helpfulReactions}
+                    isSignedIn={props.isSignedIn}
+                    title={t("No")}
+                    reactionValue="no"
+                    isSubmitting={!!isNoSubmitting}
+                    isDisabled={buttonsDisabled}
+                    onClick={props.onNoClick}
+                />
             </div>
             <SignInLink isSignedIn={props.isSignedIn} />
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
+    );
+}
+
+/**
+ * Small subcomponent for rendering a single reaction button.
+ */
+function ReactionButton(props: {
+    reactionData: IArticleReaction;
+    isSignedIn: boolean;
+    title: string;
+    reactionValue: string;
+    isSubmitting: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+}) {
+    const { reactionValue, reactionData, title, isSubmitting, isDisabled, onClick } = props;
+    const { userReaction } = reactionData;
+    const buttonStyles = buttonClasses();
+    const styles = reactionStyles();
+
+    // Content can be either a checkbox, a loader, or some text.
+    let content: React.ReactNode = title;
+    if (userReaction === reactionValue) {
+        content = <span className={styles.checkedButtonContent}>{checkCompact()}</span>;
+    }
+    if (isSubmitting) {
+        content = <ButtonLoader />;
+    }
+    const classes = classNames(
+        {
+            [buttonStyles.primary]: isSubmitting || userReaction === reactionValue,
+            [styles.checkedButton]: userReaction === reactionValue,
+        },
+        styles.votingButton,
+    );
+    return (
+        <Button disabled={isDisabled} className={classes} onClick={onClick}>
+            {content}
+        </Button>
     );
 }
 
@@ -129,65 +140,6 @@ function SignInLink(props: { isSignedIn: boolean }) {
     );
 }
 
-function reactionStyles(theme?: object) {
-    const vars = globalVariables(theme);
-
-    const frame = style({
-        paddingTop: vars.baseUnit * 2,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-    });
-
-    const title = style({
-        fontSize: vars.fonts.size.large,
-    });
-
-    const votingButton = style({
-        textAlign: "center",
-        margin: 8,
-    });
-
-    const checkedButtonContent = style({
-        ...flexHelper().middle(),
-        width: "100%",
-    });
-
-    const checkedButton = style({
-        opacity: important(1) as any,
-    });
-
-    const votingButtons = style({
-        padding: 8,
-    });
-
-    const resultText = style({
-        fontSize: vars.meta.fontSize,
-        color: vars.meta.color.toString(),
-    });
-
-    const signInText = style({
-        fontSize: vars.fonts.size.large,
-    });
-
-    const link = style({
-        color: vars.links.color.toString(),
-        fontWeight: vars.fonts.weights.bold,
-    });
-
-    return {
-        link,
-        title,
-        frame,
-        votingButton,
-        checkedButtonContent,
-        checkedButton,
-        votingButtons,
-        resultText,
-        signInText,
-    };
-}
-
 interface IOwnProps {
     articleID: number;
     reactions: IArticleReaction[];
@@ -195,6 +147,9 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
+/**
+ * Map in state from the redux store.
+ */
 function mapStateToProps(state: IUsersStoreState & IStoreState, ownProps: IOwnProps) {
     const currentUser = state.users.current;
     const reactionLoadable = state.knowledge.articlePage.reactionLoadable;
@@ -215,6 +170,9 @@ function mapStateToProps(state: IUsersStoreState & IStoreState, ownProps: IOwnPr
     };
 }
 
+/**
+ * Map in some bound actions.
+ */
 function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     const { articleID } = ownProps;
     const articleActions = new ArticleActions(dispatch, apiv2);
