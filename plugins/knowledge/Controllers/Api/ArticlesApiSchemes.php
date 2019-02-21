@@ -317,7 +317,7 @@ trait ArticlesApiSchemes {
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
             ]),
-            "reaction:a?" => Schema::parse([
+            "reactions:a?" => Schema::parse([
                 'reactionType:s' => ['enum' => ArticleReactionModel::getReactionTypes()],
                 'yes:i' => 'Positive reactions count of reaction type',
                 'no:i' => 'Negative reactions count of reaction type',
