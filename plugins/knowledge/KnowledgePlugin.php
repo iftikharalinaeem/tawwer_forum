@@ -85,7 +85,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /**
      * Add the knowledge base "Help" link to the main menu.
      *
-     * @param $sender
+     * @param mixed $sender Sender object.
      */
     public function base_render_before($sender) {
         if (is_object($menu = getValue('Menu', $sender))) {
