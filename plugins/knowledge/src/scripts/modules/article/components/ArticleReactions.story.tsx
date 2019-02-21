@@ -22,13 +22,15 @@ storiesOf("KnowledgeBase/Articles", module).add("Reactions", () => {
                     yes: 10,
                     no: 4,
                     total: 20,
-                    userReacted: true,
+                    userReaction: null,
                 },
             ]}
             articleID={1}
             isSignedIn={true}
             onYesClick={noop}
             onNoClick={noop}
+            isYesSubmitting={false}
+            isNoSubmitting={true}
         />
     );
 });

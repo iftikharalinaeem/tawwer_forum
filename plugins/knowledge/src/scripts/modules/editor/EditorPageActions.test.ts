@@ -93,6 +93,7 @@ describe("EditorPageActions", () => {
         format: "rich",
         locale: "en",
         url: "/kb/articles/1-example-article",
+        reactions: [],
     };
 
     const dummyEditArticle = {
