@@ -220,7 +220,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
             'no' => (int)$reactionCounts['neutralCount'] ?? 0,
             'total' => (int)$reactionCounts['allCount'] ?? 0,
-            'userReacted' => $this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID)
+            'userReaction' => $this->articleReactionModel->getUserReaction(
+                ArticleReactionModel::TYPE_HELPFUL,
+                $id,
+                $this->sessionInterface->UserID
+            ),
         ];
 
         $article = $this->normalizeOutput($article);
@@ -652,7 +656,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        if ($this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
+        $existingReactionValue = $this->articleReactionModel->getUserReaction(
+            ArticleReactionModel::TYPE_HELPFUL,
+            $id,
+            $this->sessionInterface->UserID
+        );
+
+        if ($existingReactionValue !== null) {
             throw new ClientException('You already reacted on this article before.');
         }
         $this->reactionModel->insert($fields);
@@ -660,13 +670,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleByID($id, true);
 
+        $newReactionValue = $this->articleReactionModel->getUserReaction(
+            ArticleReactionModel::TYPE_HELPFUL,
+            $id,
+            $this->sessionInterface->UserID
+        );
         $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['reactions'][]  = [
             'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
             'yes' => (int)$reactionCounts['positiveCount'],
             'no' => (int)$reactionCounts['neutralCount'],
             'total' => (int)$reactionCounts['allCount'],
-            'userReacted' => true
+            'userReaction' => $newReactionValue,
         ];
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
