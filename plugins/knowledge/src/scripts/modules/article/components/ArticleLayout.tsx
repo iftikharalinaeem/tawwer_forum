@@ -87,24 +87,24 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <UserContent content={article.body} />
                             </PanelWidget>
-                            {device === Devices.MOBILE && (!!prevNavArticle || !!nextNavArticle) && (
-                                <PanelWidget>
-                                    <NextPrevious
-                                        accessibleTitle={t("More Articles")}
-                                        prevItem={prevNavArticle}
-                                        nextItem={nextNavArticle}
-                                    />
-                                </PanelWidget>
-                            )}
+                            {device === Devices.MOBILE &&
+                                (!!prevNavArticle || !!nextNavArticle) && (
+                                    <PanelWidget>
+                                        <NextPrevious
+                                            accessibleTitle={t("More Articles")}
+                                            prevItem={prevNavArticle}
+                                            nextItem={nextNavArticle}
+                                        />
+                                    </PanelWidget>
+                                )}
                         </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
                         device !== Devices.TABLET && (
                             <PanelWidget>
-                                {article.outline && article.outline.length > 0 && (
-                                    <ArticleTOC items={article.outline} />
-                                )}
+                                {article.outline &&
+                                    article.outline.length > 0 && <ArticleTOC items={article.outline} />}
                             </PanelWidget>
                         )
                     }
