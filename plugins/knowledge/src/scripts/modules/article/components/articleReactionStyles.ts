@@ -5,14 +5,15 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
-import { important } from "csx";
+import { important, percent } from "csx";
+import { GlobalsNumber } from "csstype";
 
 export function reactionClasses(theme?: object) {
     const style = styleFactory("reactions");
     const vars = globalVariables(theme);
 
     const frame = style({
-        paddingTop: vars.baseUnit * 2,
+        paddingTop: 12,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -30,13 +31,13 @@ export function reactionClasses(theme?: object) {
     const checkedButtonContent = style(
         "checkButtonContent",
         {
-            width: "100%",
+            width: percent(100),
         },
         flexHelper().middle(),
     );
 
     const checkedButton = style("checkedButton", {
-        opacity: important(1) as any,
+        opacity: important(1) as GlobalsNumber,
     });
 
     const votingButtons = style("votingButton", {
