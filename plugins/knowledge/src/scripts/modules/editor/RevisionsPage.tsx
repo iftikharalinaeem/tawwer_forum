@@ -13,8 +13,8 @@ import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayou
 import PageLoader from "@library/components/PageLoader";
 import DocumentTitle from "@library/components/DocumentTitle";
 import { t } from "@library/application";
-import RevisionsPageModel, { IInjectableRevisionsState } from "./RevisionsPageModel";
-import RevisionsPageActions, { IInjectableRevisionsPageActions } from "./RevisionsPageActions";
+import RevisionsPageModel from "./RevisionsPageModel";
+import RevisionsPageActions from "./RevisionsPageActions";
 import { Modal, ModalSizes } from "@library/components/modal";
 import { LoadStatus } from "@library/@types/api";
 import UserContent from "@library/components/UserContent";
@@ -25,17 +25,8 @@ import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
-
-interface IProps
-    extends IDeviceProps,
-        IInjectableRevisionsState,
-        RouteComponentProps<{
-            id: string;
-            revisionID?: string;
-        }> {
-    revisionsPageActions: RevisionsPageActions;
-    articleActions: ArticleActions;
-}
+import { IStoreState } from "@knowledge/state/model";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -108,8 +99,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             revisions.data && (
                 <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
                     {revisions.data.slice().map(item => {
-                        const preload = () =>
-                            this.props.articleActions.fetchRevisionByID({ revisionID: item.articleRevisionID });
+                        const preload = () => this.props.preloadRevision(item.articleRevisionID);
                         return (
                             <RevisionsListItem
                                 {...item}
@@ -143,7 +133,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             void this.initializeFromUrl();
         } else if (params.revisionID !== prevParams.revisionID) {
             const revisionID = params.revisionID !== undefined ? parseInt(params.revisionID, 10) : undefined;
-            this.props.revisionsPageActions.setActiveRevision(revisionID);
+            this.props.setActiveRevision(revisionID);
         }
     }
 
@@ -151,7 +141,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * When the component unmounts we need to be sure to clear out the data we requested in componentDidMount.
      */
     public componentWillUnmount() {
-        this.props.revisionsPageActions.reset();
+        this.props.reset();
     }
 
     /**
@@ -182,24 +172,62 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Initialize the page's data from it's url.
      */
     private async initializeFromUrl() {
-        const { revisionsPageActions } = this.props;
         const { id, revisionID } = this.props.match.params;
 
         const numID = parseInt(id, 10);
         const numRevID = revisionID !== undefined ? parseInt(revisionID, 10) : undefined;
-        await revisionsPageActions.setActiveArticle(numID);
-        await revisionsPageActions.setActiveRevision(numRevID);
+        await this.props.setActiveArticle(numID);
+        await this.props.setActiveRevision(numRevID);
     }
 }
 
+interface IOwnProps
+    extends IDeviceProps,
+        RouteComponentProps<{
+            id: string;
+            revisionID?: string;
+        }> {}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+    const { revisionsPage } = state.knowledge;
+    const { selectedRevisionID, selectedRevisionStatus, revisionsStatus, articleID, articleStatus } = revisionsPage;
+    const article = articleID ? ArticleModel.selectArticle(state, articleID) : null;
+    return {
+        // article:
+        revisions: {
+            ...revisionsStatus,
+            data: RevisionsPageModel.selectRevisions(state),
+        },
+        article: {
+            ...articleStatus,
+            data: article || undefined,
+        },
+        selectedRevision: {
+            ...selectedRevisionStatus,
+            data: RevisionsPageModel.selectActiveRevision(state),
+        },
+        selectedRevisionID,
+    };
+}
+
+function mapDispatchToProps(dispatch: any) {
+    const articleActions = new ArticleActions(dispatch, apiv2);
+    const revisionsPageActions = new RevisionsPageActions(dispatch, apiv2);
+    const { setActiveRevision, setActiveArticle, reset } = revisionsPageActions;
+
+    return {
+        preloadRevision: (revisionID: number) => articleActions.fetchRevisionByID({ revisionID }),
+        setActiveRevision,
+        setActiveArticle,
+        reset,
+    };
+}
+
 const withRedux = connect(
-    RevisionsPageModel.getInjectableProps,
-    dispatch => {
-        return {
-            articleActions: new ArticleActions(dispatch, apiv2),
-            revisionsPageActions: new RevisionsPageActions(dispatch, apiv2),
-        };
-    },
+    mapStateToProps,
+    mapDispatchToProps,
 );
 
 export default withRedux(withDevice(RevisionsPage));

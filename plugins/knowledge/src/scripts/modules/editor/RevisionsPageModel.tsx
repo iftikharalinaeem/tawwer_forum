@@ -12,7 +12,6 @@ import { IRevisionFragment, IRevision, IArticle } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
-import { ICrumb } from "@library/components/Breadcrumbs";
 
 export interface IRevisionsPageState {
     articleID: number | null;
@@ -20,13 +19,6 @@ export interface IRevisionsPageState {
     revisionIDs: number[];
     revisionsStatus: ILoadable<any>;
     selectedRevisionStatus: ILoadable<any>;
-    selectedRevisionID: number | null;
-}
-
-export interface IInjectableRevisionsState {
-    article: ILoadable<IArticle>;
-    revisions: ILoadable<IRevisionFragment[]>;
-    selectedRevision: ILoadable<IRevision | null>;
     selectedRevisionID: number | null;
 }
 
@@ -44,7 +36,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         if (revs.length === 0) {
             return null;
         } else {
-            return revs[revs.length - 1];
+            return revs[0];
         }
     }
 
@@ -67,33 +59,6 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
     public static selectRevisions(state: IStoreState): IRevisionFragment[] {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionIDs.map(id => ArticleModel.selectRevisionFragment(state, id)!);
-    }
-
-    /**
-     * Get props for injecting into react.
-     *
-     * @param state A full state object.
-     */
-    public static getInjectableProps(state: IStoreState): IInjectableRevisionsState {
-        const stateSlice = RevisionsPageModel.stateSlice(state);
-        const { selectedRevisionID, selectedRevisionStatus, revisionsStatus, articleID, articleStatus } = stateSlice;
-        const article = articleID ? ArticleModel.selectArticle(state, articleID) : null;
-        return {
-            // article:
-            revisions: {
-                ...revisionsStatus,
-                data: RevisionsPageModel.selectRevisions(state),
-            },
-            article: {
-                ...articleStatus,
-                data: article || undefined,
-            },
-            selectedRevision: {
-                ...selectedRevisionStatus,
-                data: RevisionsPageModel.selectActiveRevision(state),
-            },
-            selectedRevisionID,
-        };
     }
 
     /**
