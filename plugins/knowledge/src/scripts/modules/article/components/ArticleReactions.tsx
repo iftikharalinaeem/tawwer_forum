@@ -21,11 +21,11 @@ import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { reactionStyles } from "@knowledge/modules/article/components/articleReactionStyles";
+import { reactionClasses } from "@knowledge/modules/article/components/articleReactionStyles";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting } = props;
-    const classes = reactionStyles();
+    const classes = reactionClasses();
 
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
@@ -91,8 +91,8 @@ function ReactionButton(props: {
 }) {
     const { reactionValue, reactionData, title, isSubmitting, isDisabled, onClick } = props;
     const { userReaction } = reactionData;
-    const buttonStyles = buttonClasses();
-    const styles = reactionStyles();
+    const classesButton = buttonClasses();
+    const styles = reactionClasses();
 
     // Content can be either a checkbox, a loader, or some text.
     let content: React.ReactNode = title;
@@ -104,7 +104,7 @@ function ReactionButton(props: {
     }
     const classes = classNames(
         {
-            [buttonStyles.primary]: isSubmitting || userReaction === reactionValue,
+            [classesButton.primary]: isSubmitting || userReaction === reactionValue,
             [styles.checkedButton]: userReaction === reactionValue,
         },
         styles.votingButton,
@@ -124,7 +124,7 @@ function SignInLink(props: { isSignedIn: boolean }) {
         return null;
     }
 
-    const classes = reactionStyles();
+    const classes = reactionClasses();
 
     // Signin Link
     const signInLinkCallback = content => (

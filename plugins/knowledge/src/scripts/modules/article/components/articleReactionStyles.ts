@@ -8,7 +8,7 @@ import { style } from "typestyle";
 import { flexHelper } from "@library/styles/styleHelpers";
 import { important } from "csx";
 
-export function reactionStyles(theme?: object) {
+export function reactionClasses(theme?: object) {
     const vars = globalVariables(theme);
 
     const frame = style({
