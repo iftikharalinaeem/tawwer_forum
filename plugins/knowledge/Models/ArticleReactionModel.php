@@ -25,6 +25,13 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     const COUNT_NEGATIVE = 2;
     const COUNT_ZERO = 3;
 
+    const EMPTY_RESULT = [
+        'positiveCount' => 0,
+        'negativeCount' => 0,
+        'neutralCount' => 0,
+        'allCount' => 0
+        ];
+
     /** Reaction 'helpful' po. */
     const HELPFUL_POSITIVE = 1;
 
@@ -85,6 +92,27 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get reaction counts
+     *
+     * @param int $articleID
+     * @param string $reactionType
+     *
+     * @return array Array of all counts updated
+     *
+     * @throws ClientException If no reactions found for particular articleID and reactionType then throws an exception.
+     */
+    public function getReactionCount(int $articleID, string $reactionType = self::TYPE_HELPFUL): array {
+        $reactionParams = ['articleID' => $articleID, 'reactionType' => $reactionType];
+        $res = $this->get($reactionParams);
+        if (empty($res)) {
+            $res = array_merge($reactionParams, self::EMPTY_RESULT);
+        } else {
+            $res = $res[0];
+        }
+        return $res;
+    }
+
+    /**
      * Get number of reactions of specific type for user
      *
      * @param string $reactionType
@@ -112,14 +140,39 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Check if user already reacted on article.
+     *
+     * @param string $reactionType
+     * @param int $articleID
+     * @param int $userID
+     * @return int
+     */
+    public function userReacted(string $reactionType, int $articleID, int $userID): int {
+        $sql = $this->sql()
+            ->from('reaction r')
+            ->select('reactionID')
+            ->where([
+                'ownerType' => self::OWNER_TYPE,
+                'reactionType' => $reactionType,
+                'recordType' => self::RECORD_TYPE,
+                'recordID' => $articleID,
+                'insertUserID' => $userID
+            ])
+            ->limit(1);
+        $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
+
+        return is_array($res);
+    }
+
+    /**
      * Return all possible statuses for article record/item
      *
      * @return array
      */
     public static function getHelpfulReactions(): array {
         return [
+            "no",
             "yes",
-            "no"
         ];
     }
 
