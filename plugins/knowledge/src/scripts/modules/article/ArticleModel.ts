@@ -113,6 +113,12 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                         articleToUpdate.status = action.payload.data.status;
                     }
                     break;
+                case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                    // We need to clear out all revisions that are related to the article.
+                    // Their active state is now undefined.
+                    nextState.revisionFragmentsByID = {};
+                    nextState.revisionsByID = {};
+                    break;
                 case ArticleActions.GET_ARTICLE_RESPONSE: {
                     const { articleID } = action.payload.data;
                     nextState.articlesByID[articleID] = action.payload.data;
