@@ -39,6 +39,8 @@ class KnowledgeApiController extends AbstractApiController {
     const TYPE_COMMENT = 100;
     const TYPE_ANSWER = 101;
 
+    const SPHINX_PSEUDO_CATEGORY_ID = 0;
+
     const FORMAT_RICH = 'Rich';
 
     const ARTICLE_STATUSES = [
@@ -303,7 +305,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
         } else {
             $categoryIDs = $categories;
-            $categoryIDs[] = 0;
+            $categoryIDs[] = self::SPHINX_PSEUDO_CATEGORY_ID;
         }
         $this->sphinx->setFilter('CategoryID', $categoryIDs);
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
