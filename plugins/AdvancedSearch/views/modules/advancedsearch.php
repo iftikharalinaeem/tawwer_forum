@@ -44,7 +44,7 @@
         <div class="P AdvancedSearch-Category">
             <?php
             echo $Form->label('Category', 'cat', ['class' => 'Heading']).
-                $Form->categoryDropDown('cat', ['Permission' => 'view', 'Headings' => false, 'IncludeNull' => ['all', t('(All)')], 'class' => 'BigInput']);
+                $Form->categoryDropDown('cat', ['Permission' => 'view', 'Headings' => false, 'EnableHeadings' => true, 'IncludeNull' => ['all', t('(All)')], 'class' => 'BigInput']);
             ?>
             <div class="Checkboxes Inline">
                 <?php
