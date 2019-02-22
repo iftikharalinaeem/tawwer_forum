@@ -32,7 +32,6 @@ interface IProps extends IDeviceProps {
     results: IResult[];
     query?: string;
     pages: ILinkPages;
-    theme?: object;
 }
 
 interface IState {
@@ -51,7 +50,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             recordID: category.knowledgeCategoryID,
         };
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const classesSearchBar = searchBarClasses(this.props.theme);
+        const classesSearchBar = searchBarClasses();
 
         return (
             <Container>

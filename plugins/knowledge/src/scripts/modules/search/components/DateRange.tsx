@@ -18,7 +18,6 @@ interface IProps {
     onStartChange: (value: string) => void;
     onEndChange: (value: string) => void;
     className?: string;
-    theme?: object;
 }
 
 interface IState {}
@@ -32,7 +31,7 @@ export default class DateRange extends React.PureComponent<IProps> {
         const startDate = this.props.start ? moment(this.props.start).toDate() : null;
         const fromLabel = t("From");
         const toLabel = t("To");
-        const rangeClasses = dateRangeClasses(this.props.theme);
+        const rangeClasses = dateRangeClasses();
 
         return (
             <fieldset className={classNames("dateRange", "inputBlock", this.props.className, rangeClasses.root)}>
