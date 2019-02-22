@@ -88,7 +88,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param mixed $sender Sender object.
      */
     public function base_render_before($sender) {
-        $menu  = $sender->Menu ?? null;
+        $menu  = is_object($sender) ? $sender->Menu ?? null : null;
         if (is_object($menu)) {
             $menu->addLink('Help', t('Help'), '/kb/', false, ['class' => 'Knowledge']);
         }
