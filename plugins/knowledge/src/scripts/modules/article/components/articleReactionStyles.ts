@@ -4,11 +4,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { style } from "typestyle";
-import { flexHelper } from "@library/styles/styleHelpers";
+import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
 import { important } from "csx";
 
 export function reactionClasses(theme?: object) {
+    const style = styleFactory("reactions");
     const vars = globalVariables(theme);
 
     const frame = style({
@@ -18,40 +18,41 @@ export function reactionClasses(theme?: object) {
         alignItems: "center",
     });
 
-    const title = style({
+    const title = style("title", {
         fontSize: vars.fonts.size.large,
     });
 
-    const votingButton = style({
+    const votingButton = style("votingButton", {
         textAlign: "center",
         margin: 8,
     });
 
     const checkedButtonContent = style(
+        "checkButtonContent",
         {
             width: "100%",
         },
         flexHelper().middle(),
     );
 
-    const checkedButton = style({
+    const checkedButton = style("checkedButton", {
         opacity: important(1) as any,
     });
 
-    const votingButtons = style({
+    const votingButtons = style("votingButton", {
         padding: 8,
     });
 
-    const resultText = style({
+    const resultText = style("resultText", {
         fontSize: vars.meta.fontSize,
         color: vars.meta.color.toString(),
     });
 
-    const signInText = style({
+    const signInText = style("signIn", {
         fontSize: vars.fonts.size.large,
     });
 
-    const link = style({
+    const link = style("link", {
         color: vars.links.color.toString(),
         fontWeight: vars.fonts.weights.bold,
     });
