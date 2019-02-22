@@ -11,7 +11,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
@@ -31,7 +31,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
         const { knowledgeBases, loadStatus, className } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (LoadStatus.SUCCESS === loadStatus) {

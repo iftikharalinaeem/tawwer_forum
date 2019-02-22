@@ -31,7 +31,7 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import debounce from "lodash/debounce";
 import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
@@ -161,7 +161,7 @@ class SearchForm extends React.Component<IProps, IState> {
         switch (this.props.results.status) {
             case LoadStatus.PENDING:
             case LoadStatus.LOADING:
-                return <FullPageLoader />;
+                return <Loader />;
             case LoadStatus.ERROR:
                 return null;
             case LoadStatus.SUCCESS:

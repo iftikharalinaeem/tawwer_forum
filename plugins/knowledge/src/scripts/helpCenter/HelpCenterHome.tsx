@@ -12,7 +12,7 @@ import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { Devices } from "@library/components/DeviceChecker";
 import DocumentTitle from "@library/components/DocumentTitle";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import React from "react";
@@ -31,7 +31,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         const { knowledgeBase, status, data } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (status === LoadStatus.ERROR) {

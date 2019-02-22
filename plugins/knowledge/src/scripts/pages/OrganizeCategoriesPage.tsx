@@ -15,7 +15,7 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@library/components/DocumentTitle";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import Heading from "@library/components/Heading";
 import React from "react";
 import { connect } from "react-redux";
@@ -29,7 +29,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
         const pageTitle = t("Navigation Manager");
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {

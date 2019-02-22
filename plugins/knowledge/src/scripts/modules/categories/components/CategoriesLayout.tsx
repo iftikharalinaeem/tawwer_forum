@@ -24,12 +24,15 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { compose } from "@library/components/icons";
 import Breadcrumbs from "@library/components/Breadcrumbs";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
+import classNames from "classnames";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
     results: IResult[];
     query?: string;
     pages: ILinkPages;
+    theme?: object;
 }
 
 interface IState {
@@ -48,6 +51,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
             recordID: category.knowledgeCategoryID,
         };
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const classesSearchBar = searchBarClasses(this.props.theme);
 
         return (
             <Container>
@@ -84,7 +88,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     <LinkAsButton
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
-                                        className="searchBar-actionButton"
+                                        className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
                                         baseClass={ButtonBaseClass.ICON}
                                         title={t("Compose")}
                                     >
@@ -92,7 +96,9 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     </LinkAsButton>
                                 }
                             >
-                                <label className="searchBar-label">{category.name}</label>
+                                <label className={classNames("searchBar-label", classesSearchBar.label)}>
+                                    {category.name}
+                                </label>
                             </PageTitle>
                         </PanelWidget>
                     }
