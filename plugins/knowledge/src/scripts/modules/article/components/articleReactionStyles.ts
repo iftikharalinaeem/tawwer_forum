@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
-import { important, percent } from "csx";
+import { important, percent, px } from "csx";
 import { GlobalsNumber } from "csstype";
 
 export function reactionClasses(theme?: object) {
@@ -13,7 +13,7 @@ export function reactionClasses(theme?: object) {
     const vars = globalVariables(theme);
 
     const frame = style({
-        paddingTop: 12,
+        paddingTop: px(12),
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -25,7 +25,7 @@ export function reactionClasses(theme?: object) {
 
     const votingButton = style("votingButton", {
         textAlign: "center",
-        margin: 8,
+        margin: px(8),
     });
 
     const checkedButtonContent = style(
@@ -41,7 +41,7 @@ export function reactionClasses(theme?: object) {
     });
 
     const votingButtons = style("votingButton", {
-        padding: 8,
+        padding: px(8),
     });
 
     const resultText = style("resultText", {
