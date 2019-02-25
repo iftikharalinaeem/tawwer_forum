@@ -59,7 +59,6 @@ class LocationContents extends React.Component<IProps> {
                         {message}
                         <LocationPickerInsertArticle
                             onClick={setArticleFirstPosition}
-                            key="potentialLocation-0"
                             className="isFirst"
                             isSelected={currentSort === 0}
                         />
@@ -81,7 +80,6 @@ class LocationContents extends React.Component<IProps> {
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
                     const itemSort = item.sort || 0;
-                    const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
                     const isLast = recordCount === index + 1;
                     const isCurrentLocation = currentSort === index + 1;
 
@@ -91,36 +89,33 @@ class LocationContents extends React.Component<IProps> {
 
                     const insertArticleFirst =
                         pickArticleLocation && index === 0 ? (
-                            <>
+                            <React.Fragment key="potentialLocation-0">
                                 {message}
                                 <LocationPickerInsertArticle
                                     onClick={setArticleFirstPosition}
-                                    key="potentialLocation-0"
                                     className="isFirst"
                                     isSelected={currentSort === 0} // first one is exception
                                 />
-                            </>
+                            </React.Fragment>
                         ) : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
                         return (
-                            <>
+                            <React.Fragment key={itemKey}>
                                 {insertArticleFirst}
-                                <LocationPickerArticleItem key={itemKey} name={item.name} />
+                                <LocationPickerArticleItem name={item.name} />
                                 <LocationPickerInsertArticle
                                     onClick={setArticlePosition}
-                                    key={insertArticleKey}
                                     className={classNames({ isLast })}
                                     isSelected={isCurrentLocation}
                                 />
-                            </>
+                            </React.Fragment>
                         );
                     } else {
                         return (
-                            <>
+                            <React.Fragment key={itemKey}>
                                 {insertArticleFirst}
                                 <LocationPickerCategoryItem
-                                    key={itemKey}
                                     isInitialSelection={isChosen}
                                     isSelected={isSelected}
                                     name={this.radioName}
@@ -132,19 +127,18 @@ class LocationContents extends React.Component<IProps> {
                                 {pickArticleLocation && (
                                     <LocationPickerInsertArticle
                                         onClick={setArticlePosition}
-                                        key={insertArticleKey}
                                         className={classNames({ isLast })}
                                         isSelected={isCurrentLocation}
                                     />
                                 )}
-                            </>
+                            </React.Fragment>
                         );
                     }
                 });
             }
         } else {
             contents = (
-                <li className={classNames(inheritHeightClass())} key="potentialLocation-loader">
+                <li className={classNames(inheritHeightClass())}>
                     <FullPageLoader />
                 </li>
             );
