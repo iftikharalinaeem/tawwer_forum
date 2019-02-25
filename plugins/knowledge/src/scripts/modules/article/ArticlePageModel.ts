@@ -69,7 +69,7 @@ export const articlePageReducer = produce(
                     }
                     break;
                 case ArticlePageActions.RESET:
-                    return this.initialState;
+                    return INITIAL_STATE;
             }
 
             if (
