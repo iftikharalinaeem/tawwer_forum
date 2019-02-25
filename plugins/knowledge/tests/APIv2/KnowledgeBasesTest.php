@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
@@ -126,34 +127,62 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test adding a category to a knowledge base that has not met or exceeded the article limits.
+     * Test adding a category to a knowledge base that has met or exceeded the category limit.
      */
-    public function testAddCategoryToLimit() {
+    public function testAddCategoryOverLimit() {
+        $this->expectException(\Garden\Web\Exception\ClientException::class);
+        $this->expectExceptionMessage("The category maximum has been reached for this knowledge base.");
+
         $knowledgeBase = $this->api()->post(
             $this->baseUrl,
             $this->record(__FUNCTION__)
         );
 
-        // Try to add more categories than should be allowed.
-        for ($i = 1; $i <= (KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE + 10); $i++) {
-            try {
-                $this->api()->post(
-                    "knowledge-categories",
-                    [
-                        "name" => (__FUNCTION__ . " {$i}"),
-                        "parentID" => $knowledgeBase["rootCategoryID"],
-                        "knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"],
-                    ]
-                );
-            } catch (\Garden\Web\Exception\ClientException $e) {
-                // That error should mean we've hit our limit.
-                break;
-            }
-        }
+        /** @var KnowledgeBaseModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeBaseModel::class);
+        // Instead of making X categories, we're going to manually set the count used for the limit hint.
+        $knowledgeCategoryModel->update(
+            ["countCategories" => (KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE)],
+            ["knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"]]
+        );
 
-        /** @var KnowledgeCategoryModel */
-        $knowledgeCategory = $this->api()->get("knowledge-categories/{$knowledgeBase["rootCategoryID"]}");
-        $this->assertEquals($knowledgeCategory["childCategoryCount"], KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE);
+        $this->api()->post(
+            "knowledge-categories",
+            [
+                "name" => __FUNCTION__,
+                "parentID" => $knowledgeBase["rootCategoryID"],
+                "knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"],
+            ]
+        );
+    }
+
+    /**
+     * Test adding a category to a knowledge base that has not met or exceeded the category limit.
+     */
+    public function testAddCategoryUnderLimit() {
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $this->record(__FUNCTION__)
+        );
+
+        /** @var KnowledgeBaseModel */
+        $knowledgeCategoryModel = self::container()->get(KnowledgeBaseModel::class);
+        // Instead of making X categories, we're going to manually set the count used for the limit hint.
+        $knowledgeCategoryModel->update(
+            ["countCategories" => (KnowledgeCategoryModel::ROOT_LIMIT_CATEGORIES_RECURSIVE - 1)],
+            ["knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"]]
+        );
+
+        $knowledgeCategory = $this->api()->post(
+            "knowledge-categories",
+            [
+                "name" => __FUNCTION__,
+                "parentID" => $knowledgeBase["rootCategoryID"],
+                "knowledgeBaseID" => $knowledgeBase["knowledgeBaseID"],
+            ]
+        );
+
+        $this->assertEquals($knowledgeBase["knowledgeBaseID"], $knowledgeCategory["knowledgeBaseID"]);
     }
 
     /**
