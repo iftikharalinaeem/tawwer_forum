@@ -13,7 +13,7 @@ import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -56,7 +56,7 @@ class LocationContents extends React.Component<IProps> {
                     );
                 })
             ) : (
-                <FullPageLoader />
+                <Loader />
             );
         return (
             <LocationPickerItemList id={this.listID} legendRef={this.legendRef} categoryName={title}>

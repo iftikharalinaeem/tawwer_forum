@@ -7,6 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
 import { important, percent, px } from "csx";
 import { GlobalsNumber } from "csstype";
+import { unit } from "@library/styles/styleHelpers";
 
 export function reactionClasses(theme?: object) {
     const style = styleFactory("reactions");
@@ -45,8 +46,8 @@ export function reactionClasses(theme?: object) {
     });
 
     const resultText = style("resultText", {
-        fontSize: vars.meta.fontSize,
-        color: vars.meta.color.toString(),
+        fontSize: unit(vars.meta.text.fontSize),
+        color: vars.meta.text.color.toString(),
     });
 
     const signInText = style("signIn", {
@@ -54,7 +55,7 @@ export function reactionClasses(theme?: object) {
     });
 
     const link = style("link", {
-        color: vars.links.color.toString(),
+        color: vars.links.colors.toString(),
         fontWeight: vars.fonts.weights.bold,
     });
 

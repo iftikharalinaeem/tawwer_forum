@@ -91,24 +91,25 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
                             </PanelWidget>
-                            {device === Devices.MOBILE && (!!prevNavArticle || !!nextNavArticle) && (
-                                <PanelWidget>
-                                    <NextPrevious
-                                        accessibleTitle={t("More Articles")}
-                                        prevItem={prevNavArticle}
-                                        nextItem={nextNavArticle}
-                                    />
-                                </PanelWidget>
-                            )}
+                            {device === Devices.MOBILE &&
+                                (!!prevNavArticle || !!nextNavArticle) && (
+                                    <PanelWidget>
+                                        <NextPrevious
+                                            accessibleTitle={t("More Articles")}
+                                            prevItem={prevNavArticle}
+                                            nextItem={nextNavArticle}
+                                        />
+                                    </PanelWidget>
+                                )}
                         </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
-                        device !== Devices.TABLET && (
+                        device !== Devices.TABLET &&
+                        article.outline &&
+                        article.outline.length > 0 && (
                             <PanelWidget>
-                                {article.outline && article.outline.length > 0 && (
-                                    <ArticleTOC items={article.outline} />
-                                )}
+                                <ArticleTOC items={article.outline} />
                             </PanelWidget>
                         )
                     }

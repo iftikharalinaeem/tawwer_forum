@@ -6,7 +6,7 @@
 
 import React from "react";
 import Loadable, { LoadableComponent } from "react-loadable";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import { Route, NavLinkProps, NavLink } from "react-router-dom";
 import { Omit } from "react-redux";
 import Hoverable from "@library/utils/Hoverable";
@@ -25,7 +25,7 @@ export default class RouteHandler<GeneratorProps> {
         componentPromise: LoadFunction,
         public path: string,
         public url: (data: GeneratorProps) => string,
-        loadingComponent: React.ReactNode = FullPageLoader,
+        loadingComponent: React.ReactNode = Loader,
         key?: string,
     ) {
         this.loadable = Loadable({
