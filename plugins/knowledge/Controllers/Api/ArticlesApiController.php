@@ -28,6 +28,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
+use Vanilla\Models\ReactionOwnerModel;
 
 /**
  * API controller for managing the articles resource.
@@ -56,6 +57,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ReactionModel */
     private $reactionModel;
 
+    /** @var ReactionOwnerModel */
+    private $reactionOwnerModel;
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -77,6 +81,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param UserModel $userModel
      * @param DraftModel $draftModel
      * @param ReactionModel $reactionModel
+     * @param ReactionOwnerModel $reactionOwnerModel
      * @param Parser $parser
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param FormatService $formatService
@@ -91,6 +96,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         UserModel $userModel,
         DraftModel $draftModel,
         ReactionModel $reactionModel,
+        ReactionOwnerModel $reactionOwnerModel,
         Parser $parser,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         FormatService $formatService,
@@ -104,6 +110,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->userModel = $userModel;
         $this->draftModel = $draftModel;
         $this->reactionModel = $reactionModel;
+        $this->reactionOwnerModel = $reactionOwnerModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
@@ -665,6 +672,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($existingReactionValue !== null) {
             throw new ClientException('You already reacted on this article before.');
         }
+
+        $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
+
         $this->reactionModel->insert($fields);
         $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
