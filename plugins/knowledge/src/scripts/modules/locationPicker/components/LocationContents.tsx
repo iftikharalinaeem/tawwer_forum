@@ -25,6 +25,9 @@ import LocationPickerItemList from "./LocationPickerItemList";
 import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { loaderClasses } from "@library/styles/loaderStyles";
+import Paragraph from "@library/components/Paragraph";
+import { t } from "@library/application";
+import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -55,16 +58,20 @@ class LocationContents extends React.Component<IProps> {
             const recordCount = childRecords.data.length;
             const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
-                contents = (
-                    <>
-                        {message}
-                        <LocationPickerInsertArticle
-                            onClick={setArticleFirstPosition}
-                            className="isFirst"
-                            isSelected={currentSort === 0}
-                        />
-                    </>
-                );
+                if (pickArticleLocation) {
+                    contents = (
+                        <>
+                            {message}
+                            <LocationPickerInsertArticle
+                                onClick={setArticleFirstPosition}
+                                className="isFirst"
+                                isSelected={currentSort === 0}
+                            />
+                        </>
+                    );
+                } else {
+                    contents = <LocationPickerEmpty />;
+                }
             } else {
                 contents = childRecords.data.map((item, index) => {
                     const isSelected =
@@ -140,7 +147,7 @@ class LocationContents extends React.Component<IProps> {
         } else {
             const classesLoader = loaderClasses();
             contents = (
-                <li className={inheritHeightClass()} style={{ height: "100%" }}>
+                <li className={inheritHeightClass()}>
                     <Loader loaderStyleClass={classesLoader.fullPageLoader} />
                 </li>
             );
