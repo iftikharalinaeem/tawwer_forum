@@ -6,7 +6,7 @@
 
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationModel, { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { INavigationTreeItem } from "@library/@types/api";
@@ -45,6 +45,10 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
             }
 
             const fullParent = navItems[KbRecordType.CATEGORY + fullNavItem.parentID];
+            if (fullParent === NavigationModel.SYNTHETIC_ROOT) {
+                return null;
+            }
+
             if (fullParent) {
                 return fullParent;
             }

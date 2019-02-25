@@ -83,6 +83,27 @@ class KnowledgePlugin extends \Gdn_Plugin {
     }
 
     /**
+     * Add the knowledge base "Help" link to the main menu.
+     *
+     * @param mixed $sender Sender object.
+     */
+    public function base_render_before($sender) {
+        $menu  = is_object($sender) ? $sender->Menu ?? null : null;
+        if (is_object($menu)) {
+            $menu->addLink('Help', t('Help'), '/kb/', false, ['class' => 'Knowledge']);
+        }
+    }
+
+    /**
+     * Add the knowledge base "Help" link to the DiscussionFilters menu.
+     *
+     * @param mixed $sender Sender object.
+     */
+    public function base_afterDiscussionFilters_handler($sender) {
+        echo '<li class="Knowledge">'.anchor(t('Help'), '/kb').'</li> ';
+    }
+
+    /**
      * Ensure the database is configured.
      */
     public function structure() {

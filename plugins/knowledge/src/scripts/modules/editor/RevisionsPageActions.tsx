@@ -87,7 +87,7 @@ export default class RevisionsPageActions extends ReduxActions {
      *
      * @param revisionID
      */
-    public setActiveRevision(revisionID: number | null = null) {
+    public setActiveRevision = (revisionID: number | null = null) => {
         return this.dispatch((c, getState) => {
             if (revisionID) {
                 this.dispatch(RevisionsPageActions.setRevisionAC(revisionID));
@@ -103,5 +103,5 @@ export default class RevisionsPageActions extends ReduxActions {
                 }
             }
         });
-    }
+    };
 }
