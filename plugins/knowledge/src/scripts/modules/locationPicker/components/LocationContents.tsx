@@ -80,12 +80,13 @@ class LocationContents extends React.Component<IProps> {
                     };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
+                    const itemSort = item.sort || 0;
                     const insertArticleKey = itemKey + "-potentialLocation-" + (index + 1);
                     const isLast = recordCount === index + 1;
                     const isCurrentLocation = currentSort === index + 1;
 
                     const setArticlePosition = () => {
-                        this.setArticleLocation(index + 1);
+                        this.setArticleLocation(itemSort + 1);
                     };
 
                     const insertArticleFirst =
