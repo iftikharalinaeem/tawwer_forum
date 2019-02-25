@@ -48,6 +48,18 @@ export interface IOutlineItem {
     text: string; // The text content of the heading.
 }
 
+export enum ArticleReactionType {
+    HELPFUL = "helpful",
+}
+
+export interface IArticleReaction {
+    reactionType: ArticleReactionType;
+    yes: number;
+    no: number;
+    total: number;
+    userReaction: "yes" | "no" | null;
+}
+
 interface IArticleServerManagedData extends IExpandedInsertUpdate {
     articleID: number;
     knowledgeBaseID: number;
@@ -56,6 +68,7 @@ interface IArticleServerManagedData extends IExpandedInsertUpdate {
     countViews: number; // The number of times the article has been viewed.
     url: string; // Full URL to the resource
     outline: IOutlineItem[];
+    reactions: IArticleReaction[];
 }
 
 // The record

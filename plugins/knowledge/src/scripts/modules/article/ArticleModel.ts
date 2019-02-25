@@ -9,6 +9,8 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { article } from "@library/components/icons";
 
 export interface IArticleState {
     articlesByID: {
@@ -103,8 +105,23 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
 
+    private fsaReducer = reducerWithoutInitialState<IArticleState>().case(
+        ArticleActions.putReactACs.done,
+        (nextState, payload) => {
+            const { articleID } = payload.params;
+            const { reactions } = payload.result;
+            const existingArticle = nextState.articlesByID[articleID];
+            if (existingArticle) {
+                existingArticle.reactions = reactions;
+            }
+
+            return nextState;
+        },
+    );
+
     public reducer: ReducerType = (state = this.initialState, action): IArticleState => {
         return produce(state, nextState => {
+            nextState = this.fsaReducer(nextState, action);
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
                     const { articlesByID } = nextState;
@@ -112,6 +129,12 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     if (articleToUpdate) {
                         articleToUpdate.status = action.payload.data.status;
                     }
+                    break;
+                case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                    // We need to clear out all revisions that are related to the article.
+                    // Their active state is now undefined.
+                    nextState.revisionFragmentsByID = {};
+                    nextState.revisionsByID = {};
                     break;
                 case ArticleActions.GET_ARTICLE_RESPONSE: {
                     const { articleID } = action.payload.data;

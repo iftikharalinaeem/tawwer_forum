@@ -21,6 +21,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use CommentModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Utility\InstanceValidatorSchema;
+use CategoryModel;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -37,6 +38,8 @@ class KnowledgeApiController extends AbstractApiController {
     const TYPE_POLL = 2;
     const TYPE_COMMENT = 100;
     const TYPE_ANSWER = 101;
+
+    const SPHINX_PSEUDO_CATEGORY_ID = 0;
 
     const FORMAT_RICH = 'Rich';
 
@@ -77,6 +80,7 @@ class KnowledgeApiController extends AbstractApiController {
         self::TYPE_COMMENT => [
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
+            'sphinxGUID' => 'CommentID',
             'offset' => 2,
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
@@ -86,6 +90,7 @@ class KnowledgeApiController extends AbstractApiController {
         self::TYPE_ANSWER => [
             'recordType' => 'comment',
             'recordID' => 'DiscussionID',
+            'sphinxGUID' => 'CommentID',
             'offset' => 2,
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
@@ -227,7 +232,6 @@ class KnowledgeApiController extends AbstractApiController {
         ;
 
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
-
         $this->query = $in->validate($query);
 
         $searchResults = $this->sphinxSearch();
@@ -290,9 +294,20 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['insertUserIDs'])) {
             $this->sphinx->setFilter('insertUserID', $this->query['insertUserIDs']);
         }
+
+        $categoryIDs = [];
+        $categories = array_keys(CategoryModel::getByPermission('Discussions.View'));
         if (isset($this->query['categoryIDs'])) {
-            $this->sphinx->setFilter('CategoryID', $this->query['categoryIDs']);
+            foreach ($this->query['categoryIDs'] as $categoryID) {
+                if (in_array($categoryID, $categories)) {
+                    $categoryIDs[] = $categoryID;
+                }
+            }
+        } else {
+            $categoryIDs = $categories;
+            $categoryIDs[] = self::SPHINX_PSEUDO_CATEGORY_ID;
         }
+        $this->sphinx->setFilter('CategoryID', $categoryIDs);
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
             $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
         }
@@ -333,7 +348,7 @@ class KnowledgeApiController extends AbstractApiController {
         }
 
         if (isset($this->query['knowledgeCategoryIDs'])) {
-            $this->sphinx->setFilter('categoryID', $this->query['knowledgeCategoryIDs']);
+            $this->sphinx->setFilter('knowledgeCategoryID', $this->query['knowledgeCategoryIDs']);
         }
         if (isset($this->query['dateUpdated'])) {
             $range = DateFilterSphinxSchema::dateFilterRange($this->query['dateUpdated']);
@@ -435,7 +450,7 @@ class KnowledgeApiController extends AbstractApiController {
         foreach ($articles as &$articleWithRevision) {
             $guid = $articleWithRevision['articleRevisionID'] * $typeData['multiplier'] + $typeData['offset'];
             $sphinxItem = $this->results['matches'][$guid]['attrs'];
-
+            $knowledgeCategoryID = $sphinxItem['knowledgecategoryid'] ?? $articleWithRevision['knowledgeCategoryID'];
             $articleWithRevision["orderIndex"] = $this->results['matches'][$guid]['orderIndex'];
             $articleWithRevision["recordID"] = $articleWithRevision[$typeData['recordID']];
             $articleWithRevision["recordType"] = $typeData['recordType'];
@@ -444,12 +459,11 @@ class KnowledgeApiController extends AbstractApiController {
             $articleWithRevision["status"] = self::ARTICLE_STATUSES[$sphinxItem['status']];
 
             if ($this->isExpandField('category', $expand)) {
-                $articleWithRevision["category"] = $this->results['kbCategories'][$sphinxItem['categoryid']];
+                $articleWithRevision["category"] = $this->results['kbCategories'][$knowledgeCategoryID];
             }
 
             if ($this->isExpandField('breadcrumbs', $expand)) {
                 // Casing and naming here is due to sphinx normalization.
-                $knowledgeCategoryID = $sphinxItem['categoryid'];
                 $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
                 $articleWithRevision['breadcrumbs'] = $crumbs;
             }
@@ -475,13 +489,8 @@ class KnowledgeApiController extends AbstractApiController {
         $results = [];
         foreach ($records as $record) {
             $recordID = $record[$typeData['recordID']];
-            $guid = $recordID * $typeData['multiplier'] + $typeData['offset'];
+            $guid = $record[$typeData['sphinxGUID'] ?? $typeData['recordID']] * $typeData['multiplier'] + $typeData['offset'];
             $sphinxItem = $this->results['matches'][$guid]['attrs'];
-            if (!$sphinxItem) {
-                // Bailout if we don't have valid sphinx attrs to work with.
-                continue;
-            }
-
             $url = $record['Url'];
             if ($type === self::TYPE_COMMENT) {
                 // CommentModel doesn't currently put urls on their records.
@@ -526,16 +535,17 @@ class KnowledgeApiController extends AbstractApiController {
      * Get records from discussionModel model
      *
      * @param array $ids
+     * @param int $dtype
      * @return array
      */
-    public function getDiscussions(array $ids): array {
+    public function getDiscussions(array $ids, int $dtype): array {
         $discussions = $this->discussionModel->get(
             null,
             self::SPHINX_DEFAULT_LIMIT,
             ['d.DiscussionID' => $ids]
         )->resultArray();
 
-        $normalized = $this->normalizeForumRecords($discussions, self::TYPE_DISCUSSION);
+        $normalized = $this->normalizeForumRecords($discussions, $dtype);
         return $normalized;
     }
 
@@ -543,14 +553,14 @@ class KnowledgeApiController extends AbstractApiController {
      * Get records from commentModel model
      *
      * @param array $ids
+     * @param int $dtype
      * @return array
      */
-    public function getComments(array $ids): array {
+    public function getComments(array $ids, int $dtype): array {
         $comments = $this->commentModel->getWhere(
             ['CommentID' => $ids]
         )->resultArray();
-
-        $normalized = $this->normalizeForumRecords($comments, self::TYPE_COMMENT);
+        $normalized = $this->normalizeForumRecords($comments, $dtype);
         return $normalized;
     }
 
