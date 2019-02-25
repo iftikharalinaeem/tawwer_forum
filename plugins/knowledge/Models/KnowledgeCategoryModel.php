@@ -411,8 +411,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->get()->nextRow(DATASET_TYPE_ARRAY)
         ;
 
-        if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
-            && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+        if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
             //only check articles sort if knowledgeBase is Guide + manual
             $maxArticlesSort = $this->sql()
                 ->select('a.sort', 'MAX', 'maxSort')
@@ -460,8 +459,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = c.knowledgeBaseID')
             ->get()->nextRow(DATASET_TYPE_ARRAY)
         ;
-        if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
-            && $knowledgeBase['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+        if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
             $query = $this->sql()->update('article')
                 ->set('sort' . ($direction ? '+' : '-'), 1)
                 ->where(
