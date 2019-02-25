@@ -11,6 +11,7 @@ import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import SimplePagerModel, { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import produce from "immer";
+import clone from "lodash/clone";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface ICategoriesPageState {
@@ -36,7 +37,7 @@ const INITIAL_STATE: ICategoriesPageState = {
  */
 
 export const categoryPageReducer = produce(
-    reducerWithInitialState(INITIAL_STATE)
+    reducerWithInitialState(clone(INITIAL_STATE))
         .case(CategoriesPageActions.resetAction, () => {
             return INITIAL_STATE;
         })

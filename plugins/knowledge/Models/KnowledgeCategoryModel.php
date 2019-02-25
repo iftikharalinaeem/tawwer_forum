@@ -234,14 +234,13 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     public function validateKBCategoriesLimit(int $knowledgeCategoryID, \Garden\Schema\ValidationField $validationField): bool {
         try {
             $category = $this->selectSingleFragment($knowledgeCategoryID);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $category->knowledgeCategoryID]);
         } catch (NoResultsException $e) {
             // Couldn't find the category. Maybe bad data. Unable to gather enough relevant data to perform validation.
             return true;
         }
 
-        $total = $this->getTotalInKnowledgeBase($category->getKnowledgeBaseID());
-
-        if ($total >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
+        if ($knowledgeBase["countCategories"] >= self::ROOT_LIMIT_CATEGORIES_RECURSIVE) {
             $validationField->getValidation()->addError(
                 $validationField->getName(),
                 "The category maximum has been reached for this knowledge base."

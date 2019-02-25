@@ -10,7 +10,7 @@ import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
@@ -20,7 +20,7 @@ class KnowledgeBasePage extends React.Component<IProps> {
         const { knowledgeBase, loadStatus } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (knowledgeBase === null) {

@@ -10,6 +10,7 @@ import { t } from "@library/application";
 import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 interface IProps {
     className?: string;
@@ -24,6 +25,7 @@ export default class SearchResults extends React.Component<IProps> {
     public render() {
         const hasResults = this.props.results && this.props.results.length > 0;
         let content;
+        const classes = searchBarClasses();
 
         if (hasResults) {
             content = this.props.results.map((result, i) => {
@@ -41,6 +43,6 @@ export default class SearchResults extends React.Component<IProps> {
 
         const Tag = hasResults ? `ul` : `div`;
 
-        return <Tag className={classNames("searchResults", this.props.className)}>{content}</Tag>;
+        return <Tag className={classNames("searchResults", this.props.className, classes.results)}>{content}</Tag>;
     }
 }

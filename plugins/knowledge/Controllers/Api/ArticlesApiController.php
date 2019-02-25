@@ -6,13 +6,10 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
-use Exception;
 use Garden\Web\Exception\ClientException;
 use Gdn_Session as SessionInterface;
 use MediaModel;
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
-use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
@@ -23,7 +20,6 @@ use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
@@ -224,7 +220,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
             'no' => (int)$reactionCounts['neutralCount'] ?? 0,
             'total' => (int)$reactionCounts['allCount'] ?? 0,
-            'userReacted' => $this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID)
+            'userReaction' => $this->articleReactionModel->getUserReaction(
+                ArticleReactionModel::TYPE_HELPFUL,
+                $id,
+                $this->sessionInterface->UserID
+            ),
         ];
 
         $article = $this->normalizeOutput($article);
@@ -623,7 +623,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * POST reaction on article ('helpful').
+     * PUT reaction on article ('helpful').
      *
      * @param int $id ArticleID
      * @param array $body Incoming json array with 'reaction' key.
@@ -634,7 +634,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function post_reaction(int $id, array $body): array {
+    public function put_react(int $id, array $body): array {
         $this->permission("knowledge.kb.view");
         if (!$this->sessionInterface->isValid()) {
             throw new ClientException('User must be signed in to post reaction.');
@@ -656,7 +656,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        if ($this->articleReactionModel->userReacted(ArticleReactionModel::TYPE_HELPFUL, $id, $this->sessionInterface->UserID) > 0) {
+        $existingReactionValue = $this->articleReactionModel->getUserReaction(
+            ArticleReactionModel::TYPE_HELPFUL,
+            $id,
+            $this->sessionInterface->UserID
+        );
+
+        if ($existingReactionValue !== null) {
             throw new ClientException('You already reacted on this article before.');
         }
         $this->reactionModel->insert($fields);
@@ -664,13 +670,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleByID($id, true);
 
+        $newReactionValue = $this->articleReactionModel->getUserReaction(
+            ArticleReactionModel::TYPE_HELPFUL,
+            $id,
+            $this->sessionInterface->UserID
+        );
         $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['reactions'][]  = [
             'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
             'yes' => (int)$reactionCounts['positiveCount'],
             'no' => (int)$reactionCounts['neutralCount'],
             'total' => (int)$reactionCounts['allCount'],
-            'userReacted' => true
+            'userReaction' => $newReactionValue,
         ];
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);

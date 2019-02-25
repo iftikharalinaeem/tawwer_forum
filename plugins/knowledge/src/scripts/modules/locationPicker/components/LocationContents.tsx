@@ -16,14 +16,14 @@ import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import FullPageLoader from "@library/components/FullPageLoader";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
-import classNames from "classnames";
+import Loader from "@library/components/Loader";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
 import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
+import classNames from "classnames";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -139,7 +139,7 @@ class LocationContents extends React.Component<IProps> {
         } else {
             contents = (
                 <li className={classNames(inheritHeightClass())}>
-                    <FullPageLoader />
+                    <Loader />
                 </li>
             );
         }

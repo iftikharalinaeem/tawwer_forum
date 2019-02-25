@@ -11,11 +11,12 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
+import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -29,9 +30,9 @@ import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
         const { knowledgeBases, loadStatus, className } = this.props;
-
+        const classesSubCommunityTile = subcommunityTileClasses();
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (LoadStatus.SUCCESS === loadStatus) {
@@ -46,7 +47,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
                     hiddenTitle={true}
                     items={knowledgeBases}
                     emptyMessage={t("No knowledge bases found.")}
-                    fallbackIcon={knowledgeBaseNoIcon("subcommunityList-fallbackIcon")}
+                    fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
                 />
             </WidgetContainer>
         );

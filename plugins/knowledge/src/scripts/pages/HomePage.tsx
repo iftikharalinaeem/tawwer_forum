@@ -13,7 +13,7 @@ import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import DocumentTitle from "@library/components/DocumentTitle";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import React from "react";
@@ -25,7 +25,7 @@ export class HomePage extends React.Component<IProps> {
     public render() {
         const { loadStatus, knowledgeBases } = this.props;
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (knowledgeBases.length === 1) {

@@ -7,9 +7,10 @@ import * as React from "react";
 import classNames from "classnames";
 import InputBlock, { InputTextBlockBaseClass } from "@library/components/forms/InputBlock";
 import { t } from "@library/application";
-import DateInput from "@library/components/forms/DateInput";
 import moment from "moment";
 import { style } from "typestyle";
+import { dateRangeClasses } from "@library/styles/dateRangeStyles";
+import DatePicker from "@library/components/forms/DatePicker";
 
 interface IProps {
     start: string | undefined;
@@ -26,37 +27,20 @@ interface IState {}
  */
 export default class DateRange extends React.PureComponent<IProps> {
     public render() {
-        const endDate = this.props.end ? moment(this.props.end).toDate() : undefined;
-        const startDate = this.props.start ? moment(this.props.start).toDate() : undefined;
+        const endDate = this.props.end ? moment(this.props.end).toDate() : null;
+        const startDate = this.props.start ? moment(this.props.start).toDate() : null;
         const fromLabel = t("From");
         const toLabel = t("To");
-        const longestLabelCount = (fromLabel.length >= toLabel.length ? fromLabel.length : toLabel.length) + 4; // offset
-        const labelPadding = 4;
-        const labelTooLong = longestLabelCount > 12;
+        const rangeClasses = dateRangeClasses();
 
-        const labelStyles = style({
-            width: labelTooLong ? "100%" : `calc(${longestLabelCount}ex + ${labelPadding}px)`,
-            maxWidth: "100%",
-            paddingRight: `${labelPadding}px`,
-        });
-        const inputStyles = style({
-            width: labelTooLong ? "100%" : `calc(100% - calc(${longestLabelCount}ex + ${labelPadding * 2}px))`,
-            minWidth: "136px",
-            maxWidth: "100%",
-            flexGrow: 1,
-        });
-        const dateBlockOffset = style({
-            marginLeft: labelPadding,
-        });
         return (
-            <fieldset className={classNames("dateRange", "inputBlock", this.props.className)}>
-                <legend className="inputBlock-labelText dateUpdated-label">{t("Date Updated")}</legend>
-                <label className={classNames("dateRange-boundary", dateBlockOffset)}>
-                    <span className={classNames("dateRange-label", labelStyles)}>{fromLabel}</span>
-                    <DateInput
+            <fieldset className={classNames("dateRange", "inputBlock", this.props.className, rangeClasses.root)}>
+                <legend className={classNames("inputBlock-sectionTitle")}>{t("Date Updated")}</legend>
+                <label className={classNames("dateRange-boundary", rangeClasses.boundary)}>
+                    <span className={classNames("dateRange-label", rangeClasses.label)}>{fromLabel}</span>
+                    <DatePicker
                         alignment="right"
-                        // inputClassName={inputStyles}
-                        contentClassName={inputStyles}
+                        contentClassName={rangeClasses.input}
                         onChange={this.props.onStartChange}
                         value={this.props.start}
                         disabledDays={[
@@ -66,12 +50,11 @@ export default class DateRange extends React.PureComponent<IProps> {
                         ]}
                     />
                 </label>
-                <label className={classNames("dateRange-boundary", dateBlockOffset)}>
-                    <span className={classNames("dateRange-label", labelStyles)}>{toLabel}</span>
-                    <DateInput
+                <label className={classNames("dateRange-boundary", rangeClasses.boundary)}>
+                    <span className={classNames("dateRange-label", rangeClasses.label)}>{toLabel}</span>
+                    <DatePicker
                         alignment="right"
-                        // inputClassName={inputStyles}
-                        contentClassName={inputStyles}
+                        contentClassName={rangeClasses.input}
                         onChange={this.props.onEndChange}
                         value={this.props.end}
                         disabledDays={[

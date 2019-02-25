@@ -24,6 +24,7 @@ import { connect } from "react-redux";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import classNames from "classnames";
+import { dateRangeClasses } from "@library/styles/dateRangeStyles";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -37,6 +38,7 @@ export class AdvancedSearch extends React.Component<IProps> {
         const formData = this.props.form;
         const vars = globalVariables();
         const buttons = buttonClasses();
+        const classesDateRange = dateRangeClasses();
         return (
             <form className="advancedSearch" onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
@@ -65,6 +67,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                     onEndChange={this.handleEndDateChange}
                     start={this.props.form.startDate}
                     end={this.props.form.endDate}
+                    className={classesDateRange.root}
                 />
                 <Permission permission="articles.add">
                     <Checkbox

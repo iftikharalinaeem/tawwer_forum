@@ -30,13 +30,16 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
         'negativeCount' => 0,
         'neutralCount' => 0,
         'allCount' => 0
-        ];
+    ];
 
     /** Reaction 'helpful' po. */
     const HELPFUL_POSITIVE = 1;
 
     /** Deleted status value. */
     const HELPFUL_NEGATIVE = 0;
+
+    const YES = "yes";
+    const NO = "no";
 
     /**
      * ArticleReactionModel constructor.
@@ -145,12 +148,12 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
      * @param string $reactionType
      * @param int $articleID
      * @param int $userID
-     * @return int
+     * @return string|null
      */
-    public function userReacted(string $reactionType, int $articleID, int $userID): int {
+    public function getUserReaction(string $reactionType, int $articleID, int $userID): ?string {
         $sql = $this->sql()
             ->from('reaction r')
-            ->select('reactionID')
+            ->select('reactionValue')
             ->where([
                 'ownerType' => self::OWNER_TYPE,
                 'reactionType' => $reactionType,
@@ -161,7 +164,15 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
             ->limit(1);
         $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
 
-        return is_array($res);
+        $result = $res['reactionValue'] ?? null;
+
+        if ($result === self::HELPFUL_NEGATIVE) {
+            return self::NO;
+        } elseif ($result === self::HELPFUL_POSITIVE) {
+            return self::YES;
+        }
+
+        return null;
     }
 
     /**
@@ -171,8 +182,9 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
      */
     public static function getHelpfulReactions(): array {
         return [
-            "no",
-            "yes",
+            self::NO,
+            self::YES,
+            null
         ];
     }
 

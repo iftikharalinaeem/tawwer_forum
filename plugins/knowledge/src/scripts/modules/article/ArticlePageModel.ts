@@ -4,66 +4,62 @@
  * @license Proprietary
  */
 
-import { IArticle } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
 import { produce } from "immer";
+import clone from "lodash/clone";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IArticlePageState {
     articleID: number | null;
     articleLoadable: ILoadable<{}>;
     restoreStatus: LoadStatus;
-}
-
-export interface IInjectableArticlePageState {
-    loadable: ILoadable<{
-        article: IArticle;
+    reactionLoadable: ILoadable<{
+        reaction: "yes" | "no";
     }>;
-    restoreStatus: LoadStatus;
 }
 
-type ReducerType = KnowledgeReducer<IArticlePageState>;
+const INITIAL_STATE: IArticlePageState = {
+    articleID: null,
+    articleLoadable: {
+        status: LoadStatus.PENDING,
+    },
+    reactionLoadable: {
+        status: LoadStatus.PENDING,
+    },
+    restoreStatus: LoadStatus.PENDING,
+};
 
-/**
- * Reducer for the article page.
- */
-export default class ArticlePageModel implements ReduxReducer<IArticlePageState> {
-    public static getInjectableState(state: IStoreState): IInjectableArticlePageState {
-        const { articleID, articleLoadable, restoreStatus } = state.knowledge.articlePage;
-
-        if (articleLoadable.status === LoadStatus.SUCCESS && articleID !== null) {
-            const article = ArticleModel.selectArticle(state, articleID)!;
-            return {
-                restoreStatus,
-                loadable: {
-                    status: LoadStatus.SUCCESS,
-                    data: {
-                        article,
-                    },
-                },
+export const articlePageReducer = produce(
+    reducerWithInitialState(clone(INITIAL_STATE))
+        .case(ArticleActions.putReactACs.started, (nextState, payload) => {
+            if (payload.articleID !== nextState.articleID) {
+                return nextState;
+            }
+            nextState.reactionLoadable.status = LoadStatus.LOADING;
+            nextState.reactionLoadable.data = {
+                reaction: payload.helpful,
             };
-        } else {
-            return {
-                restoreStatus,
-                loadable: articleLoadable as any,
-            };
-        }
-    }
-
-    public initialState: IArticlePageState = {
-        articleID: null,
-        articleLoadable: {
-            status: LoadStatus.PENDING,
-        },
-        restoreStatus: LoadStatus.PENDING,
-    };
-
-    public reducer: ReducerType = (state = this.initialState, action) => {
-        return produce(state, nextState => {
+            return nextState;
+        })
+        .case(ArticleActions.putReactACs.done, (nextState, payload) => {
+            if (payload.params.articleID !== nextState.articleID) {
+                return nextState;
+            }
+            nextState.reactionLoadable = INITIAL_STATE.reactionLoadable;
+            return nextState;
+        })
+        .case(ArticleActions.putReactACs.failed, (nextState, payload) => {
+            if (payload.params.articleID !== nextState.articleID) {
+                return nextState;
+            }
+            nextState.reactionLoadable.status = LoadStatus.ERROR;
+            nextState.reactionLoadable.error = payload.error;
+            return nextState;
+        })
+        .default((nextState, action: KNOWLEDGE_ACTION) => {
             switch (action.type) {
                 case ArticlePageActions.INIT:
                     const { preloaded, articleID } = action.payload;
@@ -73,7 +69,7 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
                     }
                     break;
                 case ArticlePageActions.RESET:
-                    return this.initialState;
+                    return INITIAL_STATE;
             }
 
             if (
@@ -100,6 +96,7 @@ export default class ArticlePageModel implements ReduxReducer<IArticlePageState>
                         break;
                 }
             }
-        });
-    };
-}
+
+            return nextState;
+        }),
+);

@@ -20,6 +20,7 @@ import * as React from "react";
 import NextPrevious from "@library/components/nextPrevious/NextPrevious";
 import { t } from "@library/application";
 import { withDevice } from "@library/contexts/DeviceContext";
+import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 
 /**
  * Implements the article's layout
@@ -87,24 +88,28 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <UserContent content={article.body} />
                             </PanelWidget>
-                            {device === Devices.MOBILE && (!!prevNavArticle || !!nextNavArticle) && (
-                                <PanelWidget>
-                                    <NextPrevious
-                                        accessibleTitle={t("More Articles")}
-                                        prevItem={prevNavArticle}
-                                        nextItem={nextNavArticle}
-                                    />
-                                </PanelWidget>
-                            )}
+                            <PanelWidget>
+                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                            </PanelWidget>
+                            {device === Devices.MOBILE &&
+                                (!!prevNavArticle || !!nextNavArticle) && (
+                                    <PanelWidget>
+                                        <NextPrevious
+                                            accessibleTitle={t("More Articles")}
+                                            prevItem={prevNavArticle}
+                                            nextItem={nextNavArticle}
+                                        />
+                                    </PanelWidget>
+                                )}
                         </>
                     }
                     rightTop={
                         device !== Devices.MOBILE &&
-                        device !== Devices.TABLET && (
+                        device !== Devices.TABLET &&
+                        article.outline &&
+                        article.outline.length > 0 && (
                             <PanelWidget>
-                                {article.outline && article.outline.length > 0 && (
-                                    <ArticleTOC items={article.outline} />
-                                )}
+                                <ArticleTOC items={article.outline} />
                             </PanelWidget>
                         )
                     }

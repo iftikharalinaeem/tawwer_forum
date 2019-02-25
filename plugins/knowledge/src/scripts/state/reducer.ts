@@ -6,7 +6,7 @@
 
 import ArticleMenuModel from "@knowledge/modules/article/ArticleMenuModel";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import ArticlePageModel from "@knowledge/modules/article/ArticlePageModel";
+import { articlePageReducer } from "@knowledge/modules/article/ArticlePageModel";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
@@ -23,7 +23,7 @@ import { categoryPageReducer } from "@knowledge/modules/categories/categoryPageR
 const knowledgeReducer = combineReducers<IKbState>({
     articles: new ArticleModel().reducer,
     articleMenu: new ArticleMenuModel().reducer,
-    articlePage: new ArticlePageModel().reducer,
+    articlePage: articlePageReducer,
     draftsPage: new DraftsPageModel().reducer,
     editorPage: new EditorPageModel().reducer,
     revisionsPage: new RevisionsPageModel().reducer,

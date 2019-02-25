@@ -14,7 +14,7 @@ import { LoadStatus } from "@library/@types/api";
 import { connect } from "react-redux";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import { RouteComponentProps, withRouter } from "react-router";
 import RouteActions from "@knowledge/routes/RouteActions";
 import { UnregisterCallback } from "history";
@@ -31,7 +31,7 @@ export class KnowledgeRoutes extends React.Component<IProps> {
         }
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
-            return <FullPageLoader />;
+            return <Loader />;
         }
 
         if (

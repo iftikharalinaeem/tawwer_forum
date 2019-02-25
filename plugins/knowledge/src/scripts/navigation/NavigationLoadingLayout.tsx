@@ -5,7 +5,7 @@
 
 import Navigation from "@knowledge/navigation/Navigation";
 import { t } from "@library/application";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
@@ -44,7 +44,7 @@ export default function NavigationLoadingLayout(props: IProps) {
                 }
                 middleBottom={
                     <PanelWidget>
-                        <FullPageLoader />
+                        <Loader />
                     </PanelWidget>
                 }
                 rightBottom={<></>}
