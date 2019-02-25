@@ -16,6 +16,7 @@ import WidgetContainer from "@library/components/layouts/components/WidgetContai
 import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
 import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
+import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -29,7 +30,7 @@ import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
         const { knowledgeBases, loadStatus, className } = this.props;
-
+        const classesSubCommunityTile = subcommunityTileClasses();
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
         }
@@ -46,7 +47,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
                     hiddenTitle={true}
                     items={knowledgeBases}
                     emptyMessage={t("No knowledge bases found.")}
-                    fallbackIcon={knowledgeBaseNoIcon("subcommunityList-fallbackIcon")}
+                    fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
                 />
             </WidgetContainer>
         );
