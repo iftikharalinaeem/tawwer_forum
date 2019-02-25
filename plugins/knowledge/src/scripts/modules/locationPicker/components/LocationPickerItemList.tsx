@@ -7,6 +7,7 @@
 import { t } from "@library/application";
 import classNames from "classnames";
 import * as React from "react";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps {
     categoryName: string;
@@ -25,7 +26,7 @@ export default class LocationPickerItemList extends React.Component<IProps> {
                 <legend ref={this.props.legendRef} tabIndex={-1} className="sr-only">
                     {t("Contents of folder: " + this.props.categoryName)}
                 </legend>
-                <ul className="folderContents-items">{this.props.children}</ul>
+                <ul className={classNames(inheritHeightClass(), "folderContents-items")}>{this.props.children}</ul>
             </fieldset>
         );
     }

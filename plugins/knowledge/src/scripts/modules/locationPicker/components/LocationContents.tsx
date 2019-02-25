@@ -24,6 +24,7 @@ import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
 import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { loaderClasses } from "@library/styles/loaderStyles";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -137,9 +138,10 @@ class LocationContents extends React.Component<IProps> {
                 });
             }
         } else {
+            const classesLoader = loaderClasses();
             contents = (
-                <li className={classNames(inheritHeightClass())}>
-                    <Loader />
+                <li className={inheritHeightClass()} style={{ height: "100%" }}>
+                    <Loader loaderStyleClass={classesLoader.fullPageLoader} />
                 </li>
             );
         }
