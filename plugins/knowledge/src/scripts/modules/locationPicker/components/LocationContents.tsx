@@ -79,7 +79,7 @@ class LocationContents extends React.Component<IProps> {
                     };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
-                    const itemSort = item.sort || 0;
+                    const itemSort = item.sort === null ? 0 : item.sort;
                     const isLast = recordCount === index + 1;
                     const isCurrentLocation = currentSort === index + 1;
 

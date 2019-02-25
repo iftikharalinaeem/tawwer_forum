@@ -14,6 +14,7 @@ import { produce } from "immer";
 import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { formatUrl } from "@library/application";
+import { IArticle } from "@knowledge/@types/api";
 
 export enum KbRecordType {
     CATEGORY = "knowledgeCategory",
@@ -64,6 +65,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 this.reduceDelete,
                 this.reduceRename,
                 this.reduceAdd,
+                this.reduceEdit,
             )(nextState, action);
         });
     };
@@ -230,22 +232,12 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 const article = action.payload.data;
                 const stringID = KbRecordType.ARTICLE + article.articleID;
                 const parentStringID = KbRecordType.CATEGORY + article.knowledgeCategoryID;
-                nextState.navigationItems[stringID] = {
-                    name: article.name,
-                    url: article.url,
-                    parentID: article.knowledgeCategoryID!,
-                    recordID: article.articleID,
-                    sort: article.sort,
-                    knowledgeBaseID: article.knowledgeBaseID,
-                    recordType: KbRecordType.ARTICLE,
-                    children: [],
-                };
-
-                const parentItem = nextState.navigationItems[parentStringID];
-                if (parentItem) {
-                    parentItem.children.push(stringID);
-                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
-                }
+                nextState.navigationItems[stringID] = NavigationModel.normalizeArticle(article);
+                nextState.navigationItems = NavigationModel.pushArticle(
+                    stringID,
+                    parentStringID,
+                    nextState.navigationItems,
+                );
                 break;
         }
         switch (action.type) {
@@ -272,6 +264,78 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 break;
         }
         return nextState;
+    };
+
+    /**
+     * Reduce actions related to editing existing items.
+     */
+    private reduceEdit: ReducerType = (nextState = this.initialState, action) => {
+        switch (action.type) {
+            case ArticleActions.PATCH_ARTICLE_RESPONSE:
+                const patchedArticle = action.payload.data;
+                const patchedArticleID = KbRecordType.ARTICLE + patchedArticle.articleID;
+                const patchedArticleParentStringID = KbRecordType.CATEGORY + patchedArticle.knowledgeCategoryID;
+                const originalNavigationItem = nextState.navigationItems[patchedArticleID];
+
+                // If moved out of the original category, remove it from that navigation item's children.
+                if (originalNavigationItem) {
+                    const { parentID } = originalNavigationItem;
+                    if (parentID && parentID !== patchedArticle.knowledgeCategoryID) {
+                        const originalArticleParentStringID = KbRecordType.CATEGORY + parentID;
+                        if (nextState.navigationItems[originalArticleParentStringID]) {
+                            nextState.navigationItems[
+                                originalArticleParentStringID
+                            ]!.children = nextState.navigationItems[originalArticleParentStringID]!.children.filter(
+                                item => item !== patchedArticleID,
+                            );
+                        }
+                    }
+                }
+
+                nextState.navigationItems[patchedArticleID] = NavigationModel.normalizeArticle(patchedArticle);
+
+                // Add to the children of its parent, if it isn't already there.
+                if (!originalNavigationItem || originalNavigationItem.parentID !== patchedArticle.knowledgeCategoryID) {
+                    nextState.navigationItems = NavigationModel.pushArticle(
+                        patchedArticleID,
+                        patchedArticleParentStringID,
+                        nextState.navigationItems,
+                        false,
+                    );
+                }
+                NavigationModel.sortItemChildren(nextState.navigationItems, patchedArticleParentStringID);
+                break;
+        }
+        return nextState;
+    };
+
+    private static pushArticle(
+        articleID: string,
+        parentID: string,
+        navigationItems: INormalizedNavigationItems,
+        doSort: boolean = true,
+    ): INormalizedNavigationItems {
+        const parentItem = navigationItems[parentID];
+        if (parentItem) {
+            parentItem.children.push(articleID);
+            if (doSort) {
+                NavigationModel.sortItemChildren(navigationItems, parentID);
+            }
+        }
+        return navigationItems;
+    }
+
+    private static normalizeArticle = (article: IArticle): INormalizedNavigationItem => {
+        return {
+            name: article.name,
+            url: article.url,
+            parentID: article.knowledgeCategoryID!,
+            recordID: article.articleID,
+            sort: article.sort,
+            knowledgeBaseID: article.knowledgeBaseID,
+            recordType: KbRecordType.ARTICLE,
+            children: [],
+        };
     };
 
     /**
