@@ -329,7 +329,7 @@ MESSAGE
         $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
 
         // Enforce restrictions on sorting.
-        if ($isSingle && array_key_exists("sort", $set)) {
+        if ($isSingle && array_key_exists("sortArticles", $set)) {
             $sort = $set["sortArticles"] ?? null;
 
             // Manual sorting is exclusive to guides. Help centers cannot be sorted manually.
