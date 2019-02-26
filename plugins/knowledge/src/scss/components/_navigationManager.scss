@@ -98,6 +98,15 @@ $navigationManager-input_lineHeight: 24px;
             color: $global-color_primary;
         }
     }
+
+    &.isArticle {
+        .navigationManager-draggable {
+            //margin-left: 0;
+        }
+        .navigationManager-articlePage {
+            margin-left: 0;
+        }
+    }
 }
 
 .navigationManager-draggable {
@@ -193,8 +202,9 @@ $navigationManager-input_lineHeight: 24px;
 .navigationManager-articlePage {
     display: flex;
     align-items: center;
-    width: $navigationManager-buttonWidth;
+    width: $navigationManager-item_height;
     min-height: $navigationManager-item_height;
+    margin-left: 18px;
 }
 
 .navigationManager-toggleFolder {

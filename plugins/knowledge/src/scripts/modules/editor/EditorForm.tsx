@@ -27,6 +27,7 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { richEditorFormClasses } from "plugins/rich-editor/src/scripts/styles/richEditorStyles";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -47,8 +48,9 @@ export class EditorForm extends React.PureComponent<IProps> {
      */
     public render() {
         const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
+        const classesRichEditorForm = richEditorFormClasses();
         return (
-            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+            <form className={classNames("richEditorForm", "inheritHeight")} onSubmit={this.onSubmit}>
                 <EditorHeader
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}

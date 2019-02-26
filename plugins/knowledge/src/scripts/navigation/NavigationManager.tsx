@@ -133,7 +133,15 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 onDeleteClick={deleteHandler}
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
+                isItemInRoot={this.isItemInRoot}
             />
+        );
+    };
+
+    private isItemInRoot = (itemParentID: number) => {
+        return (
+            this.props.knowledgeBase.knowledgeBaseID !== undefined &&
+            itemParentID === this.props.knowledgeBase.knowledgeBaseID
         );
     };
 
