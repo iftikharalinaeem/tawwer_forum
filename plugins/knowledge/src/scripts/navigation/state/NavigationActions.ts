@@ -48,12 +48,19 @@ export default class NavigationActions extends ReduxActions {
         IApiError
     >("PATCH_NAVIGATION_FLAT");
 
+    public static clearErrors = createAction("CLEAR_ERRORS");
+    public clearErrors = this.bindDispatch(NavigationActions.clearErrors);
+
+    public static setPatchItems = createAction<IPatchFlatItem[]>("SET_PATCH_ITEMS");
+    public setPatchItems = this.bindDispatch(NavigationActions.setPatchItems);
+
     /**
      * Patch a knowlege base's navigation using the flat format.
      *
      * @param patchItems Patch request parameters.
      */
-    public patchNavigationFlat = (knowledgeBaseID: number, patchItems: IPatchFlatItem[]) => {
+    public patchNavigationFlat = (knowledgeBaseID: number) => {
+        const patchItems = this.getState<IStoreState>().knowledge.navigation.patchItems;
         const params = {
             transactionID: uniqueId("patchNav"),
             patchItems,

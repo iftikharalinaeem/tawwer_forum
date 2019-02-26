@@ -3,19 +3,18 @@
  * @license GPL-2.0-only
  */
 
+import { IArticle } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, INavigationItem, LoadStatus, IApiError } from "@library/@types/api";
+import { IApiError, INavigationItem, LoadStatus } from "@library/@types/api";
+import { formatUrl } from "@library/application";
 import ReduxReducer from "@library/state/ReduxReducer";
 import { compare } from "@library/utility";
 import { produce } from "immer";
 import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { formatUrl } from "@library/application";
-import { IArticle } from "@knowledge/@types/api";
-import { Navigation } from "@knowledge/navigation/Navigation";
 
 export enum KbRecordType {
     CATEGORY = "knowledgeCategory",
@@ -25,6 +24,7 @@ export enum KbRecordType {
 
 export enum NavigationActionType {
     MOVE = "move",
+    GET = "get",
     OTHER = "other",
 }
 
@@ -48,6 +48,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             [NavigationModel.SYNTHETIC_ROOT.recordType +
             NavigationModel.SYNTHETIC_ROOT.recordID]: NavigationModel.SYNTHETIC_ROOT,
         },
+        patchItems: [],
         navigationItemsByKbID: {},
         submitStatus: LoadStatus.PENDING,
         fetchStatusesByKbID: [],
@@ -65,6 +66,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
             return reduceReducers(
+                this.reduceErrors,
                 this.reduceGetNav,
                 this.reducePatchNav,
                 this.reduceDelete,
@@ -74,6 +76,14 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             )(nextState, action);
         });
     };
+
+    private reduceErrors = reducerWithoutInitialState<INavigationStoreState>().case(
+        NavigationActions.clearErrors,
+        state => {
+            state.currentError = NavigationModel.DEFAULT_STATE.currentError;
+            return state;
+        },
+    );
 
     /**
      * Reduce actions related to fetching navigation.
@@ -92,11 +102,16 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             };
             state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
             state.fetchStatusesByKbID[knowledgeBaseID] = LoadStatus.SUCCESS;
+
+            // Clean up errors
+            if (state.currentError && state.currentError.type === NavigationActionType.GET) {
+                state.currentError = NavigationModel.DEFAULT_STATE.currentError;
+            }
             return state;
         })
         .case(NavigationActions.getNavigationFlatACs.failed, (state, payload) => {
             state.currentError = {
-                type: NavigationActionType.OTHER,
+                type: NavigationActionType.GET,
                 error: payload.error,
             };
             state.fetchStatusesByKbID[payload.params.knowledgeBaseID] = LoadStatus.ERROR;
@@ -104,6 +119,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         });
 
     private reducePatchNav: ReducerType = reducerWithoutInitialState<INavigationStoreState>()
+        .case(NavigationActions.setPatchItems, (state, payload) => {
+            state.patchItems = payload;
+            return state;
+        })
         .case(NavigationActions.patchNavigationFlatACs.started, (state, payload) => {
             state.patchTransactionID = payload.transactionID;
             state.submitStatus = LoadStatus.LOADING;
@@ -120,10 +139,16 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
                 state.submitStatus = LoadStatus.SUCCESS;
             }
+
+            // Clean up errors
+            if (state.currentError && state.currentError.type === NavigationActionType.MOVE) {
+                state.currentError = NavigationModel.DEFAULT_STATE.currentError;
+            }
             return state;
         })
         .case(NavigationActions.patchNavigationFlatACs.failed, (state, payload) => {
-            state.submitStatus = LoadStatus.SUCCESS;
+            state.submitStatus = LoadStatus.ERROR;
+            state.patchTransactionID = null;
             state.currentError = {
                 type: NavigationActionType.MOVE,
                 error: payload.error,
@@ -594,6 +619,7 @@ export interface INavigationStoreState {
         [kbID: number]: LoadStatus;
     };
     patchTransactionID: string | null;
+    patchItems: IPatchFlatItem[];
     currentError: {
         type: NavigationActionType;
         error: IApiError;
