@@ -206,7 +206,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationFlat(int $id, array $query = []): array {
-        throw new ServerException("Internal Server errrrrrror");
         $this->permission("knowledge.kb.view");
         $this->idParamSchema();
         $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
