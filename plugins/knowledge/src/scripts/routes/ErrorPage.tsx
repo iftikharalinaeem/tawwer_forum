@@ -94,7 +94,7 @@ export class ErrorPage extends React.Component<IProps> {
     }
 
     private parseDefaultError(): IError {
-        const errorCode = this.props.apiError ? this.props.apiError.status : null;
+        const errorCode = this.props.apiError ? this.props.apiError.response.status : null;
         const globalVars = globalVariables();
         const debug = debugHelper("errorPage");
         const errorIconClass = style({

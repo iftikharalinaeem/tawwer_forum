@@ -240,11 +240,9 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
     }
 
     const navigatedKB = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
-    const navLoadStatus = navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID] || {
-        status: LoadStatus.PENDING,
-    };
+    const navLoadStatus = navigation.fetchStatusesByKbID[navigatedRecord.knowledgeBaseID] || LoadStatus.PENDING;
 
-    if (navLoadStatus.status === LoadStatus.SUCCESS) {
+    if (navLoadStatus === LoadStatus.SUCCESS) {
         let recordKey = navigatedRecord.recordType + navigatedRecord.recordID;
         if (navigatedRecord.recordType === KbRecordType.KB) {
             recordKey = KbRecordType.CATEGORY + navigatedKB.rootCategoryID;
@@ -261,7 +259,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
         return {
             ...commonReturn,
             childRecords: {
-                ...navLoadStatus,
+                status: navLoadStatus,
                 data: NavigationSelector.selectDirectChildren(navigation.navigationItems, recordKey, recordTypes),
             },
             navigatedKB,
@@ -270,7 +268,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
         return {
             ...commonReturn,
             childRecords: {
-                ...navLoadStatus,
+                status: navLoadStatus,
             },
             navigatedKB,
         };
