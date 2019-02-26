@@ -14,8 +14,7 @@ $navigationManager-deleteButton_color: #a60215;
 $navigationManager-actionButton_shadowColor: $global-color_bg;
 $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
-//$navigationManager-folder_spacing: 12px;
-$navigationManager-folderIcon_width: 18.612px;
+$navigationManager-folderIcon_width: 19px;
 $navigationManager-folderIcon_height: 14px;
 $navigationManager-folderIcon_color: mixContentBgAndFg(50%);
 
@@ -100,11 +99,12 @@ $navigationManager-input_lineHeight: 24px;
     }
 
     &.isArticle {
-        .navigationManager-draggable {
-            //margin-left: 0;
-        }
+        .navigationManager-draggable,
         .navigationManager-articlePage {
             margin-left: 0;
+        }
+        &.isInRoot {
+            padding-left: 15px !important;
         }
     }
 }

@@ -27,7 +27,7 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { richEditorFormClasses } from "plugins/rich-editor/src/scripts/styles/richEditorStyles";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
