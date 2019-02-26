@@ -62,6 +62,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     renderLeft={true}
                     openAsModal={this.props.device === Devices.MOBILE}
                     title={isMobile ? t("Article") : undefined}
+                    paddedList={true}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
