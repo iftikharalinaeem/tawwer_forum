@@ -296,4 +296,68 @@ MESSAGE
             self::STATUS_PUBLISHED,
         ];
     }
+
+    /**
+     * Add a knowledge base.
+     *
+     * @param array $set Field values to set.
+     * @return mixed ID of the inserted row.
+     * @throws Exception If an error is encountered while performing the query.
+     */
+    public function insert(array $set) {
+        $type = $set["viewType"] ?? null;
+
+        // Enforce restrictions on KB article sorting.
+        if ($type === self::TYPE_GUIDE) {
+            $set["sortArticles"] = self::ORDER_MANUAL;
+        } elseif (array_key_exists("sortArticles", $set) && $set["sortArticles"] === self::ORDER_MANUAL) {
+            throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
+        }
+
+        return parent::insert($set);
+    }
+
+    /**
+     * Update existing knowledge bases.
+     *
+     * @param array $set Field values to set.
+     * @param array $where Conditions to restrict the update.
+     * @throws \Exception If an error is encountered while performing the query.
+     * @return bool True.
+     */
+    public function update(array $set, array $where): bool {
+        $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
+
+        // Enforce restrictions on sorting.
+        if ($isSingle && array_key_exists("sort", $set)) {
+            $sort = $set["sortArticles"] ?? null;
+
+            // Manual sorting is exclusive to guides. Help centers cannot be sorted manually.
+            if ($sort === self::ORDER_MANUAL) {
+                $viewType = $set["viewType"] ?? null;
+                if ($viewType && $viewType !== self::TYPE_GUIDE) {
+                    throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
+                }
+
+                // If we aren't setting the view type in this operation, get the existing view type from the row for comparison.
+                try {
+                    $row = $this->selectSingle(["knowledgeBaseID" => $where["knowledgeBaseID"]]);
+                } catch (NoResultsException $e) {
+                    // Avoid the "not found" exception bubbling up.
+                    $row = null;
+                }
+
+                if ($row && $row["viewType"] !== self::TYPE_GUIDE) {
+                    throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
+                }
+            }
+        }
+
+        // Force guides to have a manual sort order.
+        if ($isSingle && array_key_exists("viewType", $set) && $set["viewType"] === self::TYPE_GUIDE) {
+            $set["sortArticles"] = self::ORDER_MANUAL;
+        }
+
+        return parent::update($set, $where);
+    }
 }

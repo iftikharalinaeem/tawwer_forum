@@ -252,6 +252,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     public function testAddHelpCenterArticleOverLimit() {
         $record = $this->record(__FUNCTION__);
         $record["viewType"] = "help";
+        $record["sortArticles"] = "dateInsertedDesc";
         $knowledgeBase = $this->api()->post(
             $this->baseUrl,
             $record
