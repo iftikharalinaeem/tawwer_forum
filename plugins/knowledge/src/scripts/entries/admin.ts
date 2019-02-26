@@ -20,7 +20,6 @@ function handleKBViewTypeChange() {
 
 function updateSortArticles(viewType: string) {
     const sortArticlesGroup = document.querySelectorAll(".js-sortArticlesGroup");
-    console.log(sortArticlesGroup);
     if (viewType === "help") {
         sortArticlesGroup.forEach(group => {
             group.classList.remove("Hidden");
