@@ -77,13 +77,17 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         });
     };
 
-    private reduceErrors = reducerWithoutInitialState<INavigationStoreState>().case(
-        NavigationActions.clearErrors,
-        state => {
+    private reduceErrors = reducerWithoutInitialState<INavigationStoreState>()
+        .case(NavigationActions.clearErrors, state => {
             state.currentError = NavigationModel.DEFAULT_STATE.currentError;
             return state;
-        },
-    );
+        })
+        .case(NavigationActions.markRetryAsLoading, state => {
+            if (state.currentError) {
+                state.currentError.isLoading = true;
+            }
+            return state;
+        });
 
     /**
      * Reduce actions related to fetching navigation.
@@ -113,6 +117,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             state.currentError = {
                 type: NavigationActionType.GET,
                 error: payload.error,
+                isLoading: false,
             };
             state.fetchStatusesByKbID[payload.params.knowledgeBaseID] = LoadStatus.ERROR;
             return state;
@@ -152,6 +157,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             state.currentError = {
                 type: NavigationActionType.MOVE,
                 error: payload.error,
+                isLoading: false,
             };
             return state;
         });
@@ -623,5 +629,6 @@ export interface INavigationStoreState {
     currentError: {
         type: NavigationActionType;
         error: IApiError;
+        isLoading: boolean;
     } | null;
 }

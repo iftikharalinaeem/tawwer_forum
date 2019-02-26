@@ -48,6 +48,9 @@ export default class NavigationActions extends ReduxActions {
         IApiError
     >("PATCH_NAVIGATION_FLAT");
 
+    public static markRetryAsLoading = createAction("MARK_RETRY_AS_LOADING");
+    public markRetryAsLoading = this.bindDispatch(NavigationActions.markRetryAsLoading);
+
     public static clearErrors = createAction("CLEAR_ERRORS");
     public clearErrors = this.bindDispatch(NavigationActions.clearErrors);
 

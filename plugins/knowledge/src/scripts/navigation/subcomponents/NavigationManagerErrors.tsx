@@ -24,7 +24,11 @@ class NavigationManagerErrors extends React.Component<IProps> {
         const retryHandler = this.getRetryHandler();
 
         return (
-            <FormError onDismissClick={this.props.onClear} onRetryClick={retryHandler || undefined}>
+            <FormError
+                isRetryLoading={currentError.isLoading}
+                onDismissClick={this.props.onClear}
+                onRetryClick={retryHandler ? this.handleRetry : undefined}
+            >
                 {getGlobalErrorMessage(currentError.error)}
             </FormError>
         );
@@ -45,11 +49,13 @@ class NavigationManagerErrors extends React.Component<IProps> {
         }
     };
 
-    private handleErrorDismiss = () => {
-        this.props.onClear();
+    private handleRetry = () => {
+        const handler = this.getRetryHandler();
+        if (handler) {
+            this.props.onRetry();
+            handler();
+        }
     };
-
-    private handleRetryMove = () => {};
 }
 
 interface IOwnProps {
@@ -69,6 +75,7 @@ function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
 
     return {
         onClear: navigationActions.clearErrors,
+        onRetry: navigationActions.markRetryAsLoading,
         requestData: () => navigationActions.getNavigationFlat(ownProps.knowledgeBaseID, true),
         syncData: () => navigationActions.patchNavigationFlat(ownProps.knowledgeBaseID),
     };
