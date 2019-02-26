@@ -816,14 +816,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($fields['knowledgeCategoryID']);
             $maxSortIndex = $sortInfo['maxSort'];
             if (!is_int($fields['sort'] ?? false)) {
-                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
-                    && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
                     $fields['sort'] = $maxSortIndex + 1;
                 }
                 $updateSorts = false;
             } else {
-                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE
-                    && $sortInfo['sortArticles'] === KnowledgeBaseModel::ORDER_MANUAL) {
+                if ($sortInfo['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
                     $updateSorts = ($fields['sort'] <= $maxSortIndex);
                 } else {
                     // when KB is in Help center mode or KB is not in Manual sorting mode

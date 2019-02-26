@@ -7,11 +7,11 @@
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 

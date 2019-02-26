@@ -41,7 +41,7 @@ class LocationPicker extends React.Component<IProps, IState> {
                     />
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <LocationContents />
+                            <LocationContents key={`contents-${navigatedRecord}`} />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
@@ -60,14 +60,13 @@ class LocationPicker extends React.Component<IProps, IState> {
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal &&
-                    this.props.navigatedCategory && (
-                        <NewCategoryForm
-                            exitHandler={this.hideNewFolderModal}
-                            parentCategoryID={this.props.navigatedCategory.recordID}
-                            buttonRef={this.newFolderButtonRef}
-                        />
-                    )}
+                {this.state.showNewCategoryModal && this.props.navigatedCategory && (
+                    <NewCategoryForm
+                        exitHandler={this.hideNewFolderModal}
+                        parentCategoryID={this.props.navigatedCategory.recordID}
+                        buttonRef={this.newFolderButtonRef}
+                    />
+                )}
             </>
         );
     }

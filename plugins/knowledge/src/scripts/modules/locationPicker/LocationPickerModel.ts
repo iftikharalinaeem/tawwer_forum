@@ -6,7 +6,7 @@
 
 import { IKbCategoryFragment } from "@knowledge/@types/api";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import NavigationModel, { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationModel, { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { INavigationTreeItem } from "@library/@types/api";
@@ -139,6 +139,7 @@ export interface ILocationPickerRecord {
     recordType: KbRecordType;
     recordID: number;
     knowledgeBaseID: number;
+    position?: number;
 }
 
 export interface ILocationPickerState {
