@@ -29,8 +29,8 @@ export default class NavigationActions extends ReduxActions {
      */
     public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState<IStoreState>();
-        const fetchLoadable = state.knowledge.navigation.fetchLoadablesByKbID[knowledgeBaseID];
-        if (!forceUpdate && fetchLoadable && fetchLoadable.status === LoadStatus.SUCCESS) {
+        const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
+        if (!forceUpdate && fetchStatus === LoadStatus.SUCCESS) {
             return;
         }
 

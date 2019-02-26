@@ -13,6 +13,8 @@ use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use TheSeer\Tokenizer\Exception;
+use Garden\Web\Exception\ServerException;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -204,6 +206,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationFlat(int $id, array $query = []): array {
+        throw new ServerException("Internal Server errrrrrror");
         $this->permission("knowledge.kb.view");
         $this->idParamSchema();
         $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")

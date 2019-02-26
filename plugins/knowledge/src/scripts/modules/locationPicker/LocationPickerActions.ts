@@ -71,7 +71,7 @@ export default class LocationPickerActions extends ReduxActions {
         };
         const requestNavigation = async () => {
             const { navigatedRecord } = locationPicker;
-            if (navigatedRecord && !navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID]) {
+            if (navigatedRecord && !navigation.fetchStatusesByKbID[navigatedRecord.knowledgeBaseID]) {
                 await this.navActions.getNavigationFlat(navigatedRecord.knowledgeBaseID);
             }
         };
@@ -90,8 +90,8 @@ export default class LocationPickerActions extends ReduxActions {
             const { recordID, recordType, knowledgeBaseID } = record;
 
             if (
-                !navigation.fetchLoadablesByKbID[knowledgeBaseID] ||
-                navigation.fetchLoadablesByKbID[knowledgeBaseID].status !== LoadStatus.SUCCESS
+                !navigation.fetchStatusesByKbID[knowledgeBaseID] ||
+                navigation.fetchStatusesByKbID[knowledgeBaseID] !== LoadStatus.SUCCESS
             ) {
                 await this.navActions.getNavigationFlat(knowledgeBaseID);
             }
