@@ -13,8 +13,6 @@ use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use TheSeer\Tokenizer\Exception;
-use Garden\Web\Exception\ServerException;
 
 /**
  * Endpoint for the knowledge base resource.
