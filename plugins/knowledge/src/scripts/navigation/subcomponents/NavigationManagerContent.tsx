@@ -30,7 +30,7 @@ interface IProps {
     writeMode: boolean;
     firstID: string | null;
     getItemID: (id: string) => string;
-    isItemInRoot: (id: number) => boolean;
+    isInRoot: boolean;
 }
 
 interface IState {
@@ -47,7 +47,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot } = this.props;
+        const { item, provided, snapshot, isInRoot } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         return (
@@ -68,7 +68,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     isActive: this.isCurrent(),
                     isChild: item.data.parentID !== 0,
                     isArticle: item.data.recordType === KbRecordType.ARTICLE,
-                    isInRoot: this.props.isItemInRoot(item.data.parentID),
+                    isInRoot,
                 })}
                 aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
                 tabIndex={
