@@ -22,6 +22,7 @@ use CommentModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Utility\InstanceValidatorSchema;
 use CategoryModel;
+use Garden\Web\Exception\ServerException;
 
 /**
  * Endpoint for the Knowledge resource.
@@ -270,7 +271,7 @@ class KnowledgeApiController extends AbstractApiController {
             if (empty($errorMessage)) {
                 $errorMessage = $this->sphinx->getLastWarning();
             }
-            throw new ClientException($errorMessage);
+            throw new ServerException("Sphinx error: $errorMessage");
         }
     }
 
