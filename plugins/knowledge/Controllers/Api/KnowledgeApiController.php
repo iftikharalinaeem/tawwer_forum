@@ -544,7 +544,6 @@ class KnowledgeApiController extends AbstractApiController {
             self::SPHINX_DEFAULT_LIMIT,
             ['d.DiscussionID' => $ids]
         )->resultArray();
-
         $normalized = $this->normalizeForumRecords($discussions, $dtype);
         return $normalized;
     }
