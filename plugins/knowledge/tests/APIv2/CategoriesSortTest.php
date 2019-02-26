@@ -170,12 +170,14 @@ class CategoriesSortTest extends AbstractAPIv2Test {
 
         if (!isset(self::$preparedCategorySortData[$kbType])) {
             $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+            $sortArticles = $kbType === KnowledgeBaseModel::TYPE_GUIDE ? KnowledgeBaseModel::ORDER_MANUAL : KnowledgeBaseModel::ORDER_DATE_DESC;
 
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
                 "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
-                "viewType" => $kbType
+                "viewType" => $kbType,
+                "sortArticles" => $sortArticles,
             ])->getBody();
 
             // Setup the test categories.
@@ -251,14 +253,17 @@ class CategoriesSortTest extends AbstractAPIv2Test {
      */
     protected function prepareFreshSortData(string $kbType = KnowledgeBaseModel::TYPE_GUIDE, string $tmpDataPrefix = ''): array {
         $index = $tmpDataPrefix.$kbType;
+
         if (!isset(self::$preparedCategorySortData[$index])) {
             $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+            $sortArticles = $kbType === KnowledgeBaseModel::TYPE_GUIDE ? KnowledgeBaseModel::ORDER_MANUAL : KnowledgeBaseModel::ORDER_DATE_DESC;
 
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
                 "urlCode" => 'test-Knowledge-Base-' . round(microtime(true) * 1000) . rand(1, 1000),
-                "viewType" => $kbType
+                "viewType" => $kbType,
+                "sortArticles" => $sortArticles
             ])->getBody();
 
             // Setup the test categories.
@@ -341,12 +346,14 @@ class CategoriesSortTest extends AbstractAPIv2Test {
         $index = 'patch'.$kbType;
         if (!isset(self::$preparedCategorySortData[$index])) {
             $helloWorldBody = json_encode([["insert" => "Hello World"]]);
+            $sortArticles = $kbType === KnowledgeBaseModel::TYPE_GUIDE ? KnowledgeBaseModel::ORDER_MANUAL : KnowledgeBaseModel::ORDER_DATE_DESC;
 
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
                 "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
-                "viewType" => $kbType
+                "viewType" => $kbType,
+                "sortArticles" => $sortArticles,
             ])->getBody();
 
             // Setup the test categories.
