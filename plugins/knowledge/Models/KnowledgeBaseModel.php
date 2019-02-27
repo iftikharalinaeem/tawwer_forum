@@ -309,8 +309,7 @@ MESSAGE
         $type = $set["viewType"] ?? null;
 
         // Enforce restrictions on KB article sorting.
-        $this->validateSetSortArticles($set);
-
+        $this->validateSortArticlesInternal($set);
 
         return parent::insert($set);
     }
@@ -328,19 +327,19 @@ MESSAGE
 
         // Enforce restrictions on sorting.
         if ($isSingle) {
-            $this->validateSetSortArticles($set, $where["knowledgeBaseID"]);
+            $this->validateSortArticlesInternal($set, $where["knowledgeBaseID"]);
         }
 
         return parent::update($set, $where);
     }
 
     /**
-     * Vaidate sort value of fields to write.
+     * Vaidate sort value of fields to be written to a new or existing knowledge base row.
      *
      * @param array $set
      * @param integer $knowledgeBaseID
      */
-    private function validateSetSortArticles(array $set, int $knowledgeBaseID = null) {
+    private function validateSortArticlesInternal(array $set, int $knowledgeBaseID = null) {
         if ($knowledgeBaseID) {
             try {
                 $row = $this->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
@@ -362,7 +361,8 @@ MESSAGE
     }
 
     /**
-     * Validate the sort type attempting to be applied to a KB.
+     * Validate potential sortArticle value for a KB.
+     * This method is intended to be applied as a custom validator on a {@see \Garden\Schema\Schema} instance.
      *
      * @param array $data Full array of data to be written.
      * @param ValidationField $validation
@@ -375,7 +375,7 @@ MESSAGE
         }
 
         try {
-            $this->validateSetSortArticles($data, $recordID);
+            $this->validateSortArticlesInternal($data, $recordID);
         } catch (\InvalidArgumentException $e) {
             $field = array_key_exists("sortArticles", $data) ? "sortArticles" : "viewType";
             $validation->getValidation()->addError($field, $e->getMessage());

@@ -161,8 +161,8 @@ class KnowledgeSettingsController extends SettingsController {
                     // Manual is not an option here. That is determined by the viewType === Guide
                 ],
                 'ItemWrap' => [
-                    "<li class=\"form-group js-sortArticlesGroup\">\n",
-                    "\n</li>\n"
+                    '<li class="form-group js-sortArticlesGroup">',
+                    '</li>'
                 ]
             ],
         ];
