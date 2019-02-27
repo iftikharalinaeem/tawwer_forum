@@ -5,27 +5,28 @@
  */
 
 import { IKbCategory } from "@knowledge/@types/api";
+import PageTitle from "@knowledge/modules/common/PageTitle";
 import { IResult } from "@knowledge/modules/common/SearchResult";
 import SearchResults from "@knowledge/modules/common/SearchResults";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { t } from "@library/application";
+import Breadcrumbs from "@library/components/Breadcrumbs";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
+import { compose } from "@library/components/icons";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import LinkAsButton from "@library/components/LinkAsButton";
 import { withDevice } from "@library/contexts/DeviceContext";
 import SimplePager from "@library/simplePager/SimplePager";
 import { ILinkPages } from "@library/simplePager/SimplePagerModel";
-import * as React from "react";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import LinkAsButton from "@library/components/LinkAsButton";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import { t } from "@library/application";
-import { compose } from "@library/components/icons";
-import Breadcrumbs from "@library/components/Breadcrumbs";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import classNames from "classnames";
+import * as React from "react";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -44,13 +45,27 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
     };
 
     public render() {
-        const { category, device, pages } = this.props;
+        const { category, device, pages, results } = this.props;
         const activeRecord = {
             recordType: KbRecordType.CATEGORY,
             recordID: category.knowledgeCategoryID,
         };
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         const classesSearchBar = searchBarClasses();
+
+        const pageContent =
+            results.length > 0 ? (
+                <PanelWidgetVerticalPadding>
+                    <SearchResults results={this.props.results} />
+                    <SimplePager url={category.url + "/p:page:"} pages={pages} />
+                </PanelWidgetVerticalPadding>
+            ) : (
+                <ErrorPage
+                    defaultError={DefaultError.CATEGORY_NO_ARTICLES}
+                    knowledgeBaseID={category.knowledgeBaseID}
+                    knowledgeCategoryID={category.knowledgeCategoryID}
+                />
+            );
 
         return (
             <Container>
@@ -101,12 +116,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             </PageTitle>
                         </PanelWidget>
                     }
-                    middleBottom={
-                        <PanelWidgetVerticalPadding>
-                            <SearchResults results={this.props.results} />
-                            <SimplePager url={category.url + "/p:page:"} pages={pages} />
-                        </PanelWidgetVerticalPadding>
-                    }
+                    middleBottom={pageContent}
                     rightTop={isFullWidth && <></>}
                 />
             </Container>

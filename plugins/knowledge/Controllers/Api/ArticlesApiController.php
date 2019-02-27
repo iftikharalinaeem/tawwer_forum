@@ -364,7 +364,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
 
         // A page beyond our bounds is expected to return a not-found (404) response.
-        if ($query["page"] > $paging["pageCount"]) {
+        if ($query["page"] > 1 && $query["page"] > $paging["pageCount"]) {
             throw new NotFoundException();
         }
 
