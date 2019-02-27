@@ -334,7 +334,7 @@ MESSAGE
     }
 
     /**
-     * Vaidate sort value of fields to be written to a new or existing knowledge base row.
+     * Validate sort value of fields to be written to a new or existing knowledge base row.
      *
      * @param array $set
      * @param integer $knowledgeBaseID
