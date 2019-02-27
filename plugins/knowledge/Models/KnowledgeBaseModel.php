@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
+use Garden\Schema\Validation;
 
 /**
  * A model for managing knowledge bases.
@@ -295,5 +296,91 @@ MESSAGE
             self::STATUS_DELETED,
             self::STATUS_PUBLISHED,
         ];
+    }
+
+    /**
+     * Add a knowledge base.
+     *
+     * @param array $set Field values to set.
+     * @return mixed ID of the inserted row.
+     * @throws Exception If an error is encountered while performing the query.
+     */
+    public function insert(array $set) {
+        $type = $set["viewType"] ?? null;
+
+        // Enforce restrictions on KB article sorting.
+        $this->validateSortArticlesInternal($set);
+
+        return parent::insert($set);
+    }
+
+    /**
+     * Update existing knowledge bases.
+     *
+     * @param array $set Field values to set.
+     * @param array $where Conditions to restrict the update.
+     * @throws \Exception If an error is encountered while performing the query.
+     * @return bool True.
+     */
+    public function update(array $set, array $where): bool {
+        $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
+
+        // Enforce restrictions on sorting.
+        if ($isSingle) {
+            $this->validateSortArticlesInternal($set, $where["knowledgeBaseID"]);
+        }
+
+        return parent::update($set, $where);
+    }
+
+    /**
+     * Validate sort value of fields to be written to a new or existing knowledge base row.
+     *
+     * @param array $set
+     * @param integer $knowledgeBaseID
+     */
+    private function validateSortArticlesInternal(array $set, int $knowledgeBaseID = null) {
+        if ($knowledgeBaseID) {
+            try {
+                $row = $this->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            } catch (NoResultsException $e) {
+                $row = [];
+            }
+        } else {
+            $row = [];
+        }
+
+        $sort = $set["sortArticles"] ?? $row["sortArticles"] ?? null;
+        $type = $set["viewType"] ?? $row["viewType"] ?? null;
+
+        if ($sort === KnowledgeBaseModel::ORDER_MANUAL && $type !== KnowledgeBaseModel::TYPE_GUIDE) {
+            throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
+        } elseif ($type === KnowledgeBaseModel::TYPE_GUIDE && $sort !== KnowledgeBaseModel::ORDER_MANUAL) {
+            throw new \InvalidArgumentException("A guide must be manually sorted.");
+        }
+    }
+
+    /**
+     * Validate potential sortArticle value for a KB.
+     * This method is intended to be applied as a custom validator on a {@see \Garden\Schema\Schema} instance.
+     *
+     * @param array $data Full array of data to be written.
+     * @param ValidationField $validation
+     * @param integer $recordID
+     */
+    public function validateSortArticles(array $data, ValidationField $validation, int $recordID = null) {
+        if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
+            // Avoid additional validation if neither relevant field is detected.
+            return true;
+        }
+
+        try {
+            $this->validateSortArticlesInternal($data, $recordID);
+        } catch (\InvalidArgumentException $e) {
+            $field = array_key_exists("sortArticles", $data) ? "sortArticles" : "viewType";
+            $validation->getValidation()->addError($field, $e->getMessage());
+        }
+
+        return true;
     }
 }

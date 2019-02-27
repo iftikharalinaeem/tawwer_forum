@@ -13,6 +13,7 @@ use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Exception\Database\NoResultsException;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -131,6 +132,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ->setDescription("Create a new knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in);
+        $this->applySortTypeValidator($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
@@ -267,6 +269,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ->setDescription("Update an existing knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in, $id);
+        $this->applySortTypeValidator($in, $id);
 
         $out = $this->schema($this->fullSchema(), "out");
 
@@ -286,6 +289,21 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         return $result;
+    }
+
+    /**
+     * Add validator for sorting.
+     *
+     * @param Schema $schema
+     * @param integer $recordID
+     */
+    private function applySortTypeValidator(Schema $schema, int $recordID = null) {
+        $schema->addValidator(
+            "",
+            function (array $data, ValidationField $validationField) use ($recordID) {
+                return $this->knowledgeBaseModel->validateSortArticles($data, $validationField, $recordID);
+            }
+        );
     }
 
     /**

@@ -160,6 +160,10 @@ class KnowledgeSettingsController extends SettingsController {
                     KnowledgeBaseModel::ORDER_NAME => 'Alphabetically',
                     // Manual is not an option here. That is determined by the viewType === Guide
                 ],
+                'ItemWrap' => [
+                    '<li class="form-group js-sortArticlesGroup">',
+                    '</li>'
+                ]
             ],
         ];
 
@@ -182,6 +186,14 @@ class KnowledgeSettingsController extends SettingsController {
         }
         if ($values["bannerImage_New"]) {
             $values["bannerImage"] = $this->handleFormMediaUpload($values["bannerImage_New"]);
+        }
+
+        // A guide must be sorted manually.
+        if ($values["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $values["sortArticles"] = KnowledgeBaseModel::ORDER_MANUAL;
+        } elseif ($values["sortArticles"] === KnowledgeBaseModel::ORDER_MANUAL) {
+            // If it isn't a guide, it can't be sorted manually.
+            $values["sortArticles"] = KnowledgeBaseModel::ORDER_DATE_DESC;
         }
 
         if ($knowledgeBaseID) {
