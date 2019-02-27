@@ -27,6 +27,8 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { richEditorFormClasses } from "plugins/rich-editor/src/scripts/styles/richEditorStyles/richEditorFormClasses";
+import classNames from "classnames";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -41,6 +43,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, history, revisions, selectedRevision } = this.props;
+        const classesRichEditorForm = richEditorFormClasses();
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
@@ -50,7 +53,10 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             >
                 <PageLoader status={revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
-                        <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+                        <form
+                            className={classNames("richEditorForm", "inheritHeight", classesRichEditorForm.root)}
+                            onSubmit={this.onSubmit}
+                        >
                             <RevisionsLayout
                                 bodyHeading={this.renderTitle()}
                                 bodyContent={
