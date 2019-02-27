@@ -309,7 +309,7 @@ MESSAGE
         $type = $set["viewType"] ?? null;
 
         // Enforce restrictions on KB article sorting.
-        $this->validateSetSort($set);
+        $this->validateSetSortArticles($set);
 
 
         return parent::insert($set);
@@ -328,7 +328,7 @@ MESSAGE
 
         // Enforce restrictions on sorting.
         if ($isSingle) {
-            $this->validateSetSort($set, $where["knowledgeBaseID"]);
+            $this->validateSetSortArticles($set, $where["knowledgeBaseID"]);
         }
 
         return parent::update($set, $where);
@@ -340,12 +340,24 @@ MESSAGE
      * @param array $set
      * @param integer $knowledgeBaseID
      */
-    private function validateSetSort(array $set, int $knowledgeBaseID = null) {
-        $validation = new Validation();
-        $validationField = new ValidationField($validation, [], "sortArticles");
-        $this->validateSortType($set, $validationField, $knowledgeBaseID);
-        if ($validation->getErrorCount() > 0) {
-            throw new \InvalidArgumentException($validation->getMessage());
+    private function validateSetSortArticles(array $set, int $knowledgeBaseID = null) {
+        if ($knowledgeBaseID) {
+            try {
+                $row = $this->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            } catch (NoResultsException $e) {
+                $row = [];
+            }
+        } else {
+            $row = [];
+        }
+
+        $sort = $set["sortArticles"] ?? $row["sortArticles"] ?? null;
+        $type = $set["viewType"] ?? $row["viewType"] ?? null;
+
+        if ($sort === KnowledgeBaseModel::ORDER_MANUAL && $type !== KnowledgeBaseModel::TYPE_GUIDE) {
+            throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
+        } elseif ($type === KnowledgeBaseModel::TYPE_GUIDE && $sort !== KnowledgeBaseModel::ORDER_MANUAL) {
+            throw new \InvalidArgumentException("A guide must be manually sorted.");
         }
     }
 
@@ -356,29 +368,17 @@ MESSAGE
      * @param ValidationField $validation
      * @param integer $recordID
      */
-    public function validateSortType(array $data, ValidationField $validation, int $recordID = null) {
+    public function validateSortArticles(array $data, ValidationField $validation, int $recordID = null) {
         if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
+            // Avoid additional validation if neither relevant field is detected.
             return true;
         }
 
-        if ($recordID) {
-            try {
-                $row = $this->selectSingle(["knowledgeBaseID" => $recordID]);
-            } catch (NoResultsException $e) {
-                $row = [];
-            }
-        } else {
-            $row = [];
-        }
-
-        $sort = $data["sortArticles"] ?? $row["sortArticles"] ?? null;
-        $type = $data["viewType"] ?? $row["viewType"] ?? null;
-        $field = array_key_exists("sortArticles", $data) ? "sortArticles" : "viewType";
-
-        if ($sort === KnowledgeBaseModel::ORDER_MANUAL && $type !== KnowledgeBaseModel::TYPE_GUIDE) {
-            $validation->getValidation()->addError($field, "A knowledge base must be a guide to use manual sorting.");
-        } elseif ($type === KnowledgeBaseModel::TYPE_GUIDE && $sort !== KnowledgeBaseModel::ORDER_MANUAL) {
-            $validation->getValidation()->addError($field, "A guide must be manually sorted.");
+        try {
+            $this->validateSetSortArticles($data, $recordID);
+        } catch (\InvalidArgumentException $e) {
+            $field = array_key_exists("sortArticles", $data) ? "sortArticles" : "viewType";
+            $validation->getValidation()->addError($field, $e->getMessage());
         }
 
         return true;

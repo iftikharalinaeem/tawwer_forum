@@ -301,7 +301,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $schema->addValidator(
             "",
             function (array $data, ValidationField $validationField) use ($recordID) {
-                return $this->knowledgeBaseModel->validateSortType($data, $validationField, $recordID);
+                return $this->knowledgeBaseModel->validateSortArticles($data, $validationField, $recordID);
             }
         );
     }
