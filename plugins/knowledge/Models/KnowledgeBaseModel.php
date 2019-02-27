@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
+use Garden\Schema\Validation;
 
 /**
  * A model for managing knowledge bases.
@@ -308,11 +309,8 @@ MESSAGE
         $type = $set["viewType"] ?? null;
 
         // Enforce restrictions on KB article sorting.
-        if ($type === self::TYPE_GUIDE) {
-            $set["sortArticles"] = self::ORDER_MANUAL;
-        } elseif (array_key_exists("sortArticles", $set) && $set["sortArticles"] === self::ORDER_MANUAL) {
-            throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
-        }
+        $this->validateSetSort($set);
+
 
         return parent::insert($set);
     }
@@ -329,35 +327,60 @@ MESSAGE
         $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
 
         // Enforce restrictions on sorting.
-        if ($isSingle && array_key_exists("sortArticles", $set)) {
-            $sort = $set["sortArticles"] ?? null;
-
-            // Manual sorting is exclusive to guides. Help centers cannot be sorted manually.
-            if ($sort === self::ORDER_MANUAL) {
-                $viewType = $set["viewType"] ?? null;
-                if ($viewType && $viewType !== self::TYPE_GUIDE) {
-                    throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
-                }
-
-                // If we aren't setting the view type in this operation, get the existing view type from the row for comparison.
-                try {
-                    $row = $this->selectSingle(["knowledgeBaseID" => $where["knowledgeBaseID"]]);
-                } catch (NoResultsException $e) {
-                    // Avoid the "not found" exception bubbling up.
-                    $row = null;
-                }
-
-                if ($row && $row["viewType"] !== self::TYPE_GUIDE) {
-                    throw new \InvalidArgumentException("A knowledge base must be a guide to use manual sorting.");
-                }
-            }
-        }
-
-        // Force guides to have a manual sort order.
-        if ($isSingle && array_key_exists("viewType", $set) && $set["viewType"] === self::TYPE_GUIDE) {
-            $set["sortArticles"] = self::ORDER_MANUAL;
+        if ($isSingle) {
+            $this->validateSetSort($set, $where["knowledgeBaseID"]);
         }
 
         return parent::update($set, $where);
+    }
+
+    /**
+     * Vaidate sort value of fields to write.
+     *
+     * @param array $set
+     * @param integer $knowledgeBaseID
+     */
+    private function validateSetSort(array $set, int $knowledgeBaseID = null) {
+        $validation = new Validation();
+        $validationField = new ValidationField($validation, [], "sortArticles");
+        $this->validateSortType($set, $validationField, $knowledgeBaseID);
+        if ($validation->getErrorCount() > 0) {
+            throw new \InvalidArgumentException($validation->getMessage());
+        }
+    }
+
+    /**
+     * Validate the sort type attempting to be applied to a KB.
+     *
+     * @param array $data Full array of data to be written.
+     * @param ValidationField $validation
+     * @param integer $recordID
+     */
+    public function validateSortType(array $data, ValidationField $validation, int $recordID = null) {
+        if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
+            return true;
+        }
+
+        if ($recordID) {
+            try {
+                $row = $this->selectSingle(["knowledgeBaseID" => $recordID]);
+            } catch (NoResultsException $e) {
+                $row = [];
+            }
+        } else {
+            $row = [];
+        }
+
+        $sort = $data["sortArticles"] ?? $row["sortArticles"] ?? null;
+        $type = $data["viewType"] ?? $row["viewType"] ?? null;
+        $field = array_key_exists("sortArticles", $data) ? "sortArticles" : "viewType";
+
+        if ($sort === KnowledgeBaseModel::ORDER_MANUAL && $type !== KnowledgeBaseModel::TYPE_GUIDE) {
+            $validation->getValidation()->addError($field, "A knowledge base must be a guide to use manual sorting.");
+        } elseif ($type === KnowledgeBaseModel::TYPE_GUIDE && $sort !== KnowledgeBaseModel::ORDER_MANUAL) {
+            $validation->getValidation()->addError($field, "A guide must be manually sorted.");
+        }
+
+        return true;
     }
 }

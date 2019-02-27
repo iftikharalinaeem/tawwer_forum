@@ -301,7 +301,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $schema->addValidator(
             "",
             function (array $data, ValidationField $validationField) use ($recordID) {
-                return $this->validateSortType($data, $validationField, $recordID);
+                return $this->knowledgeBaseModel->validateSortType($data, $validationField, $recordID);
             }
         );
     }
@@ -338,41 +338,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $validationField->addError('The specified URL code is already in use by another knowledge base.');
 
             return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validate the sort type attempting to be applied to a KB.
-     *
-     * @param array $data
-     * @param ValidationField $validation
-     * @param integer $recordID
-     */
-    private function validateSortType(array $data, ValidationField $validation, int $recordID = null) {
-        if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
-            return true;
-        }
-
-        if ($recordID) {
-            try {
-                $row = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $recordID]);
-            } catch (NoResultsException $e) {
-                $row = [];
-            }
-        } else {
-            $row = [];
-        }
-
-        $sort = $data["sortArticles"] ?? $row["sortArticles"] ?? null;
-        $type = $data["viewType"] ?? $row["viewType"] ?? null;
-        $field = array_key_exists("sortArticles", $data) ? "sort" : "viewType";
-
-        if ($sort === KnowledgeBaseModel::ORDER_MANUAL && $type !== KnowledgeBaseModel::TYPE_GUIDE) {
-            $validation->getValidation()->addError($field, "A knowledge base must be a guide to use manual sorting.");
-        } elseif ($type === KnowledgeBaseModel::TYPE_GUIDE && $sort !== KnowledgeBaseModel::ORDER_MANUAL) {
-            $validation->getValidation()->addError($field, "A guide must be manually sorted.");
         }
 
         return true;
