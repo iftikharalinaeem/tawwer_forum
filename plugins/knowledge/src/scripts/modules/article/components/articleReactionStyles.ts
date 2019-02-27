@@ -4,10 +4,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
+import { flexHelper } from "@library/styles/styleHelpers";
 import { important, percent, px } from "csx";
 import { GlobalsNumber } from "csstype";
 import { unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 
 export function reactionClasses(theme?: object) {
     const style = styleFactory("reactions");

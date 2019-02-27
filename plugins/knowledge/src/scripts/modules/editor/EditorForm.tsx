@@ -29,6 +29,7 @@ import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/Locatio
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -53,7 +54,7 @@ export class EditorForm extends React.PureComponent<IProps> {
 
         return (
             <form
-                className={classNames("richEditorForm", "inheritHeight", classesRichEditorForm.root)}
+                className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
                 onSubmit={this.onSubmit}
             >
                 <EditorHeader
@@ -78,7 +79,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                         device={this.props.device}
                         topPadding={false}
                         middleBottom={
-                            <div className="inheritHeight">
+                            <div className={inheritHeightClass()}>
                                 <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
@@ -88,7 +89,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                         "richEditorForm-title",
                                         "inputBlock-inputText",
                                         "inputText",
-                                        richEditorFormClasses.title,
+                                        classesRichEditorForm.title,
                                     )}
                                     type="text"
                                     placeholder={t("Title")}
@@ -101,7 +102,12 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     ref={this.editorRef}
                                     isPrimaryEditor={true}
                                     onChange={this.editorChangeHandler}
-                                    className="FormWrapper inheritHeight richEditorForm-editor"
+                                    className={classNames(
+                                        "FormWrapper",
+                                        "inheritHeight",
+                                        "richEditorForm-editor",
+                                        inheritHeightClass(),
+                                    )}
                                     isLoading={this.isLoading}
                                     device={this.props.device}
                                     legacyMode={false}

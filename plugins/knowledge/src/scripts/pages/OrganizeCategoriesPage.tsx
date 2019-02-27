@@ -20,6 +20,8 @@ import Heading from "@library/components/Heading";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import classNames from "classnames";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -40,9 +42,9 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className="modal-scroll inheritHeight">
-                        <div className="container inheritHeight">
-                            <div className="navigationManager-container inheritHeight">
+                    <div className={classNames("modal-scroll", inheritHeightClass())}>
+                        <div className={classNames("container", inheritHeightClass())}>
+                            <div className={classNames("navigationManager-container", inheritHeightClass())}>
                                 <DocumentTitle title={pageTitle}>
                                     <Heading
                                         id={this.titleID}
@@ -52,7 +54,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
                                         title={pageTitle}
                                     />
                                 </DocumentTitle>
-                                <div className="inheritHeight">
+                                <div className={inheritHeightClass()}>
                                     <NavigationManager
                                         knowledgeBase={knowledgeBase.data}
                                         rootNavigationItemID="knowledgeCategory1"
