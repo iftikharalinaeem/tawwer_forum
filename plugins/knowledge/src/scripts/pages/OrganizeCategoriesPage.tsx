@@ -20,14 +20,15 @@ import Heading from "@library/components/Heading";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
+import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
 
     public render() {
-        const { knowledgeBase } = this.props;
+        const { knowledgeBase, hasError } = this.props;
         const pageTitle = t("Navigation Manager");
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
@@ -42,9 +43,10 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className={classNames("modal-scroll", inheritHeightClass())}>
+                    <div className={classNames("modal-scroll", inheritHeightClass(), { hasError })}>
                         <div className={classNames("container", inheritHeightClass())}>
                             <div className={classNames("navigationManager-container", inheritHeightClass())}>
+                                <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
                                 <DocumentTitle title={pageTitle}>
                                     <Heading
                                         id={this.titleID}
@@ -93,8 +95,11 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
         data: knowledgeBasesByID.data ? knowledgeBasesByID.data[kbID] : undefined,
     };
 
+    const hasError = !!state.knowledge.navigation.currentError;
+
     return {
         knowledgeBase,
+        hasError,
     };
 }
 

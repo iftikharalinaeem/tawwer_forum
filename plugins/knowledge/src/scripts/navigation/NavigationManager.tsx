@@ -579,7 +579,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 this.selectItem(item);
             },
         );
-        await this.props.navigationActions.patchNavigationFlat(1, this.calcPatchArray(newTree));
+        this.storePatchArray(newTree);
+        await this.props.navigationActions.patchNavigationFlat(1);
     };
 
     private onDragStart = (source: ITreeSourcePosition) => {
@@ -617,7 +618,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
     /**
      * Take the internal tree state and convert back to a pure data array for patching the API endpoint.
      */
-    private calcPatchArray(data: ITreeData<INormalizedNavigationItem>) {
+    private storePatchArray(data: ITreeData<INormalizedNavigationItem>) {
         const outOfTree = {};
         for (const [index, value] of Object.entries(data.items)) {
             outOfTree[index] = {
@@ -625,7 +626,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 children: value.children,
             };
         }
-        return NavigationModel.denormalizeData(outOfTree, this.props.rootNavigationItemID);
+        const calcedData = NavigationModel.denormalizeData(outOfTree, this.props.rootNavigationItemID);
+        this.props.navigationActions.setPatchItems(calcedData);
+        return calcedData;
     }
 
     private static readonly DEFAULT_EXPAND_VALUE = true;

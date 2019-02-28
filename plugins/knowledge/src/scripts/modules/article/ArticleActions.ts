@@ -344,8 +344,8 @@ export default class ArticleActions extends ReduxActions {
         ArticleActions.PATCH_ARTICLE_RESPONSE,
         ArticleActions.PATCH_ARTICLE_ERROR,
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IPatchArticleRequestBody,
         {} as IPatchArticleResponseBody,
+        {} as IPatchArticleRequestBody,
     );
 
     public patchArticle(data: IPatchArticleRequestBody) {

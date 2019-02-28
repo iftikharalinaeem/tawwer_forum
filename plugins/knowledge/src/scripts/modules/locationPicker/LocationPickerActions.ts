@@ -7,11 +7,11 @@
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import ReduxActions from "@library/state/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 
@@ -71,7 +71,7 @@ export default class LocationPickerActions extends ReduxActions {
         };
         const requestNavigation = async () => {
             const { navigatedRecord } = locationPicker;
-            if (navigatedRecord && !navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID]) {
+            if (navigatedRecord && !navigation.fetchStatusesByKbID[navigatedRecord.knowledgeBaseID]) {
                 await this.navActions.getNavigationFlat(navigatedRecord.knowledgeBaseID);
             }
         };
@@ -90,8 +90,8 @@ export default class LocationPickerActions extends ReduxActions {
             const { recordID, recordType, knowledgeBaseID } = record;
 
             if (
-                !navigation.fetchLoadablesByKbID[knowledgeBaseID] ||
-                navigation.fetchLoadablesByKbID[knowledgeBaseID].status !== LoadStatus.SUCCESS
+                !navigation.fetchStatusesByKbID[knowledgeBaseID] ||
+                navigation.fetchStatusesByKbID[knowledgeBaseID] !== LoadStatus.SUCCESS
             ) {
                 await this.navActions.getNavigationFlat(knowledgeBaseID);
             }

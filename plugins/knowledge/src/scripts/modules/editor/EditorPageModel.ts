@@ -20,6 +20,7 @@ export interface IEditorPageForm {
     name: string;
     body: DeltaOperation[];
     knowledgeCategoryID: number | null;
+    sort?: number;
 }
 
 export interface IEditorPageState {

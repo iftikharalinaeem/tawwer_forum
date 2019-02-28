@@ -88,15 +88,15 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { knowledgeBaseID } = ownProps.knowledgeBase;
     const knowledgeState = state.knowledge.navigation;
-    const loadStatus = knowledgeState.fetchLoadablesByKbID[knowledgeBaseID] || { status: LoadStatus.PENDING };
+    const loadStatus = knowledgeState.fetchStatusesByKbID[knowledgeBaseID] || LoadStatus.PENDING;
 
     let data: ILinkListData | undefined;
-    if (loadStatus.status === LoadStatus.SUCCESS) {
+    if (loadStatus === LoadStatus.SUCCESS) {
         data = NavigationSelector.selectHelpCenterNome(knowledgeState.navigationItems, ownProps.knowledgeBase);
     }
 
     const loadable: ILoadable<ILinkListData> = {
-        ...loadStatus,
+        status: loadStatus,
         data,
     };
 

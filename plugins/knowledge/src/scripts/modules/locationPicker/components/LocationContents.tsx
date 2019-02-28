@@ -4,7 +4,10 @@
  * @license Proprietary
  */
 
-import KnowledgeBaseModel, { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import KnowledgeBaseModel, { KbViewType, IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import LocationPickerArticleItem from "@knowledge/modules/locationPicker/components/LocationPickerArticleItem";
+import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/components/LocationPickerInsertArticle";
+import LocationPickerInstructions from "@knowledge/modules/locationPicker/components/LocationPickerInstructions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
@@ -17,8 +20,14 @@ import Loader from "@library/components/Loader";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
-import LocationPickerItem from "./LocationPickerItem";
+import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
+import classNames from "classnames";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { loaderClasses } from "@library/styles/loaderStyles";
+import Paragraph from "@library/components/Paragraph";
+import { t } from "@library/application";
+import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -28,11 +37,43 @@ class LocationContents extends React.Component<IProps> {
     private listID = uniqueIDFromPrefix("navigationItemList");
 
     public render() {
-        const { selectedRecord, childRecords, chosenRecord, title } = this.props;
+        const { childRecords, chosenRecord, navigatedRecord, navigatedKB, selectedRecord, title } = this.props;
 
-        const contents =
-            childRecords.status === LoadStatus.SUCCESS && childRecords.data ? (
-                childRecords.data.map(item => {
+        const currentSort =
+            navigatedRecord &&
+            navigatedRecord.recordType === KbRecordType.CATEGORY &&
+            selectedRecord &&
+            selectedRecord.recordType === KbRecordType.CATEGORY &&
+            navigatedRecord.recordID === selectedRecord.recordID
+                ? selectedRecord.position
+                : null;
+        const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
+
+        const setArticleFirstPosition = () => {
+            this.setArticleLocation(0);
+        };
+
+        let contents;
+        if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
+            const recordCount = childRecords.data.length;
+            const message = <LocationPickerInstructions />;
+            if (recordCount === 0) {
+                if (pickArticleLocation) {
+                    contents = (
+                        <>
+                            {message}
+                            <LocationPickerInsertArticle
+                                onClick={setArticleFirstPosition}
+                                className="isFirst"
+                                isSelected={currentSort === 0}
+                            />
+                        </>
+                    );
+                } else {
+                    contents = <LocationPickerEmpty />;
+                }
+            } else {
+                contents = childRecords.data.map((item, index) => {
                     const isSelected =
                         !!selectedRecord &&
                         item.recordType === selectedRecord.recordType &&
@@ -41,23 +82,77 @@ class LocationContents extends React.Component<IProps> {
                         !!chosenRecord &&
                         item.recordType === chosenRecord.recordType &&
                         item.recordID === chosenRecord.recordID;
-                    const navigateHandler = () => this.props.navigateToRecord(item);
+                    const navigateHandler = () => {
+                        this.props.navigateToRecord(item);
+                    };
                     const selectHandler = () => this.props.selectRecord(item);
-                    return (
-                        <LocationPickerItem
-                            key={item.recordType + item.recordID}
-                            isInitialSelection={isChosen}
-                            isSelected={isSelected}
-                            name={this.radioName}
-                            value={item}
-                            onNavigate={navigateHandler}
-                            onSelect={selectHandler}
-                        />
-                    );
-                })
-            ) : (
-                <Loader />
+                    const itemKey = item.recordType + item.recordID;
+                    const itemSort = item.sort === null ? 0 : item.sort;
+                    const isLast = recordCount === index + 1;
+                    const isCurrentLocation = currentSort === index + 1;
+
+                    const setArticlePosition = () => {
+                        this.setArticleLocation(itemSort + 1);
+                    };
+
+                    const insertArticleFirst =
+                        pickArticleLocation && index === 0 ? (
+                            <React.Fragment key="potentialLocation-0">
+                                {message}
+                                <LocationPickerInsertArticle
+                                    onClick={setArticleFirstPosition}
+                                    className="isFirst"
+                                    isSelected={currentSort === 0} // first one is exception
+                                />
+                            </React.Fragment>
+                        ) : null;
+
+                    if (item.recordType === KbRecordType.ARTICLE) {
+                        return (
+                            <React.Fragment key={itemKey}>
+                                {insertArticleFirst}
+                                <LocationPickerArticleItem name={item.name} />
+                                <LocationPickerInsertArticle
+                                    onClick={setArticlePosition}
+                                    className={classNames({ isLast })}
+                                    isSelected={isCurrentLocation}
+                                />
+                            </React.Fragment>
+                        );
+                    } else {
+                        return (
+                            <React.Fragment key={itemKey}>
+                                {insertArticleFirst}
+                                <LocationPickerCategoryItem
+                                    isInitialSelection={isChosen}
+                                    isSelected={isSelected}
+                                    name={this.radioName}
+                                    value={item}
+                                    onNavigate={navigateHandler}
+                                    onSelect={selectHandler}
+                                    selectable={!pickArticleLocation}
+                                />
+                                {pickArticleLocation && (
+                                    <LocationPickerInsertArticle
+                                        onClick={setArticlePosition}
+                                        className={classNames({ isLast })}
+                                        isSelected={isCurrentLocation}
+                                    />
+                                )}
+                            </React.Fragment>
+                        );
+                    }
+                });
+            }
+        } else {
+            const classesLoader = loaderClasses();
+            contents = (
+                <li className={inheritHeightClass()}>
+                    <Loader loaderStyleClass={classesLoader.fullPageLoader} />
+                </li>
             );
+        }
+
         return (
             <LocationPickerItemList id={this.listID} legendRef={this.legendRef} categoryName={title}>
                 {contents}
@@ -95,6 +190,16 @@ class LocationContents extends React.Component<IProps> {
             void this.props.requestData();
         }
     }
+
+    private setArticleLocation(position: number) {
+        const { navigatedRecord } = this.props;
+        if (navigatedRecord) {
+            this.props.selectRecord({
+                ...navigatedRecord,
+                position,
+            });
+        }
+    }
 }
 
 interface IOwnProps {}
@@ -104,6 +209,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 interface IMapResult {
     title: string;
     navigatedRecord: ILocationPickerRecord | null;
+    navigatedKB: IKnowledgeBase | null;
     selectedRecord: ILocationPickerRecord | null;
     chosenRecord: ILocationPickerRecord | null;
     childRecords: ILoadable<IKbNavigationItem[]>;
@@ -129,22 +235,21 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
                 ...knowledgeBases.knowledgeBasesByID,
                 data: kbNavItems,
             },
+            navigatedKB: null,
         };
     }
 
-    const knowledgeBase = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
-    const navLoadStatus = navigation.fetchLoadablesByKbID[navigatedRecord.knowledgeBaseID] || {
-        status: LoadStatus.PENDING,
-    };
+    const navigatedKB = knowledgeBases.knowledgeBasesByID.data[navigatedRecord.knowledgeBaseID];
+    const navLoadStatus = navigation.fetchStatusesByKbID[navigatedRecord.knowledgeBaseID] || LoadStatus.PENDING;
 
-    if (navLoadStatus.status === LoadStatus.SUCCESS) {
+    if (navLoadStatus === LoadStatus.SUCCESS) {
         let recordKey = navigatedRecord.recordType + navigatedRecord.recordID;
         if (navigatedRecord.recordType === KbRecordType.KB) {
-            recordKey = KbRecordType.CATEGORY + knowledgeBase.rootCategoryID;
+            recordKey = KbRecordType.CATEGORY + navigatedKB.rootCategoryID;
         }
         const fullNavigatedRecord = navigation.navigationItems[recordKey];
         const recordTypes: KbRecordType[] =
-            knowledgeBase.viewType === KbViewType.GUIDE
+            navigatedKB.viewType === KbViewType.GUIDE
                 ? [KbRecordType.ARTICLE, KbRecordType.CATEGORY]
                 : [KbRecordType.CATEGORY];
         if (!fullNavigatedRecord) {
@@ -154,16 +259,18 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
         return {
             ...commonReturn,
             childRecords: {
-                ...navLoadStatus,
+                status: navLoadStatus,
                 data: NavigationSelector.selectDirectChildren(navigation.navigationItems, recordKey, recordTypes),
             },
+            navigatedKB,
         };
     } else {
         return {
             ...commonReturn,
             childRecords: {
-                ...navLoadStatus,
+                status: navLoadStatus,
             },
+            navigatedKB,
         };
     }
 }

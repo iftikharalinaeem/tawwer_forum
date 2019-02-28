@@ -73,10 +73,9 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
                 'recordType' => self::RECORD_TYPE,
                 'recordID' => $articleID
             ])
+            ->join('reactionOwner ro', 'r.reactionOwnerID = ro.reactionOwnerID')
             ->groupBy([
-                'ownerType',
-                'reactionType',
-                'recordType',
+                'r.reactionOwnerID',
                 'recordID'
             ]);
         $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
@@ -159,8 +158,9 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
                 'reactionType' => $reactionType,
                 'recordType' => self::RECORD_TYPE,
                 'recordID' => $articleID,
-                'insertUserID' => $userID
+                'r.insertUserID' => $userID
             ])
+            ->join('reactionOwner ro', 'r.reactionOwnerID = ro.reactionOwnerID')
             ->limit(1);
         $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
 

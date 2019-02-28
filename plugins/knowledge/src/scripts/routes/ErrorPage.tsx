@@ -94,7 +94,7 @@ export class ErrorPage extends React.Component<IProps> {
     }
 
     private parseDefaultError(): IError {
-        const errorCode = this.props.apiError ? this.props.apiError.status : null;
+        const errorCode = this.props.apiError ? this.props.apiError.response.status : null;
         const globalVars = globalVariables();
         const debug = debugHelper("errorPage");
         const errorIconClass = style({
@@ -169,6 +169,25 @@ export class ErrorPage extends React.Component<IProps> {
                     icon: searchError(message, errorIconClass),
                 };
             }
+            case DefaultError.CATEGORY_NO_ARTICLES: {
+                const { knowledgeBaseID, knowledgeCategoryID } = this.props;
+                const message = t("This category does not have any articles.");
+                return {
+                    message,
+                    description: null,
+                    actionItem: knowledgeCategoryID ? (
+                        <Permission permission="articles.add">
+                            <EditorRoute.Link
+                                className={buttons.primary}
+                                data={{ knowledgeBaseID, knowledgeCategoryID }}
+                            >
+                                {t("New Article")}
+                            </EditorRoute.Link>
+                        </Permission>
+                    ) : null,
+                    icon: searchError(message, errorIconClass),
+                };
+            }
             case DefaultError.GENERIC:
             default: {
                 const message = t("There was an error");
@@ -225,6 +244,7 @@ export enum DefaultError {
     NOT_FOUND = "notfound",
     NO_KNOWLEDGE_BASE = "noknowledgebase",
     NO_ARTICLES = "noarticles",
+    CATEGORY_NO_ARTICLES = "categorynoarticles",
 }
 
 const withCurrentUser = connect(UsersModel.mapStateToProps);

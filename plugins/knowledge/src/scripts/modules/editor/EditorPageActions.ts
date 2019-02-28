@@ -246,12 +246,13 @@ export default class EditorPageActions extends ReduxActions {
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
             const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
-            const { body, name, knowledgeCategoryID } = request;
+            const { body, name, knowledgeCategoryID, sort } = request;
             const patchRequest: IPatchArticleRequestBody = {
                 articleID: editorState.article.data.articleID,
                 body: !isEqual(prevBody, body) ? body : undefined,
                 name: prevName !== name ? name : undefined,
                 knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
+                sort,
             };
 
             return this.updateArticle(patchRequest, history);

@@ -97,7 +97,6 @@ trait KnowledgeBasesApiSchemes {
                 "allowNull" => true,
                 "description" => "Sort order for articles of the knowledge base.",
                 "enum" => KnowledgeBaseModel::getAllTypes(),
-                "default" => KnowledgeBaseModel::TYPE_GUIDE,
                 "type" => "string",
             ],
             "rootCategoryID:i" => [
