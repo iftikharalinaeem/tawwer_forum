@@ -22,9 +22,6 @@ $dropDown-title_color                          : mixContentBgAndFg(15%);
 
 .dropDown {
     position: relative;
-    .framePanel {
-        max-height: $dropDown_minHeight;
-    }
 }
 
 .dropDown-contents {

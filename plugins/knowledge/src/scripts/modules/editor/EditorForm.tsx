@@ -27,6 +27,9 @@ import PanelLayout from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -47,12 +50,17 @@ export class EditorForm extends React.PureComponent<IProps> {
      */
     public render() {
         const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
+        const classesRichEditorForm = richEditorFormClasses();
+
         return (
-            <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+            <form
+                className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
+                onSubmit={this.onSubmit}
+            >
                 <EditorHeader
                     canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
-                    className="richEditorForm-header"
+                    className={classNames("richEditorForm-header")}
                     draft={draft}
                     optionsMenu={
                         article.status === LoadStatus.SUCCESS && article.data ? (
@@ -61,23 +69,28 @@ export class EditorForm extends React.PureComponent<IProps> {
                     }
                     saveDraft={saveDraft}
                 />
-                <Container className="richEditorForm-body">
-                    <h1 id={this.props.titleID} className="sr-only">
-                        {t("Write Discussion")}
-                    </h1>
+                <Container className={classNames("richEditorForm-body", classesRichEditorForm.body)}>
+                    <ScreenReaderContent>
+                        <h1 id={this.props.titleID}>{t("Write Discussion")}</h1>
+                    </ScreenReaderContent>
                     <PanelLayout
                         className="isOneCol"
                         growMiddleBottom={true}
                         device={this.props.device}
                         topPadding={false}
                         middleBottom={
-                            <div className={classNames("richEditorForm", "inheritHeight", this.props.className)}>
+                            <div className={classesRichEditorForm.formContent}>
                                 <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
                                 </div>
                                 <input
-                                    className="richEditorForm-title inputBlock-inputText inputText"
+                                    className={classNames(
+                                        "richEditorForm-title",
+                                        "inputBlock-inputText",
+                                        "inputText",
+                                        classesRichEditorForm.title,
+                                    )}
                                     type="text"
                                     placeholder={t("Title")}
                                     value={this.props.form.name || ""}
@@ -89,7 +102,12 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     ref={this.editorRef}
                                     isPrimaryEditor={true}
                                     onChange={this.editorChangeHandler}
-                                    className="FormWrapper inheritHeight richEditorForm-editor"
+                                    className={classNames(
+                                        "FormWrapper",
+                                        "inheritHeight",
+                                        "richEditorForm-editor",
+                                        inheritHeightClass(),
+                                    )}
                                     isLoading={this.isLoading}
                                     device={this.props.device}
                                     legacyMode={false}

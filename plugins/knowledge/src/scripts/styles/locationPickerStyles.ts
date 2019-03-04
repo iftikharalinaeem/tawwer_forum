@@ -9,8 +9,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, srOnly } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export default function locationPickerClasses(theme?: object) {
+export const locationPickerClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
 
     const debug = debugHelper("locationPicker");
@@ -64,4 +65,4 @@ export default function locationPickerClasses(theme?: object) {
         articlePlaceholder,
         instructions,
     };
-}
+});

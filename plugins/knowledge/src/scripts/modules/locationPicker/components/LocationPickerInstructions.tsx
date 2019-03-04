@@ -7,7 +7,7 @@
 import { t } from "@library/application";
 import classNames from "classnames";
 import React from "react";
-import locationPickerStyles from "@knowledge/styles/locationPickerStyles";
+import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
 
 interface IProps {}
 
@@ -16,7 +16,7 @@ interface IProps {}
  */
 export default class LocationPickerInstructions extends React.Component<IProps> {
     public render() {
-        const classes = locationPickerStyles();
+        const classes = locationPickerClasses();
         return (
             <li className={classNames("folderContents-item")}>
                 <span className={classes.instructions}>{t("Select where you want to place your Article.")}</span>

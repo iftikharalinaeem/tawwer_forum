@@ -13,6 +13,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 interface IProps {
     className?: string;
@@ -29,6 +30,7 @@ interface IProps {
     writeMode: boolean;
     firstID: string | null;
     getItemID: (id: string) => string;
+    isInRoot: boolean;
 }
 
 interface IState {
@@ -45,7 +47,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot } = this.props;
+        const { item, provided, snapshot, isInRoot } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         return (
@@ -64,6 +66,9 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     isDragging: snapshot.isDragging,
                     hasError: error,
                     isActive: this.isCurrent(),
+                    isChild: item.data.parentID !== 0,
+                    isArticle: item.data.recordType === KbRecordType.ARTICLE,
+                    isInRoot,
                 })}
                 aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
                 tabIndex={
