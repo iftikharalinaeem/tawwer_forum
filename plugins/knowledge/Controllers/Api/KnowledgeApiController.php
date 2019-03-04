@@ -84,6 +84,7 @@ class KnowledgeApiController extends AbstractApiController {
             'offset' => 2,
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
+            'namePrefix' => 'RE:',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
             'sphinxIndexWeight' => 1,
         ],
@@ -94,6 +95,7 @@ class KnowledgeApiController extends AbstractApiController {
             'offset' => 2,
             'multiplier' => 10,
             'getRecordsFunction' => 'getComments',
+            'namePrefix' => 'RE:',
             'sphinxIndexName' => ['Comment', 'Comment_Delta'],
             'sphinxIndexWeight' => 1,
         ],
@@ -499,7 +501,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
 
             $result = [
-                "name" => $record['Name'] ?? 'Comment (Record Name Not Implemented)',
+                "name" => (t($typeData['namePrefix']) ?? '').' '.$record['Name'],
                 "body" => \Gdn_Format::excerpt($record['Body'], $record['Format']),
                 "url" => $url,
                 "insertUserID" => $record['InsertUserID'],
@@ -557,7 +559,10 @@ class KnowledgeApiController extends AbstractApiController {
      */
     public function getComments(array $ids, int $dtype): array {
         $comments = $this->commentModel->getWhere(
-            ['CommentID' => $ids]
+            [
+                'CommentID' => $ids,
+                'joinDiscussions' => ['Name' => 'Name']
+            ]
         )->resultArray();
         $normalized = $this->normalizeForumRecords($comments, $dtype);
         return $normalized;
