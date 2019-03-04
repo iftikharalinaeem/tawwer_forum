@@ -79,7 +79,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                         device={this.props.device}
                         topPadding={false}
                         middleBottom={
-                            <div className={inheritHeightClass()}>
+                            <div className={classesRichEditorForm.formContent}>
                                 <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />

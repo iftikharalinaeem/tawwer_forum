@@ -9,8 +9,9 @@ import { important, percent, px } from "csx";
 import { GlobalsNumber } from "csstype";
 import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
+import { memoize } from "lodash";
 
-export function reactionClasses(theme?: object) {
+export const reactionClasses = memoize((theme?: object) => {
     const style = styleFactory("reactions");
     const vars = globalVariables(theme);
 
@@ -71,4 +72,4 @@ export function reactionClasses(theme?: object) {
         resultText,
         signInText,
     };
-}
+});
