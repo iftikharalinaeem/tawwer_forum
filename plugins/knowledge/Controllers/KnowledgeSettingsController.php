@@ -228,11 +228,11 @@ class KnowledgeSettingsController extends SettingsController {
     private function renderViewTypePicker(Gdn_Form $form, array $inputRow): string {
         $descriptionHtml = $inputRow["DescriptionHtml"] ?? "";
 
-        $label = $form->label(
+        $label = '<div class="label-wrap">' . $form->label(
             $inputRow["LabelCode"] ?? "",
             "viewType",
             $inputRow
-        );
+        ) . $descriptionHtml . '</div>';
 
         $options = [
             KnowledgeBaseModel::TYPE_GUIDE => [
@@ -257,7 +257,7 @@ class KnowledgeSettingsController extends SettingsController {
         }
         $controls .= "</ul>";
 
-        return '<li class="' . $form->getStyle("form-group").'"><div class="label-wrap">' . $label . $descriptionHtml . '</div><div class="input-wrap">' . $controls . '</div></li>';
+        return '<li class="' . $form->getStyle("form-group").'">' . $label . '<div class="input-wrap">' . $controls . '</div></li>';
     }
 
     /**
