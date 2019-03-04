@@ -126,32 +126,38 @@ class KnowledgeSettingsController extends SettingsController {
         $formData = [
             'name' => [
                 'LabelCode' => 'Name',
+                "Description" => "Title of the knowledge base.",
             ],
             'urlCode' => [
                 'LabelCode' => 'URL Code',
+                "Description" => "A customized version of the category name as it should appear in URLs.",
             ],
             'description' => [
                 'LabelCode' => 'Description',
                 'Control' => 'textbox',
                 'Options' => ['MultiLine' => true],
+                "Description" => "A description of the knowledge base. Displayed in the knowledge base picker.",
             ],
             'icon' => [
                 'LabelCode' => 'Icon',
                 'Control' => 'imageuploadpreview',
+                "Description" => "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
             ],
             "bannerImage" => [
                 "Control" => "imageuploadpreview",
                 "LabelCode" => "Banner Image",
+                "Description" => "Homepage banner image for this knowledge base."
             ],
             'viewType' => [
+                "Description" => "Determines how the categories and articles within it will display",
                 'LabelCode' => 'View Type',
-                'Control' => 'dropdown',
-                'Items' => [
-                    KnowledgeBaseModel::TYPE_GUIDE => t('Guide'),
-                    KnowledgeBaseModel::TYPE_HELP => t('Help'),
-                ],
+                'Control' => 'callback',
+                'Callback' => function (Gdn_Form $form, array $inputRow): string {
+                    return $this->renderViewTypePicker($form, $inputRow);
+                },
             ],
             'sortArticles' => [
+                "Description" => "Sorting method for articles.",
                 'LabelCode' => 'Sort Articles',
                 'Control' => 'dropdown',
                 'Items' => [
@@ -197,6 +203,7 @@ class KnowledgeSettingsController extends SettingsController {
         }
 
         if ($knowledgeBaseID) {
+            $knowledgeBaseID = (int)$knowledgeBaseID;
             $this->apiController->patch($knowledgeBaseID, $values);
         } else {
             $this->apiController->post($values);
@@ -209,6 +216,48 @@ class KnowledgeSettingsController extends SettingsController {
             $this->setRedirectTo('/vanilla/settings/categories');
             $this->render('blank', 'utility', 'dashboard');
         }
+    }
+
+    /**
+     * Generate HTML for view type picker form inputs.
+     *
+     * @param Gdn_Form $form
+     * @param array $inputRow
+     * @return string
+     */
+    private function renderViewTypePicker(Gdn_Form $form, array $inputRow): string {
+        $descriptionHtml = $inputRow["DescriptionHtml"] ?? "";
+
+        $label = '<div class="label-wrap">' . $form->label(
+            $inputRow["LabelCode"] ?? "",
+            "viewType",
+            $inputRow
+        ) . $descriptionHtml . '</div>';
+
+        $options = [
+            KnowledgeBaseModel::TYPE_GUIDE => [
+                "info" => "Guides are for making howto guides, documentation, or any \"book\" like content that should be read in order.",
+                "label" => t("Guide"),
+            ],
+            KnowledgeBaseModel::TYPE_HELP => [
+                "info" => "Help centers are for making free-form help articles that are organized into categories.",
+                "label" => t('Help Center'),
+            ],
+        ];
+
+        $controls = "<ul>";
+        foreach ($options as $value => $option) {
+            $info = '<div class="info">' .$option["info"] . '</div>';
+            $control = $form->radio(
+                "viewType",
+                $option["label"],
+                ["class" => "js-viewType", "value" => $value]
+            );
+            $controls .= '<li class="' . $form->getStyle("radio-container") . '">' . $control . $info . '</li>';
+        }
+        $controls .= "</ul>";
+
+        return '<li class="' . $form->getStyle("form-group").'">' . $label . '<div class="input-wrap">' . $controls . '</div></li>';
     }
 
     /**
