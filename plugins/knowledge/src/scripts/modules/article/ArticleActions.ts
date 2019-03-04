@@ -35,6 +35,7 @@ import apiv2 from "@library/apiv2";
 import ArticleModel from "./ArticleModel";
 import { IApiResponse, IApiError } from "@library/@types/api";
 import actionCreatorFactory from "typescript-fsa";
+import { IStoreState } from "@knowledge/state/model";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -50,7 +51,7 @@ interface IHelpfulParams {
 /**
  * Actions for the article page.
  */
-export default class ArticleActions extends ReduxActions {
+export default class ArticleActions extends ReduxActions<IStoreState> {
     private static readonly DEFAULT_ARTICLES_LIMIT = 10;
 
     public static putReactACs = createAction.async<IHelpfulParams, IArticle, IApiError>("PUT_REACT");

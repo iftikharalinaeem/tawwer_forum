@@ -28,6 +28,7 @@ import UsersActions from "@library/users/UsersActions";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { ICoreStoreState } from "@library/state/reducerRegistry";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
@@ -57,7 +58,7 @@ export interface IKbState {
     knowledgeBases: IKnowledgeBasesState;
 }
 
-export interface IStoreState extends IUsersStoreState {
+export interface IStoreState extends ICoreStoreState {
     knowledge: IKbState;
 }
 

@@ -11,8 +11,8 @@ import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import memoize from "lodash/memoize";
 
-export const locationPickerClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const locationPickerClasses = memoize(() => {
+    const globalVars = globalVariables();
 
     const debug = debugHelper("locationPicker");
 

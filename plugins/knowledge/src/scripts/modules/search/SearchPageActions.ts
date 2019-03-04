@@ -8,6 +8,7 @@ import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import apiv2 from "@library/apiv2";
 import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
+import { IStoreState } from "@knowledge/state/model";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -16,7 +17,7 @@ export interface ISearchFormActionProps {
 /**
  * Action class for the search page/form.
  */
-export default class SearchPageActions extends ReduxActions {
+export default class SearchPageActions extends ReduxActions<IStoreState> {
     // Action constants
     public static readonly GET_SEARCH_REQUEST = "@@searchPage/GET_SEARCH_REQUEST";
     public static readonly GET_SEARCH_RESPONSE = "@@searchPage/GET_SEARCH_RESPONSE";

@@ -11,9 +11,9 @@ import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { memoize } from "lodash";
 
-export const reactionClasses = memoize((theme?: object) => {
+export const reactionClasses = memoize(() => {
     const style = styleFactory("reactions");
-    const vars = globalVariables(theme);
+    const vars = globalVariables();
 
     const frame = style({
         paddingTop: px(12),
