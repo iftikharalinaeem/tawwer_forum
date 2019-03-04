@@ -37,6 +37,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -87,7 +88,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 />
                 <div
                     ref={this.self}
-                    className={classNames("navigationManager", "inheritHeight", this.props.className)}
+                    className={classNames("navigationManager", inheritHeightClass(), this.props.className)}
                     role="tree"
                     aria-describedby={this.props.describedBy}
                     onKeyDown={this.handleKeyDown}
@@ -133,8 +134,15 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 onDeleteClick={deleteHandler}
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
+                isInRoot={this.isItemInRoot(item.parentID)}
             />
         );
+    };
+
+    private isItemInRoot = (itemParentID: string) => {
+        const rootId = KbRecordType.CATEGORY + this.props.knowledgeBase.rootCategoryID;
+
+        return this.props.knowledgeBase.knowledgeBaseID !== undefined && itemParentID === rootId;
     };
 
     /**

@@ -12,7 +12,7 @@ import { categoryIcon, checkCompact, rightChevron } from "@library/components/ic
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import locationPickerClasses from "@knowledge/styles/locationPickerStyles";
+import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
 
 interface IProps {
     onClick: (position: string) => void;

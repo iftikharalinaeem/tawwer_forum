@@ -14,8 +14,7 @@ $navigationManager-deleteButton_color: #a60215;
 $navigationManager-actionButton_shadowColor: $global-color_bg;
 $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
-//$navigationManager-folder_spacing: 12px;
-$navigationManager-folderIcon_width: 18.612px;
+$navigationManager-folderIcon_width: 19px;
 $navigationManager-folderIcon_height: 14px;
 $navigationManager-folderIcon_color: mixContentBgAndFg(50%);
 
@@ -96,6 +95,16 @@ $navigationManager-input_lineHeight: 24px;
         outline: 0;
         border: {
             color: $global-color_primary;
+        }
+    }
+
+    &.isArticle {
+        .navigationManager-draggable,
+        .navigationManager-articlePage {
+            margin-left: 0;
+        }
+        &.isInRoot {
+            padding-left: 15px !important;
         }
     }
 }
@@ -193,8 +202,9 @@ $navigationManager-input_lineHeight: 24px;
 .navigationManager-articlePage {
     display: flex;
     align-items: center;
-    width: $navigationManager-buttonWidth;
+    width: $navigationManager-item_height;
     min-height: $navigationManager-item_height;
+    margin-left: 18px;
 }
 
 .navigationManager-toggleFolder {

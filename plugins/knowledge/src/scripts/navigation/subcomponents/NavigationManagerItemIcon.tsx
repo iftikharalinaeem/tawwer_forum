@@ -50,8 +50,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
             }
         } else {
             return (
-                <span className="navigationManager-articlePage">
-                    <FlexSpacer className={spacerClassName} />
+                <span className={classNames("navigationManager-articlePage", { isChild: this.props.expanded })}>
                     {article("navigationManager-articleIcon", "navigationManager-articleIconFill")}
                 </span>
             );
