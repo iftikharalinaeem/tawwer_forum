@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, srOnly } from "@library/styles/styleHelpers";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
 import { style } from "typestyle";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
 
-export const locationPickerClasses = memoize(() => {
+export const locationPickerClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
 
     const debug = debugHelper("locationPicker");

@@ -4,14 +4,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper } from "@library/styles/styleHelpers";
-import { important, percent, px } from "csx";
+import { flexHelper, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
-import { unit } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
-import { memoize } from "lodash";
+import { important, percent, px } from "csx";
 
-export const reactionClasses = memoize(() => {
+export const reactionClasses = memoizeTheme(() => {
     const style = styleFactory("reactions");
     const vars = globalVariables();
 
