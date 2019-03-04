@@ -379,14 +379,14 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * Get a single knowledge base by its ID.
      *
      * @param int $knowledgeBaseID
-     * @param bool $deleted Include "deleted" knowledgebase. Default: true (include all)
+     * @param bool $includeDeleted Include "deleted" knowledgebase. Default: true (include all)
      *
      * @return array
      * @throws NotFoundException If the knowledge base could not be found.
      */
-    public function knowledgeBaseByID(int $knowledgeBaseID, bool $deleted = true): array {
+    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true): array {
         try {
-            if ($deleted) {
+            if ($includeDeleted) {
                 $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
             } else {
                 $result = $this->knowledgeBaseModel->selectSingle(
