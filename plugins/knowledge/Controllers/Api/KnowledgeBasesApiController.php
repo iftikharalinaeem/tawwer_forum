@@ -191,6 +191,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
         $query = $in->validate($query);
+
+        //check if kb exists and status is not deleted
+        $kb = $this->knowledgeBaseByID($id, false);
         $query['knowledgeBaseID'] = $id;
         $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->schemaWithChildren()], "out");
         $rows = $this->knowledgeNavigationApi->tree($query);
@@ -211,6 +214,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
         $query = $in->validate($query);
+
+        //check if kb exists and status is not deleted
+        $kb = $this->knowledgeBaseByID($id, false);
+
         $query['knowledgeBaseID'] = $id;
         $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->categoryNavigationFragment()], "out");
 
@@ -247,6 +254,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         // Prep the input.
         $body = $in->validate($body);
+
+        //check if kb exists and status is not deleted
+        $kb = $this->knowledgeBaseByID($id, false);
 
         $navigation = $this->knowledgeNavigationApi->patchFlat($id, $body);
 
@@ -369,12 +379,23 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * Get a single knowledge base by its ID.
      *
      * @param int $knowledgeBaseID
+     * @param bool $includeDeleted Include "deleted" knowledgebase. Default: true (include all)
+     *
      * @return array
      * @throws NotFoundException If the knowledge base could not be found.
      */
-    public function knowledgeBaseByID(int $knowledgeBaseID): array {
+    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true): array {
         try {
-            $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            if ($includeDeleted) {
+                $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            } else {
+                $result = $this->knowledgeBaseModel->selectSingle(
+                    [
+                        "knowledgeBaseID" => $knowledgeBaseID,
+                        'status' => KnowledgeBaseModel::STATUS_PUBLISHED
+                    ]
+                );
+            }
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
