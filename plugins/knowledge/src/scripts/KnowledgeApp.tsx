@@ -23,6 +23,7 @@ import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
 import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
+import { ThemeContextProvider } from "@library/theming/ThemeContext";
 
 /*
  * Top level application component for knowledge.
@@ -37,21 +38,23 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <PagesContext.Provider value={{ pages: this.pages }}>
-                    <ScrollOffsetProvider scrollWatchingEnabled={true}>
-                        <SiteNavProvider>
-                            <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                                <DeviceProvider>
-                                    <BrowserRouter>
-                                        <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                            <Route component={KnowledgeRoutes} />
-                                        </LinkContextProvider>
-                                    </BrowserRouter>
-                                </DeviceProvider>{" "}
-                            </SearchContext.Provider>
-                        </SiteNavProvider>
-                    </ScrollOffsetProvider>
-                </PagesContext.Provider>
+                <ThemeContextProvider>
+                    <PagesContext.Provider value={{ pages: this.pages }}>
+                        <ScrollOffsetProvider scrollWatchingEnabled={true}>
+                            <SiteNavProvider>
+                                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                                    <DeviceProvider>
+                                        <BrowserRouter>
+                                            <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                                <Route component={KnowledgeRoutes} />
+                                            </LinkContextProvider>
+                                        </BrowserRouter>
+                                    </DeviceProvider>{" "}
+                                </SearchContext.Provider>
+                            </SiteNavProvider>
+                        </ScrollOffsetProvider>
+                    </PagesContext.Provider>
+                </ThemeContextProvider>
             </Provider>
         );
     }
