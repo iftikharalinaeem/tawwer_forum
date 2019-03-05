@@ -23,7 +23,6 @@ import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import ErrorPage from "@knowledge/routes/ErrorPage";
-import { bodyStyles } from "@library/styles/bodyStyles";
 
 /*
  * Top level application component for knowledge.
@@ -36,7 +35,6 @@ export default class KnowledgeApp extends React.Component {
      * Device checker detects device and calls a force update if needed to update the current device.
      */
     public render() {
-        bodyStyles();
         return (
             <Provider store={this.store}>
                 <ThemeProvider errorComponent={<ErrorPage />}>
