@@ -23,7 +23,7 @@ import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
 import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
-import { ThemeContextProvider } from "@library/theming/ThemeContext";
+import { ThemeProvider } from "@library/theming/ThemeProvider";
 
 /*
  * Top level application component for knowledge.
@@ -38,7 +38,7 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ThemeContextProvider>
+                <ThemeProvider>
                     <PagesContext.Provider value={{ pages: this.pages }}>
                         <ScrollOffsetProvider scrollWatchingEnabled={true}>
                             <SiteNavProvider>
@@ -54,7 +54,7 @@ export default class KnowledgeApp extends React.Component {
                             </SiteNavProvider>
                         </ScrollOffsetProvider>
                     </PagesContext.Provider>
-                </ThemeContextProvider>
+                </ThemeProvider>
             </Provider>
         );
     }
