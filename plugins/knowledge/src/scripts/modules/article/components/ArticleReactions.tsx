@@ -104,9 +104,9 @@ function ReactionButton(props: {
     }
     const classes = classNames(
         {
-            [classesButton.primary]: isSubmitting || userReaction === reactionValue,
             [styles.checkedButton]: userReaction === reactionValue,
         },
+        classesButton.primary,
         styles.votingButton,
     );
     return (
