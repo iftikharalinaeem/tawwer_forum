@@ -102,6 +102,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /**
      * List knowledge bases.
      *
+     * @param array $query
      * @return array
      */
     public function index(array $query = []): array {

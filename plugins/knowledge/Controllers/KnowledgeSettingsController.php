@@ -34,6 +34,7 @@ class KnowledgeSettingsController extends SettingsController {
      *
      * @param KnowledgeBasesApiController $apiController
      * @param MediaApiController $mediaApiController
+     * @param Gdn_Request $request
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
@@ -108,6 +109,8 @@ WIDGET;
     /**
      * Main entry function for all /knowledge-settings/knowledge-bases routes.
      *
+     * @param int|null $knowledgeBaseID
+     * @param string|null $action
      * @return void
      */
     public function knowledgeBases($knowledgeBaseID = null, $action = null) {
@@ -125,7 +128,7 @@ WIDGET;
                 case "edit":
                     $this->knowledgeBasesAddEdit($knowledgeBaseID);
                     break;
-                    case "publish":
+                case "publish":
                     $this->knowledgeBasesPublish($knowledgeBaseID);
                     break;
                 default:
