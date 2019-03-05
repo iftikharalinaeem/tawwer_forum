@@ -24,6 +24,7 @@ import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
 import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
+import ErrorPage from "@knowledge/routes/ErrorPage";
 
 /*
  * Top level application component for knowledge.
@@ -38,7 +39,7 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ThemeProvider>
+                <ThemeProvider errorComponent={<ErrorPage />}>
                     <PagesContext.Provider value={{ pages: this.pages }}>
                         <ScrollOffsetProvider scrollWatchingEnabled={true}>
                             <SiteNavProvider>
