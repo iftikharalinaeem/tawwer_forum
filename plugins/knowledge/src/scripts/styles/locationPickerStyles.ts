@@ -6,11 +6,11 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { style } from "typestyle";
 
-export const locationPickerClasses = memoizeTheme(() => {
+export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const debug = debugHelper("locationPicker");

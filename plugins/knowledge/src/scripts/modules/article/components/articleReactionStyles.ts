@@ -5,11 +5,11 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { flexHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
 
-export const reactionClasses = memoizeTheme(() => {
+export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("reactions");
     const vars = globalVariables();
 
