@@ -8,11 +8,9 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import DeviceContext, { DeviceProvider } from "@library/contexts/DeviceContext";
+import { DeviceProvider } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
 import { formatUrl } from "@library/application";
@@ -25,6 +23,7 @@ import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import ErrorPage from "@knowledge/routes/ErrorPage";
+import { bodyStyles } from "@library/styles/bodyStyles";
 
 /*
  * Top level application component for knowledge.
@@ -37,6 +36,7 @@ export default class KnowledgeApp extends React.Component {
      * Device checker detects device and calls a force update if needed to update the current device.
      */
     public render() {
+        bodyStyles();
         return (
             <Provider store={this.store}>
                 <ThemeProvider errorComponent={<ErrorPage />}>
