@@ -79,14 +79,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeCategoryByID($id);
-        // check knowledge base exist and not "deleted"
-        // NoResultsException fired if kb does not exist or "deleted"
-        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(
-            [
-                'knowledgeBaseID' => $row['knowledgeBaseID'],
-                'status' => $this->knowledgeBaseModel::STATUS_PUBLISHED
-            ]
-        );
+
+        $this->checkKnowledgeBasePublished($row['knowledgeBaseID']);
+
         if (!$this->knowledgeBaseModel->isRootCategory($id)) {
             if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
                 $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
@@ -301,22 +296,35 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         try {
             $result = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
             if (!$includeDeleted) {
-                try {
-                    $kb = $this->knowledgeBaseModel->selectSingle(
-                        [
-                            "knowledgeBaseID" => $result['knowledgeBaseID'],
-                            'status' => KnowledgeBaseModel::STATUS_PUBLISHED
-                        ]
-                    );
-                } catch (\Vanilla\Exception\Database\NoResultsException $e) {
-                    throw new NotFoundException('Knowledge Base with ID: ' . $result['knowledgeBaseID'] . ' not found!');
-                }
+                $this->checkKnowledgeBasePublished($result['knowledgeBaseID']);
             }
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
             throw new \Garden\Web\Exception\NotFoundException("Knowledge-Category");
         }
         return $result;
     }
+
+    /**
+     * Check knowledge base exist and not "deleted".
+     *
+     * @param int $knowledgeBaseID
+     * @return array
+     * @throws NotFoundException Fired if kb does not exist or "deleted".
+     */
+    private function checkKnowledgeBasePublished(int $knowledgeBaseID): array {
+        try {
+            $kb = $this->knowledgeBaseModel->selectSingle(
+                [
+                    "knowledgeBaseID" => $knowledgeBaseID,
+                    'status' => KnowledgeBaseModel::STATUS_PUBLISHED
+                ]
+            );
+            return $kb;
+        } catch (\Vanilla\Exception\Database\NoResultsException $e) {
+            throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
+        }
+    }
+
 
     /**
      * Get a knowledge category schema with minimal add/edit fields.
@@ -381,14 +389,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
             $previousState = $this->knowledgeCategoryByID($id);
 
-            // check knowledge base exist and not "deleted"
-            // NoResultsException fired if kb does not exist or "deleted"
-            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(
-                [
-                    'knowledgeBaseID' => $previousState['knowledgeBaseID'],
-                    'status' => $this->knowledgeBaseModel::STATUS_PUBLISHED
-                ]
-            );
+            $knowledgeBase = $this->checkKnowledgeBasePublished($previousState['knowledgeBaseID']);
 
             $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
 
@@ -477,15 +478,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         }
         $body = $in->validate($body);
 
-        // check knowledge base exist and not "deleted"
-        // NoResultsException fired if kb does not exist or "deleted"
-        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(
-            [
-                'knowledgeBaseID' => $body['knowledgeBaseID'],
-                'status' => $this->knowledgeBaseModel::STATUS_PUBLISHED
-            ]
-        );
-
+        $this->checkKnowledgeBasePublished($body['knowledgeBaseID']);
 
         $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID']);
         $maxSortIndex = $sortInfo['maxSort'];
