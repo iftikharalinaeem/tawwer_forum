@@ -97,16 +97,6 @@ $navigationManager-input_lineHeight: 24px;
             color: $global-color_primary;
         }
     }
-
-    &.isArticle {
-        .navigationManager-draggable,
-        .navigationManager-articlePage {
-            margin-left: 0;
-        }
-        &.isInRoot {
-            padding-left: 15px !important;
-        }
-    }
 }
 
 .navigationManager-draggable {

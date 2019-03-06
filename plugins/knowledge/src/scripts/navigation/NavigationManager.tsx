@@ -101,6 +101,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
                         isDragEnabled={!this.state.disabled}
+                        offsetPerLevel={24}
                     />
                 </div>
                 {this.renderNewCategoryModal()}
