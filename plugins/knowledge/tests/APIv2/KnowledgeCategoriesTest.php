@@ -164,15 +164,11 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     public function testPostDeleted() {
         $knowledgeCategory = $this->testPost();
         $this->api()->patch("/knowledge-bases/{$knowledgeCategory['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
-        try {
-            $record = $this->record($knowledgeCategory);
-            $record['parentID'] = $knowledgeCategory['knowledgeCategoryID'];
-            $newKnowledgeCategory =  $this->api()->post($this->baseUrl, $record);
-            $this->assertEquals(false, true, 'Post endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
-        } catch (NotFoundException $ex) {
-            $this->assertEquals(404, $ex->getCode());
-        }
-        $this->api()->patch("/knowledge-bases/{$knowledgeCategory['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_PUBLISHED]);
+
+        $record = $this->record($knowledgeCategory);
+        $record['parentID'] = $knowledgeCategory['knowledgeCategoryID'];
+        $this->expectException(NotFoundException::class);
+        $newKnowledgeCategory =  $this->api()->post($this->baseUrl, $record);
     }
 
     /**
@@ -258,12 +254,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
         $kb = $this->api()->patch("/knowledge-bases/{$categoryToDelete['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
 
-        try {
-            $r = $this->api()->delete("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}", []);
-            $this->assertEquals(false, true, 'Delete endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
-        } catch (NotFoundException $ex) {
-            $this->assertEquals(404, $ex->getCode());
-        }
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->delete("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}", []);
     }
 
     /**
@@ -274,24 +266,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
         $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
 
-        try {
-            $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}");
-            $this->assertEquals(false, true, 'GET endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
-        } catch (NotFoundException $ex) {
-            $this->assertEquals(404, $ex->getCode());
-        }
-
-        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_PUBLISHED]);
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}"
-        );
-
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual($row, $r->getBody());
-        $this->assertCamelCase($r->getBody());
-
-        return $r->getBody();
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}");
     }
 
     /**
@@ -301,21 +277,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $row = $this->testPost();
         $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
 
-        try {
-            $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}/edit");
-            $this->assertEquals(false, true, 'GET endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
-        } catch (NotFoundException $ex) {
-            $this->assertEquals(404, $ex->getCode());
-        }
-
-        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_PUBLISHED]);
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}/edit"
-        );
-
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertCamelCase($r->getBody());
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}/edit");
     }
 
     /**
@@ -325,22 +288,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $row = $this->testPost();
         $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
 
-        try {
-            $r = $this->api()->patch("{$this->baseUrl}/{$row['knowledgeCategoryID']}", $row);
-            $this->assertEquals(false, true, 'Patch endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
-        } catch (NotFoundException $ex) {
-            $this->assertEquals(404, $ex->getCode());
-        }
-
-        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_PUBLISHED]);
-
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}",
-            $row
-        );
-
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertCamelCase($r->getBody());
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->patch("{$this->baseUrl}/{$row['knowledgeCategoryID']}", $row);
     }
 
     /**
