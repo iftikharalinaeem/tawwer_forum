@@ -8,15 +8,16 @@ use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
-use Garden\TwigTrait;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Controller for serving the /knowledge-settings pages.
  */
 class KnowledgeSettingsController extends SettingsController {
 
-    use TwigTrait;
+    use TwigRenderTrait;
 
     use StaticCacheTranslationTrait;
 
@@ -72,12 +73,10 @@ class KnowledgeSettingsController extends SettingsController {
      * @param string $content
      */
     private function addHelpWidget(string $title, string $content) {
-        $widget = <<<WIDGET
-        <aside role="note" class="help">
-            <h2 class="help-title">$title</h2>
-            <div class="help-description">$content</div>
-        </aside>
-WIDGET;
+        $widget = $this->renderTwig("knowledgesettings/helpasset.twig", [
+            "content" => $content,
+            "title" => $title,
+        ]);
         $this->addAsset("Help", $widget);
     }
 
@@ -132,10 +131,7 @@ WIDGET;
                     $this->knowledgeBasesPublish($knowledgeBaseID);
                     break;
                 default:
-                    throw new Gdn_UserException(
-                        sprintf(self::t('%s not found.'), self::t("Page")),
-                        404
-                    );
+                    throw new NotFoundException("Page");
             }
         } else {
             $this->knowledgeBasesIndex($this->request->get("status", KnowledgeBaseModel::STATUS_PUBLISHED));
