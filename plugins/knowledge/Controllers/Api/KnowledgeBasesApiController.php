@@ -102,15 +102,22 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /**
      * List knowledge bases.
      *
+     * @param array $query
      * @return array
      */
-    public function index(): array {
+    public function index(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
-        $in = $this->schema([])->setDescription("List knowledge bases.");
+        $in = $this->schema([
+            "status" => [
+                "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
+            ]
+        ])->add($this->fullSchema())->setDescription("List knowledge bases.");
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
-        $rows = $this->knowledgeBaseModel->get();
+        $query = $in->validate($query);
+
+        $rows = $this->knowledgeBaseModel->get($query);
         $rows = array_map(function ($row) {
             return $this->normalizeOutput($row);
         }, $rows);
