@@ -91,16 +91,15 @@ export class ArticleLayout extends React.Component<IProps> {
                             <PanelWidget>
                                 <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
                             </PanelWidget>
-                            {device === Devices.MOBILE &&
-                                (!!prevNavArticle || !!nextNavArticle) && (
-                                    <PanelWidget>
-                                        <NextPrevious
-                                            accessibleTitle={t("More Articles")}
-                                            prevItem={prevNavArticle}
-                                            nextItem={nextNavArticle}
-                                        />
-                                    </PanelWidget>
-                                )}
+                            {(!!prevNavArticle || !!nextNavArticle) && (
+                                <PanelWidget>
+                                    <NextPrevious
+                                        accessibleTitle={t("More Articles")}
+                                        prevItem={prevNavArticle}
+                                        nextItem={nextNavArticle}
+                                    />
+                                </PanelWidget>
+                            )}
                         </>
                     }
                     rightTop={
