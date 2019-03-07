@@ -38,7 +38,6 @@
 @import "components/userContent"; // Keep first of components
 @import "components/metas";
 @import "components/icons";
-//@import "components/buttons";
 @import "components/messages";
 @import "components/inputBlock";
 @import "components/inputText";
@@ -47,7 +46,7 @@
 @import "components/tableOfContents";
 @import "components/panelList";
 
-@import "components/searchResults"; // <- here
+@import "components/searchResults";
 @import "components/breadcrumbs";
 @import "components/locationBreadcrumb";
 @import "components/radioButtonsAsTabs";
