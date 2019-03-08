@@ -5,14 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { styleFactory } from "@library/styles/styleUtils";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-
     const style = styleFactory("locationPicker");
 
     const root = style({});
