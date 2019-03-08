@@ -79,12 +79,15 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             </FramePanel>
                         </FrameBody>
                         <FrameFooter>
-                            <Button className="locationPicker-validate" onClick={this.props.exitHandler}>
+                            <Button
+                                className={classNames("locationPicker-validate", buttons.compact)}
+                                onClick={this.props.exitHandler}
+                            >
                                 {t("Cancel")}
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                className={classNames("locationPicker-newFolder", buttons.primary)}
+                                className={classNames("locationPicker-newFolder", buttons.compact)}
                                 disabled={!this.state.valid}
                                 type="submit"
                             >

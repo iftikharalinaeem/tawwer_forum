@@ -5,22 +5,17 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { style } from "typestyle";
+import { styleFactory } from "@library/styles/styleUtils";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const style = styleFactory("locationPicker");
 
-    const debug = debugHelper("locationPicker");
+    const root = style({});
 
-    const root = style({
-        ...debug.name(),
-    });
-
-    const articlePlaceholder = style({
-        ...debug.name("articlePlaceholder"),
+    const articlePlaceholder = style("articlePlaceholder", {
         display: "block",
         width: percent(100),
         height: px(24),
@@ -51,8 +46,7 @@ export const locationPickerClasses = useThemeCache(() => {
         },
     });
 
-    const instructions = style({
-        ...debug.name("instructions"),
+    const instructions = style("instructions", {
         fontSize: px(globalVars.fonts.size.medium),
         padding: `${px(8)} ${px(12)}`,
         borderBottom: `solid 1px ${globalVars.mixBgAndFg(0.15)}`,
