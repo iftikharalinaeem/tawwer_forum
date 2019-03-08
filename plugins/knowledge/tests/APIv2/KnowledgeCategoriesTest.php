@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Test the /api/v2/knowledge-categories endpoint.
@@ -82,15 +83,17 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     /**
      * Grab values for inserting a new knowledge category.
      *
+     * @param array $record Record defaults
+     *
      * @return array
      */
-    public function record() {
+    public function record(array $record = []): array {
         $record = [
-            "name" => "Test Knowledge Category",
-            "parentID" => -1,
-            "knowledgeBaseID" => 1,
-            "sortChildren" => "name",
-            "sort" => 0,
+            "name" => $record['name'] ?? "Test Knowledge Category",
+            "parentID" => $record['parentID'] ?? -1,
+            "knowledgeBaseID" => $record['knowledgeBaseID'] ?? 1,
+            "sortChildren" => $record['sortChildren'] ?? "name",
+            "sort" => $record['sort'] ?? 0,
         ];
         return $record;
     }
@@ -123,6 +126,170 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
 
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
+    }
+
+    /**
+     * Test POST /knowledge-categories.
+     *
+     * @param array $record Record placeholder
+     * @param array $extra Extra options to keep compatibility to parent method
+     *
+     * @return array
+     */
+    public function testPost(array $record = null, array $extra = []): array {
+        if ($record === null) {
+            $record = $this->record();
+            $kb = [
+                'name' => 'KnowledgeCategoriesTest:'.__FUNCTION__,
+                'description' => 'Test Knowledge Base DESCRIPTION',
+                'viewType' => 'guide',
+                'icon' => '',
+                'bannerImage' => '',
+                'sortArticles' => 'manual',
+                'sourceLocale' => '',
+                'urlCode' => 'KnowledgeCategoriesTest-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000),
+            ];
+            $knowledgeBase = $this->api()->post(
+                '/knowledge-bases',
+                $kb
+            );
+            $record['knowledgeBaseID'] = $knowledgeBase['knowledgeBaseID'];
+        }
+        return parent::testPost($record, $extra);
+    }
+
+    /**
+     * Test POST endpoint when knowledge base has status "deleted"
+     */
+    public function testPostDeleted() {
+        $knowledgeCategory = $this->testPost();
+        $this->api()->patch("/knowledge-bases/{$knowledgeCategory['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        $record = $this->record($knowledgeCategory);
+        $record['parentID'] = $knowledgeCategory['knowledgeCategoryID'];
+        $this->expectException(NotFoundException::class);
+        $newKnowledgeCategory =  $this->api()->post($this->baseUrl, $record);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function generateIndexRows($record) {
+        $rows = [];
+
+        // Insert a few rows.
+        for ($i = 0; $i < static::INDEX_ROWS; $i++) {
+            $rows[] = $this->testPost($record);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function testIndex() {
+        $record = $this->testPost();
+        $recordPlaceholder = $this->record($record);
+
+        $indexUrl = $this->indexUrl();
+        $originalIndex = $this->api()->get($indexUrl);
+        $originalRows = $originalIndex->getBody();
+        $this->assertEquals(200, $originalIndex->getStatusCode());
+
+        $rows = $this->generateIndexRows($recordPlaceholder);
+
+        $newIndex = $this->api()->get($indexUrl);
+
+        $newRows = $newIndex->getBody();
+        $this->assertEquals(count($originalRows)+count($rows), count($newRows));
+        // The index should be a proper indexed array.
+        for ($i = 0; $i < count($newRows); $i++) {
+            $this->assertArrayHasKey($i, $newRows);
+        }
+
+        if ($this->testPagingOnIndex) {
+            $this->pagingTest($indexUrl);
+        }
+
+        // There's not much we can really test here so just return and let subclasses do some more assertions.
+        return [$rows, $newRows];
+    }
+
+    /**
+     * Test index endpoint when knowledge base status is "deleted"
+     */
+    public function testIndexDeleted() {
+        $record = $this->testPost();
+        $recordPlaceholder = $this->record($record);
+
+        $indexUrl = $this->indexUrl();
+        $originalIndex = $this->api()->get($indexUrl);
+        $this->assertEquals(200, $originalIndex->getStatusCode());
+
+        $rows = $this->generateIndexRows($recordPlaceholder);
+
+        $this->api()->patch("/knowledge-bases/{$record['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        try {
+            $newIndex = $this->api()->get($indexUrl);
+            $newRows = $newIndex->getBody();
+            foreach ($newRows as $cat) {
+                if ($cat['knowledgeBaseID'] === $record['knowledgeBaseID']) {
+                    $this->assertEquals(false, true, 'Index endpoint should fire a NotFoundException when knowledge base has status "deleted"!');
+                }
+            }
+        } catch (NotFoundException $ex) {
+            $this->assertEquals(404, $ex->getCode());
+        }
+    }
+
+    /**
+     * Test DELETE endpoint when knowledge base has status "deleted"
+     */
+    public function testDeleteDeleted() {
+
+        $testData = $this->prepareCategoryToDelete();
+        $categoryToDelete = $testData['childCategory'];
+
+        $kb = $this->api()->patch("/knowledge-bases/{$categoryToDelete['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->delete("{$this->baseUrl}/{$categoryToDelete['knowledgeCategoryID']}", []);
+    }
+
+    /**
+     * Test GET /knowledge-categories/<id> when parent knowledge base status is "deleted"
+     */
+    public function testGetDeleted() {
+        $row = $this->testPost();
+
+        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}");
+    }
+
+    /**
+     * Test GET /knowledge-categories/<id>/edit when parent knowledge base status is "deleted"
+     */
+    public function testGetEditDeleted() {
+        $row = $this->testPost();
+        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->get("{$this->baseUrl}/{$row['knowledgeCategoryID']}/edit");
+    }
+
+    /**
+     * Test PATCH /knowledge-categories/<id> when parent knowledge base has status "deleted"
+     */
+    public function testPatchDeleted() {
+        $row = $this->testPost();
+        $this->api()->patch("/knowledge-bases/{$row['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
+
+        $this->expectException(NotFoundException::class);
+        $r = $this->api()->patch("{$this->baseUrl}/{$row['knowledgeCategoryID']}", $row);
     }
 
     /**

@@ -11,7 +11,7 @@ const createNavAction = actionCreatorFactory("@@navigation");
 const createServerPageAction = actionCreatorFactory("@@serverPage");
 
 export default class RouteActions {
-    public static serverErrorAC = createServerPageAction<IRouteError>("Error");
+    public static serverErrorAC = createServerPageAction<{ data: IRouteError }>("ERROR");
     public static errorAC = createNavAction<IRouteError>("ERROR");
     public static resetAC = createNavAction("RESET");
 }
