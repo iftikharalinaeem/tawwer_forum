@@ -115,12 +115,11 @@ class KnowledgeSettingsController extends SettingsController {
     public function knowledgeBases($knowledgeBaseID = null, $action = null) {
         $action = strtolower($action ?? "");
 
-        if ($knowledgeBaseID !== null) {
+        if ($knowledgeBaseID === "add") {
+            $this->knowledgeBasesAddEdit();
+        } elseif ($knowledgeBaseID !== null) {
             $knowledgeBaseID = filter_var($knowledgeBaseID, FILTER_VALIDATE_INT);
             switch ($action) {
-                case "add":
-                    $this->knowledgeBasesAddEdit();
-                    break;
                 case "delete":
                     $this->knowledgeBasesDelete($knowledgeBaseID, $this->request->get("purge") === "purge");
                     break;
@@ -189,7 +188,7 @@ class KnowledgeSettingsController extends SettingsController {
             ],
             'urlCode' => [
                 'LabelCode' => 'URL Code',
-                "Description" => "A customized version of the category name as it should appear in URLs.",
+                "Description" => "A customized version of the knowledge base name as it should appear in URLs.",
             ],
             'description' => [
                 'LabelCode' => 'Description',
@@ -251,12 +250,12 @@ class KnowledgeSettingsController extends SettingsController {
         if ($this->Form->authenticatedPostBack()) {
             if ($purge) {
                 $this->apiController->delete($knowledgeBaseID);
-                $this->informMessage(sprintf(self::t("%s purged."), self::t("Category")));
+                $this->informMessage(sprintf(self::t("%s purged."), self::t("Knowledge Base")));
             } else {
                 $this->apiController->patch($knowledgeBaseID, [
                     "status" => KnowledgeBaseModel::STATUS_DELETED,
                 ]);
-                $this->informMessage(sprintf(self::t("%s deleted."), self::t("Category")));
+                $this->informMessage(sprintf(self::t("%s deleted."), self::t("Knowledge Base")));
             }
             $this->setRedirectTo("/knowledge-settings/knowledge-bases");
             $this->render("blank", "utility", "dashboard");
@@ -275,7 +274,7 @@ class KnowledgeSettingsController extends SettingsController {
             $this->apiController->patch($knowledgeBaseID, [
                 "status" => KnowledgeBaseModel::STATUS_PUBLISHED,
             ]);
-            $this->informMessage(sprintf(self::t("%s published."), self::t("Category")));
+            $this->informMessage(sprintf(self::t("%s published."), self::t("Knowledge Base")));
             $this->setRedirectTo("/knowledge-settings/knowledge-bases");
             $this->render("blank", "utility", "dashboard");
         }
