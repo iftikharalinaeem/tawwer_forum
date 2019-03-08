@@ -7,6 +7,8 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * Test the /api/v2/articles/drafts endpoint.
@@ -102,6 +104,70 @@ class ArticleDraftsTest extends AbstractResourceTest {
     }
 
     /**
+     * Prepare knowledge with status "deleted", root category, article (and draft if needed)
+     *
+     * @param bool $getDraft Flag to create and return "draft" record-array when true
+     *                       and "article" record-array when false (default)
+     *
+     * @return array Record-array of "draft" or "article"
+     */
+    private function prepareDeletedKnowledgeBase(bool $getDraft = false): array {
+        $kb = $this->newKnowledgeBase();
+
+        $article = $this->api()->post(
+            '/articles',
+            [
+                "body" => "Hello. I am a test for articles.",
+                "format" => "markdown",
+                "knowledgeCategoryID" => $kb['rootCategoryID'],
+                "locale" => "en",
+                "name" => "Example Article",
+                "sort" => 1,
+            ]
+        )->getBody();
+
+        if ($getDraft) {
+            $record = $this->record();
+            $record['recordID'] = $article['articleID'];
+
+            $draft = $this->api()->post(
+                "{$this->baseUrl}",
+                $record
+            )->getBody();
+        }
+
+        $this->api()->patch(
+            "/knowledge-bases/{$kb['knowledgeBaseID']}",
+            ['status' => KnowledgeBaseModel::STATUS_DELETED]
+        );
+
+        return $getDraft ? $draft : $article;
+    }
+
+    /**
+     * Create new knowledge base.
+     *
+     * @return array Knowledge base
+     */
+    public function newKnowledgeBase(): array {
+        $salt = '-'.round(microtime(true) * 1000).rand(1, 1000);
+        $record = [
+            'name' => 'Test Knowledge Base',
+            'description' => 'Test Knowledge Base '.$salt,
+            'viewType' => 'guide',
+            'icon' => '',
+            'bannerImage' => '',
+            'sortArticles' => 'manual',
+            'sourceLocale' => '',
+            'urlCode' => 'test-knowledge-base'.$salt,
+        ];
+        $kb = $this->api()
+            ->post('/knowledge-bases', $record)
+            ->getBody();
+        return $kb;
+    }
+
+    /**
      * Overriding for this method, since this resource has no "edit" that would be different from the normal get-by-id,
      * but the method is used for several other tests.
      *
@@ -162,6 +228,76 @@ class ArticleDraftsTest extends AbstractResourceTest {
         $res = ArticleDraft::getExcerpt($body);
         $this->assertEquals($excerpt, $res);
     }
+
+    /**
+     * Test POST /articles/drafts when knowledge base has status "deleted"
+     */
+    public function testPostDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $record = $this->record();
+        $record['recordID'] = $article['articleID'];
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->post(
+            "{$this->baseUrl}",
+            $record
+        );
+    }
+
+    /**
+     * Test PATCH /articles/drafts/<draftID> when knowledge base has status "deleted"
+     */
+    public function testPatchDeleted() {
+        $draft = $this->prepareDeletedKnowledgeBase(true);
+
+        $record = $this->record();
+        $record['recordID'] = $draft['recordID'];
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$draft['draftID']}",
+            $record
+        );
+    }
+
+    /**
+     * Test GET /articles/drafts/<draftID> when knowledge base has status "deleted"
+     */
+    public function testGetDeleted() {
+        $draft = $this->prepareDeletedKnowledgeBase(true);
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$draft['draftID']}"
+        );
+    }
+
+    /**
+     * Test GET /articles/drafts when knowledge base has status "deleted"
+     */
+    public function testIndexDeleted() {
+        $draft = $this->prepareDeletedKnowledgeBase(true);
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}",
+            ['articleID' => $draft['recordID']]
+        );
+    }
+
+    /**
+     * Test DELETE /articles/drafts when knowledge base has status "deleted"
+     */
+    public function testDeleteDeleted() {
+        $draft = $this->prepareDeletedKnowledgeBase(true);
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->delete(
+            "{$this->baseUrl}/{$draft['draftID']}"
+        );
+    }
+
 
     /**
      * Data provider for testGetExcerpt

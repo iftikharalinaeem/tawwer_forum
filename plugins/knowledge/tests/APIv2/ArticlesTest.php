@@ -10,6 +10,7 @@ use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -117,6 +118,29 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Create new knowledge base.
+     *
+     * @return array Knowledge base
+     */
+    public function newKnowledgeBase(): array {
+        $salt = '-'.round(microtime(true) * 1000).rand(1, 1000);
+        $record = [
+            'name' => 'Test Knowledge Base',
+            'description' => 'Test Knowledge Base '.$salt,
+            'viewType' => 'guide',
+            'icon' => '',
+            'bannerImage' => '',
+            'sortArticles' => 'manual',
+            'sourceLocale' => '',
+            'urlCode' => 'test-knowledge-base'.$salt,
+        ];
+        $kb = $this->api()
+            ->post('/knowledge-bases', $record)
+            ->getBody();
+        return $kb;
+    }
+
+    /**
      * Test DELETE /articles/<id>.
      */
     public function testDelete() {
@@ -127,6 +151,47 @@ class ArticlesTest extends AbstractResourceTest {
         }
     }
 
+    /**
+     * Test GET /articles/<id> when knowledge base has status "deleted"
+     */
+    public function testGetDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$article[$this->pk]}"
+        );
+    }
+
+    /**
+     * Test POST /articles when knowledge base has status "deleted"
+     */
+    public function testPostDeleted() {
+        $kb = $this->newKnowledgeBase();
+        $record =$this->record();
+        $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
+
+        $this->api()->patch(
+            "/knowledge-bases/{$kb['knowledgeBaseID']}",
+            ['status' => KnowledgeBaseModel::STATUS_DELETED]
+        );
+        $this->expectException(NotFoundException::class);
+        $article = $this->testPost($record);
+    }
+
+    /**
+     * Test GET /articles/<id>/edit when knowledge base has status "deleted"
+     */
+    public function testGetEditDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$article[$this->pk]}/edit"
+        );
+    }
     /**
      * Test PATCH /resource/<id> with a a single field update.
      *
@@ -187,6 +252,82 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PATCH /articles/<id> when knowledge base has status "deleted".
+     */
+    public function testPatchDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->patch(
+            "{$this->baseUrl}/{$article[$this->pk]}",
+            ['name' => 'Patched test article']
+        );
+    }
+
+    /**
+     * Test PUT /articles/<id>/react when knowledge base has status "deleted".
+     */
+    public function testPutReactHelpfulDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/react",
+            ['helpful' => 'yes']
+        );
+    }
+
+    /**
+     * Test PUT /articles/<id>/react.
+     */
+    public function testPutReactHelpful() {
+        $article = $this->testPost();
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/react",
+            ['helpful' => 'yes']
+        )->getBody();
+        //die(print_r($body));
+        $this->assertEquals($article['name'], $body['name']);
+        $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
+        $this->assertEquals(1, $body['reactions'][0]['yes']);
+        $this->assertEquals(0, $body['reactions'][0]['no']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
+     * Test PATCH /articles/<id>/status when knowledge base has status "deleted".
+     */
+    public function testPatchStatusDeleted() {
+        $article = $this->prepareDeletedKnowledgeBase();
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->patch(
+            "{$this->baseUrl}/{$article[$this->pk]}/status",
+            ['status' => 'deleted']
+        );
+    }
+
+    /**
+     * Prepare knowledge with status "deleted", root category and article
+     *
+     * @return array Record-array of "draft" or "article"
+     */
+    private function prepareDeletedKnowledgeBase() {
+        $kb = $this->newKnowledgeBase();
+        $record =$this->record();
+        $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
+        $article = $this->testPost($record);
+
+        $this->api()->patch(
+            "/knowledge-bases/{$kb['knowledgeBaseID']}",
+            ['status' => KnowledgeBaseModel::STATUS_DELETED]
+        );
+
+        return $article;
+    }
+
+    /**
      * Test GET /articles.
      */
     public function testIndex() {
@@ -239,6 +380,18 @@ class ArticlesTest extends AbstractResourceTest {
             }
         }
         $this->assertTrue($success, "Unable to limit index to articles in a specific category.");
+
+        //check if articles (index) return 404 when knowledge base has status "deleted"
+        $this->api()->patch(
+            "/knowledge-bases/{$knowledgeBase['knowledgeBaseID']}",
+            ['status' => KnowledgeBaseModel::STATUS_DELETED]
+        );
+        $this->expectException(NotFoundException::class);
+
+        $r = $this->api()->get(
+            $this->baseUrl,
+            ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
+        );
     }
 
 
@@ -246,7 +399,10 @@ class ArticlesTest extends AbstractResourceTest {
      * Test getting history of article revisions.
      */
     public function testGetRevisions() {
-        $article = $this->testPost();
+        $kb = $this->newKnowledgeBase();
+        $record =$this->record();
+        $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
+        $article = $this->testPost($record);
         $articleID = $article["articleID"];
         $originalResponse = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
         $originalResponseBody = $originalResponse->getBody();
@@ -283,5 +439,14 @@ class ArticlesTest extends AbstractResourceTest {
         }
         $this->assertNotNull($published, "No published revisions detected for the article.");
         $this->assertEquals($latest["name"], $published["name"]);
+
+        //check if articles/{articleID}/revisions return 404 when knowledge base has status "deleted"
+        $this->api()->patch(
+            '/knowledge-bases/'.$kb['knowledgeBaseID'],
+            ['status' => KnowledgeBaseModel::STATUS_DELETED]
+        );
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
     }
 }

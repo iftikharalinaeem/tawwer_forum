@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
 
 /**
@@ -382,5 +383,26 @@ MESSAGE
         }
 
         return true;
+    }
+
+    /**
+     * Check knowledge base exist and not "deleted".
+     *
+     * @param int $knowledgeBaseID
+     * @return array
+     * @throws NotFoundException Fired if kb does not exist or "deleted".
+     */
+    public function checkKnowledgeBasePublished(int $knowledgeBaseID): array {
+        try {
+            $kb = $this->selectSingle(
+                [
+                    "knowledgeBaseID" => $knowledgeBaseID,
+                    'status' => KnowledgeBaseModel::STATUS_PUBLISHED
+                ]
+            );
+            return $kb;
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
+        }
     }
 }

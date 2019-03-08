@@ -51,6 +51,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
+
     /** @var DraftModel */
     private $draftModel;
 
@@ -84,6 +87,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ReactionOwnerModel $reactionOwnerModel
      * @param Parser $parser
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param FormatService $formatService
      * @param MediaModel $mediaModel
      * @param SessionInterface $sessionInterface
@@ -99,6 +103,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ReactionOwnerModel $reactionOwnerModel,
         Parser $parser,
         KnowledgeCategoryModel $knowledgeCategoryModel,
+        KnowledgeBaseModel $knowledgeBaseModel,
         FormatService $formatService,
         MediaModel $mediaModel,
         SessionInterface $sessionInterface,
@@ -112,6 +117,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->reactionModel = $reactionModel;
         $this->reactionOwnerModel = $reactionOwnerModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
 
@@ -126,16 +132,22 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param int $id Article ID.
      * @param bool $includeRevision
+     * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
+     *
      * @return array
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function articleByID(int $id, bool $includeRevision = false): array {
+    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false): array {
         try {
             if ($includeRevision) {
                 $article = $this->articleModel->getIDWithRevision($id);
             } else {
                 $article = $this->articleModel->selectSingle(["articleID" => $id]);
+            }
+            if (!$includeDeleted) {
+                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $article['knowledgeCategoryID']]);
+                $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
             }
         } catch (NoResultsException $e) {
             throw new NotFoundException("Article");
@@ -177,16 +189,22 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article draft by its numeric ID.
      *
      * @param int $id Article ID.
+     * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
+     *
      * @return array
      * @throws NotFoundException If the draft could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function draftByID(int $id): array {
+    private function draftByID(int $id, bool $includeDeleted = false): array {
         try {
             $draft = $this->draftModel->selectSingle([
                 "draftID" => $id,
                 "recordType" => "article",
             ]);
+            if (!$includeDeleted && ($draft['recordID'] ?? false)) {
+                //check if article exists and knowledge base is "published"
+                $this->articleByID($draft['recordID']);
+            }
         } catch (NoResultsException $e) {
             throw new NotFoundException("Draft");
         }
@@ -422,6 +440,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out");
 
         $query = $in->validate($query);
+        if ($query['articleID'] ?? false) {
+            //check if article exists and knowledge base is "published"
+            $this->articleByID($query['articleID']);
+        }
 
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
         $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
@@ -481,13 +503,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an knowledge category by its numeric ID.
      *
      * @param int $id Knowledge category ID.
+     * @param bool $includeDeleted Include knowledge category which belongs to knowledge base "deleted"
      * @return array
      * @throws NotFoundException If the knowledge category could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function knowledgeCategoryByID(int $id): array {
+    private function knowledgeCategoryByID(int $id, bool $includeDeleted = false): array {
         try {
             $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
+            if (!$includeDeleted) {
+                $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
+            }
         } catch (NoResultsException $e) {
             throw new NotFoundException("Knowledge Category");
         }
@@ -657,7 +683,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
 
-        // This is just check if article exists
+        // This is just check if article exists and knowledge base has status "published"
         $article = $this->articleByID($id);
 
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
@@ -742,6 +768,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body);
         $body["recordType"] = "article";
+        if ($body['recordID'] ?? false) {
+            //check if article exists and knowledge base is "published"
+            $this->articleByID($body['recordID']);
+        }
 
         $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
 
@@ -770,6 +800,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($articleID !== null) {
             // this means we patch existing Article
             $prevState = $this->articleModel->getID($articleID);
+
+            //check if knowledge category exists and knowledge base is "published"
+            $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
+
             $moveToAnotherCategory = (isset($article['knowledgeCategoryID'])
                 && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
 
@@ -822,6 +856,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 );
             }
         } else {
+            //check if knowledge category exists and knowledge base is "published"
+            $this->knowledgeCategoryByID($fields['knowledgeCategoryID']);
             // this means we insert a new Article
             $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($fields['knowledgeCategoryID']);
             $maxSortIndex = $sortInfo['maxSort'];
