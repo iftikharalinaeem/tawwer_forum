@@ -25,7 +25,7 @@ const routeReducer = reducerWithInitialState<IRouteState>(INITIAL_STATE)
     .case(RouteActions.resetAC, () => INITIAL_STATE)
     .cases([RouteActions.errorAC, RouteActions.serverErrorAC], (state, payload) => {
         return {
-            error: payload,
+            error: "data" in payload ? payload.data : payload,
         };
     });
 export default routeReducer;

@@ -7,13 +7,19 @@
 use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Garden\Schema\ValidationException;
+use Garden\StaticCacheTranslationTrait;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Controller for serving the /knowledge-settings pages.
  */
 class KnowledgeSettingsController extends SettingsController {
-    use \Garden\TwigTrait;
+
+    use TwigRenderTrait;
+
+    use StaticCacheTranslationTrait;
 
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
@@ -21,20 +27,57 @@ class KnowledgeSettingsController extends SettingsController {
     /** @var MediaApiController */
     private $mediaApiController;
 
+    /** @var Gdn_Request */
+    private $request;
+
     /**
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $apiController
      * @param MediaApiController $mediaApiController
+     * @param Gdn_Request $request
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
-        MediaApiController $mediaApiController
+        MediaApiController $mediaApiController,
+        Gdn_Request $request
     ) {
         $this->apiController = $apiController;
         $this->mediaApiController = $mediaApiController;
+        $this->request = $request;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
+    }
+
+    /**
+     * Add index-page navigation into the page's Help panel.
+     *
+     * @param string $currentStatus
+     */
+    private function addIndexNavigation(string $currentStatus = null) {
+        if ($currentStatus === null || $currentStatus === KnowledgeBaseModel::STATUS_PUBLISHED) {
+            $title = self::t("Deleted Knoweldge Bases");
+            $url = "knowledge-settings/knowledge-bases?status=" . KnowledgeBaseModel::STATUS_DELETED;
+        } else {
+            $title = self::t("Knoweldge Bases");
+            $url = "knowledge-settings/knowledge-bases";
+        }
+
+        $this->addHelpWidget(self::t("Navigation"), "<a href=\"{$this->request->url($url)}\">$title</a>");
+    }
+
+    /**
+     * A local version of the helpAsset function. Generates an aside element in the Help panel.
+     *
+     * @param string $title
+     * @param string $content
+     */
+    private function addHelpWidget(string $title, string $content) {
+        $widget = $this->renderTwig("knowledgesettings/helpasset.twig", [
+            "content" => $content,
+            "title" => $title,
+        ]);
+        $this->addAsset("Help", $widget);
     }
 
     /**
@@ -49,7 +92,7 @@ class KnowledgeSettingsController extends SettingsController {
                 "Control" => "imageupload",
                 "LabelCode" => "Banner Image",
                 "Options" => [
-                    "RemoveConfirmText" => sprintf(t("Are you sure you want to delete your %s?"), t("banner image"))
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
                 ],
             ],
             "Knowledge.ChooserTitle" => [
@@ -65,33 +108,48 @@ class KnowledgeSettingsController extends SettingsController {
     /**
      * Main entry function for all /knowledge-settings/knowledge-bases routes.
      *
+     * @param int|null $knowledgeBaseID
+     * @param string|null $action
      * @return void
      */
-    public function knowledgeBases() {
-        $pathArgs = $this->RequestArgs;
-        $isIndex = count($pathArgs) === 0;
-        $isEdit =
-            count($pathArgs) === 2 &&
-            ($id = filter_var($pathArgs[0], FILTER_VALIDATE_INT)) &&
-            $pathArgs[1] === 'edit';
-        $isAdd = count($pathArgs) === 1 && $pathArgs[0] === 'add';
+    public function knowledgeBases($knowledgeBaseID = null, $action = null) {
+        $action = strtolower($action ?? "");
 
-        if ($isIndex) {
-            $this->knowledgeBasesIndex();
-        } elseif ($isEdit) {
-            $this->knowledgeBasesAddEdit($id);
-        } elseif ($isAdd) {
+        if ($knowledgeBaseID === "add") {
             $this->knowledgeBasesAddEdit();
+        } elseif ($knowledgeBaseID !== null) {
+            $knowledgeBaseID = filter_var($knowledgeBaseID, FILTER_VALIDATE_INT);
+            switch ($action) {
+                case "delete":
+                    $this->knowledgeBasesDelete($knowledgeBaseID, $this->request->get("purge") === "purge");
+                    break;
+                case "edit":
+                    $this->knowledgeBasesAddEdit($knowledgeBaseID);
+                    break;
+                case "publish":
+                    $this->knowledgeBasesPublish($knowledgeBaseID);
+                    break;
+                default:
+                    throw new NotFoundException("Page");
+            }
+        } else {
+            $this->knowledgeBasesIndex($this->request->get("status", KnowledgeBaseModel::STATUS_PUBLISHED));
         }
     }
 
     /**
      * Render the /knowledge-settings/knowledge-categories page.
+     *
+     * @param string $status
      */
-    private function knowledgeBasesIndex() {
+    private function knowledgeBasesIndex(string $status) {
         $this->permission('Garden.Settings.Manage');
-        $knowledgeBases = $this->apiController->index();
+
+        $knowledgeBases = $this->apiController->index(["status" => $status]);
         $this->setData('knowledgeBases', $knowledgeBases);
+        $this->setData("status", $status);
+        $this->addIndexNavigation($status);
+
         $this->render('index');
     }
 
@@ -126,32 +184,38 @@ class KnowledgeSettingsController extends SettingsController {
         $formData = [
             'name' => [
                 'LabelCode' => 'Name',
+                "Description" => "Title of the knowledge base.",
             ],
             'urlCode' => [
                 'LabelCode' => 'URL Code',
+                "Description" => "A customized version of the knowledge base name as it should appear in URLs.",
             ],
             'description' => [
                 'LabelCode' => 'Description',
                 'Control' => 'textbox',
                 'Options' => ['MultiLine' => true],
+                "Description" => "A description of the knowledge base. Displayed in the knowledge base picker.",
             ],
             'icon' => [
                 'LabelCode' => 'Icon',
                 'Control' => 'imageuploadpreview',
+                "Description" => "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
             ],
             "bannerImage" => [
                 "Control" => "imageuploadpreview",
                 "LabelCode" => "Banner Image",
+                "Description" => "Homepage banner image for this knowledge base."
             ],
             'viewType' => [
+                "Description" => "Determines how the categories and articles within it will display",
                 'LabelCode' => 'View Type',
-                'Control' => 'dropdown',
-                'Items' => [
-                    KnowledgeBaseModel::TYPE_GUIDE => t('Guide'),
-                    KnowledgeBaseModel::TYPE_HELP => t('Help'),
-                ],
+                'Control' => 'callback',
+                'Callback' => function (Gdn_Form $form, array $inputRow): string {
+                    return $this->renderViewTypePicker($form, $inputRow);
+                },
             ],
             'sortArticles' => [
+                "Description" => "Sorting method for articles.",
                 'LabelCode' => 'Sort Articles',
                 'Control' => 'dropdown',
                 'Items' => [
@@ -172,6 +236,48 @@ class KnowledgeSettingsController extends SettingsController {
             'form' => $this->Form
         ]);
         $this->render('addedit');
+    }
+
+    /**
+     * Handle a request to "soft" delete a knoweldge base.
+     *
+     * @param integer $knowledgeBaseID
+     * @param bool $purge Perform a true delete of this knowledge base?
+     */
+    private function knowledgeBasesDelete(int $knowledgeBaseID, bool $purge = false) {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+
+        if ($this->Form->authenticatedPostBack()) {
+            if ($purge) {
+                $this->apiController->delete($knowledgeBaseID);
+                $this->informMessage(sprintf(self::t("%s purged."), self::t("Knowledge Base")));
+            } else {
+                $this->apiController->patch($knowledgeBaseID, [
+                    "status" => KnowledgeBaseModel::STATUS_DELETED,
+                ]);
+                $this->informMessage(sprintf(self::t("%s deleted."), self::t("Knowledge Base")));
+            }
+            $this->setRedirectTo("/knowledge-settings/knowledge-bases");
+            $this->render("blank", "utility", "dashboard");
+        }
+    }
+
+    /**
+     * Handle a request to flag a knoweldge base as published.
+     *
+     * @param integer $knowledgeBaseID
+     */
+    private function knowledgeBasesPublish(int $knowledgeBaseID) {
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+
+        if ($this->Form->authenticatedPostBack()) {
+            $this->apiController->patch($knowledgeBaseID, [
+                "status" => KnowledgeBaseModel::STATUS_PUBLISHED,
+            ]);
+            $this->informMessage(sprintf(self::t("%s published."), self::t("Knowledge Base")));
+            $this->setRedirectTo("/knowledge-settings/knowledge-bases");
+            $this->render("blank", "utility", "dashboard");
+        }
     }
 
     /**
@@ -197,6 +303,7 @@ class KnowledgeSettingsController extends SettingsController {
         }
 
         if ($knowledgeBaseID) {
+            $knowledgeBaseID = (int)$knowledgeBaseID;
             $this->apiController->patch($knowledgeBaseID, $values);
         } else {
             $this->apiController->post($values);
@@ -209,6 +316,48 @@ class KnowledgeSettingsController extends SettingsController {
             $this->setRedirectTo('/vanilla/settings/categories');
             $this->render('blank', 'utility', 'dashboard');
         }
+    }
+
+    /**
+     * Generate HTML for view type picker form inputs.
+     *
+     * @param Gdn_Form $form
+     * @param array $inputRow
+     * @return string
+     */
+    private function renderViewTypePicker(Gdn_Form $form, array $inputRow): string {
+        $descriptionHtml = $inputRow["DescriptionHtml"] ?? "";
+
+        $label = '<div class="label-wrap">' . $form->label(
+            $inputRow["LabelCode"] ?? "",
+            "viewType",
+            $inputRow
+        ) . $descriptionHtml . '</div>';
+
+        $options = [
+            KnowledgeBaseModel::TYPE_GUIDE => [
+                "info" => "Guides are for making howto guides, documentation, or any \"book\" like content that should be read in order.",
+                "label" => self::t("Guide"),
+            ],
+            KnowledgeBaseModel::TYPE_HELP => [
+                "info" => "Help centers are for making free-form help articles that are organized into categories.",
+                "label" => self::t('Help Center'),
+            ],
+        ];
+
+        $controls = "<ul>";
+        foreach ($options as $value => $option) {
+            $info = '<div class="info">' .$option["info"] . '</div>';
+            $control = $form->radio(
+                "viewType",
+                $option["label"],
+                ["class" => "js-viewType", "value" => $value]
+            );
+            $controls .= '<li class="' . $form->getStyle("radio-container") . '">' . $control . $info . '</li>';
+        }
+        $controls .= "</ul>";
+
+        return '<li class="' . $form->getStyle("form-group").'">' . $label . '<div class="input-wrap">' . $controls . '</div></li>';
     }
 
     /**

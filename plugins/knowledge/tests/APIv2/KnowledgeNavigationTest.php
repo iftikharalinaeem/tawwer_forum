@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Exception;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\Navigation;
@@ -832,5 +833,75 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
         $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
 
         $this->assertTreesEqual($expected, $actual);
+    }
+
+    /**
+     * Test GET ... 200 responses becomes 404 when knowledge base status changed to "deleted".
+     */
+    public function testDeletedKnowledgeBase() {
+
+        $responseTree = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree');
+        $initialBodyTree = $responseTree->getBody();
+        $status = $responseTree->getStatus();
+
+        $this->assertEquals('200 OK', $status);
+
+        $responseFlat = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat');
+        $initialBodyFlat = $responseFlat->getBody();
+        $status = $responseFlat->getStatus();
+
+        $this->assertEquals('200 OK', $status);
+
+        //Delete knowledge base
+        $status = $this->api()->patch(
+            'knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'],
+            ['status' => 'deleted']
+        )->getStatus();
+
+        $this->assertEquals('200 OK', $status);
+
+        try {
+            $statusTree = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getStatus();
+            $statusTree = 'When knowledge base is "deleted" api call should bring an exception!';
+        } catch (NotFoundException $e) {
+            $statusTree = $e->getCode();
+        }
+
+        $this->assertEquals('404', $statusTree);
+
+        try {
+            $statusFlat = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat')->getStatus();
+            $statusFlat = 'When knowledge base is "deleted" api call should bring an exception!';
+        } catch (NotFoundException $e) {
+            $statusFlat = $e->getCode();
+        }
+        $this->assertEquals('404', $statusFlat);
+
+        try {
+            $statusPatchFlat = $this->api()->patch('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat', [])->getStatus();
+            $statusPatchFlat = 'When knowledge base is "deleted" api call should bring an exception!';
+        } catch (NotFoundException $e) {
+            $statusPatchFlat = $e->getCode();
+        }
+        $this->assertEquals('404', $statusPatchFlat);
+
+
+        // Let's check that no data had changed after knowledge base get restored back to "published" status
+        $this->api()->patch(
+            'knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'],
+            ['status' => 'published']
+        )->getStatus();
+
+        $apiResponse = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree');
+        $this->assertEquals('200 OK', $apiResponse->getStatus());
+
+        $finalBodyTree = $apiResponse->getBody();
+        $this->assertEquals($initialBodyTree, $finalBodyTree);
+
+        $apiResponse = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat');
+        $this->assertEquals('200 OK', $apiResponse->getStatus());
+
+        $finalBodyFlat = $apiResponse->getBody();
+        $this->assertEquals($initialBodyFlat, $finalBodyFlat);
     }
 }
