@@ -4,7 +4,7 @@
     "version": "0.1",
     "mobileFriendly": true,
     "hasLocale": true,
-    "icon": "knowledge.png",
+    "icon": "knowledge.svg",
     "key": "knowledge",
     "type": "addon",
     "authors": [
