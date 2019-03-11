@@ -1657,7 +1657,7 @@ EOT
      * @param $sender DiscussionModel
      * @param $args
      */
-    public function discussionModel_modifyWheres_handler($sender, $args) {
+    public function discussionModel_modifyQuery_handler($sender, $args) {
         $filters = $sender->getFilters();
         if (isset($args['Wheres']['td.TagID']) || isset($filters)) {
             $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID");
