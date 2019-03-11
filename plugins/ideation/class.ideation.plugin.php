@@ -1650,15 +1650,35 @@ EOT
     }
 
     /**
-     * Join TagDiscussion table if filtering by status.
+     * Update Discussion query to when filtering by idea statuses.
      *
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_modifyQuery_handler($sender, $args) {
+    public function discussionModel_beforeGet_handler($sender, $args) {
+        $this->ideaQueryFiltering($sender, $args);
+    }
+
+    /**
+     * Update Discussion query to when filtering by idea statuses.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGetCount_handler($sender, $args) {
+        $this->ideaQueryFiltering($sender, $args);
+    }
+
+    /**
+     * Join TagDiscussion table filtering idea statuses. 
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    private function ideaQueryFiltering($sender, $args) {
         $filters = $sender->getFilters();
         if (isset($args['Wheres']['td.TagID']) || isset($filters)) {
-            $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID");
+            $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID", 'inner');
         }
     }
 
