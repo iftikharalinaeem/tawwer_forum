@@ -1096,6 +1096,7 @@ EOT
      *
      * @param TagModule $sender
      * @param array $args
+     * @param array $args
      */
     public function tagModule_getData_handler($sender, $args) {
         if ($args['ParentType'] != 'Discussion') {
@@ -1628,7 +1629,7 @@ EOT
             $openTags[] = val('TagID', $openStatus);
         }
         DiscussionModel::addFilter('open', t('Open'),
-            ['d.Tags' => $openTags], 'state', 'status'
+            ['td.TagID' => $openTags], 'state', 'status'
         );
 
         // Closed state
@@ -1638,14 +1639,28 @@ EOT
             $closedTags[] = val('TagID', $closedStatus);
         }
         DiscussionModel::addFilter('closed', t('Closed'),
-            ['d.Tags' => $closedTags], 'state', 'status'
+            ['td.TagID' => $closedTags], 'state', 'status'
         );
 
         // Statuses
         foreach(StatusModel::instance()->getStatuses() as $status) {
             DiscussionModel::addFilter(strtolower(val('Name', $status)).'-status' , val('Name', $status),
-                ['d.Tags' => val('TagID', $status)], 'status', 'status'
+                ['td.TagID' => val('TagID', $status)], 'status', 'status'
             );
+        }
+    }
+
+    /**
+     * Join TagDiscussion table if filtering by status.
+     *
+     *
+     * @param $sender DiscussionModel
+     * @param $args
+     */
+    public function discussionModel_modifyGetWhere_handler($sender, $args) {
+        $filters = $sender->getFilters();
+        if (isset($args['Wheres']['td.TagID']) || isset($filters)) {
+            $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID");
         }
     }
 
