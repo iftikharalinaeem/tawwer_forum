@@ -1096,7 +1096,6 @@ EOT
      *
      * @param TagModule $sender
      * @param array $args
-     * @param array $args
      */
     public function tagModule_getData_handler($sender, $args) {
         if ($args['ParentType'] != 'Discussion') {
@@ -1653,9 +1652,8 @@ EOT
     /**
      * Join TagDiscussion table if filtering by status.
      *
-     *
-     * @param $sender DiscussionModel
-     * @param $args
+     * @param DiscussionModel $sender
+     * @param array $args
      */
     public function discussionModel_modifyQuery_handler($sender, $args) {
         $filters = $sender->getFilters();
