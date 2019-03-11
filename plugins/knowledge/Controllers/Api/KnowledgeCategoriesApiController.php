@@ -79,6 +79,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeCategoryByID($id);
+
+        $this->knowledgeBaseModel->checkKnowledgeBasePublished($row['knowledgeBaseID']);
+
         if (!$this->knowledgeBaseModel->isRootCategory($id)) {
             if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
                 $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
@@ -265,7 +268,12 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $in = $this->schema([])->setDescription("List knowledge categories.");
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
-        $rows = $this->knowledgeCategoryModel->get();
+        $publishedKnowledgeBases = array_column(
+            $this->knowledgeBaseModel->get(['status' => KnowledgeBaseModel::STATUS_PUBLISHED]),
+            'knowledgeBaseID'
+        );
+
+        $rows = $this->knowledgeCategoryModel->get(['knowledgeBaseID' => $publishedKnowledgeBases]);
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
         }
@@ -278,13 +286,18 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * Get a single knowledge category by its ID.
      *
      * @param int $knowledgeCategoryID
+     * @param bool $includeDeleted Include "deleted" knowledge base. Default: false (exclude "deleted")
+     *
      * @return array
      * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
      * @throws ValidationException If the knowledge category row fails validating against the model's output schema.
      */
-    public function knowledgeCategoryByID(int $knowledgeCategoryID): array {
+    public function knowledgeCategoryByID(int $knowledgeCategoryID, bool $includeDeleted = false): array {
         try {
             $result = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $knowledgeCategoryID]);
+            if (!$includeDeleted) {
+                $this->knowledgeBaseModel->checkKnowledgeBasePublished($result['knowledgeBaseID']);
+            }
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
             throw new \Garden\Web\Exception\NotFoundException("Knowledge-Category");
         }
@@ -353,6 +366,8 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             $body = $in->validate($body, true);
 
             $previousState = $this->knowledgeCategoryByID($id);
+
+            $knowledgeBase = $this->knowledgeBaseModel->checkKnowledgeBasePublished($previousState['knowledgeBaseID']);
 
             $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
 
@@ -441,6 +456,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         }
         $body = $in->validate($body);
 
+        $this->knowledgeBaseModel->checkKnowledgeBasePublished($body['knowledgeBaseID']);
 
         $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID']);
         $maxSortIndex = $sortInfo['maxSort'];

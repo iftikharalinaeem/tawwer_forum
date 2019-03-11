@@ -59,17 +59,17 @@ abstract class KbPage extends ThemedPage {
         $this->categoriesApi = $categoriesApi;
 
         // Shared initialization.
-        $this->initAssets();
         $this->initSharedData();
     }
 
     /**
      * Initialize assets from the asset provide.
      */
-    private function initAssets() {
+    protected function initAssets() {
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts('knowledge'));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets('knowledge'));
+        parent::initAssets();
     }
 
     /** @var array */

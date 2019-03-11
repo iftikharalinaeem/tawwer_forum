@@ -4,29 +4,37 @@
  */
 
 import { onReady, onContent } from "@library/application";
+import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 onReady(handleKBViewTypeChange);
 onContent(handleKBViewTypeChange);
 
+const hiddenClass = "Hidden";
+
 function handleKBViewTypeChange() {
-    const viewTypeSelect = document.getElementById("Form_viewType") as HTMLSelectElement;
-    if (viewTypeSelect) {
-        updateSortArticles(viewTypeSelect.value);
-        viewTypeSelect.addEventListener("change", () => {
-            updateSortArticles(viewTypeSelect.value);
+    const viewTypeSelect = document.querySelectorAll("input.js-viewType");
+
+    if (viewTypeSelect.length) {
+        viewTypeSelect.forEach((input: HTMLInputElement) => {
+            updateSortArticles();
+            input.addEventListener("change", () => updateSortArticles());
         });
     }
 }
 
-function updateSortArticles(viewType: string) {
-    const sortArticlesGroup = document.querySelectorAll(".js-sortArticlesGroup");
-    if (viewType === "help") {
-        sortArticlesGroup.forEach(group => {
-            group.classList.remove("Hidden");
-        });
-    } else {
-        sortArticlesGroup.forEach(group => {
-            group.classList.add("Hidden");
-        });
+function updateSortArticles() {
+    const checkedType: HTMLInputElement | null = document.querySelector("input.js-viewType:checked");
+    const sortGroup: HTMLElement | null = document.querySelector("li.js-sortArticlesGroup");
+
+    if (checkedType === null || sortGroup === null) {
+        return;
+    }
+
+    switch (checkedType.value) {
+        case KbViewType.GUIDE:
+            sortGroup.classList.add(hiddenClass);
+            break;
+        default:
+            sortGroup.classList.remove(hiddenClass);
     }
 }
