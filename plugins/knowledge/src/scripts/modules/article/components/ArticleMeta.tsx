@@ -10,6 +10,7 @@ import ProfileLink from "@library/components/navigation/ProfileLink";
 import DateTime from "@library/components/DateTime";
 import { Link } from "react-router-dom";
 import { IUserFragment } from "@library/@types/api";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -20,17 +21,21 @@ interface IProps {
 export class ArticleMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, updateUser, permaLink } = this.props;
+        const classesMetas = metasClasses();
 
         return (
             <React.Fragment>
-                <span className="meta">
-                    <Translate source="By <0/>" c0={<ProfileLink className="meta" username={updateUser.name} />} />
+                <span className={classesMetas.meta}>
+                    <Translate
+                        source="By <0/>"
+                        c0={<ProfileLink className={classesMetas.meta} username={updateUser.name} />}
+                    />
                 </span>
-                <span className="meta">
+                <span className={classesMetas.meta}>
                     <Translate
                         source="Last Updated: <0/>"
                         c0={
-                            <Link to={permaLink} className="meta">
+                            <Link to={permaLink} className={classesMetas.meta}>
                                 <DateTime timestamp={dateUpdated} />
                             </Link>
                         }

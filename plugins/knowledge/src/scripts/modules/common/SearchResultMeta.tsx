@@ -13,6 +13,7 @@ import { t } from "@library/application";
 import { ArticleStatus } from "@knowledge/@types/api";
 import { capitalizeFirstLetter } from "@library/utility";
 import classNames from "classnames";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -26,11 +27,12 @@ export class SearchResultMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, updateUser, crumbs, status, type } = this.props;
         const isDeleted = status === ArticleStatus.DELETED;
+        const classesMetas = metasClasses();
         return (
             <React.Fragment>
                 {updateUser &&
                     updateUser.name && (
-                        <span className={classNames("meta")}>
+                        <span className={classNames(classesMetas.meta)}>
                             {isDeleted ? (
                                 <span className={classNames("meta-inline", "isDeleted")}>
                                     <Translate source="Deleted <0/>" c0={type} />
@@ -45,10 +47,10 @@ export class SearchResultMeta extends React.Component<IProps> {
                         </span>
                     )}
 
-                <span className="meta">
+                <span className={classesMetas.meta}>
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </span>
-                {crumbs && crumbs.length > 0 && <BreadCrumbString className="meta" crumbs={crumbs} />}
+                {crumbs && crumbs.length > 0 && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
             </React.Fragment>
         );
     }
