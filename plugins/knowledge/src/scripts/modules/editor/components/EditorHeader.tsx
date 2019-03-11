@@ -21,6 +21,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import FlexSpacer from "@library/components/FlexSpacer";
+import { metasClasses } from "library/src/scripts/styles/metasStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -108,14 +109,19 @@ export class EditorHeader extends React.Component<IProps> {
         const { status } = this.props.saveDraft!;
         const { data } = this.props.draft!;
         let content: ReactNode = null;
+        const classesMetas = metasClasses();
 
         if (status === LoadStatus.LOADING) {
-            content = <span className="editorHeader-saveDraft metaStyle">{t("Saving draft...")}</span>;
+            content = (
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle)}>
+                    {t("Saving draft...")}
+                </span>
+            );
         }
 
         if (data) {
             content = (
-                <span className="editorHeader-saveDraft metaStyle">
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle)}>
                     <Translate
                         source="Draft saved <0/>"
                         c0={<DateTime mode="relative" timestamp={data.dateUpdated} />}
@@ -125,7 +131,11 @@ export class EditorHeader extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            content = <span className="editorHeader-saveDraft metaStyle isError">{t("Error saving draft.")}</span>;
+            content = (
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle, "isError")}>
+                    {t("Error saving draft.")}
+                </span>
+            );
         }
 
         if (content) {

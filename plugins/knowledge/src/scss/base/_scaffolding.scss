@@ -28,14 +28,8 @@ button {
     border: 0;
     background: none;
     cursor: pointer;
-    color: $global-color-fg;
+    color: inherit;
     font: inherit;
-    padding: {
-        top: $global-button_paddingTop;
-        bottom: $global-button_paddingBottom;
-        left: $global-button_paddingSide;
-        right: $global-button_paddingSide;
-    }
 }
 
 // Disabled Inputs
