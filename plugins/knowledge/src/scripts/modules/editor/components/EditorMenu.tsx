@@ -17,6 +17,7 @@ import {
 import Permission from "@library/users/Permission";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps {
     article: IArticle;
@@ -30,6 +31,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
         const { article } = this.props;
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
+        const classesDropDown = dropDownClasses();
 
         return (
             <Permission permission="articles.add">
@@ -47,7 +49,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     />
                     <DropDownItemSeparator />
                     <DropDownItem>
-                        <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                        <RevisionsRoute.Link data={article} className={classesDropDown.action}>
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>

@@ -18,7 +18,7 @@ import SmartLink from "@library/components/navigation/SmartLink";
 import Hoverable from "@library/utils/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
-import { metasClasses } from "library/src/scripts/styles/metasStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IRevisionFragment {
     url: string;

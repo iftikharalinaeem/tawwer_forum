@@ -10,7 +10,7 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import ProfileLink from "@library/components/navigation/ProfileLink";
 import { IUserFragment } from "@library/@types/api";
-import { metasClasses } from "library/src/scripts/styles/metasStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     dateInserted: string;

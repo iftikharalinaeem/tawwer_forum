@@ -21,7 +21,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import FlexSpacer from "@library/components/FlexSpacer";
-import { metasClasses } from "library/src/scripts/styles/metasStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;

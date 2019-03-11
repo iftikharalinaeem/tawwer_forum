@@ -4,17 +4,6 @@
  * @license Proprietary
  */
 
-a.meta,
-a.metaStyle {
-    &:hover {
-        color: $link-default_hover-color;
-        text-shadow: none;
-    }
-    &:focus {
-        color: $link-default_focus-color;
-    }
-}
-
 .meta-text {
     color: inherit;
     display: inline-block;
