@@ -84,7 +84,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * If the pages url changes we need to fetch the article data again.
      */
     public componentDidUpdate(prevProps: IProps) {
-        if (this.props.match.url !== prevProps.match.url) {
+        if (this.props.match.url !== prevProps.match.url || this.props.article.status === LoadStatus.PENDING) {
             this.initializeFromUrl();
         }
     }
