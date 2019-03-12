@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { t } from "@library/application";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import DropDown from "@library/components/dropdown/DropDown";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
@@ -17,6 +17,7 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 import { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
 import { LoadStatus } from "@library/@types/api";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;
@@ -47,7 +48,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
             <React.Fragment>
                 <DropDown
                     name={t("Draft Options")}
-                    buttonClassName={ButtonBaseClass.CUSTOM}
+                    buttonClassName={ButtonTypes.CUSTOM}
                     renderLeft={true}
                     setExternalButtonRef={this.setButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"

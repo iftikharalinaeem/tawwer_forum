@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { styleFactory } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -47,10 +48,13 @@ export const locationPickerClasses = useThemeCache(() => {
     });
 
     const instructions = style("instructions", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
         fontSize: px(globalVars.fonts.size.medium),
         padding: `${px(8)} ${px(12)}`,
-        borderBottom: `solid 1px ${globalVars.mixBgAndFg(0.15)}`,
         width: percent(100),
+        minHeight: unit(50),
     });
 
     return {

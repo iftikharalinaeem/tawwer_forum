@@ -22,6 +22,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { metasClasses } from "@library/styles/metasStyles";
+import { modalClasses } from "@library/styles/modalStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -53,8 +54,16 @@ export class EditorHeader extends React.Component<IProps> {
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
+        const classesModal = modalClasses();
         return (
-            <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
+            <nav
+                className={classNames(
+                    "editorHeader",
+                    "modal-pageHeader",
+                    this.props.className,
+                    classesModal.pageHeader,
+                )}
+            >
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
