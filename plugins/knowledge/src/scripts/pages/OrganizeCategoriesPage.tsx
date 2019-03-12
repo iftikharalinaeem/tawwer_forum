@@ -23,6 +23,7 @@ import { match } from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { modalClasses } from "@library/styles/modalStyles";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -30,6 +31,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, hasError } = this.props;
         const pageTitle = t("Navigation Manager");
+        const classesModal = modalClasses();
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
             return <Loader />;
@@ -43,7 +45,9 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className={classNames("modal-scroll", inheritHeightClass(), { hasError })}>
+                    <div
+                        className={classNames("modal-scroll", classesModal.scroll, inheritHeightClass(), { hasError })}
+                    >
                         <div className={classNames("container", inheritHeightClass())}>
                             <div className={classNames("navigationManager-container", inheritHeightClass())}>
                                 <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
