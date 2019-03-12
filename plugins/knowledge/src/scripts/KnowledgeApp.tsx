@@ -13,7 +13,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { formatUrl } from "@library/application";
+import { formatUrl, getMeta } from "@library/application";
 import SearchContext from "@library/contexts/SearchContext";
 import PagesContext from "@library/contexts/PagesContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
@@ -37,7 +37,7 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ThemeProvider errorComponent={<ErrorPage />}>
+                <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
                     <PagesContext.Provider value={{ pages: this.pages }}>
                         <ScrollOffsetProvider scrollWatchingEnabled={true}>
                             <SiteNavProvider>

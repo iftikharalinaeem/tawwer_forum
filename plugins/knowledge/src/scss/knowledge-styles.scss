@@ -5,13 +5,7 @@
  */
 
 @import "base/overwrite";
-@import "~library-scss/_coreVariables";
-@import "~library-scss/mixins/_mixins";
-@import "~normalize.css";
-
-@import "~library-scss/utility/_body";
-@import "~library-scss/utility/_utility";
-@import "~library-scss/embeds/_embeds";
+@import "~library-scss/base";
 
 @import "~library-scss/layouts/panelLayout";
 @import "~library-scss/layouts/page";
@@ -30,10 +24,6 @@
 @import "~library-scss/userContent/_emoji";
 @import "~library-scss/userContent/_codeBlocks";
 @import "~library-scss/userContent/_accessibility";
-
-@import "base/scaffolding";
-@import "base/typography";
-@import "base/utilities";
 
 @import "components/userContent"; // Keep first of components
 @import "components/metas";
