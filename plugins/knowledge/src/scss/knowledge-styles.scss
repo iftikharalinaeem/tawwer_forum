@@ -21,10 +21,8 @@
 @import "~library-scss/userContent/_atMention";
 @import "~library-scss/userContent/_blockquote";
 @import "~library-scss/userContent/_emoji";
-@import "~library-scss/userContent/_codeBlocks";
 @import "~library-scss/userContent/_accessibility";
 
-@import "components/userContent"; // Keep first of components
 @import "components/metas";
 @import "components/icons";
 @import "components/messages";
