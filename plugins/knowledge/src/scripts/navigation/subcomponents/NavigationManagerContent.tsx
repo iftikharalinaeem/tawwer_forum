@@ -15,7 +15,7 @@ import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     className?: string;

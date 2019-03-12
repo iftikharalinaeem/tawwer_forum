@@ -26,7 +26,7 @@ import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import classNames from "classnames";
 import * as React from "react";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;

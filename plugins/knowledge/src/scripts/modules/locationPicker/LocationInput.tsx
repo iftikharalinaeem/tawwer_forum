@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * This component allows to display and edit the location of the current page.

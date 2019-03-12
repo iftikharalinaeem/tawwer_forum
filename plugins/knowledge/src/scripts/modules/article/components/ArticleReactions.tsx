@@ -16,7 +16,7 @@ import { checkCompact } from "@library/components/icons";
 import SmartLink from "@library/components/navigation/SmartLink";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-import { buttonClasses } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
 import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import React from "react";

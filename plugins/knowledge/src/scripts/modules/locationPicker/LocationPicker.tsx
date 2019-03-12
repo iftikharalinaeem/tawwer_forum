@@ -17,8 +17,8 @@ import { newFolder } from "@library/components/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { buttonClasses } from "@library/styles/buttonVariables";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * Component for choosing a location for a new article.

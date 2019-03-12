@@ -11,7 +11,7 @@ import classNames from "classnames";
 import React from "react";
 import { nextTick } from "process";
 import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     className?: string;

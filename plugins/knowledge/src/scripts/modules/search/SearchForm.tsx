@@ -33,7 +33,7 @@ import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import Loader from "@library/components/Loader";
 import debounce from "lodash/debounce";
-import { buttonClasses } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;

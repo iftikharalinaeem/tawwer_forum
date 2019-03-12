@@ -22,7 +22,7 @@ import Permission from "@library/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonClasses } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 import { dateRangeClasses } from "@library/styles/dateRangeStyles";
 

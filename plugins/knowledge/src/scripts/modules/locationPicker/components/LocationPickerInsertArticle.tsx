@@ -14,7 +14,7 @@ import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
 import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
 import { folderContentsClasses } from "@library/styles/folderContentsStyles";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     onClick: (position: string) => void;

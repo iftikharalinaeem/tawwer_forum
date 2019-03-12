@@ -17,7 +17,7 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 import { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
 import { LoadStatus } from "@library/@types/api";
-import { ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;

@@ -8,7 +8,7 @@ import * as React from "react";
 import Button from "@library/components/forms/Button";
 import ButtonLoader from "@library/components/ButtonLoader";
 import classNames from "classnames";
-import { buttonClasses } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 interface IProps {
     className?: string;
