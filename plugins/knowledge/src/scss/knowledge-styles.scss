@@ -16,7 +16,6 @@
 @import "~library-scss/layouts/panelLayout";
 @import "~library-scss/layouts/page";
 @import "~library-scss/layouts/overlay";
-@import "~library-scss/layouts/modal";
 @import "~library-scss/layouts/container";
 @import "~library-scss/layouts/panelArea";
 @import "~library-scss/layouts/panelWidget";
@@ -51,14 +50,13 @@
 @import "components/locationBreadcrumb";
 @import "components/radioButtonsAsTabs";
 @import "components/word";
-@import "components/folderContents";
 @import "components/editorHeader";
 @import "components/pageLocation";
 @import "components/revisionsList";
 @import "components/advancedSearch";
 @import "components/draftList";
 @import "components/draftPreview";
-@import "components/navigationManager";
+//@import "components/navigationManager";
 @import "components/navigationManagerToolbar";
 
 @import "~react-day-picker/lib/style.css";

@@ -17,8 +17,9 @@ import { Modal } from "@library/components/modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import getStore from "@library/state/getStore";
 import * as React from "react";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     exitHandler: (e: React.SyntheticEvent) => void;
@@ -78,16 +79,18 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                 />
                             </FramePanel>
                         </FrameBody>
-                        <FrameFooter>
+                        <FrameFooter selfPadded={true}>
                             <Button
-                                className={classNames("locationPicker-validate", buttons.compact)}
+                                baseClass={ButtonTypes.COMPACT}
+                                className={classNames("locationPicker-validate")}
                                 onClick={this.props.exitHandler}
                             >
                                 {t("Cancel")}
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                className={classNames("locationPicker-newFolder", buttons.compact)}
+                                baseClass={ButtonTypes.COMPACT_PRIMARY}
+                                className={classNames("locationPicker-newFolder")}
                                 disabled={!this.state.valid}
                                 type="submit"
                             >

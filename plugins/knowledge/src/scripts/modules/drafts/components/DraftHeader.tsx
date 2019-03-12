@@ -10,6 +10,7 @@ import classNames from "classnames";
 import Container from "@library/components/layouts/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import { modalClasses } from "@library/styles/modalStyles";
 
 interface IProps {
     className?: string;
@@ -21,8 +22,16 @@ interface IProps {
  */
 export default class DraftHeader extends React.Component<IProps> {
     public render() {
+        const classesModal = modalClasses();
         return (
-            <nav className={classNames("draftPage-header", "modal-pageHeader", this.props.className)}>
+            <nav
+                className={classNames(
+                    "draftPage-header",
+                    "modal-pageHeader",
+                    this.props.className,
+                    classesModal.pageHeader,
+                )}
+            >
                 <Container>
                     <PanelArea>
                         <ul className="editorHeader-items">

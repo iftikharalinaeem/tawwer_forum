@@ -15,7 +15,6 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/application";
 import Breadcrumbs from "@library/components/Breadcrumbs";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import { compose } from "@library/components/icons";
 import Container from "@library/components/layouts/components/Container";
@@ -27,6 +26,7 @@ import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import classNames from "classnames";
 import * as React from "react";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -103,7 +103,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
                                         className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                        baseClass={ButtonBaseClass.ICON}
+                                        baseClass={ButtonTypes.ICON}
                                         title={t("Compose")}
                                     >
                                         {compose()}
