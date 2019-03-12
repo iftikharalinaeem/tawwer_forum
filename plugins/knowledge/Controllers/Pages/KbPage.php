@@ -23,6 +23,7 @@ use Vanilla\Web\Page;
  * Base knowledge base page.
  */
 abstract class KbPage extends Page {
+    const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
 
     /** @var \UsersApiController */
     protected $usersApi;
@@ -125,7 +126,7 @@ abstract class KbPage extends Page {
      * @return string The rendered view.
      */
     protected function renderKbView(string $path, array $data): string {
-        return $this->renderTwig('plugins/knowledge/views/' . $path, $data);
+        return $this->renderTwig(self::TWIG_VIEWS_PATH . $path, $data);
     }
 
 

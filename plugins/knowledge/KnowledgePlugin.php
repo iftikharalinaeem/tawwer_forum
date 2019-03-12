@@ -27,7 +27,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
      *
      * @param \Gdn_Database $database
      */
-    public function __construct(\Gdn_Database $database) {
+    public function __construct(
+        \Gdn_Database $database
+    ) {
         parent::__construct();
         $this->database = $database;
     }
@@ -107,6 +109,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * Ensure the database is configured.
      */
     public function structure() {
+        \Gdn::router()->setRoute('/kb/sitemap-kb.xml(.*)', '/kb/sitemap-kb/xml$1', 'Internal');
+        \Gdn::router()->setRoute('/kb/sitemap-index.xml', '/kb/sitemap-index/xml', 'Internal');
+
+
         $this->database->structure()
             ->table("article")
             ->primaryKey("articleID")

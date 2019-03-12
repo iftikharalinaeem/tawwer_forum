@@ -11,6 +11,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Controllers\Pages\CategoryPage;
 use Vanilla\Knowledge\Controllers\Pages\HomePage;
+use Vanilla\Knowledge\Controllers\Pages\SitemapPage;
 use Vanilla\Knowledge\Controllers\Pages\KnowledgeBasePage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
 use Vanilla\Web\PageDispatchController;
@@ -52,6 +53,44 @@ class KbRootController extends PageDispatchController {
             ->blockRobots()
             ->render()
         ;
+    }
+
+    /**
+     * Render out the /kb/sitemap-index.xml page.
+     *
+     * @param  string $path Path = '/xml'
+     *         Note: technically we don't need any param here
+     *         that is done just for compatability with current routing system.
+     *         We can get rid of this param once we have better routing approach.
+     * @return Data
+     */
+    public function get_sitemapIndex(string $path): Data {
+        if ($path === '/xml') {
+            $page = $this->usePage(SitemapPage::class);
+            return $page->index();
+        } else {
+            return $this->get('/sitemap-index'.$path);
+        }
+    }
+
+    /**
+     * Render out the /kb/sitemap.xml page.
+     *
+     * @param  string $path Path = '/xml'
+     *         Note: technically we don't need any param here
+     *         that is done just for compatability with current routing system.
+     *         We can get rid of this param once we have better routing approach.
+     * @param array $args Request arguments: kb (knowledge base ID), page (page number for pagination)
+     * @return Data
+     */
+    public function get_sitemapKb(string $path, array $args): Data {
+        if ($path === '/xml') {
+            $page = $this->usePage(SitemapPage::class);
+            return $page->sitemap($args);
+        } else {
+            die(__FUNCTION__.':'.__LINE__);
+            return $this->get('/sitemap'.$path);
+        }
     }
 
     /**
