@@ -28,7 +28,7 @@ import classNames from "classnames";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { percent, px, viewHeight } from "csx";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonVariables";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {

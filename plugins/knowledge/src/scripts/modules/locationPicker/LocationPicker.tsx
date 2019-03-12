@@ -17,7 +17,8 @@ import { newFolder } from "@library/components/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonVariables";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 /**
  * Component for choosing a location for a new article.
@@ -44,18 +45,23 @@ class LocationPicker extends React.Component<IProps, IState> {
                             <LocationContents key={`contents-${navigatedRecord}`} />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
+                    <FrameFooter selfPadded={true}>
                         {navigatedRecord && (
                             <Button
                                 title={t("New Category")}
                                 className="buttonNoBorder isSquare button-pushLeft"
+                                baseClass={ButtonBaseClass.ICON}
                                 onClick={this.showNewCategoryModal}
                                 buttonRef={this.newFolderButtonRef}
                             >
                                 {newFolder()}
                             </Button>
                         )}
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className={buttons.primary}>
+                        <Button
+                            baseClass={ButtonBaseClass.COMPACT_PRIMARY}
+                            onClick={this.handleChoose}
+                            disabled={!this.canChoose}
+                        >
                             {t("Choose")}
                         </Button>
                     </FrameFooter>
