@@ -10,6 +10,7 @@ import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import classNames from "classnames";
 import React from "react";
 import { nextTick } from "process";
+import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
 
 interface IProps {
     className?: string;
@@ -32,9 +33,17 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
     };
 
     public render() {
+        const classesNavigationManager = navigationManagerClasses();
         return (
-            <form className={classNames("navigationManger-editMode", this.props.className)} onSubmit={this.submit}>
-                <label className="navigationManger-text">
+            <form
+                className={classNames(
+                    "navigationManger-editMode",
+                    this.props.className,
+                    classesNavigationManager.editMode,
+                )}
+                onSubmit={this.submit}
+            >
+                <label className={classNames("navigationManger-text", classesNavigationManager.text)}>
                     <span className="sr-only">{t("New Name: ")}</span>
                     <input
                         maxLength={255}
@@ -43,19 +52,30 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                         onChange={this.handleChange}
                         ref={this.inputRef}
                         onKeyDown={this.handleKeyDown}
-                        className={classNames("navigationManger-input", { isFolder: this.props.isFolder })}
+                        className={classNames("navigationManger-input", classesNavigationManager.input, {
+                            isFolder: this.props.isFolder,
+                        })}
                     />
                 </label>
                 <Button
                     onClick={this.props.cancel}
                     baseClass={ButtonBaseClass.CUSTOM}
-                    className="navigationManger-cancelRename navigationManager-action"
+                    className={classNames(
+                        "navigationManger-cancelRename",
+                        "navigationManager-action",
+                        classesNavigationManager.action,
+                    )}
                     tabIndex={0}
                 >
                     {t("Cancel")}
                 </Button>
                 <ButtonSubmit
-                    className="navigationManger-submitRename navigationManager-action"
+                    className={classNames(
+                        "navigationManger-submitRename",
+                        "navigationManager-action",
+                        classesNavigationManager.action,
+                        classesNavigationManager.submitRename,
+                    )}
                     baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.isSubmitDisabled}
                     tabIndex={0}

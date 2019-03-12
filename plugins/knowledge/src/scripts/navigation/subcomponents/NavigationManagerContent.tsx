@@ -14,6 +14,7 @@ import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
 
 interface IProps {
     className?: string;
@@ -50,6 +51,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const { item, provided, snapshot, isInRoot } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
+        const classesNavigationManager = navigationManagerClasses();
         return (
             <div
                 id={this.id}
@@ -62,7 +64,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 aria-roledescription={
                     provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
                 }
-                className={classNames("navigationManager-item", {
+                className={classNames("navigationManager-item", classesNavigationManager.item, {
                     isDragging: snapshot.isDragging,
                     hasError: error,
                     isActive: this.isCurrent(),
@@ -83,7 +85,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 onClick={this.selectSelf}
                 onFocus={this.handleFocusIn}
             >
-                <div className={classNames("navigationManager-draggable", this.props.className)}>
+                <div
+                    className={classNames(
+                        "navigationManager-draggable",
+                        classesNavigationManager.draggable,
+                        this.props.className,
+                    )}
+                >
                     <NavigationManagerItemIcon
                         expanded={!!item.isExpanded}
                         expandItem={this.handleExpand}
@@ -105,9 +113,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     ) : (
                         <>
                             <span
-                                className={classNames("navigationManager-itemLabel", {
-                                    isFolder: this.props.hasChildren,
-                                })}
+                                className={classNames(
+                                    "navigationManager-itemLabel",
+                                    classesNavigationManager.itemLabel,
+                                    {
+                                        isFolder: this.props.hasChildren,
+                                    },
+                                )}
                             >
                                 {this.displayName}
                             </span>
@@ -116,6 +128,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 className={classNames(
                                     "navigationManager-rename",
                                     "navigationManager-action",
+                                    classesNavigationManager.action,
                                     this.props.className,
                                 )}
                                 baseClass={ButtonBaseClass.CUSTOM}
@@ -130,6 +143,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                     className={classNames(
                                         "navigationManager-delete",
                                         "navigationManager-action",
+                                        classesNavigationManager.action,
+                                        classesNavigationManager.deleteItem,
                                         this.props.className,
                                     )}
                                     baseClass={ButtonBaseClass.CUSTOM}
