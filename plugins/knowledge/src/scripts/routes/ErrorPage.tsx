@@ -19,7 +19,7 @@ import VanillaHeader from "@library/components/headers/VanillaHeader";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/users/Permission";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import { searchError } from "@library/components/icons";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -28,7 +28,7 @@ import classNames from "classnames";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import { percent, px, viewHeight } from "csx";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonVariables";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {

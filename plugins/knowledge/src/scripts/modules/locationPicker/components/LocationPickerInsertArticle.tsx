@@ -6,7 +6,7 @@
 
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { article } from "@library/components/icons";
 import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
 import classNames from "classnames";
@@ -14,6 +14,7 @@ import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
 import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
 import { folderContentsClasses } from "@library/styles/folderContentsStyles";
+import { ButtonTypes } from "@library/styles/buttonVariables";
 
 interface IProps {
     onClick: (position: string) => void;
@@ -35,7 +36,7 @@ export default class LocationPickerInsertArticle extends React.Component<IProps>
                 <Button
                     title={title}
                     onClick={onClick}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                     className={classNames(classes.articlePlaceholder, { isActive: isSelected }, className)}
                 >
                     <span className="sr-only">{title}</span>

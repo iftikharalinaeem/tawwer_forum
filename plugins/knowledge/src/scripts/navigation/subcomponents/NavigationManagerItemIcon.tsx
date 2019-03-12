@@ -6,12 +6,13 @@
 
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import FlexSpacer from "@library/components/FlexSpacer";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import { article, folderClosed, folderOpen } from "@library/components/icons/navigationManager";
 import classNames from "classnames";
 import React from "react";
 import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { ButtonTypes } from "@library/styles/buttonVariables";
 
 interface IProps {
     expanded: boolean;
@@ -40,7 +41,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
                         onClick={this.handleClick}
                         className={className}
                         disabled={!!this.props.disabled}
-                        baseClass={ButtonBaseClass.CUSTOM}
+                        baseClass={ButtonTypes.CUSTOM}
                         tabIndex={-1}
                     >
                         {this.icon()}

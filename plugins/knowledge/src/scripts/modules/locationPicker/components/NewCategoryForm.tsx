@@ -17,9 +17,9 @@ import { Modal } from "@library/components/modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import getStore from "@library/state/getStore";
 import * as React from "react";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonVariables";
 import classNames from "classnames";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+import { ButtonTypes } from "@library/styles/buttonVariables";
 
 interface IProps {
     exitHandler: (e: React.SyntheticEvent) => void;
@@ -81,7 +81,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         </FrameBody>
                         <FrameFooter selfPadded={true}>
                             <Button
-                                baseClass={ButtonBaseClass.COMPACT}
+                                baseClass={ButtonTypes.COMPACT}
                                 className={classNames("locationPicker-validate")}
                                 onClick={this.props.exitHandler}
                             >
@@ -89,7 +89,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                baseClass={ButtonBaseClass.COMPACT_PRIMARY}
+                                baseClass={ButtonTypes.COMPACT_PRIMARY}
                                 className={classNames("locationPicker-newFolder")}
                                 disabled={!this.state.valid}
                                 type="submit"

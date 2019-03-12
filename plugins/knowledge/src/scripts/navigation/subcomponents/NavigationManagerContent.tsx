@@ -9,12 +9,13 @@ import { INormalizedNavigationItem } from "@knowledge/navigation/state/Navigatio
 import NavigationManagerItemIcon from "@knowledge/navigation/subcomponents/NavigationManagerItemIcon";
 import NavigationManagerNameForm from "@knowledge/navigation/subcomponents/NavigationManagerNameForm";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { ButtonTypes } from "@library/styles/buttonVariables";
 
 interface IProps {
     className?: string;
@@ -131,7 +132,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                     classesNavigationManager.action,
                                     this.props.className,
                                 )}
-                                baseClass={ButtonBaseClass.CUSTOM}
+                                baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
                                 tabIndex={0}
                             >
@@ -147,7 +148,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                         classesNavigationManager.deleteItem,
                                         this.props.className,
                                     )}
-                                    baseClass={ButtonBaseClass.CUSTOM}
+                                    baseClass={ButtonTypes.CUSTOM}
                                     buttonRef={this.deleteButtonRef}
                                     tabIndex={0}
                                 >

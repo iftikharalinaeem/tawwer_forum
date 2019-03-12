@@ -5,12 +5,13 @@
  */
 
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import classNames from "classnames";
 import React from "react";
 import { nextTick } from "process";
 import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { ButtonTypes } from "@library/styles/buttonVariables";
 
 interface IProps {
     className?: string;
@@ -59,7 +60,7 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                 </label>
                 <Button
                     onClick={this.props.cancel}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                     className={classNames(
                         "navigationManger-cancelRename",
                         "navigationManager-action",
@@ -76,7 +77,7 @@ export default class NavigationManagerNameForm extends React.Component<IProps, I
                         classesNavigationManager.action,
                         classesNavigationManager.submitRename,
                     )}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                     disabled={this.isSubmitDisabled}
                     tabIndex={0}
                 >

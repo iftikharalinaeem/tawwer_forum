@@ -6,7 +6,7 @@
 
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { t } from "@library/application";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import { article } from "@library/components/icons";
 import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
 import classNames from "classnames";
