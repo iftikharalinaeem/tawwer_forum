@@ -16,7 +16,7 @@ import { checkCompact } from "@library/components/icons";
 import SmartLink from "@library/components/navigation/SmartLink";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import React from "react";
@@ -91,7 +91,6 @@ function ReactionButton(props: {
 }) {
     const { reactionValue, reactionData, title, isSubmitting, isDisabled, onClick } = props;
     const { userReaction } = reactionData;
-    const classesButton = buttonClasses();
     const styles = reactionClasses();
 
     // Content can be either a checkbox, a loader, or some text.
@@ -106,11 +105,10 @@ function ReactionButton(props: {
         {
             [styles.checkedButton]: userReaction === reactionValue,
         },
-        classesButton.primary,
         styles.votingButton,
     );
     return (
-        <Button disabled={isDisabled} className={classes} onClick={onClick}>
+        <Button baseClass={ButtonTypes.PRIMARY} disabled={isDisabled} className={classes} onClick={onClick}>
             {content}
         </Button>
     );
