@@ -12,7 +12,7 @@ import { categoryIcon, checkCompact, rightChevron } from "@library/components/ic
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import ConditionalWrap from "library/src/scripts/components/ConditionalWrap";
+import { folderContentsClasses } from "@library/styles/folderContentsStyles";
 
 interface IProps {
     isInitialSelection: boolean;
@@ -31,38 +31,47 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
     public render() {
         const { value, name, isSelected, isInitialSelection, onSelect, selectable } = this.props;
         const isNavigable = [KbRecordType.CATEGORY, KbRecordType.KB].includes(value.recordType);
-
+        const classesFolderContents = folderContentsClasses();
         return (
-            <li className={classNames("folderContents-item", { isActive: isSelected })}>
-                <label className="folderContents-folder">
+            <li className={classNames("folderContents-item", classesFolderContents.item, { isActive: isSelected })}>
+                <label className={classNames("folderContents-folder", classesFolderContents.folder)}>
                     <input
                         type="radio"
-                        className={classNames("folderContents-input", "sr-only", { isSelectable: selectable })}
+                        className={classNames("folderContents-input", classesFolderContents.input, "sr-only", {
+                            isSelectable: selectable,
+                        })}
                         name={name}
                         value={value.recordID}
                         checked={isSelected}
                         onChange={onSelect}
                         disabled={!isNavigable}
                     />
-                    <span className="folderContents-content">
+                    <span className={classNames("folderContents-content", classesFolderContents.content)}>
                         <span
-                            className={classNames("folderContents-icon", {
-                                "folderContents-checkIcon": isSelected,
-                                "folderContents-folderIcon": !isSelected,
-                                isInitialSelection,
-                            })}
+                            className={classNames(
+                                "folderContents-icon",
+                                classesFolderContents.icon,
+                                classesFolderContents.checkIcon,
+                                {
+                                    "folderContents-checkIcon": isSelected,
+                                    "folderContents-folderIcon": !isSelected,
+                                    isInitialSelection,
+                                },
+                            )}
                             aria-hidden={true}
                         >
                             {isSelected ? checkCompact() : this.typeIcon}
                         </span>
-                        <span className="folderContents-label">{value.name}</span>
+                        <span className={classNames("folderContents-label", classesFolderContents.label)}>
+                            {value.name}
+                        </span>
                     </span>
                 </label>
                 {isNavigable && (
                     <Button
                         onClick={this.props.onNavigate}
                         baseClass={ButtonBaseClass.ICON}
-                        className="folderContents-subFolder"
+                        className={classNames("folderContents-subFolder", classesFolderContents.subFolder)}
                     >
                         {rightChevron("folderContents-chevron isSmall", true)}
                         <span className="sr-only">{t("Sub folder")}</span>
