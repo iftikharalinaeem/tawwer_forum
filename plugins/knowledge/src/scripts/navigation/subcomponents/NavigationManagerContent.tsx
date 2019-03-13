@@ -9,10 +9,13 @@ import { INormalizedNavigationItem } from "@knowledge/navigation/state/Navigatio
 import NavigationManagerItemIcon from "@knowledge/navigation/subcomponents/NavigationManagerItemIcon";
 import NavigationManagerNameForm from "@knowledge/navigation/subcomponents/NavigationManagerNameForm";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     className?: string;
@@ -29,6 +32,7 @@ interface IProps {
     writeMode: boolean;
     firstID: string | null;
     getItemID: (id: string) => string;
+    isInRoot: boolean;
 }
 
 interface IState {
@@ -45,9 +49,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot } = this.props;
+        const { item, provided, snapshot, isInRoot } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
+        const classesNavigationManager = navigationManagerClasses();
         return (
             <div
                 id={this.id}
@@ -60,10 +65,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 aria-roledescription={
                     provided.dragHandleProps ? t(provided.dragHandleProps["aria-roledescription"]) : undefined
                 }
-                className={classNames("navigationManager-item", {
+                className={classNames("navigationManager-item", classesNavigationManager.item, {
                     isDragging: snapshot.isDragging,
                     hasError: error,
                     isActive: this.isCurrent(),
+                    isChild: item.data.parentID !== 0,
+                    isArticle: item.data.recordType === KbRecordType.ARTICLE,
+                    isInRoot,
                 })}
                 aria-expanded={this.props.hasChildren ? item.isExpanded : undefined}
                 tabIndex={
@@ -78,7 +86,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                 onClick={this.selectSelf}
                 onFocus={this.handleFocusIn}
             >
-                <div className={classNames("navigationManager-draggable", this.props.className)}>
+                <div
+                    className={classNames(
+                        "navigationManager-draggable",
+                        classesNavigationManager.draggable,
+                        this.props.className,
+                    )}
+                >
                     <NavigationManagerItemIcon
                         expanded={!!item.isExpanded}
                         expandItem={this.handleExpand}
@@ -100,9 +114,13 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                     ) : (
                         <>
                             <span
-                                className={classNames("navigationManager-itemLabel", {
-                                    isFolder: this.props.hasChildren,
-                                })}
+                                className={classNames(
+                                    "navigationManager-itemLabel",
+                                    classesNavigationManager.itemLabel,
+                                    {
+                                        isFolder: this.props.hasChildren,
+                                    },
+                                )}
                             >
                                 {this.displayName}
                             </span>
@@ -111,9 +129,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 className={classNames(
                                     "navigationManager-rename",
                                     "navigationManager-action",
+                                    classesNavigationManager.action,
                                     this.props.className,
                                 )}
-                                baseClass={ButtonBaseClass.CUSTOM}
+                                baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
                                 tabIndex={0}
                             >
@@ -125,9 +144,11 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                     className={classNames(
                                         "navigationManager-delete",
                                         "navigationManager-action",
+                                        classesNavigationManager.action,
+                                        classesNavigationManager.deleteItem,
                                         this.props.className,
                                     )}
-                                    baseClass={ButtonBaseClass.CUSTOM}
+                                    baseClass={ButtonTypes.CUSTOM}
                                     buttonRef={this.deleteButtonRef}
                                     tabIndex={0}
                                 >

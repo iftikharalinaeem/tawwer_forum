@@ -22,9 +22,10 @@ import Permission from "@library/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 import { dateRangeClasses } from "@library/styles/dateRangeStyles";
+import { ButtonTypes } from "library/src/scripts/styles/buttonStyles";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;

@@ -8,8 +8,8 @@ import React from "react";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
-import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import classNames from "classnames";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     dateUpdated: string;
@@ -22,10 +22,11 @@ interface IProps {
 export class DraftPreviewMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated } = this.props;
+        const classesMetas = metasClasses();
         return (
             <div className={classNames("metas", "draftPreview-metas", this.props.className)}>
                 {dateUpdated && (
-                    <span className="meta">
+                    <span className={classesMetas.meta}>
                         <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                     </span>
                 )}

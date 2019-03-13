@@ -17,7 +17,8 @@ import { newFolder } from "@library/components/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * Component for choosing a location for a new article.
@@ -44,29 +45,35 @@ class LocationPicker extends React.Component<IProps, IState> {
                             <LocationContents key={`contents-${navigatedRecord}`} />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
+                    <FrameFooter selfPadded={true}>
                         {navigatedRecord && (
                             <Button
                                 title={t("New Category")}
                                 className="buttonNoBorder isSquare button-pushLeft"
+                                baseClass={ButtonTypes.ICON}
                                 onClick={this.showNewCategoryModal}
                                 buttonRef={this.newFolderButtonRef}
                             >
                                 {newFolder()}
                             </Button>
                         )}
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className={buttons.primary}>
+                        <Button
+                            baseClass={ButtonTypes.COMPACT_PRIMARY}
+                            onClick={this.handleChoose}
+                            disabled={!this.canChoose}
+                        >
                             {t("Choose")}
                         </Button>
                     </FrameFooter>
                 </Frame>
-                {this.state.showNewCategoryModal && this.props.navigatedCategory && (
-                    <NewCategoryForm
-                        exitHandler={this.hideNewFolderModal}
-                        parentCategoryID={this.props.navigatedCategory.recordID}
-                        buttonRef={this.newFolderButtonRef}
-                    />
-                )}
+                {this.state.showNewCategoryModal &&
+                    this.props.navigatedCategory && (
+                        <NewCategoryForm
+                            exitHandler={this.hideNewFolderModal}
+                            parentCategoryID={this.props.navigatedCategory.recordID}
+                            buttonRef={this.newFolderButtonRef}
+                        />
+                    )}
             </>
         );
     }

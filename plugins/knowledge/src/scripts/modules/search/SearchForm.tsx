@@ -28,12 +28,13 @@ import SearchOption from "@library/components/search/SearchOption";
 import Drawer from "@library/components/drawer/Drawer";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import { compose } from "@library/components/icons/header";
 import SearchPagination from "./components/SearchPagination";
 import Loader from "@library/components/Loader";
 import debounce from "lodash/debounce";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -56,7 +57,6 @@ class SearchForm extends React.Component<IProps, IState> {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const buttons = buttonClasses();
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} />
@@ -82,7 +82,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
                                         disableAutocomplete={true}
-                                        buttonClassName={buttons.primary}
+                                        buttonBaseClass={ButtonTypes.PRIMARY}
                                     />
                                 </PanelWidget>
                                 {isMobile && (

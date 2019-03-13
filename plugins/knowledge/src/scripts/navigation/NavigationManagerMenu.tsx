@@ -14,6 +14,7 @@ import { style } from "typestyle";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { modalClasses } from "@library/styles/modalStyles";
 
 interface IProps {
     className?: string;
@@ -27,6 +28,7 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
         const debug = debugHelper("navigationManagerMenu");
         const headerVars = vanillaHeaderVariables();
         const mediaQueries = layoutVariables().mediaQueries();
+        const classesModal = modalClasses();
         const heightStyle = style(
             { height: px(headerVars.sizing.height), ...debug.name("items") },
             mediaQueries.oneColumn({
@@ -35,7 +37,14 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
         );
 
         return (
-            <nav className={classNames("navigationManagerMenu", "modal-pageHeader", this.props.className)}>
+            <nav
+                className={classNames(
+                    "navigationManagerMenu",
+                    "modal-pageHeader",
+                    classesModal.pageHeader,
+                    this.props.className,
+                )}
+            >
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>

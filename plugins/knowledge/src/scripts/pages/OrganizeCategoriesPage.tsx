@@ -22,6 +22,9 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { modalClasses } from "@library/styles/modalStyles";
+import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -29,6 +32,8 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, hasError } = this.props;
         const pageTitle = t("Navigation Manager");
+        const classesModal = modalClasses();
+        const classesNavigationManager = navigationManagerClasses();
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
             return <Loader />;
@@ -42,20 +47,32 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
             <>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <div className={classNames("modal-scroll inheritHeight", { hasError })}>
-                        <div className="container inheritHeight">
-                            <div className="navigationManager-container inheritHeight">
+                    <div
+                        className={classNames("modal-scroll", classesModal.scroll, inheritHeightClass(), { hasError })}
+                    >
+                        <div className={classNames("container", inheritHeightClass())}>
+                            <div
+                                className={classNames(
+                                    "navigationManager-container",
+                                    classesNavigationManager.container,
+                                    inheritHeightClass(),
+                                )}
+                            >
                                 <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
                                 <DocumentTitle title={pageTitle}>
                                     <Heading
                                         id={this.titleID}
                                         depth={1}
                                         renderAsDepth={2}
-                                        className="pageSubTitle navigationManager-header"
+                                        className={classNames(
+                                            "pageSubTitle",
+                                            "navigationManager-header",
+                                            classesNavigationManager.header,
+                                        )}
                                         title={pageTitle}
                                     />
                                 </DocumentTitle>
-                                <div className="inheritHeight">
+                                <div className={inheritHeightClass()}>
                                     <NavigationManager
                                         knowledgeBase={knowledgeBase.data}
                                         rootNavigationItemID="knowledgeCategory1"

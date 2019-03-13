@@ -148,7 +148,9 @@ class LocationContents extends React.Component<IProps> {
             const classesLoader = loaderClasses();
             contents = (
                 <li className={inheritHeightClass()}>
-                    <Loader loaderStyleClass={classesLoader.fullPageLoader} />
+                    <div className={classesLoader.loaderContainer(100)}>
+                        <Loader loaderStyleClass={classesLoader.mediumLoader} />
+                    </div>
                 </li>
             );
         }

@@ -18,7 +18,7 @@ const createAction = actionCreatorFactory("@@loationPicker");
 /**
  * Actions for the article page.
  */
-export default class LocationPickerActions extends ReduxActions {
+export default class LocationPickerActions extends ReduxActions<IStoreState> {
     /**
      * Initialize the state from a category.
      *
@@ -61,7 +61,7 @@ export default class LocationPickerActions extends ReduxActions {
     private kbActions = new KnowledgeBaseActions(this.dispatch, this.api, this.getState);
 
     public requestData = async () => {
-        const state = this.getState<IStoreState>();
+        const state = this.getState();
         const { knowledgeBases, navigation, locationPicker } = state.knowledge;
         const requestKBs = async () => {
             const needsKbs = knowledgeBases.knowledgeBasesByID.status === LoadStatus.PENDING;
@@ -86,7 +86,7 @@ export default class LocationPickerActions extends ReduxActions {
      */
     public initLocationPickerFromRecord = async (record: ILocationPickerRecord) => {
         if (record) {
-            const { navigation } = this.getState<IStoreState>().knowledge;
+            const { navigation } = this.getState().knowledge;
             const { recordID, recordType, knowledgeBaseID } = record;
 
             if (
@@ -96,7 +96,7 @@ export default class LocationPickerActions extends ReduxActions {
                 await this.navActions.getNavigationFlat(knowledgeBaseID);
             }
 
-            const { navigationItems } = this.getState<IStoreState>().knowledge.navigation;
+            const { navigationItems } = this.getState().knowledge.navigation;
             const ownFullRecord = navigationItems[recordType + recordID];
             if (!ownFullRecord) {
                 return;

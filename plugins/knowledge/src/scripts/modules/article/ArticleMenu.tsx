@@ -23,6 +23,7 @@ import { ModalConfirm } from "@library/components/modal";
 import Permission from "@library/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -53,6 +54,8 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
+        const classesDropDown = dropDownClasses();
+
         return (
             <Permission permission="articles.add">
                 <DropDown
@@ -62,6 +65,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     renderLeft={true}
                     openAsModal={this.props.device === Devices.MOBILE}
                     title={isMobile ? t("Article") : undefined}
+                    paddedList={true}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
@@ -72,11 +76,11 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItem>
                         <EditorRoute.Link
+                            className={classesDropDown.action}
                             data={{
                                 knowledgeCategoryID: this.props.article.knowledgeCategoryID,
                                 knowledgeBaseID: this.props.article.knowledgeBaseID,
                             }}
-                            className={DropDownItemLink.CSS_CLASS}
                         >
                             {t("New Article")}
                         </EditorRoute.Link>
@@ -84,14 +88,14 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItem>
                         <EditorRoute.Link
+                            className={classesDropDown.action}
                             data={{ articleID: this.props.article.articleID }}
-                            className={DropDownItemLink.CSS_CLASS}
                         >
                             {t("Edit")}
                         </EditorRoute.Link>
                     </DropDownItem>
                     <DropDownItem>
-                        <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                        <RevisionsRoute.Link className={classesDropDown.action} data={article}>
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>

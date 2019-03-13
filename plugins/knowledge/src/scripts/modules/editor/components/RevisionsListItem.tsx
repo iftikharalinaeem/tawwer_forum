@@ -18,6 +18,7 @@ import SmartLink from "@library/components/navigation/SmartLink";
 import Hoverable from "@library/utils/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -32,6 +33,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
     public render() {
         const { name, status, dateInserted, url, isSelected } = this.props;
         const { photoUrl } = this.props.insertUser;
+        const classesMetas = metasClasses();
         return (
             <Hoverable onHover={this.props.onHover} duration={50}>
                 {provided => (
@@ -48,7 +50,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                             <div className="revisionsList-content">
                                 <div className="revisionsList-userName">{name}</div>
                                 <div className="revisionsList-dateTime">
-                                    <DateTime timestamp={dateInserted} className="metaStyle" />
+                                    <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                                 </div>
                             </div>
                             {status && (

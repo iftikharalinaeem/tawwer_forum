@@ -11,7 +11,7 @@ import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { categoryIcon, plusCircle } from "@library/components/icons/common";
 import { Modal } from "@library/components/modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
@@ -21,6 +21,7 @@ import { connect } from "react-redux";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -59,7 +60,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         aria-label={t("Page Location")}
                         className="pageLocation-picker"
                         onClick={this.showLocationPicker}
-                        baseClass={ButtonBaseClass.CUSTOM}
+                        baseClass={ButtonTypes.CUSTOM}
                         buttonRef={this.changeLocationButton}
                         disabled={!!this.props.disabled}
                     >

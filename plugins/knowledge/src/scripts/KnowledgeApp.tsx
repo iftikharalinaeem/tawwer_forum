@@ -8,14 +8,12 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@library/state/getStore";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import DeviceContext, { DeviceProvider } from "@library/contexts/DeviceContext";
+import { DeviceProvider } from "@library/contexts/DeviceContext";
 import { Devices } from "@library/components/DeviceChecker";
 import { Route, BrowserRouter } from "react-router-dom";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import { formatUrl } from "@library/application";
+import { formatUrl, getMeta } from "@library/application";
 import SearchContext from "@library/contexts/SearchContext";
 import PagesContext from "@library/contexts/PagesContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
@@ -23,6 +21,8 @@ import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
 import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
 import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
+import { ThemeProvider } from "@library/theming/ThemeProvider";
+import ErrorPage from "@knowledge/routes/ErrorPage";
 
 /*
  * Top level application component for knowledge.
@@ -37,21 +37,23 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <PagesContext.Provider value={{ pages: this.pages }}>
-                    <ScrollOffsetProvider scrollWatchingEnabled={true}>
-                        <SiteNavProvider>
-                            <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                                <DeviceProvider>
-                                    <BrowserRouter>
-                                        <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                            <Route component={KnowledgeRoutes} />
-                                        </LinkContextProvider>
-                                    </BrowserRouter>
-                                </DeviceProvider>{" "}
-                            </SearchContext.Provider>
-                        </SiteNavProvider>
-                    </ScrollOffsetProvider>
-                </PagesContext.Provider>
+                <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
+                    <PagesContext.Provider value={{ pages: this.pages }}>
+                        <ScrollOffsetProvider scrollWatchingEnabled={true}>
+                            <SiteNavProvider>
+                                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                                    <DeviceProvider>
+                                        <BrowserRouter>
+                                            <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                                <Route component={KnowledgeRoutes} />
+                                            </LinkContextProvider>
+                                        </BrowserRouter>
+                                    </DeviceProvider>{" "}
+                                </SearchContext.Provider>
+                            </SiteNavProvider>
+                        </ScrollOffsetProvider>
+                    </PagesContext.Provider>
+                </ThemeProvider>
             </Provider>
         );
     }

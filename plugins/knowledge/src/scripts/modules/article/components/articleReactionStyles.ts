@@ -4,14 +4,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, styleFactory } from "@library/styles/styleHelpers";
-import { important, percent, px } from "csx";
+import { flexHelper, unit, spinnerLoader, colorOut } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
-import { unit } from "@library/styles/styleHelpers";
+import { important, percent, px, ColorHelper } from "csx";
+import { buttonVariables } from "@library/styles/buttonStyles";
 
-export function reactionClasses(theme?: object) {
+export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("reactions");
-    const vars = globalVariables(theme);
+    const vars = globalVariables();
+    const buttonVars = buttonVariables();
 
     const frame = style({
         paddingTop: px(12),
@@ -70,4 +72,4 @@ export function reactionClasses(theme?: object) {
         resultText,
         signInText,
     };
-}
+});
