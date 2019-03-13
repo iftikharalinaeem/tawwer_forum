@@ -25,6 +25,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 import { dateRangeClasses } from "@library/styles/dateRangeStyles";
+import { ButtonTypes } from "library/src/scripts/styles/buttonStyles";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;

@@ -53,6 +53,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
                     setExternalButtonRef={this.setButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
                     className="draftPreview-actions"
+                    paddedList={true}
                 >
                     <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
                     <DropDownItemButton

@@ -34,6 +34,7 @@ import SearchPagination from "./components/SearchPagination";
 import Loader from "@library/components/Loader";
 import debounce from "lodash/debounce";
 import { buttonClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -56,7 +57,6 @@ class SearchForm extends React.Component<IProps, IState> {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const buttons = buttonClasses();
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} />
@@ -82,7 +82,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
                                         disableAutocomplete={true}
-                                        buttonClassName={buttons.primary}
+                                        buttonBaseClass={ButtonTypes.PRIMARY}
                                     />
                                 </PanelWidget>
                                 {isMobile && (

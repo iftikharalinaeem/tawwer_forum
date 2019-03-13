@@ -23,6 +23,7 @@ import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { metasClasses } from "@library/styles/metasStyles";
 import { modalClasses } from "@library/styles/modalStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -94,6 +95,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         type="submit"
                                         title={this.props.callToAction}
                                         disabled={!this.props.canSubmit}
+                                        baseClass={ButtonTypes.TEXT}
                                         className={classNames(
                                             "editorHeader-publish",
                                             "buttonNoHorizontalPadding",

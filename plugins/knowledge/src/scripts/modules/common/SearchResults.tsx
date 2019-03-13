@@ -11,6 +11,7 @@ import SearchResult, { IResult } from "./SearchResult";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { searchResultClasses, searchResultsClasses } from "@library/styles/searchResultsStyles";
 
 interface IProps {
     className?: string;
@@ -26,16 +27,21 @@ export default class SearchResults extends React.Component<IProps> {
         const hasResults = this.props.results && this.props.results.length > 0;
         let content;
         const classes = searchBarClasses();
+        const classesSearchResults = searchResultsClasses();
 
         if (hasResults) {
             content = this.props.results.map((result, i) => {
                 return <SearchResult {...result} key={i} />;
             });
         } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
-            content = <Paragraph className="searchResults-noResults">{t("No results found.")}</Paragraph>;
+            content = (
+                <Paragraph className={classNames("searchResults-noResults", classesSearchResults.noResults)}>
+                    {t("No results found.")}
+                </Paragraph>
+            );
         } else {
             content = (
-                <Paragraph className="searchResults-noResults isEmpty">
+                <Paragraph className={classNames("searchResults-noResults", "isEmpty", classesSearchResults.noResults)}>
                     <Translate source="No results for '<0/>'." c0={this.props.searchTerm} />
                 </Paragraph>
             );
@@ -43,6 +49,17 @@ export default class SearchResults extends React.Component<IProps> {
 
         const Tag = hasResults ? `ul` : `div`;
 
-        return <Tag className={classNames("searchResults", this.props.className, classes.results)}>{content}</Tag>;
+        return (
+            <Tag
+                className={classNames(
+                    "searchResults",
+                    classesSearchResults.root,
+                    this.props.className,
+                    classes.results,
+                )}
+            >
+                {content}
+            </Tag>
+        );
     }
 }
