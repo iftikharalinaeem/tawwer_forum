@@ -9,6 +9,8 @@ import Button from "@library/components/forms/Button";
 import { newFolder } from "@library/components/icons/common";
 import { collapseAll, expandAll } from "@library/components/icons/navigationManager";
 import React from "react";
+import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import classNames from "classnames";
 
 interface IProps {
     expandAll: () => void;
@@ -29,11 +31,16 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
     };
 
     public render() {
+        const classesNavigationManager = navigationManagerClasses();
         return (
             <div className="navigationManagerToolbar">
                 <div className="navigationManagerToolbar-bar">
                     <Button
-                        className="navigationManagerToolbar-button navigationManagerToolbar-expandAll"
+                        className={classNames(
+                            "navigationManagerToolbar-button",
+                            "navigationManagerToolbar-expandAll",
+                            classesNavigationManager.noBorder,
+                        )}
                         onClick={this.props.expandAll}
                         disabled={this.state.allExpanded}
                     >
@@ -41,7 +48,11 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
                         <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>
                     </Button>
                     <Button
-                        className="navigationManagerToolbar-button navigationManagerToolbar-collapseAll"
+                        className={classNames(
+                            "navigationManagerToolbar-button",
+                            "navigationManagerToolbar-collapseAll",
+                            classesNavigationManager.noBorder,
+                        )}
                         onClick={this.props.collapseAll}
                         disabled={this.state.allCollapsed}
                     >
