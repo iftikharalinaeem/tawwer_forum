@@ -4,20 +4,15 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import DropDown from "@library/components/dropdown/DropDown";
-import { t } from "@library/application";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api";
-import {
-    DropDownItemLink,
-    DropDownItemButton,
-    DropDownItemSeparator,
-    DropDownItem,
-} from "@library/components/dropdown";
-import Permission from "@library/users/Permission";
-import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { ArticleStatus, IArticle } from "@knowledge/@types/api";
 import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
+import { RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { t } from "@library/application";
+import { DropDownItem, DropDownItemLink, DropDownItemSeparator } from "@library/components/dropdown";
+import DropDown from "@library/components/dropdown/DropDown";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import Permission from "@library/users/Permission";
+import * as React from "react";
 
 interface IProps {
     article: IArticle;
@@ -40,6 +35,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
+                    paddedList={true}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
