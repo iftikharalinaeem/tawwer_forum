@@ -15,7 +15,7 @@ import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import Container from "@library/components/layouts/components/Container";
 import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import UserContent from "@library/components/UserContent";
+import UserContent from "@library/user-content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/components/nextPrevious/NextPrevious";
 import { t } from "@library/application";

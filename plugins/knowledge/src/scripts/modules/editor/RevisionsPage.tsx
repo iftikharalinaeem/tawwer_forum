@@ -17,7 +17,7 @@ import RevisionsPageModel from "./RevisionsPageModel";
 import RevisionsPageActions from "./RevisionsPageActions";
 import { Modal, ModalSizes } from "@library/components/modal";
 import { LoadStatus } from "@library/@types/api";
-import UserContent from "@library/components/UserContent";
+import UserContent from "@library/user-content/UserContent";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
