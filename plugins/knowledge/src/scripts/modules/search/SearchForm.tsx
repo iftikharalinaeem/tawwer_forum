@@ -34,6 +34,7 @@ import SearchPagination from "./components/SearchPagination";
 import Loader from "@library/components/Loader";
 import debounce from "lodash/debounce";
 import { buttonClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -82,7 +83,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
                                         disableAutocomplete={true}
-                                        buttonClassName={buttons.primary}
+                                        buttonBaseClass={ButtonTypes.PRIMARY}
                                     />
                                 </PanelWidget>
                                 {isMobile && (

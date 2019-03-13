@@ -108,7 +108,7 @@ function ReactionButton(props: {
         styles.votingButton,
     );
     return (
-        <Button baseClass={ButtonTypes.PRIMARY} disabled={isDisabled} className={classes} onClick={onClick}>
+        <Button baseClass={ButtonTypes.STANDARD} disabled={isDisabled} className={classes} onClick={onClick}>
             {content}
         </Button>
     );
