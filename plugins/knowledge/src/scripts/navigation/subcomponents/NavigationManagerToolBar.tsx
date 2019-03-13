@@ -60,7 +60,11 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
                         <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>
                     </Button>
                     <Button
-                        className="navigationManagerToolbar-button navigationManagerToolbar-newFolder"
+                        className={classNames(
+                            "navigationManagerToolbar-button",
+                            "navigationManagerToolbar-newFolder",
+                            classesNavigationManager.noBorder,
+                        )}
                         onClick={this.props.newCategory}
                         disabled={this.state.allExpanded}
                         buttonRef={this.props.newCategoryButtonRef}
