@@ -9,7 +9,6 @@ import BackLink from "@library/routing/links/BackLink";
 import classNames from "classnames";
 import Container from "@library/layout/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps {

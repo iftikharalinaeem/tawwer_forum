@@ -28,8 +28,8 @@ import { withDevice } from "@library/layout/DeviceContext";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ScreenReaderContent from "@library/utility/ScreenReaderContent";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { richEditorFormClasses } from "@rich-editor/src/scripts/editor/richEditorFormClasses";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
