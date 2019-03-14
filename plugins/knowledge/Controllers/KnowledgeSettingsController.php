@@ -217,7 +217,7 @@ class KnowledgeSettingsController extends SettingsController {
             'sortArticles' => [
                 "Description" => "Sorting method for articles.",
                 'LabelCode' => 'Sort Articles',
-                'Control' => 'flyouts',
+                'Control' => 'dropdown',
                 'Items' => [
                     KnowledgeBaseModel::ORDER_DATE_DESC => 'Newest First',
                     KnowledgeBaseModel::ORDER_DATE_ASC => 'Oldest First',
