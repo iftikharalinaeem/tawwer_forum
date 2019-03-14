@@ -5,7 +5,7 @@
 
 import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 import NavigationModel, {
     KbRecordType,
     INormalizedNavigationItems,

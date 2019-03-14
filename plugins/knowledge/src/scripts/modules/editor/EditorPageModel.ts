@@ -8,7 +8,7 @@ import { IArticle, IResponseArticleDraft, IRevision } from "@knowledge/@types/ap
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { DeltaOperation } from "quill/core";
 import reduceReducers from "reduce-reducers";

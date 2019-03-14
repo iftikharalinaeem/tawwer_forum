@@ -7,10 +7,10 @@
 import { IArticle, IArticleFragment, IResponseArticleDraft, IRevision, IRevisionFragment } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { article } from "@library/components/icons";
+import { article } from "@library/icons";
 
 export interface IArticleState {
     articlesByID: {

@@ -10,18 +10,18 @@ import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus, ILinkListData } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import { Devices } from "@library/components/DeviceChecker";
-import DocumentTitle from "@library/components/DocumentTitle";
-import Loader from "@library/components/Loader";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import Container from "@library/components/layouts/components/Container";
+import { Devices } from "@library/layout/DeviceChecker";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import Loader from "@library/loaders/Loader";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import Container from "@library/layout/components/Container";
 import React from "react";
 import { connect } from "react-redux";
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
-import ScreenReaderContent from "@library/components/ScreenReaderContent";
-import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
-import Splash from "@library/components/splash/Splash";
-import { t } from "@library/application";
+import ScreenReaderContent from "@library/utility/ScreenReaderContent";
+import WidgetContainer from "@library/layout/components/WidgetContainer";
+import Splash from "@library/splash/Splash";
+import { t } from "@library/dom/appUtils";
 
 /**
  * Component representing the the full home page of a help center.

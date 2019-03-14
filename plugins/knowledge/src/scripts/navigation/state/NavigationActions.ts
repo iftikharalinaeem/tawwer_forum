@@ -6,7 +6,7 @@
 import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { IApiError, LoadStatus } from "@library/@types/api";
-import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 

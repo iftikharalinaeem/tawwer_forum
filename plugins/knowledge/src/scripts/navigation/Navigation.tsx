@@ -13,9 +13,9 @@ import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, INavigationTreeItem, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import SiteNav from "@library/components/siteNav/SiteNav";
-import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import { t } from "@library/dom/appUtils";
+import SiteNav from "@library/navigation/SiteNav";
+import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
 

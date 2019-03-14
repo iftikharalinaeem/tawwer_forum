@@ -4,8 +4,8 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { t } from "@library/dom/appUtils";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 import * as React from "react";
 
 interface IProps {

@@ -6,16 +6,16 @@
 
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import ButtonLoader from "@library/components/ButtonLoader";
-import Button from "@library/components/forms/Button";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import { Frame, FrameBody, FrameFooter, FrameHeader } from "@library/components/frame";
-import FramePanel from "@library/components/frame/FramePanel";
-import { Modal } from "@library/components/modal";
-import ModalSizes from "@library/components/modal/ModalSizes";
-import getStore from "@library/state/getStore";
+import { t } from "@library/dom/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import Button from "@library/forms/Button";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { Frame, FrameBody, FrameFooter, FrameHeader } from "@library/layout/frame";
+import FramePanel from "@library/layout/frame/FramePanel";
+import { Modal } from "@library/modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import getStore from "@library/redux/getStore";
 import * as React from "react";
 import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";

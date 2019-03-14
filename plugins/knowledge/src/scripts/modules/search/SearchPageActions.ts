@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import apiv2 from "@library/apiv2";
 import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";

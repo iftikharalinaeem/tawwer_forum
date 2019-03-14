@@ -5,15 +5,15 @@
  */
 
 import React from "react";
-import { Editor } from "@rich-editor/components/editor/Editor";
-import { t } from "@library/application";
+import { Editor } from "@rich-editor/editor/Editor";
+import { t } from "@library/dom/appUtils";
 import { DeltaOperation } from "quill/core";
 import { LoadStatus } from "@library/@types/api";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
-import DocumentTitle from "@library/components/DocumentTitle";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import classNames from "classnames";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { IDeviceProps } from "@library/components/DeviceChecker";
+import { IDeviceProps } from "@library/layout/DeviceChecker";
 import EditorPageModel, { IInjectableEditorProps, IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
@@ -22,13 +22,13 @@ import apiv2 from "@library/apiv2";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout from "@library/components/layouts/PanelLayout";
-import { withDevice } from "@library/contexts/DeviceContext";
+import Container from "@library/layout/components/Container";
+import PanelLayout from "@library/layout/PanelLayout";
+import { withDevice } from "@library/layout/DeviceContext";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ScreenReaderContent from "@library/components/ScreenReaderContent";
-import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
+import ScreenReaderContent from "@library/utility/ScreenReaderContent";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {

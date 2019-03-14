@@ -5,14 +5,14 @@
  */
 
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 
-import { article } from "@library/components/icons";
-import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
+import { article } from "@library/icons";
+import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import { folderContentsClasses } from "@library/styles/folderContentsStyles";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 
 interface IProps {
     name: string;

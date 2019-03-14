@@ -6,7 +6,7 @@
 
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Modal, ModalSizes } from "@library/components/modal";
+import { Modal, ModalSizes } from "@library/modal";
 
 interface IProps
     extends RouteComponentProps<{

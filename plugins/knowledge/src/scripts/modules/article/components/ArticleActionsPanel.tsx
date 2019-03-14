@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import Heading from "@library/components/Heading";
-import { t } from "@library/application";
-import { PanelWidget } from "@library/components/layouts/PanelLayout";
+import Heading from "@library/layout/Heading";
+import { t } from "@library/dom/appUtils";
+import { PanelWidget } from "@library/layout/PanelLayout";
 
 interface IProps {}
 

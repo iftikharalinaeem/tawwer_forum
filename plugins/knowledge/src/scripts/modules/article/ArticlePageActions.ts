@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/state/ReduxActions";
+import ReduxActions from "@library/redux/ReduxActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 

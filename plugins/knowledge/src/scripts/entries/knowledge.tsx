@@ -12,17 +12,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // Our own libraries
-import { onReady } from "@library/application";
-import { registerReducer } from "@library/state/reducerRegistry";
-import { debug } from "@library/utility";
-import { getMeta } from "@library/application";
-import NotificationsModel from "@library/notifications/NotificationsModel";
-import ConversationsModel from "@library/conversations/ConversationsModel";
+import { onReady } from "@library/dom/appUtils";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import { debug } from "@library/utility/utils";
+import { getMeta } from "@library/dom/appUtils";
+import NotificationsModel from "@library/features/notifications/NotificationsModel";
+import ConversationsModel from "@library/features/conversations/ConversationsModel";
 
 // Knowledge Modules
 import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
-import { initAllUserContent } from "@library/user-content";
+import { initAllUserContent } from "@library/content";
 import { forceRenderStyles } from "typestyle";
 
 debug(getMeta("context.debug"));

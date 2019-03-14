@@ -10,10 +10,10 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
-import { newFolder } from "@library/components/icons/common";
+import { t } from "@library/dom/appUtils";
+import Button from "@library/forms/Button";
+import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/layout/frame";
+import { newFolder } from "@library/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";

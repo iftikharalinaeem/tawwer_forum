@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import Button from "@library/components/forms/Button";
-import ButtonLoader from "@library/components/ButtonLoader";
+import Button from "@library/forms/Button";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 import classNames from "classnames";
 import { buttonClasses } from "@library/styles/buttonStyles";
 

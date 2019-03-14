@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 import * as React from "react";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 
-import DropDown from "@library/components/dropdown/DropDown";
-import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
-import ModalConfirm from "@library/components/modal/ModalConfirm";
+import DropDown from "@library/flyouts/DropDown";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import ModalConfirm from "@library/modal/ModalConfirm";
 import { connect } from "react-redux";
 import { DraftsPage } from "@knowledge/modules/drafts/DraftsPage";
 import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";

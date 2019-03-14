@@ -10,8 +10,8 @@ import NavigationModel, { KbRecordType } from "@knowledge/navigation/state/Navig
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { INavigationTreeItem } from "@library/@types/api";
-import { t } from "@library/application";
-import ReduxReducer from "@library/state/ReduxReducer";
+import { t } from "@library/dom/appUtils";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { createSelector } from "reselect";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";

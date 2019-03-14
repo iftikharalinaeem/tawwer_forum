@@ -3,9 +3,9 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import React from "react";
-import NavLinksWithHeadings from "@library/components/NavLinksWithHeadings";
+import NavLinksWithHeadings from "@library/navigation/NavLinksWithHeadings";
 import { ILinkListData } from "@library/@types/api";
 
 /**

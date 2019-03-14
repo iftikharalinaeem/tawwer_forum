@@ -4,14 +4,14 @@
  */
 
 import Navigation from "@knowledge/navigation/Navigation";
-import { t } from "@library/application";
-import Loader from "@library/components/Loader";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import { t } from "@library/dom/appUtils";
+import Loader from "@library/loaders/Loader";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import Container from "@library/layout/components/Container";
+import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
-import Breadcrumbs from "@library/components/Breadcrumbs";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
 
 interface IProps {
     activeRecord: IActiveRecord;

@@ -7,7 +7,7 @@
 import { IUserFragment } from "@library/@types/api";
 import { IArticleFragment } from "@knowledge/@types/api";
 import { MultiTypeRecord } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 
 export enum KbCategorySortMode {
     NAME = "name",

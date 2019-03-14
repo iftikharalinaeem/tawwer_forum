@@ -5,12 +5,12 @@
  */
 
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/application";
-import { organize } from "@library/components/icons/navigationManager";
-import Permission from "@library/users/Permission";
+import { t } from "@library/dom/appUtils";
+import { organize } from "@library/icons/navigationManager";
+import Permission from "@library/features/users/Permission";
 import classNames from "classnames";
 import * as React from "react";
-import { siteNavAdminLinksClasses } from "@library/styles/siteNavAdminLinksStyles";
+import { siteNavAdminLinksClasses } from "@library/navigation/siteNavAdminLinksStyles";
 
 interface IProps {
     className?: string;

@@ -10,7 +10,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api";
-import ReduxActions from "@library/state/ReduxActions";
+import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 
 const createAction = actionCreatorFactory("@@loationPicker");

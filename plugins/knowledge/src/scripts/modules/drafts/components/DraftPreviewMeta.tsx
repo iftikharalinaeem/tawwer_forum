@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import Translate from "@library/components/translation/Translate";
-import DateTime from "@library/components/DateTime";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import classNames from "classnames";
 import { metasClasses } from "@library/styles/metasStyles";

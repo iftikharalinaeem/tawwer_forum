@@ -16,7 +16,7 @@ import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import DocumentTitle from "@library/components/DocumentTitle";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";

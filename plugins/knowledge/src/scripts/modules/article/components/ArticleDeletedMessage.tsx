@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import Message from "@knowledge/modules/common/Message";
 
 interface IProps {

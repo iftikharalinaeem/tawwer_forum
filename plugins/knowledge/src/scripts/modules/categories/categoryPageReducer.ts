@@ -9,7 +9,7 @@ import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageA
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api";
-import SimplePagerModel, { ILinkPages } from "@library/simplePager/SimplePagerModel";
+import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import produce from "immer";
 import clone from "lodash/clone";
 import { reducerWithInitialState } from "typescript-fsa-reducers";

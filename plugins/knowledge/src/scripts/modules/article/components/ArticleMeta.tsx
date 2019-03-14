@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import Translate from "@library/components/translation/Translate";
-import ProfileLink from "@library/components/navigation/ProfileLink";
-import DateTime from "@library/components/DateTime";
+import Translate from "@library/content/Translate";
+import ProfileLink from "@library/navigation/ProfileLink";
+import DateTime from "@library/content/DateTime";
 import { Link } from "react-router-dom";
 import { IUserFragment } from "@library/@types/api";
 import { metasClasses } from "@library/styles/metasStyles";

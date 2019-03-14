@@ -5,24 +5,24 @@
  */
 
 import React, { ReactNode } from "react";
-import { t } from "@library/application";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import BackLink from "@library/components/navigation/BackLink";
-import Button from "@library/components/forms/Button";
+import { t } from "@library/dom/appUtils";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { IDeviceProps } from "@library/layout/DeviceChecker";
+import BackLink from "@library/routing/links/BackLink";
+import Button from "@library/forms/Button";
 import classNames from "classnames";
-import ButtonLoader from "@library/components/ButtonLoader";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 import { IResponseArticleDraft } from "@knowledge/@types/api";
-import Translate from "@library/components/translation/Translate";
-import DateTime from "@library/components/DateTime";
-import Container from "@library/components/layouts/components/Container";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { Devices } from "@library/components/DeviceChecker";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
-import FlexSpacer from "@library/components/FlexSpacer";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
+import Container from "@library/layout/components/Container";
+import { withDevice } from "@library/layout/DeviceContext";
+import { Devices } from "@library/layout/DeviceChecker";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import FlexSpacer from "@library/layout/FlexSpacer";
 import { metasClasses } from "@library/styles/metasStyles";
-import { modalClasses } from "@library/styles/modalStyles";
+import { modalClasses } from "@library/modal/modalStyles";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps {
@@ -35,7 +35,7 @@ interface IProps extends IDeviceProps {
     saveDraft?: ILoadable<{}>;
     selectedLang?: string;
     selectedKey?: string;
-    mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
+    mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     mobileDropDownTitle?: string; // For mobile
 }
 

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import { KnowledgeReducer, IStoreState } from "@knowledge/state/model";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import produce from "immer";

@@ -6,7 +6,7 @@
 
 import { IUserFragment } from "@library/@types/api";
 import { Omit } from "@library/@types/utils";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.

@@ -5,17 +5,17 @@
  */
 
 import { IRevisionFragment } from "@knowledge/@types/api";
-import { t } from "@library/application";
-import DateTime from "@library/components/DateTime";
+import { t } from "@library/dom/appUtils";
+import DateTime from "@library/content/DateTime";
 import {
     revisionStatus_deleted,
     revisionStatus_draft,
     revisionStatus_pending,
     revisionStatus_published,
     revisionStatus_revision,
-} from "@library/components/icons/revision";
-import SmartLink from "@library/components/navigation/SmartLink";
-import Hoverable from "@library/utils/Hoverable";
+} from "@library/icons/revision";
+import SmartLink from "@library/routing/links/SmartLink";
+import Hoverable from "@library/utility/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";

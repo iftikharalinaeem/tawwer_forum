@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import Container from "@library/components/layouts/components/Container";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import BackLink from "@library/components/navigation/BackLink";
+import Container from "@library/layout/components/Container";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import BackLink from "@library/routing/links/BackLink";
 import classNames from "classnames";
 import React from "react";
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { modalClasses } from "@library/styles/modalStyles";
+import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps {
     className?: string;

@@ -5,13 +5,13 @@
  */
 
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import FlexSpacer from "@library/components/FlexSpacer";
-import Button from "@library/components/forms/Button";
-import { downTriangle, rightTriangle } from "@library/components/icons/common";
-import { article, folderClosed, folderOpen } from "@library/components/icons/navigationManager";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import Button from "@library/forms/Button";
+import { downTriangle, rightTriangle } from "@library/icons/common";
+import { article, folderClosed, folderOpen } from "@library/icons/navigationManager";
 import classNames from "classnames";
 import React from "react";
-import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {

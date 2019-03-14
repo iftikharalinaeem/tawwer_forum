@@ -4,12 +4,12 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import { newFolder } from "@library/components/icons/common";
-import { collapseAll, expandAll } from "@library/components/icons/navigationManager";
+import { t } from "@library/dom/appUtils";
+import Button from "@library/forms/Button";
+import { newFolder } from "@library/icons/common";
+import { collapseAll, expandAll } from "@library/icons/navigationManager";
 import React from "react";
-import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
 
 interface IProps {

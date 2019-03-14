@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/state/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import {
     IPatchArticleStatusResponseBody,
     IPatchArticleStatusRequestBody,

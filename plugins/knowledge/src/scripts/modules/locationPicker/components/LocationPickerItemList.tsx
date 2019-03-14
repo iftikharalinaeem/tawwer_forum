@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { folderContentsClasses } from "@library/styles/folderContentsStyles";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 
 interface IProps {
     categoryName: string;

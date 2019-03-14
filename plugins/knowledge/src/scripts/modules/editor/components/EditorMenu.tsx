@@ -7,11 +7,11 @@
 import { ArticleStatus, IArticle } from "@knowledge/@types/api";
 import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 import { RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/application";
-import { DropDownItem, DropDownItemLink, DropDownItemSeparator } from "@library/components/dropdown";
-import DropDown from "@library/components/dropdown/DropDown";
-import { dropDownClasses } from "@library/styles/dropDownStyles";
-import Permission from "@library/users/Permission";
+import { t } from "@library/dom/appUtils";
+import { DropDownItem, DropDownItemLink, DropDownItemSeparator } from "@library/flyouts";
+import DropDown from "@library/flyouts/DropDown";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import Permission from "@library/features/users/Permission";
 import * as React from "react";
 
 interface IProps {

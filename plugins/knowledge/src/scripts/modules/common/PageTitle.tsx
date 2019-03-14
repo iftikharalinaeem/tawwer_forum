@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import PageHeading from "@library/components/PageHeading";
+import PageHeading from "@library/layout/PageHeading";
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";

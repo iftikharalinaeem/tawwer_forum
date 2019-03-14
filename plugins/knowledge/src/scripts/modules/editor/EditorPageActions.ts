@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import {
     IPostArticleResponseBody,
     IPostArticleRequestBody,

@@ -7,8 +7,8 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
-import RouteHandler from "@knowledge/routes/RouteHandler";
-import { ModalLoader } from "@library/components/modal";
+import RouteHandler from "@knowledge/../../../../../library/src/scripts/routing/RouteHandler";
+import { ModalLoader } from "@library/modal";
 import {
     IArticleFragment,
     IArticle,
@@ -17,10 +17,10 @@ import {
     IKbCategoryFragment,
     IKbCategory,
 } from "@knowledge/@types/api";
-import { formatUrl } from "@library/application";
+import { formatUrl } from "@library/dom/appUtils";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import { logWarning } from "@library/utility";
+import { logWarning } from "@library/utility/utils";
 
 interface IEditorURLData {
     articleID?: number;

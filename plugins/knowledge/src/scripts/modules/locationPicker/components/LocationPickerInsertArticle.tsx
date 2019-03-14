@@ -5,15 +5,15 @@
  */
 
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import { article } from "@library/components/icons";
-import { categoryIcon, checkCompact, rightChevron } from "@library/components/icons/common";
+import { t } from "@library/dom/appUtils";
+import Button from "@library/forms/Button";
+import { article } from "@library/icons";
+import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
-import { folderContentsClasses } from "@library/styles/folderContentsStyles";
+import { locationPickerClasses } from "@knowledge/../../../../../../../../knowledge/plugins/knowledge/src/scripts/modules/locationPicker/locationPickerStyles";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {

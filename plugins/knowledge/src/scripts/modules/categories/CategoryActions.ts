@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { ActionsUnion } from "@library/state/utility";
+import { ActionsUnion } from "@library/redux/utility";
 import {
     IKbCategory,
     IPostKbCategoryRequestBody,
@@ -11,7 +11,7 @@ import {
     IPatchKbCategoryResponseBody,
     IPatchKbCategoryRequestBody,
 } from "@knowledge/@types/api";
-import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import {
     IDeleteKbCategoryRequest,
     IGetKbCategoryRequestBody,

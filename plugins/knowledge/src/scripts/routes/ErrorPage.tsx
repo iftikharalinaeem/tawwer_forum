@@ -5,27 +5,27 @@
  */
 
 import React, { ReactNode } from "react";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
-import Paragraph from "@library/components/Paragraph";
-import Container from "@library/components/layouts/components/Container";
-import { formatUrl, t } from "@library/application";
+import { IDeviceProps } from "@library/layout/DeviceChecker";
+import { withDevice } from "@library/layout/DeviceContext";
+import Paragraph from "@library/layout/Paragraph";
+import Container from "@library/layout/components/Container";
+import { formatUrl, t } from "@library/dom/appUtils";
 import { LoadStatus, IApiError } from "@library/@types/api";
-import DocumentTitle from "@library/components/DocumentTitle";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
 import { connect } from "react-redux";
-import Heading from "@library/components/Heading";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import LinkAsButton from "@library/components/LinkAsButton";
+import Heading from "@library/layout/Heading";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import LinkAsButton from "@library/routing/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import Permission from "@library/users/Permission";
+import Permission from "@library/features/users/Permission";
 
-import { searchError } from "@library/components/icons";
+import { searchError } from "@library/icons";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inheritHeightClass, flexHelper } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { percent, px, viewHeight } from "csx";
 import { debugHelper } from "@library/styles/styleHelpers";
 import { buttonClasses } from "@library/styles/buttonStyles";

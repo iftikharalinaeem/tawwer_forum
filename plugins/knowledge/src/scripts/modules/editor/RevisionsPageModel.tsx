@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api";

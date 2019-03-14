@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import DropDown from "@library/components/dropdown/DropDown";
-import { t } from "@library/application";
-import { InlineTypes } from "@library/components/translation/Sentence";
+import DropDown from "@library/flyouts/DropDown";
+import { t } from "@library/dom/appUtils";
+import { InlineTypes } from "@library/content/Sentence";
 
-import { DropDownItemButton, DropDownItemMetas, DropDownItemSeparator } from "@library/components/dropdown";
+import { DropDownItemButton, DropDownItemMetas, DropDownItemSeparator } from "@library/flyouts";
 
 export interface IProps {}
 

@@ -10,20 +10,20 @@ import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/
 import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/application";
-import { Devices } from "@library/components/DeviceChecker";
+import { t } from "@library/dom/appUtils";
+import { Devices } from "@library/layout/DeviceChecker";
 import {
     DropDownItem,
     DropDownItemButton,
     DropDownItemLink,
     DropDownItemSeparator,
-} from "@library/components/dropdown";
-import DropDown from "@library/components/dropdown/DropDown";
-import { ModalConfirm } from "@library/components/modal";
-import Permission from "@library/users/Permission";
+} from "@library/flyouts";
+import DropDown from "@library/flyouts/DropDown";
+import { ModalConfirm } from "@library/modal";
+import Permission from "@library/features/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
-import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;

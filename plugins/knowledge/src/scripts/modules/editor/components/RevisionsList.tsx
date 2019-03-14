@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
-import Heading from "@library/components/Heading";
+import { t } from "@library/dom/appUtils";
+import Heading from "@library/layout/Heading";
 
 interface IProps {
     children: React.ReactNode;

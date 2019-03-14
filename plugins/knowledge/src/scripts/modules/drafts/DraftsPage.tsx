@@ -5,16 +5,16 @@
  */
 
 import React from "react";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import DraftsLayout from "@knowledge/modules/drafts/components/DraftsLayout";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import PageLoader from "@library/components/PageLoader";
-import { withDevice } from "@library/contexts/DeviceContext";
-import DocumentTitle from "@library/components/DocumentTitle";
+import { IDeviceProps } from "@library/layout/DeviceChecker";
+import PageLoader from "@library/routing/PageLoader";
+import { withDevice } from "@library/layout/DeviceContext";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import { LoadStatus } from "@library/@types/api/core";
-import ModalSizes from "@library/components/modal/ModalSizes";
-import Modal from "@library/components/modal/Modal";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
+import ModalSizes from "@library/modal/ModalSizes";
+import Modal from "@library/modal/Modal";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";

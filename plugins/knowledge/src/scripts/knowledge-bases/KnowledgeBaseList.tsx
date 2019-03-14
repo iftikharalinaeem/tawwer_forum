@@ -9,14 +9,14 @@ import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IStoreState } from "@knowledge/state/model";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import { LoadStatus } from "@library/@types/api";
-import Loader from "@library/components/Loader";
-import WidgetContainer from "@library/components/layouts/components/WidgetContainer";
-import { WidgetContainerSize } from "@library/components/layouts/components/WidgetContainer";
-import SubcommunityList from "@library/components/subcommunities/SubcommunityList";
+import Loader from "@library/loaders/Loader";
+import WidgetContainer from "@library/layout/components/WidgetContainer";
+import { WidgetContainerSize } from "@library/layout/components/WidgetContainer";
+import SubcommunityList from "@library/features/subcommunities/SubcommunityList";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
-import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
+import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 
 /**
  * Component representing a list of visible knowledge bases.

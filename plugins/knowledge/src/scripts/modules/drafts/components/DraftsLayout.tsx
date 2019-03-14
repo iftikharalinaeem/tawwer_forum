@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
-import Container from "@library/components/layouts/components/Container";
-import { Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
-import { t } from "@library/application";
+import Container from "@library/layout/components/Container";
+import { Devices } from "@library/layout/DeviceChecker";
+import { withDevice } from "@library/layout/DeviceContext";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import { t } from "@library/dom/appUtils";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
 import DraftHeader from "@knowledge/modules/drafts/components/DraftHeader";

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import { KnowledgeReducer, KNOWLEDGE_ACTION } from "@knowledge/state/model";
 import { IKbCategoryFragment, IKbCategory } from "@knowledge/@types/api";
 import produce from "immer";
