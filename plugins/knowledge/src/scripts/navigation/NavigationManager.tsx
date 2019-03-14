@@ -38,7 +38,7 @@ import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/Knowledge
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { ArticleStatus } from "@knowledge/@types/api/article";
+import { PublishStatus } from "@library/@types/api/core";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -478,7 +478,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
             const { recordType, recordID } = deleteItem.data;
             switch (recordType) {
                 case KbRecordType.ARTICLE:
-                    await this.props.articleActions.patchStatus({ articleID: recordID, status: ArticleStatus.DELETED });
+                    await this.props.articleActions.patchStatus({ articleID: recordID, status: PublishStatus.DELETED });
                     break;
                 case KbRecordType.CATEGORY:
                     await this.props.categoryActions.deleteCategory(recordID);

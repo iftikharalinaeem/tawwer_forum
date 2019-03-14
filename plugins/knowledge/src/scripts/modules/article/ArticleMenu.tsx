@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { ArticleStatus, IArticle } from "@knowledge/@types/api/article";
+import { IArticle } from "@knowledge/@types/api/article";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import Permission from "@library/features/users/Permission";
 import DropDown from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
@@ -97,7 +97,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                         </RevisionsRoute.Link>
                     </DropDownItem>
                     <DropDownItemSeparator />
-                    {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
+                    {this.props.article.status === PublishStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}
@@ -131,7 +131,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private handleDeleteDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.DELETED });
+        await articleActions.patchStatus({ articleID: article.articleID, status: PublishStatus.DELETED });
         this.closeDeleteDialogue();
     };
 
@@ -156,7 +156,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private handleRestoreDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.PUBLISHED });
+        await articleActions.patchStatus({ articleID: article.articleID, status: PublishStatus.PUBLISHED });
         this.closeRestoreDialogue();
     };
 

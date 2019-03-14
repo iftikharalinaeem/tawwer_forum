@@ -13,11 +13,11 @@ import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import NavigationModel from "@knowledge/navigation/state/NavigationModel";
 import { Format } from "@knowledge/@types/api/articleRevision";
-import { IArticle, ArticleStatus } from "@knowledge/@types/api/article";
+import { IArticle } from "@knowledge/@types/api/article";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,
@@ -81,7 +81,7 @@ describe("EditorPageActions", () => {
         seoName: "",
         seoDescription: "",
         slug: "example-article",
-        status: ArticleStatus.PUBLISHED,
+        status: PublishStatus.PUBLISHED,
         score: 5,
         countViews: 5,
         outline: [],

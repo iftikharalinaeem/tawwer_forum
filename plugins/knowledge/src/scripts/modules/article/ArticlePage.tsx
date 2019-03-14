@@ -15,7 +15,7 @@ import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
@@ -23,7 +23,6 @@ import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { ArticleStatus } from "@knowledge/@types/api/article";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -99,7 +98,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const { article } = this.props;
         let messages: React.ReactNode;
 
-        if (article.data && article.data.status === ArticleStatus.DELETED) {
+        if (article.data && article.data.status === PublishStatus.DELETED) {
             messages = (
                 <Permission permission="articles.add">
                     <ArticleDeletedMessage
@@ -117,7 +116,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const { articleActions, article } = this.props;
         await articleActions.patchStatus({
             articleID: article.data!.articleID,
-            status: ArticleStatus.PUBLISHED,
+            status: PublishStatus.PUBLISHED,
         });
     };
 

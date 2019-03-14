@@ -4,12 +4,12 @@
  * @license Proprietary
  */
 
-import { ArticleStatus } from "@knowledge/@types/api/article";
 import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
 import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { PublishStatus } from "@library/@types/api/core";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -81,9 +81,9 @@ export default class SearchPageActions extends ReduxActions<IStoreState> {
     public search = async (page?: number, limit?: number) => {
         const form = SearchPageModel.stateSlice(this.getState()).form;
 
-        const statuses = [ArticleStatus.PUBLISHED];
+        const statuses = [PublishStatus.PUBLISHED];
         if (form.includeDeleted) {
-            statuses.push(ArticleStatus.DELETED);
+            statuses.push(PublishStatus.DELETED);
         }
 
         // Convert start/endDate into format for our API.
