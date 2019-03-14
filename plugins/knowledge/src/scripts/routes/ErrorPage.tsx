@@ -5,12 +5,10 @@
  */
 
 import React, { ReactNode } from "react";
-import { IDeviceProps } from "@library/layout/DeviceChecker";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import Paragraph from "@library/layout/Paragraph";
 import Container from "@library/layout/components/Container";
-import { formatUrl, t } from "@library/dom/appUtils";
-import { LoadStatus, IApiError } from "@library/@types/api";
+import { formatUrl, t } from "@library/utility/appUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
 import { connect } from "react-redux";
@@ -19,8 +17,6 @@ import VanillaHeader from "@library/headers/VanillaHeader";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/features/users/Permission";
-
-import { searchError } from "@library/icons";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inheritHeightClass, flexHelper } from "@library/styles/styleHelpers";
@@ -28,7 +24,9 @@ import classNames from "classnames";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { percent, px, viewHeight } from "csx";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { searchError } from "@library/icons/common";
+import { LoadStatus, IApiError } from "@library/@types/api/core";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {

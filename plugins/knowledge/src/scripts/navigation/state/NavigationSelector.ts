@@ -4,7 +4,6 @@
  */
 
 import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { ILinkGroup, ILinkListData, INavigationTreeItem } from "@library/@types/api";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import NavigationModel, {
     KbRecordType,
@@ -13,6 +12,7 @@ import NavigationModel, {
 } from "@knowledge/navigation/state/NavigationModel";
 import { createSelector } from "reselect";
 import { IStoreState } from "@knowledge/state/model";
+import { INavigationTreeItem, ILinkListData, ILinkGroup } from "@library/@types/api/core";
 
 export interface ISortedNavItem {
     ownID: string;

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { inheritHeightClass } from "@library/styles/styleHelpers";

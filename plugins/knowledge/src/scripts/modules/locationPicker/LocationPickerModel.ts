@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import { IKbCategoryFragment } from "@knowledge/@types/api";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import NavigationModel, { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { INavigationTreeItem } from "@library/@types/api";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { createSelector } from "reselect";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { INavigationTreeItem } from "@library/@types/api/core";
+import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 
 export interface ILPConnectedData extends ILocationPickerState {
     pageContents: INavigationTreeItem[];

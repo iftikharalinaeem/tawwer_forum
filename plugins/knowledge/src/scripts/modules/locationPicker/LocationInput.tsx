@@ -10,10 +10,9 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { categoryIcon, plusCircle } from "@library/icons/common";
-import { Modal } from "@library/modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import classNames from "classnames";
 import * as React from "react";
@@ -21,7 +20,8 @@ import { connect } from "react-redux";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import Modal from "@library/modal/Modal";
 
 /**
  * This component allows to display and edit the location of the current page.

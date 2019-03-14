@@ -4,15 +4,10 @@
  * @license Proprietary
  */
 
-import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { t } from "@library/dom/appUtils";
-
-import { article } from "@library/icons";
-import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import classNames from "classnames";
 import React from "react";
-import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
+import { article } from "@library/icons/navigationManager";
 
 interface IProps {
     name: string;

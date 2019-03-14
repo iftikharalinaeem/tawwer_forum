@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 
 interface IProps {

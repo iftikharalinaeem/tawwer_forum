@@ -4,17 +4,13 @@
  * @license Proprietary
  */
 
-import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { t } from "@library/dom/appUtils";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
+import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 import Button from "@library/forms/Button";
-import { article } from "@library/icons";
-import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
-import { knowldedgeBaseItem } from "@knowledge/icons/common";
-import { locationPickerClasses } from "@knowledge/../../../../../../../../knowledge/plugins/knowledge/src/scripts/modules/locationPicker/locationPickerStyles";
-import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     onClick: (position: string) => void;

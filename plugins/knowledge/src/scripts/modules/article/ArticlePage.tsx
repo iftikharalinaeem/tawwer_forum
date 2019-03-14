@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import ArticlePageSelector from "@knowledge/modules/article/ArticlePageSelector";
@@ -16,15 +15,15 @@ import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { IDeviceProps } from "@library/layout/DeviceChecker";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { ArticleStatus } from "@knowledge/@types/api/article";
 
 interface IState {
     showRestoreDialogue: boolean;

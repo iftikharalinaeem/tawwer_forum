@@ -4,37 +4,33 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import Container from "@library/layout/components/Container";
-import { Devices } from "@library/layout/DeviceChecker";
-import { withDevice } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
-import { t } from "@library/dom/appUtils";
 import AdvancedSearch from "@knowledge/modules/search/components/AdvancedSearch";
-import SearchBar from "@library/features/search/SearchBar";
-import ResultList from "@library/result/ResultList";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
-import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
-import QueryString from "@library/routing/QueryString";
-import qs from "qs";
-import { LoadStatus } from "@library/@types/api";
-import { IResult } from "@library/result/Result";
-import { ISearchResult, ArticleStatus } from "@knowledge/@types/api";
-import { SearchResultMeta } from "@library/result/ResultMeta";
-import DocumentTitle from "@library/routing/DocumentTitle";
+import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import { LoadStatus } from "@library/@types/api/core";
+import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import SearchBar from "@library/features/search/SearchBar";
 import SearchOption from "@library/features/search/SearchOption";
-import Drawer from "@library/layout/drawer/Drawer";
-import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import VanillaHeader from "@library/headers/VanillaHeader";
-
-import { compose } from "@library/icons/header";
-import SearchPagination from "./components/SearchPagination";
+import Container from "@library/layout/components/Container";
+import { withDevice, Devices } from "@library/layout/DeviceContext";
+import Drawer from "@library/layout/drawer/Drawer";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import Loader from "@library/loaders/Loader";
+import { IResult } from "@library/result/Result";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import QueryString from "@library/routing/QueryString";
+import { t } from "@library/utility/appUtils";
 import debounce from "lodash/debounce";
-import { buttonClasses } from "@library/styles/buttonStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import qs from "qs";
+import * as React from "react";
+import { connect } from "react-redux";
+import SearchPagination from "./components/SearchPagination";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ISearchResult } from "@knowledge/@types/api/search";
+import ResultList from "@library/result/ResultList";
+import { ResultMeta } from "@library/result/ResultMeta";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -182,7 +178,7 @@ class SearchForm extends React.Component<IProps, IState> {
 
                 return (
                     <>
-                        <SearchResults results={this.props.results.data!.map(this.mapResult)} />
+                        <ResultList results={this.props.results.data!.map(this.mapResult)} />
                         <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                     </>
                 );
@@ -200,7 +196,7 @@ class SearchForm extends React.Component<IProps, IState> {
             name: searchResult.name,
             excerpt: searchResult.body,
             meta: (
-                <SearchResultMeta
+                <ResultMeta
                     status={searchResult.status}
                     type={searchResult.recordType}
                     updateUser={searchResult.updateUser!}

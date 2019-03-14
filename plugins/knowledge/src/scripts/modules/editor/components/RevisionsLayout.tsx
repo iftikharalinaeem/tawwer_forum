@@ -5,12 +5,11 @@
  */
 
 import * as React from "react";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router";
 import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
 import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";

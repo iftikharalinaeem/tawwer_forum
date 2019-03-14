@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { newFolder } from "@library/icons/common";
 import { collapseAll, expandAll } from "@library/icons/navigationManager";

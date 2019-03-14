@@ -8,7 +8,7 @@ import { flexHelper, unit, spinnerLoader, colorOut } from "@library/styles/style
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px, ColorHelper } from "csx";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { buttonVariables } from "@library/forms/buttonStyles";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("reactions");

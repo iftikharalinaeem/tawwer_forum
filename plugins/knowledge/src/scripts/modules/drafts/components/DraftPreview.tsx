@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import Paragraph from "@library/layout/Paragraph";
 import DraftMenu from "@knowledge/modules/drafts/components/DraftMenu";

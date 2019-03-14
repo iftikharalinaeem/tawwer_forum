@@ -8,14 +8,14 @@ import { ITreeItem } from "@atlaskit/tree";
 import { INormalizedNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import NavigationManagerItemIcon from "@knowledge/navigation/subcomponents/NavigationManagerItemIcon";
 import NavigationManagerNameForm from "@knowledge/navigation/subcomponents/NavigationManagerNameForm";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import React from "react";
 import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     className?: string;

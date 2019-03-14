@@ -3,21 +3,18 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import * as React from "react";
-import { t } from "@library/dom/appUtils";
-
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
+import { LoadStatus } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
 import DropDown from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import { t } from "@library/utility/appUtils";
+import * as React from "react";
 import { connect } from "react-redux";
-import { DraftsPage } from "@knowledge/modules/drafts/DraftsPage";
-import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import apiv2 from "@library/apiv2";
-import { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
-import { LoadStatus } from "@library/@types/api";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;

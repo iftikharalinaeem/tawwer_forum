@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import * as React from "react";

@@ -12,10 +12,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 // Our own libraries
-import { onReady } from "@library/dom/appUtils";
+import { onReady } from "@library/utility/appUtils";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { debug } from "@library/utility/utils";
-import { getMeta } from "@library/dom/appUtils";
+import { getMeta } from "@library/utility/appUtils";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import ConversationsModel from "@library/features/conversations/ConversationsModel";
 

@@ -6,12 +6,13 @@
 
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import { Modal, ModalSizes } from "@library/modal";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
 
 interface IProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {
+        id?: string;
+    }> {
     children: React.ReactNode;
     titleID: string;
     className?: string;

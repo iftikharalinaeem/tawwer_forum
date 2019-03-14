@@ -3,16 +3,16 @@
  * @license Proprietary
  */
 
-import { IArticleFragment } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import produce from "immer";
 import clone from "lodash/clone";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { IArticleFragment } from "@knowledge/@types/api/article";
 
 export interface ICategoriesPageState {
     articles: ILoadable<IArticleFragment[]>;

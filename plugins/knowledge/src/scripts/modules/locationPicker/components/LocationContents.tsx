@@ -13,7 +13,7 @@ import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/l
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import Loader from "@library/loaders/Loader";
@@ -26,7 +26,7 @@ import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Paragraph from "@library/layout/Paragraph";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
 
 /**

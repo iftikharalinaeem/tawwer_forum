@@ -4,8 +4,7 @@
  * @license Proprietary
  */
 
-import { IRevisionFragment } from "@knowledge/@types/api";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import DateTime from "@library/content/DateTime";
 import {
     revisionStatus_deleted,
@@ -15,10 +14,11 @@ import {
     revisionStatus_revision,
 } from "@library/icons/revision";
 import SmartLink from "@library/routing/links/SmartLink";
-import Hoverable from "@library/utility/Hoverable";
+import Hoverable from "@library/dom/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";
+import { IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IProps extends IRevisionFragment {
     url: string;

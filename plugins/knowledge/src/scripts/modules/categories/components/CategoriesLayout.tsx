@@ -4,29 +4,28 @@
  * @license Proprietary
  */
 
-import { IKbCategory } from "@knowledge/@types/api";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { IResult } from "@library/result/Result";
-import ResultList from "@library/result/ResultList";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
 import VanillaHeader from "@library/headers/VanillaHeader";
-import { compose } from "@library/icons";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import classNames from "classnames";
 import * as React from "react";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { IKbCategory } from "@knowledge/@types/api/kbCategory";
+import { compose } from "redux";
+import ResultList from "@library/result/ResultList";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -56,7 +55,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         const pageContent =
             results.length > 0 ? (
                 <PanelWidgetVerticalPadding>
-                    <SearchResults results={this.props.results} />
+                    <ResultList results={this.props.results} />
                     <SimplePager url={category.url + "/p:page:"} pages={pages} />
                 </PanelWidgetVerticalPadding>
             ) : (

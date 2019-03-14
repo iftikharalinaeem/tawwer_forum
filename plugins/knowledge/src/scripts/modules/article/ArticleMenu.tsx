@@ -4,26 +4,23 @@
  * @license Proprietary
  */
 
-import { ArticleStatus, IArticle } from "@knowledge/@types/api";
+import { ArticleStatus, IArticle } from "@knowledge/@types/api/article";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
-import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/dom/appUtils";
-import { Devices } from "@library/layout/DeviceChecker";
-import {
-    DropDownItem,
-    DropDownItemButton,
-    DropDownItemLink,
-    DropDownItemSeparator,
-} from "@library/flyouts";
-import DropDown from "@library/flyouts/DropDown";
-import { ModalConfirm } from "@library/modal";
+import { LoadStatus } from "@library/@types/api/core";
 import Permission from "@library/features/users/Permission";
+import DropDown from "@library/flyouts/DropDown";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import { Devices } from "@library/layout/DeviceContext";
+import ModalConfirm from "@library/modal/ModalConfirm";
+import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
+import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;

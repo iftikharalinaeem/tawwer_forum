@@ -6,7 +6,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import VanillaHomeHeader from "@library/headers/VanillaHomeHeader";
 import { EditorRoute, SearchRoute, DraftsRoute, OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";

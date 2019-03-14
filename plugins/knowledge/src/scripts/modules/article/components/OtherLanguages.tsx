@@ -7,7 +7,7 @@
 import * as React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
 import Heading from "@library/layout/Heading";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import LanguagesDropDown, { ILanguageProps } from "@library/layout/LanguagesDropDown";
 

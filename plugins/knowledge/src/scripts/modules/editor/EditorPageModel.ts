@@ -4,10 +4,9 @@
  * @license Proprietary
  */
 
-import { IArticle, IResponseArticleDraft, IRevision } from "@knowledge/@types/api";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { DeltaOperation } from "quill/core";
@@ -15,6 +14,8 @@ import reduceReducers from "reduce-reducers";
 import { createSelector } from "reselect";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IRevision } from "@knowledge/@types/api/articleRevision";
 
 export interface IEditorPageForm {
     name: string;

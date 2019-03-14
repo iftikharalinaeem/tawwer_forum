@@ -4,9 +4,9 @@
  * @license Proprietary
  */
 
-import { ArticleStatus } from "@knowledge/@types/api";
-import { IUserFragment } from "@library/@types/api";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ArticleStatus } from "@knowledge/@types/api/article";
+import { IUserFragment } from "@library/@types/api/users";
 
 export interface ISearchResult {
     name: string;

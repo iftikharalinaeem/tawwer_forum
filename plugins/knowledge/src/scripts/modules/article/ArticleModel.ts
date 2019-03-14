@@ -4,13 +4,13 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft, IRevision, IRevisionFragment } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { article } from "@library/icons";
+import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 export interface IArticleState {
     articlesByID: {

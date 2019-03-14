@@ -6,7 +6,7 @@
 
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 

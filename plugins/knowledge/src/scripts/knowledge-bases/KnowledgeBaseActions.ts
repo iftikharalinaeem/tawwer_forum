@@ -6,7 +6,7 @@
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { IApiError } from "@library/@types/api";
+import { IApiError } from "@library/@types/api/core";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 

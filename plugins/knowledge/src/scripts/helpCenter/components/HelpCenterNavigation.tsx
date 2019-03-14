@@ -3,10 +3,10 @@
  * @license Proprietary
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import React from "react";
 import NavLinksWithHeadings from "@library/navigation/NavLinksWithHeadings";
-import { ILinkListData } from "@library/@types/api";
+import { ILinkListData } from "@library/@types/api/core";
 
 /**
  * Component for rendering out a full set of knowledge base home data.

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import { Link } from "react-router-dom";
 

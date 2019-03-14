@@ -12,7 +12,7 @@ import { article, folderClosed, folderOpen } from "@library/icons/navigationMana
 import classNames from "classnames";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     expanded: boolean;

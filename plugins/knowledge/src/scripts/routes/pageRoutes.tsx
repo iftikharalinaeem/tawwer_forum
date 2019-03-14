@@ -7,20 +7,15 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
-import RouteHandler from "@knowledge/../../../../../library/src/scripts/routing/RouteHandler";
-import { ModalLoader } from "@library/modal";
-import {
-    IArticleFragment,
-    IArticle,
-    IRevisionFragment,
-    IRevision,
-    IKbCategoryFragment,
-    IKbCategory,
-} from "@knowledge/@types/api";
-import { formatUrl } from "@library/dom/appUtils";
+import { formatUrl } from "@library/utility/appUtils";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@library/utility/utils";
+import RouteHandler from "@library/routing/RouteHandler";
+import ModalLoader from "@library/modal/ModalLoader";
+import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
+import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
+import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 
 interface IEditorURLData {
     articleID?: number;

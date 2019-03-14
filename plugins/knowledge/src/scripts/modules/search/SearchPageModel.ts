@@ -4,15 +4,15 @@
  * @license Proprietary
  */
 
-import { t } from "@library/dom/appUtils";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { t } from "@library/utility/appUtils";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import produce from "immer";
 import { IStoreState } from "@knowledge/state/model";
-import { ISearchResponseBody } from "@knowledge/@types/api";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ISearchResponseBody } from "@knowledge/@types/api/search";
 
 export enum SearchDomain {
     ARTICLES = "articles",

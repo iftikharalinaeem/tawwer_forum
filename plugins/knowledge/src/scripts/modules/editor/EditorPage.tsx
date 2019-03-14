@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/EditorForm";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/modal/ModalSizes";

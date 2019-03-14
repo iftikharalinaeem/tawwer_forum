@@ -5,15 +5,14 @@
  */
 
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { article } from "@library/icons";
 import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     isInitialSelection: boolean;

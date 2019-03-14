@@ -4,7 +4,7 @@
  */
 
 import Navigation from "@knowledge/navigation/Navigation";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import Loader from "@library/loaders/Loader";
 import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";

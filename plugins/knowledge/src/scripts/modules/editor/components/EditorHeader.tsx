@@ -5,25 +5,23 @@
  */
 
 import React, { ReactNode } from "react";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { IDeviceProps } from "@library/layout/DeviceChecker";
 import BackLink from "@library/routing/links/BackLink";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IResponseArticleDraft } from "@knowledge/@types/api";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import Container from "@library/layout/components/Container";
-import { withDevice } from "@library/layout/DeviceContext";
-import { Devices } from "@library/layout/DeviceChecker";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { metasClasses } from "@library/styles/metasStyles";
 import { modalClasses } from "@library/modal/modalStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;

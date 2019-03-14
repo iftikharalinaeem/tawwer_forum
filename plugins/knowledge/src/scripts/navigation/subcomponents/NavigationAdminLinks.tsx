@@ -5,7 +5,7 @@
  */
 
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { organize } from "@library/icons/navigationManager";
 import Permission from "@library/features/users/Permission";
 import classNames from "classnames";

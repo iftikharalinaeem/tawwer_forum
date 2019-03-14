@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import * as React from "react";
 

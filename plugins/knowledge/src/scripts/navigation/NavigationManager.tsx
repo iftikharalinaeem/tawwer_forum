@@ -13,7 +13,6 @@ import Tree, {
     moveItemOnTree,
     mutateTree,
 } from "@atlaskit/tree";
-import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
@@ -29,9 +28,8 @@ import NavigationManagerContent from "@knowledge/navigation/subcomponents/Naviga
 import NavigationManagerToolBar from "@knowledge/navigation/subcomponents/NavigationManagerToolBar";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { ModalConfirm } from "@library/modal";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import React from "react";
@@ -39,6 +37,8 @@ import { connect } from "react-redux";
 import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import ModalConfirm from "@library/modal/ModalConfirm";
+import { ArticleStatus } from "@knowledge/@types/api/article";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;

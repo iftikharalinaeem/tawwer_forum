@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 import * as React from "react";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import BackLink from "@library/routing/links/BackLink";
 import classNames from "classnames";
 import Container from "@library/layout/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { modalClasses } from "@library/modal/modalStyles";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 
 interface IProps {
     className?: string;

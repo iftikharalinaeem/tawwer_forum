@@ -4,11 +4,10 @@
  * @license Proprietary
  */
 
-import DateRange from "@knowledge/modules/search/components/DateRange";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
-import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/dom/appUtils";
+import { LoadStatus } from "@library/@types/api/core";
+import { t } from "@library/utility/appUtils";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Button from "@library/forms/Button";
 import Checkbox from "@library/forms/Checkbox";
@@ -22,10 +21,10 @@ import Permission from "@library/features/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonClasses } from "@library/styles/buttonStyles";
 import classNames from "classnames";
-import { dateRangeClasses } from "@library/styles/dateRangeStyles";
-import { ButtonTypes } from "library/src/scripts/styles/buttonStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { dateRangeClasses } from "@library/forms/dateRangeStyles";
+import DateRange from "@library/forms/DateRange";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;

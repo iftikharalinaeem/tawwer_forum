@@ -4,11 +4,12 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { ArticleStatus } from "@knowledge/@types/api/article";
+import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
 import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
-import apiv2 from "@library/apiv2";
-import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
+import apiv2 from "@library/apiv2";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;

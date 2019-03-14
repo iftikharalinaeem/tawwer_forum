@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import Heading from "@library/layout/Heading";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { PanelWidget } from "@library/layout/PanelLayout";
 
 interface IProps {}

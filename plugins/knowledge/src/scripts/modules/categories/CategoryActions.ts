@@ -4,21 +4,19 @@
  */
 
 import { ActionsUnion } from "@library/redux/utility";
-import {
-    IKbCategory,
-    IPostKbCategoryRequestBody,
-    IPostKbCategoryResponseBody,
-    IPatchKbCategoryResponseBody,
-    IPatchKbCategoryRequestBody,
-} from "@knowledge/@types/api";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import {
     IDeleteKbCategoryRequest,
     IGetKbCategoryRequestBody,
     IGetKbCategoryResponseBody,
+    IKbCategory,
+    IPostKbCategoryRequestBody,
+    IPostKbCategoryResponseBody,
+    IPatchKbCategoryResponseBody,
+    IPatchKbCategoryRequestBody,
 } from "@knowledge/@types/api/kbCategory";
 import actionCreatorFactory from "typescript-fsa";
-import { IApiError } from "@library/@types/api";
+import { IApiError } from "@library/@types/api/core";
 
 const createAction = actionCreatorFactory("@@category");
 

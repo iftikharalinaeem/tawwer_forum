@@ -4,11 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../../../../../vanilla/library/src/scripts/styles/globalStyleVars";
-import { useThemeCache } from "../../../../../../../vanilla/library/src/scripts/styles/styleUtils";
 import { percent, px } from "csx";
-import { styleFactory } from "../../../../../../../vanilla/library/src/scripts/styles/styleUtils";
-import { unit } from "../../../../../../../vanilla/library/src/scripts/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();

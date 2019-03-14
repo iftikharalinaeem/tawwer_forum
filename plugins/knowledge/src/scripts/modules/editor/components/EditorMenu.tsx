@@ -4,15 +4,17 @@
  * @license Proprietary
  */
 
-import { ArticleStatus, IArticle } from "@knowledge/@types/api";
-import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 import { RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/dom/appUtils";
-import { DropDownItem, DropDownItemLink, DropDownItemSeparator } from "@library/flyouts";
+import { t } from "@library/utility/appUtils";
 import DropDown from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Permission from "@library/features/users/Permission";
 import * as React from "react";
+import { IArticle, ArticleStatus } from "@knowledge/@types/api/article";
+import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 
 interface IProps {
     article: IArticle;
