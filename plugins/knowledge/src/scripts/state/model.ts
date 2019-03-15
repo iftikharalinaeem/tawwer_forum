@@ -13,7 +13,7 @@ import { ICategoriesPageState } from "@knowledge/modules/categories/categoryPage
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { IArticleState } from "@knowledge/modules/article/ArticleModel";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
-import { IUsersStoreState } from "@library/users/UsersModel";
+import { IUsersStoreState } from "@library/features/users/UsersModel";
 import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
 import { DeepPartial, Reducer } from "redux";
@@ -24,11 +24,11 @@ import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
-import UsersActions from "@library/users/UsersActions";
+import UsersActions from "@library/features/users/UsersActions";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES

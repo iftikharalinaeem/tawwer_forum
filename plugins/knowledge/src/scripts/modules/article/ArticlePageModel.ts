@@ -7,7 +7,7 @@
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import clone from "lodash/clone";
 import { reducerWithInitialState } from "typescript-fsa-reducers";

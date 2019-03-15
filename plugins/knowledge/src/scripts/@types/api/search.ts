@@ -4,9 +4,9 @@
  * @license Proprietary
  */
 
-import { ArticleStatus } from "@knowledge/@types/api";
-import { IUserFragment } from "@library/@types/api";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { IUserFragment } from "@library/@types/api/users";
+import { PublishStatus } from "@library/@types/api/core";
 
 export interface ISearchResult {
     name: string;
@@ -17,7 +17,7 @@ export interface ISearchResult {
     dateInserted: string;
     dateUpdated: string;
     knowledgeCategoryID: number;
-    status: ArticleStatus;
+    status: PublishStatus;
     recordID: number;
     recordType: string;
     updateUser?: IUserFragment;
@@ -37,7 +37,7 @@ export interface ISearchRequestBody {
     insertUserIDs?: number[];
     updateUserIDs?: number[];
     knowledgeBaseID?: number;
-    statuses?: ArticleStatus[];
+    statuses?: PublishStatus[];
     expand?: string[];
     page?: number;
     limit?: number;

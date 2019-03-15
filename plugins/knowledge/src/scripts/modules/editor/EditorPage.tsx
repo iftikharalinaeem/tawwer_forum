@@ -8,16 +8,16 @@ import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
-import Modal from "@library/components/modal/Modal";
+import Modal from "@library/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/EditorForm";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import ModalSizes from "@library/components/modal/ModalSizes";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import Permission from "@library/users/Permission";
+import ModalSizes from "@library/modal/ModalSizes";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import Permission from "@library/features/users/Permission";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
-import QueryString from "@library/components/navigation/QueryString";
+import QueryString from "@library/routing/QueryString";
 
 interface IOwnProps
     extends RouteComponentProps<{

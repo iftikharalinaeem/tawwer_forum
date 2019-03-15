@@ -4,29 +4,28 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import {
-    IPostArticleResponseBody,
-    IPostArticleRequestBody,
-    IGetArticleResponseBody,
-    IPatchArticleRequestBody,
-    IPatchArticleResponseBody,
-    IResponseArticleDraft,
-    Format,
-    IArticle,
-} from "@knowledge/@types/api";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { History } from "history";
 import qs from "qs";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import uniqueId from "lodash/uniqueId";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import isEqual from "lodash/isEqual";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import {
+    IPostArticleResponseBody,
+    IResponseArticleDraft,
+    IPostArticleRequestBody,
+    IPatchArticleRequestBody,
+    IArticle,
+    IGetArticleResponseBody,
+} from "@knowledge/@types/api/article";
+import { Format } from "@knowledge/@types/api/articleRevision";
 
 export default class EditorPageActions extends ReduxActions<IStoreState> {
     // API actions

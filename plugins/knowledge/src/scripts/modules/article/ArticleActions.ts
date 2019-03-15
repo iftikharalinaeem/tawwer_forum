@@ -4,38 +4,40 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/state/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
+import apiv2 from "@library/apiv2";
+import actionCreatorFactory from "typescript-fsa";
+import { IStoreState } from "@knowledge/state/model";
 import {
+    IArticle,
+    IArticleFragment,
     IPatchArticleStatusResponseBody,
     IPatchArticleStatusRequestBody,
     IGetArticleResponseBody,
     IGetArticleRequestBody,
-    IGetArticleRevisionsRequestBody,
-    IGetArticleRevisionsResponseBody,
-    IGetRevisionRequestBody,
-    IGetRevisionResponseBody,
-    IGetArticleDraftsRequest,
     IGetArticleDraftsResponse,
+    IGetArticleDraftsRequest,
     IGetArticleDraftResponse,
     IGetArticleDraftRequest,
+    IPostArticleResponseBody,
+    IPostArticleRequestBody,
     IPostArticleDraftResponse,
     IPostArticleDraftRequest,
     IPatchArticleDraftResponse,
     IPatchArticleDraftRequest,
     IDeleteArticleDraftResponse,
     IDeleteArticleDraftRequest,
-    IPatchArticleRequestBody,
     IPatchArticleResponseBody,
-    IPostArticleResponseBody,
-    IPostArticleRequestBody,
-    IArticleFragment,
-    IArticle,
-} from "@knowledge/@types/api";
-import apiv2 from "@library/apiv2";
-import ArticleModel from "./ArticleModel";
-import { IApiResponse, IApiError } from "@library/@types/api";
-import actionCreatorFactory from "typescript-fsa";
-import { IStoreState } from "@knowledge/state/model";
+    IPatchArticleRequestBody,
+} from "@knowledge/@types/api/article";
+import { IApiError, IApiResponse } from "@library/@types/api/core";
+import {
+    IGetArticleRevisionsResponseBody,
+    IGetArticleRevisionsRequestBody,
+    IGetRevisionResponseBody,
+    IGetRevisionRequestBody,
+} from "@knowledge/@types/api/articleRevision";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;

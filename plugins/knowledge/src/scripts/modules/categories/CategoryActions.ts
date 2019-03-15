@@ -3,22 +3,20 @@
  * @license Proprietary
  */
 
-import { ActionsUnion } from "@library/state/utility";
+import { ActionsUnion } from "@library/redux/utility";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import {
+    IDeleteKbCategoryRequest,
+    IGetKbCategoryRequestBody,
+    IGetKbCategoryResponseBody,
     IKbCategory,
     IPostKbCategoryRequestBody,
     IPostKbCategoryResponseBody,
     IPatchKbCategoryResponseBody,
     IPatchKbCategoryRequestBody,
-} from "@knowledge/@types/api";
-import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
-import {
-    IDeleteKbCategoryRequest,
-    IGetKbCategoryRequestBody,
-    IGetKbCategoryResponseBody,
 } from "@knowledge/@types/api/kbCategory";
 import actionCreatorFactory from "typescript-fsa";
-import { IApiError } from "@library/@types/api";
+import { IApiError } from "@library/@types/api/core";
 
 const createAction = actionCreatorFactory("@@category");
 

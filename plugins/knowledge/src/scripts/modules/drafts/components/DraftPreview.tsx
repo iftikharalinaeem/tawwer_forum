@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import Paragraph from "@library/components/Paragraph";
+import Paragraph from "@library/layout/Paragraph";
 import DraftMenu from "@knowledge/modules/drafts/components/DraftMenu";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";

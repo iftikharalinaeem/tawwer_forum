@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
-import Paragraph from "@library/components/Paragraph";
+import { t } from "@library/utility/appUtils";
+import Paragraph from "@library/layout/Paragraph";
 import DraftPreview from "@knowledge/modules/drafts/components/DraftPreview";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 

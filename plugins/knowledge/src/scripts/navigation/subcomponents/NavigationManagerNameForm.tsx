@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import ButtonSubmit from "@library/forms/ButtonSubmit";
 import classNames from "classnames";
 import React from "react";
 import { nextTick } from "process";
-import { navigationManagerClasses } from "@library/styles/navigationManagerStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     className?: string;

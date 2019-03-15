@@ -7,7 +7,7 @@
 import React from "react";
 import { storiesOf } from "@storybook/react";
 import { ArticleReactions } from "@knowledge/modules/article/components/ArticleReactions";
-import { ArticleReactionType } from "@knowledge/@types/api";
+import { ArticleReactionType } from "@knowledge/@types/api/article";
 
 storiesOf("KnowledgeBase/Articles", module).add("Reactions", () => {
     const noop = () => {

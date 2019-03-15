@@ -4,25 +4,23 @@
  * @license Proprietary
  */
 
+import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
+import ErrorPage from "@knowledge/routes/ErrorPage";
+import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
+import { SearchRoute } from "@knowledge/routes/pageRoutes";
+import { IStoreState } from "@knowledge/state/model";
+import SearchContext from "@library/contexts/SearchContext";
+import { DeviceProvider } from "@library/layout/DeviceContext";
+import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
+import SiteNavProvider from "@library/navigation/SiteNavContext";
+import getStore from "@library/redux/getStore";
+import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
+import PagesContext from "@library/routing/PagesContext";
+import { ThemeProvider } from "@library/theming/ThemeProvider";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
 import React from "react";
 import { Provider } from "react-redux";
-import getStore from "@library/state/getStore";
-import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import { DeviceProvider } from "@library/contexts/DeviceContext";
-import { Devices } from "@library/components/DeviceChecker";
-import { Route, BrowserRouter } from "react-router-dom";
-import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
-import { formatUrl, getMeta } from "@library/application";
-import SearchContext from "@library/contexts/SearchContext";
-import PagesContext from "@library/contexts/PagesContext";
-import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
-import { SearchRoute } from "@knowledge/routes/pageRoutes";
-import { ScrollOffsetProvider } from "@library/contexts/ScrollOffsetContext";
-import SiteNavProvider from "@library/components/siteNav/SiteNavContext";
-import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
-import { ThemeProvider } from "@library/theming/ThemeProvider";
-import ErrorPage from "@knowledge/routes/ErrorPage";
+import { BrowserRouter, Route } from "react-router-dom";
 
 /*
  * Top level application component for knowledge.

@@ -4,18 +4,13 @@
  * @license Proprietary
  */
 
-import { IUserFragment } from "@library/@types/api";
 import { Omit } from "@library/@types/utils";
-import { ICrumb } from "@library/components/Breadcrumbs";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { IUserFragment } from "@library/@types/api/users";
+import { PublishStatus } from "@library/@types/api/core";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
-}
-
-export enum ArticleStatus {
-    DELETED = "deleted",
-    UNDELETED = "undeleted",
-    PUBLISHED = "published",
 }
 
 interface IInsertUpdate {
@@ -35,7 +30,7 @@ interface IArticleDefaultedData {
     seoDescription: string; // Displayed in the of the page. If empty will be calculated from the article body.
     slug: string; // The path to the article from an import used to support redirects. This is not editable within the UI, but should be accessable via API in case we decide to make it an advanced option.
     sort: number; // The manual sort order of the article.
-    status: ArticleStatus;
+    status: PublishStatus;
     body: string; // Content of the article. Defaults to an empty string.
     name: string; // Name of the article. Defaults to an empty string.
     format: string; // Format of the content. Defaults to the site's configured default format.
@@ -107,7 +102,7 @@ export interface IGetArticleResponseBody extends IArticle {}
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {
     articleID: number;
-    status: ArticleStatus;
+    status: PublishStatus;
 }
 export interface IPatchArticleStatusResponseBody extends IArticle {}
 

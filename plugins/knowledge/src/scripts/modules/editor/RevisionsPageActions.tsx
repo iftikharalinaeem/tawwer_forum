@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/state/ReduxActions";
+import ReduxActions from "@library/redux/ReduxActions";
 import apiv2 from "@library/apiv2";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";

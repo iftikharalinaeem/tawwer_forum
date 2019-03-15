@@ -9,8 +9,8 @@ import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/Locatio
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
-import ReduxActions from "@library/state/ReduxActions";
+import { LoadStatus } from "@library/@types/api/core";
+import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 
 const createAction = actionCreatorFactory("@@loationPicker");

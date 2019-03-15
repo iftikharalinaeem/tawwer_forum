@@ -4,32 +4,29 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { Editor } from "@rich-editor/components/editor/Editor";
-import { t } from "@library/application";
-import { DeltaOperation } from "quill/core";
-import { LoadStatus } from "@library/@types/api";
-import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
-import DocumentTitle from "@library/components/DocumentTitle";
-import classNames from "classnames";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import EditorPageModel, { IInjectableEditorProps, IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
-import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
-import { connect } from "react-redux";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import EditorPageModel, { IEditorPageForm, IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
+import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
+import Container from "@library/layout/components/Container";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
+import PanelLayout from "@library/layout/PanelLayout";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import { Editor } from "@rich-editor/editor/Editor";
+import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
+import { DeltaOperation } from "quill/core";
+import React from "react";
+import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout from "@library/components/layouts/PanelLayout";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ScreenReaderContent from "@library/components/ScreenReaderContent";
-import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;

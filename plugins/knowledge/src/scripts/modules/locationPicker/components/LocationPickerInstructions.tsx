@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
-import { locationPickerClasses } from "@knowledge/styles/locationPickerStyles";
-import { folderContentsClasses } from "@library/styles/folderContentsStyles";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
+import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 
 interface IProps {}
 

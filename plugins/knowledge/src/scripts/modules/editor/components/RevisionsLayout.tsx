@@ -5,15 +5,14 @@
  */
 
 import * as React from "react";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import { withDevice } from "@library/contexts/DeviceContext";
+import Container from "@library/layout/components/Container";
+import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import { RouteComponentProps, withRouter } from "react-router";
-import Breadcrumbs, { ICrumb } from "@library/components/Breadcrumbs";
-import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
+import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;

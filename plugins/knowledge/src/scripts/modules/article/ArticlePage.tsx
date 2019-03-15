@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
 import ArticlePageSelector from "@knowledge/modules/article/ArticlePageSelector";
@@ -16,12 +15,11 @@ import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { withDevice } from "@library/contexts/DeviceContext";
-import Permission from "@library/users/Permission";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
+import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
@@ -100,7 +98,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const { article } = this.props;
         let messages: React.ReactNode;
 
-        if (article.data && article.data.status === ArticleStatus.DELETED) {
+        if (article.data && article.data.status === PublishStatus.DELETED) {
             messages = (
                 <Permission permission="articles.add">
                     <ArticleDeletedMessage
@@ -118,7 +116,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const { articleActions, article } = this.props;
         await articleActions.patchStatus({
             articleID: article.data!.articleID,
-            status: ArticleStatus.PUBLISHED,
+            status: PublishStatus.PUBLISHED,
         });
     };
 

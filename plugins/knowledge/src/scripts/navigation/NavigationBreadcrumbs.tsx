@@ -8,8 +8,8 @@ import { INavigationStoreState } from "@knowledge/navigation/state/NavigationMod
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import Breadcrumbs from "@library/components/Breadcrumbs";
-import { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
 
