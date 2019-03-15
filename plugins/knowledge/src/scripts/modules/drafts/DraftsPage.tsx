@@ -21,8 +21,8 @@ import { RouteComponentProps } from "react-router-dom";
 
 interface IOwnProps
     extends RouteComponentProps<{
-        id?: string;
-    }> {}
+            id?: string;
+        }> {}
 
 interface IProps extends IOwnProps, IInjectableDraftsPageProps, IDeviceProps {
     actions: DraftsPageActions;
