@@ -117,12 +117,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function structure() {
         $this->router->setRoute(
-            "kb\\/sitemap-kb\\.xml(\\.*)",
+            "kb/sitemap-kb\\.xml(\\.*)",
             "/kb/sitemap-kb/xml$1",
             "Internal"
         );
         $this->router->setRoute(
-            "kb\\/sitemap-index\\.xml",
+            "kb/sitemap-index\\.xml",
             "/kb/sitemap-index/xml",
             "Internal"
         );
