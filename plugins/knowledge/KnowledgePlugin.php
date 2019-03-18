@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge;
 
+use Gdn_Router as Router;
 use Garden\Container\Reference;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
@@ -22,16 +23,22 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var Router */
+    private $router;
+
     /**
      * KnowledgePlugin constructor.
      *
      * @param \Gdn_Database $database
+     * @param Router $router
      */
     public function __construct(
-        \Gdn_Database $database
+        \Gdn_Database $database,
+        Router $router
     ) {
         parent::__construct();
         $this->database = $database;
+        $this->router = $router;
     }
 
     /**
@@ -109,8 +116,16 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * Ensure the database is configured.
      */
     public function structure() {
-        \Gdn::router()->setRoute('/kb/sitemap-kb.xml(.*)', '/kb/sitemap-kb/xml$1', 'Internal');
-        \Gdn::router()->setRoute('/kb/sitemap-index.xml', '/kb/sitemap-index/xml', 'Internal');
+        $this->router->setRoute(
+            "kb\\/sitemap-kb\\.xml(\\.*)",
+            "/kb/sitemap-kb/xml$1",
+            "Internal"
+        );
+        $this->router->setRoute(
+            "kb\\/sitemap-index\\.xml",
+            "/kb/sitemap-index/xml",
+            "Internal"
+        );
 
 
         $this->database->structure()
