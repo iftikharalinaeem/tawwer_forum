@@ -4,9 +4,10 @@
  * @license Proprietary
  */
 
-import PageHeading from "@library/components/PageHeading";
+import PageHeading from "@library/layout/PageHeading";
 import classNames from "classnames";
 import * as React from "react";
+import { metasClasses } from "@library/styles/metasStyles";
 
 export interface IPageTitle {
     title: string;
@@ -26,6 +27,7 @@ export default class PageTitle extends React.Component<IPageTitle> {
     };
 
     public render() {
+        const classesMetas = metasClasses();
         return (
             <div className={classNames("pageTitleContainer", this.props.className)}>
                 <PageHeading
@@ -34,7 +36,11 @@ export default class PageTitle extends React.Component<IPageTitle> {
                     includeBackLink={this.props.includeBackLink}
                     headingClassName={classNames({ pageSmallTitle: !!this.props.smallPageTitle })}
                 />
-                {this.props.meta && <div className="pageMetas metas pageTitleContainer-metas">{this.props.meta}</div>}
+                {this.props.meta && (
+                    <div className={classNames("pageMetas", "pageTitleContainer-metas", classesMetas.root)}>
+                        {this.props.meta}
+                    </div>
+                )}
             </div>
         );
     }

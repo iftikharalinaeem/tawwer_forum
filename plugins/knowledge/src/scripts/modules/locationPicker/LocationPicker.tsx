@@ -10,14 +10,17 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
-import { newFolder } from "@library/components/icons/common";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { newFolder } from "@library/icons/common";
 import * as React from "react";
 import { connect } from "react-redux";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes, buttonClasses } from "@library/forms/buttonStyles";
+import Frame from "@library/layout/frame/Frame";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FramePanel from "@library/layout/frame/FramePanel";
+import FrameFooter from "@library/layout/frame/FrameFooter";
 
 /**
  * Component for choosing a location for a new article.
@@ -44,18 +47,23 @@ class LocationPicker extends React.Component<IProps, IState> {
                             <LocationContents key={`contents-${navigatedRecord}`} />
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
+                    <FrameFooter selfPadded={true}>
                         {navigatedRecord && (
                             <Button
                                 title={t("New Category")}
                                 className="buttonNoBorder isSquare button-pushLeft"
+                                baseClass={ButtonTypes.ICON}
                                 onClick={this.showNewCategoryModal}
                                 buttonRef={this.newFolderButtonRef}
                             >
                                 {newFolder()}
                             </Button>
                         )}
-                        <Button onClick={this.handleChoose} disabled={!this.canChoose} className={buttons.primary}>
+                        <Button
+                            baseClass={ButtonTypes.COMPACT_PRIMARY}
+                            onClick={this.handleChoose}
+                            disabled={!this.canChoose}
+                        >
                             {t("Choose")}
                         </Button>
                     </FrameFooter>

@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/state/ReduxActions";
+import ReduxActions from "@library/redux/ReduxActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IStoreState } from "@knowledge/state/model";
 
-export default class DraftsPageActions extends ReduxActions {
+export default class DraftsPageActions extends ReduxActions<IStoreState> {
     public static readonly IDENTIFIER = "@@articleDrafts/IDENTIFIER";
 
     public static readonly RESET = "@@articleDrafts/RESET";
@@ -21,7 +21,7 @@ export default class DraftsPageActions extends ReduxActions {
      * Get drafts created by a specific user.
      */
     public async getCurrentUserDrafts() {
-        const state = this.getState<IStoreState>();
+        const state = this.getState();
         const currentUserID = state.users.current.data!.userID;
         return this.articleActions.getDrafts({ insertUserID: currentUserID }, DraftsPageActions.IDENTIFIER);
     }

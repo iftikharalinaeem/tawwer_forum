@@ -13,7 +13,6 @@ import Tree, {
     moveItemOnTree,
     mutateTree,
 } from "@atlaskit/tree";
-import { ArticleStatus } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
@@ -29,14 +28,17 @@ import NavigationManagerContent from "@knowledge/navigation/subcomponents/Naviga
 import NavigationManagerToolBar from "@knowledge/navigation/subcomponents/NavigationManagerToolBar";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import { ModalConfirm } from "@library/components/modal";
-import Translate from "@library/components/translation/Translate";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import ModalConfirm from "@library/modal/ModalConfirm";
+import { PublishStatus } from "@library/@types/api/core";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -77,6 +79,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      * @inheritdoc
      */
     public render() {
+        const classesNavigationManager = navigationManagerClasses();
         return (
             <>
                 <NavigationManagerToolBar
@@ -87,7 +90,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 />
                 <div
                     ref={this.self}
-                    className={classNames("navigationManager", "inheritHeight", this.props.className)}
+                    className={classNames(
+                        "navigationManager",
+                        classesNavigationManager.root,
+                        inheritHeightClass(),
+                        this.props.className,
+                    )}
                     role="tree"
                     aria-describedby={this.props.describedBy}
                     onKeyDown={this.handleKeyDown}
@@ -100,6 +108,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
                         isDragEnabled={!this.state.disabled}
+                        offsetPerLevel={24}
                     />
                 </div>
                 {this.renderNewCategoryModal()}
@@ -133,8 +142,15 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 onDeleteClick={deleteHandler}
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
+                isInRoot={this.isItemInRoot(item.parentID)}
             />
         );
+    };
+
+    private isItemInRoot = (itemParentID: string) => {
+        const rootId = KbRecordType.CATEGORY + this.props.knowledgeBase.rootCategoryID;
+
+        return this.props.knowledgeBase.knowledgeBaseID !== undefined && itemParentID === rootId;
     };
 
     /**
@@ -462,7 +478,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
             const { recordType, recordID } = deleteItem.data;
             switch (recordType) {
                 case KbRecordType.ARTICLE:
-                    await this.props.articleActions.patchStatus({ articleID: recordID, status: ArticleStatus.DELETED });
+                    await this.props.articleActions.patchStatus({ articleID: recordID, status: PublishStatus.DELETED });
                     break;
                 case KbRecordType.CATEGORY:
                     await this.props.categoryActions.deleteCategory(recordID);

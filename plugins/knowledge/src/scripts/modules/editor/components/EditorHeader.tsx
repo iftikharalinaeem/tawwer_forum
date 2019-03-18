@@ -5,22 +5,23 @@
  */
 
 import React, { ReactNode } from "react";
-import { t } from "@library/application";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import BackLink from "@library/components/navigation/BackLink";
-import Button from "@library/components/forms/Button";
+import { t } from "@library/utility/appUtils";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import BackLink from "@library/routing/links/BackLink";
+import Button from "@library/forms/Button";
 import classNames from "classnames";
-import ButtonLoader from "@library/components/ButtonLoader";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IResponseArticleDraft } from "@knowledge/@types/api";
-import Translate from "@library/components/translation/Translate";
-import DateTime from "@library/components/DateTime";
-import Container from "@library/components/layouts/components/Container";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { Devices } from "@library/components/DeviceChecker";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
-import FlexSpacer from "@library/components/FlexSpacer";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
+import Container from "@library/layout/components/Container";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import { metasClasses } from "@library/styles/metasStyles";
+import { modalClasses } from "@library/modal/modalStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -32,7 +33,7 @@ interface IProps extends IDeviceProps {
     saveDraft?: ILoadable<{}>;
     selectedLang?: string;
     selectedKey?: string;
-    mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
+    mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     mobileDropDownTitle?: string; // For mobile
 }
 
@@ -52,8 +53,16 @@ export class EditorHeader extends React.Component<IProps> {
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
+        const classesModal = modalClasses();
         return (
-            <nav className={classNames("editorHeader", "modal-pageHeader", this.props.className)}>
+            <nav
+                className={classNames(
+                    "editorHeader",
+                    "modal-pageHeader",
+                    this.props.className,
+                    classesModal.pageHeader,
+                )}
+            >
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
@@ -84,6 +93,7 @@ export class EditorHeader extends React.Component<IProps> {
                                         type="submit"
                                         title={this.props.callToAction}
                                         disabled={!this.props.canSubmit}
+                                        baseClass={ButtonTypes.TEXT}
                                         className={classNames(
                                             "editorHeader-publish",
                                             "buttonNoHorizontalPadding",
@@ -108,14 +118,19 @@ export class EditorHeader extends React.Component<IProps> {
         const { status } = this.props.saveDraft!;
         const { data } = this.props.draft!;
         let content: ReactNode = null;
+        const classesMetas = metasClasses();
 
         if (status === LoadStatus.LOADING) {
-            content = <span className="editorHeader-saveDraft metaStyle">{t("Saving draft...")}</span>;
+            content = (
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle)}>
+                    {t("Saving draft...")}
+                </span>
+            );
         }
 
         if (data) {
             content = (
-                <span className="editorHeader-saveDraft metaStyle">
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle)}>
                     <Translate
                         source="Draft saved <0/>"
                         c0={<DateTime mode="relative" timestamp={data.dateUpdated} />}
@@ -125,7 +140,11 @@ export class EditorHeader extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            content = <span className="editorHeader-saveDraft metaStyle isError">{t("Error saving draft.")}</span>;
+            content = (
+                <span className={classNames("editorHeader-saveDraft", classesMetas.metaStyle, "isError")}>
+                    {t("Error saving draft.")}
+                </span>
+            );
         }
 
         if (content) {

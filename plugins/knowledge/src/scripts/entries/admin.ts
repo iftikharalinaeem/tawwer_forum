@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { onReady, onContent } from "@library/application";
+import { onReady, onContent } from "@library/utility/appUtils";
 import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 onReady(handleKBViewTypeChange);

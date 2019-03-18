@@ -4,20 +4,21 @@
  * @license Proprietary
  */
 
-import { IRevisionFragment } from "@knowledge/@types/api";
-import { t } from "@library/application";
-import DateTime from "@library/components/DateTime";
+import { t } from "@library/utility/appUtils";
+import DateTime from "@library/content/DateTime";
 import {
     revisionStatus_deleted,
     revisionStatus_draft,
     revisionStatus_pending,
     revisionStatus_published,
     revisionStatus_revision,
-} from "@library/components/icons/revision";
-import SmartLink from "@library/components/navigation/SmartLink";
-import Hoverable from "@library/utils/Hoverable";
+} from "@library/icons/revision";
+import SmartLink from "@library/routing/links/SmartLink";
+import Hoverable from "@library/dom/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
+import { metasClasses } from "@library/styles/metasStyles";
+import { IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -32,6 +33,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
     public render() {
         const { name, status, dateInserted, url, isSelected } = this.props;
         const { photoUrl } = this.props.insertUser;
+        const classesMetas = metasClasses();
         return (
             <Hoverable onHover={this.props.onHover} duration={50}>
                 {provided => (
@@ -48,7 +50,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                             <div className="revisionsList-content">
                                 <div className="revisionsList-userName">{name}</div>
                                 <div className="revisionsList-dateTime">
-                                    <DateTime timestamp={dateInserted} className="metaStyle" />
+                                    <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                                 </div>
                             </div>
                             {status && (

@@ -5,19 +5,11 @@
  */
 
 @import "base/overwrite";
-@import "~library-scss/_coreVariables";
-@import "~library-scss/mixins/_mixins";
-@import "~normalize.css";
-
-@import "~library-scss/utility/_body";
-@import "~library-scss/utility/_utility";
-@import "~library-scss/embeds/_embeds";
+@import "~library-scss/base";
 
 @import "~library-scss/layouts/panelLayout";
 @import "~library-scss/layouts/page";
 @import "~library-scss/layouts/overlay";
-@import "~library-scss/layouts/modal";
-@import "~library-scss/layouts/frame";
 @import "~library-scss/layouts/container";
 @import "~library-scss/layouts/panelArea";
 @import "~library-scss/layouts/panelWidget";
@@ -29,17 +21,10 @@
 @import "~library-scss/userContent/_atMention";
 @import "~library-scss/userContent/_blockquote";
 @import "~library-scss/userContent/_emoji";
-@import "~library-scss/userContent/_codeBlocks";
 @import "~library-scss/userContent/_accessibility";
 
-@import "base/scaffolding";
-@import "base/typography";
-@import "base/utilities";
-
-@import "components/userContent"; // Keep first of components
 @import "components/metas";
 @import "components/icons";
-@import "components/buttons";
 @import "components/messages";
 @import "components/inputBlock";
 @import "components/inputText";
@@ -48,23 +33,20 @@
 @import "components/tableOfContents";
 @import "components/panelList";
 
-@import "components/searchResults";
+//@import "components/searchResults";
 @import "components/breadcrumbs";
 @import "components/locationBreadcrumb";
 @import "components/radioButtonsAsTabs";
-@import "components/dropDown";
 @import "components/word";
-@import "components/folderContents";
 @import "components/editorHeader";
 @import "components/pageLocation";
 @import "components/revisionsList";
 @import "components/advancedSearch";
 @import "components/draftList";
 @import "components/draftPreview";
-@import "components/navigationManager";
+//@import "components/navigationManager";
 @import "components/navigationManagerToolbar";
 
 @import "~react-day-picker/lib/style.css";
-@import "~library-scss/components/richEditorForm";
 
 @import "browserSpecific/browserSpecific";

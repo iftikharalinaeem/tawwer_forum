@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { produce } from "immer";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import { IRevisionFragment, IRevision, IArticle } from "@knowledge/@types/api";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 
 export interface IRevisionsPageState {
     articleID: number | null;

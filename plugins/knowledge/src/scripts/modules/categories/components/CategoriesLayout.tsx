@@ -4,29 +4,28 @@
  * @license Proprietary
  */
 
-import { IKbCategory } from "@knowledge/@types/api";
 import PageTitle from "@knowledge/modules/common/PageTitle";
-import { IResult } from "@knowledge/modules/common/SearchResult";
-import SearchResults from "@knowledge/modules/common/SearchResults";
+import { IResult } from "@library/result/Result";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/application";
-import Breadcrumbs from "@library/components/Breadcrumbs";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import { compose } from "@library/components/icons";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
-import LinkAsButton from "@library/components/LinkAsButton";
-import { withDevice } from "@library/contexts/DeviceContext";
-import SimplePager from "@library/simplePager/SimplePager";
-import { ILinkPages } from "@library/simplePager/SimplePagerModel";
-import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { t } from "@library/utility/appUtils";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import Container from "@library/layout/components/Container";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
+import SimplePager from "@library/navigation/SimplePager";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import classNames from "classnames";
 import * as React from "react";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { IKbCategory } from "@knowledge/@types/api/kbCategory";
+import { compose } from "redux";
+import ResultList from "@library/result/ResultList";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -56,7 +55,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         const pageContent =
             results.length > 0 ? (
                 <PanelWidgetVerticalPadding>
-                    <SearchResults results={this.props.results} />
+                    <ResultList results={this.props.results} />
                     <SimplePager url={category.url + "/p:page:"} pages={pages} />
                 </PanelWidgetVerticalPadding>
             ) : (
@@ -103,7 +102,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
                                         className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                        baseClass={ButtonBaseClass.ICON}
+                                        baseClass={ButtonTypes.ICON}
                                         title={t("Compose")}
                                     >
                                         {compose()}

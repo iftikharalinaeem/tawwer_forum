@@ -7,6 +7,7 @@
     "icon": "knowledge.svg",
     "key": "knowledge",
     "type": "addon",
+    "priority": 1001,
     "authors": [
         {
             "name": "Stéphane LaFlèche",

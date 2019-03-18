@@ -4,15 +4,16 @@
  * @license Proprietary
  */
 
-import { ISearchOptionData } from "@library/components/search/SearchOption";
+import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { ISearchOptionProvider } from "@library/contexts/SearchContext";
-import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { AxiosResponse } from "axios";
-import { ISearchResult, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
 import apiv2 from "@library/apiv2";
 import qs from "qs";
-import { formatUrl } from "@library/application";
+import { formatUrl } from "@library/utility/appUtils";
 import pDebounce from "p-debounce";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
+import { PublishStatus } from "@library/@types/api/core";
 
 export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     /**
@@ -21,7 +22,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
         const queryObj: ISearchRequestBody = {
             all: value,
-            statuses: [ArticleStatus.PUBLISHED],
+            statuses: [PublishStatus.PUBLISHED],
             limit: 10,
             expand: ["breadcrumbs"],
             ...options,

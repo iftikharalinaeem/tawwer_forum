@@ -8,8 +8,8 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
-import ReduxReducer from "@library/state/ReduxReducer";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 
 export interface IDraftsPageState {

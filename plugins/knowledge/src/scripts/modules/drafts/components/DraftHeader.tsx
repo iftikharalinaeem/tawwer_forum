@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 import * as React from "react";
-import { t } from "@library/application";
-import BackLink from "@library/components/navigation/BackLink";
+import { t } from "@library/utility/appUtils";
+import BackLink from "@library/routing/links/BackLink";
 import classNames from "classnames";
-import Container from "@library/components/layouts/components/Container";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import Container from "@library/layout/components/Container";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { modalClasses } from "@library/modal/modalStyles";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 
 interface IProps {
     className?: string;
@@ -21,8 +22,16 @@ interface IProps {
  */
 export default class DraftHeader extends React.Component<IProps> {
     public render() {
+        const classesModal = modalClasses();
         return (
-            <nav className={classNames("draftPage-header", "modal-pageHeader", this.props.className)}>
+            <nav
+                className={classNames(
+                    "draftPage-header",
+                    "modal-pageHeader",
+                    this.props.className,
+                    classesModal.pageHeader,
+                )}
+            >
                 <Container>
                     <PanelArea>
                         <ul className="editorHeader-items">

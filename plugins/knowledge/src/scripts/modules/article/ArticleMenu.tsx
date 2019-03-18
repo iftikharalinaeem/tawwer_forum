@@ -4,23 +4,21 @@
  * @license Proprietary
  */
 
-import { ArticleStatus, IArticle } from "@knowledge/@types/api";
+import { IArticle } from "@knowledge/@types/api/article";
 import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article/ArticleActions";
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
-import InsertUpdateMetas from "@knowledge/modules/common/InsertUpdateMetas";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/application";
-import { Devices } from "@library/components/DeviceChecker";
-import {
-    DropDownItem,
-    DropDownItemButton,
-    DropDownItemLink,
-    DropDownItemSeparator,
-} from "@library/components/dropdown";
-import DropDown from "@library/components/dropdown/DropDown";
-import { ModalConfirm } from "@library/components/modal";
-import Permission from "@library/users/Permission";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
+import Permission from "@library/features/users/Permission";
+import DropDown from "@library/flyouts/DropDown";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import { Devices } from "@library/layout/DeviceContext";
+import ModalConfirm from "@library/modal/ModalConfirm";
+import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
+import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
 
@@ -53,6 +51,8 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
+        const classesDropDown = dropDownClasses();
+
         return (
             <Permission permission="articles.add">
                 <DropDown
@@ -62,6 +62,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     renderLeft={true}
                     openAsModal={this.props.device === Devices.MOBILE}
                     title={isMobile ? t("Article") : undefined}
+                    paddedList={true}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
@@ -72,11 +73,11 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItem>
                         <EditorRoute.Link
+                            className={classesDropDown.action}
                             data={{
                                 knowledgeCategoryID: this.props.article.knowledgeCategoryID,
                                 knowledgeBaseID: this.props.article.knowledgeBaseID,
                             }}
-                            className={DropDownItemLink.CSS_CLASS}
                         >
                             {t("New Article")}
                         </EditorRoute.Link>
@@ -84,19 +85,19 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     <DropDownItemSeparator />
                     <DropDownItem>
                         <EditorRoute.Link
+                            className={classesDropDown.action}
                             data={{ articleID: this.props.article.articleID }}
-                            className={DropDownItemLink.CSS_CLASS}
                         >
                             {t("Edit")}
                         </EditorRoute.Link>
                     </DropDownItem>
                     <DropDownItem>
-                        <RevisionsRoute.Link data={article} className={DropDownItemLink.CSS_CLASS}>
+                        <RevisionsRoute.Link className={classesDropDown.action} data={article}>
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>
                     <DropDownItemSeparator />
-                    {this.props.article.status === ArticleStatus.PUBLISHED ? deleteButton : restoreButton}
+                    {this.props.article.status === PublishStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}
@@ -130,7 +131,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private handleDeleteDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.DELETED });
+        await articleActions.patchStatus({ articleID: article.articleID, status: PublishStatus.DELETED });
         this.closeDeleteDialogue();
     };
 
@@ -155,7 +156,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private handleRestoreDialogueConfirm = async () => {
         const { articleActions, article } = this.props;
-        await articleActions.patchStatus({ articleID: article.articleID, status: ArticleStatus.PUBLISHED });
+        await articleActions.patchStatus({ articleID: article.articleID, status: PublishStatus.PUBLISHED });
         this.closeRestoreDialogue();
     };
 

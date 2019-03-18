@@ -7,17 +7,13 @@
 import React from "react";
 import { RouteComponentProps } from "react-router";
 import { connect } from "react-redux";
-import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
+import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
-import PageLoader from "@library/components/PageLoader";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { t } from "@library/application";
-import RevisionsPageModel from "./RevisionsPageModel";
-import RevisionsPageActions from "./RevisionsPageActions";
-import { Modal, ModalSizes } from "@library/components/modal";
-import { LoadStatus } from "@library/@types/api";
-import UserContent from "@library/components/UserContent";
+import PageLoader from "@library/routing/PageLoader";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { t } from "@library/utility/appUtils";
+import { LoadStatus } from "@library/@types/api/core";
+import UserContent from "@library/content/UserContent";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
@@ -27,6 +23,13 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import classNames from "classnames";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
+import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -41,6 +44,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, history, revisions, selectedRevision } = this.props;
+        const classesRichEditorForm = richEditorFormClasses();
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
@@ -50,7 +54,10 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             >
                 <PageLoader status={revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
-                        <form className="richEditorForm inheritHeight" onSubmit={this.onSubmit}>
+                        <form
+                            className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
+                            onSubmit={this.onSubmit}
+                        >
                             <RevisionsLayout
                                 bodyHeading={this.renderTitle()}
                                 bodyContent={

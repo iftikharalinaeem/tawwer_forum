@@ -3,13 +3,12 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
-import { KnowledgeReducer, KNOWLEDGE_ACTION } from "@knowledge/state/model";
-import { IKbCategoryFragment, IKbCategory } from "@knowledge/@types/api";
-import produce from "immer";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import { reducerWithoutInitialState, reducerWithInitialState } from "typescript-fsa-reducers";
-import { stat } from "fs";
+import ReduxReducer from "@library/redux/ReduxReducer";
+import produce from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { IKbCategory } from "@knowledge/@types/api/kbCategory";
+import { KNOWLEDGE_ACTION } from "@knowledge/state/model";
 
 export interface IKbCategoriesState {
     categoriesByID: {

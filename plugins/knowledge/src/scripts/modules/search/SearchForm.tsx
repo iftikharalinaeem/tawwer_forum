@@ -4,36 +4,33 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import Container from "@library/components/layouts/components/Container";
-import { Devices } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
-import { t } from "@library/application";
 import AdvancedSearch from "@knowledge/modules/search/components/AdvancedSearch";
-import SearchBar from "@library/components/forms/select/SearchBar";
-import SearchResults from "@knowledge/modules/common/SearchResults";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
-import { connect } from "react-redux";
-import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
-import QueryString from "@library/components/navigation/QueryString";
-import qs from "qs";
-import { LoadStatus } from "@library/@types/api";
-import { IResult } from "@knowledge/modules/common/SearchResult";
-import { ISearchResult, ArticleStatus } from "@knowledge/@types/api";
-import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
-import DocumentTitle from "@library/components/DocumentTitle";
-import SearchOption from "@library/components/search/SearchOption";
-import Drawer from "@library/components/drawer/Drawer";
-import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import { compose } from "@library/components/icons/header";
-import SearchPagination from "./components/SearchPagination";
-import Loader from "@library/components/Loader";
+import SearchPageModel, { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import { LoadStatus } from "@library/@types/api/core";
+import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import SearchBar from "@library/features/search/SearchBar";
+import SearchOption from "@library/features/search/SearchOption";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import Container from "@library/layout/components/Container";
+import { withDevice, Devices } from "@library/layout/DeviceContext";
+import Drawer from "@library/layout/drawer/Drawer";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import Loader from "@library/loaders/Loader";
+import { IResult } from "@library/result/Result";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import QueryString from "@library/routing/QueryString";
+import { t } from "@library/utility/appUtils";
 import debounce from "lodash/debounce";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import qs from "qs";
+import * as React from "react";
+import { connect } from "react-redux";
+import SearchPagination from "./components/SearchPagination";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ISearchResult } from "@knowledge/@types/api/search";
+import ResultList from "@library/result/ResultList";
+import { ResultMeta } from "@library/result/ResultMeta";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -56,7 +53,6 @@ class SearchForm extends React.Component<IProps, IState> {
         const { device, form } = this.props;
         const isMobile = device === Devices.MOBILE;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const buttons = buttonClasses();
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
                 <VanillaHeader title={t("Search")} />
@@ -82,7 +78,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                         titleAsComponent={t("Search")}
                                         handleOnKeyDown={this.handleKeyDown}
                                         disableAutocomplete={true}
-                                        buttonClassName={buttons.primary}
+                                        buttonBaseClass={ButtonTypes.PRIMARY}
                                     />
                                 </PanelWidget>
                                 {isMobile && (
@@ -182,7 +178,7 @@ class SearchForm extends React.Component<IProps, IState> {
 
                 return (
                     <>
-                        <SearchResults results={this.props.results.data!.map(this.mapResult)} />
+                        <ResultList results={this.props.results.data!.map(this.mapResult)} />
                         <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                     </>
                 );
@@ -200,7 +196,7 @@ class SearchForm extends React.Component<IProps, IState> {
             name: searchResult.name,
             excerpt: searchResult.body,
             meta: (
-                <SearchResultMeta
+                <ResultMeta
                     status={searchResult.status}
                     type={searchResult.recordType}
                     updateUser={searchResult.updateUser!}

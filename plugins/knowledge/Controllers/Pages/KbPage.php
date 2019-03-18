@@ -17,12 +17,13 @@ use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
-use Vanilla\Web\Page;
+use \ThemesApiController;
+use Vanilla\Web\ThemedPage;
 
 /**
  * Base knowledge base page.
  */
-abstract class KbPage extends Page {
+abstract class KbPage extends ThemedPage {
     const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
 
     /** @var \UsersApiController */
@@ -46,29 +47,30 @@ abstract class KbPage extends Page {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
+        ThemesApiController $themesApi,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
-        KnowledgeCategoriesApiController $categoriesApi = null  // Default needed for method extensions
+        KnowledgeCategoriesApiController $categoriesApi = null // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
         $this->categoriesApi = $categoriesApi;
 
         // Shared initialization.
-        $this->initAssets();
         $this->initSharedData();
     }
 
     /**
      * Initialize assets from the asset provide.
      */
-    private function initAssets() {
+    protected function initAssets() {
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts('knowledge'));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets('knowledge'));
+        parent::initAssets();
     }
 
     /** @var array */

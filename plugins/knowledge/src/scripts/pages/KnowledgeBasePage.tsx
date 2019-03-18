@@ -8,12 +8,12 @@ import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowl
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import Loader from "@library/components/Loader";
+import Loader from "@library/loaders/Loader";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
+import { LoadStatus } from "@library/@types/api/core";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {

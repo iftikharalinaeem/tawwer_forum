@@ -6,9 +6,9 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { t } from "@library/application";
-import DocumentTitle from "@library/components/DocumentTitle";
-import VanillaHomeHeader from "@library/components/headers/VanillaHomeHeader";
+import { t } from "@library/utility/appUtils";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import VanillaHomeHeader from "@library/headers/VanillaHomeHeader";
 import { EditorRoute, SearchRoute, DraftsRoute, OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 
 export default class DebugPage extends React.Component {

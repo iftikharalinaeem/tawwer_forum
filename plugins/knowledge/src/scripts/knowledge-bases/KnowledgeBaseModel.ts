@@ -3,14 +3,14 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/state/ReduxReducer";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import { KnowledgeReducer, IStoreState } from "@knowledge/state/model";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { ILoadable, LoadStatus } from "@library/@types/api";
 import { createSelector } from "reselect";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { LoadStatus, ILoadable } from "@library/@types/api/core";
 
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
@@ -24,8 +24,9 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for a list of loaded knowledge bases.
      */
-    public static selectKnowledgeBases = createSelector([KnowledgeBaseModel.selectSelf], selfState =>
-        Object.values(selfState.knowledgeBasesByID.data || {}),
+    public static selectKnowledgeBases = createSelector(
+        [KnowledgeBaseModel.selectSelf],
+        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
     );
 
     public static selectKnowledgeBasesAsNavItems = createSelector(

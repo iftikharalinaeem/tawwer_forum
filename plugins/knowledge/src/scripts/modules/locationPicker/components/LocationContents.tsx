@@ -13,10 +13,10 @@ import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/l
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import Loader from "@library/components/Loader";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import Loader from "@library/loaders/Loader";
 import isEqual from "lodash/isEqual";
 import * as React from "react";
 import { connect } from "react-redux";
@@ -24,9 +24,9 @@ import LocationPickerCategoryItem from "./LocationPickerCategoryItem";
 import LocationPickerItemList from "./LocationPickerItemList";
 import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { loaderClasses } from "@library/styles/loaderStyles";
-import Paragraph from "@library/components/Paragraph";
-import { t } from "@library/application";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import Paragraph from "@library/layout/Paragraph";
+import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
 
 /**
@@ -148,7 +148,9 @@ class LocationContents extends React.Component<IProps> {
             const classesLoader = loaderClasses();
             contents = (
                 <li className={inheritHeightClass()}>
-                    <Loader loaderStyleClass={classesLoader.fullPageLoader} />
+                    <div className={classesLoader.loaderContainer(100)}>
+                        <Loader loaderStyleClass={classesLoader.mediumLoader} />
+                    </div>
                 </li>
             );
         }

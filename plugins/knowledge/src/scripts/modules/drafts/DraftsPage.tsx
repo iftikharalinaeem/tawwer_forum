@@ -4,27 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { t } from "@library/application";
 import DraftsLayout from "@knowledge/modules/drafts/components/DraftsLayout";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import PageLoader from "@library/components/PageLoader";
-import { withDevice } from "@library/contexts/DeviceContext";
-import DocumentTitle from "@library/components/DocumentTitle";
-import { LoadStatus } from "@library/@types/api/core";
-import ModalSizes from "@library/components/modal/ModalSizes";
-import Modal from "@library/components/modal/Modal";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import { RouteComponentProps } from "react-router-dom";
-import { connect } from "react-redux";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
 import apiv2 from "@library/apiv2";
+import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import PageLoader from "@library/routing/PageLoader";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import React from "react";
+import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router-dom";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {}
+        id?: string;
+    }> {}
 
 interface IProps extends IOwnProps, IInjectableDraftsPageProps, IDeviceProps {
     actions: DraftsPageActions;

@@ -4,10 +4,12 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
 import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
+import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { ISearchResponseBody, ISearchRequestBody, ArticleStatus } from "@knowledge/@types/api";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { PublishStatus } from "@library/@types/api/core";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -16,7 +18,7 @@ export interface ISearchFormActionProps {
 /**
  * Action class for the search page/form.
  */
-export default class SearchPageActions extends ReduxActions {
+export default class SearchPageActions extends ReduxActions<IStoreState> {
     // Action constants
     public static readonly GET_SEARCH_REQUEST = "@@searchPage/GET_SEARCH_REQUEST";
     public static readonly GET_SEARCH_RESPONSE = "@@searchPage/GET_SEARCH_RESPONSE";
@@ -79,9 +81,9 @@ export default class SearchPageActions extends ReduxActions {
     public search = async (page?: number, limit?: number) => {
         const form = SearchPageModel.stateSlice(this.getState()).form;
 
-        const statuses = [ArticleStatus.PUBLISHED];
+        const statuses = [PublishStatus.PUBLISHED];
         if (form.includeDeleted) {
-            statuses.push(ArticleStatus.DELETED);
+            statuses.push(PublishStatus.DELETED);
         }
 
         // Convert start/endDate into format for our API.

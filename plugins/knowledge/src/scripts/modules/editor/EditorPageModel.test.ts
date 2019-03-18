@@ -6,11 +6,12 @@
 import { expect } from "chai";
 import { DeepPartial } from "redux";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import EditorPageModel, { IInjectableEditorProps, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IArticleDraftAttrs, Format } from "@knowledge/@types/api";
+import { IArticleDraftAttrs } from "@knowledge/@types/api/article";
+import { Format } from "@knowledge/@types/api/articleRevision";
 
 describe("EditorPageModel", () => {
     describe("getInjectableProps()", () => {

@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@library/components/layouts/PanelLayout";
-import { t } from "@library/application";
-import Heading from "@library/components/Heading";
+import { PanelWidget } from "@library/layout/PanelLayout";
+import { t } from "@library/utility/appUtils";
+import Heading from "@library/layout/Heading";
 import { Link } from "react-router-dom";
 
 export interface IInternalLink {

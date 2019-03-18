@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import { IDeviceProps } from "@library/components/DeviceChecker";
-import { LoadStatus } from "@library/@types/api";
-import PageLoader from "@library/components/PageLoader";
+import { LoadStatus } from "@library/@types/api/core";
+import PageLoader from "@library/routing/PageLoader";
 import SearchForm from "./SearchForm";
+import { IDeviceProps } from "@library/layout/DeviceContext";
 
 interface IProps extends IDeviceProps {}
 

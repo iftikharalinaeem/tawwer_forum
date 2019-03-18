@@ -3,20 +3,18 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import * as React from "react";
-import { t } from "@library/application";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import DropDown from "@library/components/dropdown/DropDown";
-import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
-import ModalConfirm from "@library/components/modal/ModalConfirm";
-import { connect } from "react-redux";
-import { DraftsPage } from "@knowledge/modules/drafts/DraftsPage";
-import DraftsPageModel from "@knowledge/modules/drafts/DraftsPageModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
-import { LoadStatus } from "@library/@types/api";
+import DropDown from "@library/flyouts/DropDown";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import ModalConfirm from "@library/modal/ModalConfirm";
+import { t } from "@library/utility/appUtils";
+import * as React from "react";
+import { connect } from "react-redux";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;
@@ -47,11 +45,12 @@ export class DraftMenu extends React.Component<IProps, IState> {
             <React.Fragment>
                 <DropDown
                     name={t("Draft Options")}
-                    buttonClassName={ButtonBaseClass.CUSTOM}
+                    buttonClassName={ButtonTypes.CUSTOM}
                     renderLeft={true}
                     setExternalButtonRef={this.setButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
                     className="draftPreview-actions"
+                    paddedList={true}
                 >
                     <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
                     <DropDownItemButton

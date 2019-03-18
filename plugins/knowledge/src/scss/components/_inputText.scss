@@ -6,16 +6,10 @@
 
 .inputText {
     @include textInputSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
-    @include standardBorderStyles;
-    @include placeholderStyling {
-        color: $formElement-placeholderColor;
-    }
     display: block;
     position: relative;
     width: 100%;
     vertical-align: middle;
-    color: $formElement_fg;
-    background-color: $formElement_bg;
     padding: $formElement_paddingVertical $formElement_horizontalPadding;
 
     &.isLarge {
@@ -39,7 +33,9 @@
         }
     }
 
-    outline: 0;
+    &:not(.focus-visible) {
+        outline: 0;
+    }
 }
 
 .inputText-inlineLabel {

@@ -1,9 +1,9 @@
+import { IUserFragment } from "@library/@types/api/users";
+
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-
-import { IUserFragment } from "@library/@types/api";
 
 export enum Format {
     TEXT = "text",

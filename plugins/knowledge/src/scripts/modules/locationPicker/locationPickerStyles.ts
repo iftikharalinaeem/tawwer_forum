@@ -5,22 +5,17 @@
  */
 
 import { percent, px } from "csx";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, srOnly } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { unit } from "@library/styles/styleHelpers";
 
-export default function locationPickerClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
+export const locationPickerClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const style = styleFactory("locationPicker");
 
-    const debug = debugHelper("locationPicker");
+    const root = style({});
 
-    const root = style({
-        ...debug.name(),
-    });
-
-    const articlePlaceholder = style({
-        ...debug.name("articlePlaceholder"),
+    const articlePlaceholder = style("articlePlaceholder", {
         display: "block",
         width: percent(100),
         height: px(24),
@@ -51,12 +46,14 @@ export default function locationPickerClasses(theme?: object) {
         },
     });
 
-    const instructions = style({
-        ...debug.name("instructions"),
+    const instructions = style("instructions", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
         fontSize: px(globalVars.fonts.size.medium),
         padding: `${px(8)} ${px(12)}`,
-        borderBottom: `solid 1px ${globalVars.mixBgAndFg(0.15)}`,
         width: percent(100),
+        minHeight: unit(50),
     });
 
     return {
@@ -64,4 +61,4 @@ export default function locationPickerClasses(theme?: object) {
         articlePlaceholder,
         instructions,
     };
-}
+});

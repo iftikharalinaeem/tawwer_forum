@@ -4,10 +4,11 @@
  * @license Proprietary
  */
 
-import { t } from "@library/application";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 
 interface IProps {
     categoryName: string;
@@ -21,12 +22,15 @@ interface IProps {
  */
 export default class LocationPickerItemList extends React.Component<IProps> {
     public render() {
+        const classesFolderContents = folderContentsClasses();
         return (
-            <fieldset id={this.props.id} className={classNames("folderContents")}>
+            <fieldset id={this.props.id} className={classNames("folderContents", classesFolderContents.content)}>
                 <legend ref={this.props.legendRef} tabIndex={-1} className="sr-only">
                     {t("Contents of folder: " + this.props.categoryName)}
                 </legend>
-                <ul className={classNames(inheritHeightClass(), "folderContents-items")}>{this.props.children}</ul>
+                <ul className={classNames(inheritHeightClass(), "folderContents-items", classesFolderContents.items)}>
+                    {this.props.children}
+                </ul>
             </fieldset>
         );
     }

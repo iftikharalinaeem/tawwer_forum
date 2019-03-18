@@ -3,25 +3,25 @@
  * @license Proprietary
  */
 
-import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { reactionClasses } from "@knowledge/modules/article/components/articleReactionStyles";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/application";
-import ButtonLoader from "@library/components/ButtonLoader";
-import Button from "@library/components/forms/Button";
-import Heading from "@library/components/Heading";
-import { checkCompact } from "@library/components/icons";
-import SmartLink from "@library/components/navigation/SmartLink";
-import Paragraph from "@library/components/Paragraph";
-import Translate from "@library/components/translation/Translate";
-import { buttonClasses } from "@library/styles/buttonStyles";
-import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
+import Translate from "@library/content/Translate";
+import UsersModel, { IUsersStoreState } from "@library/features/users/UsersModel";
+import Button from "@library/forms/Button";
+import Heading from "@library/layout/Heading";
+import Paragraph from "@library/layout/Paragraph";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { reactionClasses } from "@knowledge/modules/article/components/articleReactionStyles";
+import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api/article";
+import { checkCompact } from "@library/icons/common";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting } = props;
@@ -91,7 +91,6 @@ function ReactionButton(props: {
 }) {
     const { reactionValue, reactionData, title, isSubmitting, isDisabled, onClick } = props;
     const { userReaction } = reactionData;
-    const classesButton = buttonClasses();
     const styles = reactionClasses();
 
     // Content can be either a checkbox, a loader, or some text.
@@ -104,13 +103,12 @@ function ReactionButton(props: {
     }
     const classes = classNames(
         {
-            [classesButton.primary]: isSubmitting || userReaction === reactionValue,
             [styles.checkedButton]: userReaction === reactionValue,
         },
         styles.votingButton,
     );
     return (
-        <Button disabled={isDisabled} className={classes} onClick={onClick}>
+        <Button baseClass={ButtonTypes.STANDARD} disabled={isDisabled} className={classes} onClick={onClick}>
             {content}
         </Button>
     );

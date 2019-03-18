@@ -4,27 +4,27 @@
  * @license Proprietary
  */
 
-import DateRange from "@knowledge/modules/search/components/DateRange";
 import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
 import SearchPageModel, { ISearchPageState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
-import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/application";
-import ButtonLoader from "@library/components/ButtonLoader";
-import Button from "@library/components/forms/Button";
-import Checkbox from "@library/components/forms/Checkbox";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-import Heading from "@library/components/Heading";
-import RadioButtonsAsTabs from "@library/components/radioButtonsAsTabs/RadioButtonsAsTabs";
-import RadioButtonTab from "@library/components/radioButtonsAsTabs/RadioButtonTab";
-import MultiUserInput from "@library/users/MultiUserInput";
-import Permission from "@library/users/Permission";
+import { LoadStatus } from "@library/@types/api/core";
+import { t } from "@library/utility/appUtils";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import Button from "@library/forms/Button";
+import Checkbox from "@library/forms/Checkbox";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import Heading from "@library/layout/Heading";
+import RadioTabs from "@library/forms/radioTabs/RadioTabs";
+import RadioButtonTab from "@library/forms/radioTabs/RadioTab";
+import MultiUserInput from "@library/features/users/MultiUserInput";
+import Permission from "@library/features/users/Permission";
 import * as React from "react";
 import { connect } from "react-redux";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import classNames from "classnames";
-import { dateRangeClasses } from "@library/styles/dateRangeStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { dateRangeClasses } from "@library/forms/dateRangeStyles";
+import DateRange from "@library/forms/DateRange";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -44,7 +44,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                 {!this.props.hideTitle && (
                     <Heading className="advancedSearch-title pageSubTitle" title={t("Filter Results")} />
                 )}
-                <RadioButtonsAsTabs
+                <RadioTabs
                     accessibleTitle={t("Search in:")}
                     prefix="advancedSearchDomain"
                     setData={this.handleDomainChange}
@@ -53,7 +53,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                 >
                     <RadioButtonTab label={t("Articles")} data={SearchDomain.ARTICLES} />
                     <RadioButtonTab label={t("Everywhere")} data={SearchDomain.EVERYWHERE} />
-                </RadioButtonsAsTabs>
+                </RadioTabs>
                 <InputTextBlock
                     label={t("Title")}
                     inputProps={{

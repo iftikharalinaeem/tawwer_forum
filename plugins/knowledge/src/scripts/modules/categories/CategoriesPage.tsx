@@ -4,22 +4,22 @@
  * @license Proprietary
  */
 
-import { IArticleFragment, IKbCategory } from "@knowledge/@types/api";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
-import { IResult } from "@knowledge/modules/common/SearchResult";
-import { SearchResultMeta } from "@knowledge/modules/common/SearchResultMeta";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import DocumentTitle from "@library/components/DocumentTitle";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { IArticleFragment } from "@knowledge/@types/api/article";
+import { IResult } from "@library/result/Result";
+import { ResultMeta } from "@library/result/ResultMeta";
 
 /**
  * Page component for a flat category list.
@@ -127,7 +127,7 @@ export class CategoriesPage extends React.Component<IProps> {
     private mapArticleToResult(article: IArticleFragment): IResult {
         return {
             name: article.name || "",
-            meta: <SearchResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
+            meta: <ResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
             url: article.url,
             excerpt: article.excerpt || "",
             attachments: [],

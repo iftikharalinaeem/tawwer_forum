@@ -3,24 +3,23 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-import { IArticle } from "@knowledge/@types/api";
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import Breadcrumbs from "@library/components/Breadcrumbs";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import VanillaHeader from "@library/components/headers/VanillaHeader";
-import Container from "@library/components/layouts/components/Container";
-import PanelLayout, { PanelWidget } from "@library/components/layouts/PanelLayout";
-import UserContent from "@library/components/UserContent";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import Container from "@library/layout/components/Container";
+import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import UserContent from "@library/content/UserContent";
 import * as React from "react";
-import NextPrevious from "@library/components/nextPrevious/NextPrevious";
-import { t } from "@library/application";
-import { withDevice } from "@library/contexts/DeviceContext";
+import NextPrevious from "@library/navigation/NextPrevious";
+import { t } from "@library/utility/appUtils";
+import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
+import { IArticle } from "@knowledge/@types/api/article";
 
 /**
  * Implements the article's layout

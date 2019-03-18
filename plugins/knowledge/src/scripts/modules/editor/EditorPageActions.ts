@@ -4,31 +4,30 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import {
-    IPostArticleResponseBody,
-    IPostArticleRequestBody,
-    IGetArticleResponseBody,
-    IPatchArticleRequestBody,
-    IPatchArticleResponseBody,
-    IResponseArticleDraft,
-    Format,
-    IArticle,
-} from "@knowledge/@types/api";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { History } from "history";
 import qs from "qs";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import uniqueId from "lodash/uniqueId";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import isEqual from "lodash/isEqual";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import {
+    IPostArticleResponseBody,
+    IResponseArticleDraft,
+    IPostArticleRequestBody,
+    IPatchArticleRequestBody,
+    IArticle,
+    IGetArticleResponseBody,
+} from "@knowledge/@types/api/article";
+import { Format } from "@knowledge/@types/api/articleRevision";
 
-export default class EditorPageActions extends ReduxActions {
+export default class EditorPageActions extends ReduxActions<IStoreState> {
     // API actions
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
@@ -160,7 +159,7 @@ export default class EditorPageActions extends ReduxActions {
     }
 
     private getInitialRecordForEdit(): ILocationPickerRecord | null {
-        const { article, form } = this.getState<IStoreState>().knowledge.editorPage;
+        const { article, form } = this.getState().knowledge.editorPage;
         const kbID = article.data ? article.data.knowledgeBaseID : null;
         if (kbID == null) {
             return null;
@@ -188,7 +187,7 @@ export default class EditorPageActions extends ReduxActions {
      * Synchronize the current editor draft state to the server.
      */
     public async syncDraft(newDraftID: string = uniqueId()) {
-        const state = this.getState<IStoreState>();
+        const state = this.getState();
         const { form, article, draft, isDirty } = state.knowledge.editorPage;
 
         if (!isDirty) {
@@ -234,7 +233,7 @@ export default class EditorPageActions extends ReduxActions {
      * @param history History object for redirecting.
      */
     public async publish(history: History) {
-        const editorState = this.getState<IStoreState>().knowledge.editorPage;
+        const editorState = this.getState().knowledge.editorPage;
         // We don't have an article so go create one.
         const draft = editorState.draft;
         const request: IPostArticleRequestBody = {

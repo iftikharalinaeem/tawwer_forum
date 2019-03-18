@@ -5,8 +5,8 @@
 
 import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
-import { IApiError, LoadStatus } from "@library/@types/api";
-import ReduxActions, { bindThunkAction } from "@library/state/ReduxActions";
+import { IApiError, LoadStatus } from "@library/@types/api/core";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 
@@ -15,7 +15,7 @@ const createAction = actionCreatorFactory("@@navigation");
 /**
  * Redux actions for knowledge base navigation data.
  */
-export default class NavigationActions extends ReduxActions {
+export default class NavigationActions extends ReduxActions<IStoreState> {
     public static getNavigationFlatACs = createAction.async<
         { knowledgeBaseID: number },
         IKbNavigationItem[],
@@ -28,7 +28,7 @@ export default class NavigationActions extends ReduxActions {
      * @param options Parameters for the request.
      */
     public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
-        const state = this.getState<IStoreState>();
+        const state = this.getState();
         const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
         if (!forceUpdate && fetchStatus === LoadStatus.SUCCESS) {
             return;
@@ -63,7 +63,7 @@ export default class NavigationActions extends ReduxActions {
      * @param patchItems Patch request parameters.
      */
     public patchNavigationFlat = (knowledgeBaseID: number) => {
-        const patchItems = this.getState<IStoreState>().knowledge.navigation.patchItems;
+        const patchItems = this.getState().knowledge.navigation.patchItems;
         const params = {
             transactionID: uniqueId("patchNav"),
             patchItems,
