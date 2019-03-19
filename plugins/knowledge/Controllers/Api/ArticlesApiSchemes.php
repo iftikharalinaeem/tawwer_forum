@@ -56,6 +56,7 @@ trait ArticlesApiSchemes {
                     "name?",
                     "locale?",
                     "sort?",
+                    "discussionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -311,6 +312,10 @@ trait ArticlesApiSchemes {
             "excerpt:s?" => [
                 "allowNull" => true,
                 "description" => "Plain-text excerpt of the current article body.",
+            ],
+            "discussionID:i?" => [
+                "allowNull" => false,
+                "description" => "Discussion ID to link article url as discussion canonical url.",
             ],
             "outline:a?" => Schema::parse([
                 'ref:s' => 'Heading blot reference id. Ex: #title',

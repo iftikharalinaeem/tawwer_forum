@@ -29,6 +29,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
 use Vanilla\Models\ReactionOwnerModel;
+use DiscussionsApiController;
 
 /**
  * API controller for managing the articles resource.
@@ -63,6 +64,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ReactionOwnerModel */
     private $reactionOwnerModel;
 
+    /** @var DiscussionsApiController */
+    private $discussionApi;
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -90,6 +94,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param FormatService $formatService
      * @param MediaModel $mediaModel
+     * @param DiscussionsApiController $discussionApi
      * @param SessionInterface $sessionInterface
      * @param BreadcrumbModel $breadcrumbModel
      */
@@ -106,6 +111,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         KnowledgeBaseModel $knowledgeBaseModel,
         FormatService $formatService,
         MediaModel $mediaModel,
+        DiscussionsApiController $discussionApi,
         SessionInterface $sessionInterface,
         BreadcrumbModel $breadcrumbModel
     ) {
@@ -118,6 +124,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->reactionOwnerModel = $reactionOwnerModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->discussionApi = $discussionApi;
         $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
 
@@ -921,6 +928,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
             $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);
+        }
+
+        if ($fields['discussionID'] ?? false) {
+            // canonicalize discussion
+            $article = $this->articleModel->getIDWithRevision($articleID);
+            $articleUrl = $this->articleModel->url($article);
+            $this->discussionApi->put_canonical($fields['discussionID'], ['canonicalUrl' => $articleUrl]);
         }
 
         if (array_key_exists("draftID", $fields)) {
