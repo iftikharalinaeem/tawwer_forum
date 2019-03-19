@@ -14,6 +14,7 @@ use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Sitemaps\Robots;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -110,6 +111,15 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function base_afterDiscussionFilters_handler($sender) {
         echo '<li class="Knowledge">'.anchor(t('Help'), '/kb').'</li> ';
+    }
+
+    /**
+     * Add knowledge base sitemap-index to robots.txt
+     *
+     * @param Robots $robots
+     */
+    public function robots_init(Robots $robots) {
+        $robots->addSitemap('kb/sitemap-index.xml');
     }
 
     /**
