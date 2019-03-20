@@ -14,7 +14,7 @@ use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Sitemaps\Robots;
+use Vanilla\Sitemap\Robots;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
