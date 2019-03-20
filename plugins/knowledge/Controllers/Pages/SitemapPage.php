@@ -18,10 +18,10 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
  */
 class SitemapPage extends KbPage {
     const LIMIT_INDEX_KB = 500;
-    const LIMIT_ARTICLE = 2;
+    const LIMIT_ARTICLE = 200;
 
     //  KB_SITEMAP_FILENAME should be just /kb/sitemap.xml
-    const KB_SITEMAP_URL = '/kb/sitemap-kb/xml';
+    const KB_SITEMAP_URL = '/kb/sitemap-kb.xml';
 
     /** @var KnowledgeBasePage */
     private $knowledgeBasePage;
@@ -86,7 +86,10 @@ class SitemapPage extends KbPage {
                 }
             }
         }
-        return new Data($this->renderKbView('seo/pages/sitemap-index.twig', ['sitemaps' => $data]));
+        return new Data(
+            $this->renderKbView('seo/pages/sitemap-index.twig', ['sitemaps' => $data]),
+            ['CONTENT_TYPE' => 'text/xml;charset=UTF-8']
+        );
     }
 
     /**
@@ -129,6 +132,7 @@ class SitemapPage extends KbPage {
             }
         }
         $kbCategories = array_column($this->knowledgeCategoryModel->get($kbWhere, ['select' => ['knowledgeCategoryID']]), 'knowledgeCategoryID');
+
         $articles = $this->articleModel->getWithRevision(
             [
                 'a.knowledgeCategoryID' => $kbCategories,
@@ -140,6 +144,9 @@ class SitemapPage extends KbPage {
             $article['url'] = $this->articleModel->url($article);
             $article['dateUpdated'] = $article['dateUpdated']->format('c');
         }
-        return new Data($this->renderKbView('seo/pages/sitemap.twig', ['pages' => $articles]));
+        return new Data(
+            $this->renderKbView('seo/pages/sitemap.twig', ['pages' => $articles]),
+            ['CONTENT_TYPE' => 'text/xml;charset=UTF-8']
+        );
     }
 }
