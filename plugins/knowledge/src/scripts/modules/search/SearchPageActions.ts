@@ -118,6 +118,11 @@ export default class SearchPageActions extends ReduxActions<IStoreState> {
             query.categoryIDs = [parseInt(categoryID, 10)];
         }
 
+        if (form.kb) {
+            const knowledgeBaseID = form.kb.value.toString();
+            query.knowledgeBaseID = parseInt(knowledgeBaseID, 10);
+        }
+
         const requestOptions: ISearchRequestBody = {
             ...query,
             updateUserIDs: form.authors.map(author => author.value as number),

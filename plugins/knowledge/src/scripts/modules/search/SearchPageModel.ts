@@ -44,7 +44,7 @@ export interface ISearchFormState {
     startDate: string | undefined;
     endDate: string | undefined;
     includeDeleted: boolean;
-    kb?: null;
+    kb: IComboBoxOption | undefined;
 }
 
 export interface ISearchPageState {
@@ -63,7 +63,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         startDate: undefined,
         endDate: undefined,
         includeDeleted: false,
-        kb: null,
+        kb: undefined,
         communityCategory: undefined,
     };
 

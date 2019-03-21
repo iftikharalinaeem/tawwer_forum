@@ -26,6 +26,7 @@ import { buttonClasses } from "@library/forms/buttonStyles";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import DateRange from "@library/forms/DateRange";
 import CommunityCategoryInput from "@vanilla/forms/CommunityCategoryInput";
+import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -65,10 +66,16 @@ export class AdvancedSearch extends React.Component<IProps> {
                 <MultiUserInput onChange={this.handleUserChange} value={this.props.form.authors} />
                 {this.props.form.domain === SearchDomain.EVERYWHERE && (
                     <CommunityCategoryInput
+                        className="inputBlock"
                         onChange={this.handleCommunityCategoryChange}
                         value={this.props.form.communityCategory}
                     />
                 )}
+                <KnowledgeBaseInput
+                    className="inputBlock"
+                    onChange={this.handleKnowledgeBaseChange}
+                    value={this.props.form.kb}
+                />
                 <DateRange
                     onStartChange={this.handleStartDateChange}
                     onEndChange={this.handleEndDateChange}
@@ -138,6 +145,15 @@ export class AdvancedSearch extends React.Component<IProps> {
      */
     private handleCommunityCategoryChange = (option: IComboBoxOption) => {
         this.props.searchActions.updateForm({ communityCategory: option });
+    };
+
+    /**
+     * Handle changes to the Knowledge Base filter.
+     *
+     * @param option New value for the filter.
+     */
+    private handleKnowledgeBaseChange = (option: IComboBoxOption) => {
+        this.props.searchActions.updateForm({ kb: option });
     };
 
     /**
