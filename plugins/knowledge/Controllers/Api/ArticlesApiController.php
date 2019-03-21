@@ -934,7 +934,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             // canonicalize discussion
             $article = $this->articleModel->getIDWithRevision($articleID);
             $articleUrl = $this->articleModel->url($article);
-            $this->discussionApi->put_canonical($fields['discussionID'], ['canonicalUrl' => $articleUrl]);
+            $this->discussionApi->put_canonicalUrl($fields['discussionID'], ['canonicalUrl' => $articleUrl]);
         }
 
         if (array_key_exists("draftID", $fields)) {
