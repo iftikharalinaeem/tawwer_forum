@@ -25,6 +25,7 @@ import classNames from "classnames";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import DateRange from "@library/forms/DateRange";
+import CommunityCategoryInput from "@vanilla/forms/CommunityCategoryInput";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -62,6 +63,12 @@ export class AdvancedSearch extends React.Component<IProps> {
                     }}
                 />
                 <MultiUserInput onChange={this.handleUserChange} value={this.props.form.authors} />
+                {this.props.form.domain === SearchDomain.EVERYWHERE && (
+                    <CommunityCategoryInput
+                        onChange={this.handleCommunityCategoryChange}
+                        value={this.props.form.communityCategory}
+                    />
+                )}
                 <DateRange
                     onStartChange={this.handleStartDateChange}
                     onEndChange={this.handleEndDateChange}
@@ -122,6 +129,15 @@ export class AdvancedSearch extends React.Component<IProps> {
      */
     private handleUserChange = (options: IComboBoxOption[]) => {
         this.props.searchActions.updateForm({ authors: options });
+    };
+
+    /**
+     * Handle changes to the Community Category filter.
+     *
+     * @param option New value for the filter.
+     */
+    private handleCommunityCategoryChange = (option: IComboBoxOption) => {
+        this.props.searchActions.updateForm({ communityCategory: option });
     };
 
     /**
