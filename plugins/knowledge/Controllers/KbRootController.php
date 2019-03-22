@@ -88,7 +88,6 @@ class KbRootController extends PageDispatchController {
             $page = $this->usePage(SitemapPage::class);
             return $page->sitemap($args);
         } else {
-            die(__FUNCTION__.':'.__LINE__);
             return $this->get('/sitemap'.$path);
         }
     }
