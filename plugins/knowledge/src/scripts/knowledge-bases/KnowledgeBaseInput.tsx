@@ -22,7 +22,7 @@ export class KnowledgeBaseInput extends React.Component<ISelectOneProps> {
     };
 
     public render() {
-        return <SelectOne {...this.props} />;
+        return <SelectOne {...this.props} placeholder="" />;
     }
 }
 
