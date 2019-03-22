@@ -24,6 +24,7 @@ use Vanilla\Web\ThemedPage;
  * Base knowledge base page.
  */
 abstract class KbPage extends ThemedPage {
+    const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
 
     /** @var \UsersApiController */
     protected $usersApi;
@@ -127,7 +128,7 @@ abstract class KbPage extends ThemedPage {
      * @return string The rendered view.
      */
     protected function renderKbView(string $path, array $data): string {
-        return $this->renderTwig('plugins/knowledge/views/' . $path, $data);
+        return $this->renderTwig(self::TWIG_VIEWS_PATH . $path, $data);
     }
 
 

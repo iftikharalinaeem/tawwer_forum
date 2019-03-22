@@ -7,12 +7,14 @@
 
 namespace Vanilla\Knowledge;
 
+use Gdn_Router as Router;
 use Garden\Container\Reference;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Web\Robots;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -22,14 +24,22 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var Router */
+    private $router;
+
     /**
      * KnowledgePlugin constructor.
      *
      * @param \Gdn_Database $database
+     * @param Router $router
      */
-    public function __construct(\Gdn_Database $database) {
+    public function __construct(
+        \Gdn_Database $database,
+        Router $router
+    ) {
         parent::__construct();
         $this->database = $database;
+        $this->router = $router;
     }
 
     /**
@@ -104,9 +114,30 @@ class KnowledgePlugin extends \Gdn_Plugin {
     }
 
     /**
+     * Add knowledge base sitemap-index to robots.txt
+     *
+     * @param Robots $robots
+     */
+    public function robots_init(Robots $robots) {
+        $robots->addSitemap('kb/sitemap-index.xml');
+    }
+
+    /**
      * Ensure the database is configured.
      */
     public function structure() {
+        $this->router->setRoute(
+            "kb/sitemap-kb\\.xml(\\.*)",
+            "/kb/sitemap-kb/xml$1",
+            "Internal"
+        );
+        $this->router->setRoute(
+            "kb/sitemap-index\\.xml",
+            "/kb/sitemap-index/xml",
+            "Internal"
+        );
+
+
         $this->database->structure()
             ->table("article")
             ->primaryKey("articleID")

@@ -287,12 +287,37 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$article[$this->pk]}/react",
             ['helpful' => 'yes']
         )->getBody();
-        //die(print_r($body));
+
         $this->assertEquals($article['name'], $body['name']);
         $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
         $this->assertEquals(1, $body['reactions'][0]['yes']);
         $this->assertEquals(0, $body['reactions'][0]['no']);
         $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
+     * Test POST /articles when DiscussionID provided
+     * to set discussion canonical link to the article created
+     */
+    public function testPostDiscussionCanonical() {
+
+        $discussion = $this->api()->post(
+            '/discussions',
+            [
+                'categoryID' => -1,
+                'name' => 'test discussion',
+                'body' => 'Hello world!',
+                'format' => 'markdown'
+            ]
+        )->getBody();
+        $record = $this->record();
+        $record['discussionID'] = $discussion['discussionID'];
+        $article = $this->api()->post($this->baseUrl, $record)->getBody();
+
+        $discussionUpdated = $this->api()->get(
+            '/discussions/'.$discussion['discussionID']
+        )->getBody();
+        $this->assertStringEndsWith($article['url'], $discussionUpdated['canonicalUrl']);
     }
 
     /**

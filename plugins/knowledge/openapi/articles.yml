@@ -883,6 +883,10 @@ components:
           description: Manual sort order of the article.
           nullable: true
           type: integer
+        discussionID:
+          description: Discussion ID to link article url as discussion canonical url.
+          nullable: false
+          type: integer
       required:
       - knowledgeCategoryID
       type: object
