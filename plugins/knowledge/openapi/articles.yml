@@ -1037,3 +1037,6 @@ components:
         format:
           description: Post format.
           type: string
+        url:
+          description: Full URL to the answer.
+          type: string

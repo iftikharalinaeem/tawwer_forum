@@ -95,6 +95,7 @@ class DiscussionArticleModel {
                 $result[] = [
                     "body" => $this->discriminateBody($comment, $commentRaw),
                     "format" => $commentRaw["format"],
+                    "url" => $comment["url"],
                 ];
             }
         }
