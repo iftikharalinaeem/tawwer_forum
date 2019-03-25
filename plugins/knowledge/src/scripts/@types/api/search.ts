@@ -41,6 +41,7 @@ export interface ISearchRequestBody {
     expand?: string[];
     page?: number;
     limit?: number;
+    categoryIDs?: number[];
 }
 
 export type ISearchResponseBody = ISearchResult[];
