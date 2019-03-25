@@ -30,6 +30,7 @@ use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
 use Vanilla\Models\ReactionOwnerModel;
 use DiscussionsApiController;
+use Vanilla\Knowledge\Models\DiscussionArticleModel;
 
 /**
  * API controller for managing the articles resource.
@@ -79,6 +80,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var DiscussionArticleModel */
+    private $discussionArticleModel;
+
     /**
      * ArticlesApiController constructor
      *
@@ -113,7 +117,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         MediaModel $mediaModel,
         DiscussionsApiController $discussionApi,
         SessionInterface $sessionInterface,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        DiscussionArticleModel $discussionArticleModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -127,6 +132,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->discussionApi = $discussionApi;
         $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->discussionArticleModel = $discussionArticleModel;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -411,6 +417,29 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $result = $out->validate($rows);
         return new \Garden\Web\Data($result, ["paging" => $paging]);
+    }
+
+    /**
+     * Get a community discussion in a format that is easy to consume when creating a new article.
+     *
+     * @param array $query Request query.
+     */
+    public function index_fromDiscussion(array $query) {
+        $this->permission("knowledge.articles.add");
+
+        $in = $this->schema([
+            "discussionID" => [
+                "description" => "Unique identifier for the community discussion.",
+                "type" => "integer",
+            ]
+        ], "in");
+        $out = $this->discussionArticleSchema("out");
+
+        $query = $in->validate($query);
+        $article = $this->discussionArticleModel->discussionData($query["discussionID"]);
+
+        $result = $out->validate($article);
+        return $result;
     }
 
     /**

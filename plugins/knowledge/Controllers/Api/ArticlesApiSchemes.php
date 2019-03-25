@@ -39,6 +39,59 @@ trait ArticlesApiSchemes {
     /** @var Schema */
     private $articleDraftBodySchema;
 
+    /** @var Schema */
+    private $discussionArticleSchema;
+
+    /**
+     * Get a schema representing a discussion in an easy-to-consume format for creating an article.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function discussionArticleSchema(string $type = ""): Schema {
+        if ($this->discussionArticleSchema === null) {
+            $this->discussionArticleSchema = $this->schema(
+                Schema::parse([
+                    "body" => [
+                        "description" => "Full discussion body contents.",
+                        "type" => ["array", "string"],
+                    ],
+                    "format" => [
+                        "description" => "Post format.",
+                        "type" => "string",
+                    ],
+                    "url" => [
+                        "description" => "Full URL to the discussion.",
+                        "type" => "string",
+                    ],
+                    "acceptedAnswers?" => [
+                        "items" => [
+                            "type" => "object",
+                            "properties" => [
+                                "body" => [
+                                    "type" => ["array", "string"],
+                                    "description" => "Full answer body contents.",
+                                ],
+                                "format" => [
+                                    "description" => "Answer post format.",
+                                    "type" => "string",
+                                ],
+                                "url" => [
+                                    "description" => "Full URL to the answer.",
+                                    "type" => "string",
+                                ],
+                            ],
+                        ],
+                        "type" => "array",
+                    ]
+                ]),
+                "DiscussionArticle"
+            );
+        }
+
+        return $this->schema($this->discussionArticleSchema, $type);
+
+    }
 
     /**
      * Get an article schema with minimal add/edit fields.
