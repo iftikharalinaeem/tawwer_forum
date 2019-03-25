@@ -1676,8 +1676,7 @@ EOT
      * @param array $args
      */
     private function ideaQueryFiltering($sender, $args) {
-        $filters = $sender->getFilters();
-        if (isset($args['Wheres']['td.TagID']) || isset($filters)) {
+        if (isset($args['Wheres']['td.TagID'])) {
             $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID", 'inner');
         }
     }
