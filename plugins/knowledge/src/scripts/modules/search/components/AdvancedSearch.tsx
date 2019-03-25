@@ -71,11 +71,13 @@ export class AdvancedSearch extends React.Component<IProps> {
                         value={this.props.form.communityCategory}
                     />
                 )}
-                <KnowledgeBaseInput
-                    className="inputBlock"
-                    onChange={this.handleKnowledgeBaseChange}
-                    value={this.props.form.kb}
-                />
+                {this.props.form.domain === SearchDomain.ARTICLES && (
+                    <KnowledgeBaseInput
+                        className="inputBlock"
+                        onChange={this.handleKnowledgeBaseChange}
+                        value={this.props.form.kb}
+                    />
+                )}
                 <DateRange
                     onStartChange={this.handleStartDateChange}
                     onEndChange={this.handleEndDateChange}
