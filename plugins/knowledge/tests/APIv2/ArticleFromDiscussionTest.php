@@ -9,7 +9,7 @@ namespace VanillaTests\APIv2;
 /**
  * Test translating community data into a format that can easily be used to create knowledge base data.
  */
-class ArticleFromDiscussionTest extends AbstractResourceTest {
+class ArticleFromDiscussionTest extends AbstractAPIv2Test {
 
     /**
      * This method is called before the first test of this test class is run.
