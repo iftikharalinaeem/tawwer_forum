@@ -688,18 +688,7 @@ paths:
           content:
             "application/json":
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/DiscussionArticle"
-                  - $ref: "#/components/schemas/DiscussionArticleRich"
-                discriminator:
-                  propertyName: format
-                  mapping:
-                    BBCode: "#/components/schemas/DiscussionArticle"
-                    Html: "#/components/schemas/DiscussionArticle"
-                    Markdown: "#/components/schemas/DiscussionArticle"
-                    Rich: "#/components/schemas/DiscussionArticleRich"
-                    Text: "#/components/schemas/DiscussionArticle"
-                    Wysiwyg: "#/components/schemas/DiscussionArticle"
+                $ref: "#/components/schemas/DiscussionArticle"
           description: Success
       tags:
         - Articles
@@ -1016,24 +1005,35 @@ components:
       properties:
         acceptedAnswers:
           items:
-            type: object
+            $ref: "#/components/schemas/DiscussionArticleAnswer"
           type: array
         body:
-          description: Full discussion body contents.
-          type: string
+          barf: two
+          oneOf:
+            - description: Rendered discussion body contents.
+              type: string
+            - description: Rich format operations for the discussion body contents.
+              type: array
+              items:
+                type: object
         format:
           description: Post format.
           type: string
         url:
           description: Full URL to the discussion.
           type: string
-    DiscussionArticleRich:
-      allOf:
-        - $ref: "#/components/schemas/DiscussionArticle"
-        - type: object
-          properties:
-            body:
-              description: Full discussion body contents.
+    DiscussionArticleAnswer:
+      type: object
+      properties:
+        body:
+          barf: two
+          oneOf:
+            - description: Rendered answer body contents.
+              type: string
+            - description: Rich format operations for the answer body contents.
+              type: array
               items:
                 type: object
-              type: array
+        format:
+          description: Post format.
+          type: string
