@@ -90,7 +90,6 @@ trait ArticlesApiSchemes {
         }
 
         return $this->schema($this->discussionArticleSchema, $type);
-
     }
 
     /**

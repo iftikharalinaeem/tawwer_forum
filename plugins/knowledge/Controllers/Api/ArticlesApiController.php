@@ -101,6 +101,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param DiscussionsApiController $discussionApi
      * @param SessionInterface $sessionInterface
      * @param BreadcrumbModel $breadcrumbModel
+     * @param DiscussionArticleModel $discussionArticleModel
      */
     public function __construct(
         ArticleModel $articleModel,
