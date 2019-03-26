@@ -39,11 +39,12 @@ export interface ISearchFormState {
     title: string;
     domain: SearchDomain;
     authors: IComboBoxOption[];
+    communityCategory: IComboBoxOption | undefined;
     fileName: string;
     startDate: string | undefined;
     endDate: string | undefined;
     includeDeleted: boolean;
-    kb?: null;
+    kb: IComboBoxOption | undefined;
 }
 
 export interface ISearchPageState {
@@ -53,7 +54,7 @@ export interface ISearchPageState {
 }
 
 export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
-    public static readonly INITIAL_FORM = {
+    public static readonly INITIAL_FORM: ISearchFormState = {
         query: "",
         title: "",
         domain: SearchDomain.ARTICLES,
@@ -62,7 +63,8 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         startDate: undefined,
         endDate: undefined,
         includeDeleted: false,
-        kb: null,
+        kb: undefined,
+        communityCategory: undefined,
     };
 
     public static mapStateToProps(state: IStoreState): ISearchPageState {
