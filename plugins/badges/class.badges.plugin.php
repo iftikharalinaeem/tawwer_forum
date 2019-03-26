@@ -4,12 +4,21 @@
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @package Badges
  */
+use \Garden\Container\Reference;
+use Vanilla\Menu\CounterModel;
+use Vanilla\Badges\Menu\BadgesCounterProvider;
 
 /**
  * Places badges hooks into other applications.
  */
 class BadgesHooks extends Gdn_Plugin {
-
+    /**
+     * @param \Garden\Container\Container $container
+     */
+    public function container_init(\Garden\Container\Container $container) {
+        $container->rule(CounterModel::class)
+            ->addCall('addProvider', [new Reference(BadgesCounterProvider::class)]);
+    }
     /**
      * Allow badge syncing from hub.
      *
