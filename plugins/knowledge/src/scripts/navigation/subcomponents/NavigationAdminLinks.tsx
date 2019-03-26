@@ -28,7 +28,7 @@ export default class NavigationAdminLinks extends React.Component<IProps> {
             <Permission permission="moderation.manage">
                 <ul className={classNames("siteNavAdminLinks", this.props.className, classes.root)}>
                     {this.props.showDivider && (
-                        <hr className={classNames("siteNavAdminLinks-divider", classes.divider)} />
+                        <hr role="separator" className={classNames("siteNavAdminLinks-divider", classes.divider)} />
                     )}
                     <h3 className="sr-only">{t("Admin Links")}</h3>
                     <li className={classNames("siteNavAdminLinks-item", classes.item)}>

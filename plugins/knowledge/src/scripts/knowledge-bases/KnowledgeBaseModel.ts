@@ -24,9 +24,8 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for a list of loaded knowledge bases.
      */
-    public static selectKnowledgeBases = createSelector(
-        [KnowledgeBaseModel.selectSelf],
-        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
+    public static selectKnowledgeBases = createSelector([KnowledgeBaseModel.selectSelf], selfState =>
+        Object.values(selfState.knowledgeBasesByID.data || {}),
     );
 
     public static selectKnowledgeBasesAsNavItems = createSelector(

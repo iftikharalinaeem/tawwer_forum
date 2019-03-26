@@ -73,7 +73,7 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
                         <span className="navigationManagerToolbar-buttonLabel">{t("New Category")}</span>
                     </Button>
                 </div>
-                <hr className="navigationManagerToolbar-separator" />
+                <hr role="separator" className="navigationManagerToolbar-separator" />
             </div>
         );
     }
