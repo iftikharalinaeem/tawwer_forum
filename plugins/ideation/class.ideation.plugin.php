@@ -1628,7 +1628,7 @@ EOT
             $openTags[] = val('TagID', $openStatus);
         }
         DiscussionModel::addFilter('open', t('Open'),
-            ['d.Tags' => $openTags], 'state', 'status'
+            ['td.TagID' => $openTags], 'state', 'status'
         );
 
         // Closed state
@@ -1638,14 +1638,46 @@ EOT
             $closedTags[] = val('TagID', $closedStatus);
         }
         DiscussionModel::addFilter('closed', t('Closed'),
-            ['d.Tags' => $closedTags], 'state', 'status'
+            ['td.TagID' => $closedTags], 'state', 'status'
         );
 
         // Statuses
         foreach(StatusModel::instance()->getStatuses() as $status) {
             DiscussionModel::addFilter(strtolower(val('Name', $status)).'-status' , val('Name', $status),
-                ['d.Tags' => val('TagID', $status)], 'status', 'status'
+                ['td.TagID' => val('TagID', $status)], 'status', 'status'
             );
+        }
+    }
+
+    /**
+     * Update Discussion query to when filtering by idea statuses.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGet_handler($sender, $args) {
+        $this->ideaQueryFiltering($sender, $args);
+    }
+
+    /**
+     * Update Discussion query to when filtering by idea statuses.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGetCount_handler($sender, $args) {
+        $this->ideaQueryFiltering($sender, $args);
+    }
+
+    /**
+     * Join TagDiscussion table filtering idea statuses. 
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    private function ideaQueryFiltering($sender, $args) {
+        if (isset($args['Wheres']['td.TagID'])) {
+            $sender->SQL->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID", 'inner');
         }
     }
 
