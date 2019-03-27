@@ -4,40 +4,42 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
-import apiv2 from "@library/apiv2";
-import actionCreatorFactory from "typescript-fsa";
-import { IStoreState } from "@knowledge/state/model";
 import {
     IArticle,
     IArticleFragment,
-    IPatchArticleStatusResponseBody,
-    IPatchArticleStatusRequestBody,
-    IGetArticleResponseBody,
-    IGetArticleRequestBody,
-    IGetArticleDraftsResponse,
-    IGetArticleDraftsRequest,
-    IGetArticleDraftResponse,
-    IGetArticleDraftRequest,
-    IPostArticleResponseBody,
-    IPostArticleRequestBody,
-    IPostArticleDraftResponse,
-    IPostArticleDraftRequest,
-    IPatchArticleDraftResponse,
-    IPatchArticleDraftRequest,
-    IDeleteArticleDraftResponse,
     IDeleteArticleDraftRequest,
-    IPatchArticleResponseBody,
+    IDeleteArticleDraftResponse,
+    IGetArticleDraftRequest,
+    IGetArticleDraftResponse,
+    IGetArticleDraftsRequest,
+    IGetArticleDraftsResponse,
+    IGetArticleFromDiscussionRequest,
+    IGetArticleFromDiscussionResponse,
+    IGetArticleRequestBody,
+    IGetArticleResponseBody,
+    IPatchArticleDraftRequest,
+    IPatchArticleDraftResponse,
     IPatchArticleRequestBody,
+    IPatchArticleResponseBody,
+    IPatchArticleStatusRequestBody,
+    IPatchArticleStatusResponseBody,
+    IPostArticleDraftRequest,
+    IPostArticleDraftResponse,
+    IPostArticleRequestBody,
+    IPostArticleResponseBody,
 } from "@knowledge/@types/api/article";
-import { IApiError, IApiResponse } from "@library/@types/api/core";
 import {
-    IGetArticleRevisionsResponseBody,
     IGetArticleRevisionsRequestBody,
-    IGetRevisionResponseBody,
+    IGetArticleRevisionsResponseBody,
     IGetRevisionRequestBody,
+    IGetRevisionResponseBody,
 } from "@knowledge/@types/api/articleRevision";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { IStoreState } from "@knowledge/state/model";
+import { IApiError, IApiResponse } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
+import actionCreatorFactory from "typescript-fsa";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -220,6 +222,21 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
                 identifier,
             },
         );
+    }
+
+    public static getFromDiscussionACs = createAction.async<
+        IGetArticleFromDiscussionRequest,
+        IGetArticleFromDiscussionResponse,
+        IApiError
+    >("GET_FROM_DISCUSSION");
+
+    public getFromDiscussion(request: IGetArticleFromDiscussionRequest) {
+        const apiThunk = bindThunkAction(ArticleActions.getFromDiscussionACs, async () => {
+            const params = { ...request };
+            const response = await this.api.get("/articles/from-discussion", { params });
+            return response.data;
+        })(request);
+        return this.dispatch(apiThunk);
     }
 
     /**

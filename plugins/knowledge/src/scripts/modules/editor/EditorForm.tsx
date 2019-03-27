@@ -110,6 +110,8 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     legacyMode={false}
                                     reinitialize={formNeedsRefresh}
                                     initialValue={form.body}
+                                    operationsQueue={this.props.editorOperationsQueue}
+                                    clearOperationsQueue={this.props.actions.clearEditorOps}
                                 />
                             </div>
                         }
