@@ -116,7 +116,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
     public reduceSelf: ReducerType = reducerWithoutInitialState<ILocationPickerState>()
         .case(LocationPickerActions.initAC, (state, payload) => {
             const { selected, parent } = payload;
-            state.navigatedRecord = parent;
+            state.navigatedRecord = parent === NavigationModel.SYNTHETIC_ROOT ? null : parent;
             state.selectedRecord = selected;
             state.chosenRecord = selected;
             return state;
