@@ -51,7 +51,7 @@ class ArticleDraft {
 
             /** @var BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
-                $blot = $blotGroup->getPrimaryBlot();
+                $blot = $blotGroup->getMainBlot();
                 if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
                     $outline[] = [
                         'ref' => $blot->getReference(),
