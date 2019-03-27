@@ -15,6 +15,7 @@ use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Robots;
+use Gdn_Session as SessionInterface;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -24,8 +25,14 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var \Gdn_Request */
+    private $request;
+
     /** @var Router */
     private $router;
+
+    /** @var SessionInterface */
+    private $session;
 
     /**
      * KnowledgePlugin constructor.
@@ -35,11 +42,45 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function __construct(
         \Gdn_Database $database,
-        Router $router
+        Router $router,
+        SessionInterface $session,
+        \Gdn_Request $request
     ) {
         parent::__construct();
         $this->database = $database;
         $this->router = $router;
+        $this->session = $session;
+        $this->request = $request;
+    }
+
+    /**
+     * Add discussion menu options.
+     *
+     * @param mixed $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function base_discussionOptions_handler($sender, $args) {
+        $discussion = $args["Discussion"] ?? null;
+        if (!$discussion || !$this->session->checkPermission("knowledge.articles.add")) {
+            return;
+        }
+
+        if (!array_key_exists("DiscussionOptions", $args) || !is_array($args["DiscussionOptions"])) {
+            return;
+        }
+
+        $attributes = $discussion->Attributes ?? [];
+        $canonicalUrl = $attributes["CanonicalUrl"] ?? null;
+        $label = $canonicalUrl ? "Remove Article Link" : "Convert To Article";
+        $url = $canonicalUrl ?
+            "article-discussion/unlink?discussionID={$discussion->DiscussionID}" :
+            "article-discussion/convert?discussionID={$discussion->DiscussionID}";
+
+        $args['DiscussionOptions']['DiscussionArticle'] = [
+            "Label" => \Gdn::translate($label),
+            "Url" => $this->request->url($url),
+            "Class" => "Popup"
+        ];
     }
 
     /**

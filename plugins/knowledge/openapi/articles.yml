@@ -1019,6 +1019,9 @@ components:
         format:
           description: Post format.
           type: string
+        name:
+          description: Discussion name.
+          type: string
         url:
           description: Full URL to the discussion.
           type: string

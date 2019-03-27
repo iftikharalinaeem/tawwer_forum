@@ -8,6 +8,8 @@ import { Omit } from "@library/@types/utils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { IUserFragment } from "@library/@types/api/users";
 import { PublishStatus } from "@library/@types/api/core";
+import { string } from "prop-types";
+import { DeltaOperation } from "quill/core";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
@@ -109,7 +111,9 @@ export interface IPatchArticleStatusResponseBody extends IArticle {}
 // Drafts
 export interface IArticleDraftAttrs
     extends Partial<IArticleRequiredData>,
-        Omit<Partial<IArticleDefaultedData>, "body"> {}
+        Omit<Partial<IArticleDefaultedData>, "body"> {
+    discussionID?: number;
+}
 
 export interface IArticleDraft {
     recordID?: number;
@@ -154,3 +158,19 @@ export interface IDeleteArticleDraftRequest {
     draftID: number;
 }
 export interface IDeleteArticleDraftResponse {}
+
+// GET /articles/from-discussion
+export interface IGetArticleFromDiscussionRequest {
+    discussionID: number;
+}
+
+export interface ICommunityPost {
+    body: string | DeltaOperation[];
+    format: string;
+    name: string;
+    url: string;
+}
+
+export interface IGetArticleFromDiscussionResponse extends ICommunityPost {
+    acceptedAnswers?: ICommunityPost[];
+}

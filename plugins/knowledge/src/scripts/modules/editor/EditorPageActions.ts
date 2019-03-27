@@ -4,28 +4,34 @@
  * @license Proprietary
  */
 
-import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
-import { History } from "history";
-import qs from "qs";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
-import { IStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api/core";
-import uniqueId from "lodash/uniqueId";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import isEqual from "lodash/isEqual";
-import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import {
+    IArticle,
+    IGetArticleFromDiscussionResponse,
+    IGetArticleResponseBody,
+    IPatchArticleRequestBody,
+    IPostArticleRequestBody,
     IPostArticleResponseBody,
     IResponseArticleDraft,
-    IPostArticleRequestBody,
-    IPatchArticleRequestBody,
-    IArticle,
-    IGetArticleResponseBody,
 } from "@knowledge/@types/api/article";
 import { Format } from "@knowledge/@types/api/articleRevision";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
+import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api/core";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { formatUrl } from "@library/utility/appUtils";
+import { History } from "history";
+import isEqual from "lodash/isEqual";
+import uniqueId from "lodash/uniqueId";
+import qs from "qs";
+import actionCreatorFactory from "typescript-fsa";
+import { EditorQueueItem } from "@rich-editor/editor/Editor";
+
+const createAction = actionCreatorFactory("@@articleEditor");
 
 export default class EditorPageActions extends ReduxActions<IStoreState> {
     // API actions
@@ -113,8 +119,11 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
         const initialKbID = "knowledgeBaseID" ? parseInt(queryParams.knowledgeBaseID, 10) : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
-        if (!draftLoaded && initialCategoryID !== null) {
-            this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
+        if (!draftLoaded) {
+            await this.initializeDiscussionFromUrl(history);
+            if (initialCategoryID !== null) {
+                this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
+            }
         }
 
         if (initialCategoryID !== null && initialKbID !== null) {
@@ -124,6 +133,21 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
                 knowledgeBaseID: initialKbID,
             });
         }
+    }
+
+    private async initializeDiscussionFromUrl(history: History): Promise<boolean> {
+        const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
+        const discussionID = "discussionID" in queryParams ? parseInt(queryParams.discussionID, 10) : null;
+
+        let loaded = false;
+        if (discussionID !== null) {
+            const response = await this.articleActions.getFromDiscussion({ discussionID });
+            if (response) {
+                this.pushDiscussionToForm(discussionID, response);
+                loaded = true;
+            }
+        }
+        return loaded;
     }
 
     private async initializeDraftFromUrl(history: History): Promise<boolean> {
@@ -177,10 +201,50 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         };
     }
 
+    public static queueEditorOpAC = createAction<EditorQueueItem>("QUEUE_EDITOR_OP");
+
+    public static clearEditorOpsAC = createAction("CLEAR_EDITOR_OPS");
+
+    public queueEditorOp = this.bindDispatch(EditorPageActions.queueEditorOpAC);
+
+    public clearEditorOps = this.bindDispatch(EditorPageActions.clearEditorOpsAC);
+
+    private pushDiscussionToForm(discussionID: number, discussion: IGetArticleFromDiscussionResponse) {
+        const { name } = discussion;
+
+        // Set the title of the article.
+        this.updateForm({ name }, true);
+
+        // Add the "created from" text.
+        this.queueEditorOp([
+            { attributes: { italic: true }, insert: "This article was created from a " },
+            { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },
+            { attributes: { italic: true }, insert: "." },
+            { insert: "\n" },
+        ]);
+
+        // Add the discussion content.
+        this.queueEditorOp(discussion.body);
+
+        // If we have any answers, add those too.
+        if (discussion.acceptedAnswers) {
+            this.queueEditorOp([
+                { insert: discussion.acceptedAnswers.length > 1 ? "Answers" : "Answer" },
+                { attributes: { header: { level: 2, ref: "answer" } }, insert: "\n" },
+            ]);
+
+            discussion.acceptedAnswers.forEach(answer => {
+                this.queueEditorOp(answer.body);
+            });
+        }
+
+        this.updateForm({ discussionID });
+    }
+
     private pushDraftToForm(draft: IResponseArticleDraft) {
-        const { name, knowledgeCategoryID } = draft.attributes;
+        const { discussionID, name, knowledgeCategoryID } = draft.attributes;
         const body = JSON.parse(draft.body);
-        this.updateForm({ name, knowledgeCategoryID, body }, true);
+        this.updateForm({ discussionID, name, knowledgeCategoryID, body }, true);
     }
 
     /**

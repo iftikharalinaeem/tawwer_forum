@@ -16,10 +16,13 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
+import { reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { EditorQueueItem } from "@rich-editor/editor/Editor";
 
 export interface IEditorPageForm {
     name: string;
     body: DeltaOperation[];
+    discussionID?: number;
     knowledgeCategoryID: number | null;
     sort?: number;
 }
@@ -32,6 +35,7 @@ export interface IEditorPageState {
     }>; // The draft ID. Actual draft will live in normalized drafts resource.
     form: IEditorPageForm;
     formNeedsRefresh: boolean;
+    editorOperationsQueue: EditorQueueItem[];
     revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
@@ -43,6 +47,7 @@ export interface IInjectableEditorProps {
     draft: ILoadable<IResponseArticleDraft>;
     form: IEditorPageForm;
     formNeedsRefresh: boolean;
+    editorOperationsQueue: EditorQueueItem[];
     revision: ILoadable<IRevision>;
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
@@ -60,7 +65,14 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state tree.
      */
     public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const { article, saveDraft, submit, form, formNeedsRefresh } = EditorPageModel.getStateSlice(state);
+        const {
+            article,
+            saveDraft,
+            submit,
+            form,
+            formNeedsRefresh,
+            editorOperationsQueue,
+        } = EditorPageModel.getStateSlice(state);
 
         return {
             article,
@@ -70,6 +82,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             formNeedsRefresh,
             revision: EditorPageModel.selectActiveRevision(state),
             draft: EditorPageModel.selectDraft(state),
+            editorOperationsQueue,
         };
     }
 
@@ -141,6 +154,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             knowledgeCategoryID: null,
         },
         formNeedsRefresh: false,
+        editorOperationsQueue: [],
         revision: {
             status: LoadStatus.PENDING,
             error: undefined,
@@ -166,6 +180,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceInitialDraft,
                 this.reduceRevision,
                 this.reduceArticle,
+                this.reduceEditorQueue,
             )(nextState, action);
         });
     };
@@ -190,6 +205,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
         return nextState;
     };
+
+    private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
+        .case(EditorPageActions.queueEditorOpAC, (nextState, payload) => {
+            nextState.editorOperationsQueue.push(payload);
+            return nextState;
+        })
+        .case(EditorPageActions.clearEditorOpsAC, nextState => {
+            nextState.editorOperationsQueue = [];
+            return nextState;
+        });
 
     private reduceInitialDraft: ReducerType = (nextState = this.initialState, action) => {
         if (

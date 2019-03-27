@@ -52,6 +52,10 @@ trait ArticlesApiSchemes {
         if ($this->discussionArticleSchema === null) {
             $this->discussionArticleSchema = $this->schema(
                 Schema::parse([
+                    "name" => [
+                        "description" => "Discussion title.",
+                        "type" => "string",
+                    ],
                     "body" => [
                         "description" => "Full discussion body contents.",
                         "type" => ["array", "string"],
