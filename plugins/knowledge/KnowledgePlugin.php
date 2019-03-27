@@ -25,6 +25,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var \Gdn_Request */
+    private $request;
+
     /** @var Router */
     private $router;
 
@@ -40,12 +43,14 @@ class KnowledgePlugin extends \Gdn_Plugin {
     public function __construct(
         \Gdn_Database $database,
         Router $router,
-        SessionInterface $session
+        SessionInterface $session,
+        \Gdn_Request $request
     ) {
         parent::__construct();
         $this->database = $database;
         $this->router = $router;
         $this->session = $session;
+        $this->request = $request;
     }
 
     /**
@@ -67,10 +72,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $attributes = $discussion->Attributes ?? [];
         $canonicalUrl = $attributes["CanonicalUrl"] ?? null;
         $label = $canonicalUrl ? "Remove Article Link" : "Convert To Article";
+        $url = $canonicalUrl ?
+            "article-discussion/unlink?discussionID={$discussion->DiscussionID}" :
+            "article-discussion/convert?discussionID={$discussion->DiscussionID}";
 
         $args['DiscussionOptions']['DiscussionArticle'] = [
             "Label" => \Gdn::translate($label),
-            "Url" => "/#",
+            "Url" => $this->request->url($url),
             "Class" => "Popup"
         ];
     }
