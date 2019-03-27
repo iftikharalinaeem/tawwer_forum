@@ -143,7 +143,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         if (discussionID !== null) {
             const response = await this.articleActions.getFromDiscussion({ discussionID });
             if (response) {
-                this.pushDiscussionToForm(response);
+                this.pushDiscussionToForm(discussionID, response);
                 loaded = true;
             }
         }
@@ -209,10 +209,13 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
 
     public clearEditorOps = this.bindDispatch(EditorPageActions.clearEditorOpsAC);
 
-    private pushDiscussionToForm(discussion: IGetArticleFromDiscussionResponse) {
+    private pushDiscussionToForm(discussionID: number, discussion: IGetArticleFromDiscussionResponse) {
         const { name } = discussion;
+
+        // Set the title of the article.
         this.updateForm({ name }, true);
 
+        // Add the "created from" text.
         this.queueEditorOp([
             { attributes: { italic: true }, insert: "This article was created from a " },
             { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },
@@ -220,6 +223,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             { insert: "\n" },
         ]);
 
+        // Add the discussion content.
         this.queueEditorOp(discussion.body);
 
         // If we have any answers, add those too.
@@ -233,12 +237,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
                 this.queueEditorOp(answer.body);
             });
         }
+
+        this.updateForm({ discussionID });
     }
 
     private pushDraftToForm(draft: IResponseArticleDraft) {
-        const { name, knowledgeCategoryID } = draft.attributes;
+        const { discussionID, name, knowledgeCategoryID } = draft.attributes;
         const body = JSON.parse(draft.body);
-        this.updateForm({ name, knowledgeCategoryID, body }, true);
+        this.updateForm({ discussionID, name, knowledgeCategoryID, body }, true);
     }
 
     /**

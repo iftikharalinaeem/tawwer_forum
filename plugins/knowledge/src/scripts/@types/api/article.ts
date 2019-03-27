@@ -111,7 +111,9 @@ export interface IPatchArticleStatusResponseBody extends IArticle {}
 // Drafts
 export interface IArticleDraftAttrs
     extends Partial<IArticleRequiredData>,
-        Omit<Partial<IArticleDefaultedData>, "body"> {}
+        Omit<Partial<IArticleDefaultedData>, "body"> {
+    discussionID?: number;
+}
 
 export interface IArticleDraft {
     recordID?: number;

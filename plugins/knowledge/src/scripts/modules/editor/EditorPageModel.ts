@@ -22,6 +22,7 @@ import { EditorQueueItem } from "@rich-editor/editor/Editor";
 export interface IEditorPageForm {
     name: string;
     body: DeltaOperation[];
+    discussionID?: number;
     knowledgeCategoryID: number | null;
     sort?: number;
 }
