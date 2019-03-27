@@ -7,11 +7,12 @@
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
+import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 
@@ -86,7 +87,7 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
      */
     public initLocationPickerFromRecord = async (record: ILocationPickerRecord) => {
         if (record) {
-            const { navigation } = this.getState().knowledge;
+            const { knowledgeBases, navigation } = this.getState().knowledge;
             const { recordID, recordType, knowledgeBaseID } = record;
 
             if (
@@ -102,8 +103,30 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
                 return;
             }
 
+            // Determine if the navigated category is actually a KB root category. If it is, select the KB, instead.
+            let ownKnowledgeBase: IKbNavigationItem | null = null;
+            if (
+                ownFullRecord.parentID === -1 &&
+                knowledgeBases.knowledgeBasesByID &&
+                knowledgeBases.knowledgeBasesByID.status === LoadStatus.SUCCESS &&
+                knowledgeBases.knowledgeBasesByID.data &&
+                knowledgeBases.knowledgeBasesByID.data[ownFullRecord.knowledgeBaseID]
+            ) {
+                const recordKnowledgeBase = knowledgeBases.knowledgeBasesByID.data[ownFullRecord.knowledgeBaseID];
+                ownKnowledgeBase = {
+                    recordType: KbRecordType.KB,
+                    recordID: recordKnowledgeBase.knowledgeBaseID,
+                    knowledgeBaseID: recordKnowledgeBase.knowledgeBaseID,
+                    name: recordKnowledgeBase.name,
+                    url: recordKnowledgeBase.url,
+                    parentID: -1,
+                    sort: null,
+                };
+            }
+
             const parentRecord = navigationItems[KbRecordType.CATEGORY + ownFullRecord.parentID] || null;
-            this.init({ selected: ownFullRecord, parent: parentRecord });
+            const selected = ownKnowledgeBase || ownFullRecord;
+            this.init({ selected, parent: parentRecord });
         }
     };
 }
