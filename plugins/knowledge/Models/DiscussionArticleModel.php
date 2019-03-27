@@ -45,6 +45,7 @@ class DiscussionArticleModel {
         $result = [
             "body" => $this->discriminateBody($discussion, $discussionRaw),
             "format" => $discussionRaw["format"],
+            "name" => $discussion["name"],
             "url" => $discussion["url"],
         ];
 

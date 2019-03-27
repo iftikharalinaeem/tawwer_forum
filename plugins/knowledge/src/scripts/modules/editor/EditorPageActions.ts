@@ -210,6 +210,9 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
     public clearEditorOps = this.bindDispatch(EditorPageActions.clearEditorOpsAC);
 
     private pushDiscussionToForm(discussion: IGetArticleFromDiscussionResponse) {
+        const { name } = discussion;
+        this.updateForm({ name }, true);
+
         this.queueEditorOp([
             { attributes: { italic: true }, insert: "This article was created from a " },
             { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },

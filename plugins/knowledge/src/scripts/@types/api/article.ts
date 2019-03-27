@@ -165,6 +165,7 @@ export interface IGetArticleFromDiscussionRequest {
 export interface ICommunityPost {
     body: string | DeltaOperation[];
     format: string;
+    name: string;
     url: string;
 }
 
