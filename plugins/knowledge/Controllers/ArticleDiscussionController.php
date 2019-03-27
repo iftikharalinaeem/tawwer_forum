@@ -58,6 +58,8 @@ class ArticleDiscussionController extends \Gdn_Controller {
      * @param int|string $discussionID
      */
     public function unlink($discussionID = "") {
+        $this->permission("knowledge.articles.add");
+
         if (empty($discussionID) || !is_numeric($discussionID)) {
             throw new ClientException("Invalid discussion ID");
         }
