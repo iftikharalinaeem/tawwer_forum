@@ -106,6 +106,7 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
             // Determine if the navigated category is actually a KB root category. If it is, select the KB, instead.
             let ownKnowledgeBase: IKbNavigationItem | null = null;
             if (
+                ownFullRecord.recordType === KbRecordType.CATEGORY &&
                 ownFullRecord.parentID === -1 &&
                 knowledgeBases.knowledgeBasesByID &&
                 knowledgeBases.knowledgeBasesByID.status === LoadStatus.SUCCESS &&
