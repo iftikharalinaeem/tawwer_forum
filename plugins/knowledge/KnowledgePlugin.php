@@ -39,6 +39,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
      *
      * @param \Gdn_Database $database
      * @param Router $router
+     * @param SessionInterface $session
+     * @param \Gdn_Request $request
      */
     public function __construct(
         \Gdn_Database $database,

@@ -244,7 +244,12 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
     private pushDraftToForm(draft: IResponseArticleDraft) {
         const { discussionID, name, knowledgeCategoryID } = draft.attributes;
         const body = JSON.parse(draft.body);
-        this.updateForm({ discussionID, name, knowledgeCategoryID, body }, true);
+
+        const formData: Partial<IEditorPageForm> = { name, knowledgeCategoryID, body };
+        if (discussionID) {
+            formData.discussionID = discussionID;
+        }
+        this.updateForm(formData, true);
     }
 
     /**

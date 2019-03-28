@@ -27,6 +27,7 @@ class ArticleDiscussionController extends \Gdn_Controller {
      * Constructor for DI.
      *
      * @param Gdn_Request $request
+     * @param \DiscussionsApiController $discussionsApiController
      */
     public function __construct(\Gdn_Request $request, \DiscussionsApiController $discussionsApiController) {
         $this->request = $request;
