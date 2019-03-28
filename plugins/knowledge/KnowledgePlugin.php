@@ -81,7 +81,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $args['DiscussionOptions']['DiscussionArticle'] = [
             "Label" => \Gdn::translate($label),
             "Url" => $this->request->url($url),
-            "Class" => "Popup"
+            "Class" => "js-convertDiscussionToArticle"
         ];
     }
 
