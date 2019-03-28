@@ -22,6 +22,7 @@ interface IEditorURLData {
     articleRevisionID?: number;
     draftID?: number;
     knowledgeCategoryID?: number | null;
+    discussionID?: number | null;
     knowledgeBaseID?: number | null;
 }
 
@@ -45,14 +46,14 @@ function makeEditorUrl(data?: IEditorURLData) {
     }
 
     let { knowledgeCategoryID } = data;
-    const { articleRevisionID, draftID, knowledgeBaseID } = data;
+    const { articleRevisionID, draftID, knowledgeBaseID, discussionID } = data;
     if (knowledgeCategoryID !== undefined && knowledgeBaseID === undefined) {
         logWarning(
             "Attempted to initialize an editor with a categoryID but no knowledgeBaseID. They must both be provided",
         );
         knowledgeCategoryID = undefined;
     }
-    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID });
+    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID, discussionID });
 
     if (query) {
         baseUrl += `?${query}`;

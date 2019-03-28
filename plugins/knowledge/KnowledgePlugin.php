@@ -61,28 +61,29 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param mixed $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function base_discussionOptions_handler($sender, $args) {
+    public function base_discussionOptionsDropdown_handler($sender, $args) {
         $discussion = $args["Discussion"] ?? null;
         if (!$discussion || !$this->session->checkPermission("knowledge.articles.add")) {
             return;
         }
 
-        if (!array_key_exists("DiscussionOptions", $args) || !is_array($args["DiscussionOptions"])) {
+
+        /** @var \DropdownModule $dropdown */
+        $dropdown = $args['DiscussionOptionsDropdown'] ?? null;
+        if (!$dropdown instanceof \DropdownModule) {
             return;
         }
 
         $attributes = $discussion->Attributes ?? [];
         $canonicalUrl = $attributes["CanonicalUrl"] ?? null;
         $label = $canonicalUrl ? "Remove Article Link" : "Convert To Article";
-        $url = $canonicalUrl ?
-            "article-discussion/unlink?discussionID={$discussion->DiscussionID}" :
-            "article-discussion/convert?discussionID={$discussion->DiscussionID}";
+        $class = $canonicalUrl ? "js-unlinkDiscussion" : "js-convertDiscussionToArticle";
 
-        $args['DiscussionOptions']['DiscussionArticle'] = [
-            "Label" => \Gdn::translate($label),
-            "Url" => $this->request->url($url),
-            "Class" => "js-convertDiscussionToArticle"
-        ];
+        $dropdown->addLink($label, "#", "discussionArticleConvert", $class, [], [
+            "attributes" => [
+                "data-discussionID" => $discussion->DiscussionID,
+            ],
+        ]);
     }
 
     /**
