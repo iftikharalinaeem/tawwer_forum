@@ -103,6 +103,7 @@ describe("EditorPageModel", () => {
                     knowledgeCategoryID: 29,
                 },
                 formNeedsRefresh: true,
+                editorOperationsQueue: [],
             };
 
             expect(EditorPageModel.getInjectableProps(state as any)).deep.eq(expected);
