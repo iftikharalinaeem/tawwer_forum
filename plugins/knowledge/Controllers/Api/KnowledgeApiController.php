@@ -349,7 +349,16 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['updateUserIDs'])) {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
-
+        if (isset($this->query['knowledgeBaseID'])) {
+            $knowledgeCategories = array_column(
+                $this->knowledgeCategoryModel->get(
+                    ['knowledgeBaseID' => $this->query['knowledgeBaseID']],
+                    ['select' => ['knowledgeCategoryID']]
+                ),
+                'knowledgeCategoryID'
+            );
+            $this->sphinx->setFilter('knowledgeCategoryID', $knowledgeCategories);
+        }
         if (isset($this->query['knowledgeCategoryIDs'])) {
             $this->sphinx->setFilter('knowledgeCategoryID', $this->query['knowledgeCategoryIDs']);
         }
