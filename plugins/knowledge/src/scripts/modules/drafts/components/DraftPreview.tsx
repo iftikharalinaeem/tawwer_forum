@@ -30,13 +30,13 @@ export class DraftPreview extends React.Component<IProps> {
     public render() {
         const { dateUpdated, draftID, headingLevel, className, excerpt } = this.props;
         const { name } = this.props.attributes;
-        const HeadingTag = `h${headingLevel}`;
+        const HeadingTag = `h${headingLevel}` as "h1" | "h3" | "h4" | "h5" | "h6";
 
         return (
             <li className={classNames("draftPreview", className)} onClick={this.handleClick}>
                 <article className="draftPreview-item">
                     <div className="draftPreview-header">
-                        <HeadingTag className="draftPreview-title" level={this.props.headingLevel}>
+                        <HeadingTag className="draftPreview-title">
                             <EditorRoute.Link
                                 data={{
                                     articleID: this.props.recordID,
