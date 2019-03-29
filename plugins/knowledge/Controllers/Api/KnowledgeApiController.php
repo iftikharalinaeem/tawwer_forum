@@ -349,7 +349,16 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['updateUserIDs'])) {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
-
+        if (isset($this->query['knowledgeBaseID'])) {
+            $knowledgeCategories = array_column(
+                $this->knowledgeCategoryModel->get(
+                    ['knowledgeBaseID' => $this->query['knowledgeBaseID']],
+                    ['select' => ['knowledgeCategoryID']]
+                ),
+                'knowledgeCategoryID'
+            );
+            $this->sphinx->setFilter('knowledgeCategoryID', $knowledgeCategories);
+        }
         if (isset($this->query['knowledgeCategoryIDs'])) {
             $this->sphinx->setFilter('knowledgeCategoryID', $this->query['knowledgeCategoryIDs']);
         }
@@ -495,7 +504,7 @@ class KnowledgeApiController extends AbstractApiController {
             $guid = $record[$typeData['sphinxGUID'] ?? $typeData['recordID']] * $typeData['multiplier'] + $typeData['offset'];
             $sphinxItem = $this->results['matches'][$guid]['attrs'];
             $url = $record['Url'];
-            if ($type === self::TYPE_COMMENT) {
+            if (in_array($type, [self::TYPE_COMMENT, self::TYPE_ANSWER])) {
                 // CommentModel doesn't currently put urls on their records.
                 // The global function usage here is a kludge until we restructure subcommunities.
                 $url = commentUrl($record);
