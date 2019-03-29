@@ -77,7 +77,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         });
     };
 
-    private reduceErrors = reducerWithoutInitialState<INavigationStoreState>()
+    private reduceErrors: ReducerType = reducerWithoutInitialState<INavigationStoreState>()
         .case(NavigationActions.clearErrors, state => {
             state.currentError = NavigationModel.DEFAULT_STATE.currentError;
             return state;
