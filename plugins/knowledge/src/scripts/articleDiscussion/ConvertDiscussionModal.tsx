@@ -20,7 +20,12 @@ export function ConvertDiscussionModal(props: IProps) {
     };
 
     return (
-        <ModalConfirm title={t("Convert to Article")} onConfirm={navigateToDraft} elementToFocusOnExit={document.body}>
+        <ModalConfirm
+            title={t("Convert to Article")}
+            onConfirm={navigateToDraft}
+            elementToFocusOnExit={document.body}
+            confirmTitle={t("Create Article")}
+        >
             <Translate source="This will create an article that is a copy of this discussion. The discussion will then be linked to the new article." />
         </ModalConfirm>
     );
