@@ -504,7 +504,7 @@ class KnowledgeApiController extends AbstractApiController {
             $guid = $record[$typeData['sphinxGUID'] ?? $typeData['recordID']] * $typeData['multiplier'] + $typeData['offset'];
             $sphinxItem = $this->results['matches'][$guid]['attrs'];
             $url = $record['Url'];
-            if (in_array($type,  [self::TYPE_COMMENT, self::TYPE_ANSWER])) {
+            if (in_array($type, [self::TYPE_COMMENT, self::TYPE_ANSWER])) {
                 // CommentModel doesn't currently put urls on their records.
                 // The global function usage here is a kludge until we restructure subcommunities.
                 $url = commentUrl($record);
