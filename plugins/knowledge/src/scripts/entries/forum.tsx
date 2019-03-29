@@ -5,7 +5,8 @@
 
 import { ConvertDiscussionModal } from "@knowledge/articleDiscussion/ConvertDiscussionModal";
 import { UnlinkDiscussionModal } from "@knowledge/articleDiscussion/UnlinkDiscussionModal";
-import { delegateEvent, mountModal } from "@library/dom/domUtils";
+import { delegateEvent } from "@library/dom/domUtils";
+import { mountModal } from "@library/modal/Modal";
 import React from "react";
 
 delegateEvent("click", ".js-convertDiscussionToArticle", (event, triggeringElement) => {
