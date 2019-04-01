@@ -17,6 +17,7 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
+        - cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
       cache:
