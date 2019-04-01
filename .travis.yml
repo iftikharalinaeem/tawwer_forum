@@ -24,6 +24,7 @@ jobs:
         - composer install --optimize-autoloader
       script:
           - ./vendor/bin/phpunit --exclude-group=large
+      yarn: true
 #      env:
 #        - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
   # Frontend JS Job
