@@ -4,10 +4,10 @@
  * @license Proprietary
  */
 
-import ReduxActions from "@library/redux/ReduxActions";
-import apiv2 from "@library/apiv2";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
+import apiv2 from "@library/apiv2";
+import ReduxActions from "@library/redux/ReduxActions";
 
 export interface IInjectableRevisionsPageActions {
     revisionsPageActions: RevisionsPageActions;
@@ -17,6 +17,8 @@ export interface IInjectableRevisionsPageActions {
  * Actions for the revisions page.
  */
 export default class RevisionsPageActions extends ReduxActions {
+    public static readonly IDENTIFIER = "@@articleDrafts/IDENTIFIER";
+
     // API actions
     public static readonly SET_ARTICLE = "@@revisionsPage/SET_ARTICLE";
     public static readonly SET_REVISION = "@@revisionsPage/SET_REVISION";
@@ -78,6 +80,7 @@ export default class RevisionsPageActions extends ReduxActions {
 
         void Promise.all([
             this.articleActions.fetchByID({ articleID }),
+            this.articleActions.getDrafts({ articleID }, RevisionsPageActions.IDENTIFIER),
             this.articleActions.fetchRevisionsForArticle({ articleID }).then(() => this.setActiveRevision()),
         ]);
     };

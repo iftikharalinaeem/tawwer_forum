@@ -17,6 +17,7 @@ import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
     bodyContent: React.ReactNode;
+    draftList: React.ReactNode;
     revisionList: React.ReactNode;
     canSubmit: boolean;
     crumbs: ICrumb[];
@@ -58,6 +59,9 @@ export class RevisionsLayout extends React.Component<IProps> {
                         middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}
                         middleBottom={<PanelWidget>{bodyContent}</PanelWidget>}
                         rightTop={
+                            !isMobile && <PanelWidgetVerticalPadding>{this.props.draftList}</PanelWidgetVerticalPadding>
+                        }
+                        rightBottom={
                             !isMobile && (
                                 <PanelWidgetVerticalPadding>{this.props.revisionList}</PanelWidgetVerticalPadding>
                             )
