@@ -22,6 +22,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Modal from "@library/modal/Modal";
+import uniqueId from "lodash/uniqueId";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -30,6 +31,8 @@ import Modal from "@library/modal/Modal";
 export class LocationInput extends React.PureComponent<IProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
+    private domID = uniqueId("locationInput-");
+    private domErrorID = this.domID + "errors";
 
     public state: IState = {
         showLocationPicker: false,
@@ -55,6 +58,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             <React.Fragment>
                 <div className={classNames("pageLocation", this.props.className)}>
                     <Button
+                        id={this.domID}
                         title={buttonTitle}
                         type="button"
                         aria-label={t("Page Location")}
@@ -63,6 +67,8 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         baseClass={ButtonTypes.CUSTOM}
                         buttonRef={this.changeLocationButton}
                         disabled={!!this.props.disabled}
+                        aria-invalid={!!this.props.error}
+                        aria-errormessage={!!this.props.error ? this.domErrorID : undefined}
                     >
                         {buttonContents}
                     </Button>
@@ -135,6 +141,7 @@ interface IOwnProps {
     initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
     onChange?: (categoryID: number | null, sort?: number) => void;
+    error?: string;
 }
 
 interface IState {

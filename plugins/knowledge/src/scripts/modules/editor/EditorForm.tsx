@@ -27,6 +27,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import uniqueId from "lodash/uniqueId";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -34,6 +35,11 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     titleID?: string;
     mobileDropDownTitle?: string;
     kbID?: number;
+    errors: {
+        category?: string;
+        title?: string;
+        body?: string;
+    };
 }
 
 /**
@@ -42,11 +48,15 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
 export class EditorForm extends React.PureComponent<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
+    private domID: string = uniqueId("editorForm-");
+    private domTitleID: string = this.domID + "-title";
+    private domTitleErrorsID: string = this.domTitleID + "Errors";
+
     /**
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft, errors } = this.props;
         const classesRichEditorForm = richEditorFormClasses();
 
         return (
@@ -55,7 +65,6 @@ export class EditorForm extends React.PureComponent<IProps> {
                 onSubmit={this.onSubmit}
             >
                 <EditorHeader
-                    canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     className={classNames("richEditorForm-header")}
                     draft={draft}
@@ -77,11 +86,16 @@ export class EditorForm extends React.PureComponent<IProps> {
                         topPadding={false}
                         middleBottom={
                             <div className={classesRichEditorForm.formContent}>
-                                <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
+                                <LocationInput
+                                    disabled={this.isLoading}
+                                    onChange={this.locationPickerChangeHandler}
+                                    error={errors.category}
+                                />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
                                 </div>
                                 <input
+                                    id={this.domTitleID}
                                     className={classNames(
                                         "richEditorForm-title",
                                         "inputBlock-inputText",
@@ -93,6 +107,8 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     value={this.props.form.name || ""}
                                     onChange={this.titleChangeHandler}
                                     disabled={this.isLoading}
+                                    aria-invalid={!!errors.title}
+                                    aria-errormessage={!!errors.title ? this.domTitleErrorsID : undefined}
                                 />
                                 <Editor
                                     allowUpload={true}
@@ -112,6 +128,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     initialValue={form.body}
                                     operationsQueue={this.props.editorOperationsQueue}
                                     clearOperationsQueue={this.props.actions.clearEditorOps}
+                                    error={errors.body}
                                 />
                             </div>
                         }
@@ -134,26 +151,6 @@ export class EditorForm extends React.PureComponent<IProps> {
     private propsAreLoading(props: IProps): boolean {
         const { article, revision, draft } = props;
         return [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
-    }
-
-    /**
-     * Whether or not we have all of the data we need to submit the form.
-     */
-    private get canSubmit(): boolean {
-        if (!this.editorRef.current) {
-            return false;
-        }
-        const minTitleLength = 1;
-        const minBodyLength = 1;
-
-        const title = this.props.form.name || "";
-        const body = this.editorRef.current.getEditorText().trim();
-
-        return (
-            title.length >= minTitleLength &&
-            body.length >= minBodyLength &&
-            this.props.form.knowledgeCategoryID !== null
-        );
     }
 
     /**
@@ -205,11 +202,9 @@ export class EditorForm extends React.PureComponent<IProps> {
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
     private onSubmit = (event: React.FormEvent) => {
-        if (this.canSubmit) {
-            event.preventDefault();
-            event.stopPropagation();
-            void this.props.actions.publish(this.props.history);
-        }
+        event.preventDefault();
+        event.stopPropagation();
+        void this.props.actions.publish(this.props.history);
     };
 }
 
