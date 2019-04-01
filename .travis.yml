@@ -53,3 +53,6 @@ jobs:
 
 # No additional system dependencies to install. Skip the install step.
 install: true
+notifications:
+  slack:
+    secure: HX5bvTXP7/71hvUleIXYNN9TN4eWABrG9NszIlLwGhX50HqLesXBfRubtD06bOwu1h34vi+20MXKhE3Sf6S/tyh5XWsDXtjdeUZToOWkmCD9eOrDrt5pKqE9GS445BVmpPo5i5cQ//u+MJXPC507F8ZF7W9TZH/WTkvVOHz++wQ=
