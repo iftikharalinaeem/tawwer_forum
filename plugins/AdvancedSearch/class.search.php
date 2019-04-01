@@ -58,6 +58,16 @@ class Search {
             $categoryID = null;
         }
 
+        Gdn::pluginManager()->fireAs('advancedSearchPlugin')->fireEvent('beforeSearch',
+            [
+                'catgeoryID' => &$categoryID,
+                'search' =>
+                    [
+                        'subcats' => &$search['subcats'],
+                    ],
+            ]
+        );
+
         if (!$categoryID) {
             switch ($archived) {
                 case 1:
