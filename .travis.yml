@@ -17,7 +17,9 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        - cd "$TRAVIS_BUILD_DIR/vanilla"
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
+        - ./travis/install.sh
+        - cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
       cache:
@@ -35,6 +37,12 @@ jobs:
         chrome: stable
       env:
         - TEST_FILE_ROOTS=()
+      before_script:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
+        - ./travis/install.sh
+        - cd vanilla
+        - yarn install --pure-lockfile
       cache:
         directories:
           - $TRAVIS_BUILD_DIR/vanilla/node_modules
@@ -43,13 +51,6 @@ jobs:
         - yarn build -i
         - yarn test
 
-before_script:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
-  - export PATH=$HOME/.yarn/bin:$PATH
-  - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
-  - ./travis/install.sh
-  - cd vanilla
-  - yarn install --pure-lockfile
 # No additional system dependencies to install. Skip the install step.
 install: true
 notifications:
