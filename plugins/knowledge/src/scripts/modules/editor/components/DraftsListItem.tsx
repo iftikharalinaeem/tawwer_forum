@@ -27,14 +27,14 @@ export default class DraftsListItem extends React.Component<IProps> {
         const classesMetas = metasClasses();
 
         return (
-            <li className="draftsList-item">
-                <SmartLink to={url} className={classNames("draftsList-link", "panelList-link")} tabIndex={-1} replace>
-                    <div className="draftsList-photoFrame">
-                        <img src={photoUrl} className="draftsList-photo" alt={`${t("User: ")}${name}`} />
+            <li className="itemList-item">
+                <SmartLink to={url} className={classNames("itemList-link", "panelList-link")} tabIndex={-1} replace>
+                    <div className="itemList-photoFrame">
+                        <img src={photoUrl} className="itemList-photo" alt={`${t("User: ")}${name}`} />
                     </div>
-                    <div className="draftsList-content">
-                        <div className="draftsList-userName">{name}</div>
-                        <div className="draftsList-dateTime">
+                    <div className="itemList-content">
+                        <div className="itemList-userName">{name}</div>
+                        <div className="itemList-dateTime">
                             <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                         </div>
                     </div>

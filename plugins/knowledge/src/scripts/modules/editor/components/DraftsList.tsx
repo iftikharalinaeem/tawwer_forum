@@ -23,9 +23,9 @@ export default class DraftsList extends React.Component<IProps> {
             children.length > 0 && (
                 <div className="draftsList related">
                     {!this.props.hideTitle && (
-                        <Heading className="panelList-title draftsList-title" title={t("Drafts")} depth={2} />
+                        <Heading className="panelList-title itemList-title" title={t("Drafts")} depth={2} />
                     )}
-                    <ul className="draftsList-items panelList-items">{children}</ul>
+                    <ul className="itemList-items panelList-items">{children}</ul>
                 </div>
             )
         );
