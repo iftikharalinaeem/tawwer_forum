@@ -65,7 +65,7 @@ function makeEditorUrl(data?: IEditorURLData) {
 // Editor
 const EDITOR_KEY = "EditorPageKey";
 const loadEditor = () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage");
-const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, ModalLoader, EDITOR_KEY);
+export const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, ModalLoader, EDITOR_KEY);
 export const EditorRoute = new RouteHandler(
     loadEditor,
     "/kb/articles/:id(\\d+)/editor",

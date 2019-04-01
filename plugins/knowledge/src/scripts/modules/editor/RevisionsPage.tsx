@@ -8,12 +8,14 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import PageTitle from "@knowledge/modules/common/PageTitle";
+import DraftsList from "@knowledge/modules/editor/components/DraftsList";
+import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem";
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
-import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { EditorAddRoute, EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -30,8 +32,6 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import DraftsList from "@knowledge/modules/editor/components/DraftsList";
-import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -110,7 +110,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             drafts.data && (
                 <DraftsList hideTitle={this.props.device === Devices.MOBILE}>
                     {drafts.data.slice().map(item => {
-                        return <DraftsListItem {...item} />;
+                        return <DraftsListItem {...item} url={EditorAddRoute.url(item)} key={item.draftID} />;
                     })}
                 </DraftsList>
             )

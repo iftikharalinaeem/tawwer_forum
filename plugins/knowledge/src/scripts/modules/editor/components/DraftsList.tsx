@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 
 interface IProps {
-    children: React.ReactNode;
+    children: React.ReactNode[];
     hideTitle?: boolean;
 }
 
@@ -17,13 +17,17 @@ interface IProps {
  */
 export default class DraftsList extends React.Component<IProps> {
     public render() {
+        const { children } = this.props;
+
         return (
-            <div className="draftsList related">
-                {!this.props.hideTitle && (
-                    <Heading className="panelList-title draftsList-title" title={t("Drafts")} depth={2} />
-                )}
-                <ul className="draftsList-items panelList-items">{this.props.children}</ul>
-            </div>
+            children.length > 0 && (
+                <div className="draftsList related">
+                    {!this.props.hideTitle && (
+                        <Heading className="panelList-title draftsList-title" title={t("Drafts")} depth={2} />
+                    )}
+                    <ul className="draftsList-items panelList-items">{children}</ul>
+                </div>
+            )
         );
     }
 }
