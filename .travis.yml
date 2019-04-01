@@ -34,8 +34,8 @@ jobs:
       before_script:
         #- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
         #- export PATH=$HOME/.yarn/bin:$PATH
-        - ./travis/install.sh
-        - cd vanilla
+        #- ./travis/install.sh
+        #- cd vanilla
         #- yarn install --pure-lockfile
       cache:
         directories:
@@ -48,12 +48,12 @@ jobs:
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
   - export PATH=$HOME/.yarn/bin:$PATH
-  - yarn install --pure-lockfile
   - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
   - ./travis/install.sh
   - cd vanilla
   - composer self-update
   - composer install --optimize-autoloader
+  - yarn install --pure-lockfile
 
 cache:
   directories:
