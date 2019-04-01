@@ -1,23 +1,22 @@
 var ideation = {
-  start: function($) {
-    'use strict';
-    // Hide discussion type settings if ideas is checked.
-    if ($('#Form_IdeaCategory').attr('checked') === 'checked') {
-      $('.P.DiscussionTypes').hide();
-      $('#Form_UseDownVotes').parents('.form-group').show();
-    } else {
-      $('#Form_UseDownVotes').parents('.form-group').hide();
-    }
+    start: function($) {
+        'use strict';
+        // Hide DownVotes when the form first loads
+        $('#Form_UseDownVotes').parents('.form-group').hide();
 
-    // Toggle discussion type settings
-    $('#Form_IdeaCategory').on('change', function() {
-      $('.DiscussionTypes').toggle();
-      $('#Form_UseDownVotes').parents('.form-group').toggle();
-    });
-  }
+        // Hide/Show DownVotes.
+        $('#Form_IdeaCategory').on('change', function() {
+            $('.DiscussionTypes').toggle();
+            if ($(this).prop('checked')) {
+                $('#Form_UseDownVotes').parents('.form-group').show();
+            } else {
+                $('#Form_UseDownVotes').parents('.form-group').hide();
+            }
+        });
+    }
 };
 
 jQuery(document).ready(function($) {
-  'use strict';
-  ideation.start($);
+    'use strict';
+    ideation.start($);
 });
