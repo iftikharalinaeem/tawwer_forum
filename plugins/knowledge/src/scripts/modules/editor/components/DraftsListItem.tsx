@@ -22,9 +22,16 @@ interface IProps extends IResponseArticleDraft {
  */
 export default class DraftsListItem extends React.Component<IProps> {
     public render() {
-        const { dateInserted, url } = this.props;
-        const { name, photoUrl } = this.props.insertUser;
+        const { dateInserted, insertUser, url } = this.props;
         const classesMetas = metasClasses();
+
+        let name = t("(Unknown User)");
+        let photoUrl: string | undefined;
+
+        if (insertUser) {
+            name = insertUser.name;
+            photoUrl = insertUser.photoUrl;
+        }
 
         return (
             <li className="itemList-item">
