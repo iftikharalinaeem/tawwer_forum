@@ -17,9 +17,7 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        - cd vanilla
-        - composer self-update
-        - composer install --optimize-autoloader
+
       script:
           - ./vendor/bin/phpunit --exclude-group=large
       yarn: true
@@ -53,6 +51,9 @@ install:
   - yarn install --pure-lockfile
   - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
   - ./travis/install.sh
+  - cd vanilla
+  - composer self-update
+  - composer install --optimize-autoloader
 
 cache:
   directories:
