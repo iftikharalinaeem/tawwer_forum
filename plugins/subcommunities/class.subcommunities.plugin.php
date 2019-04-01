@@ -99,7 +99,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $categoryID = val('CategoryID', $site);
 
                 // Get all of the category IDs associated with the subcommunity.
-                $this->categories = CategoryModel::getSubtree($categoryID, false);
+                $this->categories = CategoryModel::getSubtree($categoryID, true);
             }
         }
 
@@ -534,6 +534,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $args['Options']['CategoryData'] = $categories;
+        $subcommunityID = SubcommunityModel::getCurrent();
+        $formValue = !empty($sender->getFormValue('cat')) ? $sender->getFormValue('cat') : null;
+        $categoryID = $formValue ?:  $subcommunityID['CategoryID'];
+        $args['Options']['Value'] = $categoryID;
     }
 
     /**
@@ -775,6 +779,28 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function discussionModel_beforeGetCount_handler($sender, $args) {
         $this->dicussionQueryFiltering($args);
     }
+
+    /**
+     * Restricting searches to the immediate subcommunity.
+     *
+     * @param Gdn_PluginManager $sender
+     * @param array $args
+     */
+
+    public function advancedSearchPlugin_beforeSearch_handler($sender, $args) {
+
+        $categoryID = $args['catgeoryID'];
+
+        if (!$categoryID && $_REQUEST['cat'] !== 'all') {
+            $webRoot = Gdn::request()->webRoot() ?? null;
+            $category = CategoryModel::categories($webRoot);
+            $categoryID = $category['CategoryID'] ?? null;
+            $args['search']['subcats'] = ($categoryID) ? 1 :  $args['search']['subcats'];
+        }
+
+    }
+
+
 
     /**
      * Add filter to discussion queries based on certain conditions.
