@@ -789,7 +789,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     public function advancedSearchPlugin_beforeSearch_handler($sender, $args) {
 
-        $categoryID = $args['catgeoryID'];
+        $categoryID = $args['categoryID'];
 
         if (!$categoryID && $_REQUEST['cat'] !== 'all') {
             $webRoot = Gdn::request()->webRoot() ?? null;
