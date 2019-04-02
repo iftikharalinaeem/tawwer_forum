@@ -17,14 +17,11 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        #- cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
       script:
           - ./vendor/bin/phpunit --exclude-group=large
       yarn: true
-#      env:
-#        - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
   # Frontend JS Job
     - name: JS Build & Test
       language: node_js
@@ -34,15 +31,6 @@ jobs:
       env:
         - TEST_FILE_ROOTS=()
       before_script:
-        #- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
-        #- export PATH=$HOME/.yarn/bin:$PATH
-        #- ./travis/install.sh
-        #- cd vanilla
-        #- yarn install --pure-lockfile
-#      cache:
-#        directories:
-#          - $TRAVIS_BUILD_DIR/vanilla/node_modules
-#        yarn: true
       script:
         - yarn build -i
         - yarn test
@@ -53,8 +41,6 @@ install:
   - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
   - ./travis/install.sh
   - cd vanilla
-#  - composer self-update
-#  - composer install --optimize-autoloader
   - yarn install --pure-lockfile
 
 cache:
