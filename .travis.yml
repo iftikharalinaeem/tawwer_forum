@@ -17,7 +17,7 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        - cd vanilla
+        #- cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
       script:
@@ -42,7 +42,7 @@ jobs:
 #      cache:
 #        directories:
 #          - $TRAVIS_BUILD_DIR/vanilla/node_modules
-        yarn: true
+#        yarn: true
       script:
         - yarn build -i
         - yarn test
