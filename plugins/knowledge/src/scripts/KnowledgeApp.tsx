@@ -21,6 +21,7 @@ import { formatUrl, getMeta } from "@library/utility/appUtils";
 import React from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
+import { LiveAnnouncer } from "react-aria-live";
 
 /*
  * Top level application component for knowledge.
@@ -35,23 +36,27 @@ export default class KnowledgeApp extends React.Component {
     public render() {
         return (
             <Provider store={this.store}>
-                <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
-                    <PagesContext.Provider value={{ pages: this.pages }}>
-                        <ScrollOffsetProvider scrollWatchingEnabled={true}>
-                            <SiteNavProvider>
-                                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                                    <DeviceProvider>
-                                        <BrowserRouter>
-                                            <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                                <Route component={KnowledgeRoutes} />
-                                            </LinkContextProvider>
-                                        </BrowserRouter>
-                                    </DeviceProvider>{" "}
-                                </SearchContext.Provider>
-                            </SiteNavProvider>
-                        </ScrollOffsetProvider>
-                    </PagesContext.Provider>
-                </ThemeProvider>
+                <LiveAnnouncer>
+                    <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
+                        <PagesContext.Provider value={{ pages: this.pages }}>
+                            <ScrollOffsetProvider scrollWatchingEnabled={true}>
+                                <SiteNavProvider>
+                                    <SearchContext.Provider
+                                        value={{ searchOptionProvider: new KnowledgeSearchProvider() }}
+                                    >
+                                        <DeviceProvider>
+                                            <BrowserRouter>
+                                                <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                                    <Route component={KnowledgeRoutes} />
+                                                </LinkContextProvider>
+                                            </BrowserRouter>
+                                        </DeviceProvider>{" "}
+                                    </SearchContext.Provider>
+                                </SiteNavProvider>
+                            </ScrollOffsetProvider>
+                        </PagesContext.Provider>
+                    </ThemeProvider>
+                </LiveAnnouncer>
             </Provider>
         );
     }
