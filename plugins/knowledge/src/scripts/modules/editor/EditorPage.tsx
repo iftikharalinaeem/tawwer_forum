@@ -21,11 +21,16 @@ import QueryString from "@library/routing/QueryString";
 
 interface IOwnProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {}
+        id?: string;
+    }> {}
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
+    errors: {
+        category?: string;
+        title?: string;
+        body?: string;
+    };
 }
 
 /**
@@ -39,6 +44,7 @@ export class EditorPage extends React.PureComponent<IProps> {
     };
 
     public render() {
+        const errors = this.props.errors ? this.props.errors : {};
         return (
             <Modal
                 titleID={this.titleID}
@@ -49,7 +55,7 @@ export class EditorPage extends React.PureComponent<IProps> {
             >
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
-                    <EditorForm titleID={this.titleID} />
+                    <EditorForm titleID={this.titleID} errors={errors} />
                 </Permission>
             </Modal>
         );

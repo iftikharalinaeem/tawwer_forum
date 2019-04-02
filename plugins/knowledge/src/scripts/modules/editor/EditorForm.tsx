@@ -56,8 +56,9 @@ export class EditorForm extends React.PureComponent<IProps> {
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft, errors } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
         const classesRichEditorForm = richEditorFormClasses();
+        const errors = this.props.errors ? this.props.errors : {};
 
         return (
             <form
@@ -89,7 +90,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                 <LocationInput
                                     disabled={this.isLoading}
                                     onChange={this.locationPickerChangeHandler}
-                                    error={errors.category}
+                                    error={errors.category ? errors.category : undefined}
                                 />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
