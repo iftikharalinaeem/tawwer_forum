@@ -103,13 +103,6 @@ raf-schd@^4.0.0:
   resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-4.0.0.tgz#9855756c5045ff4ed4516e14a47719387c3c907b"
   integrity sha512-m7zq0JkIrECzw9mO5Zcq6jN4KayE34yoIS9hJoiZNXyOAT06PPA8PrR+WtJIeFW09YjUfNkMMN9lrmAt6BURCA==
 
-react-aria-live@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/react-aria-live/-/react-aria-live-2.0.4.tgz#457cc216df5ccb3da875ee3eca70cce9c6b4559d"
-  integrity sha512-VE5b3K/54YqFD2ZWs6qBhc97cel+pYQtieQeKnZkhsENXB0wwEKDgV5ZVbrQQkjJaxw3OSjtkOJ9J6bs5TsRyA==
-  dependencies:
-    uuid "^3.2.1"
-
 react-beautiful-dnd@^10.0.2:
   version "10.0.2"
   resolved "https://registry.yarnpkg.com/react-beautiful-dnd/-/react-beautiful-dnd-10.0.2.tgz#618fe3dcd841c65235fca89bdde99a172fe77e50"
@@ -169,8 +162,3 @@ tiny-invariant@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tiny-invariant/-/tiny-invariant-1.0.3.tgz#91efaaa0269ccb6271f0296aeedb05fc3e067b7a"
   integrity sha512-ytQx8T4DL8PjlX53yYzcIC0WhIZbpR0p1qcYjw2pHu3w6UtgWwFJQ/02cnhOnBBhlFx/edUIfcagCaQSe3KMWg==
-
-uuid@^3.2.1:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
-  integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
