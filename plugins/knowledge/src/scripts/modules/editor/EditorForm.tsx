@@ -117,7 +117,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                         <AccessibleError
                                             id={this.domTitleErrorsID}
                                             error={this.props.titleError}
-                                            className={pointerEventsClass()}
+                                            className={classesRichEditorForm.titleErrorMessage}
                                         />
                                     )}
                                 </label>
