@@ -242,7 +242,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function patch_navigationFlat(int $id, array $body = []): array {
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("knowledge.articles.add");
         $this->idParamSchema();
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([

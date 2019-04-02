@@ -16,6 +16,51 @@ import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { INavigationItem, LoadStatus, IApiError } from "@library/@types/api/core";
 import { IArticle } from "@knowledge/@types/api/article";
 
+export type ReducerType = KnowledgeReducer<INavigationStoreState>;
+
+export interface IKbNavigationItem<R extends KbRecordType = KbRecordType> extends INavigationItem {
+    recordType: R;
+    knowledgeBaseID: number;
+    children?: string[];
+}
+
+export interface IPatchFlatItem {
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    recordType: KbRecordType;
+}
+
+export interface INormalizedNavigationItem extends IKbNavigationItem {
+    children: string[];
+    tempName?: string;
+    tempDeleted?: boolean;
+    error?: {
+        message: string;
+    };
+}
+export interface INormalizedNavigationItems {
+    [key: string]: INormalizedNavigationItem | undefined;
+}
+
+export interface INavigationStoreState {
+    navigationItems: INormalizedNavigationItems;
+    navigationItemsByKbID: {
+        [kbID: number]: string[];
+    };
+    submitStatus: LoadStatus;
+    fetchStatusesByKbID: {
+        [kbID: number]: LoadStatus;
+    };
+    patchTransactionID: string | null;
+    patchItems: IPatchFlatItem[];
+    currentError: {
+        type: NavigationActionType;
+        error: IApiError;
+        isLoading: boolean;
+    } | null;
+}
+
 export enum KbRecordType {
     CATEGORY = "knowledgeCategory",
     ARTICLE = "article",
@@ -595,49 +640,4 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             return compare(sortA, sortB)!;
         }
     }
-}
-
-export type ReducerType = KnowledgeReducer<INavigationStoreState>;
-
-export interface IKbNavigationItem<R extends KbRecordType = KbRecordType> extends INavigationItem {
-    recordType: R;
-    knowledgeBaseID: number;
-    children?: string[];
-}
-
-export interface IPatchFlatItem {
-    parentID: number;
-    recordID: number;
-    sort: number | null;
-    recordType: KbRecordType;
-}
-
-export interface INormalizedNavigationItem extends IKbNavigationItem {
-    children: string[];
-    tempName?: string;
-    tempDeleted?: boolean;
-    error?: {
-        message: string;
-    };
-}
-export interface INormalizedNavigationItems {
-    [key: string]: INormalizedNavigationItem | undefined;
-}
-
-export interface INavigationStoreState {
-    navigationItems: INormalizedNavigationItems;
-    navigationItemsByKbID: {
-        [kbID: number]: string[];
-    };
-    submitStatus: LoadStatus;
-    fetchStatusesByKbID: {
-        [kbID: number]: LoadStatus;
-    };
-    patchTransactionID: string | null;
-    patchItems: IPatchFlatItem[];
-    currentError: {
-        type: NavigationActionType;
-        error: IApiError;
-        isLoading: boolean;
-    } | null;
 }

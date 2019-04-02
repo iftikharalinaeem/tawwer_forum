@@ -25,6 +25,7 @@ import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import Permission from "@library/features/users/Permission";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -44,7 +45,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
         }
 
         return (
-            <>
+            <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
                     <div
@@ -82,7 +83,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
                         </div>
                     </div>
                 </FullKnowledgeModal>
-            </>
+            </Permission>
         );
     }
 

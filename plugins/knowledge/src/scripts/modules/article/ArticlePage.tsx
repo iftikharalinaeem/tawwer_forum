@@ -184,4 +184,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(ArticlePage));
+export default withDevice(withRedux(ArticlePage));
