@@ -74,10 +74,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
                                     />
                                 </DocumentTitle>
                                 <div className={inheritHeightClass()}>
-                                    <NavigationManager
-                                        knowledgeBase={knowledgeBase.data}
-                                        rootNavigationItemID="knowledgeCategory1"
-                                    />
+                                    <NavigationManager knowledgeBase={knowledgeBase.data} />
                                 </div>
                             </div>
                         </div>
