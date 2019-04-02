@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import Container from "@library/layout/components/Container";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
-import { t } from "@library/utility/appUtils";
-import { RouteComponentProps, withRouter } from "react-router";
+import Container from "@library/layout/components/Container";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import Heading from "@library/layout/Heading";
+import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import SmartAlign from "@library/layout/SmartAlign";
 import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
-import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import { t } from "@library/utility/appUtils";
+import * as React from "react";
+import { RouteComponentProps, withRouter } from "react-router";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
@@ -32,7 +33,27 @@ export class RevisionsLayout extends React.Component<IProps> {
         const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
         const isDesktop = device === Devices.DESKTOP;
         const isMobile = device === Devices.MOBILE;
-        const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revisions");
+        const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revision History");
+
+        let mobileDropDownContent: React.ReactNode = (
+            <>
+                <Heading>
+                    <SmartAlign>{t("Revisions")}</SmartAlign>
+                </Heading>
+                {this.props.revisionList}
+            </>
+        );
+        if (this.props.draftList !== null) {
+            mobileDropDownContent = (
+                <>
+                    <Heading>
+                        <SmartAlign>{t("Drafts")}</SmartAlign>
+                    </Heading>
+                    {this.props.draftList}
+                    {mobileDropDownContent}
+                </>
+            );
+        }
 
         return (
             <>
@@ -42,7 +63,7 @@ export class RevisionsLayout extends React.Component<IProps> {
                     className="richEditorRevisionsForm-header"
                     callToAction={t("Restore")}
                     mobileDropDownTitle={mobileTitle}
-                    mobileDropDownContent={this.props.revisionList}
+                    mobileDropDownContent={mobileDropDownContent}
                 />
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout

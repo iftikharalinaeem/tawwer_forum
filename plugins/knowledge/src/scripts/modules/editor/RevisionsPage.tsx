@@ -105,8 +105,12 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     private renderDrafts(): React.ReactNode {
         const { drafts } = this.props;
+
+        if (drafts.status !== LoadStatus.SUCCESS || (Array.isArray(drafts.data) && drafts.data.length === 0)) {
+            return null;
+        }
+
         return (
-            drafts.status === LoadStatus.SUCCESS &&
             drafts.data && (
                 <DraftsList hideTitle={this.props.device === Devices.MOBILE}>
                     {drafts.data.slice().map(item => {
