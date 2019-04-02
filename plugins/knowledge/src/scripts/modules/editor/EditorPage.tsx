@@ -26,25 +26,27 @@ interface IOwnProps
 
 interface IProps extends IOwnProps, IInjectableEditorProps {
     actions: EditorPageActions;
-    errors: {
-        category?: string;
-        title?: string;
-        body?: string;
-    };
+}
+
+interface IState {
+    categoryError?: string;
+    titleError?: string;
+    bodyError?: string;
 }
 
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.PureComponent<IProps> {
+export class EditorPage extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("editorPage");
 
-    public state = {
-        showFolderPicker: false,
+    public state: IState = {
+        categoryError: "Category is required.",
+        titleError: "Title is required.",
+        bodyError: "Body is required.",
     };
 
     public render() {
-        const errors = this.props.errors ? this.props.errors : {};
         return (
             <Modal
                 titleID={this.titleID}
@@ -55,7 +57,15 @@ export class EditorPage extends React.PureComponent<IProps> {
             >
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
-                    <EditorForm titleID={this.titleID} errors={errors} />
+                    <EditorForm
+                        titleID={this.titleID}
+                        categoryError={this.state.categoryError}
+                        titleError={this.state.titleError}
+                        bodyError={this.state.bodyError}
+                        removeCategoryError={this.removeCategoryError}
+                        removeTitleError={this.removeTitleError}
+                        removeBodyError={this.removeBodyError}
+                    />
                 </Permission>
             </Modal>
         );
@@ -111,6 +121,33 @@ export class EditorPage extends React.PureComponent<IProps> {
         } else {
             this.props.history.push("/kb");
         }
+    };
+
+    /**
+     * Remove error message for body
+     */
+    private removeBodyError = () => {
+        this.setState({
+            bodyError: undefined,
+        });
+    };
+
+    /**
+     * Remove error message for title
+     */
+    private removeTitleError = () => {
+        this.setState({
+            titleError: undefined,
+        });
+    };
+
+    /**
+     * Remove error message for category
+     */
+    private removeCategoryError = () => {
+        this.setState({
+            categoryError: undefined,
+        });
     };
 }
 

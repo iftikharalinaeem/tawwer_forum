@@ -23,6 +23,8 @@ import isEqual from "lodash/isEqual";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Modal from "@library/modal/Modal";
 import uniqueId from "lodash/uniqueId";
+import AccessibleError from "@library/forms/AccessibleError";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -56,7 +58,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
 
         return (
             <React.Fragment>
-                <div className={classNames("pageLocation", this.props.className)}>
+                <label className={classNames("pageLocation", this.props.className)}>
                     <Button
                         id={this.domID}
                         title={buttonTitle}
@@ -72,7 +74,8 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                     >
                         {buttonContents}
                     </Button>
-                </div>
+                    {!!this.props.error && <AccessibleError id={this.domErrorID} error={this.props.error} />}
+                </label>
                 {this.state.showLocationPicker && (
                     <Modal
                         exitHandler={this.hideLocationPicker}
