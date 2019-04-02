@@ -30,7 +30,6 @@ jobs:
         chrome: stable
       env:
         - TEST_FILE_ROOTS=()
-      before_script:
       script:
         - yarn build -i
         - yarn test
