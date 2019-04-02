@@ -73,7 +73,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException If the target knowledge category is not empty.
      */
     public function delete(int $id) {
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema()->setDescription("Delete a knowledge category.");
         $this->schema([], "out");
@@ -221,7 +221,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function get_edit(int $id): array {
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema()->setDescription("Get a knowledge category for editing.");
         $out = $this->schema(Schema::parse([
@@ -352,7 +352,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeCategoryPostSchema())
@@ -441,7 +441,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body = []): array {
-        $this->permission("Garden.Settings.Manage");
+        $this->permission("knowledge.articles.add");
 
         $in = $this->schema($this->knowledgeCategoryPostSchema())
             ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateKBCategoriesLimit"])
