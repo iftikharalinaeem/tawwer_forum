@@ -985,7 +985,7 @@ components:
           description: How many times the article has been viewed.
           type: integer
       required:
-        - articleBrokenID
+        - articleID
         - knowledgeCategoryID
         - name
         - seoName
