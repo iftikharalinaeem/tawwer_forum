@@ -25,6 +25,8 @@ import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import Permission from "@library/features/users/Permission";
+import { hot } from "react-hot-loader";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -44,7 +46,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
         }
 
         return (
-            <>
+            <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                 <FullKnowledgeModal titleID={this.titleID}>
                     <NavigationManagerMenu />
                     <div
@@ -73,16 +75,13 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
                                     />
                                 </DocumentTitle>
                                 <div className={inheritHeightClass()}>
-                                    <NavigationManager
-                                        knowledgeBase={knowledgeBase.data}
-                                        rootNavigationItemID="knowledgeCategory1"
-                                    />
+                                    <NavigationManager knowledgeBase={knowledgeBase.data} />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </FullKnowledgeModal>
-            </>
+            </Permission>
         );
     }
 
@@ -127,7 +126,9 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(OrganizeCategoriesPage);
+export default hot(module)(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(OrganizeCategoriesPage),
+);

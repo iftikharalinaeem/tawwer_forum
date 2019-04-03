@@ -184,3 +184,9 @@ export function getPageRoutes() {
         <Route component={NotFound} key={"not found"} />,
     ];
 }
+
+// The point where `mountReact` or ReactDOM.render() is what will re-render the tree.
+// This is only here to prevent changes to these modules from causing a full reload.
+if (module.hot) {
+    module.hot.accept();
+}

@@ -24,15 +24,31 @@ import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
 import { initAllUserContent } from "@library/content";
 import { forceRenderStyles } from "typestyle";
+import { AppContainer } from "react-hot-loader";
 
 debug(getMeta("context.debug"));
+
+const render = () => {
+    const app = document.querySelector("#app");
+    ReactDOM.render(
+        <AppContainer>
+            <KnowledgeApp />
+        </AppContainer>,
+        app,
+    );
+    forceRenderStyles();
+};
 
 onReady(() => {
     initAllUserContent();
     registerReducer("knowledge", rootReducer);
     registerReducer("notifications", new NotificationsModel().reducer);
     registerReducer("conversations", new ConversationsModel().reducer);
-    const app = document.querySelector("#app");
-    ReactDOM.render(<KnowledgeApp />, app);
-    forceRenderStyles();
+    render();
 });
+
+if (module.hot) {
+    module.hot.accept("@knowledge/KnowledgeApp", () => {
+        render();
+    });
+}

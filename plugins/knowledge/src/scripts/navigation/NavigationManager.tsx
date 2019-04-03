@@ -45,7 +45,6 @@ interface IProps extends IActions, INavigationStoreState {
     navigationItems: INormalizedNavigationItems;
     knowledgeBase: IKnowledgeBase;
     describedBy?: string;
-    rootNavigationItemID: string;
 }
 
 interface IState {
@@ -199,12 +198,16 @@ export class NavigationManager extends React.Component<IProps, IState> {
         );
     };
 
+    private get rootNavigationItemID() {
+        return KbRecordType.CATEGORY + this.props.knowledgeBase.rootCategoryID;
+    }
+
     /**
      * Get the id of the first element in the tree to focus it.
      */
     private getFirstItemID = (): string | null => {
         const { items } = this.state.treeData;
-        const rootItem = items[this.props.rootNavigationItemID];
+        const rootItem = items[this.rootNavigationItemID];
         if (rootItem && rootItem.children.length > 0) {
             // Hard coded until we
             return rootItem.children[0];
@@ -218,7 +221,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private getLastItemID = (): string | null => {
         const { items } = this.state.treeData;
-        const rootItem = items[this.props.rootNavigationItemID];
+        const rootItem = items[this.rootNavigationItemID];
         if (rootItem && rootItem.children.length > 0) {
             return rootItem.children[rootItem.children.length - 1];
         } else {
@@ -588,7 +591,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
             },
         );
         this.storePatchArray(newTree);
-        await this.props.navigationActions.patchNavigationFlat(1);
+        await this.props.navigationActions.patchNavigationFlat(this.props.knowledgeBase.knowledgeBaseID);
     };
 
     private onDragStart = (source: ITreeSourcePosition) => {
@@ -604,7 +607,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private updateAllItems(update: Partial<ITreeItem<INormalizedNavigationItem>>) {
         const data: ITreeData<INormalizedNavigationItem> = {
-            rootId: this.props.rootNavigationItemID,
+            rootId: this.rootNavigationItemID,
             items: {},
         };
 
@@ -634,7 +637,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 children: value.children,
             };
         }
-        const calcedData = NavigationModel.denormalizeData(outOfTree, this.props.rootNavigationItemID);
+        const calcedData = NavigationModel.denormalizeData(outOfTree, this.rootNavigationItemID);
         this.props.navigationActions.setPatchItems(calcedData);
         return calcedData;
     }

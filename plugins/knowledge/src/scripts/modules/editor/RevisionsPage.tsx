@@ -30,6 +30,7 @@ import { t } from "@library/utility/appUtils";
 import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import classNames from "classnames";
 import React from "react";
+import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 
@@ -272,4 +273,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(RevisionsPage));
+export default hot(module)(withRedux(withDevice(RevisionsPage)));

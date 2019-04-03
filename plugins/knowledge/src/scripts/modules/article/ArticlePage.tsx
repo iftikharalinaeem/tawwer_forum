@@ -23,6 +23,7 @@ import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { hot } from "react-hot-loader";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -184,4 +185,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(ArticlePage));
+export default hot(module)(withDevice(withRedux(ArticlePage)));

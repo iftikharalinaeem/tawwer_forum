@@ -14,6 +14,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { LoadStatus } from "@library/@types/api/core";
+import { hot } from "react-hot-loader";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {
@@ -77,7 +78,9 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(KnowledgeBasePage);
+export default hot(module)(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(KnowledgeBasePage),
+);

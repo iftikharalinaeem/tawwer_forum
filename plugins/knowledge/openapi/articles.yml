@@ -95,18 +95,6 @@ paths:
                       type: integer
                   x-filter:
                       field: insertUserID
-                - description: >
-                      <p>Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.</p>
-                  in: query
-                  name: expand
-                  schema:
-                      items:
-                          enum:
-                              - insertUser
-                              - updateUser
-                          type: string
-                      type: array
-                  style: form
             responses:
                 "200":
                     content:
@@ -148,8 +136,6 @@ paths:
                                         insertUserID:
                                             description: Unique ID of the user who originally created the draft.
                                             type: integer
-                                        insertUser:
-                                            $ref: "#/components/schemas/UserFragment"
                                         parentRecordID:
                                             description: The unique ID of the intended parent to this record.
                                             nullable: true
@@ -166,8 +152,6 @@ paths:
                                         updateUserID:
                                             description: Unique ID of the last user to update the draft.
                                             type: integer
-                                        updateUser:
-                                            $ref: "#/components/schemas/UserFragment"
                                     required:
                                         - draftID
                                         - recordType
@@ -1024,7 +1008,6 @@ components:
                         $ref: "#/components/schemas/DiscussionArticleAnswer"
                     type: array
                 body:
-                    barf: two
                     oneOf:
                         - description: Rendered discussion body contents.
                           type: string
@@ -1045,7 +1028,6 @@ components:
             type: object
             properties:
                 body:
-                    barf: two
                     oneOf:
                         - description: Rendered answer body contents.
                           type: string

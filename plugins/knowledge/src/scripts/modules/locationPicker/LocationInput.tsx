@@ -22,6 +22,9 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Modal from "@library/modal/Modal";
+import uniqueId from "lodash/uniqueId";
+import AccessibleError from "@library/forms/AccessibleError";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -30,17 +33,20 @@ import Modal from "@library/modal/Modal";
 export class LocationInput extends React.PureComponent<IProps, IState> {
     private changeLocationButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private static readonly SELECT_MESSAGE = t("Select a Category");
+    private domID = uniqueId("locationInput-");
+    private domErrorID = this.domID + "errors";
 
     public state: IState = {
         showLocationPicker: false,
     };
 
     public render() {
-        const { className, ...passThrough } = this.props;
+        const { inputClassName, modalClassName, ...passThrough } = this.props;
         const { locationBreadcrumb } = this.props;
         const buttonTitle = locationBreadcrumb
             ? LocationBreadcrumbs.renderString(locationBreadcrumb)
             : LocationInput.SELECT_MESSAGE;
+        const classesRichEditorForm = richEditorFormClasses();
 
         const buttonContents = locationBreadcrumb ? (
             <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
@@ -53,8 +59,9 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
 
         return (
             <React.Fragment>
-                <div className={classNames("pageLocation", this.props.className)}>
+                <label className={classNames("pageLocation", inputClassName)}>
                     <Button
+                        id={this.domID}
                         title={buttonTitle}
                         type="button"
                         aria-label={t("Page Location")}
@@ -63,15 +70,24 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         baseClass={ButtonTypes.CUSTOM}
                         buttonRef={this.changeLocationButton}
                         disabled={!!this.props.disabled}
+                        aria-invalid={!!this.props.error}
+                        aria-errormessage={!!this.props.error ? this.domErrorID : undefined}
                     >
                         {buttonContents}
                     </Button>
-                </div>
+                    {!!this.props.error && (
+                        <AccessibleError
+                            id={this.domErrorID}
+                            error={this.props.error}
+                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                        />
+                    )}
+                </label>
                 {this.state.showLocationPicker && (
                     <Modal
                         exitHandler={this.hideLocationPicker}
                         size={ModalSizes.SMALL}
-                        className={classNames(this.props.className)}
+                        className={classNames(modalClassName)}
                         label={t("Choose a location for this page.")}
                         elementToFocusOnExit={this.changeLocationButton.current!}
                     >
@@ -131,10 +147,12 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
 }
 
 interface IOwnProps {
-    className?: string;
+    inputClassName?: string;
+    modalClassName?: string;
     initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
     onChange?: (categoryID: number | null, sort?: number) => void;
+    error?: string;
 }
 
 interface IState {
