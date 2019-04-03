@@ -12,8 +12,6 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
-import WidgetContainer from "@library/layout/components/WidgetContainer";
-import { WidgetContainerSize } from "@library/layout/components/WidgetContainer";
 import SubcommunityList from "@library/features/subcommunities/SubcommunityList";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
@@ -40,16 +38,14 @@ class KnowledgeBaseList extends React.Component<IProps> {
         }
 
         return (
-            <WidgetContainer size={WidgetContainerSize.LARGE}>
-                <SubcommunityList
-                    title={t("Choose a subcommunity")}
-                    titleLevel={1}
-                    hiddenTitle={true}
-                    items={knowledgeBases}
-                    emptyMessage={t("No knowledge bases found.")}
-                    fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
-                />
-            </WidgetContainer>
+            <SubcommunityList
+                title={t("Choose a subcommunity")}
+                titleLevel={1}
+                hiddenTitle={true}
+                items={knowledgeBases}
+                emptyMessage={t("No knowledge bases found.")}
+                fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
+            />
         );
     }
 

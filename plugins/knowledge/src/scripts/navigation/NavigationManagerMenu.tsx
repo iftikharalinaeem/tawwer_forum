@@ -13,7 +13,7 @@ import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { px } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps {
