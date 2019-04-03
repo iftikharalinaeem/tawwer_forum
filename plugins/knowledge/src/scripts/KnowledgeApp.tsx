@@ -23,11 +23,15 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
 import { LiveAnnouncer } from "react-aria-live";
 
+interface IState {
+    app: React.ReactNode;
+}
+
 /*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
-export default class KnowledgeApp extends React.Component {
+export default class KnowledgeApp extends React.Component<{}, IState> {
     private store = getStore<IStoreState>();
 
     /**
@@ -50,7 +54,7 @@ export default class KnowledgeApp extends React.Component {
                                                     <Route component={KnowledgeRoutes} />
                                                 </LinkContextProvider>
                                             </BrowserRouter>
-                                        </DeviceProvider>{" "}
+                                        </DeviceProvider>
                                     </SearchContext.Provider>
                                 </SiteNavProvider>
                             </ScrollOffsetProvider>
