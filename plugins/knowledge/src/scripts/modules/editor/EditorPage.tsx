@@ -40,6 +40,8 @@ interface IState {
 export class EditorPage extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("editorPage");
 
+    public state: IState = {};
+
     public render() {
         return (
             <Modal
