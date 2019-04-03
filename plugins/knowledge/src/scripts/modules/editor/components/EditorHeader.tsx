@@ -25,7 +25,7 @@ import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
-    canSubmit: boolean;
+    canSubmit?: boolean;
     className?: string;
     draft?: ILoadable<IResponseArticleDraft>;
     isSubmitLoading: boolean;
@@ -43,6 +43,7 @@ interface IProps extends IDeviceProps {
 export class EditorHeader extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
+        canSubmit: true,
         draft: {
             status: LoadStatus.PENDING,
         },

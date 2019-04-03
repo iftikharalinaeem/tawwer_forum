@@ -16,7 +16,6 @@ import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import PanelLayout from "@library/layout/PanelLayout";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import { Editor } from "@rich-editor/editor/Editor";
 import classNames from "classnames";
@@ -27,6 +26,9 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import uniqueId from "lodash/uniqueId";
+import AccessibleError from "@library/forms/AccessibleError";
+import { inheritHeightClass, pointerEventsClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -34,6 +36,12 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     titleID?: string;
     mobileDropDownTitle?: string;
     kbID?: number;
+    categoryError?: string;
+    titleError?: string;
+    bodyError?: string;
+    removeCategoryError: () => void;
+    removeTitleError: () => void;
+    removeBodyError: () => void;
 }
 
 /**
@@ -42,11 +50,15 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
 export class EditorForm extends React.PureComponent<IProps> {
     private editorRef: React.RefObject<Editor> = React.createRef();
 
+    private domID: string = uniqueId("editorForm-");
+    private domTitleID: string = this.domID + "-title";
+    private domTitleErrorsID: string = this.domTitleID + "Errors";
+
     /**
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft, mobileDropDownTitle } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
         const classesRichEditorForm = richEditorFormClasses();
 
         return (
@@ -55,7 +67,6 @@ export class EditorForm extends React.PureComponent<IProps> {
                 onSubmit={this.onSubmit}
             >
                 <EditorHeader
-                    canSubmit={this.canSubmit}
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     className={classNames("richEditorForm-header")}
                     draft={draft}
@@ -77,23 +88,39 @@ export class EditorForm extends React.PureComponent<IProps> {
                         topPadding={false}
                         middleBottom={
                             <div className={classesRichEditorForm.formContent}>
-                                <LocationInput disabled={this.isLoading} onChange={this.locationPickerChangeHandler} />
+                                <LocationInput
+                                    disabled={this.isLoading}
+                                    onChange={this.locationPickerChangeHandler}
+                                    error={this.props.categoryError}
+                                />
                                 <div className="sr-only">
                                     <DocumentTitle title={this.props.form.name || "Untitled"} />
                                 </div>
-                                <input
-                                    className={classNames(
-                                        "richEditorForm-title",
-                                        "inputBlock-inputText",
-                                        "inputText",
-                                        classesRichEditorForm.title,
+                                <label>
+                                    <input
+                                        id={this.domTitleID}
+                                        className={classNames(
+                                            "richEditorForm-title",
+                                            "inputBlock-inputText",
+                                            "inputText",
+                                            classesRichEditorForm.title,
+                                        )}
+                                        type="text"
+                                        placeholder={t("Title")}
+                                        value={this.props.form.name || ""}
+                                        onChange={this.titleChangeHandler}
+                                        disabled={this.isLoading}
+                                        aria-invalid={!!this.props.titleError}
+                                        aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
+                                    />
+                                    {!!this.props.titleError && (
+                                        <AccessibleError
+                                            id={this.domTitleErrorsID}
+                                            error={this.props.titleError}
+                                            className={classesRichEditorForm.titleErrorMessage}
+                                        />
                                     )}
-                                    type="text"
-                                    placeholder={t("Title")}
-                                    value={this.props.form.name || ""}
-                                    onChange={this.titleChangeHandler}
-                                    disabled={this.isLoading}
-                                />
+                                </label>
                                 <Editor
                                     allowUpload={true}
                                     ref={this.editorRef}
@@ -112,6 +139,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     initialValue={form.body}
                                     operationsQueue={this.props.editorOperationsQueue}
                                     clearOperationsQueue={this.props.actions.clearEditorOps}
+                                    error={this.props.bodyError}
                                 />
                             </div>
                         }
@@ -137,26 +165,6 @@ export class EditorForm extends React.PureComponent<IProps> {
     }
 
     /**
-     * Whether or not we have all of the data we need to submit the form.
-     */
-    private get canSubmit(): boolean {
-        if (!this.editorRef.current) {
-            return false;
-        }
-        const minTitleLength = 1;
-        const minBodyLength = 1;
-
-        const title = this.props.form.name || "";
-        const body = this.editorRef.current.getEditorText().trim();
-
-        return (
-            title.length >= minTitleLength &&
-            body.length >= minBodyLength &&
-            this.props.form.knowledgeCategoryID !== null
-        );
-    }
-
-    /**
      * Handle changes in the form. Updates the draft.
      */
     private handleFormChange(form: Partial<IEditorPageForm>) {
@@ -168,6 +176,7 @@ export class EditorForm extends React.PureComponent<IProps> {
      * Handle changes in the location picker.
      */
     private locationPickerChangeHandler = (categoryID: number, sort?: number) => {
+        this.props.removeCategoryError();
         this.handleFormChange({ knowledgeCategoryID: categoryID, sort });
     };
 
@@ -176,6 +185,7 @@ export class EditorForm extends React.PureComponent<IProps> {
      */
     private editorChangeHandler = debounce((content: DeltaOperation[]) => {
         this.handleFormChange({ body: content });
+        this.props.removeBodyError();
     }, 1000 / 60);
 
     /**
@@ -198,6 +208,7 @@ export class EditorForm extends React.PureComponent<IProps> {
      * Change handler for the title
      */
     private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.props.removeTitleError();
         this.handleFormChange({ name: event.target.value });
     };
 
@@ -205,11 +216,9 @@ export class EditorForm extends React.PureComponent<IProps> {
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
     private onSubmit = (event: React.FormEvent) => {
-        if (this.canSubmit) {
-            event.preventDefault();
-            event.stopPropagation();
-            void this.props.actions.publish(this.props.history);
-        }
+        event.preventDefault();
+        event.stopPropagation();
+        void this.props.actions.publish(this.props.history);
     };
 }
 
