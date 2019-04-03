@@ -577,14 +577,14 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const itemID = treeData.items[source.parentId].children[source.index];
         const item = treeData.items[itemID];
 
-        const dest = treeData.items[destination.parentId];
-        if (dest && dest.data.recordType === KbRecordType.ARTICLE) {
+        const destinationItem = treeData.items[destination.parentId];
+        if (destinationItem && destinationItem.data.recordType === KbRecordType.ARTICLE) {
             return;
         }
 
         if (destination.index === undefined) {
-            if (dest) {
-                destination.index = dest.children.length;
+            if (destinationItem) {
+                destination.index = destinationItem.children.length;
             } else {
                 destination.index = 0;
             }
