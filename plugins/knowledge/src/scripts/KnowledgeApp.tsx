@@ -22,6 +22,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
 import { LiveAnnouncer } from "react-aria-live";
+import { hot } from "react-hot-loader";
 
 interface IState {
     app: React.ReactNode;
@@ -31,7 +32,7 @@ interface IState {
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
-export default class KnowledgeApp extends React.Component<{}, IState> {
+class KnowledgeApp extends React.Component<{}, IState> {
     private store = getStore<IStoreState>();
 
     /**
@@ -71,3 +72,5 @@ export default class KnowledgeApp extends React.Component<{}, IState> {
         };
     }
 }
+
+export default hot(module)(KnowledgeApp);

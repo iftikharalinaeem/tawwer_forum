@@ -20,6 +20,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import Splash from "@library/splash/Splash";
+import { hot } from "react-hot-loader";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
@@ -66,7 +67,9 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(HomePage);
+export default hot(module)(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(HomePage),
+);

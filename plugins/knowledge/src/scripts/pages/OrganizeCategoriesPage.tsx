@@ -26,6 +26,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
+import { hot } from "react-hot-loader";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -125,7 +126,9 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(OrganizeCategoriesPage);
+export default hot(module)(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(OrganizeCategoriesPage),
+);
