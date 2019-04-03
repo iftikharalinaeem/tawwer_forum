@@ -20,6 +20,7 @@ import { match } from "react-router";
 import { IArticleFragment } from "@knowledge/@types/api/article";
 import { IResult } from "@library/result/Result";
 import { ResultMeta } from "@library/result/ResultMeta";
+import { hot } from "react-hot-loader";
 
 /**
  * Page component for a flat category list.
@@ -178,7 +179,9 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(CategoriesPage);
+export default hot(module)(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(CategoriesPage),
+);
