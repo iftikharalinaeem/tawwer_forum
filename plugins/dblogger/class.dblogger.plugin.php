@@ -1,4 +1,7 @@
 <?php
+
+use Garden\Container\Container;
+use Vanilla\Logger;
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -57,17 +60,21 @@ class DbLoggerPlugin extends Gdn_Plugin {
 
     /**
      * Install the database logger as early as possible.
+     *
+     * @param Container $dic
      */
-    public function gdn_dispatcher_appStartup_handler() {
-        $logger = new DbLogger();
+    public function container_init(Container $dic) {
+        $dbLogger = new DbLogger();
 
         try {
-            $logger->setPruneAfter(c('Plugins.dblogger.PruneAfter', '-90 days'));
+            $dbLogger->setPruneAfter(c('Plugins.dblogger.PruneAfter', '-90 days'));
         } catch (InvalidArgumentException $e) {
             // Do nothing on an invalid date. Just don't set it.
         }
 
-        Logger::addLogger($logger, $this->getLevel());
+        /** @var Logger */
+        $vanillaLogger = $dic->get(Logger::class);
+        $vanillaLogger->addLogger($dbLogger, $this->getLevel());
     }
 
     /**
