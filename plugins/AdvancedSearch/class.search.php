@@ -7,6 +7,9 @@
 /**
  * A utility class to help with searches.
  */
+
+use Garden\EventManager;
+
 class Search {
     /// Properties ///
     protected static $types;
@@ -58,15 +61,24 @@ class Search {
             $categoryID = null;
         }
 
-        Gdn::pluginManager()->fireAs('advancedSearchPlugin')->fireEvent('beforeSearch',
-            [
-                'catgeoryID' => &$categoryID,
-                'search' =>
-                    [
-                        'subcats' => &$search['subcats'],
-                    ],
-            ]
-        );
+        if (!array_key_exists('subcats', $search)) {
+            $search['subcats'] = null;
+        }
+
+        $args = [
+            'categoryID' => $categoryID,
+            'search' =>
+                [
+                    'subcats' => $search['subcats'],
+                ],
+        ];
+
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $args = $eventManager->fireFilter('advancedSearchPlugin_beforeSearch', $args);
+
+        $categoryID = $args['categoryID'] ?? $categoryID;
+        $search['subcats'] = $args['search']['subcats'] ?? $search['subcats'];
 
         if (!$categoryID) {
             switch ($archived) {
