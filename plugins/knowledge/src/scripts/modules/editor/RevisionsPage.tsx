@@ -30,6 +30,7 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import { hot } from "react-hot-loader";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -237,4 +238,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withDevice(RevisionsPage));
+export default hot(module)(withRedux(withDevice(RevisionsPage)));

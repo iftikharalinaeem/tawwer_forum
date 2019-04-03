@@ -1,4 +1,4 @@
-# Configure the build.
+dist: xenial
 jobs:
   fast_finish: true
   include:
@@ -6,6 +6,8 @@ jobs:
     - name: PHP 7.2
       language: php
       php: 7.2
+      services:
+      - mysql
       addons:
         apt:
           packages:
@@ -14,14 +16,8 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
-        - ./travis/install.sh
-        - cd vanilla
         - composer self-update
         - composer install --optimize-autoloader
-      cache:
-        directories:
-          - $HOME/.composer/cache/files
       script:
           - ./vendor/bin/phpunit --exclude-group=large
           - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
@@ -35,33 +31,25 @@ jobs:
         chrome: stable
       env:
         - TEST_FILE_ROOTS=(plugins/knowledge)
-      before_script:
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
-        - export PATH=$HOME/.yarn/bin:$PATH
-        - ./travis/install.sh
-        - cd vanilla
-        - yarn install --pure-lockfile
-      cache:
-        directories:
-          - $TRAVIS_BUILD_DIR/vanilla/node_modules
-        yarn: true
       script:
         - yarn build -i
         - yarn check-types
         - yarn test
 
-# No additional system dependencies to install. Skip the install step.
-install: true
+install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
+  - export PATH=$HOME/.yarn/bin:$PATH
+  - phpenv config-rm xdebug.ini
+  - ./travis/install.sh
+  - cd vanilla
+  - yarn install --pure-lockfile
 
-# Send status update notifications to a HipChat room.
-notifications:
-  hipchat:
-    format: html
-    on_success: change
-    rooms:
-      - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
-    template:
-      - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+    - $TRAVIS_BUILD_DIR/vanilla/node_modules
+    - $TRAVIS_BUILD_DIR/vanilla/plugins/rich-editor/node_modules
+  yarn: true
 
 notifications:
   hipchat:
@@ -75,4 +63,4 @@ notifications:
         by %{author}: %{message}
     format: html
   slack:
-    secure: "EMwrufwlxpr5UqV93dJr55ngTD415lZGXx3J3PP6CJKLasGHea7ZnYX2JN5TRTrkT3C+eDFiiQdoz2u9eQU8BuqrUNQdAphMUhnWwjQqddudEvSiwH6GmwOG9Bc/m0mMUfK3/qCA+2wpDfHHsdaZmSeylfKClHpSwVgjYxOB7xA="
+    secure: C/DEretqnvfm2mFlmt9N3H4DMzLfxHfIoR4s3X1N4M1X7NiElxjv7bx0XatylDA4jEhnrDAitzrwJRSkUU5bVf1kmVXHP26m65ketEFf8RPlx8FH6bDeftmmeWD7Od6Oo1E7Uv6oT410pCOJR1tlJp16fNKePpu+CmivDBr9eQ61XrMdu6UlNYmseNuLCB5ss2Z5+EuS9ftkD5B9QdIHw7Fqc3JTMw5aYMPVYweI4pn3zwFQ1Xt3lAYVAvfkk71/Gj65+/4PMPs3PPTSe+9+qrepei246K9T/8IdTmQyjFoqCwiP+KxtkQdjr69pIRqf8LPYyNUrNTrjjGxy7Zb2dkhN7la7pYWf1JMNnSscy43a1ZIp26ewAPk4ym/Bt5EO1VpX5JR98I7aofIcP2EW/DmMMaFbRhbe36ZdzrdufIdn0kLKM/mfZBxJuBfFg1aPaQzVi15hJfyMHKVLmkVtH1evk1C+A3r5aoQXAGljJga7IK5VtIyLEVPdl/gRPELPyTs1vN8c2Hh310pU/W+9joHqkwHxyz7w2CH5KlY7uyFb/7zIr/Xv6rzpMBvr5hin8DjU9YslrN8IDN4t+HjXLDSMI6i0B+IlXFQIFLBaNjHH+5J6IxLtglBwVXPbKfy427AAjgOwdJSRzX0Tpxulez67NeDhlXUxwHqUxi5HUEM=
