@@ -37,24 +37,24 @@ export default class RevisionsListItem extends React.Component<IProps> {
         return (
             <Hoverable onHover={this.props.onHover} duration={50}>
                 {provided => (
-                    <li {...provided} className="revisionsList-item">
+                    <li {...provided} className="itemList-item">
                         <SmartLink
                             to={url}
-                            className={classNames("revisionsList-link", "panelList-link", { isSelected })}
+                            className={classNames("itemList-link", "panelList-link", { isSelected })}
                             tabIndex={-1}
                             replace
                         >
-                            <div className="revisionsList-photoFrame">
-                                <img src={photoUrl} className="revisionsList-photo" alt={`${t("User: ")}${name}`} />
+                            <div className="itemList-photoFrame">
+                                <img src={photoUrl} className="itemList-photo" alt={`${t("User: ")}${name}`} />
                             </div>
-                            <div className="revisionsList-content">
-                                <div className="revisionsList-userName">{name}</div>
-                                <div className="revisionsList-dateTime">
+                            <div className="itemList-content">
+                                <div className="itemList-userName">{name}</div>
+                                <div className="itemList-dateTime">
                                     <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                                 </div>
                             </div>
                             {status && (
-                                <div className={classNames("revisionsList-status", `status-${status.toLowerCase()}`)}>
+                                <div className={classNames("itemList-status", `status-${status.toLowerCase()}`)}>
                                     {this.icon(status)}
                                 </div>
                             )}
@@ -66,7 +66,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
     }
 
     private icon(status: string) {
-        const commonClass = "revisionsList-icon";
+        const commonClass = "itemList-icon";
         switch (status) {
             case "draft":
                 return revisionStatus_draft(commonClass);

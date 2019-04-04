@@ -127,6 +127,8 @@ export interface IResponseArticleDraft extends IArticleDraft, IInsertUpdate {
     draftID: number;
     recordType: "article";
     excerpt: string;
+    insertUser?: IUserFragment;
+    updateUser?: IUserFragment;
 }
 
 // GET /articles/drafts

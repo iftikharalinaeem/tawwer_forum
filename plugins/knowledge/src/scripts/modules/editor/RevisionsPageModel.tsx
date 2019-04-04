@@ -4,20 +4,24 @@
  * @license Proprietary
  */
 
-import ReduxReducer from "@library/redux/ReduxReducer";
+import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { produce } from "immer";
-import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
+import ReduxReducer from "@library/redux/ReduxReducer";
+import { produce } from "immer";
+import DraftsPageActions from "../drafts/DraftsPageActions";
 
 export interface IRevisionsPageState {
     articleID: number | null;
     articleStatus: ILoadable<any>;
+    draftIDs: number[];
     revisionIDs: number[];
     revisionsStatus: ILoadable<any>;
+    draftsStatus: ILoadable<any>;
     selectedRevisionStatus: ILoadable<any>;
     selectedRevisionID: number | null;
 }
@@ -52,6 +56,16 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
     }
 
     /**
+     * Select all drafts currently loaded.
+     *
+     * @param state A full state object.
+     */
+    public static selectDrafts(state: IStoreState): IResponseArticleDraft[] {
+        const stateSlice = this.stateSlice(state);
+        return stateSlice.draftIDs.map(id => ArticleModel.selectDraft(state, id)!);
+    }
+
+    /**
      * Select all revisions currently loaded.
      *
      * @param state A full state object.
@@ -80,6 +94,10 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
     public initialState: IRevisionsPageState = {
         articleID: null,
         articleStatus: {
+            status: LoadStatus.PENDING,
+        },
+        draftIDs: [],
+        draftsStatus: {
             status: LoadStatus.PENDING,
         },
         selectedRevisionID: null,
@@ -123,6 +141,22 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
                     case ArticleActions.GET_REVISION_ERROR:
                         draft.selectedRevisionStatus.status = LoadStatus.ERROR;
                         draft.selectedRevisionStatus.error = action.payload;
+                        break;
+                }
+            }
+
+            if (action.meta && action.meta.identifier && action.meta.identifier === DraftsPageActions.IDENTIFIER) {
+                switch (action.type) {
+                    case ArticleActions.GET_DRAFTS_REQUEST:
+                        draft.draftsStatus.status = LoadStatus.LOADING;
+                        break;
+                    case ArticleActions.GET_DRAFTS_RESPONSE:
+                        draft.draftsStatus.status = LoadStatus.SUCCESS;
+                        draft.draftIDs = action.payload.data.map(articleDraft => articleDraft.draftID);
+                        break;
+                    case ArticleActions.GET_DRAFTS_ERROR:
+                        draft.draftsStatus.status = LoadStatus.ERROR;
+                        draft.draftsStatus.error = action.payload;
                         break;
                 }
             }

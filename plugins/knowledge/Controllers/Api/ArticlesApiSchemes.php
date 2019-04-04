@@ -270,6 +270,7 @@ trait ArticlesApiSchemes {
                 "description" => "Unique ID of the user who originally created the draft.",
                 "type" => "integer",
             ],
+            "insertUser?" => $this->getUserFragmentSchema(),
             "dateInserted" => [
                 "description" => "When the draft was created.",
                 "type" => "datetime",
@@ -278,6 +279,7 @@ trait ArticlesApiSchemes {
                 "description" => "Unique ID of the last user to update the draft.",
                 "type" => "integer",
             ],
+            "updateUser?" => $this->getUserFragmentSchema(),
             "dateUpdated" => [
                 "description" => "When the draft was last updated",
                 "type" => "datetime",

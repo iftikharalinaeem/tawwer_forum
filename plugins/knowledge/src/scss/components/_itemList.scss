@@ -4,43 +4,43 @@
  * @license Proprietary
  */
 
-$revisionList-avatar_size: 30px;
-$revisionList-avatar_margin: 9px;
-$revisionList-avatar_borderWidth: 1px;
-$revisionList-avatar_borderRadius: 50%;
-$revisionList-avatar_borderColor: mix($global-color_fg, $global-color_bg, 10%);
+$itemList-avatar_size: 30px;
+$itemList-avatar_margin: 9px;
+$itemList-avatar_borderWidth: 1px;
+$itemList-avatar_borderRadius: 50%;
+$itemList-avatar_borderColor: mix($global-color_fg, $global-color_bg, 10%);
 
-$revisionList-status_color: mix($global-color_fg, $global-color_bg, 50%);
-$revisionList-status_size: $icon-default_size;
+$itemList-status_color: mix($global-color_fg, $global-color_bg, 50%);
+$itemList-status_size: $icon-default_size;
 
-$revisionList-spacing: 16px;
-$revisionList-item_minHeight: 63px;
+$itemList-spacing: 16px;
+$itemList-item_minHeight: 63px;
 
-$revisionList-user_fontSize: 16px;
+$itemList-user_fontSize: 16px;
 
-$revisionList-linkPadding_mobile: 16px;
+$itemList-linkPadding_mobile: 16px;
 
-$revisionList-border_color: $global-border_color;
+$itemList-border_color: $global-border_color;
 
-.revisionsList {
+.itemList {
     padding: {
         top: $global-gutter_halfSize;
         bottom: $global-gutter_halfSize;
     }
 }
 
-.revisionsList-item {
-    + .revisionsList-item {
-        border-top: solid $revisionList-border_color 1px;
+.itemList-item {
+    + .itemList-item {
+        border-top: solid $itemList-border_color 1px;
     }
 }
 
-.revisionsList-link {
+.itemList-link {
     display: flex;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    min-height: $revisionList-item_minHeight;
+    min-height: $itemList-item_minHeight;
     padding: 0 $global-gutter_quarterSize;
     user-select: none;
 
@@ -59,50 +59,53 @@ $revisionList-border_color: $global-border_color;
 }
 
 @include mediaQuery-panelLayout_oneColumn {
-    .revisionsList {
+    .itemList {
         padding: {
             top: 0;
             bottom: 0;
         }
     }
 
-    .revisionsList-link {
+    .itemList-link {
         padding: {
-            left: $revisionList-linkPadding_mobile;
-            right: $revisionList-linkPadding_mobile;
+            left: $itemList-linkPadding_mobile;
+            right: $itemList-linkPadding_mobile;
         }
     }
 }
 
-.revisionsList-title {
+.itemList-title {
     padding: {
         right: $global-gutter_quarterSize;
         left: $global-gutter_quarterSize;
     }
 }
 
-.revisionsList-photoFrame {
+.itemList-photoFrame {
     position: relative;
-    width: $revisionList-avatar_size + $revisionList-avatar_borderWidth * 2;
-    height: $revisionList-avatar_size + $revisionList-avatar_borderWidth * 2;
-    margin-right: $revisionList-avatar_margin;
-    border-radius: $revisionList-avatar_borderRadius;
-    border: solid $revisionList-avatar_borderColor $revisionList-avatar_borderWidth;
+    width: $itemList-avatar_size + $itemList-avatar_borderWidth * 2;
+    height: $itemList-avatar_size + $itemList-avatar_borderWidth * 2;
+    margin-right: $itemList-avatar_margin;
+    border-radius: $itemList-avatar_borderRadius;
+    border: solid $itemList-avatar_borderColor $itemList-avatar_borderWidth;
     overflow: hidden;
 }
 
-.revisionsList-content {
+.itemList-content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
     flex-grow: 1;
     line-height: $global-condensed_lineHeight;
-    max-width: calc(100% - #{$revisionList-avatar_size + $revisionList-avatar_margin + $revisionList-avatar_borderWidth * 2 + $revisionList-spacing * 2});
+    max-width: calc(
+        100% - #{$itemList-avatar_size + $itemList-avatar_margin + $itemList-avatar_borderWidth * 2 + $itemList-spacing *
+            2}
+    );
     padding: 8px 0;
 }
 
-.revisionsList-photo {
+.itemList-photo {
     position: absolute;
     top: 0;
     right: 0;
@@ -118,28 +121,28 @@ $revisionList-border_color: $global-border_color;
     }
 }
 
-.revisionsList-userName {
+.itemList-userName {
     @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
     text-decoration: none;
     color: inherit;
-    font-size: $revisionList-user_fontSize;
+    font-size: $itemList-user_fontSize;
     font-weight: $global-fontWeight_semiBold;
 }
 
-.revisionsList-status {
+.itemList-status {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: $revisionList-status_size;
-    width: $revisionList-status_size;
-    color: $revisionList-status_color;
+    height: $itemList-status_size;
+    width: $itemList-status_size;
+    color: $itemList-status_color;
 
     &.status-published {
         color: $global-color_primary;
     }
 }
 
-.revisionsList-icon {
+.itemList-icon {
     display: block;
     margin: auto;
 }
