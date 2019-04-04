@@ -33,7 +33,7 @@ export const editorFormClasses = useThemeCache(() => {
     const root = style({
         height: viewHeight(100),
         maxHeight: viewHeight(100),
-        overflow: "auto",
+        overflow: "hidden",
         paddingBottom: px(12),
     });
 
@@ -107,17 +107,17 @@ export const editorFormClasses = useThemeCache(() => {
     });
 
     const body = style("body", {
-        display: "contents",
+        overflow: "auto",
     });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
         borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
-        top: headerVars.sizing.height,
+        top: 0,
         zIndex: 2,
         background: colorOut(vars.colors.bg),
     });
 
-    const embedBar = style("embedBar", sticky(), {});
+    const embedBar = style("embedBar", {});
 
     const formContent = style("formContent", {
         display: "flex",
