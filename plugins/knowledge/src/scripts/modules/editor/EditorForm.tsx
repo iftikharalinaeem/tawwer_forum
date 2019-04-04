@@ -31,9 +31,11 @@ import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 import { DeltaOperation } from "quill/core";
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState, useRef } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import { useSpring, animated as a, interpolate } from "react-spring";
+import { useMeasure } from "@library/dom/hookUtils";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -135,6 +137,35 @@ export function EditorForm(props: IProps) {
         [props.actions.publish, props.history],
     );
 
+    const [scrollPos, setScrollPos] = useState(0);
+    const embedBarRef = useRef<HTMLDivElement | null>(null);
+    const measured = useMeasure(embedBarRef);
+    const onScroll = useCallback(e => setScrollPos(e.target.scrollTop), []);
+    const windowWidth = window.innerWidth;
+    window.embedRef = embedBarRef;
+    const { y } = useSpring({ y: scrollPos });
+    let start = 0;
+    let end = 0;
+    if (embedBarRef.current) {
+        const rect = embedBarRef.current.getBoundingClientRect();
+        start = rect.top;
+        end = rect.top + rect.height;
+    }
+
+    const opacity = y.interpolate({
+        map: Math.abs,
+        range: [0, 400],
+        output: [0, 1],
+        extrapolate: "clamp",
+    });
+
+    const width = y.interpolate({
+        map: Math.abs,
+        range: [start, end],
+        output: [measured.width || 0, windowWidth],
+        extrapolate: "clamp",
+    });
+
     return (
         <form className={classNames(classesEditorForm.root, inheritHeightClass())} onSubmit={onSubmit}>
             <EditorHeader
@@ -145,7 +176,7 @@ export function EditorForm(props: IProps) {
                 }
                 saveDraft={saveDraft}
             />
-            <div className={classNames(classesEditorForm.body, inheritHeightClass())}>
+            <div className={classNames(classesEditorForm.body, inheritHeightClass())} onScroll={onScroll}>
                 <div className={classesEditorForm.spacer} />
                 <ScreenReaderContent>
                     <h1 id={props.titleID}>{t("Write Discussion")}</h1>
@@ -192,8 +223,21 @@ export function EditorForm(props: IProps) {
                     clearOperationsQueue={props.actions.clearEditorOps}
                 >
                     <div className={classesEditorForm.embedBarContainer}>
+                        <a.div
+                            className={classesEditorForm.embedBarTop}
+                            style={{
+                                opacity,
+                            }}
+                        />
                         <EditorEmbedBar
+                            contentRef={embedBarRef}
                             className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                        />
+                        <a.div
+                            className={classesEditorForm.embedBarBottom}
+                            style={{
+                                width,
+                            }}
                         />
                     </div>
 

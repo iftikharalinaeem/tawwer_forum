@@ -111,13 +111,32 @@ export const editorFormClasses = useThemeCache(() => {
     });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
-        borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
+        // borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
         top: 0,
         zIndex: 2,
         background: colorOut(vars.colors.bg),
     });
 
     const embedBar = style("embedBar", {});
+
+    const embedBarBottom = style("embedBarBottom", {
+        position: "absolute",
+        top: percent(100),
+        left: percent(50),
+        transform: `translateX(-50%)`,
+        height: globalVars.separator.size,
+        background: colorOut(globalVars.separator.color),
+    });
+
+    const embedBarTop = style("embedBarTop", {
+        position: "absolute",
+        top: 0,
+        left: percent(50),
+        width: percent(100),
+        transform: `translateX(-50%)`,
+        height: globalVars.separator.size,
+        background: colorOut(globalVars.separator.color),
+    });
 
     const formContent = style("formContent", {
         display: "flex",
@@ -168,6 +187,8 @@ export const editorFormClasses = useThemeCache(() => {
         formContent,
         bodyErrorMessage,
         containerWidth,
+        embedBarTop,
+        embedBarBottom,
         titleErrorMessage,
         categoryErrorParagraph,
         titleErrorParagraph,
