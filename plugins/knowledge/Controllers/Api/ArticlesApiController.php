@@ -32,6 +32,7 @@ use Vanilla\Models\ReactionOwnerModel;
 use DiscussionsApiController;
 use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
+use Vanilla\ApiUtils;
 
 /**
  * API controller for managing the articles resource.
@@ -474,6 +475,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                     "field" => "insertUserID",
                 ],
             ],
+            "expand?" => ApiUtils::getExpandDefinition(["insertUser", "updateUser"]),
         ], "in")->setDescription("List article drafts.")->requireOneOf(["articleID", "insertUserID"]);
         $out = $this->schema([
             ":a" => $this->fullDraftSchema(),
@@ -489,6 +491,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
         $rows = $this->draftModel->get($where, $options);
         $rows = (new ArticleDraft($this->parser))->normalizeDraftFields($rows, false);
+
+        $expandUsers = $this->resolveExpandFields(
+            $query,
+            [
+                "insertUser" => "insertUserID",
+                "updateUser" => "updateUserID",
+            ]
+        );
+        $this->userModel->expandUsers(
+            $rows,
+            $expandUsers
+        );
+
         $result = $out->validate($rows);
         return $result;
     }

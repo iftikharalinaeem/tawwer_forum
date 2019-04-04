@@ -108,6 +108,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         renderItem={this.renderItem}
                         isDragEnabled={!this.state.disabled}
                         offsetPerLevel={24}
+                        isNestingEnabled={true}
                     />
                 </div>
                 {this.renderNewCategoryModal()}
@@ -576,6 +577,19 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const itemID = treeData.items[source.parentId].children[source.index];
         const item = treeData.items[itemID];
 
+        const destinationItem = treeData.items[destination.parentId];
+        if (destinationItem && destinationItem.data.recordType === KbRecordType.ARTICLE) {
+            return;
+        }
+
+        if (destination.index === undefined) {
+            if (destinationItem) {
+                destination.index = destinationItem.children.length;
+            } else {
+                destination.index = 0;
+            }
+        }
+
         let newTree = moveItemOnTree(treeData, source, destination);
         const currentlySelectedItem = this.state.selectedItem;
         if (currentlySelectedItem) {
@@ -679,6 +693,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
 
                 return true;
             });
+
             data.items[itemID] = {
                 parentID: KbRecordType.CATEGORY + itemValue.parentID,
                 id: itemID,
