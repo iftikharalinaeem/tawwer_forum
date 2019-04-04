@@ -21,9 +21,9 @@ export default class RevisionsList extends React.Component<IProps> {
         return (
             <div className="revisionsList related">
                 {!this.props.hideTitle && (
-                    <Heading className="panelList-title revisionsList-title" title={t("Revisions")} depth={2} />
+                    <Heading className="panelList-title itemList-title" title={t("Revisions")} depth={2} />
                 )}
-                <ul className="revisionsList-items panelList-items">{this.props.children}</ul>
+                <ul className="itemList-items panelList-items">{this.props.children}</ul>
             </div>
         );
     }

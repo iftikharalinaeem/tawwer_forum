@@ -217,7 +217,7 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
             "get",
             `/articles/drafts`,
             ArticleActions.getDraftsACs,
-            request,
+            { ...request, expand: "all" },
             {
                 identifier,
             },

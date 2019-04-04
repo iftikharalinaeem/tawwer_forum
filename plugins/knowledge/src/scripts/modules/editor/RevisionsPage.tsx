@@ -4,33 +4,35 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { RouteComponentProps } from "react-router";
-import { connect } from "react-redux";
-import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
-import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
-import PageLoader from "@library/routing/PageLoader";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import { t } from "@library/utility/appUtils";
-import { LoadStatus } from "@library/@types/api/core";
-import UserContent from "@library/content/UserContent";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
-import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
-import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
-import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import apiv2 from "@library/apiv2";
-import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import DraftsList from "@knowledge/modules/editor/components/DraftsList";
+import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem";
+import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
+import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
+import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
-import classNames from "classnames";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
+import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
+import { EditorAddRoute, EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
+import UserContent from "@library/content/UserContent";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
-import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import PageLoader from "@library/routing/PageLoader";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
 import { hot } from "react-hot-loader";
+import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -44,7 +46,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render() {
-        const { article, history, revisions, selectedRevision } = this.props;
+        const { article, drafts, history, revisions, selectedRevision } = this.props;
         const classesEditorForm = editorFormClasses();
         return (
             <Modal
@@ -67,7 +69,8 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                                     )
                                 }
                                 crumbs={article.data && article.data.breadcrumbs ? article.data.breadcrumbs : []}
-                                revisionList={this.renderList()}
+                                draftList={this.renderDrafts()}
+                                revisionList={this.renderRevisions()}
                                 canSubmit={this.canSubmit}
                             />
                         </form>
@@ -100,7 +103,28 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     /**
      * Render the list of revisions.
      */
-    private renderList(): React.ReactNode {
+    private renderDrafts(): React.ReactNode {
+        const { drafts } = this.props;
+
+        if (drafts.status !== LoadStatus.SUCCESS || (Array.isArray(drafts.data) && drafts.data.length === 0)) {
+            return null;
+        }
+
+        return (
+            drafts.data && (
+                <DraftsList hideTitle={this.props.device === Devices.MOBILE}>
+                    {drafts.data.slice().map(item => {
+                        return <DraftsListItem {...item} url={EditorAddRoute.url(item)} key={item.draftID} />;
+                    })}
+                </DraftsList>
+            )
+        );
+    }
+
+    /**
+     * Render the list of revisions.
+     */
+    private renderRevisions(): React.ReactNode {
         const { revisions, selectedRevisionID } = this.props;
         return (
             revisions.status === LoadStatus.SUCCESS &&
@@ -200,13 +224,23 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { revisionsPage } = state.knowledge;
-    const { selectedRevisionID, selectedRevisionStatus, revisionsStatus, articleID, articleStatus } = revisionsPage;
+    const {
+        selectedRevisionID,
+        selectedRevisionStatus,
+        revisionsStatus,
+        articleID,
+        articleStatus,
+        draftsStatus,
+    } = revisionsPage;
     const article = articleID ? ArticleModel.selectArticle(state, articleID) : null;
     return {
-        // article:
         revisions: {
             ...revisionsStatus,
             data: RevisionsPageModel.selectRevisions(state),
+        },
+        drafts: {
+            ...draftsStatus,
+            data: RevisionsPageModel.selectDrafts(state),
         },
         article: {
             ...articleStatus,
