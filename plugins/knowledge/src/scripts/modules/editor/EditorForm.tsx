@@ -31,7 +31,7 @@ import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 import { DeltaOperation } from "quill/core";
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
@@ -49,209 +49,202 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
     removeBodyError: () => void;
 }
 
-/**
- * Form for the editor page.
- */
-export class EditorForm extends React.PureComponent<IProps> {
-    private domID: string = uniqueId("editorForm-");
-    private domTitleID: string = this.domID + "-title";
-    private domTitleErrorsID: string = this.domTitleID + "Errors";
-    private domEditorErrorID: string = this.domID + "editorError";
-    private domDescriptionID: string = this.domID + "description";
-    /**
-     * @inheritdoc
-     */
-    public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft, bodyError } = this.props;
-        const classesRichEditor = richEditorClasses(false);
-        const classesEditorForm = editorFormClasses();
-        const classesUserContent = userContentClasses();
-
-        return (
-            <form className={classNames(classesEditorForm.root, inheritHeightClass())} onSubmit={this.onSubmit}>
-                <EditorHeader
-                    isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
-                    draft={draft}
-                    optionsMenu={
-                        article.status === LoadStatus.SUCCESS && article.data ? (
-                            <EditorMenu article={article.data} />
-                        ) : null
-                    }
-                    saveDraft={saveDraft}
-                />
-                <div className={classesEditorForm.body}>
-                    <div className={classesEditorForm.spacer} />
-                    <ScreenReaderContent>
-                        <h1 id={this.props.titleID}>{t("Write Discussion")}</h1>
-                    </ScreenReaderContent>
-                    <div className="sr-only">
-                        <DocumentTitle title={this.props.form.name || "Untitled"} />
-                    </div>
-                    <div className={classesEditorForm.containerWidth}>
-                        <LocationInput
-                            disabled={this.isLoading}
-                            onChange={this.locationPickerChangeHandler}
-                            error={this.props.categoryError}
-                        />
-                        <label>
-                            <input
-                                id={this.domTitleID}
-                                className={classNames("inputText", classesEditorForm.title)}
-                                type="text"
-                                placeholder={t("Title")}
-                                value={this.props.form.name || ""}
-                                onChange={this.titleChangeHandler}
-                                disabled={this.isLoading}
-                                aria-invalid={!!this.props.titleError}
-                                aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
-                            />
-                            {!!this.props.titleError && (
-                                <AccessibleError
-                                    id={this.domTitleErrorsID}
-                                    error={this.props.titleError}
-                                    className={classesEditorForm.titleErrorMessage}
-                                />
-                            )}
-                        </label>
-                    </div>
-                    <Editor
-                        allowUpload={true}
-                        isPrimaryEditor={true}
-                        legacyMode={false}
-                        onChange={this.editorChangeHandler}
-                        isLoading={this.isLoading}
-                        reinitialize={formNeedsRefresh}
-                        initialValue={form.body}
-                        operationsQueue={this.props.editorOperationsQueue}
-                        clearOperationsQueue={this.props.actions.clearEditorOps}
-                    >
-                        <div className={classesEditorForm.embedBarContainer}>
-                            <EditorEmbedBar
-                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
-                            />
-                        </div>
-
-                        <div
-                            className={classNames(
-                                "richEditor",
-                                { isDisabled: this.isLoading },
-                                "FormWrapper",
-                                classesEditorForm.editor,
-                                classesRichEditor.root,
-                                classesEditorForm.containerWidth,
-                                inheritHeightClass(),
-                            )}
-                            aria-label={t("Type your message.")}
-                            aria-describedby={this.domDescriptionID}
-                            role="textbox"
-                            aria-multiline={true}
-                            id={this.domID}
-                            aria-errormessage={bodyError ? this.domEditorErrorID : undefined}
-                            aria-invalid={!!bodyError}
-                        >
-                            <EditorDescriptions id={this.domDescriptionID} />
-                            <div
-                                className={classNames(
-                                    "richEditor-frame",
-                                    "InputBox",
-                                    "isMenuInset",
-                                    classesEditorForm.modernFrame,
-                                )}
-                            >
-                                <>
-                                    {bodyError && (
-                                        <AccessibleError
-                                            id={this.domEditorErrorID}
-                                            ariaHidden={true}
-                                            error={bodyError}
-                                            className={classesEditorForm.bodyErrorMessage}
-                                            paragraphClassName={classesEditorForm.categoryErrorParagraph}
-                                            wrapClassName={classesUserContent.root}
-                                        />
-                                    )}
-                                    <EditorContent />
-                                    <EditorInlineMenus />
-                                    <EditorParagraphMenu />
-                                </>
-                            </div>
-                        </div>
-                    </Editor>
-                </div>
-            </form>
-        );
-    }
-
-    /**
-     * Determine if the form is loading data or not.
-     */
-    private get isLoading(): boolean {
-        return this.propsAreLoading(this.props);
-    }
-
-    /**
-     * Determine from a set of props if the component should display as loading or now.
-     */
-    private propsAreLoading(props: IProps): boolean {
-        const { article, revision, draft } = props;
-        return [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
-    }
-
-    /**
-     * Handle changes in the form. Updates the draft.
-     */
-    private handleFormChange(form: Partial<IEditorPageForm>) {
-        this.props.actions.updateForm(form);
-        this.updateDraft();
-    }
-
-    /**
-     * Handle changes in the location picker.
-     */
-    private locationPickerChangeHandler = (categoryID: number, sort?: number) => {
-        this.props.removeCategoryError();
-        this.handleFormChange({ knowledgeCategoryID: categoryID, sort });
-    };
-
-    /**
-     * Change handler for the editor.
-     */
-    private editorChangeHandler = debounce((content: DeltaOperation[]) => {
-        this.handleFormChange({ body: content });
-        this.props.removeBodyError();
-    }, 1000 / 60);
+export function EditorForm(props: IProps) {
+    const domID = useMemo(() => uniqueId("editorForm-"), []);
+    const domTitleID = domID + "-title";
+    const domTitleErrorsID = domTitleID + "Errors";
+    const domEditorErrorID = domID + "editorError";
+    const domDescriptionID = domID + "description";
+    const { article, draft, revision, form, formNeedsRefresh, saveDraft, bodyError } = props;
+    const classesRichEditor = richEditorClasses(false);
+    const classesEditorForm = editorFormClasses();
+    const classesUserContent = userContentClasses();
+    const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
 
     /**
      * Update the draft from the contents of the form.
      *
      * This it throttled to happen at most and every 10 seconds.
      */
-    private updateDraft = throttle(
-        () => {
-            void this.props.actions.syncDraft();
-        },
-        10000,
-        {
-            leading: false,
-            trailing: true,
-        },
+    const updateDraft = useCallback(
+        throttle(
+            () => {
+                void props.actions.syncDraft();
+            },
+            10000,
+            {
+                leading: false,
+                trailing: true,
+            },
+        ),
+        [props.actions.syncDraft],
     );
 
     /**
+     * Handle changes in the form. Updates the draft.
+     */
+    const handleFormChange = useCallback(
+        (delta: Partial<IEditorPageForm>) => {
+            props.actions.updateForm(delta);
+            updateDraft();
+        },
+        [props.actions.updateForm, updateDraft],
+    );
+
+    /**
+     * Handle changes in the location picker.
+     */
+    const locationPickerChangeHandler = useCallback(
+        (categoryID: number, sort?: number) => {
+            props.removeCategoryError();
+            handleFormChange({ knowledgeCategoryID: categoryID, sort });
+        },
+        [props.removeCategoryError, handleFormChange],
+    );
+
+    /**
+     * Change handler for the editor.
+     */
+    const editorChangeHandler = useCallback(
+        debounce((content: DeltaOperation[]) => {
+            handleFormChange({ body: content });
+            props.removeBodyError();
+        }, 1000 / 60),
+        [handleFormChange, props.removeBodyError],
+    );
+    /**
      * Change handler for the title
      */
-    private titleChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.removeTitleError();
-        this.handleFormChange({ name: event.target.value });
-    };
+    const titleChangeHandler = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            props.removeTitleError();
+            handleFormChange({ name: event.target.value });
+        },
+        [props.removeTitleError, handleFormChange],
+    );
 
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
-    private onSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        event.stopPropagation();
-        void this.props.actions.publish(this.props.history);
-    };
+    const onSubmit = useCallback(
+        (event: React.FormEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void props.actions.publish(props.history);
+        },
+        [props.actions.publish, props.history],
+    );
+
+    return (
+        <form className={classNames(classesEditorForm.root, inheritHeightClass())} onSubmit={onSubmit}>
+            <EditorHeader
+                isSubmitLoading={props.submit.status === LoadStatus.LOADING}
+                draft={draft}
+                optionsMenu={
+                    article.status === LoadStatus.SUCCESS && article.data ? <EditorMenu article={article.data} /> : null
+                }
+                saveDraft={saveDraft}
+            />
+            <div className={classNames(classesEditorForm.body, inheritHeightClass())}>
+                <div className={classesEditorForm.spacer} />
+                <ScreenReaderContent>
+                    <h1 id={props.titleID}>{t("Write Discussion")}</h1>
+                </ScreenReaderContent>
+                <div className="sr-only">
+                    <DocumentTitle title={props.form.name || "Untitled"} />
+                </div>
+                <div className={classesEditorForm.containerWidth}>
+                    <LocationInput
+                        disabled={isLoading}
+                        onChange={locationPickerChangeHandler}
+                        error={props.categoryError}
+                    />
+                    <label>
+                        <input
+                            id={domTitleID}
+                            className={classNames("inputText", classesEditorForm.title)}
+                            type="text"
+                            placeholder={t("Title")}
+                            value={props.form.name || ""}
+                            onChange={titleChangeHandler}
+                            disabled={isLoading}
+                            aria-invalid={!!props.titleError}
+                            aria-errormessage={!!props.titleError ? domTitleErrorsID : undefined}
+                        />
+                        {!!props.titleError && (
+                            <AccessibleError
+                                id={domTitleErrorsID}
+                                error={props.titleError}
+                                className={classesEditorForm.titleErrorMessage}
+                            />
+                        )}
+                    </label>
+                </div>
+                <Editor
+                    allowUpload={true}
+                    isPrimaryEditor={true}
+                    legacyMode={false}
+                    onChange={editorChangeHandler}
+                    isLoading={isLoading}
+                    reinitialize={formNeedsRefresh}
+                    initialValue={form.body}
+                    operationsQueue={props.editorOperationsQueue}
+                    clearOperationsQueue={props.actions.clearEditorOps}
+                >
+                    <div className={classesEditorForm.embedBarContainer}>
+                        <EditorEmbedBar
+                            className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                        />
+                    </div>
+
+                    <div
+                        className={classNames(
+                            "richEditor",
+                            { isDisabled: isLoading },
+                            "FormWrapper",
+                            classesEditorForm.editor,
+                            classesRichEditor.root,
+                            classesEditorForm.containerWidth,
+                            inheritHeightClass(),
+                        )}
+                        aria-label={t("Type your message.")}
+                        aria-describedby={domDescriptionID}
+                        role="textbox"
+                        aria-multiline={true}
+                        id={domID}
+                        aria-errormessage={bodyError ? domEditorErrorID : undefined}
+                        aria-invalid={!!bodyError}
+                    >
+                        <EditorDescriptions id={domDescriptionID} />
+                        <div
+                            className={classNames(
+                                "richEditor-frame",
+                                "InputBox",
+                                "isMenuInset",
+                                classesEditorForm.modernFrame,
+                            )}
+                        >
+                            <>
+                                {bodyError && (
+                                    <AccessibleError
+                                        id={domEditorErrorID}
+                                        ariaHidden={true}
+                                        error={bodyError}
+                                        className={classesEditorForm.bodyErrorMessage}
+                                        paragraphClassName={classesEditorForm.categoryErrorParagraph}
+                                        wrapClassName={classesUserContent.root}
+                                    />
+                                )}
+                                <EditorContent />
+                                <EditorInlineMenus />
+                                <EditorParagraphMenu />
+                            </>
+                        </div>
+                    </div>
+                </Editor>
+            </div>
+        </form>
+    );
 }
 
 const withRedux = connect(
