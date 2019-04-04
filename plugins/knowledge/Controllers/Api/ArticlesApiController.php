@@ -512,6 +512,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get revisions from a specific article.
      *
      * @param int $id
+     * @param array $query
      * @return Data
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).

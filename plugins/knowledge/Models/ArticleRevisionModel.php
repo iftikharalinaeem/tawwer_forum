@@ -60,6 +60,8 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get revisions count for the article
+     *
      * @param int $articleID
      * @return int
      */
