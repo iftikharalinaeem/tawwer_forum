@@ -31,6 +31,7 @@ use Vanilla\Models\ReactionModel;
 use Vanilla\Models\ReactionOwnerModel;
 use DiscussionsApiController;
 use Vanilla\Knowledge\Models\DiscussionArticleModel;
+use Garden\Web\Data;
 
 /**
  * API controller for managing the articles resource.
@@ -40,6 +41,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     use ArticlesApiSchemes;
 
     use UpdateMediaTrait;
+
+    const REVISIONS_LIMIT = 10;
 
     /** @var ArticleModel */
     private $articleModel;
@@ -417,7 +420,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
 
         $result = $out->validate($rows);
-        return new \Garden\Web\Data($result, ["paging" => $paging]);
+        return new Data($result, ["paging" => $paging]);
     }
 
     /**
@@ -494,16 +497,33 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get revisions from a specific article.
      *
      * @param int $id
-     * @return array
+     * @return Data
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function index_revisions(int $id): array {
+    public function index_revisions(int $id, array $query = []): Data {
         $this->permission("knowledge.kb.view");
 
         $this->idParamSchema()->setDescription("Get revisions from a specific article.");
+        $in = Schema::parse([
+            "limit:i" => [
+                "default" => self::REVISIONS_LIMIT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+            "page:i" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+        ]);
+        $query = $in->validate($query);
+        $offset = ($query['page'] - 1) * $query['limit'];
+
         $out = $this->schema([
             ":a" => Schema::parse([
                 "articleRevisionID",
@@ -517,13 +537,27 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out");
 
         $article = $this->articleByID($id);
+
         $revisions = $this->articleRevisionModel->get(
             ["articleID" => $article["articleID"]],
             [
                 "orderFields" => "dateInserted",
                 "orderDirection" => "desc",
+                "offset" => $offset,
+                "limit" => $query['limit']
             ]
         );
+
+        $paging = \Vanilla\ApiUtils::numberedPagerInfo(
+            $this->articleRevisionModel->getRevisionsCount($article["articleID"]),
+            '/api/v2/articles/'.$article["articleID"].'/revisions',
+            $query,
+            $in
+        );
+        // A page beyond our bounds is expected to return a not-found (404) response.
+        if ($query["page"] > 1 && $query["page"] > $paging["pageCount"]) {
+            throw new NotFoundException();
+        }
 
         foreach ($revisions as &$revision) {
             $this->userModel->expandUsers(
@@ -533,7 +567,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $result = $out->validate($revisions);
-        return $result;
+        return new Data($result, ["paging" => $paging]);
     }
 
     /**

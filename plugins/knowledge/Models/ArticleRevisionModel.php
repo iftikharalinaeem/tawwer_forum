@@ -58,4 +58,20 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
             ["articleRevisionID" => $articleRevisionID]
         );
     }
+
+    /**
+     * @param int $articleID
+     * @return int
+     */
+    public function getRevisionsCount(int $articleID): int {
+        $revisionsCount = $this->get(
+            ["articleID" => $articleID],
+            [
+                "select" => [['articleRevisionID', 'count', 'revisionsCount']],
+                "validation" => false
+            ]
+        );
+
+        return current($revisionsCount)["revisionsCount"];
+    }
 }

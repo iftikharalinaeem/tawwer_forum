@@ -581,13 +581,31 @@ paths:
     "/articles/{id}/revisions":
         get:
             parameters:
-                - description: |
+                - description:
                       <p>The article ID.</p>
                   in: path
                   name: id
                   required: true
                   schema:
                       type: integer
+                - description:
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+                - description:
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 10
+                      maximum: 100
+                      minimum: 1
             responses:
                 "200":
                     content:
