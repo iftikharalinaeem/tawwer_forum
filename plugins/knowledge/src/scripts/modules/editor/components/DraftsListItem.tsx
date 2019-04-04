@@ -35,7 +35,7 @@ export default class DraftsListItem extends React.Component<IProps> {
 
         return (
             <li className="itemList-item">
-                <SmartLink to={url} className={classNames("itemList-link", "panelList-link")} tabIndex={-1} replace>
+                <SmartLink to={url} className={classNames("itemList-link", "panelList-link")} tabIndex={-1}>
                     <div className="itemList-photoFrame">
                         <img src={photoUrl} className="itemList-photo" alt={`${t("User: ")}${name}`} />
                     </div>
