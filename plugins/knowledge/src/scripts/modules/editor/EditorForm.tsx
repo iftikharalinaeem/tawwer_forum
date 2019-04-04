@@ -11,24 +11,29 @@ import EditorPageModel, { IEditorPageForm, IInjectableEditorProps } from "@knowl
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import Container from "@library/layout/components/Container";
-import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
-import PanelLayout from "@library/layout/PanelLayout";
+import { userContentClasses } from "@library/content/userContentStyles";
+import AccessibleError from "@library/forms/AccessibleError";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
-import { Editor } from "@rich-editor/editor/Editor";
+import { Editor } from "@rich-editor/editor/context";
+import EditorContent from "@rich-editor/editor/EditorContent";
+import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
+import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
+import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
+import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
+import uniqueId from "lodash/uniqueId";
 import { DeltaOperation } from "quill/core";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
-import uniqueId from "lodash/uniqueId";
-import AccessibleError from "@library/forms/AccessibleError";
-import { inheritHeightClass, pointerEventsClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -48,27 +53,24 @@ interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentPro
  * Form for the editor page.
  */
 export class EditorForm extends React.PureComponent<IProps> {
-    private editorRef: React.RefObject<Editor> = React.createRef();
-
     private domID: string = uniqueId("editorForm-");
     private domTitleID: string = this.domID + "-title";
     private domTitleErrorsID: string = this.domTitleID + "Errors";
-
+    private domEditorErrorID: string = this.domID + "editorError";
+    private domDescriptionID: string = this.domID + "description";
     /**
      * @inheritdoc
      */
     public render() {
-        const { article, draft, form, formNeedsRefresh, saveDraft } = this.props;
+        const { article, draft, form, formNeedsRefresh, saveDraft, bodyError } = this.props;
+        const classesRichEditor = richEditorClasses(false);
         const classesRichEditorForm = richEditorFormClasses();
+        const classesUserContent = userContentClasses();
 
         return (
-            <form
-                className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
-                onSubmit={this.onSubmit}
-            >
+            <form className={classNames(classesRichEditorForm.root, inheritHeightClass())} onSubmit={this.onSubmit}>
                 <EditorHeader
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
-                    className={classNames("richEditorForm-header")}
                     draft={draft}
                     optionsMenu={
                         article.status === LoadStatus.SUCCESS && article.data ? (
@@ -77,74 +79,96 @@ export class EditorForm extends React.PureComponent<IProps> {
                     }
                     saveDraft={saveDraft}
                 />
-                <Container className={classNames("richEditorForm-body", classesRichEditorForm.body)}>
+                <div className={classesRichEditorForm.body}>
                     <ScreenReaderContent>
                         <h1 id={this.props.titleID}>{t("Write Discussion")}</h1>
                     </ScreenReaderContent>
-                    <PanelLayout
-                        className="isOneCol"
-                        growMiddleBottom={true}
-                        device={this.props.device}
-                        topPadding={false}
-                        middleBottom={
-                            <div className={classesRichEditorForm.formContent}>
-                                <LocationInput
-                                    disabled={this.isLoading}
-                                    onChange={this.locationPickerChangeHandler}
-                                    error={this.props.categoryError}
-                                />
-                                <div className="sr-only">
-                                    <DocumentTitle title={this.props.form.name || "Untitled"} />
-                                </div>
-                                <label>
-                                    <input
-                                        id={this.domTitleID}
-                                        className={classNames(
-                                            "richEditorForm-title",
-                                            "inputBlock-inputText",
-                                            "inputText",
-                                            classesRichEditorForm.title,
-                                        )}
-                                        type="text"
-                                        placeholder={t("Title")}
-                                        value={this.props.form.name || ""}
-                                        onChange={this.titleChangeHandler}
-                                        disabled={this.isLoading}
-                                        aria-invalid={!!this.props.titleError}
-                                        aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
-                                    />
-                                    {!!this.props.titleError && (
+
+                    <LocationInput
+                        disabled={this.isLoading}
+                        onChange={this.locationPickerChangeHandler}
+                        error={this.props.categoryError}
+                    />
+                    <div className="sr-only">
+                        <DocumentTitle title={this.props.form.name || "Untitled"} />
+                    </div>
+                    <label>
+                        <input
+                            id={this.domTitleID}
+                            className={classNames("inputText", classesRichEditorForm.title)}
+                            type="text"
+                            placeholder={t("Title")}
+                            value={this.props.form.name || ""}
+                            onChange={this.titleChangeHandler}
+                            disabled={this.isLoading}
+                            aria-invalid={!!this.props.titleError}
+                            aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
+                        />
+                        {!!this.props.titleError && (
+                            <AccessibleError
+                                id={this.domTitleErrorsID}
+                                error={this.props.titleError}
+                                className={classesRichEditorForm.titleErrorMessage}
+                            />
+                        )}
+                    </label>
+                    <Editor
+                        allowUpload={true}
+                        isPrimaryEditor={true}
+                        legacyMode={false}
+                        onChange={this.editorChangeHandler}
+                        isLoading={this.isLoading}
+                        reinitialize={formNeedsRefresh}
+                        initialValue={form.body}
+                        operationsQueue={this.props.editorOperationsQueue}
+                        clearOperationsQueue={this.props.actions.clearEditorOps}
+                    >
+                        <EditorEmbedBar />
+                        <div
+                            className={classNames(
+                                "richEditor",
+                                { isDisabled: this.isLoading },
+                                "FormWrapper",
+                                classesRichEditorForm.editor,
+                                classesRichEditor.root,
+                                inheritHeightClass(),
+                            )}
+                            aria-label={t("Type your message.")}
+                            aria-describedby={this.domDescriptionID}
+                            role="textbox"
+                            aria-multiline={true}
+                            id={this.domID}
+                            aria-errormessage={bodyError ? this.domEditorErrorID : undefined}
+                            aria-invalid={!!bodyError}
+                        >
+                            <EditorDescriptions id={this.domDescriptionID} />
+                            <div
+                                className={classNames(
+                                    "richEditor-frame",
+                                    "InputBox",
+                                    "isMenuInset",
+                                    classesRichEditorForm.modernFrame,
+                                )}
+                            >
+                                <>
+                                    {bodyError && (
                                         <AccessibleError
-                                            id={this.domTitleErrorsID}
-                                            error={this.props.titleError}
-                                            className={classesRichEditorForm.titleErrorMessage}
+                                            id={this.domEditorErrorID}
+                                            ariaHidden={true}
+                                            error={bodyError}
+                                            className={classesRichEditorForm.bodyErrorMessage}
+                                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                                            wrapClassName={classesUserContent.root}
                                         />
                                     )}
-                                </label>
-                                <Editor
-                                    allowUpload={true}
-                                    ref={this.editorRef}
-                                    isPrimaryEditor={true}
-                                    onChange={this.editorChangeHandler}
-                                    className={classNames(
-                                        "FormWrapper",
-                                        "inheritHeight",
-                                        "richEditorForm-editor",
-                                        inheritHeightClass(),
-                                    )}
-                                    isLoading={this.isLoading}
-                                    device={this.props.device}
-                                    legacyMode={false}
-                                    reinitialize={formNeedsRefresh}
-                                    initialValue={form.body}
-                                    operationsQueue={this.props.editorOperationsQueue}
-                                    clearOperationsQueue={this.props.actions.clearEditorOps}
-                                    error={this.props.bodyError}
-                                />
+                                    <EditorContent />
+                                    <EditorInlineMenus />
+                                    <EditorParagraphMenu />
+                                </>
                             </div>
-                        }
-                    />
-                </Container>
+                        </div>
+                    </Editor>
+                </div>
             </form>
         );
     }
