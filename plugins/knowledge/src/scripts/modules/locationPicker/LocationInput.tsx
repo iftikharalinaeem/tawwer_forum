@@ -24,7 +24,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import Modal from "@library/modal/Modal";
 import uniqueId from "lodash/uniqueId";
 import AccessibleError from "@library/forms/AccessibleError";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -46,7 +46,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
         const buttonTitle = locationBreadcrumb
             ? LocationBreadcrumbs.renderString(locationBreadcrumb)
             : LocationInput.SELECT_MESSAGE;
-        const classesRichEditorForm = richEditorFormClasses();
+        const classesEditorForm = editorFormClasses();
 
         const buttonContents = locationBreadcrumb ? (
             <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
@@ -79,7 +79,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         <AccessibleError
                             id={this.domErrorID}
                             error={this.props.error}
-                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                            paragraphClassName={classesEditorForm.categoryErrorParagraph}
                         />
                     )}
                 </label>

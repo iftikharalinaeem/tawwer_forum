@@ -23,7 +23,7 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import apiv2 from "@library/apiv2";
 import { IStoreState } from "@knowledge/state/model";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import classNames from "classnames";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import Modal from "@library/modal/Modal";
@@ -45,7 +45,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, history, revisions, selectedRevision } = this.props;
-        const classesRichEditorForm = richEditorFormClasses();
+        const classesEditorForm = editorFormClasses();
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
@@ -56,7 +56,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 <PageLoader status={revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form
-                            className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
+                            className={classNames("richEditorForm", inheritHeightClass(), classesEditorForm.root)}
                             onSubmit={this.onSubmit}
                         >
                             <RevisionsLayout

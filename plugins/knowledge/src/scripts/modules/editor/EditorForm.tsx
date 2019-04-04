@@ -25,7 +25,7 @@ import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
@@ -64,11 +64,11 @@ export class EditorForm extends React.PureComponent<IProps> {
     public render() {
         const { article, draft, form, formNeedsRefresh, saveDraft, bodyError } = this.props;
         const classesRichEditor = richEditorClasses(false);
-        const classesRichEditorForm = richEditorFormClasses();
+        const classesEditorForm = editorFormClasses();
         const classesUserContent = userContentClasses();
 
         return (
-            <form className={classNames(classesRichEditorForm.root, inheritHeightClass())} onSubmit={this.onSubmit}>
+            <form className={classNames(classesEditorForm.root, inheritHeightClass())} onSubmit={this.onSubmit}>
                 <EditorHeader
                     isSubmitLoading={this.props.submit.status === LoadStatus.LOADING}
                     draft={draft}
@@ -79,7 +79,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                     }
                     saveDraft={saveDraft}
                 />
-                <div className={classesRichEditorForm.body}>
+                <div className={classesEditorForm.body}>
                     <ScreenReaderContent>
                         <h1 id={this.props.titleID}>{t("Write Discussion")}</h1>
                     </ScreenReaderContent>
@@ -95,7 +95,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                     <label>
                         <input
                             id={this.domTitleID}
-                            className={classNames("inputText", classesRichEditorForm.title)}
+                            className={classNames("inputText", classesEditorForm.title)}
                             type="text"
                             placeholder={t("Title")}
                             value={this.props.form.name || ""}
@@ -108,7 +108,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                             <AccessibleError
                                 id={this.domTitleErrorsID}
                                 error={this.props.titleError}
-                                className={classesRichEditorForm.titleErrorMessage}
+                                className={classesEditorForm.titleErrorMessage}
                             />
                         )}
                     </label>
@@ -123,13 +123,13 @@ export class EditorForm extends React.PureComponent<IProps> {
                         operationsQueue={this.props.editorOperationsQueue}
                         clearOperationsQueue={this.props.actions.clearEditorOps}
                     >
-                        <EditorEmbedBar />
+                        <EditorEmbedBar className={classesEditorForm.inlineMenuItems} />
                         <div
                             className={classNames(
                                 "richEditor",
                                 { isDisabled: this.isLoading },
                                 "FormWrapper",
-                                classesRichEditorForm.editor,
+                                classesEditorForm.editor,
                                 classesRichEditor.root,
                                 inheritHeightClass(),
                             )}
@@ -147,7 +147,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                     "richEditor-frame",
                                     "InputBox",
                                     "isMenuInset",
-                                    classesRichEditorForm.modernFrame,
+                                    classesEditorForm.modernFrame,
                                 )}
                             >
                                 <>
@@ -156,8 +156,8 @@ export class EditorForm extends React.PureComponent<IProps> {
                                             id={this.domEditorErrorID}
                                             ariaHidden={true}
                                             error={bodyError}
-                                            className={classesRichEditorForm.bodyErrorMessage}
-                                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                                            className={classesEditorForm.bodyErrorMessage}
+                                            paragraphClassName={classesEditorForm.categoryErrorParagraph}
                                             wrapClassName={classesUserContent.root}
                                         />
                                     )}
