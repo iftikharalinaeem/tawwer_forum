@@ -80,38 +80,40 @@ export class EditorForm extends React.PureComponent<IProps> {
                     saveDraft={saveDraft}
                 />
                 <div className={classesEditorForm.body}>
+                    <div className={classesEditorForm.spacer} />
                     <ScreenReaderContent>
                         <h1 id={this.props.titleID}>{t("Write Discussion")}</h1>
                     </ScreenReaderContent>
-
-                    <LocationInput
-                        disabled={this.isLoading}
-                        onChange={this.locationPickerChangeHandler}
-                        error={this.props.categoryError}
-                    />
                     <div className="sr-only">
                         <DocumentTitle title={this.props.form.name || "Untitled"} />
                     </div>
-                    <label>
-                        <input
-                            id={this.domTitleID}
-                            className={classNames("inputText", classesEditorForm.title)}
-                            type="text"
-                            placeholder={t("Title")}
-                            value={this.props.form.name || ""}
-                            onChange={this.titleChangeHandler}
+                    <div className={classesEditorForm.containerWidth}>
+                        <LocationInput
                             disabled={this.isLoading}
-                            aria-invalid={!!this.props.titleError}
-                            aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
+                            onChange={this.locationPickerChangeHandler}
+                            error={this.props.categoryError}
                         />
-                        {!!this.props.titleError && (
-                            <AccessibleError
-                                id={this.domTitleErrorsID}
-                                error={this.props.titleError}
-                                className={classesEditorForm.titleErrorMessage}
+                        <label>
+                            <input
+                                id={this.domTitleID}
+                                className={classNames("inputText", classesEditorForm.title)}
+                                type="text"
+                                placeholder={t("Title")}
+                                value={this.props.form.name || ""}
+                                onChange={this.titleChangeHandler}
+                                disabled={this.isLoading}
+                                aria-invalid={!!this.props.titleError}
+                                aria-errormessage={!!this.props.titleError ? this.domTitleErrorsID : undefined}
                             />
-                        )}
-                    </label>
+                            {!!this.props.titleError && (
+                                <AccessibleError
+                                    id={this.domTitleErrorsID}
+                                    error={this.props.titleError}
+                                    className={classesEditorForm.titleErrorMessage}
+                                />
+                            )}
+                        </label>
+                    </div>
                     <Editor
                         allowUpload={true}
                         isPrimaryEditor={true}
@@ -123,7 +125,12 @@ export class EditorForm extends React.PureComponent<IProps> {
                         operationsQueue={this.props.editorOperationsQueue}
                         clearOperationsQueue={this.props.actions.clearEditorOps}
                     >
-                        <EditorEmbedBar className={classesEditorForm.inlineMenuItems} />
+                        <div className={classesEditorForm.embedBarContainer}>
+                            <EditorEmbedBar
+                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                            />
+                        </div>
+
                         <div
                             className={classNames(
                                 "richEditor",
@@ -131,6 +138,7 @@ export class EditorForm extends React.PureComponent<IProps> {
                                 "FormWrapper",
                                 classesEditorForm.editor,
                                 classesRichEditor.root,
+                                classesEditorForm.containerWidth,
                                 inheritHeightClass(),
                             )}
                             aria-label={t("Type your message.")}

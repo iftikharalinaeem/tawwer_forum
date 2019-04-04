@@ -21,18 +21,24 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent, px, viewHeight } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
+    const layoutVars = layoutVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
-    const overshoot = vars.scrollContainer.overshoot;
     const root = style({
         height: viewHeight(100),
         maxHeight: viewHeight(100),
         overflow: "auto",
+        paddingBottom: px(12),
+    });
+
+    const spacer = style("spacer", {
+        marginBottom: layoutVars.gutter.size,
     });
 
     const textWrap = style("textWrap", {
@@ -76,6 +82,18 @@ export const editorFormClasses = useThemeCache(() => {
         },
     });
 
+    const containerWidth = style(
+        "containerWidth",
+        {
+            width: percent(100),
+            maxWidth: layoutVars.middleColumnWidth,
+        },
+        paddings({ horizontal: 12 }),
+        margins({
+            horizontal: "auto",
+        }),
+    );
+
     const editor = style("editor", {
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
@@ -83,12 +101,6 @@ export const editorFormClasses = useThemeCache(() => {
         display: "flex",
         flexGrow: 1,
         flexDirection: "column",
-        width: percent(100),
-        maxWidth: 672,
-        ...paddings({ horizontal: 12 }),
-        ...margins({
-            horizontal: "auto",
-        }),
         $nest: {
             "& .richEditor-text": {},
         },
@@ -96,20 +108,16 @@ export const editorFormClasses = useThemeCache(() => {
 
     const body = style("body", {
         display: "contents",
-        flexDirection: "column",
-        paddingTop: unit(globalVars.overlay.fullPageHeadingSpacer),
-        marginBottom: px(12),
-        overflow: "hidden",
     });
 
-    const stickyBar = style("stickyBar", sticky(), {
-        top: headerVars.sizing.height,
-        zIndex: 1,
-    });
-
-    const inlineMenuItems = style("inlineMenuItems", {
+    const embedBarContainer = style("embedBarContainer", sticky(), {
         borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
+        top: headerVars.sizing.height,
+        zIndex: 2,
+        background: colorOut(vars.colors.bg),
     });
+
+    const embedBar = style("embedBar", sticky(), {});
 
     const formContent = style("formContent", {
         display: "flex",
@@ -149,17 +157,19 @@ export const editorFormClasses = useThemeCache(() => {
 
     return {
         root,
+        spacer,
         textWrap,
         title,
         editor,
         modernFrame,
         body,
-        inlineMenuItems,
+        embedBar,
+        embedBarContainer,
         formContent,
         bodyErrorMessage,
+        containerWidth,
         titleErrorMessage,
         categoryErrorParagraph,
         titleErrorParagraph,
-        stickyBar,
     };
 });
