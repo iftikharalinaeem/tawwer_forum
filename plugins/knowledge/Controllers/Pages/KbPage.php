@@ -16,6 +16,7 @@ use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use \ThemesApiController;
 use Vanilla\Web\ThemedPage;
@@ -51,9 +52,10 @@ abstract class KbPage extends ThemedPage {
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
-        KnowledgeCategoriesApiController $categoriesApi = null // Default needed for method extensions
+        KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
+        ContentSecurityPolicyModel $cspModel
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi, $cspModel);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
