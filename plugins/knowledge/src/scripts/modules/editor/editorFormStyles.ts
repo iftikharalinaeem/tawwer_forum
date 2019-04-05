@@ -3,26 +3,25 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    paddings,
-    placeholderStyles,
-    textInputSizing,
-    colorOut,
-    unit,
     absolutePosition,
-    pointerEvents,
+    colorOut,
     margins,
     negative,
+    paddings,
+    placeholderStyles,
+    pointerEvents,
     sticky,
+    textInputSizing,
+    unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc, percent, px, viewHeight, viewWidth } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { calc, percent, px, viewHeight } from "csx";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,15 +41,6 @@ export const editorFormClasses = useThemeCache(() => {
         height: layoutVars.gutter.size,
         minHeight: layoutVars.gutter.size,
         width: percent(100),
-    });
-
-    const textWrap = style("textWrap", {
-        ...paddings({
-            top: 0,
-            bottom: 0,
-            right: unit(globalVars.gutter.quarter),
-            left: unit(globalVars.gutter.quarter),
-        }),
     });
 
     const title = style("title", {
@@ -91,7 +81,16 @@ export const editorFormClasses = useThemeCache(() => {
             width: percent(100),
             maxWidth: layoutVars.middleColumnWidth,
         },
-        paddings({ horizontal: 12 }),
+        paddings({
+            horizontal: layoutVars.gutter.size + layoutVars.gutter.halfSize,
+        }),
+        layoutVariables()
+            .mediaQueries()
+            .oneColumn(
+                paddings({
+                    horizontal: layoutVars.gutter.halfSize + 4, // 4 is from panel widget. Not yet converted,
+                }),
+            ),
         margins({
             horizontal: "auto",
         }),
@@ -174,7 +173,6 @@ export const editorFormClasses = useThemeCache(() => {
     return {
         root,
         spacer,
-        textWrap,
         title,
         editor,
         embedBar,
