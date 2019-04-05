@@ -269,14 +269,7 @@ export function EditorForm(props: IProps) {
                     aria-invalid={!!bodyError}
                 >
                     <EditorDescriptions id={domDescriptionID} />
-                    <div
-                        className={classNames(
-                            "richEditor-frame",
-                            "InputBox",
-                            "isMenuInset",
-                            classesEditorForm.modernFrame,
-                        )}
-                    >
+                    <div className={classNames(classesEditorForm.modernFrame)}>
                         <>
                             {bodyError && (
                                 <AccessibleError
