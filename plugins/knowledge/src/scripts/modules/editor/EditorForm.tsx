@@ -36,6 +36,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { animated as a, useSpring } from "react-spring";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -158,7 +159,7 @@ export function EditorForm(props: IProps) {
 
     const boxShadow = y.interpolate({
         range: [start, end],
-        output: [shadowHelper().makeShadow(0.3), shadowHelper().makeShadow(0)],
+        output: [shadowHelper().makeShadow(0.2), shadowHelper().makeShadow(0)],
     });
 
     return (
@@ -266,7 +267,7 @@ export function EditorForm(props: IProps) {
                     aria-invalid={!!bodyError}
                 >
                     <EditorDescriptions id={domDescriptionID} />
-                    <div className={classNames(classesEditorForm.modernFrame)}>
+                    <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
                         <>
                             {bodyError && (
                                 <AccessibleError
