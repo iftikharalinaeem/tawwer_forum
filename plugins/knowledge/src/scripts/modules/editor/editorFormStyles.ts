@@ -18,10 +18,11 @@ import {
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc, percent, px, viewHeight } from "csx";
+import { calc, percent, px, viewHeight, viewWidth } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { layoutVariables } from "@library/layout/layoutStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,7 +35,6 @@ export const editorFormClasses = useThemeCache(() => {
         height: viewHeight(100),
         maxHeight: viewHeight(100),
         overflow: "auto",
-        paddingBottom: px(12),
     });
 
     const spacer = style("spacer", {
@@ -105,22 +105,26 @@ export const editorFormClasses = useThemeCache(() => {
         }),
     });
 
-    const editor = style("editor", {
-        display: "flex",
-        flexDirection: "column",
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-        marginTop: unit(-formElementVars.border.width),
-        $nest: {
-            "& .richEditor-text": {},
-        },
-    });
+    const editor = (topWindowPosition: number) =>
+        style("editor", {
+            display: "flex",
+            flexDirection: "column",
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            marginTop: unit(-formElementVars.border.width),
+            minHeight: calc(`100vh - ${px(topWindowPosition)}`),
+        });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
         // borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
         top: headerVars.sizing.height,
         zIndex: 2,
         background: colorOut(vars.colors.bg),
+    });
+
+    const header = style("header", sticky(), {
+        top: 0,
+        zIndex: 2,
     });
 
     const embedBar = style("embedBar", {});
@@ -132,6 +136,7 @@ export const editorFormClasses = useThemeCache(() => {
         transform: `translateX(-50%)`,
         height: globalVars.separator.size,
         background: colorOut(globalVars.separator.color),
+        width: percent(100),
     });
 
     const embedBarTop = style("embedBarTop", {
@@ -173,6 +178,7 @@ export const editorFormClasses = useThemeCache(() => {
         title,
         editor,
         embedBar,
+        header,
         embedBarContainer,
         bodyErrorMessage,
         containerWidth,

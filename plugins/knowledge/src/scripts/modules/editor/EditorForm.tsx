@@ -37,6 +37,8 @@ import { useSpring, animated as a, interpolate } from "react-spring";
 import { useMeasure } from "@library/dom/hookUtils";
 import { style } from "typestyle";
 import { calc } from "csx";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -140,50 +142,49 @@ export function EditorForm(props: IProps) {
 
     const contentRef = useRef<HTMLDivElement>(null);
     const contentSize = useMeasure(contentRef);
-    const contentClass = style({
-        $debugName: "contentHeight",
-        minHeight: calc(`100vh - ${contentSize.top}px - 24px`),
-    });
-
     const [scrollPos, setScrollPos] = useState(0);
     const embedBarRef = useRef<HTMLDivElement | null>(null);
-    const measured = useMeasure(embedBarRef);
     const onScroll = useCallback(e => setScrollPos(e.target.scrollTop), []);
-    const windowWidth = window.innerWidth;
-    window.embedRef = embedBarRef;
-    const { y } = useSpring({ y: scrollPos });
+    const { y } = useSpring({ y: scrollPos, tension: 100 });
     let start = 0;
     let end = 0;
     if (embedBarRef.current) {
         const rect = embedBarRef.current.getBoundingClientRect();
-        start = rect.top;
-        end = rect.top + rect.height;
+        start = rect.top / 2;
+        end = rect.top + rect.height * 2;
     }
 
     const opacity = y.interpolate({
-        map: Math.abs,
-        range: [0, 400],
+        range: [start, end],
         output: [0, 1],
-        extrapolate: "clamp",
     });
 
-    const width = y.interpolate({
-        map: Math.abs,
+    const boxShadow = y.interpolate({
         range: [start, end],
-        output: [measured.width || 0, windowWidth],
-        extrapolate: "clamp",
+        output: [shadowHelper().makeShadow(0.3), shadowHelper().makeShadow(0)],
     });
 
     return (
         <form className={classNames(classesEditorForm.root)} onSubmit={onSubmit} onScroll={onScroll}>
-            <EditorHeader
-                isSubmitLoading={props.submit.status === LoadStatus.LOADING}
-                draft={draft}
-                optionsMenu={
-                    article.status === LoadStatus.SUCCESS && article.data ? <EditorMenu article={article.data} /> : null
-                }
-                saveDraft={saveDraft}
-            />
+            <a.div
+                className={classesEditorForm.header}
+                style={{
+                    boxShadow,
+                }}
+            >
+                <EditorHeader
+                    isSubmitLoading={props.submit.status === LoadStatus.LOADING}
+                    draft={draft}
+                    useShadow={false}
+                    optionsMenu={
+                        article.status === LoadStatus.SUCCESS && article.data ? (
+                            <EditorMenu article={article.data} />
+                        ) : null
+                    }
+                    saveDraft={saveDraft}
+                />
+            </a.div>
+
             <div className={classesEditorForm.spacer} />
             <ScreenReaderContent>
                 <h1 id={props.titleID}>{t("Write Discussion")}</h1>
@@ -240,10 +241,11 @@ export function EditorForm(props: IProps) {
                         contentRef={embedBarRef}
                         className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
                     />
+                    <div className={classNames(classesEditorForm.embedBarBottom, classesEditorForm.containerWidth)} />
                     <a.div
                         className={classesEditorForm.embedBarBottom}
                         style={{
-                            width,
+                            opacity,
                         }}
                     />
                 </div>
@@ -253,10 +255,9 @@ export function EditorForm(props: IProps) {
                         "richEditor",
                         { isDisabled: isLoading },
                         "FormWrapper",
-                        classesEditorForm.editor,
+                        classesEditorForm.editor(contentSize.top),
                         classesRichEditor.root,
                         classesEditorForm.containerWidth,
-                        contentClass,
                     )}
                     ref={contentRef}
                     aria-label={t("Type your message.")}

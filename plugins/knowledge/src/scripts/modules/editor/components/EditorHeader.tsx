@@ -35,6 +35,7 @@ interface IProps extends IDeviceProps {
     selectedKey?: string;
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     mobileDropDownTitle?: string; // For mobile
+    useShadow?: boolean;
 }
 
 /**
@@ -51,13 +52,18 @@ export class EditorHeader extends React.Component<IProps> {
             status: LoadStatus.PENDING,
         },
         isSubmitLoading: false,
+        useShadow: true,
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
 
         return (
-            <nav className={classNames(this.props.className, classesModal.pageHeader)}>
+            <nav
+                className={classNames(this.props.className, classesModal.pageHeader, {
+                    noShadow: !this.props.useShadow,
+                })}
+            >
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
@@ -150,4 +156,4 @@ export class EditorHeader extends React.Component<IProps> {
     }
 }
 
-export default withDevice<IProps>(EditorHeader);
+export default withDevice(EditorHeader);
