@@ -16,7 +16,6 @@ import AccessibleError from "@library/forms/AccessibleError";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import { Editor } from "@rich-editor/editor/context";
 import EditorContent from "@rich-editor/editor/EditorContent";
@@ -36,6 +35,8 @@ import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { useSpring, animated as a, interpolate } from "react-spring";
 import { useMeasure } from "@library/dom/hookUtils";
+import { style } from "typestyle";
+import { calc } from "csx";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -137,6 +138,13 @@ export function EditorForm(props: IProps) {
         [props.actions.publish, props.history],
     );
 
+    const contentRef = useRef<HTMLDivElement>(null);
+    const contentSize = useMeasure(contentRef);
+    const contentClass = style({
+        $debugName: "contentHeight",
+        minHeight: calc(`100vh - ${contentSize.top}px - 24px`),
+    });
+
     const [scrollPos, setScrollPos] = useState(0);
     const embedBarRef = useRef<HTMLDivElement | null>(null);
     const measured = useMeasure(embedBarRef);
@@ -167,7 +175,7 @@ export function EditorForm(props: IProps) {
     });
 
     return (
-        <form className={classNames(classesEditorForm.root, inheritHeightClass())} onSubmit={onSubmit}>
+        <form className={classNames(classesEditorForm.root)} onSubmit={onSubmit} onScroll={onScroll}>
             <EditorHeader
                 isSubmitLoading={props.submit.status === LoadStatus.LOADING}
                 draft={draft}
@@ -176,117 +184,116 @@ export function EditorForm(props: IProps) {
                 }
                 saveDraft={saveDraft}
             />
-            <div className={classNames(classesEditorForm.body, inheritHeightClass())} onScroll={onScroll}>
-                <div className={classesEditorForm.spacer} />
-                <ScreenReaderContent>
-                    <h1 id={props.titleID}>{t("Write Discussion")}</h1>
-                </ScreenReaderContent>
-                <div className="sr-only">
-                    <DocumentTitle title={props.form.name || "Untitled"} />
-                </div>
-                <div className={classesEditorForm.containerWidth}>
-                    <LocationInput
+            <div className={classesEditorForm.spacer} />
+            <ScreenReaderContent>
+                <h1 id={props.titleID}>{t("Write Discussion")}</h1>
+            </ScreenReaderContent>
+            <div className="sr-only">
+                <DocumentTitle title={props.form.name || "Untitled"} />
+            </div>
+            <div className={classesEditorForm.containerWidth}>
+                <LocationInput
+                    disabled={isLoading}
+                    onChange={locationPickerChangeHandler}
+                    error={props.categoryError}
+                />
+                <label>
+                    <input
+                        id={domTitleID}
+                        className={classNames("inputText", classesEditorForm.title)}
+                        type="text"
+                        placeholder={t("Title")}
+                        value={props.form.name || ""}
+                        onChange={titleChangeHandler}
                         disabled={isLoading}
-                        onChange={locationPickerChangeHandler}
-                        error={props.categoryError}
+                        aria-invalid={!!props.titleError}
+                        aria-errormessage={!!props.titleError ? domTitleErrorsID : undefined}
                     />
-                    <label>
-                        <input
-                            id={domTitleID}
-                            className={classNames("inputText", classesEditorForm.title)}
-                            type="text"
-                            placeholder={t("Title")}
-                            value={props.form.name || ""}
-                            onChange={titleChangeHandler}
-                            disabled={isLoading}
-                            aria-invalid={!!props.titleError}
-                            aria-errormessage={!!props.titleError ? domTitleErrorsID : undefined}
+                    {!!props.titleError && (
+                        <AccessibleError
+                            id={domTitleErrorsID}
+                            error={props.titleError}
+                            className={classesEditorForm.titleErrorMessage}
                         />
-                        {!!props.titleError && (
-                            <AccessibleError
-                                id={domTitleErrorsID}
-                                error={props.titleError}
-                                className={classesEditorForm.titleErrorMessage}
-                            />
-                        )}
-                    </label>
+                    )}
+                </label>
+            </div>
+            <Editor
+                allowUpload={true}
+                isPrimaryEditor={true}
+                legacyMode={false}
+                onChange={editorChangeHandler}
+                isLoading={isLoading}
+                reinitialize={formNeedsRefresh}
+                initialValue={form.body}
+                operationsQueue={props.editorOperationsQueue}
+                clearOperationsQueue={props.actions.clearEditorOps}
+            >
+                <div className={classesEditorForm.embedBarContainer}>
+                    <a.div
+                        className={classesEditorForm.embedBarTop}
+                        style={{
+                            opacity,
+                        }}
+                    />
+                    <EditorEmbedBar
+                        contentRef={embedBarRef}
+                        className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                    />
+                    <a.div
+                        className={classesEditorForm.embedBarBottom}
+                        style={{
+                            width,
+                        }}
+                    />
                 </div>
-                <Editor
-                    allowUpload={true}
-                    isPrimaryEditor={true}
-                    legacyMode={false}
-                    onChange={editorChangeHandler}
-                    isLoading={isLoading}
-                    reinitialize={formNeedsRefresh}
-                    initialValue={form.body}
-                    operationsQueue={props.editorOperationsQueue}
-                    clearOperationsQueue={props.actions.clearEditorOps}
-                >
-                    <div className={classesEditorForm.embedBarContainer}>
-                        <a.div
-                            className={classesEditorForm.embedBarTop}
-                            style={{
-                                opacity,
-                            }}
-                        />
-                        <EditorEmbedBar
-                            contentRef={embedBarRef}
-                            className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
-                        />
-                        <a.div
-                            className={classesEditorForm.embedBarBottom}
-                            style={{
-                                width,
-                            }}
-                        />
-                    </div>
 
+                <div
+                    className={classNames(
+                        "richEditor",
+                        { isDisabled: isLoading },
+                        "FormWrapper",
+                        classesEditorForm.editor,
+                        classesRichEditor.root,
+                        classesEditorForm.containerWidth,
+                        contentClass,
+                    )}
+                    ref={contentRef}
+                    aria-label={t("Type your message.")}
+                    aria-describedby={domDescriptionID}
+                    role="textbox"
+                    aria-multiline={true}
+                    id={domID}
+                    aria-errormessage={bodyError ? domEditorErrorID : undefined}
+                    aria-invalid={!!bodyError}
+                >
+                    <EditorDescriptions id={domDescriptionID} />
                     <div
                         className={classNames(
-                            "richEditor",
-                            { isDisabled: isLoading },
-                            "FormWrapper",
-                            classesEditorForm.editor,
-                            classesRichEditor.root,
-                            classesEditorForm.containerWidth,
-                            inheritHeightClass(),
+                            "richEditor-frame",
+                            "InputBox",
+                            "isMenuInset",
+                            classesEditorForm.modernFrame,
                         )}
-                        aria-label={t("Type your message.")}
-                        aria-describedby={domDescriptionID}
-                        role="textbox"
-                        aria-multiline={true}
-                        id={domID}
-                        aria-errormessage={bodyError ? domEditorErrorID : undefined}
-                        aria-invalid={!!bodyError}
                     >
-                        <EditorDescriptions id={domDescriptionID} />
-                        <div
-                            className={classNames(
-                                "richEditor-frame",
-                                "InputBox",
-                                "isMenuInset",
-                                classesEditorForm.modernFrame,
+                        <>
+                            {bodyError && (
+                                <AccessibleError
+                                    id={domEditorErrorID}
+                                    ariaHidden={true}
+                                    error={bodyError}
+                                    className={classesEditorForm.bodyErrorMessage}
+                                    paragraphClassName={classesEditorForm.categoryErrorParagraph}
+                                    wrapClassName={classesUserContent.root}
+                                />
                             )}
-                        >
-                            <>
-                                {bodyError && (
-                                    <AccessibleError
-                                        id={domEditorErrorID}
-                                        ariaHidden={true}
-                                        error={bodyError}
-                                        className={classesEditorForm.bodyErrorMessage}
-                                        paragraphClassName={classesEditorForm.categoryErrorParagraph}
-                                        wrapClassName={classesUserContent.root}
-                                    />
-                                )}
-                                <EditorContent />
-                                <EditorInlineMenus />
-                                <EditorParagraphMenu />
-                            </>
-                        </div>
+                            <EditorContent />
+                            <EditorInlineMenus />
+                            <EditorParagraphMenu />
+                        </>
                     </div>
-                </Editor>
-            </div>
+                </div>
+            </Editor>
         </form>
     );
 }

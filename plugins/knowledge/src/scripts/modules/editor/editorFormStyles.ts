@@ -33,12 +33,15 @@ export const editorFormClasses = useThemeCache(() => {
     const root = style({
         height: viewHeight(100),
         maxHeight: viewHeight(100),
-        overflow: "hidden",
+        overflow: "auto",
         paddingBottom: px(12),
     });
 
     const spacer = style("spacer", {
-        marginBottom: layoutVars.gutter.size,
+        display: "block",
+        height: layoutVars.gutter.size,
+        minHeight: layoutVars.gutter.size,
+        width: percent(100),
     });
 
     const textWrap = style("textWrap", {
@@ -94,25 +97,28 @@ export const editorFormClasses = useThemeCache(() => {
         }),
     );
 
+    const modernFrame = style("modernFrame", {
+        position: "relative",
+        ...paddings({
+            top: globalVars.gutter.half,
+            bottom: globalVars.gutter.size,
+        }),
+    });
+
     const editor = style("editor", {
+        display: "flex",
+        flexDirection: "column",
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         marginTop: unit(-formElementVars.border.width),
-        display: "flex",
-        flexGrow: 1,
-        flexDirection: "column",
         $nest: {
             "& .richEditor-text": {},
         },
     });
 
-    const body = style("body", {
-        overflow: "auto",
-    });
-
     const embedBarContainer = style("embedBarContainer", sticky(), {
         // borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
-        top: 0,
+        top: headerVars.sizing.height,
         zIndex: 2,
         background: colorOut(vars.colors.bg),
     });
@@ -136,20 +142,6 @@ export const editorFormClasses = useThemeCache(() => {
         transform: `translateX(-50%)`,
         height: globalVars.separator.size,
         background: colorOut(globalVars.separator.color),
-    });
-
-    const formContent = style("formContent", {
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-    });
-
-    const modernFrame = style("modernFrame", {
-        position: "relative",
-        ...paddings({
-            top: globalVars.gutter.half,
-            bottom: globalVars.gutter.size,
-        }),
     });
 
     const bodyErrorMessage = style("bodyErrorMessage", {
@@ -180,13 +172,11 @@ export const editorFormClasses = useThemeCache(() => {
         textWrap,
         title,
         editor,
-        modernFrame,
-        body,
         embedBar,
         embedBarContainer,
-        formContent,
         bodyErrorMessage,
         containerWidth,
+        modernFrame,
         embedBarTop,
         embedBarBottom,
         titleErrorMessage,
