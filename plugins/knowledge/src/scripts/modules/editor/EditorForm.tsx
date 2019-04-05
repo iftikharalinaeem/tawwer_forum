@@ -239,9 +239,9 @@ export function EditorForm(props: IProps) {
                         contentRef={embedBarRef}
                         className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
                     />
-                    <div className={classNames(classesEditorForm.embedBarBottom, classesEditorForm.containerWidth)} />
+                    <div className={classesEditorForm.embedBarBottom} />
                     <a.div
-                        className={classesEditorForm.embedBarBottom}
+                        className={classesEditorForm.embedBarBottomFull}
                         style={{
                             opacity,
                         }}

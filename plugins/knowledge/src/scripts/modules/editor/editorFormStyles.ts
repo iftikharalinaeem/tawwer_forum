@@ -22,6 +22,7 @@ import {
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px, viewHeight } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -75,6 +76,9 @@ export const editorFormClasses = useThemeCache(() => {
         },
     });
 
+    const desktopGutter = layoutVars.gutter.size + layoutVars.gutter.halfSize;
+    const mobileGutter = layoutVars.gutter.halfSize + 4; // 4 is from panel widget. Not yet converted,;
+
     const containerWidth = style(
         "containerWidth",
         {
@@ -82,15 +86,15 @@ export const editorFormClasses = useThemeCache(() => {
             maxWidth: layoutVars.middleColumnWidth,
         },
         paddings({
-            horizontal: layoutVars.gutter.size + layoutVars.gutter.halfSize,
+            horizontal: desktopGutter,
         }),
         layoutVariables()
             .mediaQueries()
-            .oneColumn(
-                paddings({
-                    horizontal: layoutVars.gutter.halfSize + 4, // 4 is from panel widget. Not yet converted,
+            .oneColumn({
+                ...paddings({
+                    horizontal: mobileGutter,
                 }),
-            ),
+            }),
         margins({
             horizontal: "auto",
         }),
@@ -128,25 +132,38 @@ export const editorFormClasses = useThemeCache(() => {
 
     const embedBar = style("embedBar", {});
 
-    const embedBarBottom = style("embedBarBottom", {
+    const embedBarMixin: NestedCSSProperties = {
         position: "absolute",
-        top: percent(100),
-        left: percent(50),
         transform: `translateX(-50%)`,
         height: globalVars.separator.size,
         background: colorOut(globalVars.separator.color),
+    };
+
+    const embedBarBottomFull = style("embedBarBottom", embedBarMixin, {
+        top: percent(100),
+        left: percent(50),
         width: percent(100),
     });
-
-    const embedBarTop = style("embedBarTop", {
-        position: "absolute",
+    const embedBarTop = style("embedBarTop", embedBarMixin, {
         top: 0,
         left: percent(50),
         width: percent(100),
-        transform: `translateX(-50%)`,
-        height: globalVars.separator.size,
-        background: colorOut(globalVars.separator.color),
     });
+
+    const embedBarBottom = style(
+        "containerInset",
+        embedBarMixin,
+        {
+            top: percent(100),
+            left: percent(50),
+            width: layoutVars.middleColumnWidth - desktopGutter * 2,
+        },
+        layoutVariables()
+            .mediaQueries()
+            .oneColumn({
+                width: calc(`100% - ${mobileGutter * 2}px`),
+            }),
+    );
 
     const bodyErrorMessage = style("bodyErrorMessage", {
         ...absolutePosition.topLeft(),
@@ -180,6 +197,7 @@ export const editorFormClasses = useThemeCache(() => {
         embedBarContainer,
         bodyErrorMessage,
         containerWidth,
+        embedBarBottomFull,
         modernFrame,
         embedBarTop,
         embedBarBottom,
