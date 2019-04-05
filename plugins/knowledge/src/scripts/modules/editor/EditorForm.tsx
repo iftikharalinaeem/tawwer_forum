@@ -6,39 +6,36 @@
 
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorPageModel, { IEditorPageForm, IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { userContentClasses } from "@library/content/userContentStyles";
+import { useMeasure } from "@library/dom/hookUtils";
 import AccessibleError from "@library/forms/AccessibleError";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 import { t } from "@library/utility/appUtils";
 import { Editor } from "@rich-editor/editor/context";
 import EditorContent from "@rich-editor/editor/EditorContent";
+import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 import { DeltaOperation } from "quill/core";
-import React, { useMemo, useCallback, useState, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { useSpring, animated as a, interpolate } from "react-spring";
-import { useMeasure } from "@library/dom/hookUtils";
-import { style } from "typestyle";
-import { calc } from "csx";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { modalClasses } from "@library/modal/modalStyles";
+import { animated as a, useSpring } from "react-spring";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -297,4 +294,4 @@ const withRedux = connect(
     dispatch => ({ actions: new EditorPageActions(dispatch, apiv2) }),
 );
 
-export default withRedux(withRouter(withDevice<IProps>(EditorForm)));
+export default withRedux(withRouter(withDevice(EditorForm)));
