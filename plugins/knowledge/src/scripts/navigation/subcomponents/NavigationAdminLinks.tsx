@@ -32,11 +32,11 @@ export default class NavigationAdminLinks extends React.Component<IProps> {
                     )}
                     <h3 className="sr-only">{t("Admin Links")}</h3>
                     <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                        {organize()}
                         <OrganizeCategoriesRoute.Link
                             className={classNames("siteNavAdminLinks-link", classes.link)}
                             data={{ kbID: this.props.kbID }}
                         >
+                            {organize(classes.linkIcon)}
                             {t("Organize Categories")}
                         </OrganizeCategoriesRoute.Link>
                     </li>
