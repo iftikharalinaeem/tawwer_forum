@@ -66,12 +66,10 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
      * @return int
      */
     public function getRevisionsCount(int $articleID): int {
-        $revisionsCount = $this->get(
-            ["articleID" => $articleID],
-            [
-                "select" => [['articleRevisionID', 'count', 'revisionsCount']],
-                "validation" => false
-            ]
+        $revisionsCount = $this->selectAggregated(
+            [['articleRevisionID', 'count', 'revisionsCount']],
+            [],
+            ["articleID" => $articleID]
         );
 
         return current($revisionsCount)["revisionsCount"];
