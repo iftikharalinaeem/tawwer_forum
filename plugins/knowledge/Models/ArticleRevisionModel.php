@@ -66,12 +66,12 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
      * @return int
      */
     public function getRevisionsCount(int $articleID): int {
-        $revisionsCount = $this->selectAggregated(
-            [['articleRevisionID', 'count', 'revisionsCount']],
-            [],
-            ["articleID" => $articleID]
-        );
+        $sqlDriver = $this->sql();
 
-        return current($revisionsCount)["revisionsCount"];
+        $sqlDriver->select('articleRevisionID', 'count', 'revisionsCount');
+
+        $result = $sqlDriver->getWhere($this->getTable(), ["articleID" => $articleID])->resultArray();
+
+        return current($result)["revisionsCount"];
     }
 }
