@@ -5,30 +5,28 @@
  * @license Proprietary
  */
 
-import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
-import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
-import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { IArticlePageState } from "@knowledge/modules/article/ArticlePageModel";
-import { ICategoriesPageState } from "@knowledge/modules/categories/categoryPageReducer";
+import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { IArticleState } from "@knowledge/modules/article/ArticleModel";
-import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
-import { IUsersStoreState } from "@library/features/users/UsersModel";
-import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
+import { IArticlePageState } from "@knowledge/modules/article/ArticlePageModel";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import { IKbCategoriesState } from "@knowledge/modules/categories/CategoryModel";
+import { ICategoriesPageState } from "@knowledge/modules/categories/categoryPageReducer";
+import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import { IDraftsPageState } from "@knowledge/modules/drafts/DraftsPageModel";
-import { DeepPartial, Reducer } from "redux";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
+import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
+import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
+import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
+import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
 import { INavigationStoreState } from "@knowledge/navigation/state/NavigationModel";
 import { IRouteState } from "@knowledge/routes/RouteReducer";
-import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import CategoryActions from "@knowledge/modules/categories/CategoryActions";
-import ArticlePageActions from "@knowledge/modules/article/ArticlePageActions";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
-import UsersActions from "@library/features/users/UsersActions";
-import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
-import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
-import { IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { DeepPartial, Reducer } from "redux";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
@@ -36,7 +34,6 @@ export type KNOWLEDGE_ACTION =
     | typeof ArticlePageActions.ACTION_TYPES
     | typeof ArticleActions.ACTION_TYPES
     | typeof RevisionsPageActions.ACTION_TYPES
-    | typeof UsersActions.ACTION_TYPES
     | typeof SearchPageActions.ACTION_TYPES
     | typeof DraftsPageActions.ACTION_TYPES;
 

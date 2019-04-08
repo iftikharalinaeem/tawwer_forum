@@ -83,7 +83,7 @@ abstract class KbPage extends ThemedPage {
      */
     private function initSharedData() {
         $me = $this->usersApi->get_me([]);
-        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me)));
+        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
         $this->knowledgeBases = $this->kbApi->index();
         $this->addReduxAction(new ReduxAction(
