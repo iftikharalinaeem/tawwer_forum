@@ -17,7 +17,7 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { EditorQueueItem } from "@rich-editor/editor/Editor";
+import { EditorQueueItem } from "@rich-editor/editor/context";
 
 export interface IEditorPageForm {
     name: string;

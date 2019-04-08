@@ -4,24 +4,24 @@
  * @license Proprietary
  */
 
-import React, { ReactNode } from "react";
-import { t } from "@library/utility/appUtils";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import BackLink from "@library/routing/links/BackLink";
-import Button from "@library/forms/Button";
-import classNames from "classnames";
-import ButtonLoader from "@library/loaders/ButtonLoader";
-import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
-import Container from "@library/layout/components/Container";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
-import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import FlexSpacer from "@library/layout/FlexSpacer";
-import { metasClasses } from "@library/styles/metasStyles";
-import { modalClasses } from "@library/modal/modalStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import Container from "@library/layout/components/Container";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { modalClasses } from "@library/modal/modalStyles";
+import BackLink from "@library/routing/links/BackLink";
+import { metasClasses } from "@library/styles/metasStyles";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React, { ReactNode } from "react";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -35,6 +35,7 @@ interface IProps extends IDeviceProps {
     selectedKey?: string;
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     mobileDropDownTitle?: string; // For mobile
+    useShadow?: boolean;
 }
 
 /**
@@ -51,18 +52,17 @@ export class EditorHeader extends React.Component<IProps> {
             status: LoadStatus.PENDING,
         },
         isSubmitLoading: false,
+        useShadow: true,
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
+
         return (
             <nav
-                className={classNames(
-                    "editorHeader",
-                    "modal-pageHeader",
-                    this.props.className,
-                    classesModal.pageHeader,
-                )}
+                className={classNames(this.props.className, classesModal.pageHeader, {
+                    noShadow: !this.props.useShadow,
+                })}
             >
                 <Container>
                     <PanelArea>
@@ -156,4 +156,4 @@ export class EditorHeader extends React.Component<IProps> {
     }
 }
 
-export default withDevice<IProps>(EditorHeader);
+export default withDevice(EditorHeader);

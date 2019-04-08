@@ -29,7 +29,7 @@ import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
-import { EditorQueueItem } from "@rich-editor/editor/Editor";
+import { EditorQueueItem } from "@rich-editor/editor/context";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 

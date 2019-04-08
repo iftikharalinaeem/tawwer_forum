@@ -13,6 +13,7 @@ import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem"
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import { EditorAddRoute, EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
@@ -27,7 +28,6 @@ import DocumentTitle from "@library/routing/DocumentTitle";
 import PageLoader from "@library/routing/PageLoader";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import classNames from "classnames";
 import React from "react";
 import { hot } from "react-hot-loader";
@@ -47,8 +47,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, drafts, history, revisions, selectedRevision } = this.props;
-        const classesRichEditorForm = richEditorFormClasses();
-
+        const classesEditorForm = editorFormClasses();
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
@@ -59,7 +58,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 <PageLoader status={revisions.status}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form
-                            className={classNames("richEditorForm", inheritHeightClass(), classesRichEditorForm.root)}
+                            className={classNames("richEditorForm", inheritHeightClass(), classesEditorForm.root)}
                             onSubmit={this.onSubmit}
                         >
                             <RevisionsLayout
