@@ -49,11 +49,11 @@ abstract class KbPage extends ThemedPage {
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
         ThemesApiController $themesApi,
+        ContentSecurityPolicyModel $cspModel,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
-        KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
-        ContentSecurityPolicyModel $cspModel
+        KnowledgeCategoriesApiController $categoriesApi = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi, $cspModel);
         $this->usersApi = $usersApi;
