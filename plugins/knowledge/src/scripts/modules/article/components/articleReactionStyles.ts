@@ -9,11 +9,11 @@ import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px, ColorHelper } from "csx";
 import { buttonVariables } from "@library/forms/buttonStyles";
+import { setAllLinkColors } from "@library/styles/styleHelpers";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("reactions");
     const vars = globalVariables();
-    const buttonVars = buttonVariables();
 
     const frame = style({
         paddingTop: px(12),
@@ -56,9 +56,11 @@ export const reactionClasses = useThemeCache(() => {
         fontSize: vars.fonts.size.large,
     });
 
+    const linkColors = setAllLinkColors();
     const link = style("link", {
-        color: vars.links.colors.toString(),
         fontWeight: vars.fonts.weights.bold,
+        color: linkColors.color,
+        $nest: linkColors.nested,
     });
 
     return {
