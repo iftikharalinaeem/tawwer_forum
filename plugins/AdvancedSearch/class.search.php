@@ -70,6 +70,7 @@ class Search {
             'search' =>
                 [
                     'subcats' => $search['subcats'],
+                    'cat' => $search['cat'],
                 ],
         ];
 
