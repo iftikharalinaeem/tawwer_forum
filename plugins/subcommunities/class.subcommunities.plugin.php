@@ -99,7 +99,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $categoryID = val('CategoryID', $site);
 
                 // Get all of the category IDs associated with the subcommunity.
-                $this->categories = CategoryModel::getSubtree($categoryID, false);
+                $this->categories = CategoryModel::getSubtree($categoryID, true);
             }
         }
 
@@ -513,6 +513,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $categories = $this->getCategories();
 
+        // Because including the ParentCategory throws off the depths, we are building the depth.
+        $categories = $this->rebuildCategoryDepths($categories);
+
         // Allow moving a post to another subcommunity!
         $path = Gdn::request()->path();
         if (stringBeginsWith($path, 'moderation/')) {
@@ -534,6 +537,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $args['Options']['CategoryData'] = $categories;
+        $subcommunityID = SubcommunityModel::getCurrent();
+        $formValue = !empty($sender->getFormValue('cat')) ? $sender->getFormValue('cat') : null;
+        $categoryID = $formValue ?:  $subcommunityID['CategoryID'];
+        $args['Options']['Value'] = $categoryID;
+    }
+
+    /**
+     * Rebuilds the Depth of Subcommunity Categories for the CategoryDropDown.
+     *
+     * @param array $categories
+     * @return array
+     */
+    private function rebuildCategoryDepths(array $categories): array {
+        foreach ($categories as $categoryID => $category) {
+            if ($category['ParentCategoryID'] < 0) {
+                $categories[$categoryID]['Depth'] = 1;
+            } else {
+                $categories[$categoryID]['Depth'] = (int)$categories[$category['ParentCategoryID']]['Depth'] + 1;
+            }
+        }
+        return $categories;
     }
 
     /**
@@ -774,6 +798,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function discussionModel_beforeGetCount_handler($sender, $args) {
         $this->dicussionQueryFiltering($args);
+    }
+
+    /**
+     * Restricting searches to the immediate subcommunity.
+     *
+     * @param  array $args
+     * @return mixed
+     */
+
+    public function advancedSearchPlugin_beforeSearch_handler($args) {
+
+        $searchCategory = $args['search']['cat'] ?? '';
+
+        if ($searchCategory !== 'all') {
+            $subCommunityCategory = SubcommunityModel::getCurrent() ?? null;
+            $category = CategoryModel::categories($subCommunityCategory['CategoryID']);
+            $args['categoryID'] = $category['CategoryID'] ?? null;
+            $args['search']['subcats'] = ( $args['categoryID']) ? 1 : $args['subcats'];
+
+            return $args;
+        }
     }
 
     /**
