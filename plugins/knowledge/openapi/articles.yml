@@ -727,6 +727,27 @@ paths:
             tags:
                 - Articles
             summary: Get a community discussion in a format that is easy to consume when creating a new article.
+    "/articles/{id}/react":
+        put:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/React"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleSimple"
+                    description: Success
+        tags:
+            - Articles
+        summary: Put reaction on article.
 components:
     requestBodies:
         ArticlePost:
@@ -768,6 +789,19 @@ components:
                             - body
                             - format
                         type: object
+            required: true
+        React:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          helpful:
+                            description: User reaction on `Was it helpful?`.
+                            type: string
+                            enum:
+                              - yes
+                              - no
             required: true
     schemas:
         Article:
