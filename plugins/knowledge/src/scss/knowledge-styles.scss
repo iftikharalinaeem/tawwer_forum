@@ -30,10 +30,8 @@
 @import "components/tableOfContents";
 @import "components/panelList";
 
-//@import "components/searchResults";
 @import "components/breadcrumbs";
 @import "components/locationBreadcrumb";
-@import "components/radioButtonsAsTabs";
 @import "components/word";
 @import "components/editorHeader";
 @import "components/pageLocation";
@@ -41,7 +39,6 @@
 @import "components/advancedSearch";
 @import "components/draftList";
 @import "components/draftPreview";
-//@import "components/navigationManager";
 @import "components/navigationManagerToolbar";
 
 @import "~react-day-picker/lib/style.css";

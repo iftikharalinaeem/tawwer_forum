@@ -58,4 +58,20 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
             ["articleRevisionID" => $articleRevisionID]
         );
     }
+
+    /**
+     * Get revisions count for the article
+     *
+     * @param int $articleID
+     * @return int
+     */
+    public function getRevisionsCount(int $articleID): int {
+        $sqlDriver = $this->sql();
+
+        $sqlDriver->select('articleRevisionID', 'count', 'revisionsCount');
+
+        $result = $sqlDriver->getWhere($this->getTable(), ["articleID" => $articleID])->resultArray();
+
+        return current($result)["revisionsCount"];
+    }
 }

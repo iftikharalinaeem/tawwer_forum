@@ -95,7 +95,8 @@ function ReactionButton(props: {
 
     // Content can be either a checkbox, a loader, or some text.
     let content: React.ReactNode = title;
-    if (userReaction === reactionValue) {
+    const checked = userReaction === reactionValue;
+    if (checked) {
         content = <span className={styles.checkedButtonContent}>{checkCompact()}</span>;
     }
     if (isSubmitting) {
@@ -108,7 +109,12 @@ function ReactionButton(props: {
         styles.votingButton,
     );
     return (
-        <Button baseClass={ButtonTypes.STANDARD} disabled={isDisabled} className={classes} onClick={onClick}>
+        <Button
+            baseClass={checked ? ButtonTypes.PRIMARY : ButtonTypes.STANDARD}
+            disabled={isDisabled}
+            className={classes}
+            onClick={onClick}
+        >
             {content}
         </Button>
     );

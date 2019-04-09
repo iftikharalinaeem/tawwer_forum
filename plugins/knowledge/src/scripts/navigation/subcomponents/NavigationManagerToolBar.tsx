@@ -11,6 +11,7 @@ import { collapseAll, expandAll } from "@library/icons/navigationManager";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     expandAll: () => void;
@@ -36,10 +37,11 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
             <div className="navigationManagerToolbar">
                 <div className="navigationManagerToolbar-bar">
                     <Button
+                        baseClass={ButtonTypes.CUSTOM}
                         className={classNames(
                             "navigationManagerToolbar-button",
                             "navigationManagerToolbar-expandAll",
-                            classesNavigationManager.noBorder,
+                            classesNavigationManager.button,
                         )}
                         onClick={this.props.expandAll}
                         disabled={this.state.allExpanded}
@@ -48,10 +50,11 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
                         <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>
                     </Button>
                     <Button
+                        baseClass={ButtonTypes.CUSTOM}
                         className={classNames(
                             "navigationManagerToolbar-button",
                             "navigationManagerToolbar-collapseAll",
-                            classesNavigationManager.noBorder,
+                            classesNavigationManager.button,
                         )}
                         onClick={this.props.collapseAll}
                         disabled={this.state.allCollapsed}
@@ -60,10 +63,11 @@ export default class NavigationManagerToolBar extends React.Component<IProps, IS
                         <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>
                     </Button>
                     <Button
+                        baseClass={ButtonTypes.CUSTOM}
                         className={classNames(
                             "navigationManagerToolbar-button",
                             "navigationManagerToolbar-newFolder",
-                            classesNavigationManager.noBorder,
+                            classesNavigationManager.button,
                         )}
                         onClick={this.props.newCategory}
                         disabled={this.state.allExpanded}
