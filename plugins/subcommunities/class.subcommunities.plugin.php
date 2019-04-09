@@ -513,6 +513,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $categories = $this->getCategories();
 
+        // Because including the ParentCategory throws off the depths, we are building the depth.
+        $categories = $this->rebuildCategoryDepths($categories);
+
         // Allow moving a post to another subcommunity!
         $path = Gdn::request()->path();
         if (stringBeginsWith($path, 'moderation/')) {
@@ -538,6 +541,23 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $formValue = !empty($sender->getFormValue('cat')) ? $sender->getFormValue('cat') : null;
         $categoryID = $formValue ?:  $subcommunityID['CategoryID'];
         $args['Options']['Value'] = $categoryID;
+    }
+
+    /**
+     * Rebuilds the Depth of Subcommunity Categories for the CategoryDropDown.
+     *
+     * @param array $categories
+     * @return array
+     */
+    private function rebuildCategoryDepths(array $categories): array {
+        foreach ($categories as $categoryID => $category) {
+            if ($category['ParentCategoryID'] < 0) {
+                $categories[$categoryID]['Depth'] = 1;
+            } else {
+                $categories[$categoryID]['Depth'] = (int)$categories[$category['ParentCategoryID']]['Depth'] + 1;
+            }
+        }
+        return $categories;
     }
 
     /**
