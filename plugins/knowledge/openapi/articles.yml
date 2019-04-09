@@ -1018,6 +1018,11 @@ components:
                 views:
                     description: How many times the article has been viewed.
                     type: integer
+                reactions:
+                    description: List of user reactions on article.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Reaction"
             required:
                 - articleID
                 - knowledgeCategoryID
@@ -1075,3 +1080,25 @@ components:
                 url:
                     description: Full URL to the answer.
                     type: string
+        Reaction:
+          type: object
+          properties:
+            reactionType:
+              type: string
+              example: helpful
+            yes:
+              type: integer
+              example: 1
+            no:
+              type: integer
+              example: 0
+            total:
+              type: integer
+              example: 1
+            userReaction:
+              type: string
+              enum:
+                - yes
+                - no
+                - null
+              example: yes
