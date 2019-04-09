@@ -140,22 +140,34 @@ components:
           type: string
         insertUserID:
           type: integer
-        knowledgeCategory:
-          $ref: '#/components/schemas/CategoryBreadcrumbsFragment'
+        breadcrumbs:
+          desciption: 'List of breadcrumbs objects {name:"", url:""}. Only returned if: expand[] = breadcrumbs.'
+          items:
+            $ref: '#/components/schemas/CategoryBreadcrumbsFragment'
+          type: array
         knowledgeCategoryID:
           type: integer
         name:
           type: string
+          example: Some article title Lorem Ipsum...
         recordID:
           type: integer
         recordType:
           enum:
           - article
           - knowledgeCategory
+          - discussion
+          - comment
           type: string
+          example: article
         status:
           type: string
+          enum:
+          - published
+          - deleted
         updateUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUser:
           $ref: '#/components/schemas/UserFragment'
         updateUserID:
           type: integer
@@ -174,26 +186,17 @@ components:
       type: object
     CategoryBreadcrumbsFragment:
       properties:
-        breadcrumbs:
-          items:
-            properties:
-              name:
-                description: Breadcrumb element name.
-                minLength: 1
-                type: string
-              url:
-                description: Breadcrumb element url.
-                minLength: 1
-                type: string
-            required:
-            - name
-            - url
-            type: object
-          type: array
-        knowledgeCategoryID:
-          description: Knowledge category ID.
-          type: integer
+        name:
+          description: Breadcrumb element name.
+          minLength: 1
+          type: string
+          example: User Guide
+        url:
+          description: Breadcrumb element url.
+          minLength: 1
+          type: string
+          example: 'https://knowledge.com/kb/user-guide/'
       required:
-      - knowledgeCategoryID
-      - breadcrumbs
+      - name
+      - url
       type: object
