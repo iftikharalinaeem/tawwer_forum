@@ -10,7 +10,7 @@ import Paragraph from "@library/layout/Paragraph";
 import Container from "@library/layout/components/Container";
 import { formatUrl, t } from "@library/utility/appUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState, mapUsersStoreState, isUserGuest } from "@library/features/users/userModel";
 import { connect } from "react-redux";
 import Heading from "@library/layout/Heading";
 import VanillaHeader from "@library/headers/VanillaHeader";
@@ -205,11 +205,7 @@ export class ErrorPage extends React.Component<IProps> {
 
     private renderSignin() {
         const { currentUser } = this.props;
-        if (
-            currentUser.status === LoadStatus.SUCCESS &&
-            currentUser.data &&
-            currentUser.data.userID === UsersModel.GUEST_ID
-        ) {
+        if (currentUser.status === LoadStatus.SUCCESS && currentUser.data && isUserGuest(currentUser.data)) {
             return (
                 <LinkAsButton to={formatUrl(`/entry/signin?Target=${encodeURIComponent(window.location.href)}`)}>
                     {t("Sign In")}
@@ -245,6 +241,6 @@ export enum DefaultError {
     CATEGORY_NO_ARTICLES = "categorynoarticles",
 }
 
-const withCurrentUser = connect(UsersModel.mapStateToProps);
+const withCurrentUser = connect(mapUsersStoreState);
 
 export default withCurrentUser(withDevice(ErrorPage));

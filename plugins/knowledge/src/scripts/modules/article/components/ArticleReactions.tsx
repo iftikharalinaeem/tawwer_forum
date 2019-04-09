@@ -9,7 +9,7 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
-import UsersModel, { IUsersStoreState } from "@library/features/users/UsersModel";
+import { IUsersStoreState, isUserGuest } from "@library/features/users/userModel";
 import Button from "@library/forms/Button";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
@@ -158,7 +158,7 @@ function mapStateToProps(state: IUsersStoreState & IStoreState, ownProps: IOwnPr
     const currentUser = state.users.current;
     const reactionLoadable = state.knowledge.articlePage.reactionLoadable;
     let isSignedIn = false;
-    if (currentUser.data && currentUser.data.userID !== UsersModel.GUEST_ID) {
+    if (currentUser.data && !isUserGuest(currentUser.data)) {
         isSignedIn = true;
     }
     return {
