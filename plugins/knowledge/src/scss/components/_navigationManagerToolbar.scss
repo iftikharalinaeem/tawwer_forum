@@ -20,19 +20,11 @@ $navigationManagerToolbar-separator_color: mixContentBgAndFg(80%);
     flex-wrap: wrap;
     position: relative;
     width: 100%;
+    margin-bottom: 3px;
 }
 
 .navigationManagerToolbar-newFolder {
     margin-left: auto;
-}
-
-.navigationManagerToolbar-button {
-    border: 0;
-
-    &:focus,
-    &:hover {
-        z-index: 1;
-    }
 }
 
 .navigationManagerToolbar-separator {

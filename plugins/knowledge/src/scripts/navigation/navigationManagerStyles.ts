@@ -9,7 +9,9 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { important, percent } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { OutlineProperty } from "csstype";
+import { buttonStates } from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
+import { allButtonStates } from "@library/styles/styleHelpers";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -62,7 +64,6 @@ export const navigationManagerVariables = useThemeCache(() => {
     });
 
     const input = makeThemeVars("input", {
-        padding: 6,
         lineHeight: 24,
     });
 
@@ -186,13 +187,20 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...borders({
             color: "transparent",
         }),
-        $nest: {
-            "&:focus": {
-                ...borders({
-                    color: globalVars.mainColors.primary.fade(0.5),
-                }),
+        ...allButtonStates({
+            hover: {
+                color: colorOut(globalVars.mainColors.primary),
             },
-        },
+            focus: {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            active: {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            focusNotKeyboard: {
+                outline: 0,
+            },
+        }),
     });
 
     const deleteItem = style("deleteItem", {
@@ -207,18 +215,19 @@ export const navigationManagerClasses = useThemeCache(() => {
             },
         },
     });
+
     const input = style("input", {
         ...borders({
             color: "transparent",
+            radius: 0,
+            width: 1,
         }),
         ...paddings({
-            top: 0,
-            right: vars.input.padding,
-            bottom: 0,
-            left: vars.input.padding,
+            vertical: 0,
+            horizontal: 5,
         }),
         lineHeight: unit(vars.input.lineHeight),
-        marginLeft: unit(-1),
+        outline: 0,
         $nest: {
             "&.isFolder": {
                 fontWeight: globalVars.fonts.weights.semiBold,
@@ -231,10 +240,8 @@ export const navigationManagerClasses = useThemeCache(() => {
     const itemLabel = style("itemLabel", {
         flexGrow: 1,
         ...paddings({
-            top: unit(3),
-            right: unit(vars.input.padding),
-            bottom: unit(3),
-            left: unit(vars.input.padding),
+            vertical: 3,
+            horizontal: 6,
         }),
         $nest: {
             "&.isFolder": {
@@ -260,10 +267,10 @@ export const navigationManagerClasses = useThemeCache(() => {
         display: "flex",
         position: "relative",
         alignItems: "center",
-        padding: 0,
         height: unit(vars.item.height),
         width: unit(buttonWidth),
         flexBasis: unit(buttonWidth),
+        padding: 0,
     });
 
     const articlePage = style("articlePage", {
@@ -309,8 +316,22 @@ export const navigationManagerClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    const noBorder = style("noBorder", {
+    const button = style("button", {
+        ...userSelect(),
         border: important(0),
+        $nest: {
+            ...buttonStates({
+                focusNotKeyboard: {
+                    outline: 0,
+                },
+                allStates: {
+                    color: colorOut(globalVars.mainColors.primary),
+                },
+                noState: {
+                    color: colorOut(globalVars.mainColors.fg),
+                },
+            }),
+        },
     });
 
     return {
@@ -335,6 +356,6 @@ export const navigationManagerClasses = useThemeCache(() => {
         folderIcon,
         editMode,
         text,
-        noBorder,
+        button,
     };
 });

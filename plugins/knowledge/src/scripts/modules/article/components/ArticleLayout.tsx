@@ -20,6 +20,8 @@ import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle } from "@knowledge/@types/api/article";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import classNames from "classnames";
 
 /**
  * Implements the article's layout
@@ -30,6 +32,7 @@ export class ArticleLayout extends React.Component<IProps> {
         const { articleID } = article;
 
         const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
+        const classesButtons = buttonClasses();
 
         let title = "";
         if (currentNavCategory) {
@@ -66,7 +69,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                 actions={
                                     <ArticleMenu
                                         article={article}
-                                        buttonClassName="pageTitle-menu"
+                                        buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
                                         device={this.props.device}
                                     />
                                 }

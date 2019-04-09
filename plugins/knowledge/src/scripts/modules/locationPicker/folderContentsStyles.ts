@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, paddings, states, unit } from "@library/styles/styleHelpers";
+import { colorOut, paddings, buttonStates, unit } from "@library/styles/styleHelpers";
 import { calc, percent } from "csx";
 
 export const folderContentsVariables = useThemeCache(() => {
@@ -132,6 +132,10 @@ export const folderContentsClasses = useThemeCache(() => {
         color: colorOut(globalVars.mainColors.primary),
     });
 
+    const uncheckedIcon = style("uncheckedIcon", {
+        color: colorOut(globalVars.mainColors.fg.fade(0.55)),
+    });
+
     const subFolder = style("subFolder", {
         position: "absolute",
         top: 0,
@@ -140,8 +144,24 @@ export const folderContentsClasses = useThemeCache(() => {
         minHeight: unit(vars.item.minHeight),
         width: unit(vars.itemAction.width),
         $nest: {
-            ...states({
-                allStates: {
+            ...buttonStates({
+                noState: {
+                    backgroundColor: colorOut(globalVars.mainColors.bg),
+                    color: colorOut(globalVars.mainColors.primary),
+                },
+                hover: {
+                    backgroundColor: colorOut(globalVars.mainColors.primary),
+                    color: colorOut(globalVars.mainColors.bg),
+                },
+                focus: {
+                    backgroundColor: colorOut(globalVars.mainColors.secondary),
+                    color: colorOut(globalVars.mainColors.bg),
+                },
+                accessibleFocus: {
+                    backgroundColor: colorOut(globalVars.mainColors.secondary),
+                    color: colorOut(globalVars.mainColors.bg),
+                },
+                active: {
                     backgroundColor: colorOut(globalVars.mainColors.primary),
                     color: colorOut(globalVars.mainColors.bg),
                 },
@@ -160,6 +180,7 @@ export const folderContentsClasses = useThemeCache(() => {
         icon,
         folderIcon,
         checkIcon,
+        uncheckedIcon,
         subFolder,
     };
 });

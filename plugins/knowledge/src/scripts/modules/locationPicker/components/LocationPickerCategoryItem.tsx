@@ -51,7 +51,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                             className={classNames(
                                 "folderContents-icon",
                                 classesFolderContents.icon,
-                                classesFolderContents.checkIcon,
+                                isSelected ? classesFolderContents.checkIcon : classesFolderContents.uncheckedIcon,
                                 {
                                     "folderContents-checkIcon": isSelected,
                                     "folderContents-folderIcon": !isSelected,
@@ -70,7 +70,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                 {isNavigable && (
                     <Button
                         onClick={this.props.onNavigate}
-                        baseClass={ButtonTypes.ICON}
+                        baseClass={ButtonTypes.CUSTOM}
                         className={classNames("folderContents-subFolder", classesFolderContents.subFolder)}
                     >
                         {rightChevron("folderContents-chevron isSmall", true)}
