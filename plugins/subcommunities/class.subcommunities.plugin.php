@@ -808,7 +808,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
 
     public function advancedSearchPlugin_beforeSearch_handler($args) {
-        if ($_REQUEST['cat'] !== 'all') {
+        if ( $args['search']['cat'] !== 'all') {
             $subCommunityCategory = SubcommunityModel::getCurrent() ?? null;
             $category = CategoryModel::categories($subCommunityCategory['CategoryID']);
             $args['categoryID'] = $category['CategoryID'] ?? null;
