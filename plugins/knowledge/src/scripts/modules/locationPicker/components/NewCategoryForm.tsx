@@ -83,7 +83,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         </FrameBody>
                         <FrameFooter selfPadded={true}>
                             <Button
-                                baseClass={ButtonTypes.COMPACT}
+                                baseClass={ButtonTypes.TEXT}
                                 className={classNames("locationPicker-validate")}
                                 onClick={this.props.exitHandler}
                             >
@@ -91,7 +91,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                             </Button>
                             <Button
                                 title={t("New Category")}
-                                baseClass={ButtonTypes.COMPACT_PRIMARY}
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
                                 className={classNames("locationPicker-newFolder")}
                                 disabled={!this.state.valid}
                                 type="submit"

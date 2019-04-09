@@ -15,7 +15,6 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Heading from "@library/layout/Heading";
 import RadioTabs from "@library/forms/radioTabs/RadioTabs";
-import RadioButtonTab from "@library/forms/radioTabs/RadioTab";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import Permission from "@library/features/users/Permission";
 import * as React from "react";
@@ -27,6 +26,7 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import DateRange from "@library/forms/DateRange";
 import CommunityCategoryInput from "@vanilla/forms/CommunityCategoryInput";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
+import RadioTab from "@library/forms/radioTabs/RadioTab";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -53,8 +53,8 @@ export class AdvancedSearch extends React.Component<IProps> {
                     activeTab={this.props.form.domain || SearchDomain.EVERYWHERE}
                     childClass="advancedSearchDomain-tab"
                 >
-                    <RadioButtonTab label={t("Articles")} data={SearchDomain.ARTICLES} />
-                    <RadioButtonTab label={t("Everywhere")} data={SearchDomain.EVERYWHERE} />
+                    <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />
+                    <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />
                 </RadioTabs>
                 <InputTextBlock
                     label={t("Title")}
