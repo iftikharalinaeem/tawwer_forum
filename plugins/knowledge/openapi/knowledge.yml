@@ -142,7 +142,7 @@ components:
           type: integer
         breadcrumbs:
           items:
-            description: 'List of breadcrumbs objects {name:"", url:""}. Only returned if: expand[] = breadcrumbs.'
+            description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
             properties:
               name:
                 description: Breadcrumb element name.
