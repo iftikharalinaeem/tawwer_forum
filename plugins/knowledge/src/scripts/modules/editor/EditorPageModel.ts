@@ -18,6 +18,7 @@ import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
+import { boolean } from "@storybook/addon-knobs";
 
 export interface IEditorPageForm {
     name: string;
@@ -40,6 +41,7 @@ export interface IEditorPageState {
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
     isDirty: boolean;
+    notifyConversion: boolean;
 }
 
 export interface IInjectableEditorProps {
@@ -51,6 +53,7 @@ export interface IInjectableEditorProps {
     revision: ILoadable<IRevision>;
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
+    notifyConversion: boolean;
 }
 
 type ReducerType = KnowledgeReducer<IEditorPageState>;
@@ -72,6 +75,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             form,
             formNeedsRefresh,
             editorOperationsQueue,
+            notifyConversion,
         } = EditorPageModel.getStateSlice(state);
 
         return {
@@ -83,6 +87,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             revision: EditorPageModel.selectActiveRevision(state),
             draft: EditorPageModel.selectDraft(state),
             editorOperationsQueue,
+            notifyConversion,
         };
     }
 
@@ -140,7 +145,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return state.knowledge.editorPage;
     }
 
-    public static readonly INITIAL_STATE = {
+    public static readonly INITIAL_STATE: IEditorPageState = {
         article: {
             status: LoadStatus.PENDING,
         },
@@ -166,8 +171,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             status: LoadStatus.PENDING,
         },
         isDirty: false,
+        notifyConversion: false,
     };
-    public initialState: IEditorPageState = EditorPageModel.INITIAL_STATE;
+    public initialState = EditorPageModel.INITIAL_STATE;
 
     /**
      * Reducer implementation for the editor page.
@@ -209,10 +215,18 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
         .case(EditorPageActions.queueEditorOpAC, (nextState, payload) => {
             nextState.editorOperationsQueue.push(payload);
+            if (typeof payload === "string") {
+                // The item needs conversion.
+                nextState.notifyConversion = true;
+            }
             return nextState;
         })
         .case(EditorPageActions.clearEditorOpsAC, nextState => {
             nextState.editorOperationsQueue = [];
+            return nextState;
+        })
+        .case(EditorPageActions.clearConversionNoticeAC, nextState => {
+            nextState.notifyConversion = false;
             return nextState;
         });
 

@@ -104,6 +104,7 @@ describe("EditorPageModel", () => {
                 },
                 formNeedsRefresh: true,
                 editorOperationsQueue: [],
+                notifyConversion: false,
             };
 
             expect(EditorPageModel.getInjectableProps(state as any)).deep.eq(expected);

@@ -30,6 +30,7 @@ import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
 import { EditorQueueItem } from "@rich-editor/editor/context";
+import { EditorPage } from "@knowledge/modules/editor/EditorPage";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -202,12 +203,13 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
     }
 
     public static queueEditorOpAC = createAction<EditorQueueItem>("QUEUE_EDITOR_OP");
-
-    public static clearEditorOpsAC = createAction("CLEAR_EDITOR_OPS");
-
     public queueEditorOp = this.bindDispatch(EditorPageActions.queueEditorOpAC);
 
+    public static clearEditorOpsAC = createAction("CLEAR_EDITOR_OPS");
     public clearEditorOps = this.bindDispatch(EditorPageActions.clearEditorOpsAC);
+
+    public static clearConversionNoticeAC = createAction("CLEAR_CONVERSION_NOTICE");
+    public clearConversionNotice = this.bindDispatch(EditorPageActions.clearConversionNoticeAC);
 
     private pushDiscussionToForm(discussionID: number, discussion: IGetArticleFromDiscussionResponse) {
         const { name } = discussion;

@@ -21,7 +21,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
-import { calc, percent, px, viewHeight } from "csx";
+import { calc, percent, px, viewHeight, important } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { borders } from "@library/styles/styleHelpers";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
@@ -119,6 +119,13 @@ export const editorFormClasses = useThemeCache(() => {
         }),
     });
 
+    const conversionNotice = style(
+        "conversionNotice",
+        margins({
+            top: unit(16),
+        }),
+    );
+
     const editor = (topWindowPosition: number) =>
         style("editor", {
             display: "flex",
@@ -208,6 +215,7 @@ export const editorFormClasses = useThemeCache(() => {
         embedBarContainer,
         bodyErrorMessage,
         containerWidth,
+        conversionNotice,
         embedBarBottomFull,
         modernFrame,
         embedBarTop,
