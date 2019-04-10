@@ -141,8 +141,8 @@ components:
         insertUserID:
           type: integer
         breadcrumbs:
+          description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
           items:
-            description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
             properties:
               name:
                 description: Breadcrumb element name.
