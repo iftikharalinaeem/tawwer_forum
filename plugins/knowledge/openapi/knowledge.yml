@@ -4,22 +4,34 @@ paths:
   /knowledge/search:
     get:
       parameters:
-      - description: >
-          <p>Unique ID of a knowledge base. Results will be relative to this
-          value.</p>
+      - description: 'Global search flag. Default: false'
+        in: query
+        name: global
+        schema:
+          type: boolean
+          default: false
+      - description: Unique ID of a knowledge base. Results will be relative to this
+          value.
         in: query
         name: knowledgeBaseID
         schema:
           type: integer
-      - description: |
-          <p>Knowledge category ID to filter results.</p>
+      - description: Knowledge category ID list to filter results.
         in: query
-        name: knowledgeCategoryID
+        name: knowledgeCategoryIDs
         schema:
-          type: integer
-      - description: >
-          <p>Array of insertUserIDs (authors of article) to filter
-          results.</p>
+          items:
+            type: integer
+          type: array
+      - description: 'Community forum category ID list to filter results. Can only be used when: global = true'
+        in: query
+        name: categoryIDs
+        schema:
+          items:
+            type: integer
+          type: array
+      - description: Array of insertUserIDs (authors of article) to filter
+          results.
         in: query
         name: insertUserIDs
         schema:
@@ -27,9 +39,8 @@ paths:
             type: integer
           type: array
         style: form
-      - description: >
-          <p>Array of updateUserIDs (last editors of an article) to filter
-          results.</p>
+      - description: Array of updateUserIDs (last editors of an article) to filter
+          results.
         in: query
         name: updateUserIDs
         schema:
@@ -37,8 +48,7 @@ paths:
             type: integer
           type: array
         style: form
-      - description: |
-          <p>Expand data for: user, category.</p>
+      - description: 'Expand data for: user, category.'
         in: query
         name: expand
         schema:
@@ -65,8 +75,7 @@ paths:
         schema:
           format: date-filter
           type: string
-      - description: |
-          <p>Article statuses array to filter results.</p>
+      - description: Article statuses array to filter results.
         in: query
         name: statuses
         schema:
@@ -74,24 +83,37 @@ paths:
             type: string
           type: array
         style: form
-      - description: |
-          <p>Keywords to search against article name.</p>
+      - description: Keywords to search against article name.
         in: query
         name: name
         schema:
           type: string
-      - description: |
-          <p>Keywords to search against article body.</p>
+      - description: Keywords to search against article body.
         in: query
         name: body
         schema:
           type: string
-      - description: |
-          <p>Keywords to search against article name or body.</p>
+      - description: Keywords to search against article name or body.
         in: query
         name: all
         schema:
           type: string
+      - description: 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).'
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+          maximum: 100
+      - description: Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+          minimum: 1
       responses:
         '200':
           content:
@@ -118,22 +140,45 @@ components:
           type: string
         insertUserID:
           type: integer
-        knowledgeCategory:
-          $ref: '#/components/schemas/CategoryBreadcrumbsFragment'
+        breadcrumbs:
+          description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
+          items:
+            properties:
+              name:
+                description: Breadcrumb element name.
+                minLength: 1
+                type: string
+                example: User Guide
+              url:
+                description: Breadcrumb element url.
+                minLength: 1
+                type: string
+                example: 'https://knowledge.com/kb/user-guide/'
+            type: object
+          type: array
         knowledgeCategoryID:
           type: integer
         name:
           type: string
+          example: Some article title Lorem Ipsum...
         recordID:
           type: integer
         recordType:
           enum:
           - article
           - knowledgeCategory
+          - discussion
+          - comment
           type: string
+          example: article
         status:
           type: string
+          enum:
+          - published
+          - deleted
         updateUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUser:
           $ref: '#/components/schemas/UserFragment'
         updateUserID:
           type: integer
@@ -150,28 +195,4 @@ components:
       - status
       - recordType
       type: object
-    CategoryBreadcrumbsFragment:
-      properties:
-        breadcrumbs:
-          items:
-            properties:
-              name:
-                description: Breadcrumb element name.
-                minLength: 1
-                type: string
-              url:
-                description: Breadcrumb element url.
-                minLength: 1
-                type: string
-            required:
-            - name
-            - url
-            type: object
-          type: array
-        knowledgeCategoryID:
-          description: Knowledge category ID.
-          type: integer
-      required:
-      - knowledgeCategoryID
-      - breadcrumbs
-      type: object
+

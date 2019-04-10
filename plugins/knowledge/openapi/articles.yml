@@ -727,6 +727,27 @@ paths:
             tags:
                 - Articles
             summary: Get a community discussion in a format that is easy to consume when creating a new article.
+    "/articles/{id}/react":
+        put:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/React"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleSimple"
+                    description: Success
+            tags:
+                - Articles
+            summary: Put reaction on article.
 components:
     requestBodies:
         ArticlePost:
@@ -768,6 +789,19 @@ components:
                             - body
                             - format
                         type: object
+            required: true
+        React:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          helpful:
+                            description: User reaction on `Was it helpful?`.
+                            type: string
+                            enum:
+                              - yes
+                              - no
             required: true
     schemas:
         Article:
@@ -1018,6 +1052,11 @@ components:
                 views:
                     description: How many times the article has been viewed.
                     type: integer
+                reactions:
+                    description: List of user reactions on article.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Reaction"
             required:
                 - articleID
                 - knowledgeCategoryID
@@ -1075,3 +1114,25 @@ components:
                 url:
                     description: Full URL to the answer.
                     type: string
+        Reaction:
+          type: object
+          properties:
+            reactionType:
+              type: string
+              example: helpful
+            yes:
+              type: integer
+              example: 1
+            no:
+              type: integer
+              example: 0
+            total:
+              type: integer
+              example: 1
+            userReaction:
+              type: string
+              enum:
+                - yes
+                - no
+                - null
+              example: yes

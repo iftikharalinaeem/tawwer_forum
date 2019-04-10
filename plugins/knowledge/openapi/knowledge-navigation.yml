@@ -1,8 +1,15 @@
 openapi: 3.0.0
 info:
 paths:
-  '/knowledge-navigation/flat':
+  '/knowledge-bases/{id}/navigation-flat':
     get:
+      parameters:
+      - description: Knowledge base ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           content:
@@ -13,9 +20,16 @@ paths:
                 type: array
           description: Success
       tags:
-      - Knowledge Navigation
+      - Knowledge Bases Navigation
       summary: Get a navigation-friendly category hierarchy flat mode.
     patch:
+      parameters:
+      - description: Knowledge base ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           content:
@@ -26,7 +40,7 @@ paths:
                 type: array
           description: Success
       tags:
-      - Knowledge Navigation
+      - Knowledge Bases Navigation
       requestBody:
         content:
           application/json:
@@ -62,8 +76,15 @@ paths:
       summary: >-
         Update the navigation structure of a knowledge base, using the flat
         format.
-  '/knowledge-navigation/tree':
+  '/knowledge-bases/{id}/navigation-tree':
     get:
+      parameters:
+      - description: Knowledge base ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           content:
@@ -74,7 +95,7 @@ paths:
                 type: array
           description: Success
       tags:
-      - Knowledge Navigation
+      - Knowledge Bases Navigation
       summary: Get a navigation-friendly category hierarchy tree mode.
 components:
   schemas:
