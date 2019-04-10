@@ -27,7 +27,7 @@ import { LoadStatus, ILinkListData, ILoadable } from "@library/@types/api/core";
  */
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
-        const { knowledgeBase, status, data } = this.props;
+        const { knowledgeBase, status, data, rootCategoryUrl } = this.props;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             return <Loader />;
@@ -60,7 +60,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                         <h1>{knowledgeBase.name}</h1>
                     </ScreenReaderContent>
                     <WidgetContainer>
-                        <HelpCenterNavigation data={data!} />
+                        <HelpCenterNavigation data={data!} rootCategoryUrl={rootCategoryUrl} />
                     </WidgetContainer>
                 </Container>
             </>
@@ -90,8 +90,16 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const loadStatus = knowledgeState.fetchStatusesByKbID[knowledgeBaseID] || LoadStatus.PENDING;
 
     let data: ILinkListData | undefined;
+    let rootCategoryUrl: string | undefined;
     if (loadStatus === LoadStatus.SUCCESS) {
-        data = NavigationSelector.selectHelpCenterNome(knowledgeState.navigationItems, ownProps.knowledgeBase);
+        data = NavigationSelector.selectHelpCenterHome(knowledgeState.navigationItems, ownProps.knowledgeBase);
+        const rootCategory = NavigationSelector.selectCategory(
+            ownProps.knowledgeBase.rootCategoryID,
+            knowledgeState.navigationItems,
+        );
+        if (rootCategory) {
+            rootCategoryUrl = rootCategory.url;
+        }
     }
 
     const loadable: ILoadable<ILinkListData> = {
@@ -99,7 +107,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
         data,
     };
 
-    return loadable;
+    return { ...loadable, rootCategoryUrl };
 }
 
 function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
