@@ -24,6 +24,7 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
                     accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
                     data={data}
                     depth={2}
+                    ungroupedTitle={t("Other Articles")}
                     ungroupedViewAllUrl={rootCategoryUrl}
                 />
             );
