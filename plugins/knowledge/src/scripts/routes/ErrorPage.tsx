@@ -24,7 +24,7 @@ import classNames from "classnames";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { percent, px, viewHeight } from "csx";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import { searchError } from "@library/icons/common";
 import { LoadStatus, IApiError } from "@library/@types/api/core";
 
@@ -122,7 +122,7 @@ export class ErrorPage extends React.Component<IProps> {
                     message,
                     description: t("The page you were looking for could not be found."),
                     actionItem: (
-                        <LinkAsButton className={buttons.primary} to={"/kb"}>
+                        <LinkAsButton baseClass={ButtonTypes.PRIMARY} to={"/kb"}>
                             {t("Back to home page")}
                         </LinkAsButton>
                     ),
