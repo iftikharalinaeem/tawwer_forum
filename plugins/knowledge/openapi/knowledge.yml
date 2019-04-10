@@ -9,7 +9,7 @@ paths:
         name: global
         schema:
           type: boolean
-        default: false
+          default: false
       - description: Unique ID of a knowledge base. Results will be relative to this
           value.
         in: query
@@ -141,9 +141,20 @@ components:
         insertUserID:
           type: integer
         breadcrumbs:
-          desciption: 'List of breadcrumbs objects {name:"", url:""}. Only returned if: expand[] = breadcrumbs.'
           items:
-            $ref: '#/components/schemas/CategoryBreadcrumbsFragment'
+            description: 'List of breadcrumbs objects {name:"", url:""}. Only returned if: expand[] = breadcrumbs.'
+            properties:
+              name:
+                description: Breadcrumb element name.
+                minLength: 1
+                type: string
+                example: User Guide
+              url:
+                description: Breadcrumb element url.
+                minLength: 1
+                type: string
+                example: 'https://knowledge.com/kb/user-guide/'
+            type: object
           type: array
         knowledgeCategoryID:
           type: integer
@@ -184,19 +195,4 @@ components:
       - status
       - recordType
       type: object
-    CategoryBreadcrumbsFragment:
-      properties:
-        name:
-          description: Breadcrumb element name.
-          minLength: 1
-          type: string
-          example: User Guide
-        url:
-          description: Breadcrumb element url.
-          minLength: 1
-          type: string
-          example: 'https://knowledge.com/kb/user-guide/'
-      required:
-      - name
-      - url
-      type: object
+
