@@ -21,6 +21,8 @@ import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import UserContent from "@library/content/UserContent";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -46,8 +48,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render() {
-        const { article, drafts, history, revisions, selectedRevision } = this.props;
+        const { article, history, revisions, selectedRevision } = this.props;
         const classesEditorForm = editorFormClasses();
+
+        const loadStatus = revisions.data ? LoadStatus.SUCCESS : revisions.status;
+
         return (
             <Modal
                 size={ModalSizes.FULL_SCREEN}
@@ -55,7 +60,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 label={t("Article Revisions")}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
-                <PageLoader status={revisions.status}>
+                <PageLoader status={loadStatus}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form
                             className={classNames("richEditorForm", inheritHeightClass(), classesEditorForm.root)}
@@ -125,24 +130,26 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render the list of revisions.
      */
     private renderRevisions(): React.ReactNode {
-        const { revisions, selectedRevisionID } = this.props;
+        const { revisions, selectedRevisionID, pagination } = this.props;
         return (
-            revisions.status === LoadStatus.SUCCESS &&
             revisions.data && (
-                <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
-                    {revisions.data.slice().map(item => {
-                        const preload = () => this.props.preloadRevision(item.articleRevisionID);
-                        return (
-                            <RevisionsListItem
-                                {...item}
-                                isSelected={item.articleRevisionID === selectedRevisionID}
-                                url={RevisionsRoute.url(item)}
-                                onHover={preload}
-                                key={item.articleRevisionID}
-                            />
-                        );
-                    })}
-                </RevisionsList>
+                <>
+                    <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
+                        {revisions.data.slice().map(item => {
+                            const preload = () => this.props.preloadRevision(item.articleRevisionID);
+                            return (
+                                <RevisionsListItem
+                                    {...item}
+                                    isSelected={item.articleRevisionID === selectedRevisionID}
+                                    url={RevisionsRoute.url(item)}
+                                    onHover={preload}
+                                    key={item.articleRevisionID}
+                                />
+                            );
+                        })}
+                    </RevisionsList>
+                    <LoadMoreButton nextPage={pagination.revisions.next} onClick={this.loadArticleRevisions} />
+                </>
             )
         );
     }
@@ -201,6 +208,20 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     }
 
     /**
+     * Get revisions of an article.
+     *
+     * @param articleID
+     * @param page
+     */
+    private loadArticleRevisions = (): void => {
+        const { articleID, fetchRevisionsForArticle, pagination } = this.props;
+        if (!articleID || !pagination.revisions.next) {
+            return;
+        }
+        void fetchRevisionsForArticle({ articleID, page: pagination.revisions.next });
+    };
+
+    /**
      * Initialize the page's data from it's url.
      */
     private async initializeFromUrl() {
@@ -231,9 +252,11 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
         articleID,
         articleStatus,
         draftsStatus,
+        pagination,
     } = revisionsPage;
     const article = articleID ? ArticleModel.selectArticle(state, articleID) : null;
     return {
+        articleID,
         revisions: {
             ...revisionsStatus,
             data: RevisionsPageModel.selectRevisions(state),
@@ -251,6 +274,7 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
             data: RevisionsPageModel.selectActiveRevision(state),
         },
         selectedRevisionID,
+        pagination,
     };
 }
 
@@ -258,12 +282,14 @@ function mapDispatchToProps(dispatch: any) {
     const articleActions = new ArticleActions(dispatch, apiv2);
     const revisionsPageActions = new RevisionsPageActions(dispatch, apiv2);
     const { setActiveRevision, setActiveArticle, reset } = revisionsPageActions;
+    const { fetchRevisionsForArticle } = articleActions;
 
     return {
         preloadRevision: (revisionID: number) => articleActions.fetchRevisionByID({ revisionID }),
         setActiveRevision,
         setActiveArticle,
         reset,
+        fetchRevisionsForArticle,
     };
 }
 
@@ -271,5 +297,19 @@ const withRedux = connect(
     mapStateToProps,
     mapDispatchToProps,
 );
+
+function LoadMoreButton(props: { nextPage?: number; onClick: () => void }) {
+    const { nextPage, onClick } = props;
+
+    if (!nextPage || nextPage < 2) {
+        return null;
+    }
+
+    return (
+        <Button baseClass={ButtonTypes.STANDARD} onClick={onClick}>
+            {t("Load More")}
+        </Button>
+    );
+}
 
 export default hot(module)(withRedux(withDevice(RevisionsPage)));
