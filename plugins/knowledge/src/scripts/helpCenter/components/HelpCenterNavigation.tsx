@@ -13,7 +13,7 @@ import { ILinkListData } from "@library/@types/api/core";
  */
 export default class HelpCenterNavigation extends React.Component<IProps> {
     public render() {
-        const { data } = this.props;
+        const { data, rootCategoryUrl } = this.props;
         const ungroupedCount = data.ungroupedItems || [];
         const groupedContent = data.groups || [];
 
@@ -24,6 +24,7 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
                     accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
                     data={data}
                     depth={2}
+                    ungroupedViewAllUrl={rootCategoryUrl}
                 />
             );
         } else {
@@ -34,4 +35,5 @@ export default class HelpCenterNavigation extends React.Component<IProps> {
 
 interface IProps {
     data: ILinkListData;
+    rootCategoryUrl?: string;
 }

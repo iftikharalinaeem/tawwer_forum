@@ -193,7 +193,7 @@ export default class NavigationSelector {
         return navItems[key] as IKbNavigationItem<KbRecordType.CATEGORY> | undefined;
     }
 
-    public static selectHelpCenterNome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {
+    public static selectHelpCenterHome(navItems: INormalizedNavigationItems, knowledgeBase: IKnowledgeBase) {
         const rootNavItemID = KbRecordType.CATEGORY + knowledgeBase.rootCategoryID;
         const treeData = NavigationSelector.selectNavTree(navItems, rootNavItemID);
         const data: ILinkListData = {
