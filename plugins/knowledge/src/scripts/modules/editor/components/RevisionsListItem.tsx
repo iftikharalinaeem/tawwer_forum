@@ -31,11 +31,11 @@ interface IProps extends IRevisionFragment {
  */
 export default class RevisionsListItem extends React.Component<IProps> {
     public render() {
-        const { name, status, dateInserted, url, isSelected } = this.props;
-        const { photoUrl } = this.props.insertUser;
+        const { status, dateInserted, url, isSelected } = this.props;
+        const { name, photoUrl } = this.props.insertUser;
         const classesMetas = metasClasses();
         return (
-            <Hoverable onHover={this.props.onHover} duration={50}>
+            <Hoverable onHover={this.props.onHover} duration={250}>
                 {provided => (
                     <li {...provided} className="itemList-item">
                         <SmartLink
