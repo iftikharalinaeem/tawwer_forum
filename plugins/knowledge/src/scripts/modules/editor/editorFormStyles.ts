@@ -21,7 +21,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
-import { calc, percent, px, viewHeight } from "csx";
+import { calc, percent, px, viewHeight, important } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const editorFormClasses = useThemeCache(() => {
@@ -107,6 +107,13 @@ export const editorFormClasses = useThemeCache(() => {
             bottom: globalVars.gutter.size,
         }),
     });
+
+    const conversionNotice = style(
+        "conversionNotice",
+        margins({
+            top: unit(16),
+        }),
+    );
 
     const editor = (topWindowPosition: number) =>
         style("editor", {
@@ -197,6 +204,7 @@ export const editorFormClasses = useThemeCache(() => {
         embedBarContainer,
         bodyErrorMessage,
         containerWidth,
+        conversionNotice,
         embedBarBottomFull,
         modernFrame,
         embedBarTop,

@@ -19,6 +19,7 @@ import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import { Editor } from "@rich-editor/editor/context";
 import EditorContent from "@rich-editor/editor/EditorContent";
@@ -36,7 +37,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { animated as a, useSpring } from "react-spring";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
+import Message from "@library/messages/Message";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -63,6 +64,31 @@ export function EditorForm(props: IProps) {
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
     const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
+    const { clearConversionNotice } = props.actions;
+    const message = t(
+        "This text has been converted from another format. As a result you may lose some of your formatting. Do you wish to continue?",
+    );
+    const conversionNotice = props.notifyConversion && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            onCancel={props.history.goBack}
+            onConfirm={clearConversionNotice}
+            contents={message}
+            stringContents={message}
+        />
+    );
+
+    const canSubmit = (() => {
+        const minTitleLength = 1;
+        const title = props.form.name || "";
+
+        return (
+            title.length >= minTitleLength &&
+            props.form.knowledgeCategoryID !== null &&
+            !isLoading &&
+            !props.notifyConversion
+        );
+    })();
 
     /**
      * Update the draft from the contents of the form.
@@ -171,6 +197,7 @@ export function EditorForm(props: IProps) {
                 }}
             >
                 <EditorHeader
+                    canSubmit={canSubmit}
                     isSubmitLoading={props.submit.status === LoadStatus.LOADING}
                     draft={draft}
                     useShadow={false}
@@ -248,6 +275,7 @@ export function EditorForm(props: IProps) {
                     />
                 </div>
 
+                {conversionNotice}
                 <div
                     className={classNames(
                         "richEditor",
