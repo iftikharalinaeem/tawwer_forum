@@ -50,6 +50,8 @@ export interface IRevision extends IRevisionRequiredData, IRevisionDefaultedData
 
 export interface IGetArticleRevisionsRequestBody {
     articleID: number;
+    page?: number;
+    limit?: number;
 }
 
 export type IGetArticleRevisionsResponseBody = IRevisionFragment[];
