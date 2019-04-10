@@ -14,6 +14,7 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import DraftsPageActions from "../drafts/DraftsPageActions";
+import SimplePagerModel from "@library/navigation/SimplePagerModel";
 
 export interface IRevisionsPageState {
     articleID: number | null;
@@ -24,6 +25,13 @@ export interface IRevisionsPageState {
     draftsStatus: ILoadable<any>;
     selectedRevisionStatus: ILoadable<any>;
     selectedRevisionID: number | null;
+    pagination: {
+        revisions: {
+            current: number;
+            next?: number;
+            prev?: number;
+        };
+    };
 }
 
 /**
@@ -108,6 +116,11 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         revisionsStatus: {
             status: LoadStatus.PENDING,
         },
+        pagination: {
+            revisions: {
+                current: 1,
+            },
+        },
     };
 
     /**
@@ -179,7 +192,19 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
                         break;
                     case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                         draft.revisionsStatus.status = LoadStatus.SUCCESS;
-                        draft.revisionIDs = action.payload.data.map(rev => rev.articleRevisionID);
+                        const newRevisions = action.payload.data.map(rev => rev.articleRevisionID);
+                        draft.revisionIDs = state.revisionIDs.concat(newRevisions);
+
+                        const { link } = action.payload.headers;
+                        const currentPage = action.meta.page || 1;
+                        if (link) {
+                            const pages = SimplePagerModel.parseLinkHeader(link, "page");
+                            draft.pagination.revisions = {
+                                current: currentPage,
+                                next: pages.next,
+                                prev: pages.prev,
+                            };
+                        }
                         break;
                     case ArticleActions.GET_ARTICLE_REVISIONS_ERROR:
                         draft.revisionsStatus.status = LoadStatus.ERROR;
