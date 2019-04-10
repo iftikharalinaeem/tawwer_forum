@@ -745,9 +745,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ArticleSimple"
                     description: Success
-        tags:
-            - Articles
-        summary: Put reaction on article.
+            tags:
+                - Articles
+            summary: Put reaction on article.
 components:
     requestBodies:
         ArticlePost:
