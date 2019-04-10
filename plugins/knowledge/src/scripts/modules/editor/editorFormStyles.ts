@@ -23,6 +23,8 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { borders } from "@library/styles/styleHelpers";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -30,7 +32,8 @@ export const editorFormClasses = useThemeCache(() => {
     const layoutVars = layoutVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
-    const style = styleFactory("richEditorForm");
+    const style = styleFactory("editorFormClasses");
+    const classesRichEditor = richEditorClasses(false);
     const root = style({
         height: viewHeight(100),
         maxHeight: viewHeight(100),
@@ -43,6 +46,8 @@ export const editorFormClasses = useThemeCache(() => {
         minHeight: layoutVars.gutter.size,
         width: percent(100),
     });
+
+    const iconWrap = classesRichEditor.iconWrap;
 
     const title = style("title", {
         $nest: {
@@ -57,8 +62,11 @@ export const editorFormClasses = useThemeCache(() => {
                 backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
-                border: 0,
                 borderRadius: 0,
+                borderTop: 0,
+                borderRight: 0,
+                borderLeft: 0,
+                borderBottom: `solid transparent 2px`,
                 marginBottom: unit(globalVars.spacer.size),
                 ...paddings({
                     left: 0,
@@ -67,6 +75,9 @@ export const editorFormClasses = useThemeCache(() => {
             },
             "&:not(.focus-visible)": {
                 outline: "none",
+            },
+            "&:focus": {
+                borderBottomColor: colorOut(globalVars.mainColors.primary),
             },
             ...placeholderStyles({
                 lineHeight: "inherit",
