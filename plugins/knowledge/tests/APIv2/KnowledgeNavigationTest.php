@@ -11,6 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Test the /api/v2/knowledge-navigation endpoint.
@@ -89,6 +90,8 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                             "name" => $item["name"],
                             "description" => $item["name"],
                             "urlCode" => 'test-'.round(microtime(true) * 1000).rand(1, 1000),
+                            "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+                            "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
                         ]);
                         $parentID = $knowledgeBase['rootCategoryID'];
                         $this->knowledgeBase = $knowledgeBase;

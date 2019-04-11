@@ -321,6 +321,8 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
             "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+            "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+            "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();

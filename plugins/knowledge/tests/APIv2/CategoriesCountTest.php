@@ -7,6 +7,7 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * Test the /api/v2/knowledge-categories endpoint.
@@ -116,6 +117,8 @@ class CategoriesCountTest extends AbstractAPIv2Test {
             "name" => __FUNCTION__ . " Test Knowledge Base",
             "description" => 'Some description',
             "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+            "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+            "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
         ])->getBody();
         // Setup the test categories.
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$newKnowledgeBase['rootCategoryID'])->getBody();
@@ -234,6 +237,8 @@ class CategoriesCountTest extends AbstractAPIv2Test {
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
             "urlCode" => 'test-Knowledge-Base'.round(microtime(true) * 1000).rand(1, 1000),
+            "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+            "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
@@ -311,6 +316,8 @@ class CategoriesCountTest extends AbstractAPIv2Test {
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
             "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+            "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+            "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
         ])->getBody();
 
         $rootCategory = $this->api()->get($this->baseUrl.'/'.$knowledgeBase['rootCategoryID'])->getBody();
