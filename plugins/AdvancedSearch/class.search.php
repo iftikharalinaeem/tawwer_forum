@@ -65,6 +65,10 @@ class Search {
             $search['subcats'] = null;
         }
 
+        if (!array_key_exists('cat', $search)) {
+            $search['cat'] = null;
+        }
+
         $args = [
             'categoryID' => $categoryID,
             'search' =>
