@@ -523,4 +523,6 @@ components:
       required:
         - name
         - description
+        - urlCode
+        - viewType
       type: object

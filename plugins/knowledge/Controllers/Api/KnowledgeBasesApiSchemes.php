@@ -130,7 +130,7 @@ trait KnowledgeBasesApiSchemes {
                     "icon?",
                     "bannerImage?",
                     "sourceLocale?",
-                    "viewType?",
+                    "viewType",
                     "sortArticles?",
                     "status?",
                     "urlCode",
