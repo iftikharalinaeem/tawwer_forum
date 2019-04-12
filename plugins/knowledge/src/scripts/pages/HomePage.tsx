@@ -21,9 +21,13 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import Splash from "@library/splash/Splash";
 import { hot } from "react-hot-loader";
+import { splashVariables } from "@library/splash/splashStyles";
+import get from "lodash/get";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
+        const splashVars = splashVariables();
+        const title = get(splashVars, "title.text", t("How can we help you?"));
         const { loadStatus, knowledgeBases } = this.props;
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
@@ -36,7 +40,7 @@ export class HomePage extends React.Component<IProps> {
 
         return (
             <>
-                <Splash title={t("How can we help you?")} />
+                <Splash title={title} />
                 <Container>
                     <DocumentTitle title={t("Home")}>
                         <VanillaHeader />
