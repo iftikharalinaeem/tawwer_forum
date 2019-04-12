@@ -391,10 +391,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             throw new NotFoundException();
         }
 
-        $knowledgeBase = array_pop($this->knowledgeBaseModel->get(
+        $kb = $this->knowledgeBaseModel->get(
             ['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']],
             ['selects' => 'sortArticles']
-        ));
+        );
+        $knowledgeBase = array_pop($kb);
         $sortRule = KnowledgeBaseModel::SORT_CONFIGS[$knowledgeBase['sortArticles']];
         $options["orderFields"] = $sortRule[0];
         $options["orderDirection"] = $sortRule[1];
