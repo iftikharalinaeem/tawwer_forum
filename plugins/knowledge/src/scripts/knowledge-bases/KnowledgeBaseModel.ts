@@ -24,8 +24,9 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for a list of loaded knowledge bases.
      */
-    public static selectKnowledgeBases = createSelector([KnowledgeBaseModel.selectSelf], selfState =>
-        Object.values(selfState.knowledgeBasesByID.data || {}),
+    public static selectKnowledgeBases = createSelector(
+        [KnowledgeBaseModel.selectSelf],
+        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
     );
 
     public static selectKnowledgeBasesAsNavItems = createSelector(
@@ -52,12 +53,13 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         return selfState.find(kb => kb.urlCode === urlCode) || null;
     };
 
-    public initialState: IKnowledgeBasesState = {
+    public static INITIAL_STATE: IKnowledgeBasesState = {
         knowledgeBasesByID: {
             status: LoadStatus.PENDING,
         },
     };
 
+    public initialState = KnowledgeBaseModel.INITIAL_STATE;
     public reducer: ReducerType = (state = this.initialState, action) => {
         return produce(state, nextState => {
             return this.internalReducer(nextState, action);
