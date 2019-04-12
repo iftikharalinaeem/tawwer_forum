@@ -358,11 +358,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "maximum" => 100,
                 "type" => "integer",
             ],
-            "order:s?" => [
-                "description" => "Sort method for results.",
-                "enum" => ["dateInserted", "dateUpdated", "sort"],
-                "default" => "dateInserted",
-            ],
             "page:i?" => [
                 "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                 "default" => 1,
@@ -381,15 +376,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "includeBody" => $includeExcerpts,
             "limit" => $limit,
             "offset" => $offset,
-            "orderFields" => $query["order"],
         ];
-        switch ($query["order"]) {
-            case "dateUpdated":
-                $options["orderDirection"] = "desc";
-                break;
-            default:
-                $options["orderDirection"] = "asc";
-        }
 
         $knowledgeCategory = $this->knowledgeCategoryByID($query["knowledgeCategoryID"]);
         $paging = \Vanilla\ApiUtils::numberedPagerInfo(
@@ -403,6 +390,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($query["page"] > 1 && $query["page"] > $paging["pageCount"]) {
             throw new NotFoundException();
         }
+
+        $kb = $this->knowledgeBaseModel->get(
+            ['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']],
+            ['selects' => 'sortArticles']
+        );
+        $knowledgeBase = array_pop($kb);
+        $sortRule = KnowledgeBaseModel::SORT_CONFIGS[$knowledgeBase['sortArticles']];
+        $options["orderFields"] = $sortRule[0];
+        $options["orderDirection"] = $sortRule[1];
 
         $rows = $this->articleModel->getWithRevision(
             ["a.knowledgeCategoryID" => $query["knowledgeCategoryID"]],

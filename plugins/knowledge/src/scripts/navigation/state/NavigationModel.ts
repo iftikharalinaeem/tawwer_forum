@@ -116,8 +116,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 this.reducePatchNav,
                 this.reduceDelete,
                 this.reduceRename,
-                this.reduceAdd,
-                this.reduceEdit,
             )(nextState, action);
         });
     };
@@ -273,162 +271,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
     };
 
     /**
-     * Reduce actions related to adding new items.
-     */
-    private reduceAdd: ReducerType = (nextState = this.initialState, action) => {
-        switch (action.type) {
-            case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                const patchedArticle = action.payload.data;
-                const patchedArticleID = KbRecordType.ARTICLE + patchedArticle.articleID;
-                const patchedArticleParentStringID = KbRecordType.CATEGORY + patchedArticle.knowledgeCategoryID;
-                const originalNavigationItem = nextState.navigationItems[patchedArticleID];
-
-                // If moved out of the original category, remove it from that navigation item's children.
-                if (originalNavigationItem) {
-                    const { parentID } = originalNavigationItem;
-                    if (parentID && parentID !== patchedArticle.knowledgeCategoryID) {
-                        const originalArticleParentStringID = KbRecordType.CATEGORY + parentID;
-                        if (nextState.navigationItems[originalArticleParentStringID]) {
-                            nextState.navigationItems[
-                                originalArticleParentStringID
-                            ]!.children = nextState.navigationItems[originalArticleParentStringID]!.children.filter(
-                                item => item !== patchedArticleID,
-                            );
-                        }
-                    }
-                }
-
-                nextState.navigationItems[patchedArticleID] = {
-                    name: patchedArticle.name,
-                    url: patchedArticle.url,
-                    parentID: patchedArticle.knowledgeCategoryID!,
-                    recordID: patchedArticle.articleID,
-                    sort: patchedArticle.sort,
-                    knowledgeBaseID: patchedArticle.knowledgeBaseID,
-                    recordType: KbRecordType.ARTICLE,
-                    children: [],
-                };
-
-                // Add to the children of its parent, if it isn't already there.
-                if (!originalNavigationItem || originalNavigationItem.parentID !== patchedArticle.knowledgeCategoryID) {
-                    const patchedParentItem = nextState.navigationItems[patchedArticleParentStringID];
-                    if (patchedParentItem) {
-                        patchedParentItem.children.push(patchedArticleID);
-                        NavigationModel.sortItemChildren(nextState.navigationItems, patchedArticleParentStringID);
-                    }
-                }
-                break;
-            case ArticleActions.POST_ARTICLE_RESPONSE:
-                const article = action.payload.data;
-                const stringID = KbRecordType.ARTICLE + article.articleID;
-                const parentStringID = KbRecordType.CATEGORY + article.knowledgeCategoryID;
-                nextState.navigationItems[stringID] = NavigationModel.normalizeArticle(article);
-                nextState.navigationItems = NavigationModel.pushArticle(
-                    stringID,
-                    parentStringID,
-                    nextState.navigationItems,
-                );
-                break;
-        }
-        switch (action.type) {
-            case CategoryActions.POST_CATEGORY_RESPONSE:
-                const category = action.payload.data;
-                const stringID = KbRecordType.CATEGORY + category.knowledgeCategoryID;
-                const parentStringID = KbRecordType.CATEGORY + category.parentID;
-                nextState.navigationItems[stringID] = {
-                    name: category.name,
-                    url: category.url,
-                    parentID: category.parentID,
-                    recordID: category.knowledgeCategoryID,
-                    sort: category.sort,
-                    knowledgeBaseID: category.knowledgeBaseID,
-                    recordType: KbRecordType.CATEGORY,
-                    children: [],
-                };
-
-                const parentItem = nextState.navigationItems[parentStringID];
-                if (parentItem) {
-                    parentItem.children.push(stringID);
-                    NavigationModel.sortItemChildren(nextState.navigationItems, parentStringID);
-                }
-                break;
-        }
-        return nextState;
-    };
-
-    /**
-     * Reduce actions related to editing existing items.
-     */
-    private reduceEdit: ReducerType = (nextState = this.initialState, action) => {
-        switch (action.type) {
-            case ArticleActions.PATCH_ARTICLE_RESPONSE:
-                const patchedArticle = action.payload.data;
-                const patchedArticleID = KbRecordType.ARTICLE + patchedArticle.articleID;
-                const patchedArticleParentStringID = KbRecordType.CATEGORY + patchedArticle.knowledgeCategoryID;
-                const originalNavigationItem = nextState.navigationItems[patchedArticleID];
-
-                // If moved out of the original category, remove it from that navigation item's children.
-                if (originalNavigationItem) {
-                    const { parentID } = originalNavigationItem;
-                    if (parentID && parentID !== patchedArticle.knowledgeCategoryID) {
-                        const originalArticleParentStringID = KbRecordType.CATEGORY + parentID;
-                        if (nextState.navigationItems[originalArticleParentStringID]) {
-                            nextState.navigationItems[
-                                originalArticleParentStringID
-                            ]!.children = nextState.navigationItems[originalArticleParentStringID]!.children.filter(
-                                item => item !== patchedArticleID,
-                            );
-                        }
-                    }
-                }
-
-                nextState.navigationItems[patchedArticleID] = NavigationModel.normalizeArticle(patchedArticle);
-
-                // Add to the children of its parent, if it isn't already there.
-                if (!originalNavigationItem || originalNavigationItem.parentID !== patchedArticle.knowledgeCategoryID) {
-                    nextState.navigationItems = NavigationModel.pushArticle(
-                        patchedArticleID,
-                        patchedArticleParentStringID,
-                        nextState.navigationItems,
-                        false,
-                    );
-                }
-                NavigationModel.sortItemChildren(nextState.navigationItems, patchedArticleParentStringID);
-                break;
-        }
-        return nextState;
-    };
-
-    private static pushArticle(
-        articleID: string,
-        parentID: string,
-        navigationItems: INormalizedNavigationItems,
-        doSort: boolean = true,
-    ): INormalizedNavigationItems {
-        const parentItem = navigationItems[parentID];
-        if (parentItem) {
-            parentItem.children.push(articleID);
-            if (doSort) {
-                NavigationModel.sortItemChildren(navigationItems, parentID);
-            }
-        }
-        return navigationItems;
-    }
-
-    private static normalizeArticle = (article: IArticle): INormalizedNavigationItem => {
-        return {
-            name: article.name,
-            url: article.url,
-            parentID: article.knowledgeCategoryID!,
-            recordID: article.articleID,
-            sort: article.sort,
-            knowledgeBaseID: article.knowledgeBaseID,
-            recordType: KbRecordType.ARTICLE,
-            children: [],
-        };
-    };
-
-    /**
      * Reduce actions related to the deletion of a navigation item.
      */
     private reduceDelete: ReducerType = (nextState = this.initialState, action) => {
@@ -564,8 +406,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
      * - Store the the item in an indexed Map.
      */
     public static normalizeData(data: IKbNavigationItem[]) {
-        data = data.sort(this.sortNavigationItems);
-
         const normalizedByID: { [id: string]: INormalizedNavigationItem } = {
             [NavigationModel.SYNTHETIC_ROOT.recordType +
             NavigationModel.SYNTHETIC_ROOT.recordID]: NavigationModel.SYNTHETIC_ROOT,
@@ -590,54 +430,5 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         }
 
         return normalizedByID;
-    }
-
-    /**
-     * Sort a navigation item's children.
-     *
-     * @param navItems The keyed items to pull from.
-     * @param idToSort The item whos children you want to sort.
-     */
-    private static sortItemChildren(navItems: INormalizedNavigationItems, idToSort: string) {
-        const item = navItems[idToSort];
-        if (!item) {
-            return;
-        }
-
-        const newChildren = item.children
-            .map(childID => navItems[childID]) // Map to actual items.
-            .sort(this.sortNavigationItems) // Sort
-            .map(child => child!.recordType + child!.recordID); // Back to IDs
-        item.children = newChildren;
-    }
-
-    /**
-     * Given two navigation items, compare them and determine their sort order.
-     */
-    private static sortNavigationItems(a: INormalizedNavigationItem, b: INormalizedNavigationItem) {
-        const sortA = a.sort;
-        const sortB = b.sort;
-        if (sortA === sortB) {
-            // Same sort weight? We must go deeper.
-            const typeA = a.recordType;
-            const typeB = b.recordType;
-            if (typeA === typeB) {
-                // Same record type? Sort by name.
-                const nameA = a.name;
-                const nameB = b.name;
-                return compare(nameA, nameB)!;
-            }
-            // Articles rank lower than categories.
-            return typeA === KbRecordType.ARTICLE ? 1 : -1;
-        } else if (sortA === null) {
-            // If they're not the same, and A is null, then B must not be null. B should rank higher.
-            return 1;
-        } else if (sortB === null) {
-            // If they're not the same, and B is null, then A must not be null. A should rank higher.
-            return -1;
-        } else {
-            // We have two non-null, non-equal sort weights. Compare them using the combined-comparison operator.
-            return compare(sortA, sortB)!;
-        }
     }
 }

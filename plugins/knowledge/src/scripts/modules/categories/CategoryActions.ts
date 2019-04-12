@@ -17,6 +17,7 @@ import {
 } from "@knowledge/@types/api/kbCategory";
 import actionCreatorFactory from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 
 const createAction = actionCreatorFactory("@@category");
 
@@ -75,18 +76,25 @@ export default class CategoryActions extends ReduxActions {
         {} as IPostKbCategoryRequestBody,
     );
 
+    private navigationActions = new NavigationActions(this.dispatch, this.api);
+
     /**
      * Create a new category.
      *
      * @param data The category data.
      */
-    public postCategory = (data: IPostKbCategoryRequestBody) => {
-        return this.dispatchApi<IPostKbCategoryResponseBody>(
+    public postCategory = async (data: IPostKbCategoryRequestBody) => {
+        const categoryResponse = await this.dispatchApi<IPostKbCategoryResponseBody>(
             "post",
             "/knowledge-categories",
             CategoryActions.postCategoryACs,
             data,
         );
+
+        if (categoryResponse && categoryResponse.data) {
+            await this.navigationActions.getNavigationFlat(categoryResponse.data.knowledgeBaseID, true);
+        }
+        return categoryResponse;
     };
 
     public static readonly PATCH_CATEGORY_REQUEST = "@@kbCategories/PATCH_CATEGORY_REQUEST";
@@ -108,12 +116,17 @@ export default class CategoryActions extends ReduxActions {
      *
      * @param data The category data.
      */
-    public patchCategory = (data: IPatchKbCategoryRequestBody) => {
-        return this.dispatchApi<IPatchKbCategoryResponseBody>(
+    public patchCategory = async (data: IPatchKbCategoryRequestBody) => {
+        const categoryResponse = await this.dispatchApi<IPatchKbCategoryResponseBody>(
             "patch",
             `/knowledge-categories/${data.knowledgeCategoryID}`,
             CategoryActions.patchCategoryACs,
             data,
         );
+
+        if (categoryResponse && categoryResponse.data) {
+            await this.navigationActions.getNavigationFlat(categoryResponse.data.knowledgeBaseID, true);
+        }
+        return categoryResponse;
     };
 }

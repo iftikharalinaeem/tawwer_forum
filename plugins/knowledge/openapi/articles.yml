@@ -32,17 +32,6 @@ paths:
                       maximum: 100
                       minimum: 1
                 - description: |
-                      Sort method for results.
-                  in: query
-                  name: order
-                  schema:
-                      type: string
-                      default: dateInserted
-                      enum:
-                          - dateInserted
-                          - dateUpdated
-                          - sort
-                - description: |
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
                   in: query
                   name: page
