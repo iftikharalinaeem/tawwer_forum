@@ -47,7 +47,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
                     name={t("Draft Options")}
                     buttonClassName={ButtonTypes.CUSTOM}
                     renderLeft={true}
-                    setExternalButtonRef={this.setButtonRef}
+                    buttonRef={this.toggleButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
                     className="draftPreview-actions"
                     paddedList={true}
@@ -91,14 +91,6 @@ export class DraftMenu extends React.Component<IProps, IState> {
      */
     private closeDeleteDialogue = () => {
         this.setState({ showDeleteDialogue: false });
-    };
-
-    /*
-     * Set reference to button we need to target
-     */
-    private setButtonRef = (ref: React.RefObject<HTMLButtonElement>) => {
-        this.toggleButtonRef = ref;
-        this.forceUpdate();
     };
 }
 
