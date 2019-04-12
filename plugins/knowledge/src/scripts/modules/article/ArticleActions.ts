@@ -40,6 +40,7 @@ import { IApiError, IApiResponse } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -212,6 +213,8 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
         {} as IGetArticleDraftsRequest & { identifier: string },
     );
 
+    private navigationActions = new NavigationActions(this.dispatch, this.api);
+
     public getDrafts(request: IGetArticleDraftsRequest, identifier: string) {
         return this.dispatchApi<IGetArticleDraftsResponse>(
             "get",
@@ -282,8 +285,18 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
      *
      * @param data The article data.
      */
-    public postArticle(data: IPostArticleRequestBody) {
-        return this.dispatchApi<IPostArticleResponseBody>("post", `/articles`, ArticleActions.postArticleACs, data);
+    public async postArticle(data: IPostArticleRequestBody) {
+        const articleResponse = await this.dispatchApi<IPostArticleResponseBody>(
+            "post",
+            `/articles`,
+            ArticleActions.postArticleACs,
+            data,
+        );
+
+        if (articleResponse && articleResponse.data) {
+            await this.navigationActions.getNavigationFlat(articleResponse.data.knowledgeBaseID, true);
+        }
+        return articleResponse;
     }
 
     // POST /articles/drafts
@@ -368,16 +381,21 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
         {} as IPatchArticleRequestBody,
     );
 
-    public patchArticle(data: IPatchArticleRequestBody) {
+    public patchArticle = async (data: IPatchArticleRequestBody) => {
         const { articleID, ...rest } = data;
-        return this.dispatchApi<IPatchArticleResponseBody>(
+        const articleResponse = await this.dispatchApi<IPatchArticleResponseBody>(
             "patch",
             `/articles/${articleID}`,
             ArticleActions.patchArticleACs,
             rest,
             { articleID },
         );
-    }
+
+        if (articleResponse && articleResponse.data) {
+            await this.navigationActions.getNavigationFlat(articleResponse.data.knowledgeBaseID, true);
+        }
+        return articleResponse;
+    };
 
     /**
      * Update an articles status.
