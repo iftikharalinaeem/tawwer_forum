@@ -213,7 +213,7 @@ export default class ArticleActions extends ReduxActions<IStoreState> {
         {} as IGetArticleDraftsRequest & { identifier: string },
     );
 
-    private navigationActions = new NavigationActions(this.dispatch, this.api);
+    private navigationActions = new NavigationActions(this.dispatch, this.api, this.getState);
 
     public getDrafts(request: IGetArticleDraftsRequest, identifier: string) {
         return this.dispatchApi<IGetArticleDraftsResponse>(

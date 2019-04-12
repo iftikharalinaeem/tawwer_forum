@@ -18,6 +18,7 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import NavigationModel from "@knowledge/navigation/state/NavigationModel";
 import { Format } from "@knowledge/@types/api/articleRevision";
 import { IArticle } from "@knowledge/@types/api/article";
+import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,
@@ -379,6 +380,7 @@ describe("EditorPageActions", () => {
 
             const initialState: DeepPartial<IStoreState> = {
                 knowledge: {
+                    navigation: NavigationModel.DEFAULT_STATE,
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
                         form: initialForm,
@@ -420,6 +422,8 @@ describe("EditorPageActions", () => {
 
             const initialState: DeepPartial<IStoreState> = {
                 knowledge: {
+                    navigation: NavigationModel.DEFAULT_STATE,
+
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
                         article: {
