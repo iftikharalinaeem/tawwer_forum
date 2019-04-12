@@ -192,7 +192,13 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             throw new NotFoundException('Knowledge Base with ID: '.$knowledgeBaseID.' not found!');
         }
 
-        $categories = $this->knowledgeCategoryModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+        $categories = $this->knowledgeCategoryModel->get(
+            ["knowledgeBaseID" => $knowledgeBaseID],
+            [
+                'orderFields' => 'sort',
+                'orderDirection' => 'asc'
+            ]
+        );
 
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
