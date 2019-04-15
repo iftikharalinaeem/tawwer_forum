@@ -12,6 +12,7 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
+import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import VanillaHeader from "@library/headers/VanillaHeader";
 import { compose } from "@library/icons/header";
@@ -54,15 +55,17 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         const splashAction = (
-            <LinkAsButton
-                to={EditorRoute.url({ knowledgeBaseID })}
-                onMouseOver={EditorRoute.preload}
-                className={classNames("searchBar-actionButton")}
-                baseClass={ButtonTypes.ICON}
-                title={t("Compose")}
-            >
-                {compose()}
-            </LinkAsButton>
+            <Permission permission="articles.add">
+                <LinkAsButton
+                    to={EditorRoute.url({ knowledgeBaseID })}
+                    onMouseOver={EditorRoute.preload}
+                    className={classNames("searchBar-actionButton")}
+                    baseClass={ButtonTypes.ICON}
+                    title={t("Compose")}
+                >
+                    {compose()}
+                </LinkAsButton>
+            </Permission>
         );
 
         return (
