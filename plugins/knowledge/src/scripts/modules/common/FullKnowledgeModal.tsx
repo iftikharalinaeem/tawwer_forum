@@ -11,8 +11,8 @@ import ModalSizes from "@library/modal/ModalSizes";
 
 interface IProps
     extends RouteComponentProps<{
-            id?: string;
-        }> {
+        id?: string;
+    }> {
     children: React.ReactNode;
     titleID: string;
     className?: string;
@@ -27,7 +27,6 @@ export class FullKnowledgeModal extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
                 className={this.props.className}
-                isWholePage={true}
             >
                 {this.props.children}
             </Modal>
