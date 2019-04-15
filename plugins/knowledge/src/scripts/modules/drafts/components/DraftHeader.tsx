@@ -11,6 +11,7 @@ import Container from "@library/layout/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { modalClasses } from "@library/modal/modalStyles";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
 
 interface IProps {
     className?: string;
@@ -23,6 +24,7 @@ interface IProps {
 export default class DraftHeader extends React.Component<IProps> {
     public render() {
         const classesModal = modalClasses();
+        const classesEditorHeader = editorHeaderClasses();
         return (
             <nav
                 className={classNames(
@@ -34,14 +36,14 @@ export default class DraftHeader extends React.Component<IProps> {
             >
                 <Container>
                     <PanelArea>
-                        <ul className="editorHeader-items">
-                            <li className="editorHeader-item isPullLeft">
+                        <ul className={classesEditorHeader.items}>
+                            <li className={classNames(classesEditorHeader.item, "isPullLeft")}>
                                 <PanelWidgetHorizontalPadding>
                                     <BackLink title={t("Back")} className="draftPage-backLink" visibleLabel={true} />
                                 </PanelWidgetHorizontalPadding>
                             </li>
                             {this.props.mobileDropDownTitle && (
-                                <li className="editorHeader-center">
+                                <li className={classNames(classesEditorHeader.centreColumn, classesEditorHeader.item)}>
                                     <MobileDropDown
                                         title={this.props.mobileDropDownTitle!}
                                         buttonClass="editorHeader-mobileDropDown"

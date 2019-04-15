@@ -22,6 +22,9 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
+import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
+import { unit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -36,12 +39,21 @@ interface IProps extends IDeviceProps {
     mobileDropDownContent?: React.ReactNode; // Needed for mobile flyouts
     mobileDropDownTitle?: string; // For mobile
     useShadow?: boolean;
+    selfPadded?: boolean;
+}
+
+interface IState {
+    actionWidth: number | null;
 }
 
 /**
  * Implement editor header component
  */
-export class EditorHeader extends React.Component<IProps> {
+export class EditorHeader extends React.Component<IProps, IState> {
+    private restoreRef: React.RefObject<HTMLLIElement> = React.createRef();
+    public state: IState = {
+        actionWidth: null,
+    };
     public static defaultProps: Partial<IProps> = {
         callToAction: t("Publish"),
         canSubmit: true,
@@ -53,10 +65,60 @@ export class EditorHeader extends React.Component<IProps> {
         },
         isSubmitLoading: false,
         useShadow: true,
+        selfPadded: false,
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
+        const classesEditorHeader = editorHeaderClasses();
+
+        const content = (
+            <ul className={classNames(classesEditorHeader.items)}>
+                <li
+                    className={classNames(classesEditorHeader.item, "isPullLeft")}
+                    style={
+                        this.state.actionWidth
+                            ? { width: unit(this.state.actionWidth) }
+                            : { width: unit(globalVariables().icon.sizes.default) }
+                    }
+                >
+                    <BackLink
+                        title={t("Cancel")}
+                        visibleLabel={true}
+                        className={classNames("editorHeader-backLink", classesEditorHeader.backLink)}
+                    />
+                </li>
+                {this.renderDraftIndicator()}
+                {showMobileDropDown ? (
+                    <li className={classNames(classesEditorHeader.centreColumn, "editorHeader-center")}>
+                        <MobileDropDown
+                            title={this.props.mobileDropDownTitle!}
+                            buttonClass="editorHeader-mobileDropDown2"
+                            frameBodyClassName="isSelfPadded"
+                        >
+                            {this.props.mobileDropDownContent}
+                        </MobileDropDown>
+                    </li>
+                ) : (
+                    <FlexSpacer tag="li" className="editorHeader-split" />
+                )}
+                <li
+                    ref={this.restoreRef}
+                    className={classNames(classesEditorHeader.item, classesEditorHeader.itemPaddingLeft)}
+                >
+                    <Button
+                        type="submit"
+                        title={this.props.callToAction}
+                        disabled={!this.props.canSubmit}
+                        baseClass={ButtonTypes.TEXT}
+                        className={classNames("editorHeader-publish", "buttonNoHorizontalPadding", "buttonNoBorder")}
+                    >
+                        {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
+                    </Button>
+                </li>
+                {this.props.optionsMenu && <li className="editorHeader-item">{this.props.optionsMenu}</li>}
+            </ul>
+        );
 
         return (
             <nav
@@ -64,55 +126,24 @@ export class EditorHeader extends React.Component<IProps> {
                     noShadow: !this.props.useShadow,
                 })}
             >
-                <Container>
+                {!this.props.selfPadded && (
                     <PanelArea>
-                        <PanelWidgetHorizontalPadding>
-                            <ul className="editorHeader-items">
-                                <li className="editorHeader-item isPullLeft">
-                                    <BackLink
-                                        title={t("Cancel")}
-                                        visibleLabel={true}
-                                        className="editorHeader-backLink"
-                                    />
-                                </li>
-                                {this.renderDraftIndicator()}
-                                {showMobileDropDown ? (
-                                    <li className="editorHeader-center">
-                                        <MobileDropDown
-                                            title={this.props.mobileDropDownTitle!}
-                                            buttonClass="editorHeader-mobileDropDown"
-                                            frameBodyClassName="isSelfPadded"
-                                        >
-                                            {this.props.mobileDropDownContent}
-                                        </MobileDropDown>
-                                    </li>
-                                ) : (
-                                    <FlexSpacer tag="li" className="editorHeader-split" />
-                                )}
-                                <li className="editorHeader-item">
-                                    <Button
-                                        type="submit"
-                                        title={this.props.callToAction}
-                                        disabled={!this.props.canSubmit}
-                                        baseClass={ButtonTypes.TEXT}
-                                        className={classNames(
-                                            "editorHeader-publish",
-                                            "buttonNoHorizontalPadding",
-                                            "buttonNoBorder",
-                                        )}
-                                    >
-                                        {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
-                                    </Button>
-                                </li>
-                                {this.props.optionsMenu && (
-                                    <li className="editorHeader-item">{this.props.optionsMenu}</li>
-                                )}
-                            </ul>
-                        </PanelWidgetHorizontalPadding>
+                        <Container>
+                            <PanelWidgetHorizontalPadding>{content}</PanelWidgetHorizontalPadding>
+                        </Container>
                     </PanelArea>
-                </Container>
+                )}
+                {this.props.selfPadded && content}
             </nav>
         );
+    }
+
+    public componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<{}>, snapshot?: any): void {
+        if (!this.state.actionWidth && this.restoreRef.current) {
+            this.setState({
+                actionWidth: this.restoreRef.current.offsetWidth,
+            });
+        }
     }
 
     private renderDraftIndicator(): React.ReactNode {
@@ -149,7 +180,17 @@ export class EditorHeader extends React.Component<IProps> {
         }
 
         if (content) {
-            return <li className="editorHeader-item editorHeader-itemDraftStatus">{content}</li>;
+            return (
+                <li
+                    className={classNames(
+                        "editorHeader-item",
+                        "editorHeader-itemDraftStatus",
+                        classesMetas.draftStatus,
+                    )}
+                >
+                    {content}
+                </li>
+            );
         } else {
             return null;
         }
