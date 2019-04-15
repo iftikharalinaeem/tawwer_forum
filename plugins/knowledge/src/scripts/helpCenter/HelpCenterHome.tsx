@@ -49,7 +49,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         return (
             <>
-                <Splash title={t("How can we help you?")} />
+                <Splash title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <VanillaHeader />
