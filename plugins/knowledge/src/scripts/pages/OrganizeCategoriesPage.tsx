@@ -27,6 +27,7 @@ import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
+import { TouchScrollable } from "react-scrolllock";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -47,39 +48,27 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
 
         return (
             <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
-                <FullKnowledgeModal titleID={this.titleID}>
+                <FullKnowledgeModal titleID={this.titleID} scrollable={true}>
                     <NavigationManagerMenu />
-                    <div
-                        className={classNames("modal-scroll", classesModal.scroll, inheritHeightClass(), { hasError })}
-                    >
-                        <div className={classNames("container", inheritHeightClass())}>
-                            <div
-                                className={classNames(
-                                    "navigationManager-container",
-                                    classesNavigationManager.container,
-                                    inheritHeightClass(),
-                                )}
-                            >
-                                <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
-                                <DocumentTitle title={pageTitle}>
-                                    <Heading
-                                        id={this.titleID}
-                                        depth={1}
-                                        renderAsDepth={2}
-                                        className={classNames(
-                                            "pageSubTitle",
-                                            "navigationManager-header",
-                                            classesNavigationManager.header,
-                                        )}
-                                        title={pageTitle}
-                                    />
-                                </DocumentTitle>
-                                <div className={inheritHeightClass()}>
-                                    <NavigationManager knowledgeBase={knowledgeBase.data} />
-                                </div>
-                            </div>
+                    <TouchScrollable>
+                        <div className={classNames(classesNavigationManager.container)}>
+                            <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
+                            <DocumentTitle title={pageTitle}>
+                                <Heading
+                                    id={this.titleID}
+                                    depth={1}
+                                    renderAsDepth={2}
+                                    className={classNames(
+                                        "pageSubTitle",
+                                        "navigationManager-header",
+                                        classesNavigationManager.header,
+                                    )}
+                                    title={pageTitle}
+                                />
+                            </DocumentTitle>
+                            <NavigationManager knowledgeBase={knowledgeBase.data} />
                         </div>
-                    </div>
+                    </TouchScrollable>
                 </FullKnowledgeModal>
             </Permission>
         );

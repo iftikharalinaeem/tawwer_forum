@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent } from "csx";
+import { important, percent, color } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
@@ -27,7 +27,7 @@ export const navigationManagerVariables = useThemeCache(() => {
             radius: 2,
             color: globalVars.mixBgAndFg(0.9),
         },
-        bg: globalVars.mixPrimaryAndBg(0.2),
+        bg: color("#E5EFFB"),
     });
 
     const error = makeThemeVars("error", {
@@ -99,10 +99,18 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
+        paddingTop: globalVars.gutter.size,
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
-        margin: "auto",
+        ...margins({ horizontal: "auto" }),
+    });
+
+    const formError = style("formError", {
+        position: "absolute",
+        top: unit(globalVars.gutter.half),
+        left: 0,
+        right: 0,
     });
 
     const header = style("header", {
@@ -115,18 +123,15 @@ export const navigationManagerClasses = useThemeCache(() => {
     const item = style("item", {
         maxWidth: percent(100),
         border: important(0),
+        outline: important("none"),
         $nest: {
             "&.isDragging": {
                 minWidth: unit(300),
                 $nest: {
                     "& .navigationManager-draggable": {
                         ...shadows.embed(),
-                        paddingRight: globalVars.fonts.weights.semiBold,
                         ...borders(vars.dragging.border),
                         backgroundColor: colorOut(globalVars.mainColors.bg),
-                    },
-                    "& .navigationManager-action": {
-                        display: important("none"),
                     },
                 },
             },
@@ -238,7 +243,8 @@ export const navigationManagerClasses = useThemeCache(() => {
         },
     });
     const itemLabel = style("itemLabel", {
-        flexGrow: 1,
+        flex: 1,
+        width: percent(100),
         ...paddings({
             vertical: 3,
             horizontal: 6,
@@ -337,6 +343,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     return {
         root,
         container,
+        formError,
         header,
         item,
         draggable,
