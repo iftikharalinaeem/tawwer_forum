@@ -6,7 +6,7 @@
 
 import React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
-import Modal from "@library/modal/Modal";
+import Modal, { PAGE_CONTAINER_ID } from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 
 interface IProps
