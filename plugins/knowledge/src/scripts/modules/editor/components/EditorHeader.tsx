@@ -79,8 +79,8 @@ export class EditorHeader extends React.Component<IProps, IState> {
                     className={classNames(classesEditorHeader.item, "isPullLeft")}
                     style={
                         this.state.actionWidth && showMobileDropDown
-                            ? { width: unit(this.state.actionWidth) }
-                            : { width: unit(globalVars.icon.sizes.default) }
+                            ? { minWidth: unit(this.state.actionWidth) }
+                            : { minWidth: unit(globalVars.icon.sizes.default) }
                     }
                 >
                     <BackLink
