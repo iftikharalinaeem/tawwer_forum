@@ -210,6 +210,10 @@ export const editorFormClasses = useThemeCache(() => {
         lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.large + 2),
     });
 
+    const publish = style("publish", {
+        whiteSpace: "nowrap",
+    });
+
     return {
         root,
         spacer,
@@ -228,5 +232,6 @@ export const editorFormClasses = useThemeCache(() => {
         titleErrorMessage,
         categoryErrorParagraph,
         titleErrorParagraph,
+        publish,
     };
 });
