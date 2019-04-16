@@ -208,7 +208,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                         'a.knowledgeCategoryID' => $catIds,
                         'a.status' => ArticleModel::STATUS_PUBLISHED
                     ],
-                    ["limit" => false],
+                    [
+                        "limit" => false,
+                        "orderFields" => 'sort',
+                        "orderDirection" => 'asc'
+                    ],
                     ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
                 );
             } else {
