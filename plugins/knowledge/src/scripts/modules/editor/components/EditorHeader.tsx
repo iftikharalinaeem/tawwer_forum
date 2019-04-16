@@ -13,7 +13,6 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { modalClasses } from "@library/modal/modalStyles";
@@ -22,6 +21,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -65,21 +65,22 @@ export class EditorHeader extends React.Component<IProps, IState> {
         },
         isSubmitLoading: false,
         useShadow: true,
-        selfPadded: false,
     };
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
+        const classesEditorForm = editorFormClasses();
         const classesEditorHeader = editorHeaderClasses();
+        const globalVars = globalVariables();
 
         const content = (
             <ul className={classNames(classesEditorHeader.items)}>
                 <li
                     className={classNames(classesEditorHeader.item, "isPullLeft")}
                     style={
-                        this.state.actionWidth
+                        this.state.actionWidth && showMobileDropDown
                             ? { width: unit(this.state.actionWidth) }
-                            : { width: unit(globalVariables().icon.sizes.default) }
+                            : { width: unit(globalVars.icon.sizes.default) }
                     }
                 >
                     <BackLink
@@ -99,9 +100,7 @@ export class EditorHeader extends React.Component<IProps, IState> {
                             {this.props.mobileDropDownContent}
                         </MobileDropDown>
                     </li>
-                ) : (
-                    <FlexSpacer tag="li" className="editorHeader-split" />
-                )}
+                ) : null}
                 <li
                     ref={this.restoreRef}
                     className={classNames(classesEditorHeader.item, classesEditorHeader.itemPaddingLeft)}
