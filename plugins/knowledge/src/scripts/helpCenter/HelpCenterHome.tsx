@@ -3,24 +3,30 @@
  * @license Proprietary
  */
 
+import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
+import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import Loader from "@library/loaders/Loader";
+import Permission from "@library/features/users/Permission";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import VanillaHeader from "@library/headers/VanillaHeader";
+import { compose } from "@library/icons/header";
 import Container from "@library/layout/components/Container";
-import React from "react";
-import { connect } from "react-redux";
-import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import Loader from "@library/loaders/Loader";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import LinkAsButton from "@library/routing/LinkAsButton";
 import Splash from "@library/splash/Splash";
 import { t } from "@library/utility/appUtils";
-import { LoadStatus, ILinkListData, ILoadable } from "@library/@types/api/core";
+import classNames from "classnames";
+import React from "react";
+import { connect } from "react-redux";
 
 /**
  * Component representing the the full home page of a help center.
@@ -28,6 +34,7 @@ import { LoadStatus, ILinkListData, ILoadable } from "@library/@types/api/core";
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, status, data, rootCategoryUrl } = this.props;
+        const { knowledgeBaseID } = knowledgeBase;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             return <Loader />;
@@ -41,15 +48,29 @@ export class HelpCenterHome extends React.Component<IProps> {
             return (
                 <ErrorPage
                     defaultError={DefaultError.NO_ARTICLES}
-                    knowledgeBaseID={knowledgeBase.knowledgeBaseID}
+                    knowledgeBaseID={knowledgeBaseID}
                     knowledgeCategoryID={knowledgeBase.rootCategoryID}
                 />
             );
         }
 
+        const splashAction = (
+            <Permission permission="articles.add">
+                <LinkAsButton
+                    to={EditorRoute.url({ knowledgeBaseID })}
+                    onMouseOver={EditorRoute.preload}
+                    className={classNames("searchBar-actionButton")}
+                    baseClass={ButtonTypes.ICON}
+                    title={t("Compose")}
+                >
+                    {compose()}
+                </LinkAsButton>
+            </Permission>
+        );
+
         return (
             <>
-                <Splash title={knowledgeBase.name} />
+                <Splash action={splashAction} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <VanillaHeader />
