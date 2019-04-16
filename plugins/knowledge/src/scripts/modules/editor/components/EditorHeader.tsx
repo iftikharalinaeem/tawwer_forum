@@ -22,6 +22,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
+import { editorFormClasses } from "plugins/knowledge/src/scripts/modules/editor/editorFormStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
@@ -57,6 +58,7 @@ export class EditorHeader extends React.Component<IProps> {
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
+        const classesEditorForm = editorFormClasses();
 
         return (
             <nav
@@ -99,6 +101,7 @@ export class EditorHeader extends React.Component<IProps> {
                                             "editorHeader-publish",
                                             "buttonNoHorizontalPadding",
                                             "buttonNoBorder",
+                                            classesEditorForm.publish,
                                         )}
                                     >
                                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
