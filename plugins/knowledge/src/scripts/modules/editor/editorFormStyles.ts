@@ -35,8 +35,13 @@ export const editorFormClasses = useThemeCache(() => {
     const style = styleFactory("editorFormClasses");
     const classesRichEditor = richEditorClasses(false);
     const root = style({
-        height: viewHeight(100),
-        maxHeight: viewHeight(100),
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: percent(100),
+        maxHeight: percent(100),
         overflow: "auto",
     });
 
