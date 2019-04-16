@@ -14,6 +14,7 @@ import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
+import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
 
 interface IProps extends IDeviceProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
@@ -35,9 +36,11 @@ export class RevisionsLayout extends React.Component<IProps> {
         const isMobile = device === Devices.MOBILE;
         const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revision History");
 
+        const classesMobileDropdown = mobileDropDownClasses();
+
         let mobileDropDownContent: React.ReactNode = (
             <>
-                <Heading>
+                <Heading depth={3} className={classesMobileDropdown.subTitle}>
                     <SmartAlign>{t("Revisions")}</SmartAlign>
                 </Heading>
                 {this.props.revisionList}
@@ -46,7 +49,7 @@ export class RevisionsLayout extends React.Component<IProps> {
         if (this.props.draftList !== null) {
             mobileDropDownContent = (
                 <>
-                    <Heading>
+                    <Heading depth={3} className={classesMobileDropdown.subTitle}>
                         <SmartAlign>{t("Drafts")}</SmartAlign>
                     </Heading>
                     {this.props.draftList}

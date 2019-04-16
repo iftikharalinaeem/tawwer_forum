@@ -7,6 +7,8 @@
 import * as React from "react";
 import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
+import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
+import classNames from "classnames";
 
 interface IProps {
     children: React.ReactNode;
@@ -18,12 +20,15 @@ interface IProps {
  */
 export default class RevisionsList extends React.Component<IProps> {
     public render() {
+        const classes = mobileDropDownClasses();
         return (
             <div className="revisionsList related">
                 {!this.props.hideTitle && (
                     <Heading className="panelList-title itemList-title" title={t("Revisions")} depth={2} />
                 )}
-                <ul className="itemList-items panelList-items">{this.props.children}</ul>
+                <ul className={classNames("itemList-items", "panelList-items", classes.listContainer)}>
+                    {this.props.children}
+                </ul>
             </div>
         );
     }
