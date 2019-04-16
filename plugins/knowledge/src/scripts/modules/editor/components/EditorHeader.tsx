@@ -22,7 +22,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
-import { editorFormClasses } from "plugins/knowledge/src/scripts/modules/editor/editorFormStyles";
+import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 
 interface IProps extends IDeviceProps {
     callToAction?: string;
