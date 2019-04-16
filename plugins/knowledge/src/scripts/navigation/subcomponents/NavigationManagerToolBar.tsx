@@ -12,6 +12,7 @@ import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { useDevice, Devices } from "@library/layout/DeviceContext";
 
 interface IProps {
     expandAll: () => void;
@@ -20,65 +21,55 @@ interface IProps {
     newCategoryButtonRef: React.RefObject<HTMLButtonElement>;
 }
 
-interface IState {
-    allExpanded: boolean;
-    allCollapsed: boolean;
-}
-
-export default class NavigationManagerToolBar extends React.Component<IProps, IState> {
-    public state: IState = {
-        allExpanded: false,
-        allCollapsed: false,
-    };
-
-    public render() {
-        const classesNavigationManager = navigationManagerClasses();
-        return (
-            <div className="navigationManagerToolbar">
-                <div className="navigationManagerToolbar-bar">
-                    <Button
-                        baseClass={ButtonTypes.CUSTOM}
-                        className={classNames(
-                            "navigationManagerToolbar-button",
-                            "navigationManagerToolbar-expandAll",
-                            classesNavigationManager.button,
-                        )}
-                        onClick={this.props.expandAll}
-                        disabled={this.state.allExpanded}
-                    >
-                        {expandAll("navigationManagerToolbar-icon")}
-                        <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>
-                    </Button>
-                    <Button
-                        baseClass={ButtonTypes.CUSTOM}
-                        className={classNames(
-                            "navigationManagerToolbar-button",
-                            "navigationManagerToolbar-collapseAll",
-                            classesNavigationManager.button,
-                        )}
-                        onClick={this.props.collapseAll}
-                        disabled={this.state.allCollapsed}
-                    >
-                        {collapseAll("navigationManagerToolbar-icon")}
-                        <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>
-                    </Button>
-                    <Button
-                        baseClass={ButtonTypes.CUSTOM}
-                        className={classNames(
-                            "navigationManagerToolbar-button",
-                            "navigationManagerToolbar-newFolder",
-                            classesNavigationManager.button,
-                        )}
-                        onClick={this.props.newCategory}
-                        disabled={this.state.allExpanded}
-                        buttonRef={this.props.newCategoryButtonRef}
-                    >
-                        {newFolder("navigationManagerToolbar-icon navigationManagerToolbar-newFolder")}
-                        <span className="navigationManagerToolbar-buttonLabel">{t("New Category")}</span>
-                    </Button>
-                </div>
-                <hr role="separator" className="navigationManagerToolbar-separator" />
+export default function NavigationManagerToolBar(props: IProps) {
+    const classesNavigationManager = navigationManagerClasses();
+    const device = useDevice();
+    const isMobile = device === Devices.MOBILE;
+    return (
+        <div className="navigationManagerToolbar">
+            <div className="navigationManagerToolbar-bar">
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(
+                        "navigationManagerToolbar-button",
+                        "navigationManagerToolbar-expandAll",
+                        classesNavigationManager.button,
+                    )}
+                    onClick={props.expandAll}
+                    ariaLabel={t("Expand All")}
+                >
+                    {expandAll("navigationManagerToolbar-icon")}
+                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>}
+                </Button>
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(
+                        "navigationManagerToolbar-button",
+                        "navigationManagerToolbar-collapseAll",
+                        classesNavigationManager.button,
+                    )}
+                    onClick={props.collapseAll}
+                    ariaLabel={t("Collapse All")}
+                >
+                    {collapseAll("navigationManagerToolbar-icon")}
+                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>}
+                </Button>
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(
+                        "navigationManagerToolbar-button",
+                        "navigationManagerToolbar-newFolder",
+                        classesNavigationManager.button,
+                    )}
+                    onClick={props.newCategory}
+                    ariaLabel={t("New Category")}
+                    buttonRef={props.newCategoryButtonRef}
+                >
+                    {newFolder("navigationManagerToolbar-icon navigationManagerToolbar-newFolder")}
+                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("New Category")}</span>}
+                </Button>
             </div>
-        );
-    }
+            <hr role="separator" className="navigationManagerToolbar-separator" />
+        </div>
+    );
 }
