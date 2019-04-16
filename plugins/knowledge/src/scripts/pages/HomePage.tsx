@@ -11,23 +11,22 @@ import KnowledgeBasePage from "@knowledge/pages/KnowledgeBasePage";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import Loader from "@library/loaders/Loader";
 import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";
+import Loader from "@library/loaders/Loader";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import Splash from "@library/splash/Splash";
+import { splashVariables } from "@library/splash/splashStyles";
+import { t } from "@library/utility/appUtils";
 import React from "react";
+import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import Splash from "@library/splash/Splash";
-import { hot } from "react-hot-loader";
-import { splashVariables } from "@library/splash/splashStyles";
-import get from "lodash/get";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
         const splashVars = splashVariables();
-        const title = get(splashVars, "title.text", t("How can we help you?"));
+        const title = t(splashVars.title.text);
         const { loadStatus, knowledgeBases } = this.props;
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
