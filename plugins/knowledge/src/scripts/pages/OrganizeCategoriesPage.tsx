@@ -5,7 +5,6 @@
  */
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
 import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
@@ -22,20 +21,17 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
-import { TouchScrollable } from "react-scrolllock";
+import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
 
     public render() {
-        const { knowledgeBase, hasError } = this.props;
+        const { knowledgeBase } = this.props;
         const pageTitle = t("Navigation Manager");
-        const classesModal = modalClasses();
         const classesNavigationManager = navigationManagerClasses();
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
@@ -48,27 +44,25 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
 
         return (
             <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
-                <FullKnowledgeModal titleID={this.titleID} scrollable={true}>
+                <FullKnowledgeModal scrollable={true} titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    <TouchScrollable>
-                        <div className={classNames(classesNavigationManager.container)}>
-                            <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
-                            <DocumentTitle title={pageTitle}>
-                                <Heading
-                                    id={this.titleID}
-                                    depth={1}
-                                    renderAsDepth={2}
-                                    className={classNames(
-                                        "pageSubTitle",
-                                        "navigationManager-header",
-                                        classesNavigationManager.header,
-                                    )}
-                                    title={pageTitle}
-                                />
-                            </DocumentTitle>
-                            <NavigationManager knowledgeBase={knowledgeBase.data} />
-                        </div>
-                    </TouchScrollable>
+                    <div className={classNames(classesNavigationManager.container)}>
+                        <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
+                        <DocumentTitle title={pageTitle}>
+                            <Heading
+                                id={this.titleID}
+                                depth={1}
+                                renderAsDepth={2}
+                                className={classNames(
+                                    "pageSubTitle",
+                                    "navigationManager-header",
+                                    classesNavigationManager.header,
+                                )}
+                                title={pageTitle}
+                            />
+                        </DocumentTitle>
+                        <NavigationManager knowledgeBase={knowledgeBase.data} />
+                    </div>
                 </FullKnowledgeModal>
             </Permission>
         );

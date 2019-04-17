@@ -14,6 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -141,13 +142,13 @@ export const navigationManagerClasses = useThemeCache(() => {
             ...media.oneColumn({
                 width: calc(`100% + ${unit(globalVars.gutter.size)}`),
             }).$nest,
-            "&.isDragging": {
+            "&&.isDragging": {
                 minWidth: unit(300),
                 $nest: {
                     "& .navigationManager-draggable": {
                         ...shadows.embed(),
                         ...borders(vars.dragging.border),
-                        backgroundColor: colorOut(globalVars.mainColors.bg),
+                        backgroundColor: colorOut(vars.dragging.bg),
                     },
                 },
             },
@@ -155,7 +156,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 backgroundColor: colorOut(vars.dragging.bg.fade(0.4)),
             },
 
-            "&.isActive .navigationManager-draggable": {
+            "&&.isActive .navigationManager-draggable": {
                 backgroundColor: colorOut(vars.dragging.bg),
                 ...borders(vars.dragging.border),
             },
