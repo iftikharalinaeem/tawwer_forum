@@ -70,7 +70,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         return (
             <>
-                <Splash action={splashAction} title={t("How can we help you?")} />
+                <Splash action={splashAction} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <VanillaHeader />
