@@ -4,7 +4,11 @@
  * @license Proprietary
  */
 
-import ErrorMessage, { getError, IErrorMessageProps } from "@knowledge/modules/common/ErrorMessage";
+import ErrorMessage, {
+    getErrorCode,
+    IErrorMessageProps,
+    messageFromErrorCode,
+} from "@knowledge/modules/common/ErrorMessage";
 import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
@@ -15,13 +19,14 @@ import React from "react";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {
-        const error = getError(this.props);
+        const code = getErrorCode(this.props);
+        const message = messageFromErrorCode(code);
         const classes = {
             inheritHeight: inheritHeightClass(),
         };
 
         return (
-            <DocumentTitle title={error.message}>
+            <DocumentTitle title={message}>
                 <VanillaHeader />
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>

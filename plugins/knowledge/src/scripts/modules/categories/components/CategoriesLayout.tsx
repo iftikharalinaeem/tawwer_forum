@@ -26,6 +26,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { compose } from "redux";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -54,12 +55,13 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
 
         const pageContent =
             results.length > 0 ? (
-                <PanelWidgetVerticalPadding>
+                <>
                     <ResultList results={this.props.results} />
                     <SimplePager url={category.url + "/p:page:"} pages={pages} />
-                </PanelWidgetVerticalPadding>
+                </>
             ) : (
                 <ErrorMessage
+                    classNames={[inheritHeightClass()]}
                     defaultError={DefaultError.CATEGORY_NO_ARTICLES}
                     knowledgeBaseID={category.knowledgeBaseID}
                     knowledgeCategoryID={category.knowledgeCategoryID}
@@ -115,7 +117,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             </PageTitle>
                         </PanelWidget>
                     }
-                    middleBottom={pageContent}
+                    middleBottom={<PanelWidgetVerticalPadding>{pageContent}</PanelWidgetVerticalPadding>}
                     rightTop={isFullWidth && <></>}
                 />
             </Container>
