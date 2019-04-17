@@ -53,11 +53,11 @@ export default class CategoryActions extends ReduxActions {
     );
 
     // Usable action for deleting a category.
-    public getCategory(request: IGetKbCategoryRequestBody) {
+    public getCategory(request: IGetKbCategoryRequestBody): Promise<IGetKbCategoryResponseBody> {
         const { id } = request;
         const apiThunk = bindThunkAction(CategoryActions.getCategoryACs, async () => {
             const response = await this.api.get(`/knowledge-categories/${id}?expand=all`);
-            return response.data;
+            return response.data as IGetKbCategoryResponseBody;
         })(request);
         return this.dispatch(apiThunk);
     }
