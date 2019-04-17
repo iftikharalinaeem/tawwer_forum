@@ -4,28 +4,28 @@
  * @license Proprietary
  */
 
+import { IKbCategory } from "@knowledge/@types/api/kbCategory";
+import ErrorMessage, { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import PageTitle from "@knowledge/modules/common/PageTitle";
-import { IResult } from "@library/result/Result";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { t } from "@library/utility/appUtils";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { IResult } from "@library/result/Result";
+import ResultList from "@library/result/ResultList";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { IKbCategory } from "@knowledge/@types/api/kbCategory";
 import { compose } from "redux";
-import ResultList from "@library/result/ResultList";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -59,7 +59,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     <SimplePager url={category.url + "/p:page:"} pages={pages} />
                 </PanelWidgetVerticalPadding>
             ) : (
-                <ErrorPage
+                <ErrorMessage
                     defaultError={DefaultError.CATEGORY_NO_ARTICLES}
                     knowledgeBaseID={category.knowledgeBaseID}
                     knowledgeCategoryID={category.knowledgeCategoryID}

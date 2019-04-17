@@ -12,7 +12,7 @@ import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
@@ -24,6 +24,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import { hot } from "react-hot-loader";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 interface IState {
     showRestoreDialogue: boolean;

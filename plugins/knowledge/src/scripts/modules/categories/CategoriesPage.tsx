@@ -9,7 +9,7 @@ import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageA
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -21,6 +21,7 @@ import { IArticleFragment } from "@knowledge/@types/api/article";
 import { IResult } from "@library/result/Result";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { hot } from "react-hot-loader";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 /**
  * Page component for a flat category list.

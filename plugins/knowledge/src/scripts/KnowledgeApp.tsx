@@ -5,7 +5,7 @@
  */
 
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
-import ErrorPage from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";

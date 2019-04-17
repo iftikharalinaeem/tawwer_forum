@@ -6,7 +6,7 @@
 
 import React from "react";
 import { Route } from "react-router-dom";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { formatUrl } from "@library/utility/appUtils";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
@@ -16,6 +16,7 @@ import ModalLoader from "@library/modal/ModalLoader";
 import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 interface IEditorURLData {
     articleID?: number;
