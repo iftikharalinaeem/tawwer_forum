@@ -69,7 +69,6 @@ export class EditorHeader extends React.Component<IProps, IState> {
     public render() {
         const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
-        const classesEditorForm = editorFormClasses();
         const classesEditorHeader = editorHeaderClasses();
         const globalVars = globalVariables();
 

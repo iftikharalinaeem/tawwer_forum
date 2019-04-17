@@ -6,7 +6,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
-import FormError from "@library/forms/FormError";
 import { NavigationActionType } from "@knowledge/navigation/state/NavigationModel";
 import apiv2, { getGlobalErrorMessage } from "@library/apiv2";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";

@@ -49,12 +49,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     public render() {
         const { article, history, revisions, selectedRevision } = this.props;
-        const classesEditorForm = editorFormClasses();
-
         const loadStatus = revisions.data ? LoadStatus.SUCCESS : revisions.status;
 
         return (
             <Modal
+                scrollable={true}
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={history.goBack}
                 label={t("Article Revisions")}
@@ -62,10 +61,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             >
                 <PageLoader status={loadStatus}>
                     <DocumentTitle title={t("Article Revisions")}>
-                        <form
-                            className={classNames("richEditorForm", inheritHeightClass(), classesEditorForm.root)}
-                            onSubmit={this.onSubmit}
-                        >
+                        <form className={classNames(inheritHeightClass())} onSubmit={this.onSubmit}>
                             <RevisionsLayout
                                 bodyHeading={this.renderTitle()}
                                 bodyContent={
