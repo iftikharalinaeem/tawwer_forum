@@ -23,7 +23,6 @@ import { style } from "typestyle";
 
 class ErrorMessage extends React.Component<IProps> {
     public render() {
-        const baseClassNames = this.props.classNames || [];
         const error = this.getError(this.props);
         const vars = globalVariables();
         const flexClasses = flexHelper();
@@ -55,10 +54,9 @@ class ErrorMessage extends React.Component<IProps> {
                 ...debug.name("cta"),
             }),
         };
-        baseClassNames.push(classes.root);
 
         return (
-            <div className={classNames(...baseClassNames)}>
+            <div className={classNames(this.props.className, classes.root)}>
                 {error.icon}
                 <Heading depth={1} className={classes.title} title={error.message} />
                 {error.description && <Paragraph className={classes.description}>{error.description}</Paragraph>}
@@ -245,7 +243,7 @@ export enum DefaultError {
 }
 
 interface IProps extends IErrorMessageProps, IInjectableUserState {
-    classNames?: string[];
+    className?: string;
 }
 
 const withCurrentUser = connect(mapUsersStoreState);

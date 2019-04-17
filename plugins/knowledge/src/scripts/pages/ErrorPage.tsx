@@ -31,7 +31,7 @@ export class ErrorPage extends React.Component<IProps> {
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>
-                            <ErrorMessage {...this.props} classNames={[classes.inheritHeight]} />
+                            <ErrorMessage {...this.props} className={classes.inheritHeight} />
                         </PanelWidget>
                     </PanelWidgetVerticalPadding>
                 </Container>

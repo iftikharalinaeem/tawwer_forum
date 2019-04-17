@@ -25,8 +25,8 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { compose } from "redux";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { compose } from "@library/icons/common";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -61,7 +61,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 </>
             ) : (
                 <ErrorMessage
-                    classNames={[inheritHeightClass()]}
+                    className={inheritHeightClass()}
                     defaultError={DefaultError.CATEGORY_NO_ARTICLES}
                     knowledgeBaseID={category.knowledgeBaseID}
                     knowledgeCategoryID={category.knowledgeCategoryID}
