@@ -39,7 +39,7 @@ class ErrorMessage extends React.Component<IProps> {
             title: style({
                 fontSize: px(vars.fonts.size.smallTitle),
                 lineHeight: vars.lineHeights.condensed,
-                fontWeight: 600,
+                fontWeight: vars.fonts.weights.semiBold,
                 textAlign: "center",
                 ...debug.name("title"),
             }),
