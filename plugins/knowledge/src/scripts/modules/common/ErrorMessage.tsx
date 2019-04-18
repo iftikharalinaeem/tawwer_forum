@@ -1,41 +1,33 @@
 /**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { ReactNode } from "react";
-import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
-import Paragraph from "@library/layout/Paragraph";
-import Container from "@library/layout/components/Container";
-import { formatUrl, t } from "@library/utility/appUtils";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import { IInjectableUserState, mapUsersStoreState, isUserGuest } from "@library/features/users/userModel";
-import { connect } from "react-redux";
-import Heading from "@library/layout/Heading";
-import VanillaHeader from "@library/headers/VanillaHeader";
-import LinkAsButton from "@library/routing/LinkAsButton";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { IApiError, LoadStatus } from "@library/@types/api/core";
 import Permission from "@library/features/users/Permission";
-import { style } from "typestyle";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { inheritHeightClass, flexHelper } from "@library/styles/styleHelpers";
-import classNames from "classnames";
-import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
-import { percent, px, viewHeight } from "csx";
-import { debugHelper } from "@library/styles/styleHelpers";
+import { IInjectableUserState, isUserGuest, mapUsersStoreState } from "@library/features/users/userModel";
 import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import { searchError } from "@library/icons/common";
-import { LoadStatus, IApiError } from "@library/@types/api/core";
+import Heading from "@library/layout/Heading";
+import Paragraph from "@library/layout/Paragraph";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
+import { formatUrl, t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import { percent, px, viewHeight } from "csx";
+import React, { ReactNode } from "react";
+import { connect } from "react-redux";
+import { style } from "typestyle";
 
-export class ErrorPage extends React.Component<IProps> {
+class ErrorMessage extends React.Component<IProps> {
     public render() {
+        const error = this.getError(this.props);
         const vars = globalVariables();
-        const error = this.getError();
         const flexClasses = flexHelper();
         const debug = debugHelper("errorPage");
         const classes = {
-            inheritHeight: inheritHeightClass(),
             root: style({
                 ...flexClasses.middle(),
                 maxWidth: percent(100),
@@ -64,35 +56,24 @@ export class ErrorPage extends React.Component<IProps> {
         };
 
         return (
-            <DocumentTitle title={error.message}>
-                <VanillaHeader />
-                <Container className={classes.inheritHeight}>
-                    <PanelWidgetVerticalPadding className={classes.inheritHeight}>
-                        <PanelWidget className={classes.inheritHeight}>
-                            <div className={classNames(classes.root, classes.inheritHeight)}>
-                                {error.icon}
-                                <Heading depth={1} className={classes.title} title={error.message} />
-                                {error.description && (
-                                    <Paragraph className={classes.description}>{error.description}</Paragraph>
-                                )}
-                                {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
-                            </div>
-                        </PanelWidget>
-                    </PanelWidgetVerticalPadding>
-                </Container>
-            </DocumentTitle>
+            <div className={classNames(this.props.className, classes.root)}>
+                {error.icon}
+                <Heading depth={1} className={classes.title} title={error.message} />
+                {error.description && <Paragraph className={classes.description}>{error.description}</Paragraph>}
+                {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
+            </div>
         );
     }
 
-    private getError() {
+    private getError(errorMessageProps: IErrorMessageProps) {
+        const errorCode = getErrorCode(errorMessageProps);
         return {
-            ...this.parseDefaultError(),
-            ...(this.props.error || {}),
+            ...this.parseErrorCode(errorCode),
+            ...(errorMessageProps.error || {}),
         };
     }
 
-    private parseDefaultError(): IError {
-        const errorCode = this.props.apiError ? this.props.apiError.response.status : null;
+    private parseErrorCode(errorCode?: string | number): IError {
         const globalVars = globalVariables();
         const debug = debugHelper("errorPage");
         const errorIconClass = style({
@@ -104,10 +85,11 @@ export class ErrorPage extends React.Component<IProps> {
             ...debug.name("icon"),
         });
         const buttons = buttonClasses();
-        switch (errorCode || this.props.defaultError) {
+        const message = messageFromErrorCode(errorCode);
+
+        switch (errorCode) {
             case 403:
             case DefaultError.PERMISSION: {
-                const message = t("No Permission");
                 return {
                     message,
                     description: t("You don't have permission to view this resource."),
@@ -117,7 +99,6 @@ export class ErrorPage extends React.Component<IProps> {
             }
             case 404:
             case DefaultError.NOT_FOUND: {
-                const message = t("Page not found");
                 return {
                     message,
                     description: t("The page you were looking for could not be found."),
@@ -130,7 +111,6 @@ export class ErrorPage extends React.Component<IProps> {
                 };
             }
             case DefaultError.NO_KNOWLEDGE_BASE: {
-                const message = t("There are no knowledge bases");
                 return {
                     message,
                     description: (
@@ -148,7 +128,6 @@ export class ErrorPage extends React.Component<IProps> {
             }
             case DefaultError.NO_ARTICLES: {
                 const { knowledgeBaseID, knowledgeCategoryID } = this.props;
-                const message = t("This knowledge base does not have any articles.");
                 return {
                     message,
                     description: knowledgeBaseID ? (
@@ -169,7 +148,6 @@ export class ErrorPage extends React.Component<IProps> {
             }
             case DefaultError.CATEGORY_NO_ARTICLES: {
                 const { knowledgeBaseID, knowledgeCategoryID } = this.props;
-                const message = t("This category does not have any articles.");
                 return {
                     message,
                     description: null,
@@ -188,7 +166,6 @@ export class ErrorPage extends React.Component<IProps> {
             }
             case DefaultError.GENERIC:
             default: {
-                const message = t("There was an error");
                 return {
                     message,
                     description: t("Please try again later."),
@@ -217,7 +194,31 @@ export class ErrorPage extends React.Component<IProps> {
     }
 }
 
-interface IProps extends IDeviceProps, IInjectableUserState {
+export function messageFromErrorCode(errorCode?: string | number) {
+    switch (errorCode) {
+        case 403:
+        case DefaultError.PERMISSION:
+            return t("No Permission");
+        case 404:
+        case DefaultError.NOT_FOUND:
+            return t("Page not found");
+        case DefaultError.NO_KNOWLEDGE_BASE:
+            return t("There are no knowledge bases");
+        case DefaultError.NO_ARTICLES:
+            return t("This knowledge base does not have any articles.");
+        case DefaultError.CATEGORY_NO_ARTICLES:
+            return t("This category does not have any articles.");
+        case DefaultError.GENERIC:
+        default:
+            return t("There was an error");
+    }
+}
+
+export function getErrorCode(errorMessageProps: IErrorMessageProps) {
+    return errorMessageProps.apiError ? errorMessageProps.apiError.response.status : errorMessageProps.defaultError;
+}
+
+export interface IErrorMessageProps {
     defaultError?: DefaultError;
     error?: Partial<IError>;
     apiError?: IApiError;
@@ -225,7 +226,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
     knowledgeCategoryID?: number;
 }
 
-interface IError {
+export interface IError {
     message: string;
     description: ReactNode;
     actionItem: ReactNode;
@@ -241,6 +242,10 @@ export enum DefaultError {
     CATEGORY_NO_ARTICLES = "categorynoarticles",
 }
 
+interface IProps extends IErrorMessageProps, IInjectableUserState {
+    className?: string;
+}
+
 const withCurrentUser = connect(mapUsersStoreState);
 
-export default withCurrentUser(withDevice(ErrorPage));
+export default withCurrentUser(ErrorMessage);

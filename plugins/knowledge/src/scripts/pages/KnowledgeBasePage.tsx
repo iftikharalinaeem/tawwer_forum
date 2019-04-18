@@ -6,7 +6,7 @@ import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Loader from "@library/loaders/Loader";
@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { LoadStatus } from "@library/@types/api/core";
 import { hot } from "react-hot-loader";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {

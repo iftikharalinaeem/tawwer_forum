@@ -16,8 +16,9 @@ import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import Permission from "@library/features/users/Permission";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import QueryString from "@library/routing/QueryString";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 interface IOwnProps
     extends RouteComponentProps<{

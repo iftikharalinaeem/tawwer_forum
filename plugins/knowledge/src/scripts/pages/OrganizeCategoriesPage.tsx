@@ -8,7 +8,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -27,6 +27,7 @@ import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");

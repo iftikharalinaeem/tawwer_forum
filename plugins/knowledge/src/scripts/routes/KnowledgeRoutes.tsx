@@ -8,7 +8,7 @@ import React from "react";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { getModalRoutes } from "@knowledge/routes/modalRoutes";
 import { IStoreState } from "@knowledge/state/model";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { connect } from "react-redux";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
@@ -19,6 +19,7 @@ import { UnregisterCallback } from "history";
 import PageLoader from "@library/routing/PageLoader";
 import { LoadStatus } from "@library/@types/api/core";
 import ModalRouter from "@library/modal/ModalRouter";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 /**
  * Routing component for pages and modals in the /kb directory.
