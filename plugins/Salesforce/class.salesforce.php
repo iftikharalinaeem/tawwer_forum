@@ -55,7 +55,7 @@ class Salesforce {
             // See if user has their own connection established.
             if ($userConnection = val('Salesforce', Gdn::session()->User->Attributes)) {
                 $this->accessToken = val('AccessToken', $userConnection);
-                $this->instanceUrl = val('instanceUrl', $userConnection);
+                $this->instanceUrl = val('InstanceUrl', $userConnection);
                 $this->RefreshToken = val('RefreshToken', $userConnection);
             }
         }
