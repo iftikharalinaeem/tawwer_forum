@@ -51,7 +51,7 @@ class KnowledgeApp extends React.Component<{}, IState> {
                                     >
                                         <DeviceProvider>
                                             <BrowserRouter basename={formatUrl("")}>
-                                                <LinkContextProvider liSnkContext={formatUrl("/kb", true)}>
+                                                <LinkContextProvider linkContext={formatUrl("/kb", true)}>
                                                     <Route component={KnowledgeRoutes} />
                                                 </LinkContextProvider>
                                             </BrowserRouter>
