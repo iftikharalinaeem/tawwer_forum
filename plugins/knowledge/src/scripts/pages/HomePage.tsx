@@ -11,7 +11,6 @@ import KnowledgeBasePage from "@knowledge/pages/KnowledgeBasePage";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -22,6 +21,7 @@ import React from "react";
 import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
+import VanillaHomeHeader from "@library/headers/VanillaHomeHeader";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
@@ -42,7 +42,7 @@ export class HomePage extends React.Component<IProps> {
                 <Splash title={title} />
                 <Container>
                     <DocumentTitle title={t("Home")}>
-                        <VanillaHeader />
+                        <VanillaHomeHeader />
                     </DocumentTitle>
                     <KnowledgeBaseList />
                 </Container>
