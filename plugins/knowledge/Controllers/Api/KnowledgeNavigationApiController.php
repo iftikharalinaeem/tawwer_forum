@@ -238,7 +238,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $categories
      * @param array $articles
      * @param bool $flatMode Mode: flat or tree
-     * @param string $rootCategoryID Category ID to start from
+     * @param int $rootCategoryID Category ID to start from
+     * @param string $sortOrder Knowledge base sort order settings
      *
      * @return array
      */
