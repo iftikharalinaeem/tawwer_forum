@@ -1,7 +1,8 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @author John Ashton <john@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
  */
 
 /**
@@ -18,19 +19,19 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @var string
      */
-    protected $ClosedCaseStatusString = 'Closed';
+    protected $closedCaseStatusString = 'Closed';
 
     /**
      * If time since last update from Salesforce is less then this; we wont check for update - saving api calls.
      *
      * @var int
      */
-    protected $MinimumTimeForUpdate = 600;
+    protected $minimumTimeForUpdate = 600;
 
     /**
      * Used in setup for OAuth.
      */
-    const ProviderKey = 'Salesforce';
+    const PROVIDERKEY = 'Salesforce';
 
     /** @var SsoUtils */
     private $ssoUtils;
@@ -48,7 +49,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     /**
      * Setup the plugin
      *
-     * @throws Gdn_UserException
+     * @throws Gdn_UserException If no cURL is set.
      */
     public function setup() {
         saveToConfig('Garden.AttachmentsEnabled', true);
@@ -60,21 +61,28 @@ class SalesforcePlugin extends Gdn_Plugin {
             throw new Gdn_UserException($error, 400);
         }
         // Save the provider type.
-        Gdn::sql()->replace('UserAuthenticationProvider',
+        Gdn::sql()->replace(
+            'UserAuthenticationProvider',
             [
                 'AuthenticationSchemeAlias' => 'salesforce',
                 'URL' => '...',
                 'AssociationSecret' => '...',
                 'AssociationHashMethod' => '...'
             ],
-            ['AuthenticationKey' => self::ProviderKey], true
+            [
+                'AuthenticationKey' => self::PROVIDERKEY
+            ],
+            true
         );
         Gdn::permissionModel()->define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
     }
 
     /**
+     * Get connection
+     *
      * @param Controller $sender
      * @param array $args
+     *
      */
     public function base_getConnections_handler($sender, $args) {
         if (!Salesforce::isConfigured()) {
@@ -84,13 +92,13 @@ class SalesforcePlugin extends Gdn_Plugin {
         if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $sf = getValueR('User.Attributes.'.Salesforce::ProviderKey, $args);
+        $sf = getValueR('User.Attributes.'.Salesforce::PROVIDERKEY, $args);
         trace($sf);
-        $profile = getValueR('User.Attributes.'.Salesforce::ProviderKey.'.Profile', $args);
-        $sender->Data["Connections"][Salesforce::ProviderKey] = [
+        $profile = getValueR('User.Attributes.'.Salesforce::PROVIDERKEY.'.Profile', $args);
+        $sender->Data["Connections"][Salesforce::PROVIDERKEY] = [
             'Icon' => $this->getWebResource('icon.svg', '/'),
-            'Name' => Salesforce::ProviderKey,
-            'ProviderKey' => Salesforce::ProviderKey,
+            'Name' => Salesforce::PROVIDERKEY,
+            'PROVIDERKEY' => Salesforce::PROVIDERKEY,
             'ConnectUrl' => Salesforce::authorizeUri(Salesforce::profileConnecUrl()),
             'Profile' => [
                 'Name' => val('fullname', $profile),
@@ -100,6 +108,8 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Create connection
+     *
      * @param ProfileController $sender
      * @param string $userReference
      * @param string $username
@@ -137,7 +147,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'InstanceUrl' => null,
                 'Profile' => null,
             ];
-            Gdn::userModel()->saveAttribute($sender->User->UserID, Salesforce::ProviderKey, $attributes);
+            Gdn::userModel()->saveAttribute($sender->User->UserID, Salesforce::PROVIDERKEY, $attributes);
             $message = $e->getMessage();
             Gdn::dispatcher()->passData('Exception', htmlspecialchars($message))
                 ->dispatch('home/error');
@@ -151,7 +161,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         $profile = $salesforce->getLoginProfile($loginID);
         Gdn::userModel()->saveAuthentication([
             'UserID' => $sender->User->UserID,
-            'Provider' => Salesforce::ProviderKey,
+            'Provider' => Salesforce::PROVIDERKEY,
             'UniqueID' => $profile['id']
         ]);
         $attributes = [
@@ -160,8 +170,8 @@ class SalesforcePlugin extends Gdn_Plugin {
             'InstanceUrl' => $instanceUrl,
             'Profile' => $profile,
         ];
-        Gdn::userModel()->saveAttribute($sender->User->UserID, Salesforce::ProviderKey, $attributes);
-        $this->EventArguments['Provider'] = Salesforce::ProviderKey;
+        Gdn::userModel()->saveAttribute($sender->User->UserID, Salesforce::PROVIDERKEY, $attributes);
+        $this->EventArguments['Provider'] = Salesforce::PROVIDERKEY;
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
@@ -200,12 +210,10 @@ class SalesforcePlugin extends Gdn_Plugin {
         $token = val('token', $_GET, false);
         if ($token) {
             $salesforce->revoke($token);
-            removeFromConfig([
-                'Plugins.Salesforce.DashboardConnection.Token' => false,
-                'Plugins.Salesforce.DashboardConnection.RefreshToken' => false,
-                'Plugins.Salesforce.DashboardConnection.Token' => false,
-                'Plugins.Salesforce.DashboardConnection.InstanceUrl' => false
-            ]);
+            removeFromConfig('Plugins.Salesforce.DashboardConnection.Token');
+            removeFromConfig('Plugins.Salesforce.DashboardConnection.RefreshToken');
+            removeFromConfig('Plugins.Salesforce.DashboardConnection.Token');
+            removeFromConfig('Plugins.Salesforce.DashboardConnection.InstanceUrl');
         }
         redirectTo('/plugin/Salesforce');
     }
@@ -233,11 +241,17 @@ class SalesforcePlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Enable controller
+     */
     public function controller_enable() {
         saveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', true);
         redirectTo('/plugin/Salesforce');
     }
 
+    /**
+     * Disable controller
+     */
     public function controller_disable() {
         removeFromConfig('Plugins.Salesforce.DashboardConnection.Enabled');
         redirectTo('/plugin/Salesforce');
@@ -271,7 +285,6 @@ class SalesforcePlugin extends Gdn_Plugin {
             'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false)
         ]);
         if (c('Plugins.Salesforce.DashboardConnection.LoginId') && c('Plugins.Salesforce.DashboardConnection.Enabled')) {
-//         $Salesforce->useDashboardConnection();
             $dashboardConnectionProfile = $salesforce->getLoginProfile(c('Plugins.Salesforce.DashboardConnection.LoginId'));
             $sender->setData('DashboardConnectionProfile', $dashboardConnectionProfile);
             $sender->addCssFile('admin.css');
@@ -313,6 +326,8 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Create "Add Lead" and "Create Case" options on discussions options
+     *
      * @param DiscussionController $sender
      * @param array $args
      */
@@ -346,12 +361,13 @@ class SalesforcePlugin extends Gdn_Plugin {
                 }
             }
         }
-
     }
 
     /**
-     * @param CommentController $sender
-     * @param $args
+     * Create "Add Lead" and "Create Case" options on discussion thread options
+     *
+     * @param DiscussionController $sender
+     * @param array $args
      */
     public function discussionController_commentOptions_handler($sender, $args) {
         //Staff Only
@@ -384,15 +400,13 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
-     *
      * Creates the Add Salesforce Lead Panel
      *
      * @param DiscussionController $sender
      * @param array $args
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @throws Exception Permission Denied.
+     * @throws Gdn_UserException If invalid request or content type not supported.
      */
-
     public function discussionController_salesforceLead_create($sender, $args) {
         // Signed in users only.
         if (!(Gdn::session()->UserID)) {
@@ -425,7 +439,6 @@ class SalesforcePlugin extends Gdn_Plugin {
             $commentModel = new CommentModel();
             $content = $commentModel->getID($elementID);
             $url = commentUrl($content);
-
         } else {
             throw new Gdn_UserException('Content Type not supported');
         }
@@ -513,7 +526,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
-        
+
         list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
         $data = [
             'DiscussionID' => $content->DiscussionID,
@@ -541,8 +554,8 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $sender
      * @param array $args
-     * @throws Gdn_UserException
-     * @throws Exception
+     * @throws Gdn_UserException If invalid request URL.
+     * @throws Exception Permission Denied.
      *
      */
     public function discussionController_salesforceCase_create($sender, $args) {
@@ -603,15 +616,15 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $contact = $salesforce->findContact($formValues['Email']);
                 if (!$contact['Id']) {
                     //If not a contact then add contact
-                   $contactData = [
-                            'FirstName' => $formValues['FirstName'],
-                            'LastName' => $formValues['LastName'],
-                            'Email' => $formValues['Email'],
-                            'LeadSource' => $formValues['LeadSource'],
-                   ];
-                   $sender->EventArguments['ContactData'] = &$contactData;
-                   $sender->fireEvent('CreateSalesforceContact');
-                   $contact['Id'] = $salesforce->createContact($contactData);
+                    $contactData = [
+                        'FirstName' => $formValues['FirstName'],
+                        'LastName' => $formValues['LastName'],
+                        'Email' => $formValues['Email'],
+                        'LeadSource' => $formValues['LeadSource'],
+                    ];
+                    $sender->EventArguments['ContactData'] = &$contactData;
+                    $sender->fireEvent('CreateSalesforceContact');
+                    $contact['Id'] = $salesforce->createContact($contactData);
                 }
 
                 //Create Case using salesforce API
@@ -633,7 +646,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $sender->fireEvent('SendingCaseData');
                 $caseID = $salesforce->createCase($caseData);
 
-                    //Save information to our Attachment Table
+                //Save information to our Attachment Table
                 $attachmentData = [
                     'Type' => 'salesforce-case',
                     'ForeignID' => $attachmentModel->rowID($content),
@@ -686,10 +699,11 @@ class SalesforcePlugin extends Gdn_Plugin {
         $sender->Form->setData($data);
         $sender->setData('Data', $data);
         $sender->render('createcase', '', 'plugins/Salesforce');
-
     }
 
     /**
+     * Call writeAndUpdateAttachments()
+     *
      * @param DiscussionController $sender
      * @param array $args
      */
@@ -698,6 +712,8 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Call writeAndUpdateAttachments()
+     *
      * @param DiscussionController $sender
      * @param array $args
      */
@@ -705,7 +721,12 @@ class SalesforcePlugin extends Gdn_Plugin {
         $this->writeAndUpdateAttachments($sender, $args);
     }
 
-
+    /**
+     * Write update attachments
+     *
+     * @param DiscussionController $sender
+     * @param array $args
+     */
     protected function writeAndUpdateAttachments($sender, $args) {
         $type = val('Type', $args);
 
@@ -716,7 +737,9 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             return;
         }
+
         $session = Gdn::session();
+
         if (!$session->checkPermission('Garden.SignIn.Allow')) {
             return;
         }
@@ -731,7 +754,6 @@ class SalesforcePlugin extends Gdn_Plugin {
                                 'one' => 'two'
                             ]
                         ]);
-
                     } else {
                         writeGenericAttachment([
                             'Icon' => 'ticket',
@@ -742,30 +764,29 @@ class SalesforcePlugin extends Gdn_Plugin {
             }
             return;
         }
+
         if (!$session->checkPermission('Garden.Staff.Allow')) {
             return;
         }
         $salesforce = Salesforce::instance();
+
         if (isset($args[$content]->Attachments)) {
             if ($salesforce->isConnected()) {
                 try {
-                    $this->updateAttachments($args[$content]->Attachments, $sender, $args);
+                    $this->updateAttachments($args[$content]->Attachments);
                 } catch (Gdn_UserException $e) {
                     $sender->informMessage('Error Reconnecting to Salesforce');
                 }
             }
-
-            // writeAttachments($Args[$Content]->Attachments);
-
         }
     }
 
     /**
+     * Update attachments
+     *
      * @param array $attachments
-     * @param $sender
-     * @param array $args
      */
-    protected function updateAttachments(&$attachments, $sender, $args) {
+    protected function updateAttachments(&$attachments) {
         $salesforce = Salesforce::instance();
         $attachmentModel = new AttachmentModel();
 
@@ -795,11 +816,11 @@ class SalesforcePlugin extends Gdn_Plugin {
                     $attachmentModel->save($updatedAttachment);
                     $attachment = $updatedAttachment;
                 }
-
             } elseif ($attachment['Type'] == 'salesforce-lead') {
                 if (!$this->isToBeUpdated($attachment, $attachment['Type'])) {
                     continue;
                 }
+
                 $leadResponse = $salesforce->getLead($attachment['SourceID']);
                 $updatedAttachment = (array)$attachmentModel->getID($attachment['AttachmentID']);
 
@@ -823,14 +844,14 @@ class SalesforcePlugin extends Gdn_Plugin {
                     $updatedAttachment['DateUpdated'] = Gdn_Format::toDateTime();
                     $attachmentModel->save($updatedAttachment);
                     $attachment = $updatedAttachment;
-
                 }
-
             }
         }
     }
 
     /**
+     * Join attachments to user
+     *
      * @param ProfileController $sender
      * @param array $args
      */
@@ -840,6 +861,8 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Write lead attachment
+     *
      * @param ProfileController $Sender
      * @param array $Args
      */
@@ -888,6 +911,8 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Load CSS into header
+     *
      * @param AssetModel $sender
      */
     public function assetModel_styleCss_handler($sender) {
@@ -895,9 +920,9 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Render Login Modal If staff triggers and action from popup and not connected to salesforce
+     * Render Login Modal if staff triggers and action from popup and not connected to salesforce
      *
-     * @param DiscussionController|CommentController $sender
+     * @param DiscussionController $sender
      * @return bool
      */
     public function loginModal($sender) {
@@ -910,23 +935,25 @@ class SalesforcePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check for attachment last update
+     *
      * @param array $attachment Attachment Data - see AttachmentModel
      * @param string $type case or lead
      * @return bool
      */
     protected function isToBeUpdated($attachment, $type = 'salesforce-case') {
-        if (val('Status', $attachment) == $this->ClosedCaseStatusString) {
+        if (val('Status', $attachment) == $this->closedCaseStatusString) {
             return false;
         }
         $timeDiff = time() - strtotime($attachment['DateUpdated']);
-        if ($timeDiff < $this->MinimumTimeForUpdate) {
+        if ($timeDiff < $this->minimumTimeForUpdate) {
             trace("Not Checking For Update: $timeDiff seconds since last update");
             return false;
         }
         if (isset($attachment['LastModifiedDate'])) {
             if ($type == 'salesforce-case') {
                 $timeDiff = time() - strtotime($attachment['LastModifiedDate']);
-                if ($timeDiff < $this->MinimumTimeForUpdate && $attachment['Status'] != $this->ClosedCaseStatusString) {
+                if ($timeDiff < $this->minimumTimeForUpdate && $attachment['Status'] != $this->closedCaseStatusString) {
                     trace("Not Checking For Update: $timeDiff seconds since last update");
                     return false;
                 }
@@ -944,9 +971,13 @@ class SalesforcePlugin extends Gdn_Plugin {
         require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Salesforce');
     }
 
+    /**
+     * Check if Salesforce is configured
+     *
+     * @return bool
+     */
     public function isConfigured() {
         $salesforce = Salesforce::instance();
         return $salesforce->isConfigured();
     }
-
 }
