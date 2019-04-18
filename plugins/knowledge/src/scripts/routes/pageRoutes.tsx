@@ -34,7 +34,7 @@ interface IEditorURLData {
  */
 function makeEditorUrl(data?: IEditorURLData) {
     let baseUrl = "";
-    const addRoot = formatUrl("/kb/articles/add");
+    const addRoot = "/kb/articles/add";
 
     if (!data) {
         return addRoot;
@@ -43,7 +43,7 @@ function makeEditorUrl(data?: IEditorURLData) {
     if (data.articleID === undefined) {
         baseUrl = addRoot;
     } else {
-        baseUrl = formatUrl(`/kb/articles/${data.articleID}/editor`);
+        baseUrl = `/kb/articles/${data.articleID}/editor`;
     }
 
     let { knowledgeCategoryID } = data;
@@ -82,9 +82,9 @@ export const EditorRoute = new RouteHandler(
  */
 export function makeRevisionsUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
     if ("articleRevisionID" in articleOrRevison) {
-        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`);
+        return `/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`;
     } else {
-        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions`);
+        return `/kb/articles/${articleOrRevison.articleID}/revisions`;
     }
 }
 export const RevisionsRoute = new RouteHandler(
@@ -103,7 +103,7 @@ export const ArticleRoute = new RouteHandler(
 export const DebugRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/debug" */ "@knowledge/DebugPage"),
     "/kb/debug",
-    () => formatUrl("/kb/debug"),
+    () => "/kb/debug",
 );
 
 const CATEGORIES_KEY = "CategoriesPageKey";
@@ -126,32 +126,32 @@ export const CategoryPagedRoute = new RouteHandler(
 export const SearchRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
     "/kb/search",
-    (data?: undefined) => formatUrl("/kb/search"),
+    (data?: undefined) => "/kb/search",
 );
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
-    (data?: undefined) => formatUrl("/kb/drafts"),
+    (data?: undefined) => "/kb/drafts",
     ModalLoader,
 );
 
 export const HomeRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/HomePage"),
     "/kb",
-    (data?: undefined) => formatUrl("/kb"),
+    (data?: undefined) => "/kb",
 );
 
 export const KnowledgeBasePage = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
     "/kb/:urlCode([\\w\\d-]+)",
-    (data: { urlCode: string }) => formatUrl(`/kb/${data.urlCode}`),
+    (data: { urlCode: string }) => `/kb/${data.urlCode}`,
 );
 
 export const OrganizeCategoriesRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/organize-categories" */ "@knowledge/pages/OrganizeCategoriesPage"),
     "/kb/:id/organize-categories",
-    (data: { kbID: number }) => formatUrl(`/kb/${data.kbID}/organize-categories`),
+    (data: { kbID: number }) => `/kb/${data.kbID}/organize-categories`,
     ModalLoader,
 );
 
