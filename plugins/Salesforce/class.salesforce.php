@@ -1,6 +1,5 @@
 <?php
 /**
- * @author John Ashton <john@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
