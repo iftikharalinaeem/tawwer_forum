@@ -7,7 +7,7 @@ import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNav
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import ErrorPage, { DefaultError } from "@knowledge/routes/ErrorPage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
@@ -27,6 +27,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 /**
  * Component representing the the full home page of a help center.
