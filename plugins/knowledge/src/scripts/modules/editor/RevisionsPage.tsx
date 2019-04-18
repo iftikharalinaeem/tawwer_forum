@@ -119,7 +119,13 @@ export class RevisionsPage extends React.Component<IProps, IState> {
             drafts.data && (
                 <DraftsList hideTitle={this.props.device === Devices.MOBILE}>
                     {drafts.data.slice().map(item => {
-                        return <DraftsListItem {...item} url={EditorAddRoute.url(item)} key={item.draftID} />;
+                        return (
+                            <DraftsListItem
+                                {...item}
+                                url={EditorAddRoute.url({ draftID: item.draftID, articleID: this.articleID })}
+                                key={item.draftID}
+                            />
+                        );
                     })}
                 </DraftsList>
             )
@@ -225,12 +231,17 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Initialize the page's data from it's url.
      */
     private async initializeFromUrl() {
-        const { id, revisionID } = this.props.match.params;
+        await this.props.setActiveArticle(this.articleID);
+        await this.props.setActiveRevision(this.revisionID);
+    }
 
-        const numID = parseInt(id, 10);
-        const numRevID = revisionID !== undefined ? parseInt(revisionID, 10) : undefined;
-        await this.props.setActiveArticle(numID);
-        await this.props.setActiveRevision(numRevID);
+    private get articleID(): number {
+        return parseInt(this.props.match.params.id, 10);
+    }
+
+    private get revisionID(): number | null {
+        const { revisionID } = this.props.match.params;
+        return revisionID !== undefined ? parseInt(this.props.match.params.id, 10) : null;
     }
 }
 
