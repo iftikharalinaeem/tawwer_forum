@@ -81,7 +81,6 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @param Controller $sender
      * @param array $args
-     *
      */
     public function base_getConnections_handler($sender, $args) {
         if (!Salesforce::isConfigured()) {
@@ -113,7 +112,6 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param string $userReference
      * @param string $username
      * @param bool $code
-     *
      */
     public function profileController_salesforceConnect_create($sender, $userReference = '', $username = '', $code = false) {
         $sender->permission('Garden.SignIn.Allow');
@@ -555,7 +553,6 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param array $args
      * @throws Gdn_UserException If invalid request URL.
      * @throws Exception Permission Denied.
-     *
      */
     public function discussionController_salesforceCase_create($sender, $args) {
 
