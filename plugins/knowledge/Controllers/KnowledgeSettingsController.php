@@ -21,6 +21,9 @@ class KnowledgeSettingsController extends SettingsController {
 
     use StaticCacheTranslationTrait;
 
+    /** Maximum length allowed for the KB chooser page. */
+    const CHOOSER_TITLE_MAX_LENGTH = 20;
+
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
 
@@ -98,6 +101,13 @@ class KnowledgeSettingsController extends SettingsController {
             "Knowledge.ChooserTitle" => [
                 "LabelCode" => "Knowledge Base Chooser Title",
                 "Control" => "textbox",
+                "Description" => self::t(
+                    "This title will appear on the Knowledge homepage.",
+                    sprintf("This title will appear on the Knowledge homepage. It should be %d characters or less.", self::CHOOSER_TITLE_MAX_LENGTH)
+                ),
+                "Options" => [
+                    "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
+                ]
             ],
         ]);
 
