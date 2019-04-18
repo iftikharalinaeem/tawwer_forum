@@ -27,7 +27,7 @@ class Salesforce {
     /**
      * @var string OAuth Access Token
      */
-    protected $AccessToken;
+    protected $accessToken;
 
     /**
      * @var String Instance URL Used for API Calls
@@ -50,19 +50,19 @@ class Salesforce {
     public function __construct($accessToken = false, $instanceUrl = false) {
         if ($accessToken && $instanceUrl) {
             // We passed in a connection
-            $this->AccessToken = $accessToken;
+            $this->accessToken = $accessToken;
             $this->instanceUrl = $instanceUrl;
         } elseif (Gdn::session()->isValid()) {
             // See if user has their own connection established.
             if ($userConnection = val('Salesforce', Gdn::session()->User->Attributes)) {
-                $this->AccessToken = val('AccessToken', $userConnection);
+                $this->accessToken = val('AccessToken', $userConnection);
                 $this->instanceUrl = val('instanceUrl', $userConnection);
                 $this->RefreshToken = val('RefreshToken', $userConnection);
             }
         }
 
         // Fallback to global dashboard connection.
-        if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->AccessToken) {
+        if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->accessToken) {
             $this->useDashboardConnection();
             $this->DashboardConnection = true;
         }
@@ -85,8 +85,8 @@ class Salesforce {
      */
     public function useDashboardConnection() {
         trace('DashboardConnection');
-        $this->AccessToken = c('Plugins.Salesforce.DashboardConnection.Token');
-        $this->instanceUrl = c('Plugins.Salesforce.DashboardConnection.instanceUrl');
+        $this->accessToken = c('Plugins.Salesforce.DashboardConnection.Token');
+        $this->instanceUrl = c('Plugins.Salesforce.DashboardConnection.InstanceUrl');
         $this->RefreshToken = c('Plugins.Salesforce.DashboardConnection.RefreshToken');
     }
 
@@ -480,7 +480,7 @@ class Salesforce {
                 return $httpResponse;
             }
         }
-        if (!$this->AccessToken) {
+        if (!$this->accessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
         $httpResponse = $this->httpRequest($url, $post, 'application/json');
@@ -530,7 +530,7 @@ class Salesforce {
             $options['Method'] = 'POST';
             $queryParams = $post;
         }
-        $headers['Authorization'] = 'OAuth '.$this->AccessToken;
+        $headers['Authorization'] = 'OAuth '.$this->accessToken;
         trace('Salesforce Request - '.$options['Method'].' : '.$url);
 
         // log the query params being sent to salesforce
@@ -565,7 +565,7 @@ class Salesforce {
      * @return bool
      */
     public function isConnected() {
-        if (!$this->AccessToken || !$this->instanceUrl) {
+        if (!$this->accessToken || !$this->instanceUrl) {
             return false;
         }
         return true;
@@ -588,7 +588,7 @@ class Salesforce {
             $instanceUrl = $response['instance_url'];
             $accessToken = $response['access_token'];
             saveToConfig([
-                'Plugins.Salesforce.DashboardConnection.instanceUrl' => $instanceUrl,
+                'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $instanceUrl,
                 'Plugins.Salesforce.DashboardConnection.Token' => $accessToken,
             ]);
             $this->setAccessToken($accessToken);
@@ -799,7 +799,7 @@ class Salesforce {
      * @param $accessToken
      */
     public function setAccessToken($accessToken) {
-        $this->AccessToken = $accessToken;
+        $this->accessToken = $accessToken;
     }
 
     /**
