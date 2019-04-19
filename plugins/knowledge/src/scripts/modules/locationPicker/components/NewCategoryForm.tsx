@@ -6,22 +6,22 @@
 
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import ButtonLoader from "@library/loaders/ButtonLoader";
 import Button from "@library/forms/Button";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
-import FramePanel from "@library/layout/frame/FramePanel";
-import ModalSizes from "@library/modal/ModalSizes";
-import getStore from "@library/redux/getStore";
-import * as React from "react";
-import classNames from "classnames";
-import { ButtonTypes, buttonClasses } from "@library/forms/buttonStyles";
-import Modal from "@library/modal/Modal";
 import Frame from "@library/layout/frame/Frame";
-import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import getStore from "@library/redux/getStore";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import classNames from "classnames";
+import * as React from "react";
+import { frameFooterClasses } from "@library/layout/frame/frameStyles";
 
 interface IProps {
     exitHandler: (e: React.SyntheticEvent) => void;
@@ -55,7 +55,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     private inputRef = React.createRef<InputTextBlock>();
 
     public render() {
-        const buttons = buttonClasses();
+        const classesFrameFooter = frameFooterClasses();
         return (
             <Modal
                 titleID={this.titleID}
@@ -64,10 +64,16 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
             >
                 <form onSubmit={this.handleFormSubmit}>
-                    <Frame>
-                        <FrameHeader id={this.titleID} closeFrame={this.props.exitHandler} title={t("New Category")} />
-                        <FrameBody>
-                            <FramePanel>
+                    <Frame
+                        header={
+                            <FrameHeader
+                                id={this.titleID}
+                                closeFrame={this.props.exitHandler}
+                                title={t("New Category")}
+                            />
+                        }
+                        body={
+                            <FrameBody>
                                 <InputTextBlock
                                     ref={this.inputRef}
                                     label={t("New Category")}
@@ -79,27 +85,29 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                         placeholder: t("Example: Appearance"),
                                     }}
                                 />
-                            </FramePanel>
-                        </FrameBody>
-                        <FrameFooter selfPadded={true}>
-                            <Button
-                                baseClass={ButtonTypes.TEXT}
-                                className={classNames("locationPicker-validate")}
-                                onClick={this.props.exitHandler}
-                            >
-                                {t("Cancel")}
-                            </Button>
-                            <Button
-                                title={t("New Category")}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
-                                className={classNames("locationPicker-newFolder")}
-                                disabled={!this.state.valid}
-                                type="submit"
-                            >
-                                {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
-                            </Button>
-                        </FrameFooter>
-                    </Frame>
+                            </FrameBody>
+                        }
+                        footer={
+                            <FrameFooter justifyRight={true}>
+                                <Button
+                                    baseClass={ButtonTypes.TEXT}
+                                    className={classesFrameFooter.actionButton}
+                                    onClick={this.props.exitHandler}
+                                >
+                                    {t("Cancel")}
+                                </Button>
+                                <Button
+                                    title={t("New Category")}
+                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    className={classesFrameFooter.actionButton}
+                                    disabled={!this.state.valid}
+                                    type="submit"
+                                >
+                                    {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
+                                </Button>
+                            </FrameFooter>
+                        }
+                    />
                 </form>
             </Modal>
         );

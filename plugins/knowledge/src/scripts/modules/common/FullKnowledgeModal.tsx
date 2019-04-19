@@ -16,6 +16,7 @@ interface IProps
     children: React.ReactNode;
     titleID: string;
     className?: string;
+    scrollable?: boolean;
 }
 
 export class FullKnowledgeModal extends React.Component<IProps> {
@@ -27,6 +28,7 @@ export class FullKnowledgeModal extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
                 className={this.props.className}
+                scrollable={this.props.scrollable}
             >
                 {this.props.children}
             </Modal>

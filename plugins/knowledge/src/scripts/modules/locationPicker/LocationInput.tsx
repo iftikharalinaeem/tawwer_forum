@@ -90,6 +90,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         className={classNames(modalClassName)}
                         label={t("Choose a location for this page.")}
                         elementToFocusOnExit={this.changeLocationButton.current!}
+                        // scrollable={true}
                     >
                         <LocationPicker
                             afterChoose={this.handleChoose}
