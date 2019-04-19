@@ -10,18 +10,17 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { newFolder } from "@library/icons/common";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
-import { ButtonTypes, buttonClasses } from "@library/forms/buttonStyles";
-import Frame from "@library/layout/frame/Frame";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FramePanel from "@library/layout/frame/FramePanel";
-import FrameFooter from "@library/layout/frame/FrameFooter";
-import FlexSpacer from "@library/layout/FlexSpacer";
 
 /**
  * Component for choosing a location for a new article.
@@ -34,42 +33,45 @@ class LocationPicker extends React.Component<IProps, IState> {
 
     public render() {
         const { navigatedRecord } = this.props;
-        const buttons = buttonClasses();
         return (
             <>
-                <Frame>
-                    <FrameHeader
-                        onBackClick={this.canNavigateBack ? this.goBack : undefined}
-                        closeFrame={this.props.onCloseClick}
-                        title={this.props.title}
-                    />
-                    <FrameBody className="isSelfPadded">
-                        <FramePanel>
+                <Frame
+                    header={
+                        <FrameHeader
+                            onBackClick={this.canNavigateBack ? this.goBack : undefined}
+                            closeFrame={this.props.onCloseClick}
+                            title={this.props.title}
+                        />
+                    }
+                    body={
+                        <FrameBody className="isSelfPadded">
                             <LocationContents key={`contents-${navigatedRecord}`} />
-                        </FramePanel>
-                    </FrameBody>
-                    <FrameFooter>
-                        {navigatedRecord && (
+                        </FrameBody>
+                    }
+                    footer={
+                        <FrameFooter>
+                            {navigatedRecord && (
+                                <Button
+                                    title={t("New Category")}
+                                    className="buttonNoBorder isSquare button-pushLeft"
+                                    baseClass={ButtonTypes.ICON_COMPACT}
+                                    onClick={this.showNewCategoryModal}
+                                    buttonRef={this.newFolderButtonRef}
+                                >
+                                    {newFolder()}
+                                </Button>
+                            )}
+                            <FlexSpacer />
                             <Button
-                                title={t("New Category")}
-                                className="buttonNoBorder isSquare button-pushLeft"
-                                baseClass={ButtonTypes.ICON_COMPACT}
-                                onClick={this.showNewCategoryModal}
-                                buttonRef={this.newFolderButtonRef}
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                onClick={this.handleChoose}
+                                disabled={!this.canChoose}
                             >
-                                {newFolder()}
+                                {t("Choose")}
                             </Button>
-                        )}
-                        <FlexSpacer />
-                        <Button
-                            baseClass={ButtonTypes.TEXT_PRIMARY}
-                            onClick={this.handleChoose}
-                            disabled={!this.canChoose}
-                        >
-                            {t("Choose")}
-                        </Button>
-                    </FrameFooter>
-                </Frame>
+                        </FrameFooter>
+                    }
+                />
                 {this.state.showNewCategoryModal && this.props.navigatedCategory && (
                     <NewCategoryForm
                         exitHandler={this.hideNewFolderModal}

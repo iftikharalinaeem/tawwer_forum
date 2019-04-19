@@ -63,7 +63,6 @@ export class RevisionsLayout extends React.Component<IProps> {
                 <EditorHeader
                     canSubmit={this.props.canSubmit}
                     isSubmitLoading={false}
-                    className="richEditorRevisionsForm-header"
                     callToAction={t("Restore")}
                     mobileDropDownTitle={mobileTitle}
                     mobileDropDownContent={mobileDropDownContent}

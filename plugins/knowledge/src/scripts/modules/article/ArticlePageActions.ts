@@ -7,6 +7,7 @@
 import ReduxActions from "@library/redux/ReduxActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 
 /**
  * Actions for the article page.
@@ -34,6 +35,7 @@ export default class ArticlePageActions extends ReduxActions {
     }
 
     private articleActions = new ArticleActions(this.dispatch, this.api);
+    private navigationActions = new NavigationActions(this.dispatch, this.api);
 
     /**
      * Reset the page state.
@@ -41,14 +43,23 @@ export default class ArticlePageActions extends ReduxActions {
     public reset = this.bindDispatch(ArticlePageActions.createResetAction);
 
     public init = async (articleID: number) => {
-        this.dispatch((a, getState) => {
-            const article = ArticleModel.selectArticle(getState(), articleID);
+        this.dispatch(async (a, getState) => {
+            let article = ArticleModel.selectArticle(getState(), articleID);
             if (article) {
                 this.dispatch(ArticlePageActions.createInitAction(articleID, true));
             } else {
                 this.dispatch(ArticlePageActions.createInitAction(articleID));
-                return this.articleActions.fetchByID({ articleID });
+                const articleResponse = await this.articleActions.fetchByID({ articleID });
+                if (!articleResponse) {
+                    return;
+                }
+
+                article = articleResponse.data;
             }
+
+            const kbID = article.knowledgeBaseID;
+            await this.navigationActions.getNavigationFlat(kbID);
+            return article;
         });
     };
 }
