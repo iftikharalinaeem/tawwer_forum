@@ -4,129 +4,78 @@
  * @license Proprietary
  */
 
+import { IArticleFragment } from "@knowledge/@types/api/article";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
+import { ResultMeta } from "@library/result/ResultMeta";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
+import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { IArticleFragment } from "@knowledge/@types/api/article";
-import { IResult } from "@library/result/Result";
-import { ResultMeta } from "@library/result/ResultMeta";
-import { hot } from "react-hot-loader";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 
 /**
  * Page component for a flat category list.
  */
-export class CategoriesPage extends React.Component<IProps> {
-    public render() {
-        const { articles, category, pages } = this.props;
-        const id = this.categoryID;
+export function CategoriesPage(props: IProps) {
+    const { articles, category, pages, requestArticles, requestCategory } = props;
+    const { page } = props.match.params;
 
-        // Handle errors
-        if (id === null) {
-            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
-        }
+    const id = useMemo(
+        () => {
+            const parsedID = parseInt(props.match.params.id, 10);
+            if (Number.isNaN(parsedID)) {
+                return null;
+            } else {
+                return parsedID;
+            }
+        },
+        [props.match.params.id],
+    );
 
-        const articlesError = articles.status === LoadStatus.ERROR && articles.error;
-        if (articlesError) {
-            return <ErrorPage apiError={articles.error} />;
-        }
+    useEffect(
+        () => {
+            if (id === null) {
+                return;
+            }
 
-        const categoryError = category.status === LoadStatus.ERROR && category.error;
-        if (categoryError) {
-            return <ErrorPage apiError={category.error} />;
-        }
-
-        // Handle loading statuses
-        const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
-
-        if (!category.data || !articles.data) {
-            return <NavigationLoadingLayout activeRecord={activeRecord} />;
-        }
-
-        // Render either a loading layout or a full layout.
-        return (
-            <DocumentTitle title={category.data!.name}>
-                <CategoriesLayout
-                    results={articles.data.map(this.mapArticleToResult)}
-                    category={category.data}
-                    pages={pages}
-                />
-            </DocumentTitle>
-        );
-    }
-
-    /**
-     * If the component mounts without preloaded data we need to request it.
-     */
-    public componentDidMount() {
-        this.fetchCategoryData();
-    }
-
-    /**
-     * If we the id of the page changes we need to re-fetch the data.
-     */
-    public componentDidUpdate(prevProps: IProps) {
-        const { id, page } = this.props.match.params;
-
-        if (id !== prevProps.match.params.id || page !== prevProps.match.params.page) {
-            this.fetchCategoryData();
-        }
-    }
-
-    /**
-     * Use our passed in action to fetch category.
-     */
-    private fetchCategoryData() {
-        const { requestArticles, articles, category, requestCategory } = this.props;
-        const id = this.categoryID;
-        const { page } = this.props.match.params;
-
-        if (id === null) {
-            return;
-        }
-
-        if (articles.status === LoadStatus.PENDING) {
             void requestArticles(id, page);
-        }
-
-        if (category.status === LoadStatus.PENDING) {
             void requestCategory(id);
-        }
+        },
+        [id, page],
+    );
+
+    // Handle errors
+    if (id === null) {
+        return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
     }
 
-    /**
-     * Get a numeric category ID from the string id passed by the router.
-     */
-    private get categoryID(): number | null {
-        const id = parseInt(this.props.match.params.id, 10);
-        if (Number.isNaN(id)) {
-            return null;
-        } else {
-            return id;
-        }
+    const articlesError = articles.status === LoadStatus.ERROR && articles.error;
+    if (articlesError) {
+        return <ErrorPage apiError={articles.error} />;
     }
 
-    /**
-     * Cleanup the page contents.
-     */
-    public componentWillUnmount() {
-        this.props.onReset();
+    const categoryError = category.status === LoadStatus.ERROR && category.error;
+    if (categoryError) {
+        return <ErrorPage apiError={category.error} />;
     }
 
-    /**
-     * Map an article fragment into an `IResult`.
-     */
-    private mapArticleToResult(article: IArticleFragment): IResult {
+    // Handle loading statuses
+    const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
+
+    if (category.status === LoadStatus.LOADING || !category.data || !articles.data) {
+        return <NavigationLoadingLayout activeRecord={activeRecord} />;
+    }
+
+    const articleResults = articles.data.map((article: IArticleFragment) => {
         return {
             name: article.name || "",
             meta: <ResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
@@ -135,7 +84,14 @@ export class CategoriesPage extends React.Component<IProps> {
             attachments: [],
             location: [],
         };
-    }
+    });
+
+    // Render either a loading layout or a full layout.
+    return (
+        <DocumentTitle title={category.data!.name}>
+            <CategoriesLayout results={articleResults} category={category.data} pages={pages} />
+        </DocumentTitle>
+    );
 }
 
 interface IOwnProps {
