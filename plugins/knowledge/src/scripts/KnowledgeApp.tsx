@@ -23,6 +23,8 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route } from "react-router-dom";
 import { LiveAnnouncer } from "react-aria-live";
 import { hot } from "react-hot-loader";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 
 interface IState {
     app: React.ReactNode;
@@ -45,17 +47,19 @@ class KnowledgeApp extends React.Component<{}, IState> {
                     <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
                         <PagesContext.Provider value={{ pages: this.pages }}>
                             <ScrollOffsetProvider scrollWatchingEnabled={true}>
-                                <SiteNavProvider>
+                                <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
                                     <SearchContext.Provider
                                         value={{ searchOptionProvider: new KnowledgeSearchProvider() }}
                                     >
-                                        <DeviceProvider>
-                                            <BrowserRouter>
-                                                <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                                    <Route component={KnowledgeRoutes} />
-                                                </LinkContextProvider>
-                                            </BrowserRouter>
-                                        </DeviceProvider>
+                                        <NavHistoryContextProvider>
+                                            <DeviceProvider>
+                                                <BrowserRouter>
+                                                    <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                                        <Route component={KnowledgeRoutes} />
+                                                    </LinkContextProvider>
+                                                </BrowserRouter>
+                                            </DeviceProvider>
+                                        </NavHistoryContextProvider>
                                     </SearchContext.Provider>
                                 </SiteNavProvider>
                             </ScrollOffsetProvider>
