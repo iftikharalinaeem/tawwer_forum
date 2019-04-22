@@ -12,6 +12,8 @@ import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
+import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -25,18 +27,20 @@ interface IProps {
  * - Note that hard coded kbID is temporary
  */
 export default function NavigationLoadingLayout(props: IProps) {
+    const { lastKB } = useNavHistory();
+    const navigation = lastKB && (
+        <Navigation
+            activeRecord={props.activeRecord}
+            collapsible={lastKB.viewType === KbViewType.GUIDE}
+            kbID={lastKB.knowledgeBaseID}
+        />
+    );
+
     return (
         <Container>
-            <VanillaHeader
-                title={t("Loading")}
-                mobileDropDownContent={<Navigation activeRecord={props.activeRecord} collapsible={false} kbID={1} />}
-            />
+            <VanillaHeader title={t("Loading")} mobileDropDownContent={navigation} />
             <PanelLayout
-                leftBottom={
-                    <PanelWidget>
-                        <Navigation activeRecord={props.activeRecord} collapsible={true} kbID={1} />
-                    </PanelWidget>
-                }
+                leftBottom={<PanelWidget>{navigation}</PanelWidget>}
                 breadcrumbs={
                     <PanelWidget>
                         <Breadcrumbs forceDisplay={true}>{[]}</Breadcrumbs>

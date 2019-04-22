@@ -21,6 +21,7 @@ import React, { useEffect, useMemo } from "react";
 import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { match } from "react-router";
+import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 
 /**
  * Page component for a flat category list.
@@ -71,7 +72,12 @@ export function CategoriesPage(props: IProps) {
     // Handle loading statuses
     const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
 
-    if (category.status === LoadStatus.LOADING || !category.data || !articles.data) {
+    if (
+        category.status === LoadStatus.LOADING ||
+        articles.status === LoadStatus.LOADING ||
+        !category.data ||
+        !articles.data
+    ) {
         return <NavigationLoadingLayout activeRecord={activeRecord} />;
     }
 
@@ -88,7 +94,8 @@ export function CategoriesPage(props: IProps) {
 
     // Render either a loading layout or a full layout.
     return (
-        <DocumentTitle title={category.data!.name}>
+        <DocumentTitle title={category.data.name}>
+            <NavHistoryUpdater lastKbID={category.data.knowledgeBaseID} />
             <CategoriesLayout results={articleResults} category={category.data} pages={pages} />
         </DocumentTitle>
     );

@@ -408,21 +408,10 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     exitHandler={this.hideNewFolderModal}
                     parentCategoryID={this.currentTargetCategoryID}
                     buttonRef={this.newCategoryButtonRef}
-                    onSuccessfulSubmit={this.onNewCategorySuccess}
                 />
             )
         );
     }
-
-    /**
-     * Handler for the when a new category has been successfully created.
-     *
-     * - Re-fetches the navigation tree.
-     */
-    private onNewCategorySuccess = async () => {
-        const { knowledgeBaseID } = this.props.knowledgeBase;
-        await this.props.navigationActions.getNavigationFlat(knowledgeBaseID, true);
-    };
 
     /**
      * Show the location picker modal.
