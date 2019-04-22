@@ -25,6 +25,7 @@ import Modal from "@library/modal/Modal";
 import uniqueId from "lodash/uniqueId";
 import AccessibleError from "@library/forms/AccessibleError";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -167,31 +168,41 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { chosenRecord } = state.knowledge.locationPicker;
     const { navigationItems } = state.knowledge.navigation;
     let chosenCategoryID: number | null = null;
+    let locationBreadcrumb: ICrumb[] | null = null;
     let chosenSort: number | null = null;
     if (chosenRecord) {
         if (chosenRecord.recordType === KbRecordType.CATEGORY) {
             chosenCategoryID = chosenRecord.recordID;
+            locationBreadcrumb =
+                chosenRecord.recordID !== null
+                    ? NavigationSelector.selectBreadcrumb(
+                          navigationItems,
+                          KbRecordType.CATEGORY + chosenRecord.recordID,
+                      )
+                    : null;
             if (chosenRecord.position !== undefined) {
                 chosenSort = chosenRecord.position;
             }
-        }
-
-        if (
+        } else if (
             chosenRecord.recordType === KbRecordType.KB &&
             knowledgeBasesByID.data &&
             knowledgeBasesByID.data[chosenRecord.recordID]
         ) {
-            chosenCategoryID = knowledgeBasesByID.data[chosenRecord.recordID].rootCategoryID;
+            const knowledgeBase = knowledgeBasesByID.data[chosenRecord.recordID];
+            chosenCategoryID = knowledgeBase.rootCategoryID;
+            locationBreadcrumb = [
+                {
+                    name: knowledgeBase.name,
+                    url: knowledgeBase.url,
+                },
+            ];
         }
     }
     return {
         chosenRecord,
         chosenSort,
         chosenCategoryID,
-        locationBreadcrumb:
-            chosenCategoryID !== null
-                ? NavigationSelector.selectBreadcrumb(navigationItems, KbRecordType.CATEGORY + chosenCategoryID)
-                : null,
+        locationBreadcrumb,
     };
 }
 
