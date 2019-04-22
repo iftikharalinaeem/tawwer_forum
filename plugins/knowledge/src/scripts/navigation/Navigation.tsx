@@ -29,12 +29,7 @@ export class Navigation extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { navItems, knowledgeBase } = this.props;
 
-        if (
-            knowledgeBase.status !== LoadStatus.SUCCESS ||
-            navItems.status !== LoadStatus.SUCCESS ||
-            !knowledgeBase.data ||
-            !navItems.data
-        ) {
+        if (!knowledgeBase.data || !navItems.data) {
             return null;
         }
 
@@ -48,7 +43,12 @@ export class Navigation extends React.Component<IProps> {
                 hiddenTitle={hasTitle}
                 collapsible={this.props.collapsible!}
                 activeRecord={this.props.activeRecord}
-                bottomCTA={<NavigationAdminLinks kbID={this.props.kbID} showDivider={navItems.data!.length > 0} />}
+                bottomCTA={
+                    <NavigationAdminLinks
+                        knowledgeBase={this.props.knowledgeBase.data!}
+                        showDivider={navItems.data!.length > 0}
+                    />
+                }
                 onItemHover={this.preloadItem}
                 clickableCategoryLabels={clickableCategoryLabels}
             >
