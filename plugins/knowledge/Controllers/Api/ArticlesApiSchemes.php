@@ -333,7 +333,7 @@ trait ArticlesApiSchemes {
         return Schema::parse([
             "articleID:i" => "Unique article ID.",
             "knowledgeCategoryID:i" => [
-                "allowNull" => true,
+                "allowNull" => false,
                 "Category the article belongs in.",
             ],
             "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
