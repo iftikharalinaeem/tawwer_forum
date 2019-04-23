@@ -944,6 +944,29 @@ class SalesforcePlugin extends Gdn_Plugin {
         require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Salesforce');
     }
 
+    public function userModel_afterSave_handler($sender, $args) {
+        $salesforce = Salesforce::instance();
+        $fields = $args['FormPostValues'];
+
+        // check if connected to salesforce
+        if ($salesforce->isConnected()) {
+
+            // add new contact
+            $contactData = [
+                'FirstName' => $fields['Name'],
+                'LastName' => 'Test444444 last name',
+                'Email' => $fields['Email'],
+                'LeadSource' => 'Vanilla',
+            ];
+            $sender->EventArguments['ContactData'] = &$contactData;
+            $sender->fireEvent('CreateSalesforceContact');
+            $salesforce->createContact($contactData);
+        } else {
+            $this->loginModal($sender);
+            return;
+        }
+    }
+
     public function isConfigured() {
         $salesforce = Salesforce::instance();
         return $salesforce->isConfigured();

@@ -324,6 +324,22 @@ class Salesforce {
     }
 
     /**
+     * ...
+     *
+     * @param $object
+     * @param array $fields
+     * @return mixed
+     * @throws Gdn_UserException
+     */
+    public function updateObject($object, array $fields, $id) {
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
+        if (isset($response['Response']['success'])) {
+            return $response['Response']['id'];
+        }
+        throw new Gdn_UserException($response['Response'][0]['message']);
+    }
+
+    /**
      * Preform a SELECT query using SOQL
      *
      * @param array $fields
