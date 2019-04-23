@@ -170,17 +170,14 @@ export function EditorForm(props: IProps) {
     const [scrollPos, setScrollPos] = useState(0);
     const embedBarRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
-    const onScroll = useCallback(
-        () => {
-            requestAnimationFrame(() => {
-                if (!formRef.current) {
-                    return;
-                }
-                setScrollPos(Math.max(0, formRef.current.scrollTop));
-            });
-        },
-        [setScrollPos, formRef.current],
-    );
+    const onScroll = useCallback(() => {
+        requestAnimationFrame(() => {
+            if (!formRef.current) {
+                return;
+            }
+            setScrollPos(Math.max(0, formRef.current.scrollTop));
+        });
+    }, [setScrollPos, formRef.current]);
     const { y } = useSpring({ y: scrollPos, tension: 100 });
     let start = 0;
     let end = 0;

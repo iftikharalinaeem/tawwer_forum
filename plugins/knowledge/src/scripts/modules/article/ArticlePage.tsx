@@ -25,6 +25,7 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import { hot } from "react-hot-loader";
 import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -56,6 +57,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
+                <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
                     article={article.data}
                     prevNavArticle={this.props.prevNavArticle}
