@@ -35,7 +35,7 @@ import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, status, data, rootCategoryUrl } = this.props;
-        const { knowledgeBaseID, rootCategoryID } = knowledgeBase;
+        const { bannerImage, knowledgeBaseID, rootCategoryID } = knowledgeBase;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             return <Loader />;
@@ -71,7 +71,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         return (
             <>
-                <Splash action={splashAction} title={knowledgeBase.name} />
+                <Splash action={splashAction} backgroundImage={bannerImage} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <VanillaHeader />
