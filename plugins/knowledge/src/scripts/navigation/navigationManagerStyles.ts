@@ -7,14 +7,18 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent } from "csx";
+import { important, percent, color, calc } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
     const makeThemeVars = variableFactory("navigationManager");
 
     const colors = makeThemeVars("colors", {
@@ -27,7 +31,10 @@ export const navigationManagerVariables = useThemeCache(() => {
             radius: 2,
             color: globalVars.mixBgAndFg(0.9),
         },
-        bg: globalVars.mixPrimaryAndBg(0.2),
+        bg: color("#E5EFFB"),
+        scrollGutter: {
+            mobile: globalVars.gutter.size * 2,
+        },
     });
 
     const error = makeThemeVars("error", {
@@ -36,6 +43,7 @@ export const navigationManagerVariables = useThemeCache(() => {
 
     const item = makeThemeVars("item", {
         height: 28,
+        mobileHeight: formElementVars.sizing.height,
     });
 
     const deleteButton = makeThemeVars("deleteButton", {
@@ -88,21 +96,36 @@ export const navigationManagerClasses = useThemeCache(() => {
     const chevronFullWidth = vars.chevron.width + 2 * vars.chevron.margin;
     const buttonWidth = chevronFullWidth + vars.folderIcon.width;
     const shadows = shadowHelper();
+    const media = layoutVariables().mediaQueries();
 
     const root = style({
         $nest: {
             "& > [data-react-beautiful-dnd-droppable]": {
                 paddingBottom: unit(50),
                 marginLeft: unit(-chevronFullWidth),
+                ...media.oneColumn({
+                    marginLeft: unit(-chevronFullWidth / 2),
+                }),
             },
+            ...media.oneColumn({
+                paddingRight: unit(vars.dragging.scrollGutter.mobile),
+            }).$nest,
         },
     });
 
     const container = style("container", {
+        paddingTop: globalVars.gutter.size,
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
-        margin: "auto",
+        ...margins({ horizontal: "auto" }),
+    });
+
+    const formError = style("formError", {
+        position: "absolute",
+        top: unit(globalVars.gutter.half),
+        left: 0,
+        right: 0,
     });
 
     const header = style("header", {
@@ -113,20 +136,19 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const item = style("item", {
-        maxWidth: percent(100),
         border: important(0),
+        outline: important("none"),
         $nest: {
-            "&.isDragging": {
+            ...media.oneColumn({
+                width: calc(`100% + ${unit(globalVars.gutter.size)}`),
+            }).$nest,
+            "&&.isDragging": {
                 minWidth: unit(300),
                 $nest: {
                     "& .navigationManager-draggable": {
                         ...shadows.embed(),
-                        paddingRight: globalVars.fonts.weights.semiBold,
                         ...borders(vars.dragging.border),
-                        backgroundColor: colorOut(globalVars.mainColors.bg),
-                    },
-                    "& .navigationManager-action": {
-                        display: important("none"),
+                        backgroundColor: colorOut(vars.dragging.bg),
                     },
                 },
             },
@@ -134,7 +156,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 backgroundColor: colorOut(vars.dragging.bg.fade(0.4)),
             },
 
-            "&.isActive .navigationManager-draggable": {
+            "&&.isActive .navigationManager-draggable": {
                 backgroundColor: colorOut(vars.dragging.bg),
                 ...borders(vars.dragging.border),
             },
@@ -165,6 +187,9 @@ export const navigationManagerClasses = useThemeCache(() => {
         lineHeight: unit(vars.dragging.lineHeight),
         fontSize: unit(globalVars.fonts.size.medium),
         backgroundColor: colorOut(globalVars.mainColors.bg),
+        ...media.oneColumn({
+            minHeight: unit(vars.item.mobileHeight),
+        }),
         ...borders({
             color: "transparent",
         }),
@@ -238,7 +263,8 @@ export const navigationManagerClasses = useThemeCache(() => {
         },
     });
     const itemLabel = style("itemLabel", {
-        flexGrow: 1,
+        flex: 1,
+        width: percent(100),
         ...paddings({
             vertical: 3,
             horizontal: 6,
@@ -319,6 +345,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     const button = style("button", {
         ...userSelect(),
         border: important(0),
+        ...paddings({ horizontal: 12 }),
         $nest: {
             ...buttonStates({
                 focusNotKeyboard: {
@@ -337,6 +364,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     return {
         root,
         container,
+        formError,
         header,
         item,
         draggable,

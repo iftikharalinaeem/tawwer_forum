@@ -228,7 +228,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
-        $result = $this->getNavigation($categories, $articles, $flat);
+        $result = $this->getNavigation($categories, $articles, $flat, KnowledgeCategoryModel::ROOT_ID, $knowledgeBase["sortArticles"]);
         return $result;
     }
 
@@ -238,7 +238,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param array $categories
      * @param array $articles
      * @param bool $flatMode Mode: flat or tree
-     * @param string $rootCategoryID Category ID to start from
+     * @param int $rootCategoryID Category ID to start from
+     * @param string $sortOrder Knowledge base sort order settings
      *
      * @return array
      */
@@ -246,13 +247,24 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         array $categories,
         array $articles,
         bool $flatMode = true,
-        int $rootCategoryID = KnowledgeCategoryModel::ROOT_ID
+        int $rootCategoryID = KnowledgeCategoryModel::ROOT_ID,
+        string $sortOrder = KnowledgeBaseModel::ORDER_MANUAL
     ): array {
         $categories = $this->normalizeOutput($categories, Navigation::RECORD_TYPE_CATEGORY);
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);
 
         if ($flatMode) {
-            return array_merge($categories, $articles);
+            $all = array_merge($categories, $articles);
+            if ($sortOrder === KnowledgeBaseModel::ORDER_MANUAL) {
+                usort($all, function ($prev, $next) {
+                    if ($prev['sort'] === $next['sort']) {
+                        return 0;
+                    } else {
+                        return ($prev['sort'] < $next['sort']) ? -1 : 1;
+                    }
+                });
+            }
+            return $all;
         } else {
             return $this->makeNavigationTree($rootCategoryID, $categories, $articles);
         }

@@ -35,7 +35,7 @@ import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, status, data, rootCategoryUrl } = this.props;
-        const { knowledgeBaseID } = knowledgeBase;
+        const { knowledgeBaseID, rootCategoryID } = knowledgeBase;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             return <Loader />;
@@ -58,7 +58,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         const splashAction = (
             <Permission permission="articles.add">
                 <LinkAsButton
-                    to={EditorRoute.url({ knowledgeBaseID })}
+                    to={EditorRoute.url({ knowledgeBaseID, knowledgeCategoryID: rootCategoryID })}
                     onMouseOver={EditorRoute.preload}
                     className={classNames("searchBar-actionButton")}
                     baseClass={ButtonTypes.ICON}

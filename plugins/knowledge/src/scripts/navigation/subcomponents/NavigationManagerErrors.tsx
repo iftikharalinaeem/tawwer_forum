@@ -6,10 +6,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState } from "@knowledge/state/model";
-import FormError from "@library/forms/FormError";
 import { NavigationActionType } from "@knowledge/navigation/state/NavigationModel";
 import apiv2, { getGlobalErrorMessage } from "@library/apiv2";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import Message from "@library/messages/Message";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { t } from "@library/utility/appUtils";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 
 type RetryHandler = (() => void) | null;
 
@@ -21,16 +24,19 @@ class NavigationManagerErrors extends React.Component<IProps> {
             return null;
         }
 
+        const classes = navigationManagerClasses();
         const retryHandler = this.getRetryHandler();
 
         return (
-            <FormError
-                isRetryLoading={currentError.isLoading}
-                onDismissClick={this.props.onClear}
-                onRetryClick={retryHandler ? this.handleRetry : undefined}
-            >
-                {getGlobalErrorMessage(currentError.error)}
-            </FormError>
+            <Message
+                className={classes.formError}
+                onConfirm={retryHandler ? this.handleRetry : undefined}
+                confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
+                onCancel={this.props.onClear}
+                stringContents={
+                    getGlobalErrorMessage(currentError.error) || t("Something went wrong while contacting the server.")
+                }
+            />
         );
     }
 
