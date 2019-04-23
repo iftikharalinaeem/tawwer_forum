@@ -31,6 +31,7 @@ import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
 import { EditorQueueItem } from "@rich-editor/editor/context";
 import { EditorPage } from "@knowledge/modules/editor/EditorPage";
+import { getRelativeUrl } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -347,8 +348,10 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         };
 
         history.replace(editLocation);
+
+        const pathname = getRelativeUrl(article.url);
         history.push({
-            pathname: article.url,
+            pathname,
         });
     }
 
@@ -437,14 +440,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             return;
         }
 
-        const { url } = fullArticleResponse.data;
+        const pathname = getRelativeUrl(fullArticleResponse.data.url); //const { pathname } = new URL(article.url)
 
         // Redirect to the new url.
         history.replace({
             ...history.location,
             search: "",
         });
-        history.push(url);
+        history.push(pathname);
     }
 
     /**

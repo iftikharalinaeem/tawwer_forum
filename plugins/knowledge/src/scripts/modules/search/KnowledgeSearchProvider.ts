@@ -66,6 +66,6 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     };
 
     public makeSearchUrl(query: string): string {
-        return formatUrl(`/kb/search?query=${encodeURIComponent(query)}`);
+        return `/kb/search?query=${encodeURIComponent(query)}`;
     }
 }

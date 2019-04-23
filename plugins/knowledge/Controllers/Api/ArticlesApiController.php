@@ -618,7 +618,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $name = $row["name"] ?? null;
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}");
+        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
 
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
