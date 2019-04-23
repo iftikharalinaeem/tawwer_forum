@@ -15,69 +15,75 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/core";
 
 /**
  * Data connect navigation component for knowledge base.
  */
-export class Navigation extends React.Component<IProps> {
-    /**
-     * @inheritdoc
-     */
-    public render(): React.ReactNode {
-        const { navItems, knowledgeBase } = this.props;
-
-        if (
-            knowledgeBase.status !== LoadStatus.SUCCESS ||
-            navItems.status !== LoadStatus.SUCCESS ||
-            !knowledgeBase.data ||
-            !navItems.data
-        ) {
-            return null;
-        }
-
-        const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
-        const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
-        const title = hasTitle ? t("Subcategories") : undefined;
-
-        return (
-            <SiteNav
-                title={title}
-                hiddenTitle={hasTitle}
-                collapsible={this.props.collapsible!}
-                activeRecord={this.props.activeRecord}
-                bottomCTA={<NavigationAdminLinks kbID={this.props.kbID} showDivider={navItems.data!.length > 0} />}
-                onItemHover={this.preloadItem}
-                clickableCategoryLabels={clickableCategoryLabels}
-            >
-                {navItems.data}
-            </SiteNav>
-        );
-    }
+export function Navigation(props: IProps) {
+    const { navItems, knowledgeBase } = props;
 
     /**
      * Preload a navigation item from the API.
      */
-    private preloadItem = (item: INavigationTreeItem) => {
-        if (item.recordType === KbRecordType.ARTICLE) {
-            void this.props.preloadArticle(item.recordID);
-        }
-    };
+    const preloadItem = useCallback(
+        (item: INavigationTreeItem) => {
+            if (item.recordType === KbRecordType.ARTICLE) {
+                void props.preloadArticle(item.recordID);
+            }
+        },
+        [props.preloadArticle],
+    );
 
     /**
      * Fetch navigation data when the component is mounted.
      */
-    public componentDidMount() {
-        if (this.props.navItems.status === LoadStatus.PENDING) {
-            void this.props.requestNavigation();
-        }
+    useEffect(
+        () => {
+            if (props.navItems.status === LoadStatus.PENDING) {
+                void props.requestNavigation();
+            }
+        },
+        [props.navItems.status],
+    );
 
-        if (this.props.knowledgeBase.status === LoadStatus.PENDING) {
-            this.props.requestKnowledgeBase();
-        }
+    useEffect(
+        () => {
+            if (props.knowledgeBase.status === LoadStatus.PENDING) {
+                props.requestKnowledgeBase();
+            }
+        },
+        [props.knowledgeBase.status],
+    );
+
+    if (!knowledgeBase.data || !navItems.data) {
+        return null;
     }
+
+    const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
+    const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
+    const title = hasTitle ? t("Subcategories") : undefined;
+
+    return (
+        <SiteNav
+            title={title}
+            hiddenTitle={hasTitle}
+            collapsible={props.collapsible!}
+            activeRecord={props.activeRecord}
+            bottomCTA={
+                <NavigationAdminLinks
+                    knowledgeBase={props.knowledgeBase.data!}
+                    showDivider={navItems.data!.length > 0}
+                />
+            }
+            onItemHover={preloadItem}
+            clickableCategoryLabels={clickableCategoryLabels}
+        >
+            {navItems.data}
+        </SiteNav>
+    );
 }
 
 interface IOwnProps {
