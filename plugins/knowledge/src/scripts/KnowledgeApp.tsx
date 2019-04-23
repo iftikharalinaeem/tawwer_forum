@@ -46,7 +46,7 @@ class KnowledgeApp extends React.Component<{}, IState> {
                 <LiveAnnouncer>
                     <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
                         <PagesContext.Provider value={{ pages: this.pages }}>
-                            <ScrollOffsetProvider scrollWatchingEnabled={true}>
+                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
                                 <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
                                     <SearchContext.Provider
                                         value={{ searchOptionProvider: new KnowledgeSearchProvider() }}
