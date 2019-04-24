@@ -23,15 +23,18 @@ export const navigationManagerVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.primary,
+        bg: globalVars.mainColors.bg,
     });
 
     const dragging = makeThemeVars("dragging", {
         lineHeight: 18,
+        fontWeight: globalVars.fonts.weights.bold,
         border: {
             radius: 2,
-            color: globalVars.mixBgAndFg(0.9),
+            color: globalVars.mixBgAndFg(.2),
         },
-        bg: color("#E5EFFB"),
+        bg: colors.bg,
+        shadow: shadowHelper().dropDown,
         scrollGutter: {
             mobile: globalVars.gutter.size * 2,
         },
@@ -75,6 +78,18 @@ export const navigationManagerVariables = useThemeCache(() => {
         lineHeight: 24,
     });
 
+    const states = makeThemeVars("states", {
+        hover: {
+            bg: colors.fg.fade(.05),
+        },
+        focus: {
+            bg: colors.fg.fade(.05),
+        },
+        active: {
+            bg: colors.fg.fade(.08),
+        },
+    });
+
     return {
         colors,
         dragging,
@@ -86,6 +101,7 @@ export const navigationManagerVariables = useThemeCache(() => {
         folderIcon,
         chevron,
         input,
+        states,
     };
 });
 
@@ -144,20 +160,22 @@ export const navigationManagerClasses = useThemeCache(() => {
             }).$nest,
             "&&.isDragging": {
                 minWidth: unit(300),
+                opacity: .5,
                 $nest: {
                     "& .navigationManager-draggable": {
                         ...shadows.embed(),
                         ...borders(vars.dragging.border),
                         backgroundColor: colorOut(vars.dragging.bg),
+                        fontWeight: vars.dragging.fontWeight,
                     },
                 },
             },
             "&:hover .navigationManager-draggable": {
-                backgroundColor: colorOut(vars.dragging.bg.fade(0.4)),
+                backgroundColor: colorOut(vars.states.hover.bg),
             },
 
             "&&.isActive .navigationManager-draggable": {
-                backgroundColor: colorOut(vars.dragging.bg),
+                backgroundColor: colorOut(vars.states.active.bg),
                 ...borders(vars.dragging.border),
             },
             "&.isActive .navigationManager-action": {
@@ -165,7 +183,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             },
 
             "&:focus .navigationManager-draggable": {
-                backgroundColor: colorOut(vars.dragging.bg),
+                backgroundColor: colorOut(vars.states.focus.bg),
                 ...borders(vars.dragging.border),
             },
             "&:focus .navigationManager-action": {

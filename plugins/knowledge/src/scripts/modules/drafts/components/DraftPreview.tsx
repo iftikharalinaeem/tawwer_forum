@@ -13,6 +13,9 @@ import DraftMenu from "@knowledge/modules/drafts/components/DraftMenu";
 import { DraftPreviewMeta } from "@knowledge/modules/drafts/components/DraftPreviewMeta";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { searchResultClasses, searchResultsClasses } from "@library/features/search/searchResultsStyles";
+import TruncatedText from "@library/content/TruncatedText";
+import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftPreviewStyles";
 
 interface IProps extends IResponseArticleDraft, RouteComponentProps<any> {
     headingLevel?: 2 | 3 | 4 | 5 | 6;
@@ -31,28 +34,38 @@ export class DraftPreview extends React.Component<IProps> {
         const { dateUpdated, draftID, headingLevel, className, excerpt } = this.props;
         const { name } = this.props.attributes;
         const HeadingTag = `h${headingLevel}` as "h1" | "h3" | "h4" | "h5" | "h6";
+        const classesSearchResults = searchResultsClasses();
+        const classesResult = searchResultClasses();
+        const classes = draftPreviewClasses();
 
         return (
-            <li className={classNames("draftPreview", className)} onClick={this.handleClick}>
-                <article className="draftPreview-item">
-                    <div className="draftPreview-header">
-                        <HeadingTag className="draftPreview-title">
-                            <EditorRoute.Link
-                                data={{
-                                    articleID: this.props.recordID,
-                                    draftID: this.props.draftID,
-                                }}
-                                className="draftPreview-link"
+            <li
+                className={classNames("draftPreview", classesSearchResults.item, classesResult.root, className)}
+                onClick={this.handleClick}
+            >
+                <article className={classNames("draftPreview-item", classesSearchResults.result)}>
+                    <div className={classNames("draftPreview-main", classesResult.main)}>
+                        <div className={classNames("draftPreview-header", classes.header)}>
+                            <a
+                                href={EditorRoute.url(this.props)}
+                                onClick={this.handleClick}
+                                className={classNames("draftPreview-link", classesResult.title)}
                             >
-                                {!!name ? name : <em>{t("(Untitled)")}</em>}
-                            </EditorRoute.Link>
-                        </HeadingTag>
-                        <DraftMenu className="draftPreview-menu" draftID={draftID} url={EditorRoute.url(this.props)} />
+                                <HeadingTag className={classNames("draftPreview-title", classesResult.title)}>
+                                    {!!name ? name : <em>{t("(Untitled)")}</em>}
+                                </HeadingTag>
+                            </a>
+                            <DraftMenu
+                                className={classNames("draftPreview-menu")}
+                                draftID={draftID}
+                                url={EditorRoute.url(this.props)}
+                            />
+                        </div>
+                        <DraftPreviewMeta className={classesResult.metas} dateUpdated={dateUpdated} />
+                        <Paragraph className={classNames("draftPreview-excerpt", classesResult.excerpt)}>
+                            <TruncatedText>{excerpt ? <em>{excerpt}</em> : <em>{t("(No Body)")}</em>}</TruncatedText>
+                        </Paragraph>
                     </div>
-                    <Paragraph className="draftPreview-excerpt">
-                        {excerpt ? <em>{excerpt}</em> : <em>{t("(No Body)")}</em>}
-                    </Paragraph>
-                    <DraftPreviewMeta dateUpdated={dateUpdated} />
                 </article>
             </li>
         );
