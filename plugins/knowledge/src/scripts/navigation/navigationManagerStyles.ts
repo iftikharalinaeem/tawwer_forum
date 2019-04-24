@@ -31,10 +31,8 @@ export const navigationManagerVariables = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.bold,
         border: {
             radius: 2,
-            color: globalVars.mixBgAndFg(.2),
+            color: globalVars.mixBgAndFg(0.2),
         },
-        bg: colors.bg,
-        shadow: shadowHelper().dropDown,
         scrollGutter: {
             mobile: globalVars.gutter.size * 2,
         },
@@ -80,13 +78,17 @@ export const navigationManagerVariables = useThemeCache(() => {
 
     const states = makeThemeVars("states", {
         hover: {
-            bg: colors.fg.fade(.05),
+            bg: colors.fg.fade(0.05),
         },
         focus: {
-            bg: colors.fg.fade(.05),
+            bg: colors.fg.fade(0.05),
         },
         active: {
-            bg: colors.fg.fade(.08),
+            bg: colors.fg.fade(0.08),
+        },
+        dragged: {
+            bg: globalVars.mainColors.bg,
+            shadow: `0 5px 10px 0 rgba(0, 0, 0, 0.3)`,
         },
     });
 
@@ -154,19 +156,20 @@ export const navigationManagerClasses = useThemeCache(() => {
     const item = style("item", {
         border: important(0),
         outline: important("none"),
+        ...userSelect("none"),
         $nest: {
             ...media.oneColumn({
                 width: calc(`100% + ${unit(globalVars.gutter.size)}`),
             }).$nest,
-            "&&.isDragging": {
+            "&&&.isDragging": {
                 minWidth: unit(300),
-                opacity: .5,
+                opacity: 1,
                 $nest: {
                     "& .navigationManager-draggable": {
-                        ...shadows.embed(),
+                        boxShadow: vars.states.dragged.shadow,
                         ...borders(vars.dragging.border),
-                        backgroundColor: colorOut(vars.dragging.bg),
                         fontWeight: vars.dragging.fontWeight,
+                        backgroundColor: colorOut(vars.states.dragged.bg),
                     },
                 },
             },
