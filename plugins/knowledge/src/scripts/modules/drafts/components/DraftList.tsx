@@ -5,11 +5,10 @@
  */
 
 import * as React from "react";
-import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import Paragraph from "@library/layout/Paragraph";
 import DraftPreview from "@knowledge/modules/drafts/components/DraftPreview";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import ResultList from "@library/result/ResultList";
 
 interface IProps {
     className?: string;
@@ -21,22 +20,13 @@ interface IProps {
  */
 export default class DraftsList extends React.Component<IProps> {
     public render() {
-        const { data, className } = this.props;
-        const Tag = data.length > 0 ? `ul` : `div`;
-        let content;
-
-        if (data.length > 0) {
-            content = data.map((result, i) => {
-                return <DraftPreview {...result} key={`draftPreview-${i}`} />;
-            });
-        } else {
-            content = <Paragraph className="draftList-noResults">{t("You do not have any drafts.")}</Paragraph>;
-        }
-
         return (
-            <div className="draftList">
-                <Tag className={classNames("draftList-list", className)}>{content}</Tag>
-            </div>
+            <ResultList
+                results={this.props.data}
+                result={DraftPreview}
+                emptyMessage={t("You do not have any drafts.")}
+                className={this.props.className}
+            />
         );
     }
 }

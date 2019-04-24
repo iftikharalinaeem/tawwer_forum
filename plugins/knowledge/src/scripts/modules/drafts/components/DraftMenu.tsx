@@ -15,6 +15,7 @@ import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import classNames from "classnames";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;
@@ -49,7 +50,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
                     renderLeft={true}
                     buttonRef={this.toggleButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
-                    className="draftPreview-actions"
+                    className={classNames("draftPreview-actions", this.props.className)}
                     paddedList={true}
                 >
                     <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
