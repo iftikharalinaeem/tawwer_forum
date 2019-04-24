@@ -372,7 +372,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             $moveToAnotherParent = (is_int($body['parentID'] ?? false) && ($body['parentID'] != $previousState['parentID']));
 
             if (!isset($body['sort'])) {
-                if ($moveToAnotherParent || !($previousState['sort'] ?? false)) {
+                if ($moveToAnotherParent || !is_int($previousState['sort'])) {
                     $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($body['parentID'] ?? $previousState['parentID']);
                     $maxSortIndex = $sortInfo['maxSort'];
                     $body['sort'] = $maxSortIndex + 1;
