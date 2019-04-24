@@ -71,7 +71,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         return (
             <>
-                <Splash action={splashAction} backgroundImage={bannerImage} title={knowledgeBase.name} />
+                <Splash action={splashAction} outerBackgroundImage={bannerImage} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <VanillaHeader />
