@@ -60,6 +60,7 @@ class CategoryPage extends KbPage {
 
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_CATEGORY_RESPONSE, Data::box($category)));
+        $this->preloadNavigation($category['knowledgeBaseID']);
     }
 
     /**
