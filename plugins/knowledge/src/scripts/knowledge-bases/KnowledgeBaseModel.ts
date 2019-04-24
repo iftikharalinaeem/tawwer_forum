@@ -124,6 +124,7 @@ export interface IKnowledgeBase {
     urlCode: string;
     url: string;
     icon: string;
+    bannerImage: string;
     sourceLocale: string;
     viewType: KbViewType;
     rootCategoryID: number;
