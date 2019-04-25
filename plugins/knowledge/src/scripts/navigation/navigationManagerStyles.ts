@@ -31,7 +31,7 @@ export const navigationManagerVariables = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.bold,
         border: {
             radius: 2,
-            color: globalVars.mixBgAndFg(.2),
+            color: globalVars.mixBgAndFg(0.2),
         },
         bg: colors.bg,
         shadow: shadowHelper().dropDown,
@@ -80,13 +80,13 @@ export const navigationManagerVariables = useThemeCache(() => {
 
     const states = makeThemeVars("states", {
         hover: {
-            bg: colors.fg.fade(.05),
+            bg: colors.fg.fade(0.05),
         },
         focus: {
-            bg: colors.fg.fade(.05),
+            bg: colors.fg.fade(0.05),
         },
         active: {
-            bg: colors.fg.fade(.08),
+            bg: colors.fg.fade(0.08),
         },
     });
 
@@ -160,7 +160,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             }).$nest,
             "&&.isDragging": {
                 minWidth: unit(300),
-                opacity: .5,
+                opacity: 0.5,
                 $nest: {
                     "& .navigationManager-draggable": {
                         ...shadows.embed(),

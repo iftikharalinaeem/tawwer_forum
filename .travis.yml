@@ -35,6 +35,7 @@ jobs:
         - yarn build -i
         - yarn check-types
         - yarn test
+        - yarn prettier --check "src/scripts/**/*"
 
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
