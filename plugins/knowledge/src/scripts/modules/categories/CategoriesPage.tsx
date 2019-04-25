@@ -30,29 +30,23 @@ export function CategoriesPage(props: IProps) {
     const { articles, category, pages, requestArticles, requestCategory } = props;
     const { page } = props.match.params;
 
-    const id = useMemo(
-        () => {
-            const parsedID = parseInt(props.match.params.id, 10);
-            if (Number.isNaN(parsedID)) {
-                return null;
-            } else {
-                return parsedID;
-            }
-        },
-        [props.match.params.id],
-    );
+    const id = useMemo(() => {
+        const parsedID = parseInt(props.match.params.id, 10);
+        if (Number.isNaN(parsedID)) {
+            return null;
+        } else {
+            return parsedID;
+        }
+    }, [props.match.params.id]);
 
-    useEffect(
-        () => {
-            if (id === null) {
-                return;
-            }
+    useEffect(() => {
+        if (id === null) {
+            return;
+        }
 
-            void requestArticles(id, page);
-            void requestCategory(id);
-        },
-        [id, page],
-    );
+        void requestArticles(id, page);
+        void requestCategory(id);
+    }, [id, page]);
 
     // Handle errors
     if (id === null) {
