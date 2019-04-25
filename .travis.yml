@@ -32,10 +32,10 @@ jobs:
       env:
         - TEST_FILE_ROOTS=(plugins/knowledge)
       script:
-        - yarn build -i
+        - yarn prettier --check "src/scripts/**/*"
         - yarn check-types
         - yarn test
-        - yarn prettier --check "src/scripts/**/*"
+        - yarn build -i
 
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
