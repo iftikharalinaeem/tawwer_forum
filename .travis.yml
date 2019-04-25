@@ -55,7 +55,9 @@ install:
 cache:
   directories:
     - $HOME/.composer/cache/files
-    - $HOME/.cache/yarn
+    - $TRAVIS_BUILD_DIR/vanilla/node_modules
+    - $TRAVIS_BUILD_DIR/vanilla/plugins/rich-editor/node_modules
+  yarn: true
 
 notifications:
   hipchat:
