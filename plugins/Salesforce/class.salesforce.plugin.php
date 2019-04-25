@@ -951,20 +951,27 @@ class SalesforcePlugin extends Gdn_Plugin {
         // check if connected to salesforce
         if ($salesforce->isConnected()) {
 
-            // add new contact
-            $contactData = [
-                'FirstName' => $fields['Name'],
-                'LastName' => 'Test444444 last name',
-                'Email' => $fields['Email'],
-                'LeadSource' => 'Vanilla',
-            ];
-
             $contact = $salesforce->findContact($fields['Email']);
             if (!$contact['Id']) {
+                // add new contact
+                $contactData = [
+                    'FirstName' => $fields['Name'],
+                    'LastName' => 'Test444444 last name',
+                    'Email' => $fields['Email'],
+                    'LeadSource' => 'Vanilla',
+                ];
+
                 $sender->EventArguments['ContactData'] = &$contactData;
                 $sender->fireEvent('CreateSalesforceContact');
                 $salesforce->createContact($contactData);
             } else {
+                // update contact
+                $contactData = [
+                    'FirstName' => $fields['Name'],
+                    'LastName' => 'THIS_FIELD_IS_UPDATED',
+                    'Email' => $fields['Email'],
+                ];
+
                 $sender->EventArguments['ContactData'] = &$contactData;
                 $sender->fireEvent('UpdateSalesforceContact');
                 $salesforce->updateContact($contactData,$contact['Id']);

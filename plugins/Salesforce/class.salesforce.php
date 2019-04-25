@@ -346,7 +346,7 @@ class Salesforce {
      * @throws Gdn_UserException
      */
     public function updateObject($object, array $fields, $id) {
-        $response = $this->request('sobjects/'.$object.'/'.$id.'/', json_encode($fields), false, 'PATCH');
+        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
 
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
@@ -514,9 +514,9 @@ class Salesforce {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
 
-//        var_dump($url);
-//        var_dump($post);
-//        var_dump($method);
+        var_dump($url);
+        var_dump($post);
+        var_dump($method);
 
         $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
 
