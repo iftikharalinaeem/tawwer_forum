@@ -346,12 +346,14 @@ class Salesforce {
      * @throws Gdn_UserException
      */
     public function updateObject($object, array $fields, $id) {
+        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
         $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
 
-        if (isset($response['Response']['success'])) {
-            return $response['Response']['id'];
+        // PATCH requests to salesforce return 204 on success and no message.
+        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
+            return true;
         }
-        throw new Gdn_UserException($response['Response'][0]['message']);
+        throw new Gdn_UserException(t('Failed to update your User info to Salesforce.'));
     }
 
     /**
