@@ -19,8 +19,10 @@ jobs:
         - composer self-update
         - composer install --optimize-autoloader
       script:
-          - ./vendor/bin/phpunit --exclude-group=large
-          - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
+        - set -e
+        - ./vendor/bin/phpunit --exclude-group=large
+        - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
+        - set +e
       env:
           - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
   # Frontend JS Job
@@ -32,10 +34,12 @@ jobs:
       env:
         - TEST_FILE_ROOTS=(plugins/knowledge)
       script:
-        - yarn prettier --check "src/scripts/**/*"
+        - set -e
+        - yarn prettier --check "plugins/knowledge/src/scripts/**/*"
         - yarn check-types
         - yarn test
         - yarn build -i
+        - set +e
 
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
@@ -44,6 +48,9 @@ install:
   - ./travis/install.sh
   - cd vanilla
   - yarn install --pure-lockfile
+  - cd plugins/knowledge
+  - yarn install --pure-lockfile
+  - cd ../..
 
 cache:
   directories:
