@@ -244,6 +244,22 @@ class Salesforce {
     }
 
     /**
+     * Update a new Contact Object in Salesforce
+     *
+     * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_contact.htm
+     * @see Salesforce::ValidateContact
+     * @param array $contact
+     * @return string ContactID
+     * @throws Gdn_UserException
+     */
+    public function updateContact(array $contact, $id) {
+        if ($this->validateContact($contact) === true) {
+            return $this->updateObject('Contact', $contact, $id);
+        }
+        throw new Gdn_UserException('Update Contact: Required Fields Missing: '.print_r($this->validateContact($contact)));
+    }
+
+    /**
      * @param array $contact
      * @return array|bool True or array of missing required fields
      */
@@ -316,7 +332,7 @@ class Salesforce {
      * @throws Gdn_UserException
      */
     public function createObject($object, array $fields) {
-        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields), true, 'POST');
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
         }
@@ -324,15 +340,14 @@ class Salesforce {
     }
 
     /**
-     * ...
-     *
      * @param $object
      * @param array $fields
      * @return mixed
      * @throws Gdn_UserException
      */
     public function updateObject($object, array $fields, $id) {
-        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
+        $response = $this->request('sobjects/'.$object.'/'.$id.'/', json_encode($fields), false, 'PATCH');
+
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
         }
@@ -484,7 +499,7 @@ class Salesforce {
      *
      * @see http://www.salesforce.com/us/developer/docs/api_rest/
      */
-    public function request($path, $post = false, $cache = true) {
+    public function request($path, $post = false, $cache = true, $method = 'GET') {
         $url = $this->InstanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
         $cacheKey = 'Salesforce.Request'.md5($url);
 
@@ -498,7 +513,15 @@ class Salesforce {
         if (!$this->AccessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
-        $httpResponse = $this->httpRequest($url, $post, 'application/json');
+
+//        var_dump($url);
+//        var_dump($post);
+//        var_dump($method);
+
+        $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
+
+        var_dump($httpResponse);
+
         $contentType = $httpResponse['ContentType'];
         Gdn::controller()->setJson('Type', $contentType);
         if (strpos($contentType, 'application/json') !== false) {
@@ -531,20 +554,21 @@ class Salesforce {
      *    [ContentType] - HTTP Content Type
      * @throws Exception
      */
-    public function httpRequest($url, $post = false, $requestContentType = null) {
+    public function httpRequest($url, $post = false, $requestContentType = null, $method = 'GET') {
         $proxy = new ProxyRequest();
         $options['URL'] = $url;
-        $options['Method'] = 'GET';
+        $options['Method'] = $method;
         $options['ConnectTimeout'] = 10;
         $options['Timeout'] = 10;
         $queryParams = null;
         if (!empty($requestContentType)) {
             $headers['Content-Type'] = $requestContentType;
         }
-        if ($post) {
-            $options['Method'] = 'POST';
+
+        if ($post || $method === 'PATCH') {
             $queryParams = $post;
         }
+
         $headers['Authorization'] = 'OAuth '.$this->AccessToken;
         trace('Salesforce Request - '.$options['Method'].' : '.$url);
 

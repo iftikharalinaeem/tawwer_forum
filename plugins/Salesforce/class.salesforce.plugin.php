@@ -958,9 +958,17 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'Email' => $fields['Email'],
                 'LeadSource' => 'Vanilla',
             ];
-            $sender->EventArguments['ContactData'] = &$contactData;
-            $sender->fireEvent('CreateSalesforceContact');
-            $salesforce->createContact($contactData);
+
+            $contact = $salesforce->findContact($fields['Email']);
+            if (!$contact['Id']) {
+                $sender->EventArguments['ContactData'] = &$contactData;
+                $sender->fireEvent('CreateSalesforceContact');
+                $salesforce->createContact($contactData);
+            } else {
+                $sender->EventArguments['ContactData'] = &$contactData;
+                $sender->fireEvent('UpdateSalesforceContact');
+                $salesforce->updateContact($contactData,$contact['Id']);
+            }
         } else {
             $this->loginModal($sender);
             return;
