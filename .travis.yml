@@ -36,9 +36,9 @@ jobs:
       script:
         - set -e
         - yarn prettier --check "plugins/knowledge/src/scripts/**/*"
+        - yarn build -i
         - yarn check-types
         - yarn test
-        - yarn build -i
         - set +e
 
 install:
