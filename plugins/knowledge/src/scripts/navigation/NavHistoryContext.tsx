@@ -54,14 +54,11 @@ interface IUpdaterProps {
 
 export function NavHistoryUpdater(props: IUpdaterProps) {
     const { setLastKbID } = useNavHistory();
-    useEffect(
-        () => {
-            if (props.lastKbID != null) {
-                setLastKbID(props.lastKbID);
-            }
-        },
-        [props.lastKbID],
-    );
+    useEffect(() => {
+        if (props.lastKbID != null) {
+            setLastKbID(props.lastKbID);
+        }
+    }, [props.lastKbID]);
 
     return null;
 }

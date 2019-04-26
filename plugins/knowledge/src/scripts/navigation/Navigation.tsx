@@ -40,23 +40,17 @@ export function Navigation(props: IProps) {
     /**
      * Fetch navigation data when the component is mounted.
      */
-    useEffect(
-        () => {
-            if (props.navItems.status === LoadStatus.PENDING) {
-                void props.requestNavigation();
-            }
-        },
-        [props.navItems.status],
-    );
+    useEffect(() => {
+        if (props.navItems.status === LoadStatus.PENDING) {
+            void props.requestNavigation();
+        }
+    }, [props.navItems.status]);
 
-    useEffect(
-        () => {
-            if (props.knowledgeBase.status === LoadStatus.PENDING) {
-                props.requestKnowledgeBase();
-            }
-        },
-        [props.knowledgeBase.status],
-    );
+    useEffect(() => {
+        if (props.knowledgeBase.status === LoadStatus.PENDING) {
+            props.requestKnowledgeBase();
+        }
+    }, [props.knowledgeBase.status]);
 
     if (!knowledgeBase.data || !navItems.data) {
         return null;
