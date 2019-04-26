@@ -7,14 +7,13 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent, color, calc } from "csx";
+import { important, percent, calc } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
