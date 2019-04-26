@@ -7,14 +7,13 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent, color, calc } from "csx";
+import { important, percent, calc } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -33,8 +32,6 @@ export const navigationManagerVariables = useThemeCache(() => {
             radius: 2,
             color: globalVars.mixBgAndFg(0.2),
         },
-        bg: colors.bg,
-        shadow: shadowHelper().dropDown,
         scrollGutter: {
             mobile: globalVars.gutter.size * 2,
         },
@@ -87,6 +84,10 @@ export const navigationManagerVariables = useThemeCache(() => {
         },
         active: {
             bg: colors.fg.fade(0.08),
+        },
+        dragged: {
+            bg: globalVars.mainColors.bg,
+            shadow: `0 5px 10px 0 rgba(0, 0, 0, 0.3)`,
         },
     });
 
@@ -154,19 +155,20 @@ export const navigationManagerClasses = useThemeCache(() => {
     const item = style("item", {
         border: important(0),
         outline: important("none"),
+        ...userSelect("none"),
         $nest: {
             ...media.oneColumn({
                 width: calc(`100% + ${unit(globalVars.gutter.size)}`),
             }).$nest,
-            "&&.isDragging": {
+            "&&&.isDragging": {
                 minWidth: unit(300),
-                opacity: 0.5,
+                opacity: 0.65,
                 $nest: {
                     "& .navigationManager-draggable": {
-                        ...shadows.embed(),
+                        boxShadow: vars.states.dragged.shadow,
                         ...borders(vars.dragging.border),
-                        backgroundColor: colorOut(vars.dragging.bg),
                         fontWeight: vars.dragging.fontWeight,
+                        backgroundColor: colorOut(vars.states.dragged.bg),
                     },
                 },
             },

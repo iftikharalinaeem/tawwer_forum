@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import Tree, {
+import {
     IRenderItemParams,
     ITreeData,
     ITreeDestinationPosition,
@@ -12,6 +12,7 @@ import Tree, {
     ITreeSourcePosition,
     moveItemOnTree,
     mutateTree,
+    IDragUpdate,
 } from "@atlaskit/tree";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -39,6 +40,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { PublishStatus } from "@library/@types/api/core";
+import CombineAwareTree from "@knowledge/navigation/CombineAwareTree";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -56,6 +58,7 @@ interface IState {
     writeMode: boolean;
     elementToFocusOnDeleteClose: HTMLButtonElement | null;
     dragging: boolean;
+    allowCombining: boolean;
 }
 
 export class NavigationManager extends React.Component<IProps, IState> {
@@ -72,6 +75,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
         writeMode: false,
         elementToFocusOnDeleteClose: null,
         dragging: false,
+        allowCombining: true,
     };
 
     /**
@@ -99,16 +103,17 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     aria-describedby={this.props.describedBy}
                     onKeyDown={this.handleKeyDown}
                 >
-                    <Tree
+                    <CombineAwareTree
                         tree={this.state.treeData}
                         onDragEnd={this.onDragEnd}
                         onDragStart={this.onDragStart}
+                        onDragUpdate={this.onDragUpdate}
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
                         isDragEnabled={!this.state.disabled}
                         offsetPerLevel={24}
-                        isNestingEnabled={true}
+                        isNestingEnabled={this.state.allowCombining}
                     />
                 </div>
                 {this.renderNewCategoryModal()}
@@ -122,6 +127,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
+
         const hasChildren = item.children && item.children.length > 0;
         const deleteHandler = (focusButton: HTMLButtonElement) => {
             this.setState({ elementToFocusOnDeleteClose: focusButton });
@@ -539,6 +545,14 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private enableTree = () => {
         this.setState({ disabled: false });
+    };
+
+    private onDragUpdate = (update: IDragUpdate) => {
+        const isHoveringArticle = update.combine && update.combine.draggableId.startsWith("article");
+        const newAllowCombining = !isHoveringArticle;
+        if (newAllowCombining !== this.state.allowCombining) {
+            this.setState({ allowCombining: newAllowCombining });
+        }
     };
 
     /**

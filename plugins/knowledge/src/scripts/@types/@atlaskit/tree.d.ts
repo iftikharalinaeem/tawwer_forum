@@ -5,7 +5,7 @@
  */
 
 declare module "@atlaskit/tree" {
-    import { DraggableStateSnapshot, DraggableProvided } from "react-beautiful-dnd";
+    import { DraggableStateSnapshot, DraggableProvided, DragUpdate } from "react-beautiful-dnd";
     export { DraggableStateSnapshot, DraggableProvided };
 
     export type Path = number[];
@@ -64,11 +64,14 @@ declare module "@atlaskit/tree" {
         snapshot: DraggableStateSnapshot;
     }
 
-    interface ITreeProps<T> {
+    export type IDragUpdate = DragUpdate;
+
+    export interface ITreeProps<T> {
         tree: ITreeData<T>;
         onExpand?(itemID: string): void;
         onCollapse?(itemID: string): void;
         onDragStart?(source: ITreeSourcePosition): void;
+        onDragUpdate?: (update: DragUpdate) => void;
         onDragEnd?(source: ITreeSourcePosition, destination?: ITreeDestinationPosition): void;
         renderItem(params: IRenderItemParams<T>): void;
         offsetPerLevel?: number;
@@ -76,5 +79,7 @@ declare module "@atlaskit/tree" {
         isNestingEnabled?: boolean;
     }
 
-    export default class Tree<T> extends React.Component<ITreeProps<T>> {}
+    export default class Tree<T> extends React.Component<ITreeProps<T>> {
+        protected onDragUpdate(update: IDragUpdate): void;
+    }
 }
