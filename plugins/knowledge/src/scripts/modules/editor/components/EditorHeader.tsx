@@ -109,7 +109,11 @@ export class EditorHeader extends React.Component<IProps, IState> {
                         title={this.props.callToAction}
                         disabled={!this.props.canSubmit}
                         baseClass={ButtonTypes.TEXT}
-                        className={classNames("editorHeader-publish", "buttonNoHorizontalPadding", "buttonNoBorder")}
+                        className={classNames(
+                            "buttonNoHorizontalPadding",
+                            "buttonNoBorder",
+                            classesEditorHeader.publish,
+                        )}
                     >
                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                     </Button>

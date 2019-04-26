@@ -67,6 +67,7 @@ export const editorHeaderClasses = useThemeCache(() => {
     const publish = style("publish", {
         color: colorOut(globalVars.mainColors.primary),
         fontWeight: globalVars.fonts.weights.semiBold,
+        whiteSpace: "nowrap",
     });
 
     const otherLanguagesToggle = style("otherLanguagesToggle", {
