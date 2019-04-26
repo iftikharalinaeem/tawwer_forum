@@ -6,7 +6,7 @@
 import Navigation from "@knowledge/navigation/Navigation";
 import { t } from "@library/utility/appUtils";
 import Loader from "@library/loaders/Loader";
-import VanillaHeader from "@library/headers/VanillaHeader";
+import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
@@ -38,7 +38,7 @@ export default function NavigationLoadingLayout(props: IProps) {
 
     return (
         <Container>
-            <VanillaHeader title={t("Loading")} mobileDropDownContent={navigation} />
+            <TitleBar title={t("Loading")} mobileDropDownContent={navigation} />
             <PanelLayout
                 leftBottom={<PanelWidget>{navigation}</PanelWidget>}
                 breadcrumbs={
