@@ -10,7 +10,6 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
-import VanillaHeader from "@library/headers/VanillaHeader";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
@@ -22,6 +21,7 @@ import ArticleReactions from "@knowledge/modules/article/components/ArticleReact
 import { IArticle } from "@knowledge/@types/api/article";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
+import TitleBar from "@library/headers/TitleBar";
 
 /**
  * Implements the article's layout
@@ -41,7 +41,7 @@ export class ArticleLayout extends React.Component<IProps> {
 
         return (
             <Container>
-                <VanillaHeader
+                <TitleBar
                     isFixed={true}
                     title={title}
                     mobileDropDownContent={

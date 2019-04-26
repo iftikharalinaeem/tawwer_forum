@@ -12,7 +12,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import VanillaHeader from "@library/headers/VanillaHeader";
+import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
@@ -70,7 +70,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
 
         return (
             <Container>
-                <VanillaHeader
+                <TitleBar
                     title={category.name}
                     mobileDropDownContent={
                         <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />

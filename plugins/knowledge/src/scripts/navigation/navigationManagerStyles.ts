@@ -14,7 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
