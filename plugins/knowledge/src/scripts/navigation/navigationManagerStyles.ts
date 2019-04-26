@@ -163,7 +163,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             }).$nest,
             "&&&.isDragging": {
                 minWidth: unit(300),
-                opacity: 1,
+                opacity: 0.65,
                 $nest: {
                     "& .navigationManager-draggable": {
                         boxShadow: vars.states.dragged.shadow,
