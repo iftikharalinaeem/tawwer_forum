@@ -16,7 +16,6 @@ import {
     placeholderStyles,
     pointerEvents,
     sticky,
-    textInputSizing,
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -24,6 +23,7 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import {textInputSizingFromSpacing} from "@library/styles/styleHelpers";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -54,10 +54,9 @@ export const editorFormClasses = useThemeCache(() => {
     const title = style("title", {
         $nest: {
             "&.inputText, &&": {
-                ...textInputSizing(
-                    vars.title.height,
+                ...textInputSizingFromSpacing(
                     vars.title.fontSize,
-                    globalVars.gutter.half,
+                    0,
                     formElementVars.border.fullWidth,
                 ),
                 color: colorOut(formElementVars.colors.fg),
