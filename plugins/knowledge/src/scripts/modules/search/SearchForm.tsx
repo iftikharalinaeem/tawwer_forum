@@ -12,7 +12,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
 import SearchOption from "@library/features/search/SearchOption";
-import VanillaHeader from "@library/headers/VanillaHeader";
+import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { withDevice, Devices } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
@@ -55,7 +55,7 @@ class SearchForm extends React.Component<IProps, IState> {
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <VanillaHeader title={t("Search")} />
+                <TitleBar title={t("Search")} />
                 <Container>
                     <QueryString value={this.props.form} defaults={SearchPageModel.INITIAL_FORM} />
                     <PanelLayout

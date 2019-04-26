@@ -9,7 +9,7 @@ import ErrorMessage, {
     IErrorMessageProps,
     messageFromErrorCode,
 } from "@knowledge/modules/common/ErrorMessage";
-import VanillaHeader from "@library/headers/VanillaHeader";
+import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
@@ -27,7 +27,7 @@ export class ErrorPage extends React.Component<IProps> {
 
         return (
             <DocumentTitle title={message}>
-                <VanillaHeader />
+                <TitleBar />
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>

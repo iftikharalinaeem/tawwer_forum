@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
@@ -21,14 +21,13 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
-import { calc, percent, px, viewHeight, important } from "csx";
+import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { borders } from "@library/styles/styleHelpers";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
     const layoutVars = layoutVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
@@ -51,8 +50,6 @@ export const editorFormClasses = useThemeCache(() => {
         minHeight: layoutVars.gutter.size,
         width: percent(100),
     });
-
-    const iconWrap = classesRichEditor.iconWrap;
 
     const title = style("title", {
         $nest: {
@@ -142,7 +139,6 @@ export const editorFormClasses = useThemeCache(() => {
         });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
-        // borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
         top: headerVars.sizing.height,
         zIndex: 2,
         background: colorOut(vars.colors.bg),

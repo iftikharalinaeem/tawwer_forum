@@ -14,7 +14,6 @@ import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import VanillaHeader from "@library/headers/VanillaHeader";
 import { compose } from "@library/icons/header";
 import Container from "@library/layout/components/Container";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
@@ -28,6 +27,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import TitleBar from "@library/headers/TitleBar";
 
 /**
  * Component representing the the full home page of a help center.
@@ -74,7 +74,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <Splash action={splashAction} outerBackgroundImage={bannerImage} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <VanillaHeader />
+                        <TitleBar />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}

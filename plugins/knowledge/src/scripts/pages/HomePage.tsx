@@ -21,7 +21,7 @@ import React from "react";
 import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import VanillaHomeHeader from "@library/headers/VanillaHomeHeader";
+import VanillaHomeHeader from "@library/headers/TitleBarHome";
 
 export class HomePage extends React.Component<IProps> {
     public render() {

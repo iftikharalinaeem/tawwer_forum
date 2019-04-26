@@ -6,7 +6,7 @@
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { unit, colorOut } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { margins } from "@library/styles/styleHelpers";
@@ -14,7 +14,7 @@ import { em, percent, px } from "csx";
 
 export const editorHeaderClasses = useThemeCache(() => {
     const style = styleFactory("editorHeader");
-    const headerVariables = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
@@ -26,10 +26,10 @@ export const editorHeaderClasses = useThemeCache(() => {
             justifyContent: "flex-end",
             alignItems: "center",
             width: percent(100),
-            height: unit(headerVariables.sizing.height),
+            height: unit(titleBarVars.sizing.height),
         },
         mediaQueries.oneColumn({
-            height: unit(headerVariables.sizing.mobile.height),
+            height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
