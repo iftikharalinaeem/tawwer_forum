@@ -256,7 +256,13 @@ class Salesforce {
         if ($this->validateContact($contact) === true) {
             return $this->updateObject('Contact', $contact, $id);
         }
-        throw new Gdn_UserException('Update Contact: Required Fields Missing: '.print_r($this->validateContact($contact)));
+        // error
+        Logger::event(
+            'salesforce_failure',
+            Logger::ERROR,
+            'Update Contact: Required Fields Missing: '.print_r($this->validateContact($contact)),
+            [(array)$contact, $id]
+        );
     }
 
     /**
@@ -351,7 +357,7 @@ class Salesforce {
 
         // PATCH requests to salesforce return 204 on success and no message.
         if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
-            return true;
+            return $response['Response']['id'];
         }
         throw new Gdn_UserException(t('Failed to update your User info to Salesforce.'));
     }
@@ -515,14 +521,14 @@ class Salesforce {
         if (!$this->AccessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
-
-        var_dump($url);
-        var_dump($post);
-        var_dump($method);
+//
+//        var_dump($url);
+//        var_dump($post);
+//        var_dump($method);
 
         $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
 
-        var_dump($httpResponse);
+//        var_dump($httpResponse);
 
         $contentType = $httpResponse['ContentType'];
         Gdn::controller()->setJson('Type', $contentType);
@@ -850,6 +856,32 @@ class Salesforce {
      */
     public function setInstanceUrl($instanceUrl) {
         $this->InstanceUrl = $instanceUrl;
+    }
+
+    public function getFields($object) {
+        $salesforceFields = [];
+        $path = 'sobjects/'.$object.'/describe';
+        $response = $this->request($path);
+
+        //error
+        if ($response['HttpCode'] != 200) {
+            trace('Salesforce Request - GET : '.$path);
+        }
+
+        $fields = valr('Response.fields', $response, []);
+        foreach ($fields as $field) {
+            $name = val('name', $field);
+            $salesforceFields[$name] = [
+                'name' => $field['name'],
+                'label' => $field['label'],
+                'type' => $field['type'],
+                'length' => $field['length'],
+                'defaultValue' => $field['defaultValue'],
+                'picklistValue' => $field['picklistValues'],
+                'inlinehelptext' => $field['inlineHelpText'],
+            ];
+        }
+        return $salesforceFields;
     }
 
 }

@@ -32,6 +32,21 @@ class SalesforcePlugin extends Gdn_Plugin {
      */
     const ProviderKey = 'Salesforce';
 
+    const defaultContactFields = [
+        [   "Name" => "Birthdate",
+            "SalesForceID" => "Birthdate"
+        ],
+        [   "Name" => "Languages",
+            "SalesForceID" => "Languages"
+        ],
+        [   "Name" => "Phone",
+            "SalesForceID" => "Phone"
+        ],
+        [   "Name" => "Title",
+            "SalesForceID" => "Title"
+        ]
+    ];
+
     /** @var SsoUtils */
     private $ssoUtils;
 
@@ -268,7 +283,8 @@ class SalesforcePlugin extends Gdn_Plugin {
             'DashboardConnection' => c('Plugins.Salesforce.DashboardConnection.Enabled'),
             'DashboardConnectionProfile' => false,
             'DashboardConnectionToken' => c('Plugins.Salesforce.DashboardConnection.Token', false),
-            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false)
+            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false),
+            'SyncUsers' => c('Plugins.Salesforce.SyncUsers', false)
         ]);
         if (c('Plugins.Salesforce.DashboardConnection.LoginId') && c('Plugins.Salesforce.DashboardConnection.Enabled')) {
 //         $Salesforce->useDashboardConnection();
@@ -282,6 +298,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Plugins.Salesforce.ApplicationID',
             'Plugins.Salesforce.Secret',
             'Plugins.Salesforce.AuthenticationUrl',
+            'Plugins.Salesforce.SyncUsers.Enabled'
         ]);
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
@@ -292,6 +309,12 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $formValues = $sender->Form->formValues();
             if ($sender->Form->isPostBack()) {
+                saveToConfig('Plugins.Salesforce.SyncUsers.Enabled', (boolean)$formValues['Plugins.Salesforce.SyncUsers.Enabled']);
+
+                if($formValues['Plugins.Salesforce.SyncUsers.Enabled']) {
+                    //TODO: pull custom fields and maps
+                }
+
                 $sender->Form->validateRule('Plugins.Salesforce.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
                 $sender->Form->validateRule('Plugins.Salesforce.Secret', 'function:ValidateRequired', 'Secret is required');
                 $sender->Form->validateRule('Plugins.Salesforce.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
@@ -686,7 +709,44 @@ class SalesforcePlugin extends Gdn_Plugin {
         $sender->Form->setData($data);
         $sender->setData('Data', $data);
         $sender->render('createcase', '', 'plugins/Salesforce');
+    }
 
+
+    /**
+     * Create an array of Fields and their properties from the according objects in Salesforce.
+     *
+     * @param array $availableSalesforceFields All the Fields for an object that are available on Salesforce.
+     * @param array $objectFields Names of Fields input by the user in the settings form.
+     * @return array|string Nested array of valid Salesforce Fields with Field Names as keys or string, Field Name if there is a field that does not exist on Salesforce.
+     */
+    public function mapAvailableFields($availableSalesforceFields, $objectFields) {
+        $salesForceCaseFields = [];
+        // $objectFields are the configurable Fields (Custom, Sub-Forum, Category, URL and Language)
+        foreach ($objectFields as $fieldName => $fieldValue) {
+            // A field in the settings form was left blank.
+            if (!$fieldValue) {
+                continue;
+            }
+
+            if ($fieldName === 'Custom') {
+                $customFields = $this->generateCutomFieldsMap($availableSalesforceFields, $fieldValue);
+                if (!is_array($customFields)) {
+                    return $customFields;
+                }
+                if ($customFields) {
+                    $salesForceCaseFields['Custom'] = $customFields;
+                }
+            } else {
+                // If there is a corresponding field on Salesforce, add it's properties to the array to be saved to the config.
+                if (array_key_exists($fieldValue, $availableSalesforceFields)) {
+                    $salesForceCaseFields[$fieldName] = $availableSalesforceFields[$fieldValue];
+                } else {
+                    return $fieldValue;
+                }
+            }
+        }
+
+        return $salesForceCaseFields;
     }
 
     /**
@@ -944,47 +1004,159 @@ class SalesforcePlugin extends Gdn_Plugin {
         require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Salesforce');
     }
 
-    public function userModel_afterSave_handler($sender, $args) {
-        $salesforce = Salesforce::instance();
-        $fields = $args['FormPostValues'];
+    /**
+     * Add SalesForce ID input
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_beforeCheckbox_handler($sender) {
+        echo '<div class="form-group">';
+        echo    '<div class="label-wrap">';
+        echo        $sender->Form->label('SalesForce ID', 'SalesForceID');
+        echo    '</div>';
+        echo    '<div class="input-wrap">';
+        echo        $sender->Form->textBox('SalesForce ID');
+        echo    '</div>';
+        echo '</div>';
+    }
 
-        // check if connected to salesforce
-        if ($salesforce->isConnected()) {
-
-            $contact = $salesforce->findContact($fields['Email']);
-            if (!$contact['Id']) {
-                // add new contact
-                $contactData = [
-                    'FirstName' => $fields['Name'],
-                    'LastName' => 'Test444444 last name',
-                    'Email' => $fields['Email'],
-                    'LeadSource' => 'Vanilla',
-                ];
-
-                $sender->EventArguments['ContactData'] = &$contactData;
-                $sender->fireEvent('CreateSalesforceContact');
-                $salesforce->createContact($contactData);
-            } else {
-                // update contact
-                $contactData = [
-                    'FirstName' => $fields['Name'],
-                    'LastName' => 'THIS_FIELD_IS_UPDATED',
-                    'Email' => $fields['Email'],
-                ];
-
-                $sender->EventArguments['ContactData'] = &$contactData;
-                $sender->fireEvent('UpdateSalesforceContact');
-                $salesforce->updateContact($contactData,$contact['Id']);
-            }
-        } else {
-            $this->loginModal($sender);
+    /**
+     * Create/Update contact on Salesforce
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterRegister_handler($sender, $args) {
+        //if  SyncUsers is enabled
+        if (!c('Plugins.Salesforce.SyncUsers')) {
             return;
         }
+
+        $this->syncUser($sender, $args['FormPostValues']);
+    }
+
+    /**
+     * Create/Update contact on Salesforce
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterSave_handler($sender, $args) {
+        //if  SyncUsers is enabled
+        if (!c('Plugins.Salesforce.SyncUsers')) {
+            return;
+        }
+
+        $this->syncUser($sender, $args['FormPostValues']);
+    }
+
+    public function syncUser($sender, $formFields) {
+        $salesforce = Salesforce::instance();
+
+        // check if connected to salesforce
+        if (!$salesforce->isConnected()) {
+            $salesforce->reconnect();
+        }
+
+        $salesforceFields = $salesforce->getFields('Contact');
+
+        // if error fetching salesforce fields
+        if (count($salesforceFields) == 0) {
+            Logger::event(
+                'salesforce_failure',
+                Logger::ERROR,
+                'Error getting Contact fields',
+                $salesforceFields
+            );
+
+            return;
+        }
+
+        //error
+        if (count($salesforceFields) == 0) {
+            Logger::event(
+                'salesforce_failure',
+                Logger::ERROR,
+                'Error mapping contact fields',
+                $salesforceFields
+            );
+
+            return;
+        }
+
+        // create contactData
+        $contactData = $this->createContactData($formFields, $salesforceFields);
+        $contact = $salesforce->findContact($formFields['Email']);
+        $sender->EventArguments['ContactData'] = &$contactData;
+
+        if (!$contact['Id']) {
+            // add new contact
+            $sender->fireEvent('CreateSalesforceContact');
+            $salesforce->createContact($contactData);
+        } else {
+            // update contact
+            $sender->fireEvent('UpdateSalesforceContact');
+            $salesforce->updateContact($contactData, $contact['Id']);
+        }
+    }
+
+    /**
+     * Create contact data
+     *
+     * @param array $formFields
+     * @param array $salesforceFields
+     * @return array
+     */
+    private function createContactData($formFields, $salesforceFields) {
+        $contactData = [];
+
+        //unset "Name"
+        unset($formFields["Name"]);
+
+        foreach ($formFields as $field => $fieldValue) {
+
+            if($fieldValue !== "") {
+                //field has SalesforceID ? (SalesforceID is used for custom fields)
+                $fieldID = c('ProfileExtender.Fields.'.$field.'.SalesForceID') ?
+                    c('ProfileExtender.Fields.'.$field.'.SalesForceID') :
+                    $field;
+                // field exists in Salesforce ?
+                if(isset($salesforceFields[$field])) {
+                    $contactData[$fieldID] = $fieldValue;
+                }
+            }
+        }
+
+        //special case for "DateOfBirth"
+        if(isset($formFields["DateFields"])) {
+            $dateOfBirth = $this->validateDateOfBirth($formFields["DateOfBirth_Day"], $formFields["DateOfBirth_Month"], $formFields["DateOfBirth_Year"]);
+            if($dateOfBirth) {
+                $contactData["Birthdate"] = $dateOfBirth;
+            }
+        }
+
+        return $contactData;
+    }
+
+    /**
+     * Validate and sanitize DateOfBirth
+     * @param string $day
+     * @param string $month
+     * @param string $year
+     * @return bool|string
+     */
+    private function validateDateOfBirth($day, $month, $year) {
+        $dateOfBirth = false;
+
+        if($day !== "0" && $month !== "0" && $year !== "0" ) {
+            $dateOfBirth = $year.'-'.$month.'-'.$day;
+        }
+
+        return $dateOfBirth;
     }
 
     public function isConfigured() {
         $salesforce = Salesforce::instance();
         return $salesforce->isConfigured();
     }
-
 }
