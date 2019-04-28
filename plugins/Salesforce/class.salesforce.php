@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
  */
 
 /**
@@ -16,22 +16,22 @@ class Salesforce {
      */
     static $Instance;
 
-    const ProviderKey = 'Salesforce';
+    const PROVIDERKEY = 'Salesforce';
 
     /**
      * @var int time in seconds to cache GET requests; This will help limit you calls to the API for duplicate requests
      */
-    protected $CacheTTL = 300;
+    protected $cacheTTL = 300;
 
     /**
      * @var string OAuth Access Token
      */
-    protected $AccessToken;
+    protected $accessToken;
 
     /**
      * @var String Instance URL Used for API Calls
      */
-    protected $InstanceUrl;
+    protected $instanceUrl;
 
     /**
      * @var string REST API Version
@@ -49,19 +49,19 @@ class Salesforce {
     public function __construct($accessToken = false, $instanceUrl = false) {
         if ($accessToken && $instanceUrl) {
             // We passed in a connection
-            $this->AccessToken = $accessToken;
-            $this->InstanceUrl = $instanceUrl;
+            $this->accessToken = $accessToken;
+            $this->instanceUrl = $instanceUrl;
         } elseif (Gdn::session()->isValid()) {
             // See if user has their own connection established.
             if ($userConnection = val('Salesforce', Gdn::session()->User->Attributes)) {
-                $this->AccessToken = val('AccessToken', $userConnection);
-                $this->InstanceUrl = val('InstanceUrl', $userConnection);
+                $this->accessToken = val('AccessToken', $userConnection);
+                $this->instanceUrl = val('InstanceUrl', $userConnection);
                 $this->RefreshToken = val('RefreshToken', $userConnection);
             }
         }
 
         // Fallback to global dashboard connection.
-        if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->AccessToken) {
+        if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->accessToken) {
             $this->useDashboardConnection();
             $this->DashboardConnection = true;
         }
@@ -84,8 +84,8 @@ class Salesforce {
      */
     public function useDashboardConnection() {
         trace('DashboardConnection');
-        $this->AccessToken = c('Plugins.Salesforce.DashboardConnection.Token');
-        $this->InstanceUrl = c('Plugins.Salesforce.DashboardConnection.InstanceUrl');
+        $this->accessToken = c('Plugins.Salesforce.DashboardConnection.Token');
+        $this->instanceUrl = c('Plugins.Salesforce.DashboardConnection.InstanceUrl');
         $this->RefreshToken = c('Plugins.Salesforce.DashboardConnection.RefreshToken');
     }
 
@@ -306,6 +306,22 @@ class Salesforce {
     }
 
     /**
+     * @param $object
+     * @param array $fields
+     * @return mixed
+     * @throws Gdn_UserException
+     */
+    public function updateObject($object, array $fields, $id) {
+        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
+        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
+        // PATCH requests to salesforce return 204 on success and no message.
+        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
+            return $response['Response']['id'];
+        }
+        throw new Gdn_UserException(t('Failed to update your User info to Salesforce.'));
+    }
+
+    /**
      * @param array $case
      * @return array|bool True or array of missing required fields
      */
@@ -338,28 +354,11 @@ class Salesforce {
      * @throws Gdn_UserException
      */
     public function createObject($object, array $fields) {
-        $response = $this->request('sobjects/'.$object.'/', json_encode($fields), true, 'POST');
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
         }
         throw new Gdn_UserException($response['Response'][0]['message']);
-    }
-
-    /**
-     * @param $object
-     * @param array $fields
-     * @return mixed
-     * @throws Gdn_UserException
-     */
-    public function updateObject($object, array $fields, $id) {
-        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
-        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
-
-        // PATCH requests to salesforce return 204 on success and no message.
-        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
-            return $response['Response']['id'];
-        }
-        throw new Gdn_UserException(t('Failed to update your User info to Salesforce.'));
     }
 
     /**
@@ -401,7 +400,7 @@ class Salesforce {
      * Get User Profile fields.
      *
      * @param string $loginID - id from the Access Tokens after successful OAuth
-     * @return array $profile
+     * @return array|bool $profile
      * @throws Exception
      */
     public function getLoginProfile($loginID) {
@@ -508,7 +507,7 @@ class Salesforce {
      * @see http://www.salesforce.com/us/developer/docs/api_rest/
      */
     public function request($path, $post = false, $cache = true, $method = 'GET') {
-        $url = $this->InstanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
+        $url = $this->instanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
         $cacheKey = 'Salesforce.Request'.md5($url);
 
         if ($cache && !$post) {
@@ -518,18 +517,10 @@ class Salesforce {
                 return $httpResponse;
             }
         }
-        if (!$this->AccessToken) {
+        if (!$this->accessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
-//
-//        var_dump($url);
-//        var_dump($post);
-//        var_dump($method);
-
         $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
-
-//        var_dump($httpResponse);
-
         $contentType = $httpResponse['ContentType'];
         Gdn::controller()->setJson('Type', $contentType);
         if (strpos($contentType, 'application/json') !== false) {
@@ -540,7 +531,7 @@ class Salesforce {
             }
         }
         if ($cache && $httpResponse['HttpCode'] == 200 && !$post) {
-            $cacheTTL = $this->CacheTTL + rand(0, 30);
+            $cacheTTL = $this->cacheTTL + rand(0, 30);
             Gdn::cache()->store($cacheKey, $httpResponse, [
                 Gdn_Cache::FEATURE_EXPIRY => $cacheTTL,
                 Gdn_Cache::FEATURE_COMPRESS => true
@@ -554,7 +545,7 @@ class Salesforce {
      *
      * @param string $url -
      * @param bool|array $post
-     * @param string|bull AccessToken
+     * @param string|bool AccessToken
      * @return array $HttpResponse with the following keys
      *    [HttpCode] - HTTP Status Code
      *    [Response] - HTTP Body
@@ -577,7 +568,7 @@ class Salesforce {
             $queryParams = $post;
         }
 
-        $headers['Authorization'] = 'OAuth '.$this->AccessToken;
+        $headers['Authorization'] = 'OAuth '.$this->accessToken;
         trace('Salesforce Request - '.$options['Method'].' : '.$url);
 
         // log the query params being sent to salesforce
@@ -612,7 +603,7 @@ class Salesforce {
      * @return bool
      */
     public function isConnected() {
-        if (!$this->AccessToken || !$this->InstanceUrl) {
+        if (!$this->accessToken || !$this->instanceUrl) {
             return false;
         }
         return true;
@@ -647,15 +638,15 @@ class Salesforce {
             }
 
             // Update user connection.
-            $profile = valr('Attributes.'.self::ProviderKey.'.Profile', Gdn::session()->User);
+            $profile = valr('Attributes.'.self::PROVIDERKEY.'.Profile', Gdn::session()->User);
             $attributes = [
                 'RefreshToken' => $this->RefreshToken,
                 'AccessToken' => $response['access_token'],
-                'InstanceUrl' => $response['instance_url'],
+                'instanceUrl' => $response['instance_url'],
                 'Profile' => $profile,
             ];
 
-            Gdn::userModel()->saveAttribute(Gdn::session()->UserID, self::ProviderKey, $attributes);
+            Gdn::userModel()->saveAttribute(Gdn::session()->UserID, self::PROVIDERKEY, $attributes);
             $this->setAccessToken($response['access_token']);
             $this->setInstanceUrl($response['instance_url']);
         }
@@ -697,7 +688,6 @@ class Salesforce {
         trace($response);
         if ($response['HttpCode'] == 400) {
             throw new Gdn_UserException('Someone has Revoked your Connection.  Please reconnect manually,');
-            return false;
         }
         if (strpos($response['ContentType'], 'application/json') !== false) {
             $refreshResponse = json_decode($response['Response'], true);
@@ -711,6 +701,7 @@ class Salesforce {
      *
      * @param string $searchField fields that we need to search for.
      * @param string $type salesforce object type.
+     * @throws Gdn_UserException
      * @return bool
      */
     public function salesforceFieldExists(string $searchField = '', string $type = '') {
@@ -846,28 +837,32 @@ class Salesforce {
      * @param $accessToken
      */
     public function setAccessToken($accessToken) {
-        $this->AccessToken = $accessToken;
+        $this->accessToken = $accessToken;
     }
 
     /**
-     * Setter for InstanceUrl.
+     * Setter for instanceUrl.
      *
      * @param $instanceUrl
      */
     public function setInstanceUrl($instanceUrl) {
-        $this->InstanceUrl = $instanceUrl;
+        $this->instanceUrl = $instanceUrl;
     }
 
+    /**
+     * Get Salesforce Object fields
+     *
+     * @param $object
+     * @return array
+     */
     public function getFields($object) {
         $salesforceFields = [];
         $path = 'sobjects/'.$object.'/describe';
         $response = $this->request($path);
-
         //error
         if ($response['HttpCode'] != 200) {
             trace('Salesforce Request - GET : '.$path);
         }
-
         $fields = valr('Response.fields', $response, []);
         foreach ($fields as $field) {
             $name = val('name', $field);
@@ -883,5 +878,4 @@ class Salesforce {
         }
         return $salesforceFields;
     }
-
 }
