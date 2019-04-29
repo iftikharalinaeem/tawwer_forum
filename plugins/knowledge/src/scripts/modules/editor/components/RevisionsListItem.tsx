@@ -45,7 +45,7 @@ export default class RevisionsListItem extends React.Component<IProps> {
                             replace
                         >
                             <div className="itemList-photoFrame">
-                                <img src={photoUrl} className="itemList-photo" alt={`${t("User")+": "}${name}`} />
+                                <img src={photoUrl} className="itemList-photo" alt={`${t("User") + ": "}${name}`} />
                             </div>
                             <div className="itemList-content">
                                 <div className="itemList-userName">{name}</div>
