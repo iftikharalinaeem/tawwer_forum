@@ -26,7 +26,7 @@ export default class LocationPickerItemList extends React.Component<IProps> {
         return (
             <fieldset id={this.props.id} className={classNames("folderContents", classesFolderContents.content)}>
                 <legend ref={this.props.legendRef} tabIndex={-1} className="sr-only">
-                    {t("Contents of folder: " + this.props.categoryName)}
+                    {t("Contents of folder: ") + this.props.categoryName}
                 </legend>
                 <ul className={classNames(inheritHeightClass(), "folderContents-items", classesFolderContents.items)}>
                     {this.props.children}
