@@ -25,7 +25,7 @@ export default class DraftsListItem extends React.Component<IProps> {
         const { dateInserted, insertUser, url } = this.props;
         const classesMetas = metasClasses();
 
-        let name = '('+t("Unknown User") + ')';
+        let name = '(' + t("Unknown User") + ')';
         let photoUrl: string | undefined;
 
         if (insertUser) {
