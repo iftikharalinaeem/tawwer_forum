@@ -38,8 +38,8 @@ echo $this->Form->errors();
         <li class="row form-group">
             <?php
             $SyncUsersLabel = t('SyncUsers.Label', 'Sync users with SalesForce contacts?');
-            $SyncUsersDesc = t('SyncUsers.Desc', 'Creates/updates contacts on SalesForce whenever a user registers/updates his profile');
-            echo $this->Form->toggle('PluginsSalesforce.SyncUsers.Enabled', $SyncUsersLabel, [], $SyncUsersDesc, false);
+            $SyncUsersDesc = t('SyncUsers.Desc', 'Creates/update a contact on SalesForce whenever a user register/update his profile');
+            echo $this->Form->toggle('Plugins.Salesforce.SyncUsers', $SyncUsersLabel, [], $SyncUsersDesc, false);
             ?>
         </li>
     <?php } ?>

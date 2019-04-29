@@ -279,7 +279,8 @@ class SalesforcePlugin extends Gdn_Plugin {
             'DashboardConnection' => c('Plugins.Salesforce.DashboardConnection.Enabled'),
             'DashboardConnectionProfile' => false,
             'DashboardConnectionToken' => c('Plugins.Salesforce.DashboardConnection.Token', false),
-            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false)
+            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false),
+            'Plugins.Salesforce.SyncUsers' => c('Plugins.Salesforce.SyncUsers')
         ]);
         if (c('Plugins.Salesforce.DashboardConnection.LoginId') && c('Plugins.Salesforce.DashboardConnection.Enabled')) {
             $dashboardConnectionProfile = $salesforce->getLoginProfile(c('Plugins.Salesforce.DashboardConnection.LoginId'));
@@ -292,6 +293,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Plugins.Salesforce.ApplicationID',
             'Plugins.Salesforce.Secret',
             'Plugins.Salesforce.AuthenticationUrl',
+            'Plugins.Salesforce.SyncUsers',
         ]);
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
@@ -302,7 +304,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $formValues = $sender->Form->formValues();
             if ($sender->Form->isPostBack()) {
-                saveToConfig('Plugins.Salesforce.SyncUsers.Enabled', (boolean)$formValues['Plugins.Salesforce.SyncUsers.Enabled']);
+                saveToConfig('Plugins.Salesforce.SyncUsers', (boolean)$formValues['Plugins.Salesforce.SyncUsers']);
                 $sender->Form->validateRule('Plugins.Salesforce.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
                 $sender->Form->validateRule('Plugins.Salesforce.Secret', 'function:ValidateRequired', 'Secret is required');
                 $sender->Form->validateRule('Plugins.Salesforce.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
@@ -612,13 +614,9 @@ class SalesforcePlugin extends Gdn_Plugin {
                 //check to see if user is a contact
                 $contact = $salesforce->findContact($formValues['Email']);
                 if (!$contact['Id']) {
-                    //If not a contact then add contact
-                    $contactData = [
-                        'FirstName' => $formValues['FirstName'],
-                        'LastName' => $formValues['LastName'],
-                        'Email' => $formValues['Email'],
-                        'LeadSource' => $formValues['LeadSource'],
-                    ];
+                    //if not a contact then add contact
+                    $contactData = $this->createContactData($formValues);
+
                     $sender->EventArguments['ContactData'] = &$contactData;
                     $sender->fireEvent('CreateSalesforceContact');
                     $contact['Id'] = $salesforce->createContact($contactData);
@@ -1034,29 +1032,10 @@ class SalesforcePlugin extends Gdn_Plugin {
         if (!$salesforce->isConnected()) {
             $salesforce->reconnect();
         }
-        $salesforceFields = $salesforce->getFields('Contact');
-        // if error fetching salesforce fields
-        if (count($salesforceFields) == 0) {
-            Logger::event(
-                'salesforce_failure',
-                Logger::ERROR,
-                'Error getting Contact fields',
-                $salesforceFields
-            );
-            return;
-        }
-        //error
-        if (count($salesforceFields) == 0) {
-            Logger::event(
-                'salesforce_failure',
-                Logger::ERROR,
-                'Error mapping contact fields',
-                $salesforceFields
-            );
-            return;
-        }
+
         // create contactData
-        $contactData = $this->createContactData($formFields, $salesforceFields);
+        $contactData = $this->createContactData($formFields);
+
         $contact = $salesforce->findContact($formFields['Email']);
         $sender->EventArguments['ContactData'] = &$contactData;
         if (!$contact['Id']) {
@@ -1077,7 +1056,9 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param array $salesforceFields
      * @return array
      */
-    private function createContactData($formFields, $salesforceFields) {
+    private function createContactData($formFields) {
+        $salesforceFields = $this->getContactFields();
+
         $contactData = [];
         //unset "Name"
         unset($formFields["Name"]);
@@ -1101,6 +1082,29 @@ class SalesforcePlugin extends Gdn_Plugin {
             }
         }
         return $contactData;
+    }
+
+    /**
+     * Get Contact fields
+     *
+     * @return array|void
+     */
+    private function getContactFields() {
+        $salesforceFields = [];
+        $salesforce = Salesforce::instance();
+        $salesforceFields = $salesforce->getFields('Contact');
+        // if error fetching salesforce fields
+        if (count($salesforceFields) == 0) {
+            Logger::event(
+                'salesforce_failure',
+                Logger::ERROR,
+                'Error getting Contact fields',
+                $salesforceFields
+            );
+            return;
+        }
+
+        return $salesforceFields;
     }
 
     /**
