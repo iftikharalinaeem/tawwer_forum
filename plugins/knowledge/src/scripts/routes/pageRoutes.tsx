@@ -100,12 +100,6 @@ export const ArticleRoute = new RouteHandler(
     (article: IArticle | IArticleFragment) => article.url,
 );
 
-export const DebugRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/kb/debug" */ "@knowledge/DebugPage"),
-    "/kb/debug",
-    () => "/kb/debug",
-);
-
 const CATEGORIES_KEY = "CategoriesPageKey";
 export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
@@ -174,7 +168,6 @@ export function getPageRoutes() {
         EditorRoute.route,
         RevisionsRoute.route,
         ArticleRoute.route,
-        DebugRoute.route,
         CategoryRoute.route,
         CategoryPagedRoute.route,
         SearchRoute.route,
