@@ -25,7 +25,7 @@ export default class DraftsListItem extends React.Component<IProps> {
         const { dateInserted, insertUser, url } = this.props;
         const classesMetas = metasClasses();
 
-        let name = '(' + t("Unknown User") + ')';
+        let name = "(" + t("Unknown User") + ")";
         let photoUrl: string | undefined;
 
         if (insertUser) {
@@ -37,7 +37,7 @@ export default class DraftsListItem extends React.Component<IProps> {
             <li className="itemList-item">
                 <SmartLink to={url} className={classNames("itemList-link", "panelList-link")} tabIndex={-1}>
                     <div className="itemList-photoFrame">
-                        <img src={photoUrl} className="itemList-photo" alt={`${t("User") + ': '}${name}`} />
+                        <img src={photoUrl} className="itemList-photo" alt={`${t("User") + ": "}${name}`} />
                     </div>
                     <div className="itemList-content">
                         <div className="itemList-userName">{name}</div>
