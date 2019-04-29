@@ -302,6 +302,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $formValues = $sender->Form->formValues();
             if ($sender->Form->isPostBack()) {
+                saveToConfig('Plugins.Salesforce.SyncUsers.Enabled', (boolean)$formValues['Plugins.Salesforce.SyncUsers.Enabled']);
                 $sender->Form->validateRule('Plugins.Salesforce.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
                 $sender->Form->validateRule('Plugins.Salesforce.Secret', 'function:ValidateRequired', 'Secret is required');
                 $sender->Form->validateRule('Plugins.Salesforce.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
@@ -988,7 +989,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         echo        $sender->Form->label('SalesForce ID', 'SalesForceID');
         echo    '</div>';
         echo    '<div class="input-wrap">';
-        echo        $sender->Form->textBox('SalesForce ID');
+        echo        $sender->Form->textBox('SalesForceID');
         echo    '</div>';
         echo '</div>';
     }
@@ -1087,7 +1088,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                     c('ProfileExtender.Fields.'.$field.'.SalesForceID') :
                     $field;
                 // field exists in Salesforce ?
-                if(isset($salesforceFields[$field])) {
+                if(isset($salesforceFields[$fieldID])) {
                     $contactData[$fieldID] = $fieldValue;
                 }
             }

@@ -306,22 +306,6 @@ class Salesforce {
     }
 
     /**
-     * @param $object
-     * @param array $fields
-     * @return mixed
-     * @throws Gdn_UserException
-     */
-    public function updateObject($object, array $fields, $id) {
-        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
-        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
-        // PATCH requests to salesforce return 204 on success and no message.
-        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
-            return $response['Response']['id'];
-        }
-        throw new Gdn_UserException(t('Failed to update your User info to Salesforce.'));
-    }
-
-    /**
      * @param array $case
      * @return array|bool True or array of missing required fields
      */
@@ -354,8 +338,26 @@ class Salesforce {
      * @throws Gdn_UserException
      */
     public function createObject($object, array $fields) {
-        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields), true, 'POST');
         if (isset($response['Response']['success'])) {
+            return $response['Response']['id'];
+        }
+        throw new Gdn_UserException($response['Response'][0]['message']);
+    }
+
+    /**
+     * Update Object
+     *
+     * @param $object
+     * @param array $fields
+     * @return mixed
+     * @throws Gdn_UserException
+     */
+    public function updateObject($object, array $fields, $id) {
+        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
+        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
+        // PATCH requests to salesforce return 204 on success and no message.
+        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
             return $response['Response']['id'];
         }
         throw new Gdn_UserException($response['Response'][0]['message']);
@@ -520,7 +522,9 @@ class Salesforce {
         if (!$this->accessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
+
         $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
+
         $contentType = $httpResponse['ContentType'];
         Gdn::controller()->setJson('Type', $contentType);
         if (strpos($contentType, 'application/json') !== false) {
