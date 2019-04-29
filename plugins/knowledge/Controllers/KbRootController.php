@@ -33,18 +33,6 @@ class KbRootController extends PageDispatchController {
     }
 
     /**
-     * Render out the /kb/debug page.
-     */
-    public function get_debug(): Data {
-        $page = $this->useSimplePage('Debug');
-        if (!debug()) {
-            throw new NotFoundException();
-        }
-
-        return $page->render();
-    }
-
-    /**
      * Render out the /kb/search page.
      */
     public function get_search(): Data {
