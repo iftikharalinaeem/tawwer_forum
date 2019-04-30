@@ -49,14 +49,7 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
         $knowledgeBase = $this->kbModel->selectFragmentForCategoryID($categoryID);
         $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
 
-        $result = [
-            new Breadcrumb(\Gdn::translate('Home'), \Gdn::request()->url('/', true)),
-        ];
-
-        // We only add the knowledge base "home" crumb when we have multiple knowledge bases.
-        if ($this->knowledgeBaseCount > 1) {
-            $result[] = new Breadcrumb(\Gdn::translate('Help'), \Gdn::request()->url('/kb', true));
-        }
+        $result = [];
 
         foreach ($categories as $index => $category) {
             $isKbRoot = $category->getParentID() === KnowledgeCategoryModel::ROOT_ID;
