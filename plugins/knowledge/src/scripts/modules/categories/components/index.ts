@@ -5,4 +5,3 @@
  */
 
 import * as CategoriesLayout from "./CategoriesLayout";
-import * as CategoryMenu from "./CategoryMenu";
