@@ -7,7 +7,7 @@
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { newFolder } from "@library/icons/common";
-import { collapseAll, expandAll } from "@library/icons/navigationManager";
+import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
