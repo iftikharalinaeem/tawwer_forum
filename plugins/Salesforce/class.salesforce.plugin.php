@@ -1098,7 +1098,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @return array
      */
-    private function getContactFields() {
+    private function getContactFields(): array {
         $salesforce = Salesforce::instance();
         $salesforceFields = $salesforce->getFields('Contact');
 
