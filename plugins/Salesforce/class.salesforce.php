@@ -249,10 +249,10 @@ class Salesforce {
      * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_contact.htm
      * @see Salesforce::ValidateContact
      * @param array $contact
-     * @return string ContactID
-     * @throws Gdn_UserException
+     * @param string $id
+     * @return string $contactID
      */
-    public function updateContact(array $contact, $id) {
+    public function updateContact(array $contact, $id): string {
         if ($this->validateContact($contact) === true) {
             return $this->updateObject('Contact', $contact, $id);
         }
@@ -332,12 +332,12 @@ class Salesforce {
     }
 
     /**
-     * @param $object
+     * @param string $object
      * @param array $fields
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function createObject($object, array $fields) {
+    public function createObject(string $object, array $fields) {
         $response = $this->request('sobjects/'.$object.'/', json_encode($fields), true, 'POST');
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
@@ -348,19 +348,19 @@ class Salesforce {
     /**
      * Update Object
      *
-     * @param $object
+     * @param string $object
      * @param array $fields
-     * @return mixed
-     * @throws Gdn_UserException
+     * @param string $id
+     * @return string
      */
-    public function updateObject($object, array $fields, $id) {
+    public function updateObject(string $object, array $fields, string $id) {
         // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
         $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
         // PATCH requests to salesforce return 204 on success and no message.
         if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
             return $response['Response']['id'];
         }
-        throw new Gdn_UserException($response['Response'][0]['message']);
+        return isset($response['Response'][0]['message']) ? $response['Response'][0]['message'] : '';
     }
 
     /**
@@ -499,6 +499,7 @@ class Salesforce {
      * @param $path
      * @param bool|array $post false or array of values to be sent as json POST
      * @param bool $cache
+     * @param string $method
      * @return array $httpResponse with the following keys
      *    [HttpCode] - HTTP Status Code
      *    [Response] - JSON Decoded Values if Content Type == Json
@@ -508,7 +509,7 @@ class Salesforce {
      *
      * @see http://www.salesforce.com/us/developer/docs/api_rest/
      */
-    public function request($path, $post = false, $cache = true, $method = 'GET') {
+    public function request($path, $post = false, $cache = true, string $method = 'GET') {
         $url = $this->instanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
         $cacheKey = 'Salesforce.Request'.md5($url);
 
@@ -589,6 +590,7 @@ class Salesforce {
             null,
             $headers
         );
+
         $failureCodes = [500 => true];
         if (isset($failureCodes[$proxy->ResponseStatus])) {
             throw new Gdn_UserException('HTTP Error communicating with Salesforce.  Code: '.$proxy->ResponseStatus);
@@ -856,10 +858,10 @@ class Salesforce {
     /**
      * Get Salesforce Object fields
      *
-     * @param $object
+     * @param string $object
      * @return array
      */
-    public function getFields($object) {
+    public function getFields(string $object): array {
         $salesforceFields = [];
         $path = 'sobjects/'.$object.'/describe';
         $response = $this->request($path);
@@ -869,7 +871,8 @@ class Salesforce {
         }
         $fields = valr('Response.fields', $response, []);
         foreach ($fields as $field) {
-            $name = val('name', $field);
+            $name = $field['name'];
+
             $salesforceFields[$name] = [
                 'name' => $field['name'],
                 'label' => $field['label'],

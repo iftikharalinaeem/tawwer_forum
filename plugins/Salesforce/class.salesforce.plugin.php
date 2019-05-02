@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Vanilla\Web\TwigRenderTrait;
+
 /**
  * Salesforce Plugin
  *
@@ -12,6 +14,8 @@
  *
  */
 class SalesforcePlugin extends Gdn_Plugin {
+
+    use TwigRenderTrait;
 
     /**
      * If status is set to this we will stop getting updates from Salesforce
@@ -981,15 +985,14 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_beforeCheckbox_handler($sender) {
-        echo '<div class="form-group">';
-        echo    '<div class="label-wrap">';
-        echo        $sender->Form->label('SalesForce ID', 'SalesForceID');
-        echo    '</div>';
-        echo    '<div class="input-wrap">';
-        echo        $sender->Form->textBox('SalesForceID');
-        echo    '</div>';
-        echo '</div>';
+    public function settingsController_beforeProfileExtenderAddEditRender_handler($sender) {
+        $data = [];
+        $data["formLabel"] = $sender->Form->label('SalesForce ID', 'SalesForceID');
+        $data["formInput"] = $sender->Form->textBox('SalesForceID', ['class' => 'form-control']);
+
+        $content =  $this->renderTwig('/plugins/Salesforce/views/profileExtenderAddEdit.twig', $data);
+
+        $sender->setData('beforeProfileExtenderCheckbox', $content);
     }
 
     /**
@@ -998,7 +1001,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param \UserModel $sender
      * @param array $args
      */
-    public function userModel_afterRegister_handler($sender, $args) {
+    public function userModel_afterRegister_handler(\UserModel $sender, array $args) {
         //if  SyncUsers is enabled
         if (!c('Plugins.Salesforce.SyncUsers')) {
             return;
@@ -1012,7 +1015,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param \UserModel $sender
      * @param array $args
      */
-    public function userModel_afterSave_handler($sender, $args) {
+    public function userModel_afterSave_handler(\UserModel $sender, array $args) {
         //if  SyncUsers is enabled
         if (!c('Plugins.Salesforce.SyncUsers')) {
             return;
@@ -1023,15 +1026,14 @@ class SalesforcePlugin extends Gdn_Plugin {
     /**
      * Sync user with contact in Salesforce
      *
-     * @param /Gdn_Controller $sender
+     * @param \UserModel $sender
      * @param array $formFields
      */
-    public function syncUser($sender, $formFields) {
+    public function syncUser(\UserModel $sender, array $formFields) {
         $salesforce = Salesforce::instance();
-        // check if connected to salesforce
-        if (!$salesforce->isConnected()) {
-            $salesforce->reconnect();
-        }
+
+        // reconnect salesforce in case it's not connected
+        $salesforce->reconnect();
 
         // create contactData
         $contactData = $this->createContactData($formFields);
@@ -1053,27 +1055,34 @@ class SalesforcePlugin extends Gdn_Plugin {
      * Create contact data
      *
      * @param array $formFields
-     * @param array $salesforceFields
      * @return array
      */
-    private function createContactData($formFields) {
+    private function createContactData(array $formFields) {
         $salesforceFields = $this->getContactFields();
 
         $contactData = [];
-        //unset "Name"
+        //Salesforce does not accept field "Name", so unset
         unset($formFields["Name"]);
-        foreach ($formFields as $field => $fieldValue) {
-            if($fieldValue !== "") {
-                //field has SalesforceID ? (SalesforceID is used for custom fields)
-                $fieldID = c('ProfileExtender.Fields.'.$field.'.SalesForceID') ?
-                    c('ProfileExtender.Fields.'.$field.'.SalesForceID') :
-                    $field;
-                // field exists in Salesforce ?
-                if(isset($salesforceFields[$fieldID])) {
-                    $contactData[$fieldID] = $fieldValue;
+
+        // if there are fields from Salesforce, map fields
+        if (count($salesforceFields) > 0) {
+            foreach ($formFields as $field => $fieldValue) {
+                if($fieldValue !== "") {
+                    //field has SalesforceID ? (SalesforceID is used for custom fields)
+                    $fieldID = c('ProfileExtender.Fields.'.$field.'.SalesForceID') ?
+                        c('ProfileExtender.Fields.'.$field.'.SalesForceID') :
+                        $field;
+                    // field exists in Salesforce ?
+                    if(isset($salesforceFields[$fieldID])) {
+                        $contactData[$fieldID] = $fieldValue;
+                    }
                 }
             }
+        //Otherwise, send as is
+        } else {
+            $contactData = $formFields;
         }
+
         //special case for "DateOfBirth"
         if(isset($formFields["DateFields"])) {
             $dateOfBirth = $this->validateDateOfBirth($formFields["DateOfBirth_Day"], $formFields["DateOfBirth_Month"], $formFields["DateOfBirth_Year"]);
@@ -1087,12 +1096,12 @@ class SalesforcePlugin extends Gdn_Plugin {
     /**
      * Get Contact fields
      *
-     * @return array|void
+     * @return array
      */
     private function getContactFields() {
-        $salesforceFields = [];
         $salesforce = Salesforce::instance();
         $salesforceFields = $salesforce->getFields('Contact');
+
         // if error fetching salesforce fields
         if (count($salesforceFields) == 0) {
             Logger::event(
@@ -1101,7 +1110,6 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'Error getting Contact fields',
                 $salesforceFields
             );
-            return;
         }
 
         return $salesforceFields;
@@ -1114,7 +1122,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param string $year
      * @return bool|string
      */
-    private function validateDateOfBirth($day, $month, $year) {
+    private function validateDateOfBirth(string $day, string $month, string $year) {
         $dateOfBirth = false;
         if($day !== "0" && $month !== "0" && $year !== "0" ) {
             $dateOfBirth = $year.'-'.$month.'-'.$day;
