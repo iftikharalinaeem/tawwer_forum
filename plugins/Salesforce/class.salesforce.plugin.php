@@ -985,7 +985,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_beforeProfileExtenderAddEditRender_handler($sender) {
+    public function settingsController_beforeProfileExtenderAddEditRender_handler(\SettingsController $sender) {
         $data = [];
         $data["formLabel"] = $sender->Form->label('SalesForce ID', 'SalesForceID');
         $data["formInput"] = $sender->Form->textBox('SalesForceID', ['class' => 'form-control']);

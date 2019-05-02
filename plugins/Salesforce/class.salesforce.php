@@ -252,7 +252,7 @@ class Salesforce {
      * @param string $id
      * @return string $contactID
      */
-    public function updateContact(array $contact, $id): string {
+    public function updateContact(array $contact, string $id): string {
         if ($this->validateContact($contact) === true) {
             return $this->updateObject('Contact', $contact, $id);
         }
@@ -360,7 +360,7 @@ class Salesforce {
         if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
             return $response['Response']['id'];
         }
-        return isset($response['Response'][0]['message']) ? $response['Response'][0]['message'] : '';
+        return $response['Response'][0]['message'] ?? '';
     }
 
     /**
