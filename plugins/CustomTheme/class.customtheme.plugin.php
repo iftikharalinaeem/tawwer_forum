@@ -566,15 +566,17 @@ Here are some things you should know before you begin:
         }
         $sender->setData('LiveRevisionID', $liveRevisionID);
 
+
+        $revisionData = Gdn::sql()
+            ->select('RevisionID, Label, ThemeName, Live, IncludeThemeCSS, InsertUserID, DateInserted')
+            ->from('CustomThemeRevision')
+            ->where('ThemeName', self::getCurrentThemeKey())
+            ->orderBy('RevisionID', 'desc')
+            ->limit(300)
+            ->get();
+
         // Load revision history
-        $sender->setData('RevisionData', Gdn::sql()
-                ->select()
-                ->from('CustomThemeRevision')
-                ->where('ThemeName', self::getCurrentThemeKey())
-                ->orderBy('RevisionID', 'desc')
-                ->limit(10)
-                ->get()
-        );
+        $sender->setData('RevisionData', $revisionData);
 
         // If nothing was saved, still load defautl master, so the page isn't empty
         if (stringIsNullOrEmpty($newHtml)) {
