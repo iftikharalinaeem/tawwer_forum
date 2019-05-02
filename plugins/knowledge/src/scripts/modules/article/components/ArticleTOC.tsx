@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import classNames from "classnames";
 import { IOutlineItem } from "@knowledge/@types/api/article";
+import { panelListClasses } from "@library/layout/panelListStyles";
 
 interface IProps {
     items: IOutlineItem[];
@@ -25,13 +26,19 @@ export default class ArticleTOC extends React.Component<IProps> {
             return null;
         }
 
+        const classesPanelList = panelListClasses();
         const contents = this.props.items
             .filter(item => item.level === 2)
             .map(item => {
                 const href = "#" + item.ref;
                 const isActive = window.location.hash === href;
                 return (
-                    <li className={classNames("panelList-item", "tableOfContents-item", { isActive })} key={item.ref}>
+                    <li
+                        className={classNames("panelList-item", classesPanelList.item, "tableOfContents-item", {
+                            isActive,
+                        })}
+                        key={item.ref}
+                    >
                         <a
                             href={href}
                             onClick={this.forceHashChange}
@@ -45,9 +52,14 @@ export default class ArticleTOC extends React.Component<IProps> {
             });
 
         return (
-            <nav className="panelList tableOfContents">
-                <Heading title={t("On This Page")} className="panelList-title tableOfContents-title" />
-                <ul className="panelList-items tableOfContents-items">{contents}</ul>
+            <nav className={classNames("panelList", "tableOfContents", classesPanelList.root)}>
+                <Heading
+                    title={t("On This Page")}
+                    className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
+                />
+                <ul className={classNames("panelList-items", "tableOfContents-items", classesPanelList.items)}>
+                    {contents}
+                </ul>
             </nav>
         );
     }

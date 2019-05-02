@@ -13,7 +13,7 @@ import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { px } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps {
@@ -26,13 +26,13 @@ interface IProps {
 export default class NavigationManagerMenu extends React.Component<IProps> {
     public render() {
         const debug = debugHelper("navigationManagerMenu");
-        const headerVars = titleBarVariables();
+        const titleBarVars = titleBarVariables();
         const mediaQueries = layoutVariables().mediaQueries();
         const classesModal = modalClasses();
         const heightStyle = style(
-            { height: px(headerVars.sizing.height), ...debug.name("items") },
+            { height: px(titleBarVars.sizing.height), ...debug.name("items") },
             mediaQueries.oneColumn({
-                height: px(headerVars.sizing.mobile.height),
+                height: px(titleBarVars.sizing.mobile.height),
             }),
         );
 

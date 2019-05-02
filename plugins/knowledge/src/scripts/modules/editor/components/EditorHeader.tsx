@@ -21,7 +21,6 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
-import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";

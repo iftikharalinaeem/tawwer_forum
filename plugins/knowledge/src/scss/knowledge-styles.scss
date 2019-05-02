@@ -7,12 +7,7 @@
 @import "base/overwrite";
 @import "~library-scss/base";
 
-@import "~library-scss/layouts/panelLayout";
-@import "~library-scss/layouts/page";
-@import "~library-scss/layouts/panelArea";
-@import "~library-scss/layouts/panelWidget";
 @import "~library-scss/layouts/mobileMenu";
-@import "~library-scss/layouts/deviceChecker";
 
 @import "~library-scss/userContent/_spoiler";
 @import "~library-scss/userContent/_atMention";
@@ -27,15 +22,12 @@
 @import "components/pageHeading";
 @import "components/navMenu";
 @import "components/tableOfContents";
-@import "components/panelList";
 
 @import "components/breadcrumbs";
 @import "components/locationBreadcrumb";
 @import "components/word";
 @import "components/pageLocation";
-@import "components/itemList";
 @import "components/advancedSearch";
-@import "components/draftList";
 @import "components/navigationManagerToolbar";
 
 @import "~react-day-picker/lib/style.css";
