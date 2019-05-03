@@ -253,14 +253,15 @@ class Salesforce {
      * @return string $contactID
      */
     public function updateContact(array $contact, string $id): string {
-        if ($this->validateContact($contact) === true) {
+        $validate = $this->validateContact($contact);
+        if ($validate === true) {
             return $this->updateObject('Contact', $contact, $id);
         }
         // error
         Logger::event(
             'salesforce_failure',
             Logger::ERROR,
-            'Update Contact: Required Fields Missing: '.print_r($this->validateContact($contact)),
+            'Update Contact: Required Fields Missing: '.$validate,
             [(array)$contact, $id]
         );
 
@@ -356,8 +357,7 @@ class Salesforce {
      * @return string
      */
     public function updateObject(string $object, array $fields, string $id) {
-        // Because we are using ProxyRequest which doesn't support PATCH to make the cURL call, we pass the HttpMethod in the URL.
-        $response = $this->request('sobjects/'.$object.'/'.$id.'?_HttpMethod=PATCH', json_encode($fields), false, 'POST');
+        $response = $this->request('sobjects/'.$object.'/'.$id, json_encode($fields), false, 'PATCH');
         // PATCH requests to salesforce return 204 on success and no message.
         if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
             return $response['Response']['id'];
