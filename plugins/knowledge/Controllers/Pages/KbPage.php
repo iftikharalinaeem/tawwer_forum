@@ -19,6 +19,7 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use \ThemesApiController;
+use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\ThemedPage;
 
 /**
@@ -39,6 +40,9 @@ abstract class KbPage extends ThemedPage {
     /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
 
+    /** @var DeploymentCacheBuster */
+    public $deploymentCacheBuster;
+
     /**
      * @inheritdoc
      */
@@ -53,13 +57,15 @@ abstract class KbPage extends ThemedPage {
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
-        KnowledgeCategoriesApiController $categoriesApi = null // Default needed for method extensions
+        KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
+        DeploymentCacheBuster $deploymentCacheBuster = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi, $cspModel);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
         $this->categoriesApi = $categoriesApi;
+        $this->deploymentCacheBuster = $deploymentCacheBuster;
 
         // Shared initialization.
         $this->initSharedData();
@@ -89,6 +95,12 @@ abstract class KbPage extends ThemedPage {
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ALL_KBS,
             Data::box($this->knowledgeBases),
+            []
+        ));
+
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::SET_LOCAL_DEPLOYMENT_KEY,
+            new Data($this->deploymentCacheBuster->value()),
             []
         ));
     }
