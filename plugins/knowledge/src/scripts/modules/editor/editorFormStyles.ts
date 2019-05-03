@@ -33,6 +33,7 @@ export const editorFormClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const style = styleFactory("editorFormClasses");
     const classesRichEditor = richEditorClasses(false);
+    const mediaQueries = layoutVars.mediaQueries();
     const root = style({
         position: "fixed",
         top: 0,
@@ -84,27 +85,24 @@ export const editorFormClasses = useThemeCache(() => {
         },
     });
 
-    const desktopGutter = layoutVars.gutter.size + layoutVars.gutter.halfSize;
     const mobileGutter = layoutVars.gutter.halfSize + 4; // 4 is from panel widget. Not yet converted,;
 
     const containerWidth = style(
         "containerWidth",
         {
             width: percent(100),
-            maxWidth: layoutVars.middleColumn.width,
+            maxWidth: layoutVars.middleColumn.paddedWidth,
         },
         paddings({
-            horizontal: desktopGutter,
+            horizontal: globalVars.gutter.size,
         }),
-        layoutVariables()
-            .mediaQueries()
-            .oneColumnDown({
-                ...paddings({
-                    horizontal: mobileGutter,
-                }),
-            }),
         margins({
             horizontal: "auto",
+        }),
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                horizontal: mobileGutter,
+            }),
         }),
     );
 
