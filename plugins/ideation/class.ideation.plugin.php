@@ -1670,6 +1670,16 @@ EOT
     }
 
     /**
+     * Update Discussion query to when filtering by idea statuses.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGetAnnouncements_handler($sender, $args) {
+        $this->ideaQueryFiltering($sender, $args);
+    }
+
+    /**
      * Join TagDiscussion table filtering idea statuses. 
      *
      * @param DiscussionModel $sender
