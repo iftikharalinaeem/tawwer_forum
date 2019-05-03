@@ -19,6 +19,7 @@ import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";
 import { IRevisionFragment } from "@knowledge/@types/api/articleRevision";
+import { itemListClasses } from "@knowledge/modules/editor/components/itemListStyles";
 
 interface IProps extends IRevisionFragment {
     url: string;
@@ -34,27 +35,38 @@ export default class RevisionsListItem extends React.Component<IProps> {
         const { status, dateInserted, url, isSelected } = this.props;
         const { name, photoUrl } = this.props.insertUser;
         const classesMetas = metasClasses();
+        const classes = itemListClasses();
         return (
             <Hoverable onHover={this.props.onHover} duration={250}>
                 {provided => (
-                    <li {...provided} className="itemList-item">
+                    <li {...provided} className={classNames(classes.item, "itemList-item")}>
                         <SmartLink
                             to={url}
-                            className={classNames("itemList-link", "panelList-link", { isSelected })}
+                            className={classNames("itemList-link", classes.link, "panelList-link", { isSelected })}
                             tabIndex={-1}
                             replace
                         >
-                            <div className="itemList-photoFrame">
-                                <img src={photoUrl} className="itemList-photo" alt={`${t("User") + ": "}${name}`} />
+                            <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
+                                <img
+                                    src={photoUrl}
+                                    className={classNames("itemList-photo", classes.photo)}
+                                    alt={`${t("User") + ": "}${name}`}
+                                />
                             </div>
-                            <div className="itemList-content">
-                                <div className="itemList-userName">{name}</div>
-                                <div className="itemList-dateTime">
+                            <div className={classNames("itemList-content", classes.content)}>
+                                <div className={classNames("itemList-userName", classes.userName)}>{name}</div>
+                                <div className={classNames("itemList-dateTime", classes.dateTime)}>
                                     <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                                 </div>
                             </div>
                             {status && (
-                                <div className={classNames("itemList-status", `status-${status.toLowerCase()}`)}>
+                                <div
+                                    className={classNames(
+                                        "itemList-status",
+                                        classes.status,
+                                        `status-${status.toLowerCase()}`,
+                                    )}
+                                >
                                     {this.icon(status)}
                                 </div>
                             )}
@@ -66,7 +78,8 @@ export default class RevisionsListItem extends React.Component<IProps> {
     }
 
     private icon(status: string) {
-        const commonClass = "itemList-icon";
+        const classes = itemListClasses();
+        const commonClass = classNames("itemList-icon", classes.icon);
         switch (status) {
             case "draft":
                 return revisionStatus_draft(commonClass);

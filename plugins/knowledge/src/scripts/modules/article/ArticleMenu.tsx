@@ -47,7 +47,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
-        const isMobile = this.props.device === Devices.MOBILE;
+        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 
@@ -60,7 +60,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
-                    openAsModal={this.props.device === Devices.MOBILE}
+                    openAsModal={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}
                     title={isMobile ? t("Article") : undefined}
                     paddedList={true}
                 >
