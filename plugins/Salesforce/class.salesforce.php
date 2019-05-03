@@ -530,9 +530,9 @@ class Salesforce {
         Gdn::controller()->setJson('Type', $contentType);
         if (strpos($contentType, 'application/json') !== false) {
             $httpResponse['Response'] = json_decode($httpResponse['Response'], true);
-            if (isset($result['error'])) {
-                Gdn::dispatcher()->passData('SalesforceResponse', $result);
-                throw new Gdn_UserException($result['error']['message']);
+            if (isset($httpResponse['error'])) {
+                Gdn::dispatcher()->passData('SalesforceResponse', );
+                throw new Gdn_UserException($httpResponse['Response'][0]['message']);
             }
         }
         if ($cache && $httpResponse['HttpCode'] == 200 && !$post) {
