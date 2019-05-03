@@ -66,7 +66,9 @@ export class EditorHeader extends React.Component<IProps, IState> {
         useShadow: true,
     };
     public render() {
-        const showMobileDropDown = (this.props.device === Devices.MOBILE || this.props.device === Devices.XS) && this.props.mobileDropDownTitle;
+        const showMobileDropDown =
+            (this.props.device === Devices.MOBILE || this.props.device === Devices.XS) &&
+            this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
         const classesEditorHeader = editorHeaderClasses();
         const globalVars = globalVariables();
