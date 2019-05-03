@@ -263,6 +263,8 @@ class Salesforce {
             'Update Contact: Required Fields Missing: '.print_r($this->validateContact($contact)),
             [(array)$contact, $id]
         );
+
+        return '';
     }
 
     /**
