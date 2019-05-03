@@ -4,22 +4,23 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { getPageRoutes } from "@knowledge/routes/pageRoutes";
-import { getModalRoutes } from "@knowledge/routes/modalRoutes";
-import { IStoreState } from "@knowledge/state/model";
-import ErrorPage from "@knowledge/pages/ErrorPage";
-import { connect } from "react-redux";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import ErrorPage from "@knowledge/pages/ErrorPage";
+import { getModalRoutes } from "@knowledge/routes/modalRoutes";
+import { getPageRoutes } from "@knowledge/routes/pageRoutes";
+import RouteActions from "@knowledge/routes/RouteActions";
+import UpdatePrompt from "@knowledge/server/UpdatePrompt";
+import { IStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Loader from "@library/loaders/Loader";
-import { RouteComponentProps, withRouter } from "react-router";
-import RouteActions from "@knowledge/routes/RouteActions";
-import { UnregisterCallback } from "history";
-import PageLoader from "@library/routing/PageLoader";
-import { LoadStatus } from "@library/@types/api/core";
 import ModalRouter from "@library/modal/ModalRouter";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import PageLoader from "@library/routing/PageLoader";
+import { UnregisterCallback } from "history";
+import React from "react";
+import { connect } from "react-redux";
+import { RouteComponentProps, withRouter } from "react-router";
 
 /**
  * Routing component for pages and modals in the /kb directory.
@@ -45,6 +46,7 @@ export class KnowledgeRoutes extends React.Component<IProps> {
 
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
+                <UpdatePrompt />
                 <ModalRouter modalRoutes={getModalRoutes()} pageRoutes={getPageRoutes()} />
             </PageLoader>
         );
