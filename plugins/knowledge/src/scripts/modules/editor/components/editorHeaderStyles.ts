@@ -28,7 +28,7 @@ export const editorHeaderClasses = useThemeCache(() => {
             width: percent(100),
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );

@@ -24,7 +24,7 @@ interface IProps {
 export default function NavigationManagerToolBar(props: IProps) {
     const classesNavigationManager = navigationManagerClasses();
     const device = useDevice();
-    const isMobile = device === Devices.MOBILE;
+    const isMobile = device === Devices.MOBILE || device === Devices.XS;
     return (
         <div className="navigationManagerToolbar">
             <div className="navigationManagerToolbar-bar">

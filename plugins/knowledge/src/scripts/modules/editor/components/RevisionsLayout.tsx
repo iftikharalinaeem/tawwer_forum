@@ -32,8 +32,8 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
 export class RevisionsLayout extends React.Component<IProps> {
     public render() {
         const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
-        const isDesktop = device === Devices.DESKTOP;
-        const isMobile = device === Devices.MOBILE;
+        const isDesktop = device === Devices.DESKTOP || device === Devices.NO_BLEED;
+        const isMobile = device === Devices.MOBILE || device === Devices.XS;
         const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revision History");
 
         const classesMobileDropdown = mobileDropDownClasses();

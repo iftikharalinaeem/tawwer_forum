@@ -51,7 +51,7 @@ class SearchForm extends React.Component<IProps, IState> {
 
     public render() {
         const { device, form } = this.props;
-        const isMobile = device === Devices.MOBILE;
+        const isMobile = device === Devices.MOBILE || device === Devices.XS;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         return (
             <DocumentTitle title={form.query ? form.query : t("Search Results")}>

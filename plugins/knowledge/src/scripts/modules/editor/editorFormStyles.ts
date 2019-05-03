@@ -98,7 +98,7 @@ export const editorFormClasses = useThemeCache(() => {
         }),
         layoutVariables()
             .mediaQueries()
-            .oneColumn({
+            .oneColumnDown({
                 ...paddings({
                     horizontal: mobileGutter,
                 }),
@@ -174,7 +174,7 @@ export const editorFormClasses = useThemeCache(() => {
         },
         layoutVariables()
             .mediaQueries()
-            .oneColumn({
+            .oneColumnDown({
                 width: calc(`100% - ${mobileGutter * 2}px`),
             }),
     );

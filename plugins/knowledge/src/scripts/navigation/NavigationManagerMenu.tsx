@@ -31,7 +31,7 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
         const classesModal = modalClasses();
         const heightStyle = style(
             { height: px(titleBarVars.sizing.height), ...debug.name("items") },
-            mediaQueries.oneColumn({
+            mediaQueries.oneColumnDown({
                 height: px(titleBarVars.sizing.mobile.height),
             }),
         );

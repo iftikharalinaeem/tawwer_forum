@@ -78,9 +78,17 @@ export const itemListClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("itemList");
 
-    const items = style("items", {});
-    const item = style("item", {});
-    const dateTime = style("dateTime", {});
+    const items = style("items", {
+        display: "block",
+    });
+
+    const item = style("item", {
+        display: "block",
+    });
+
+    const dateTime = style("dateTime", {
+        display: "block",
+    });
 
     const root = style(
         {
@@ -93,7 +101,7 @@ export const itemListClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...paddings({ vertical: 0 }),
         }),
     );
@@ -118,7 +126,7 @@ export const itemListClasses = useThemeCache(() => {
                 },
             }),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...paddings({
                 horizontal: vars.link.mobile.padding,
             }),
@@ -140,7 +148,6 @@ export const itemListClasses = useThemeCache(() => {
         justifyContent: "space-between",
         alignItems: "flex-start",
         flexGrow: 1,
-        lineHeight: unit(globalVars.lineHeights.condensed),
         ...paddings({
             vertical: 8,
             horizontal: 0,
