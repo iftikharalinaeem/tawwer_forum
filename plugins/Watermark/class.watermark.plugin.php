@@ -23,8 +23,10 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function editorPlugin_beforeSaveUploads_handler($sender, $args) {
+        $categoryID = $this->getCategoryIDbyDiscussion($args["DiscussionID"]);
+
         $watermarkCategories = c('Watermark.WatermarkCategories');
-        if (in_array($args['CategoryID'], $watermarkCategories)) {
+        if (in_array($categoryID, $watermarkCategories)) {
             $filePath = $args['TmpFilePath'];
             $fileExtension = $args['FileExtension'];
 
@@ -41,6 +43,18 @@ class WatermarkPlugin extends Gdn_Plugin {
                 return true;
             }
         }
+    }
+
+    /**
+     * Get CategoryID
+     *
+     * @param string $discussionID
+     * @return string
+     */
+    public function getCategoryIDbyDiscussion($discussionID) {
+        $discussion = DiscussionModel::instance()->getID($discussionID);
+
+        return $discussion->CategoryID;
     }
 
     /**
