@@ -80,9 +80,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     device={this.props.device}
                     breadcrumbs={
                         category.breadcrumbs && (
-                            <PanelWidget>
-                                <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
-                            </PanelWidget>
+                            <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
                         )
                     }
                     leftBottom={

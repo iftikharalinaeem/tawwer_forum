@@ -50,11 +50,9 @@ export class ArticleLayout extends React.Component<IProps> {
                 />
                 <PanelLayout
                     breadcrumbs={
-                        this.props.device !== Devices.MOBILE &&
+                        this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS &&
                         article.breadcrumbs && (
-                            <PanelWidget>
-                                <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
-                            </PanelWidget>
+                            <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
                         )
                     }
                     leftBottom={
@@ -80,7 +78,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                         permaLink={article.url}
                                     />
                                 }
-                                includeBackLink={this.props.device !== Devices.MOBILE}
+                                includeBackLink={this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS}
                             />
                             {messages && <div className="messages">{messages}</div>}
                         </PanelWidget>

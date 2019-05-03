@@ -42,9 +42,7 @@ export default function NavigationLoadingLayout(props: IProps) {
             <PanelLayout
                 leftBottom={<PanelWidget>{navigation}</PanelWidget>}
                 breadcrumbs={
-                    <PanelWidget>
-                        <Breadcrumbs forceDisplay={true}>{[]}</Breadcrumbs>
-                    </PanelWidget>
+                    <Breadcrumbs forceDisplay={true}>{[]}</Breadcrumbs>
                 }
                 middleBottom={
                     <PanelWidget>
