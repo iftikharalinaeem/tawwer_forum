@@ -218,6 +218,15 @@ class KnowledgePlugin extends \Gdn_Plugin {
         ;
 
         $this->database->structure()
+            ->table("pageRouteAlias")
+            ->primaryKey("pageRouteAliasID")
+            ->column("recordID", "int", false, "index.byType")
+            ->column("recordType", 'varchar(32)', false, "index.byType")
+            ->column("alias", "varchar(255)", false, ["index"])
+            ->set()
+        ;
+
+        $this->database->structure()
             ->table("articleRevision")
             ->primaryKey("articleRevisionID")
             ->column("articleID", "int", false, ["index", "unique.publishedRevision"])

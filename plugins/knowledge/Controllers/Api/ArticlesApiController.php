@@ -33,6 +33,7 @@ use DiscussionsApiController;
 use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
+use Vanilla\Knowledge\Models\PageRouteAliasModel;
 
 /**
  * API controller for managing the articles resource.
@@ -87,6 +88,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var DiscussionArticleModel */
     private $discussionArticleModel;
 
+    /** @var PageRouteAliasModel */
+    private $pageRouteAliasModel;
+
     /**
      * ArticlesApiController constructor
      *
@@ -106,6 +110,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param SessionInterface $sessionInterface
      * @param BreadcrumbModel $breadcrumbModel
      * @param DiscussionArticleModel $discussionArticleModel
+     * @param PageRouteAliasModel $pageRouteAliasModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -123,7 +128,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         DiscussionsApiController $discussionApi,
         SessionInterface $sessionInterface,
         BreadcrumbModel $breadcrumbModel,
-        DiscussionArticleModel $discussionArticleModel
+        DiscussionArticleModel $discussionArticleModel,
+        PageRouteAliasModel $pageRouteAliasModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -138,6 +144,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->discussionArticleModel = $discussionArticleModel;
+        $this->pageRouteAliasModel = $pageRouteAliasModel;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -734,6 +741,100 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row = $this->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * PUT article aliases.
+     *
+     * @param int $id ArticleID
+     * @param array $body Incoming json array with 'aliases'.
+     *
+     * @return array Data array Article record/item
+
+     */
+    public function put_aliases(int $id, array $body): array {
+        $this->permission("knowledge.articles.add");
+
+        $this->idParamSchema();
+        $in = $this->schema([
+            "aliases:a" => [
+                "description" => "Article aliases list",
+                "items" => ["type" => "string"]
+            ],
+        ], "in")
+            ->addValidator("aliases", [$this, 'validateAliases'])
+            ->setDescription("Set article aliases.");
+        $out = $this->articleSchema("out");
+        $body = $in->validate($body);
+
+        // This is just check if article exists and knowledge base has status "published"
+        $article = $this->articleByID($id);
+
+        $aliases = array_unique($body['aliases']);
+
+        $existingAliases = $this->pageRouteAliasModel->getAliases(
+            ArticleModel::RECORD_TYPE,
+            $id
+        );
+        foreach ($aliases as $alias) {
+            if ($exists = array_search($alias, $existingAliases)) {
+                unset($existingAliases[$exists]);
+            } else {
+                $this->pageRouteAliasModel->addAlias(
+                    ArticleModel::RECORD_TYPE,
+                    $id,
+                    $alias
+                );
+            }
+        }
+        if (count($existingAliases) > 0) {
+            $this->pageRouteAliasModel->dropAliases(
+                ArticleModel::RECORD_TYPE,
+                $id,
+                $existingAliases
+            );
+        }
+
+
+        $row = $this->articleByID($id, true);
+
+        $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['aliases']  = $this->pageRouteAliasModel->getAliases(
+            ArticleModel::RECORD_TYPE,
+            $id,
+            true
+        );
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Get article aliases.
+     *
+     * @param int $id ArticleID
+     *
+     * @return array Data array Article record/item
+
+     */
+    public function get_aliases(int $id): array {
+        $this->permission("knowledge.articles.add");
+
+        $this->idParamSchema();
+        $in = $this->schema([], "in")->setDescription("Get article aliases.");
+        $out = $this->articleAliasesSchema("out");
+
+        $row = $this->articleByID($id, true);
+
+        //$row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $row['aliases']  = $this->pageRouteAliasModel->getAliases(
+            ArticleModel::RECORD_TYPE,
+            $id,
+            true
+        );
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }

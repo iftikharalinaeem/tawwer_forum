@@ -16,6 +16,14 @@ use Vanilla\Exception\Database\NoResultsException;
  * A model for managing articles.
  */
 class ArticleModel extends \Vanilla\Models\PipelineModel {
+    /**
+     * Record type is the key we can use as a foreign reference
+     * to differentiate records of other types: article, discussion, category, etc
+     *
+     * @var string
+     *
+     */
+    const RECORD_TYPE = 'article';
 
     /** Published status value. Default status. */
     const STATUS_PUBLISHED = "published";
