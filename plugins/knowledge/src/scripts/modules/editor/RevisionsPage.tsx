@@ -113,7 +113,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
 
         return (
             drafts.data && (
-                <DraftsList hideTitle={this.props.device === Devices.MOBILE}>
+                <DraftsList hideTitle={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}>
                     {drafts.data.slice().map(item => {
                         return (
                             <DraftsListItem
@@ -136,7 +136,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
         return (
             revisions.data && (
                 <>
-                    <RevisionsList hideTitle={this.props.device === Devices.MOBILE}>
+                    <RevisionsList hideTitle={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}>
                         {revisions.data.slice().map(item => {
                             const preload = () => this.props.preloadRevision(item.articleRevisionID);
                             return (

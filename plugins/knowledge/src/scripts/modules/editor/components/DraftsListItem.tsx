@@ -7,11 +7,12 @@
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
-import Hoverable from "@library/dom/Hoverable";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/styles/metasStyles";
+import { itemListClasses } from "@knowledge/modules/editor/components/itemListStyles";
+import { panelListClasses } from "@library/layout/panelListStyles";
 
 interface IProps extends IResponseArticleDraft {
     url: string;
@@ -24,6 +25,8 @@ export default class DraftsListItem extends React.Component<IProps> {
     public render() {
         const { dateInserted, insertUser, url } = this.props;
         const classesMetas = metasClasses();
+        const classes = itemListClasses();
+        const classesPanelList = panelListClasses();
 
         let name = "(" + t("Unknown User") + ")";
         let photoUrl: string | undefined;
@@ -34,14 +37,22 @@ export default class DraftsListItem extends React.Component<IProps> {
         }
 
         return (
-            <li className="itemList-item">
-                <SmartLink to={url} className={classNames("itemList-link", "panelList-link")} tabIndex={-1}>
-                    <div className="itemList-photoFrame">
-                        <img src={photoUrl} className="itemList-photo" alt={`${t("User") + ": "}${name}`} />
+            <li className={classNames("itemList-item", classes.item)}>
+                <SmartLink
+                    to={url}
+                    className={classNames("itemList-link", classes.link, "panelList-link", classesPanelList.link)}
+                    tabIndex={-1}
+                >
+                    <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
+                        <img
+                            src={photoUrl}
+                            className={classNames("itemList-photo", classes.photo)}
+                            alt={`${t("User") + ": "}${name}`}
+                        />
                     </div>
-                    <div className="itemList-content">
-                        <div className="itemList-userName">{name}</div>
-                        <div className="itemList-dateTime">
+                    <div className={classNames("itemList-content", classes.content)}>
+                        <div className={classNames("itemList-userName", classes.userName)}>{name}</div>
+                        <div className={classNames("itemList-dateTime", classes.dateTime)}>
                             <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
                         </div>
                     </div>

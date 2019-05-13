@@ -21,7 +21,6 @@ import { metasClasses } from "@library/styles/metasStyles";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
-import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -67,7 +66,9 @@ export class EditorHeader extends React.Component<IProps, IState> {
         useShadow: true,
     };
     public render() {
-        const showMobileDropDown = this.props.device === Devices.MOBILE && this.props.mobileDropDownTitle;
+        const showMobileDropDown =
+            (this.props.device === Devices.MOBILE || this.props.device === Devices.XS) &&
+            this.props.mobileDropDownTitle;
         const classesModal = modalClasses();
         const classesEditorHeader = editorHeaderClasses();
         const globalVars = globalVariables();

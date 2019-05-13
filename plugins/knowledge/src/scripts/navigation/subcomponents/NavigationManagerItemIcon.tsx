@@ -8,7 +8,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Button from "@library/forms/Button";
 import { downTriangle, rightTriangle } from "@library/icons/common";
-import { article, folderClosed, folderOpen } from "@library/icons/navigationManager";
+import { article, folderClosed, folderOpen } from "@knowledge/navigation/navigationManagerIcons";
 import classNames from "classnames";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";

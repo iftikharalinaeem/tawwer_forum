@@ -12,7 +12,7 @@ import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
@@ -120,11 +120,11 @@ export const navigationManagerClasses = useThemeCache(() => {
             "& > [data-react-beautiful-dnd-droppable]": {
                 paddingBottom: unit(50),
                 marginLeft: unit(-chevronFullWidth),
-                ...media.oneColumn({
+                ...media.oneColumnDown({
                     marginLeft: unit(-chevronFullWidth / 2),
                 }),
             },
-            ...media.oneColumn({
+            ...media.oneColumnDown({
                 paddingRight: unit(vars.dragging.scrollGutter.mobile),
             }).$nest,
         },
@@ -157,7 +157,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         outline: important("none"),
         ...userSelect("none"),
         $nest: {
-            ...media.oneColumn({
+            ...media.oneColumnDown({
                 width: calc(`100% + ${unit(globalVars.gutter.size)}`),
             }).$nest,
             "&&&.isDragging": {
@@ -207,7 +207,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         lineHeight: unit(vars.dragging.lineHeight),
         fontSize: unit(globalVars.fonts.size.medium),
         backgroundColor: colorOut(globalVars.mainColors.bg),
-        ...media.oneColumn({
+        ...media.oneColumnDown({
             minHeight: unit(vars.item.mobileHeight),
         }),
         ...borders({

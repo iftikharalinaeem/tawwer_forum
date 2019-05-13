@@ -9,7 +9,7 @@ import { allLinkStates, colorOut, debugHelper, margins, unit, flexHelper } from 
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px, percent } from "csx";
 import { style } from "typestyle";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
@@ -28,7 +28,7 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
             }),
             ...debug.name(),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...margins({
                 vertical: 16,
             }),
