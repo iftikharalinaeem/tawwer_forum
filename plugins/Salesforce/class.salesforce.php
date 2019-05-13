@@ -356,7 +356,7 @@ class Salesforce {
      * @param string $id
      * @return string
      */
-    public function updateObject(string $object, array $fields, string $id) {
+    public function updateObject(string $object, array $fields, string $id): string {
         $response = $this->request('sobjects/'.$object.'/'.$id, json_encode($fields), false, 'PATCH');
         // PATCH requests to salesforce return 204 on success and no message.
         if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {

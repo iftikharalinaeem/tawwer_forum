@@ -1057,7 +1057,7 @@ class SalesforcePlugin extends Gdn_Plugin {
      * @param array $formFields
      * @return array
      */
-    private function createContactData(array $formFields) {
+    private function createContactData(array $formFields): array {
         $salesforceFields = $this->getContactFields();
 
         $contactData = [];
