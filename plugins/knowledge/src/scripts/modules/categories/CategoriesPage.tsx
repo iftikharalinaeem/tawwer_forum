@@ -80,7 +80,6 @@ export function CategoriesPage(props: IProps) {
             name: article.name || "",
             meta: <ResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
             url: article.url,
-            excerpt: article.excerpt || "",
             attachments: [],
             location: [],
         };
