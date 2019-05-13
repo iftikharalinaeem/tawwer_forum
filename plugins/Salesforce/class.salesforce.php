@@ -244,6 +244,31 @@ class Salesforce {
     }
 
     /**
+     * Update a new Contact Object in Salesforce
+     *
+     * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_contact.htm
+     * @see Salesforce::ValidateContact
+     * @param array $contact
+     * @param string $id
+     * @return string $contactID
+     */
+    public function updateContact(array $contact, string $id): string {
+        $validate = $this->validateContact($contact);
+        if ($validate === true) {
+            return $this->updateObject('Contact', $contact, $id);
+        }
+        // error
+        Logger::event(
+            'salesforce_failure',
+            Logger::ERROR,
+            'Update Contact: Required Fields Missing: '.$validate,
+            [(array)$contact, $id]
+        );
+
+        return '';
+    }
+
+    /**
      * @param array $contact
      * @return array|bool True or array of missing required fields
      */
@@ -310,17 +335,34 @@ class Salesforce {
     }
 
     /**
-     * @param $object
+     * @param string $object
      * @param array $fields
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function createObject($object, array $fields) {
-        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
+    public function createObject(string $object, array $fields) {
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields), true, 'POST');
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
         }
         throw new Gdn_UserException($response['Response'][0]['message']);
+    }
+
+    /**
+     * Update Object
+     *
+     * @param string $object
+     * @param array $fields
+     * @param string $id
+     * @return string
+     */
+    public function updateObject(string $object, array $fields, string $id): string {
+        $response = $this->request('sobjects/'.$object.'/'.$id, json_encode($fields), false, 'PATCH');
+        // PATCH requests to salesforce return 204 on success and no message.
+        if (isset($response['HttpCode']) && $response['HttpCode'] === 204) {
+            return $response['Response']['id'];
+        }
+        return $response['Response'][0]['message'] ?? '';
     }
 
     /**
@@ -459,6 +501,7 @@ class Salesforce {
      * @param $path
      * @param bool|array $post false or array of values to be sent as json POST
      * @param bool $cache
+     * @param string $method
      * @return array $httpResponse with the following keys
      *    [HttpCode] - HTTP Status Code
      *    [Response] - JSON Decoded Values if Content Type == Json
@@ -468,7 +511,7 @@ class Salesforce {
      *
      * @see http://www.salesforce.com/us/developer/docs/api_rest/
      */
-    public function request($path, $post = false, $cache = true) {
+    public function request($path, $post = false, $cache = true, string $method = 'GET') {
         $url = $this->instanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
         $cacheKey = 'Salesforce.Request'.md5($url);
 
@@ -482,14 +525,16 @@ class Salesforce {
         if (!$this->accessToken) {
             throw new Gdn_UserException("You don't have a valid Salesforce connection.");
         }
-        $httpResponse = $this->httpRequest($url, $post, 'application/json');
+
+        $httpResponse = $this->httpRequest($url, $post, 'application/json', $method);
+
         $contentType = $httpResponse['ContentType'];
         Gdn::controller()->setJson('Type', $contentType);
         if (strpos($contentType, 'application/json') !== false) {
             $httpResponse['Response'] = json_decode($httpResponse['Response'], true);
-            if (isset($result['error'])) {
-                Gdn::dispatcher()->passData('SalesforceResponse', $result);
-                throw new Gdn_UserException($result['error']['message']);
+            if (isset($httpResponse['error'])) {
+                Gdn::dispatcher()->passData('SalesforceResponse', $httpResponse);
+                throw new Gdn_UserException($httpResponse['Response'][0]['message']);
             }
         }
         if ($cache && $httpResponse['HttpCode'] == 200 && !$post) {
@@ -515,20 +560,21 @@ class Salesforce {
      *    [ContentType] - HTTP Content Type
      * @throws Exception
      */
-    public function httpRequest($url, $post = false, $requestContentType = null) {
+    public function httpRequest($url, $post = false, $requestContentType = null, $method = 'GET') {
         $proxy = new ProxyRequest();
         $options['URL'] = $url;
-        $options['Method'] = 'GET';
+        $options['Method'] = $method;
         $options['ConnectTimeout'] = 10;
         $options['Timeout'] = 10;
         $queryParams = null;
         if (!empty($requestContentType)) {
             $headers['Content-Type'] = $requestContentType;
         }
-        if ($post) {
-            $options['Method'] = 'POST';
+
+        if ($post || $method === 'PATCH') {
             $queryParams = $post;
         }
+
         $headers['Authorization'] = 'OAuth '.$this->accessToken;
         trace('Salesforce Request - '.$options['Method'].' : '.$url);
 
@@ -546,6 +592,7 @@ class Salesforce {
             null,
             $headers
         );
+
         $failureCodes = [500 => true];
         if (isset($failureCodes[$proxy->ResponseStatus])) {
             throw new Gdn_UserException('HTTP Error communicating with Salesforce.  Code: '.$proxy->ResponseStatus);
@@ -810,4 +857,34 @@ class Salesforce {
         $this->instanceUrl = $instanceUrl;
     }
 
+    /**
+     * Get Salesforce Object fields
+     *
+     * @param string $object
+     * @return array
+     */
+    public function getFields(string $object): array {
+        $salesforceFields = [];
+        $path = 'sobjects/'.$object.'/describe';
+        $response = $this->request($path);
+        //error
+        if ($response['HttpCode'] != 200) {
+            trace('Salesforce Request - GET : '.$path);
+        }
+        $fields = valr('Response.fields', $response, []);
+        foreach ($fields as $field) {
+            $name = $field['name'];
+
+            $salesforceFields[$name] = [
+                'name' => $field['name'],
+                'label' => $field['label'],
+                'type' => $field['type'],
+                'length' => $field['length'],
+                'defaultValue' => $field['defaultValue'],
+                'picklistValue' => $field['picklistValues'],
+                'inlinehelptext' => $field['inlineHelpText'],
+            ];
+        }
+        return $salesforceFields;
+    }
 }

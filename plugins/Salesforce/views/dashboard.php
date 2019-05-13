@@ -34,6 +34,15 @@ echo $this->Form->errors();
         </div>
         <?php echo $this->Form->textBoxWrap('Plugins.Salesforce.AuthenticationUrl'); ?>
     </li>
+    <?php if ($this->Data['DashboardConnection']) { ?>
+        <li class="row form-group">
+            <?php
+            $SyncUsersLabel = t('SyncUsers.Label', 'Sync users with SalesForce contacts?');
+            $SyncUsersDesc = t('SyncUsers.Desc', 'Creates/update a contact on SalesForce whenever a user register/update his profile');
+            echo $this->Form->toggle('Plugins.Salesforce.SyncUsers', $SyncUsersLabel, [], $SyncUsersDesc, false);
+            ?>
+        </li>
+    <?php } ?>
 </ul>
 
 <?php echo $this->Form->close('Save'); ?>

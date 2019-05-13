@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Vanilla\Web\TwigRenderTrait;
+
 /**
  * Salesforce Plugin
  *
@@ -12,6 +14,8 @@
  *
  */
 class SalesforcePlugin extends Gdn_Plugin {
+
+    use TwigRenderTrait;
 
     /**
      * If status is set to this we will stop getting updates from Salesforce
@@ -279,7 +283,8 @@ class SalesforcePlugin extends Gdn_Plugin {
             'DashboardConnection' => c('Plugins.Salesforce.DashboardConnection.Enabled'),
             'DashboardConnectionProfile' => false,
             'DashboardConnectionToken' => c('Plugins.Salesforce.DashboardConnection.Token', false),
-            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false)
+            'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false),
+            'Plugins.Salesforce.SyncUsers' => c('Plugins.Salesforce.SyncUsers')
         ]);
         if (c('Plugins.Salesforce.DashboardConnection.LoginId') && c('Plugins.Salesforce.DashboardConnection.Enabled')) {
             $dashboardConnectionProfile = $salesforce->getLoginProfile(c('Plugins.Salesforce.DashboardConnection.LoginId'));
@@ -292,6 +297,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Plugins.Salesforce.ApplicationID',
             'Plugins.Salesforce.Secret',
             'Plugins.Salesforce.AuthenticationUrl',
+            'Plugins.Salesforce.SyncUsers',
         ]);
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
@@ -302,6 +308,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         } else {
             $formValues = $sender->Form->formValues();
             if ($sender->Form->isPostBack()) {
+                saveToConfig('Plugins.Salesforce.SyncUsers', (boolean)$formValues['Plugins.Salesforce.SyncUsers']);
                 $sender->Form->validateRule('Plugins.Salesforce.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
                 $sender->Form->validateRule('Plugins.Salesforce.Secret', 'function:ValidateRequired', 'Secret is required');
                 $sender->Form->validateRule('Plugins.Salesforce.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
@@ -611,13 +618,9 @@ class SalesforcePlugin extends Gdn_Plugin {
                 //check to see if user is a contact
                 $contact = $salesforce->findContact($formValues['Email']);
                 if (!$contact['Id']) {
-                    //If not a contact then add contact
-                    $contactData = [
-                        'FirstName' => $formValues['FirstName'],
-                        'LastName' => $formValues['LastName'],
-                        'Email' => $formValues['Email'],
-                        'LeadSource' => $formValues['LeadSource'],
-                    ];
+                    //if not a contact then add contact
+                    $contactData = $this->createContactData($formValues);
+
                     $sender->EventArguments['ContactData'] = &$contactData;
                     $sender->fireEvent('CreateSalesforceContact');
                     $contact['Id'] = $salesforce->createContact($contactData);
@@ -975,5 +978,155 @@ class SalesforcePlugin extends Gdn_Plugin {
     public function isConfigured() {
         $salesforce = Salesforce::instance();
         return $salesforce->isConfigured();
+    }
+
+    /**
+     * Add SalesForce ID input
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_beforeProfileExtenderAddEditRender_handler(\SettingsController $sender) {
+        $data = [];
+        $data["formLabel"] = $sender->Form->label('SalesForce ID', 'SalesForceID');
+        $data["formInput"] = $sender->Form->textBox('SalesForceID', ['class' => 'form-control']);
+
+        $content =  $this->renderTwig('/plugins/Salesforce/views/profileExtenderAddEdit.twig', $data);
+
+        $sender->setData('beforeProfileExtenderCheckbox', $content);
+    }
+
+    /**
+     * Create/Update contact on Salesforce
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterRegister_handler(\UserModel $sender, array $args) {
+        //if  SyncUsers is enabled
+        if (!c('Plugins.Salesforce.SyncUsers')) {
+            return;
+        }
+        $this->syncUser($sender, $args['FormPostValues']);
+    }
+
+    /**
+     * Create/Update contact on Salesforce
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_afterSave_handler(\UserModel $sender, array $args) {
+        //if  SyncUsers is enabled
+        if (!c('Plugins.Salesforce.SyncUsers')) {
+            return;
+        }
+        $this->syncUser($sender, $args['FormPostValues']);
+    }
+
+    /**
+     * Sync user with contact in Salesforce
+     *
+     * @param \UserModel $sender
+     * @param array $formFields
+     */
+    public function syncUser(\UserModel $sender, array $formFields) {
+        $salesforce = Salesforce::instance();
+
+        // reconnect salesforce in case it's not connected
+        $salesforce->reconnect();
+
+        // create contactData
+        $contactData = $this->createContactData($formFields);
+
+        $contact = $salesforce->findContact($formFields['Email']);
+        $sender->EventArguments['ContactData'] = &$contactData;
+        if (!$contact['Id']) {
+            // add new contact
+            $sender->fireEvent('CreateSalesforceContact');
+            $salesforce->createContact($contactData);
+        } else {
+            // update contact
+            $sender->fireEvent('UpdateSalesforceContact');
+            $salesforce->updateContact($contactData, $contact['Id']);
+        }
+    }
+
+    /**
+     * Create contact data
+     *
+     * @param array $formFields
+     * @return array
+     */
+    private function createContactData(array $formFields): array {
+        $salesforceFields = $this->getContactFields();
+
+        $contactData = [];
+        //Salesforce does not accept field "Name", so unset
+        unset($formFields["Name"]);
+
+        // if there are fields from Salesforce, map fields
+        if (count($salesforceFields) > 0) {
+            foreach ($formFields as $field => $fieldValue) {
+                if($fieldValue !== "") {
+                    //field has SalesforceID ? (SalesforceID is used for custom fields)
+                    $fieldID = c('ProfileExtender.Fields.'.$field.'.SalesForceID') ?
+                        c('ProfileExtender.Fields.'.$field.'.SalesForceID') :
+                        $field;
+                    // field exists in Salesforce ?
+                    if(isset($salesforceFields[$fieldID])) {
+                        $contactData[$fieldID] = $fieldValue;
+                    }
+                }
+            }
+        //Otherwise, send as is
+        } else {
+            $contactData = $formFields;
+        }
+
+        //special case for "DateOfBirth"
+        if(isset($formFields["DateFields"])) {
+            $dateOfBirth = $this->validateDateOfBirth($formFields["DateOfBirth_Day"], $formFields["DateOfBirth_Month"], $formFields["DateOfBirth_Year"]);
+            if($dateOfBirth) {
+                $contactData["Birthdate"] = $dateOfBirth;
+            }
+        }
+        return $contactData;
+    }
+
+    /**
+     * Get Contact fields
+     *
+     * @return array
+     */
+    private function getContactFields(): array {
+        $salesforce = Salesforce::instance();
+        $salesforceFields = $salesforce->getFields('Contact');
+
+        // if error fetching salesforce fields
+        if (count($salesforceFields) == 0) {
+            Logger::event(
+                'salesforce_failure',
+                Logger::ERROR,
+                'Error getting Contact fields',
+                $salesforceFields
+            );
+        }
+
+        return $salesforceFields;
+    }
+
+    /**
+     * Validate and sanitize DateOfBirth
+     * @param string $day
+     * @param string $month
+     * @param string $year
+     * @return bool|string
+     */
+    private function validateDateOfBirth(string $day, string $month, string $year) {
+        $dateOfBirth = false;
+        if($day !== "0" && $month !== "0" && $year !== "0" ) {
+            $dateOfBirth = $year.'-'.$month.'-'.$day;
+        }
+        return $dateOfBirth;
     }
 }
