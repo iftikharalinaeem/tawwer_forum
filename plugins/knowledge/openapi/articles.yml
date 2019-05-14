@@ -758,6 +758,24 @@ paths:
             tags:
                 - Articles
             summary: Put aliases for article.
+        get:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleAliases"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get aliases for article.
 components:
     requestBodies:
         ArticlePost:
@@ -1102,6 +1120,40 @@ components:
                 - updateUserID
                 - dateUpdated
                 - status
+        ArticleAliases:
+            type: object
+            properties:
+                articleID:
+                    description: Unique article ID.
+                    type: integer
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    nullable: true
+                    type: integer
+                knowledgeBaseID:
+                    description: Knowledge base ID article belongs to.
+                    nullable: false
+                    type: integer
+                status:
+                    description: ""
+                    enum:
+                        - deleted
+                        - published
+                    minLength: 1
+                    nullable: true
+                    type: string
+                aliases:
+                    description: List of url aliases for article.
+                    type: array
+                    items:
+                      type: string
+                    example: ['category/discussion-migrated-from/forum/', 'another-url/for-the-same/article']
+            required:
+                - articleID
+                - knowledgeCategoryID
+                - knowledgeBaseID
+                - status
+                - aliases
         DiscussionArticle:
             type: object
             properties:
