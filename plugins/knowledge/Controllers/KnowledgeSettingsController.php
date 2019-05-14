@@ -386,6 +386,7 @@ class KnowledgeSettingsController extends SettingsController {
                 'type' => MediaApiController::TYPE_IMAGE,
             ]);
         } catch (ValidationException $e) {
+            // Migrate error messages to ensure the ability to associate errors with the correct form field.
             $validation = $e->getValidation();
             foreach ($validation->getErrors() as $error) {
                 $validation->addError($field, $error["message"], $error);
