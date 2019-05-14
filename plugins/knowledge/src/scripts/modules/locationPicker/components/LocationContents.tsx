@@ -39,14 +39,13 @@ class LocationContents extends React.Component<IProps> {
     public render() {
         const { childRecords, chosenRecord, navigatedRecord, navigatedKB, selectedRecord, title } = this.props;
 
-        const currentSort =
+        const isSelectedInNavigated =
             navigatedRecord &&
-            navigatedRecord.recordType === KbRecordType.CATEGORY &&
             selectedRecord &&
-            selectedRecord.recordType === KbRecordType.CATEGORY &&
-            navigatedRecord.recordID === selectedRecord.recordID
-                ? selectedRecord.position
-                : null;
+            navigatedRecord.recordType === selectedRecord.recordType &&
+            navigatedRecord.recordID === selectedRecord.recordID;
+
+        const currentSort = selectedRecord && isSelectedInNavigated ? selectedRecord.position : null;
         const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
 
         const setArticleFirstPosition = () => {
