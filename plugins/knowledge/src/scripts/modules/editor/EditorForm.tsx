@@ -21,7 +21,7 @@ import DocumentTitle from "@library/routing/DocumentTitle";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
-import { Editor } from "@rich-editor/editor/context";
+import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
 import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
