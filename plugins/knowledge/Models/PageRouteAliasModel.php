@@ -6,7 +6,6 @@
 
 namespace Vanilla\Knowledge\Models;
 
-use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Database\Operation;
@@ -128,5 +127,32 @@ class PageRouteAliasModel extends \Vanilla\Models\PipelineModel {
             $where['alias'] = $aliases;
         }
         return parent::delete($where);
+    }
+
+    /**
+     * Get recordID of particular recordType by alias.
+     *
+     * @param string $recordType
+     * @param string $alias
+     * @return int
+     * @throws NoResultsException Exception is thrown if no records found.
+     */
+    public function getRecordID(string $recordType, string $alias): int {
+        $where = [
+            'recordType' => $recordType,
+            'alias' => $alias
+        ];
+        $options = [
+            'select' => ['recordID'],
+            'limit' => 1
+        ];
+
+        $data = parent::get($where, $options);
+
+        if (empty($data)) {
+            throw new NoResultsException();
+        } else {
+            return $data[0]['recordID'];
+        }
     }
 }

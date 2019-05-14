@@ -840,6 +840,34 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get article by its alias.
+     *
+     * @param array $query Query should have one mandatory argument: alias
+     *
+     * @return array Data array Article record/item
+
+     */
+    public function get_byAlias(array $query): array {
+        $this->permission("knowledge.kb.view");
+
+        $in = $this->schema([
+            "alias" => [
+                "type" => "string",
+            ],
+        ], "in")->setDescription("Get article by its alias.");
+        $out = $this->articleSchema("out");
+        $query = $in->validate($query);
+
+        try {
+            $articleID = $this->pageRouteAliasModel->getRecordID(ArticleModel::RECORD_TYPE, $query['alias']);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Article");
+        }
+
+        return $this->get($articleID);
+    }
+
+    /**
      * PUT reaction on article ('helpful').
      *
      * @param int $id ArticleID
