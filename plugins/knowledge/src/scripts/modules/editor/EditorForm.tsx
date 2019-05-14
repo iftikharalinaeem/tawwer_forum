@@ -36,7 +36,7 @@ import { DeltaOperation } from "quill/core";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
-import { animated as a, useSpring } from "react-spring";
+import { animated, useSpring } from "react-spring";
 import Message from "@library/messages/Message";
 import { TouchScrollable } from "react-scrolllock";
 
@@ -166,44 +166,23 @@ export function EditorForm(props: IProps) {
     );
 
     const contentRef = useRef<HTMLDivElement>(null);
-    const contentSize = useMeasure(contentRef);
-    const [scrollPos, setScrollPos] = useState(0);
     const embedBarRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
-    const onScroll = useCallback(() => {
-        requestAnimationFrame(() => {
-            if (!formRef.current) {
-                return;
-            }
-            setScrollPos(Math.max(0, formRef.current.scrollTop));
-        });
-    }, [setScrollPos, formRef.current]);
-    const { y } = useSpring({ y: scrollPos, tension: 100 });
-    let start = 0;
-    let end = 0;
-    if (embedBarRef.current) {
-        const rect = embedBarRef.current.getBoundingClientRect();
-        start = rect.top / 2;
-        end = rect.top + rect.height * 2;
-    }
-
-    const opacity = y.interpolate({
-        range: [start, end],
-        output: [0, 1],
-    });
-
-    const boxShadow = y.interpolate({
-        range: [start, end],
-        output: [shadowHelper().makeShadow(0.2), shadowHelper().makeShadow(0)],
-    });
+    const contentSize = useMeasure(contentRef);
+    const transition = useFormScrollTransition(formRef, embedBarRef);
 
     return (
         <TouchScrollable>
-            <form className={classNames(classesEditorForm.root)} onSubmit={onSubmit} onScroll={onScroll} ref={formRef}>
-                <a.div
+            <form
+                className={classNames(classesEditorForm.root)}
+                onSubmit={onSubmit}
+                onScroll={transition.scrollHandler}
+                ref={formRef}
+            >
+                <animated.div
                     className={classesEditorForm.header}
                     style={{
-                        boxShadow,
+                        boxShadow: transition.headerBoxShadow,
                     }}
                 >
                     <EditorHeader
@@ -218,7 +197,7 @@ export function EditorForm(props: IProps) {
                         }
                         saveDraft={saveDraft}
                     />
-                </a.div>
+                </animated.div>
 
                 <div className={classesEditorForm.spacer} />
                 <ScreenReaderContent>
@@ -266,21 +245,26 @@ export function EditorForm(props: IProps) {
                     clearOperationsQueue={props.actions.clearEditorOps}
                 >
                     <div className={classesEditorForm.embedBarContainer}>
-                        <a.div
+                        <animated.div
                             className={classesEditorForm.embedBarTop}
                             style={{
-                                opacity,
+                                opacity: transition.headerBorderOpacity,
                             }}
                         />
-                        <EditorEmbedBar
-                            contentRef={embedBarRef}
-                            className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
-                        />
-                        <div className={classesEditorForm.embedBarBottom} />
-                        <a.div
-                            className={classesEditorForm.embedBarBottomFull}
+                        <animated.div
                             style={{
-                                opacity,
+                                boxShadow: transition.embedBarBoxShadow,
+                            }}
+                        >
+                            <EditorEmbedBar
+                                contentRef={embedBarRef}
+                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                            />
+                        </animated.div>
+                        <animated.div
+                            className={classesEditorForm.embedBarBottom}
+                            style={{
+                                opacity: transition.embedBarBorderOpacity,
                             }}
                         />
                     </div>
@@ -327,6 +311,80 @@ export function EditorForm(props: IProps) {
             </form>
         </TouchScrollable>
     );
+}
+
+/**
+ * Hook for the scroll transition in the editor page.
+ *
+ * The following should happen on scroll
+ * - Header box shadow fades out.
+ * - The short embed bar border fades out.
+ * - A full header border/divider fades in.
+ * - A full embed bar box shadow fades in.
+ *
+ * @param formRef A ref to the form element (the scroll container).
+ * @param embedBarRef A ref to the embed bar (it's dimensions are needed).
+ */
+function useFormScrollTransition(
+    formRef: React.RefObject<HTMLFormElement>,
+    embedBarRef: React.RefObject<HTMLDivElement>,
+) {
+    const [scrollPos, setScrollPos] = useState(0);
+
+    // Scroll handler to pass to the form element.
+    const scrollHandler = useCallback(() => {
+        requestAnimationFrame(() => {
+            if (!formRef.current) {
+                return;
+            }
+            setScrollPos(Math.max(0, formRef.current.scrollTop));
+        });
+    }, [setScrollPos, formRef.current]);
+
+    // Calculate some dimensions.
+    const { y } = useSpring({ y: scrollPos, tension: 100 });
+    let start = 0;
+    let end = 0;
+    if (embedBarRef.current) {
+        const rect = embedBarRef.current.getBoundingClientRect();
+        start = rect.top / 2;
+        end = rect.top + rect.height * 2;
+    }
+
+    // Fades in.
+    const headerBorderOpacity = y.interpolate({
+        range: [start, end],
+        output: [0, 1],
+    });
+
+    // Fades out.
+    const embedBarBorderOpacity = y.interpolate({
+        range: [start, end],
+        output: [1, 0],
+    });
+
+    const transparentShadow = shadowHelper().makeShadow(0);
+    const fullShadow = shadowHelper().makeShadow(0.2);
+
+    // Fades out.
+    const headerBoxShadow = y.interpolate({
+        range: [start, end],
+        output: [fullShadow, transparentShadow],
+    });
+
+    // Fades in.
+    const embedBarBoxShadow = y.interpolate({
+        range: [start, end],
+        output: [transparentShadow, fullShadow],
+    });
+
+    return {
+        scrollHandler,
+        headerBorderOpacity,
+        headerBoxShadow,
+        embedBarBorderOpacity,
+        embedBarBoxShadow,
+    };
 }
 
 const withRedux = connect(

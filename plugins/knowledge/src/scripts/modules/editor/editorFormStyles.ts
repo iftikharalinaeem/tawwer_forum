@@ -139,7 +139,7 @@ export const editorFormClasses = useThemeCache(() => {
 
     const header = style("header", sticky(), {
         top: 0,
-        zIndex: 2,
+        zIndex: 3,
     });
 
     const embedBar = style("embedBar", {});
@@ -151,11 +151,6 @@ export const editorFormClasses = useThemeCache(() => {
         background: colorOut(globalVars.separator.color),
     };
 
-    const embedBarBottomFull = style("embedBarBottom", embedBarMixin, {
-        top: percent(100),
-        left: percent(50),
-        width: percent(100),
-    });
     const embedBarTop = style("embedBarTop", embedBarMixin, {
         top: 0,
         left: percent(50),
@@ -214,7 +209,6 @@ export const editorFormClasses = useThemeCache(() => {
         bodyErrorMessage,
         containerWidth,
         conversionNotice,
-        embedBarBottomFull,
         modernFrame,
         embedBarTop,
         embedBarBottom,
