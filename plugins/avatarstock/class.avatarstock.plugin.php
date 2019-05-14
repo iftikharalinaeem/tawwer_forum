@@ -293,7 +293,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
             );
 
             // make sure both p & n thumbnails are not empty before saving to the db.
-            if(empty($thumb_parsed) || empty($crop_parsed)) {
+            if (empty($thumb_parsed) || empty($crop_parsed)) {
                 return false;
             }
             // Generate correct save path for db
