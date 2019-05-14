@@ -175,7 +175,9 @@ class CategoriesSortTest extends AbstractAPIv2Test {
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
-                "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+                "urlCode" => slugify(
+                    'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000)
+                ),
                 "viewType" => $kbType,
                 "sortArticles" => $sortArticles,
             ])->getBody();
@@ -261,7 +263,9 @@ class CategoriesSortTest extends AbstractAPIv2Test {
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
-                "urlCode" => 'test-Knowledge-Base-' . round(microtime(true) * 1000) . rand(1, 1000),
+                "urlCode" => slugify(
+                    'test-Knowledge-Base-' . round(microtime(true) * 1000) . rand(1, 1000)
+                ),
                 "viewType" => $kbType,
                 "sortArticles" => $sortArticles
             ])->getBody();
@@ -351,7 +355,9 @@ class CategoriesSortTest extends AbstractAPIv2Test {
             $newKnowledgeBase = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " Test Knowledge Base",
                 "description" => 'Some description',
-                "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+                "urlCode" => slugify(
+                    'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000)
+                ),
                 "viewType" => $kbType,
                 "sortArticles" => $sortArticles,
             ])->getBody();
