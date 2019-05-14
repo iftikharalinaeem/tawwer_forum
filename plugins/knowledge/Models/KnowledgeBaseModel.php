@@ -102,7 +102,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @return bool
      */
     public function urlCodeValidator(string $urlCode, ValidationField $field): bool {
-        $regex = '/^[\w\-]+$/';
+        $regex = '/^[a-z0-9\-_]+$/';
         $reservedSlugs = [
             'articles',
             'categories',
@@ -113,7 +113,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         if (!preg_match($regex, $urlCode)) {
             $validation->addError('urlCode', <<<MESSAGE
-URL code can only be made of the following characters: a-z, A-Z, 0-9, _, -
+URL code can only be made of the following characters: a-z, 0-9, _, -
 MESSAGE
             );
         }
