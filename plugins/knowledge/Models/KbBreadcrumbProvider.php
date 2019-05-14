@@ -47,17 +47,19 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
 
         $categoryID = $record->getRecordID();
         $knowledgeBase = $this->kbModel->selectFragmentForCategoryID($categoryID);
-        $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
 
         $result = [];
 
-        foreach ($categories as $index => $category) {
-            $isKbRoot = $category->getParentID() === KnowledgeCategoryModel::ROOT_ID;
-            if ($isKbRoot) {
-                // We are in knowledge base categoryID. We need to push
-                $result[] = $knowledgeBase->asBreadcrumb();
-            } else {
-                $result[] = $category->asBreadcrumb();
+        if ($knowledgeBase->getViewType() === KnowledgeBaseModel::TYPE_GUIDE) {
+            $result[] = $knowledgeBase->asBreadcrumb();
+        } else {
+            $categories = $this->kbCategoryModel->selectWithAncestors($categoryID);
+            foreach ($categories as $index => $category) {
+                if ($category->getParentID() === KnowledgeCategoryModel::ROOT_ID) {
+                    $result[] = $knowledgeBase->asBreadcrumb();
+                } else {
+                    $result[] = $category->asBreadcrumb();
+                }
             }
         }
 
