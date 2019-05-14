@@ -15,8 +15,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { IResult } from "@library/result/Result";
@@ -99,7 +98,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
                                         className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                        baseClass={ButtonTypes.ICON}
+                                        baseClass={ButtonTypes.ICON_COMPACT}
                                         title={t("Compose")}
                                     >
                                         {compose()}
@@ -112,7 +111,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             </PageTitle>
                         </PanelWidget>
                     }
-                    middleBottom={<PanelWidgetVerticalPadding>{pageContent}</PanelWidgetVerticalPadding>}
+                    middleBottom={pageContent}
                     rightTop={isFullWidth && <></>}
                 />
             </Container>

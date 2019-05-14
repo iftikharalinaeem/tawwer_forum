@@ -77,7 +77,7 @@ export interface IArticleFragment {
     dateUpdated: string;
     updateUser: IUserFragment;
     url: string; // Full URL to the resource
-    excerpt: string; // Excerpt of the article's content.
+    excerpt?: string; // Excerpt of the article's content.
 }
 
 // Request/Response interfaces
