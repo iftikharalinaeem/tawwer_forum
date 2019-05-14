@@ -196,6 +196,9 @@ function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
                     url: knowledgeBase.url,
                 },
             ];
+            if (chosenRecord.position !== undefined) {
+                chosenSort = chosenRecord.position;
+            }
         }
     }
     return {
