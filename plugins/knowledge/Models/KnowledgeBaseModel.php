@@ -307,8 +307,6 @@ MESSAGE
      * @throws Exception If an error is encountered while performing the query.
      */
     public function insert(array $set) {
-        $type = $set["viewType"] ?? null;
-
         // Enforce restrictions on KB article sorting.
         $this->validateSortArticlesInternal($set);
 

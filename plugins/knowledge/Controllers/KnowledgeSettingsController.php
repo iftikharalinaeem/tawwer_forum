@@ -200,6 +200,10 @@ class KnowledgeSettingsController extends SettingsController {
             'urlCode' => [
                 'LabelCode' => 'URL Code',
                 "Description" => "A customized version of the knowledge base name as it should appear in URLs.",
+                "Options" => [
+                    "data-react-input" => true,
+                    "data-validation-filter" => "slug",
+                ],
             ],
             'description' => [
                 'LabelCode' => 'Description',
