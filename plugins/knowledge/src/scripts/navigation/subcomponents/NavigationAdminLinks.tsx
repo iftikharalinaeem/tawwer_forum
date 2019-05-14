@@ -6,7 +6,7 @@
 
 import { OrganizeCategoriesRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/utility/appUtils";
-import { organize } from "@library/icons/navigationManager";
+import { organize } from "@knowledge/navigation/navigationManagerIcons";
 import Permission from "@library/features/users/Permission";
 import classNames from "classnames";
 import React, { useState, useRef } from "react";

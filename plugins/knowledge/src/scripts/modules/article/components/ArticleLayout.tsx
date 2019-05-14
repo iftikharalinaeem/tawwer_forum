@@ -22,6 +22,7 @@ import { IArticle } from "@knowledge/@types/api/article";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 
 /**
  * Implements the article's layout
@@ -51,11 +52,7 @@ export class ArticleLayout extends React.Component<IProps> {
                 <PanelLayout
                     breadcrumbs={
                         this.props.device !== Devices.MOBILE &&
-                        article.breadcrumbs && (
-                            <PanelWidget>
-                                <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
-                            </PanelWidget>
-                        )
+                        this.props.device !== Devices.XS && <NavigationBreadcrumbs activeRecord={activeRecord} />
                     }
                     leftBottom={
                         <PanelWidget>
@@ -80,7 +77,9 @@ export class ArticleLayout extends React.Component<IProps> {
                                         permaLink={article.url}
                                     />
                                 }
-                                includeBackLink={this.props.device !== Devices.MOBILE}
+                                includeBackLink={
+                                    this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS
+                                }
                             />
                             {messages && <div className="messages">{messages}</div>}
                         </PanelWidget>

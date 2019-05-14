@@ -32,8 +32,8 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
 export class RevisionsLayout extends React.Component<IProps> {
     public render() {
         const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
-        const isDesktop = device === Devices.DESKTOP;
-        const isMobile = device === Devices.MOBILE;
+        const isDesktop = device === Devices.DESKTOP || device === Devices.NO_BLEED;
+        const isMobile = device === Devices.MOBILE || device === Devices.XS;
         const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revision History");
 
         const classesMobileDropdown = mobileDropDownClasses();
@@ -70,13 +70,10 @@ export class RevisionsLayout extends React.Component<IProps> {
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout
                         device={this.props.device}
-                        topPadding={this.props.device !== Devices.MOBILE}
+                        topPadding={this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS}
                         breadcrumbs={
-                            this.props.device !== Devices.MOBILE && (
-                                <PanelWidget>
-                                    <Breadcrumbs children={crumbs} forceDisplay={false} />
-                                </PanelWidget>
-                            )
+                            this.props.device !== Devices.MOBILE &&
+                            this.props.device !== Devices.XS && <Breadcrumbs children={crumbs} forceDisplay={false} />
                         }
                         leftTop={isDesktop && <></>}
                         middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}

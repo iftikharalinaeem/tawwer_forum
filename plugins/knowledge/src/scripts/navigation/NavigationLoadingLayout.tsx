@@ -41,11 +41,7 @@ export default function NavigationLoadingLayout(props: IProps) {
             <TitleBar title={t("Loading")} mobileDropDownContent={navigation} />
             <PanelLayout
                 leftBottom={<PanelWidget>{navigation}</PanelWidget>}
-                breadcrumbs={
-                    <PanelWidget>
-                        <Breadcrumbs forceDisplay={true}>{[]}</Breadcrumbs>
-                    </PanelWidget>
-                }
+                breadcrumbs={<Breadcrumbs forceDisplay={true}>{[]}</Breadcrumbs>}
                 middleBottom={
                     <PanelWidget>
                         <Loader />

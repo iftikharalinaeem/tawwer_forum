@@ -7,7 +7,7 @@
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import classNames from "classnames";
 import React from "react";
-import { article } from "@library/icons/navigationManager";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 interface IProps {
     name: string;

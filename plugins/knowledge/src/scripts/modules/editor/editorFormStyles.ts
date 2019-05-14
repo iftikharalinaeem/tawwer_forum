@@ -5,7 +5,7 @@
  */
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
@@ -27,12 +27,13 @@ import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
     const layoutVars = layoutVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("editorFormClasses");
     const classesRichEditor = richEditorClasses(false);
+    const mediaQueries = layoutVars.mediaQueries();
     const root = style({
         position: "fixed",
         top: 0,
@@ -84,27 +85,24 @@ export const editorFormClasses = useThemeCache(() => {
         },
     });
 
-    const desktopGutter = layoutVars.gutter.size + layoutVars.gutter.halfSize;
     const mobileGutter = layoutVars.gutter.halfSize + 4; // 4 is from panel widget. Not yet converted,;
 
     const containerWidth = style(
         "containerWidth",
         {
             width: percent(100),
-            maxWidth: layoutVars.middleColumnWidth,
+            maxWidth: layoutVars.middleColumn.paddedWidth,
         },
         paddings({
-            horizontal: desktopGutter,
+            horizontal: globalVars.gutter.size,
         }),
-        layoutVariables()
-            .mediaQueries()
-            .oneColumn({
-                ...paddings({
-                    horizontal: mobileGutter,
-                }),
-            }),
         margins({
             horizontal: "auto",
+        }),
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                horizontal: mobileGutter,
+            }),
         }),
     );
 
@@ -134,7 +132,7 @@ export const editorFormClasses = useThemeCache(() => {
         });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
-        top: headerVars.sizing.height,
+        top: titleBarVars.sizing.height,
         zIndex: 2,
         background: colorOut(vars.colors.bg),
     });
@@ -170,11 +168,11 @@ export const editorFormClasses = useThemeCache(() => {
         {
             top: percent(100),
             left: percent(50),
-            width: layoutVars.middleColumnWidth - desktopGutter * 2,
+            width: layoutVars.middleColumn.width,
         },
         layoutVariables()
             .mediaQueries()
-            .oneColumn({
+            .oneColumnDown({
                 width: calc(`100% - ${mobileGutter * 2}px`),
             }),
     );

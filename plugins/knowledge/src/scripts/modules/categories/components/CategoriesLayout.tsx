@@ -27,6 +27,7 @@ import classNames from "classnames";
 import * as React from "react";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { compose } from "@library/icons/common";
+import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -78,13 +79,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 />
                 <PanelLayout
                     device={this.props.device}
-                    breadcrumbs={
-                        category.breadcrumbs && (
-                            <PanelWidget>
-                                <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
-                            </PanelWidget>
-                        )
-                    }
+                    breadcrumbs={<NavigationBreadcrumbs activeRecord={activeRecord} />}
                     leftBottom={
                         <PanelWidget>
                             <Navigation

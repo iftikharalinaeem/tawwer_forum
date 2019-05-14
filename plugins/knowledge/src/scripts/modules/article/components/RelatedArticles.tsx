@@ -9,6 +9,8 @@ import { PanelWidget } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import { Link } from "react-router-dom";
+import { panelListClasses } from "@library/layout/panelListStyles";
+import classNames from "classnames";
 
 export interface IInternalLink {
     name: string;
@@ -24,11 +26,16 @@ interface IProps {
  */
 export default class RelatedArticles extends React.Component<IProps> {
     public render() {
+        const classes = panelListClasses();
         if (this.props.children && this.props.children.length > 0) {
             const contents = this.props.children.map((item, i) => {
                 return (
-                    <li className="panelList-item relatedArticles-item" key={"related-" + i}>
-                        <Link to={item.to} className="panelList-link relatedArticles-link" title={item.name}>
+                    <li className={classNames("panelList-item", "relatedArticles-item")} key={"related-" + i}>
+                        <Link
+                            to={item.to}
+                            className={classNames("panelList-link", classes.link, "relatedArticles-link")}
+                            title={item.name}
+                        >
                             {item.name}
                         </Link>
                     </li>
@@ -37,9 +44,12 @@ export default class RelatedArticles extends React.Component<IProps> {
 
             return (
                 <PanelWidget>
-                    <nav className="panelList relatedArticles">
-                        <Heading title={t("Related Articles")} className="panelList-title relatedArticles-title" />
-                        <ul className="panelList-items relatedArticles-items">{contents}</ul>
+                    <nav className={classNames("panelList", "relatedArticles")}>
+                        <Heading
+                            title={t("Related Articles")}
+                            className={classNames("panelList-title", "relatedArticles-title")}
+                        />
+                        <ul className={classNames("panelList-items", "relatedArticles-items")}>{contents}</ul>
                     </nav>
                 </PanelWidget>
             );

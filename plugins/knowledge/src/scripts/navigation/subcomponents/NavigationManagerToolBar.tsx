@@ -7,7 +7,7 @@
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { newFolder } from "@library/icons/common";
-import { collapseAll, expandAll } from "@library/icons/navigationManager";
+import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
@@ -24,7 +24,7 @@ interface IProps {
 export default function NavigationManagerToolBar(props: IProps) {
     const classesNavigationManager = navigationManagerClasses();
     const device = useDevice();
-    const isMobile = device === Devices.MOBILE;
+    const isMobile = device === Devices.MOBILE || device === Devices.XS;
     return (
         <div className="navigationManagerToolbar">
             <div className="navigationManagerToolbar-bar">
