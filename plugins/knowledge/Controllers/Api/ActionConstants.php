@@ -31,4 +31,7 @@ abstract class ActionConstants {
     // Category page
     const GET_ARTICLES_RESPONSE = "@@kbCategoriesPage/GET_ARTICLES_RESPONSE";
     const GET_ARTICLES_ERROR = "@@kbCategoriesPage/GET_ARTICLES_ERROR";
+
+    // Server data
+    const SET_LOCAL_DEPLOYMENT_KEY = "@@server/SET_LOCAL_DEPLOYMENT_KEY";
 }

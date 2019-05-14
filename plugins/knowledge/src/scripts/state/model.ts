@@ -27,6 +27,7 @@ import { INavigationStoreState } from "@knowledge/navigation/state/NavigationMod
 import { IRouteState } from "@knowledge/routes/RouteReducer";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { DeepPartial, Reducer } from "redux";
+import { IServerState } from "@knowledge/server/serverReducer";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
@@ -57,6 +58,7 @@ export interface IKbState {
 
 export interface IStoreState extends ICoreStoreState {
     knowledge: IKbState;
+    server: IServerState;
 }
 
 export type IPartialStoreState = DeepPartial<IStoreState>;
