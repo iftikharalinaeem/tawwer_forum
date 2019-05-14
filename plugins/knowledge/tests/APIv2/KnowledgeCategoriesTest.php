@@ -147,7 +147,9 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
                 'bannerImage' => '',
                 'sortArticles' => 'manual',
                 'sourceLocale' => '',
-                'urlCode' => 'KnowledgeCategoriesTest-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000),
+                'urlCode' => slugify(
+                    'KnowledgeCategoriesTest-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000)
+                ),
             ];
             $knowledgeBase = $this->api()->post(
                 '/knowledge-bases',
@@ -320,7 +322,9 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " KB #1",
             "Description" => 'Test knowledge base description',
-            "urlCode" => 'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000),
+            "urlCode" => slugify(
+                'test-Knowledge-Base-'.round(microtime(true) * 1000).rand(1, 1000)
+            ),
             "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
             "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
         ])->getBody();

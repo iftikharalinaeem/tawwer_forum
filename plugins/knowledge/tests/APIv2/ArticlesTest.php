@@ -205,7 +205,7 @@ class ArticlesTest extends AbstractResourceTest {
             $this->defaultKB = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " KB #1",
                 "Description" => 'Test knowledge base description',
-                "urlCode" => 'test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000),
+                "urlCode" => slugify('test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
             ])->getBody();
