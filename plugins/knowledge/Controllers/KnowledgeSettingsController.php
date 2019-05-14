@@ -11,6 +11,7 @@ use Garden\StaticCacheTranslationTrait;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\TwigRenderTrait;
+use Garden\Schema\Validation;
 
 /**
  * Controller for serving the /knowledge-settings pages.
@@ -298,10 +299,10 @@ class KnowledgeSettingsController extends SettingsController {
     private function post_addEdit($knowledgeBaseID = null) {
         $values = $this->Form->formValues();
         if ($values['icon_New']) {
-            $values['icon'] = $this->handleFormMediaUpload($values['icon_New']);
+            $values['icon'] = $this->handleFormMediaUpload($values['icon_New'], "icon");
         }
         if ($values["bannerImage_New"]) {
-            $values["bannerImage"] = $this->handleFormMediaUpload($values["bannerImage_New"]);
+            $values["bannerImage"] = $this->handleFormMediaUpload($values["bannerImage_New"], "bannerImage");
         }
 
         // A guide must be sorted manually.
@@ -374,14 +375,24 @@ class KnowledgeSettingsController extends SettingsController {
      * Pass along an UploadFile to the MediaApiController and return it's URL.
      *
      * @param Vanilla\UploadedFile $file
+     * @param string $field
      *
      * @return string
      */
-    private function handleFormMediaUpload(Vanilla\UploadedFile $file): string {
-        $image = $this->mediaApiController->post([
-            'file' => $file,
-            'type' => MediaApiController::TYPE_IMAGE,
-        ]);
+    private function handleFormMediaUpload(Vanilla\UploadedFile $file, string $field): string {
+        try {
+            $image = $this->mediaApiController->post([
+                'file' => $file,
+                'type' => MediaApiController::TYPE_IMAGE,
+            ]);
+        } catch (ValidationException $e) {
+            // Migrate error messages to ensure the ability to associate errors with the correct form field.
+            $validation = $e->getValidation();
+            foreach ($validation->getErrors() as $error) {
+                $validation->addError($field, $error["message"], $error);
+            }
+            throw $e;
+        }
 
         return $image['url'];
     }

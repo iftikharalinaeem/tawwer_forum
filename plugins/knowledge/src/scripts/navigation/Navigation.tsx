@@ -114,10 +114,18 @@ function mapStateToProps(store: IStoreState, ownProps: IOwnProps) {
                 }
                 break;
             case KbViewType.HELP: {
-                const rootID = ownProps.activeRecord.recordType + ownProps.activeRecord.recordID;
-                navItems.data = NavigationSelector.selectDirectChildren(items, rootID, [KbRecordType.CATEGORY]).map(
-                    item => ({ ...item, children: [] }),
-                );
+                const isHelpCenterRoot =
+                    ownProps.activeRecord.recordType === KbRecordType.CATEGORY &&
+                    knowledgeBase.data.rootCategoryID === ownProps.activeRecord.recordID;
+                if (isHelpCenterRoot) {
+                    // Avoid seeing any navigation for a root-level help center category (i.e. hide top-level categories).
+                    navItems.data = [];
+                } else {
+                    const rootID = ownProps.activeRecord.recordType + ownProps.activeRecord.recordID;
+                    navItems.data = NavigationSelector.selectDirectChildren(items, rootID, [KbRecordType.CATEGORY]).map(
+                        item => ({ ...item, children: [] }),
+                    );
+                }
             }
         }
     }

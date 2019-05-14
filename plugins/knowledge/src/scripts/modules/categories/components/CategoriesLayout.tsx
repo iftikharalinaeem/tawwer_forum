@@ -15,7 +15,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
@@ -27,6 +27,7 @@ import classNames from "classnames";
 import * as React from "react";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { compose } from "@library/icons/common";
+import { NavigationBreadcrumbs } from "@knowledge/navigation/NavigationBreadcrumbs";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -78,9 +79,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 />
                 <PanelLayout
                     device={this.props.device}
-                    breadcrumbs={
-                        category.breadcrumbs && <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
-                    }
+                    breadcrumbs={<NavigationBreadcrumbs activeRecord={activeRecord} />}
                     leftBottom={
                         <PanelWidget>
                             <Navigation
@@ -100,7 +99,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
                                         className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                        baseClass={ButtonTypes.ICON}
+                                        baseClass={ButtonTypes.ICON_COMPACT}
                                         title={t("Compose")}
                                     >
                                         {compose()}
@@ -113,7 +112,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                             </PageTitle>
                         </PanelWidget>
                     }
-                    middleBottom={<PanelWidgetVerticalPadding>{pageContent}</PanelWidgetVerticalPadding>}
+                    middleBottom={pageContent}
                     rightTop={isFullWidth && <></>}
                 />
             </Container>

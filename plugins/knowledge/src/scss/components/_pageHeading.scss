@@ -4,77 +4,77 @@
  * @license Proprietary
  */
 
-$pageHeading-cta_margin                        : 1em !default;
-$pageHeading-dropdown_width                    : 150px !default;
-$pageHeading-backLink_height                   : $icon-default_size;
-$pageHeading-backLink_width                    : $pageHeading-backLink_height * 12px / 21px;
+////$pageHeading-cta_margin                        : 1em !default;
+////$pageHeading-dropdown_width                    : 150px !default;
+////$pageHeading-backLink_height                   : $icon-default_size;
+//$pageHeading-backLink_width                    : $pageHeading-backLink_height * 12px / 21px;
 
-.pageHeading {
-    display: flex;
-    width: 100%;
-    align-items: center;
-}
+//.pageHeading {
+//    display: flex;
+//    width: 100%;
+//    align-items: center;
+//}
 
-.pageTitle {
-    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
-    display: block;
-    margin: {
-        top: 0;
-        bottom: 0;
-    }
-}
+//.pageTitle {
+//    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
+//    display: block;
+//    margin: {
+//        top: 0;
+//        bottom: 0;
+//    }
+//}
 
-.pageSmallTitle {
-    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
-    font-size: $global-smallTitle_fontSize;
-    font-weight: $global-fontWeight_bold;
-    display: block;
-    margin: {
-        top: 0;
-        bottom: 0;
-    }
-}
+//.pageSmallTitle {
+//    @include lineHeightAdjustment($global-base_lineHeight, $global-heading_lineHeightRatio);
+//    font-size: $global-smallTitle_fontSize;
+//    font-weight: $global-fontWeight_bold;
+//    display: block;
+//    margin: {
+//        top: 0;
+//        bottom: 0;
+//    }
+//}
 
-.pageHeading-underTitle {
-    margin-top: $utility-baseUnit;
-}
+//.pageHeading-underTitle {
+//    margin-top: $utility-baseUnit;
+//}
 
-.pageHeading-main {
-    position: relative;
-    display: block;
-    width: 100%;
-    flex-grow: 1;
-}
+//.pageHeading-main {
+//    position: relative;
+//    display: block;
+//    width: 100%;
+//    flex-grow: 1;
+//}
 
-.pageHeading-titleBar {
-    display: flex;
-    position: relative;
-    align-items: center;
-}
+//.pageHeading-titleBar {
+//    display: flex;
+//    position: relative;
+//    align-items: center;
+//}
 
 
-.pageHeading-p {
-    font-size: $global-small_fontSize;
-    margin-bottom: $utility-baseUnit * 2;
-}
+//.pageHeading-p {
+//    font-size: $global-small_fontSize;
+//    margin-bottom: $utility-baseUnit * 2;
+//}
 
-.pageHeading-actions {
-    display: flex;
-    margin-left: $pageHeading-cta_margin;
-    align-self: flex-start;
-    position: relative;
-}
+//.pageHeading-actions {
+//    display: flex;
+//    margin-left: $pageHeading-cta_margin;
+//    align-self: flex-start;
+//    position: relative;
+//}
 
 .pageHeading-backLink {
-    @include absolute-topLeft(50%);
-    overflow: visible;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translateY(-50%);
-    height: $pageHeading-backLink_height;
-    width: $pageHeading-backLink_width;
-    flex-basis: $pageHeading-backLink_width;
+    //@include absolute-topLeft(50%);
+    //overflow: visible;
+    //display: flex;
+    //align-items: center;
+    //justify-content: center;
+    //transform: translateY(-50%);
+    //height: $pageHeading-backLink_height;
+    //width: $pageHeading-backLink_width;
+    //flex-basis: $pageHeading-backLink_width;
     margin: {
         top: -#{lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio)};
         bottom: -#{$pageHeading-backLink_width + 21px};
@@ -83,32 +83,27 @@ $pageHeading-backLink_width                    : $pageHeading-backLink_height * 
 }
 
 
-.icon-chevronLeftCompact {
-    height: $pageHeading-backLink_height;
-    width: 14.14px;
-}
+//.icon-chevronLeftCompact {
+//    height: $pageHeading-backLink_height;
+//    width: 14.14px;
+//}
 
 
-.pageHeading-link {
-    display: block;
-    height: $icon-default_size;
-    width: $icon-default_size;
-    color: inherit;
-}
+//.pageHeading-link {
+//    display: block;
+//    height: $icon-default_size;
+//    width: $icon-default_size;
+//    color: inherit;
+//}
 
-.pageHeading-backIcon {
-    position: relative;
-    display: block;
-    width: $icon-default_size;
-    height: $icon-default_size;
-}
+//.pageHeading-backIcon {
+//    position: relative;
+//    display: block;
+//    width: $icon-default_size;
+//    height: $icon-default_size;
+//}
 
 .pageHeading-titleWrap {
     position: relative;
-}
-
-.pageHeading-hamburgerWrapper {
-    display: flex;
-    align-items: center;
 }
 
