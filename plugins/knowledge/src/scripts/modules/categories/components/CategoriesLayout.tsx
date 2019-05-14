@@ -16,7 +16,6 @@ import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { IResult } from "@library/result/Result";
