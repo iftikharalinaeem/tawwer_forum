@@ -645,9 +645,9 @@ class GroupsHooks extends Gdn_Plugin {
      * @param PostController $sender
      */
     public function postController_render_before($sender) {
-        $group = $sender->data('Group');
+        $groupID = $sender->Request->get('groupid');
 
-        if ($group) {
+        if ($groupID) {
             // Hide the category drop-down.
             $sender->ShowCategorySelector = false;
 
