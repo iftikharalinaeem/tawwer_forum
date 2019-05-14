@@ -7,6 +7,7 @@ import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import * as React from "react";
+import { simplePagerClasses } from "@library/navigation/simplePagerStyles";
 
 interface IProps {
     onNextClick?: React.MouseEventHandler;
@@ -21,22 +22,16 @@ export default class SearchPagination extends React.Component<IProps> {
         const { onNextClick, onPreviousClick } = this.props;
 
         const isSingle = (onNextClick && !onPreviousClick) || (!onNextClick && onPreviousClick);
-
+        const classes = simplePagerClasses();
         return (
-            <div className="simplePager">
+            <div className={classNames("simplePager", classes.root)}>
                 {onPreviousClick && (
-                    <Button
-                        className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
-                        onClick={onPreviousClick}
-                    >
+                    <Button className={classNames(classes.button, { isSingle })} onClick={onPreviousClick}>
                         {t("Previous")}
                     </Button>
                 )}
                 {onNextClick && (
-                    <Button
-                        className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
-                        onClick={onNextClick}
-                    >
+                    <Button className={classNames(classes.button, { isSingle })} onClick={onNextClick}>
                         {t("Next")}
                     </Button>
                 )}
