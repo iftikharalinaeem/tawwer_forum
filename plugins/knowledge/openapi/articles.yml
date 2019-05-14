@@ -776,6 +776,25 @@ paths:
             tags:
                 - Articles
             summary: Get aliases for article.
+    "/articles/by-alias":
+        get:
+            parameters:
+              - description: Article alias.
+                in: query
+                name: alias
+                required: true
+                schema:
+                  type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get an article by its alias.
 components:
     requestBodies:
         ArticlePost:
