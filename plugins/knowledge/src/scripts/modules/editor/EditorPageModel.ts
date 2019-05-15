@@ -6,7 +6,7 @@
 
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus, IApiError } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { DeltaOperation } from "quill/core";
@@ -37,6 +37,7 @@ export interface IEditorPageState {
     form: IEditorPageForm;
     formNeedsRefresh: boolean;
     editorOperationsQueue: EditorQueueItem[];
+    currentError: IApiError | null;
     revision: ILoadable<number>; // The revision ID. Actual revision will live in normalized revisions resource.
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
@@ -54,6 +55,7 @@ export interface IInjectableEditorProps {
     saveDraft: ILoadable<{}>;
     submit: ILoadable<{}>;
     notifyConversion: boolean;
+    currentError: IApiError | null;
 }
 
 type ReducerType = KnowledgeReducer<IEditorPageState>;
@@ -76,6 +78,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             formNeedsRefresh,
             editorOperationsQueue,
             notifyConversion,
+            currentError,
         } = EditorPageModel.getStateSlice(state);
 
         return {
@@ -88,6 +91,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             draft: EditorPageModel.selectDraft(state),
             editorOperationsQueue,
             notifyConversion,
+            currentError,
         };
     }
 
@@ -160,6 +164,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
         formNeedsRefresh: false,
         editorOperationsQueue: [],
+        currentError: null,
         revision: {
             status: LoadStatus.PENDING,
             error: undefined,
@@ -187,6 +192,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceRevision,
                 this.reduceArticle,
                 this.reduceEditorQueue,
+                this.reduceErrors,
             )(nextState, action);
         });
     };
@@ -204,6 +210,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 const { forceRefresh } = action.payload;
                 nextState.formNeedsRefresh = forceRefresh;
                 nextState.isDirty = !forceRefresh;
+                break;
+            case EditorPageActions.RESET_ERROR:
+                nextState.currentError = null;
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;
@@ -229,6 +238,24 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             nextState.notifyConversion = false;
             return nextState;
         });
+
+    /**
+     * Simple non-specific reducer for the page.
+     */
+    private reduceErrors: ReducerType = (nextState = this.initialState, action) => {
+        switch (action.type) {
+            case EditorPageActions.GET_ARTICLE_ERROR:
+            case ArticleActions.GET_DRAFT_ERROR:
+            case ArticleActions.GET_REVISION_ERROR:
+            case ArticleActions.PATCH_DRAFT_ERROR:
+            case ArticleActions.PATCH_ARTICLE_ERROR:
+            case ArticleActions.POST_ARTICLE_ERROR:
+            case ArticleActions.POST_DRAFT_ERROR:
+                nextState.currentError = action.payload;
+        }
+
+        return nextState;
+    };
 
     private reduceInitialDraft: ReducerType = (nextState = this.initialState, action) => {
         if (

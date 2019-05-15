@@ -43,6 +43,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
 
     // Frontend only actions
     public static readonly RESET = "@@articleEditor/RESET";
+    public static readonly RESET_ERROR = "@@articleEditor/RESET_ERROR";
     public static readonly SET_ACTIVE_REVISION = "@@articleEditor/SET_ACTIVE_REVISION";
 
     /**
@@ -53,7 +54,8 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         | ReturnType<typeof EditorPageActions.createSetRevision>
         | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setInitialDraftAC>
-        | ReturnType<typeof EditorPageActions.createResetAction>;
+        | ReturnType<typeof EditorPageActions.createResetAction>
+        | ReturnType<typeof EditorPageActions.createResetErrorAction>;
 
     /**
      * Action creators for GET /articles/:id
@@ -74,6 +76,13 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         return EditorPageActions.createAction(EditorPageActions.RESET, {});
     }
 
+    /**
+     * Create a reset error action
+     */
+    private static createResetErrorAction() {
+        return EditorPageActions.createAction(EditorPageActions.RESET_ERROR, {});
+    }
+
     private static createSetRevision(revisionID: number) {
         return EditorPageActions.createAction(EditorPageActions.SET_ACTIVE_REVISION, { revisionID });
     }
@@ -82,6 +91,11 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
      * Reset the page state.
      */
     public reset = this.bindDispatch(EditorPageActions.createResetAction);
+
+    /**
+     * Reset the page state.
+     */
+    public resetError = this.bindDispatch(EditorPageActions.createResetErrorAction);
 
     // Form handling
     public static readonly UPDATE_FORM = "@articleEditor/UPDATE_FORM";
