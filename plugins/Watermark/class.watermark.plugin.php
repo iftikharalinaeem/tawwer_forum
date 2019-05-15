@@ -24,8 +24,8 @@ class WatermarkPlugin extends Gdn_Plugin {
      *
      * @return boolean
      */
-    public function editorPlugin_beforeSaveUploads_handler($sender, $args) {
-        $categoryID = $this->getCategoryIDbyDiscussion($args["DiscussionID"]);
+    public function editorPlugin_beforeSaveUploads_handler(EditorPlugin $sender, array $args): bool {
+        $categoryID = isset($args['CategoryID']) ? $args['CategoryID'] : $this->getCategoryIDbyDiscussion($args["DiscussionID"]);
         $watermarkCategories = c('Watermark.WatermarkCategories');
 
         if (in_array($categoryID, $watermarkCategories)) {
@@ -51,9 +51,9 @@ class WatermarkPlugin extends Gdn_Plugin {
      * Get CategoryID
      *
      * @param string $discussionID
-     * @return string
+     * @return int
      */
-    public function getCategoryIDbyDiscussion($discussionID) {
+    public function getCategoryIDbyDiscussion(string $discussionID): int {
         $discussion = DiscussionModel::instance()->getID($discussionID);
 
         return $discussion->CategoryID;
