@@ -19,12 +19,16 @@ class WatermarkPlugin extends Gdn_Plugin {
      * with the discussion are then linked to the discussion, at this point we call the
      * insertDiscussionMedia Handler where we can watermark the image if it is in an assigned category.
      *
-     * @param $sender
-     * @param $args
+     * @param EditorPlugin $sender
+     * @param array $args
+     *
+     * @return boolean
      */
-    public function editorPlugin_beforeSaveUploads_handler($sender, $args) {
+    public function editorPlugin_beforeSaveUploads_handler(EditorPlugin $sender, array $args): bool {
+        $categoryID = isset($args['CategoryID']) ? $args['CategoryID'] : $this->getCategoryIDbyDiscussion($args["DiscussionID"]);
         $watermarkCategories = c('Watermark.WatermarkCategories');
-        if (in_array($args['CategoryID'], $watermarkCategories)) {
+
+        if (in_array($categoryID, $watermarkCategories)) {
             $filePath = $args['TmpFilePath'];
             $fileExtension = $args['FileExtension'];
 
@@ -41,6 +45,18 @@ class WatermarkPlugin extends Gdn_Plugin {
                 return true;
             }
         }
+    }
+
+    /**
+     * Get CategoryID
+     *
+     * @param string $discussionID
+     * @return int
+     */
+    public function getCategoryIDbyDiscussion(string $discussionID): int {
+        $discussion = DiscussionModel::instance()->getID($discussionID);
+
+        return $discussion->CategoryID;
     }
 
     /**
