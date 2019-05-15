@@ -19,7 +19,6 @@ import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
 import { boolean } from "@storybook/addon-knobs";
-import { EditorPage } from "./EditorPage";
 
 export interface IEditorPageForm {
     name: string;
