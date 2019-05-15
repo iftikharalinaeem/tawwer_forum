@@ -292,6 +292,10 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 ]
             );
 
+            // make sure both p & n thumbnails are valid before saving to the db.
+            if ($thumb_parsed['Url'] === false || $crop_parsed['Url'] === false) {
+                return false;
+            }
             // Generate correct save path for db
             $path_thumb_db = sprintf($thumb_parsed['SaveFormat'], $path_thumb);
             $post = Gdn::request()->post();
