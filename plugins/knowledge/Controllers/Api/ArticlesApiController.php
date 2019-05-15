@@ -828,7 +828,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleByID($id, true);
 
-        //$row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['aliases']  = $this->pageRouteAliasModel->getAliases(
             ArticleModel::RECORD_TYPE,
             $id,
