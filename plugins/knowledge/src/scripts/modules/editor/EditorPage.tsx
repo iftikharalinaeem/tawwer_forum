@@ -19,6 +19,8 @@ import Permission from "@library/features/users/Permission";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import QueryString from "@library/routing/QueryString";
 import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import Message from "@library/messages/Message";
+import { t } from "@library/utility/appUtils";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -51,6 +53,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
+                {this.renderErrorMessage()}
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
                     <EditorForm
@@ -90,6 +93,24 @@ export class EditorPage extends React.Component<IProps, IState> {
         this.props.actions.reset();
     }
 
+    /**
+     * Render the current error message, if there is one.
+     */
+    private renderErrorMessage(): React.ReactNode {
+        if (this.props.currentError === null) {
+            return null;
+        }
+
+        return (
+            <Message
+                confirmText={t("Dismiss")}
+                onConfirm={this.props.actions.resetError}
+                contents={this.props.currentError.message}
+                stringContents={this.props.currentError.message}
+                isFixed={true}
+            />
+        );
+    }
     /**
      * Render a query string component from the form value.
      */
