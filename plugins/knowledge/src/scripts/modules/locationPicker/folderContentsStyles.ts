@@ -18,11 +18,11 @@ export const folderContentsVariables = useThemeCache(() => {
     });
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.primary,
+        fg: globalVars.mainColors.fg,
     });
 
     const item = makeThemeVars("item", {
-        spacing: 6,
+        spacing: 12,
         minHeight: 44,
     });
 
@@ -87,6 +87,10 @@ export const folderContentsClasses = useThemeCache(() => {
         },
     });
 
+    const folderContents = style("folderContents", {
+        display: "block",
+    });
+
     const content = style("content", {
         display: "flex",
         justifyContent: "center",
@@ -143,27 +147,23 @@ export const folderContentsClasses = useThemeCache(() => {
         height: percent(100),
         minHeight: unit(vars.item.minHeight),
         width: unit(vars.itemAction.width),
+        color: colorOut(vars.colors.fg),
         $nest: {
             ...buttonStates({
                 noState: {
-                    backgroundColor: colorOut(globalVars.mainColors.bg),
-                    color: colorOut(globalVars.mainColors.primary),
+                    color: colorOut(vars.colors.fg),
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.mainColors.primary),
-                    color: colorOut(globalVars.mainColors.bg),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.mainColors.secondary),
-                    color: colorOut(globalVars.mainColors.bg),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
                 accessibleFocus: {
-                    backgroundColor: colorOut(globalVars.mainColors.secondary),
-                    color: colorOut(globalVars.mainColors.bg),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.mainColors.primary),
-                    color: colorOut(globalVars.mainColors.bg),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
             }),
         },
@@ -182,5 +182,6 @@ export const folderContentsClasses = useThemeCache(() => {
         checkIcon,
         uncheckedIcon,
         subFolder,
+        folderContents,
     };
 });
