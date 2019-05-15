@@ -103,23 +103,28 @@ export class EditorHeader extends React.Component<IProps, IState> {
                 ) : null}
                 <li
                     ref={this.restoreRef}
-                    className={classNames(classesEditorHeader.item, classesEditorHeader.itemPaddingLeft)}
+                    className={classNames(classesEditorHeader.item, classesEditorHeader.itemMarginLeft)}
                 >
                     <Button
                         type="submit"
                         title={this.props.callToAction}
                         disabled={!this.props.canSubmit}
-                        baseClass={ButtonTypes.TEXT}
+                        baseClass={ButtonTypes.TEXT_PRIMARY}
                         className={classNames(
                             "buttonNoHorizontalPadding",
                             "buttonNoBorder",
                             classesEditorHeader.publish,
+                            classesEditorHeader.itemMarginLeft,
                         )}
                     >
                         {this.props.isSubmitLoading ? <ButtonLoader /> : this.props.callToAction}
                     </Button>
                 </li>
-                {this.props.optionsMenu && <li className="editorHeader-item">{this.props.optionsMenu}</li>}
+                {this.props.optionsMenu && (
+                    <li className={classNames("editorHeader-item", classesEditorHeader.itemMarginLeft)}>
+                        {this.props.optionsMenu}
+                    </li>
+                )}
             </ul>
         );
 
