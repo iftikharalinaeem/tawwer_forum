@@ -488,10 +488,16 @@ trait ArticlesApiSchemes {
     public static function validateAliases(array $aliases, \Garden\Schema\ValidationField $validationField): bool {
         $valid = true;
         foreach ($aliases as $alias) {
-            if ($alias !== rawurlencode(rawurldecode($alias))) {
+            $encoded = implode('/', array_map(
+                function ($str) {
+                    return rawurlencode(rawurldecode($str));
+                },
+                explode('/', $alias)
+            ));
+            if ($alias !== $encoded) {
                 $validationField->getValidation()->addError(
                     $validationField->getName(),
-                    "Alias is not valid url: '".$alias."'. Try: '".rawurlencode($alias)."'"
+                    "Alias is not valid url: '".$alias."'. Try: '".$encoded."'"
                 );
                 $valid = false;
             }
