@@ -884,7 +884,7 @@ class BadgesApiController extends AbstractApiController {
      */
     public function userBadgeByID($userID, $badgeID) {
         $row = $this->userBadgeModel->getByUser($userID, $badgeID);
-        if (!$row || !empty($row['_New'])|| empty($row['DateCompleted'])) {
+        if (!$row || !empty($row['_New']) || empty($row['DateCompleted'])) {
             throw new NotFoundException('UserBadge');
         }
 
