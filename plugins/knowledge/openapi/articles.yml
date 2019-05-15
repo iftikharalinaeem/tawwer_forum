@@ -737,6 +737,64 @@ paths:
             tags:
                 - Articles
             summary: Put reaction on article.
+    "/articles/{id}/aliases":
+        put:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/Aliases"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleSimple"
+                    description: Success
+            tags:
+                - Articles
+            summary: Put aliases for article.
+        get:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleAliases"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get aliases for article.
+    "/articles/by-alias":
+        get:
+            parameters:
+              - description: Article alias.
+                in: query
+                name: alias
+                required: true
+                schema:
+                  type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get an article by its alias.
 components:
     requestBodies:
         ArticlePost:
@@ -786,11 +844,24 @@ components:
                         type: object
                         properties:
                           helpful:
-                            description: User reaction on `Was it helpful?`.
+                            description: User reaction on 'Was it helpful?'.
                             type: string
                             enum:
                               - yes
                               - no
+            required: true
+        Aliases:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          aliases:
+                            description: Array of url aliases for article.
+                            type: array
+                            items:
+                                type: string
+                        example: { 'aliases': [ 'category/discussion-migrated-from/forum/', 'another-url/for-the-same/article' ]}
             required: true
     schemas:
         Article:
@@ -1046,6 +1117,12 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/Reaction"
+                aliases:
+                    description: List of url aliases for article.
+                    type: array
+                    items:
+                      type: string
+                    example: ['category/discussion-migrated-from/forum/', 'another-url/for-the-same/article']
             required:
                 - articleID
                 - knowledgeCategoryID
@@ -1062,6 +1139,40 @@ components:
                 - updateUserID
                 - dateUpdated
                 - status
+        ArticleAliases:
+            type: object
+            properties:
+                articleID:
+                    description: Unique article ID.
+                    type: integer
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    nullable: true
+                    type: integer
+                knowledgeBaseID:
+                    description: Knowledge base ID article belongs to.
+                    nullable: false
+                    type: integer
+                status:
+                    description: ""
+                    enum:
+                        - deleted
+                        - published
+                    minLength: 1
+                    nullable: true
+                    type: string
+                aliases:
+                    description: List of url aliases for article.
+                    type: array
+                    items:
+                      type: string
+                    example: ['category/discussion-migrated-from/forum/', 'another-url/for-the-same/article']
+            required:
+                - articleID
+                - knowledgeCategoryID
+                - knowledgeBaseID
+                - status
+                - aliases
         DiscussionArticle:
             type: object
             properties:

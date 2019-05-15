@@ -78,7 +78,7 @@
             {% if status == constant('Vanilla\\Knowledge\\Models\\KnowledgeBaseModel::STATUS_PUBLISHED') %}
                 {{ t("Add a knowledge base to get started.") }}
                 {% else %}
-                {{ t("No "~status~" knowledge bases found.") }}
+                {{ t('No "deleted" knowledge bases found.') }}
             {% endif %}
         </p>
     </div>

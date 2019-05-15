@@ -42,6 +42,9 @@ trait ArticlesApiSchemes {
     /** @var Schema */
     private $discussionArticleSchema;
 
+    /** @var Schema */
+    private $articleAliasesSchema;
+
     /**
      * Get a schema representing a discussion in an easy-to-consume format for creating an article.
      *
@@ -184,11 +187,32 @@ trait ArticlesApiSchemes {
                 "insertUser?",
                 "updateUser?",
                 "reactions?",
+                "aliases?",
                 "status",
                 "locale",
             ])->add($this->fullSchema()), "Article");
         }
         return $this->schema($this->articleSchema, $type);
+    }
+
+    /**
+     * Get aliases for an article.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function articleAliasesSchema(string $type = ""): Schema {
+        if ($this->articleAliasesSchema === null) {
+            $this->articleAliasesSchema = $this->schema(Schema::parse([
+                "articleID",
+                "knowledgeCategoryID",
+                "knowledgeBaseID",
+                "aliases",
+                "status",
+                "locale",
+            ])->add($this->fullSchema()), "Article");
+        }
+        return $this->schema($this->articleAliasesSchema, $type);
     }
 
     /**
@@ -391,6 +415,8 @@ trait ArticlesApiSchemes {
                     'enum' => ArticleReactionModel::getHelpfulReactions(),
                 ]
             ]),
+            //"aliases:a?" =>  Schema::parse(["alias" => "string"]),
+            "aliases:a?" => ['items' => ['type' => 'string']],
         ]);
     }
 
@@ -449,5 +475,33 @@ trait ArticlesApiSchemes {
             $this->idParamSchema = Schema::parse(["id:i" => "The article ID."]);
         }
         return $this->schema($this->idParamSchema, $type);
+    }
+
+    /**
+     * Validate the value of aliases array when put aliases. Compatible with \Garden\Schema\Schema.
+     *
+     * @param array $aliases
+     * @param \Garden\Schema\ValidationField $validationField
+     * @return bool
+     * @throws \Garden\Schema\ValidationException If the selected row fails output validation.
+     */
+    public static function validateAliases(array $aliases, \Garden\Schema\ValidationField $validationField): bool {
+        $valid = true;
+        foreach ($aliases as $alias) {
+            $encoded = implode('/', array_map(
+                function ($str) {
+                    return rawurlencode(rawurldecode($str));
+                },
+                explode('/', $alias)
+            ));
+            if ($alias !== $encoded) {
+                $validationField->getValidation()->addError(
+                    $validationField->getName(),
+                    "Alias is not valid url: '".$alias."'. Try: '".$encoded."'"
+                );
+                $valid = false;
+            }
+        }
+        return $valid;
     }
 }
