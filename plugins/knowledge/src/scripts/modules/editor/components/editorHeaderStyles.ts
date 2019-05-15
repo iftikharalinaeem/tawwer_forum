@@ -48,8 +48,8 @@ export const editorHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const itemPaddingLeft = style("itemPaddingLeft", {
-        marginLeft: unit(globalVars.spacer.size),
+    const itemMarginLeft = style("itemMarginLeft", {
+        marginLeft: unit(globalVars.gutter.half),
     });
 
     const centreColumn = style("centreColumn", {
@@ -92,6 +92,6 @@ export const editorHeaderClasses = useThemeCache(() => {
         otherLanguagesToggle,
         split,
         backLink,
-        itemPaddingLeft,
+        itemMarginLeft,
     };
 });
