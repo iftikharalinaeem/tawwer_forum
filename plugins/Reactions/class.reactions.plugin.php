@@ -227,7 +227,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int|null $userID
      * @return array
      */
-    public function commentsApiController_delete_reactions(CommentsApiController $sender, $id, $userID = null) {
+    public function commentsApiController_delete_reactions(CommentsApiController $sender, int $id, int $userID = null) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema(
@@ -451,7 +451,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int|null $userID
      * @return array
      */
-    public function discussionsApiController_delete_reactions(DiscussionsApiController $sender, $id, $userID = null) {
+    public function discussionsApiController_delete_reactions(DiscussionsApiController $sender, int $id, int $userID = null) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema(
