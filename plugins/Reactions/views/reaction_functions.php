@@ -128,9 +128,18 @@ function reactionButton($row, $urlCode, $options = []) {
       $dataAttr = "data-reaction=\"$urlCode2\"";
    }
 
-   $result = <<<EOT
-<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
+    if ($permissionClass && $permissionClass === 'Negative' && !checkPermission('Garden.Moderation.Manage')) {
+        $result = <<<EOT
+<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 EOT;
+
+    } else {
+        $result = <<<EOT
+<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
+
+EOT;
+
+    }
 
    return $result;
 }
@@ -311,8 +320,9 @@ function writeRecordReactions($row) {
          continue;
 
       $reactionType = ReactionModel::fromTagID($tag['TagID']);
-      if (!$reactionType || $reactionType['Hidden'])
-         continue;
+       $skipReaction = $reactionType['Class'] === 'Negative' && !checkPermission('Garden.Moderation.Manage');
+       if (!$reactionType || $reactionType['Hidden'] || $skipReaction)
+           continue;
       $urlCode = $reactionType['UrlCode'];
       $spriteClass = getValue('SpriteClass', $reactionType, "React$urlCode");
       $title = sprintf('%s - %s on %s', $user['Name'], t($reactionType['Name']), Gdn_Format::dateFull($tag['DateInserted']));
