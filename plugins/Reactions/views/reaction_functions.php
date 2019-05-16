@@ -132,7 +132,6 @@ function reactionButton($row, $urlCode, $options = []) {
         $result = <<<EOT
 <a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 EOT;
-
     } else {
         $result = <<<EOT
 <a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
