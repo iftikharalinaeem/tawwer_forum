@@ -111,10 +111,15 @@ class ReactionsReactTest extends AbstractAPIv2Test {
      */
     public function testDeleteCommentReaction() {
         $type = 'Like';
-        $userID = $this->api()->getUserID();
+
+        $user = $this->createTestUser(rand(1, 100));
+        $userID = (int)$user['userID'];
+        $this->api()->setUserID($userID);
+
         $this->api()->post('/comments/1/reactions', [
             'reactionType' => $type
         ]);
+
         $postResponse = $this->api()->get('/comments/1/reactions');
         $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), $type, $postResponse->getBody()));
 
@@ -186,7 +191,11 @@ class ReactionsReactTest extends AbstractAPIv2Test {
      */
     public function testDeleteDiscussionReaction() {
         $type = 'Like';
-        $userID = $this->api()->getUserID();
+
+        $user = $this->createTestUser(rand(1, 100));
+        $userID = (int)$user['userID'];
+        $this->api()->setUserID($userID);
+
         $this->api()->post('/discussions/1/reactions', [
             'reactionType' => $type
         ]);
@@ -312,5 +321,25 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         }
 
         $this->assertTrue($result, "Unable to find a greater-than-zero count for reaction type: {$type}");
+    }
+
+    /**
+     * Create a default user to test reacting.
+     *
+     * @param int $uid unique identifier.
+     *
+     * @return array $user newly created user.
+     */
+    protected function createTestUser(int $uid): array {
+        // Create a new user for this test. It will receive the default member role.
+        $username = substr(__FUNCTION__, 0, 20);
+        $user = $this->api()->post('users', [
+            'name' => $username . $uid,
+            'email' => $username .$uid . '@example.com',
+            'password' => 'vanilla'
+        ])->getBody()
+        ;
+
+        return $user;
     }
 }
