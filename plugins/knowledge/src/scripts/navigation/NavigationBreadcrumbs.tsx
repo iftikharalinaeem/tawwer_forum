@@ -12,15 +12,10 @@ import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
 import { connect } from "react-redux";
-import { t, formatUrl } from "@library/utility/appUtils";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps extends INavigationStoreState {
     actions: NavigationActions;
     activeRecord: IActiveRecord;
-    knowledgeBases: {
-        [id: number]: IKnowledgeBase;
-    };
 }
 
 /**
@@ -28,31 +23,18 @@ interface IProps extends INavigationStoreState {
  */
 export class NavigationBreadcrumbs extends React.Component<IProps> {
     public render(): React.ReactNode {
-        const { activeRecord, knowledgeBases, navigationItems } = this.props;
+        const { activeRecord, navigationItems } = this.props;
         const recordKey = activeRecord.recordType + activeRecord.recordID;
-        const recordBreadcrumbs = NavigationSelector.selectBreadcrumb(navigationItems, recordKey);
-
-        if (Object.keys(knowledgeBases).length > 1) {
-            recordBreadcrumbs.unshift({
-                name: t("Help"),
-                url: formatUrl("/kb"),
-            });
-        }
-
-        recordBreadcrumbs.unshift({
-            name: t("Home"),
-            url: formatUrl("/"),
-        });
-
-        return <Breadcrumbs forceDisplay={false}>{recordBreadcrumbs}</Breadcrumbs>;
+        return (
+            <Breadcrumbs forceDisplay={false}>
+                {NavigationSelector.selectBreadcrumb(navigationItems, recordKey)}
+            </Breadcrumbs>
+        );
     }
 }
 
 function mapStateToProps(store: IStoreState) {
-    return {
-        ...store.knowledge.navigation,
-        knowledgeBases: store.knowledge.knowledgeBases.knowledgeBasesByID.data || {},
-    };
+    return store.knowledge.navigation;
 }
 
 function mapDispatchToProps(dispatch) {
