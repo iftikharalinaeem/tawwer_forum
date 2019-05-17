@@ -8,11 +8,11 @@ import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@t
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
-import { reducerWithoutInitialState, reducerWithInitialState } from "typescript-fsa-reducers";
-import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IArticleState {
     articlesByID: {
