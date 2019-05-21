@@ -128,7 +128,7 @@ function reactionButton($row, $urlCode, $options = []) {
       $dataAttr = "data-reaction=\"$urlCode2\"";
    }
 
-    if ($permissionClass && $permissionClass === 'Negative' && !checkPermission('Garden.Moderation.Manage')) {
+    if ($permissionClass && $permissionClass !== 'Positive' && !checkPermission('Garden.Moderation.Manage')) {
         $result = <<<EOT
 <a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 EOT;
@@ -319,7 +319,7 @@ function writeRecordReactions($row) {
          continue;
 
       $reactionType = ReactionModel::fromTagID($tag['TagID']);
-       $skipReaction = $reactionType['Class'] === 'Negative' && !checkPermission('Garden.Moderation.Manage');
+       $skipReaction = $reactionType['Class'] !== 'Positive' && !checkPermission('Garden.Moderation.Manage');
        if (!$reactionType || $reactionType['Hidden'] || $skipReaction)
            continue;
       $urlCode = $reactionType['UrlCode'];
