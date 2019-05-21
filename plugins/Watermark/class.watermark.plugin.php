@@ -41,10 +41,12 @@ class WatermarkPlugin extends Gdn_Plugin {
 
             $quality = c('Watermark.Quality', 70);
 
-            if (self::watermark($filePath, $watermarkParams, $fileExtension, $quality) === true) {
-                return true;
+            if (self::watermark($filePath, $watermarkParams, $fileExtension, $quality) !== true) {
+                return false;
             }
         }
+
+        return true;
     }
 
     /**
