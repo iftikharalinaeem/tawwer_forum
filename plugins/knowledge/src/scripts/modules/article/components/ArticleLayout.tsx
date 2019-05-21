@@ -22,7 +22,6 @@ import { IArticle } from "@knowledge/@types/api/article";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
-import NavigationBreadcrumbs from "@knowledge/navigation/NavigationBreadcrumbs";
 
 /**
  * Implements the article's layout
@@ -52,7 +51,8 @@ export class ArticleLayout extends React.Component<IProps> {
                 <PanelLayout
                     breadcrumbs={
                         this.props.device !== Devices.MOBILE &&
-                        this.props.device !== Devices.XS && <NavigationBreadcrumbs activeRecord={activeRecord} />
+                        this.props.device !== Devices.XS &&
+                        article.breadcrumbs && <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
                     }
                     leftBottom={
                         <PanelWidget>

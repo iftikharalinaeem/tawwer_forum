@@ -4,13 +4,15 @@
  * @license Proprietary
  */
 
+import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import CategoryActions from "@knowledge/modules/categories/CategoryActions";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
-import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@types/api/article";
-import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IArticleState {
     articlesByID: {
@@ -105,23 +107,8 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
 
-    private fsaReducer = reducerWithoutInitialState<IArticleState>().case(
-        ArticleActions.putReactACs.done,
-        (nextState, payload) => {
-            const { articleID } = payload.params;
-            const { reactions } = payload.result;
-            const existingArticle = nextState.articlesByID[articleID];
-            if (existingArticle) {
-                existingArticle.reactions = reactions;
-            }
-
-            return nextState;
-        },
-    );
-
-    public reducer: ReducerType = (state = this.initialState, action): IArticleState => {
+    private internalReducer: ReducerType = (state = { ...this.initialState }, action): IArticleState => {
         return produce(state, nextState => {
-            nextState = this.fsaReducer(nextState, action);
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
                     const { articlesByID } = nextState;
@@ -168,7 +155,27 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                         delete nextState.draftsByID[action.meta.draftID];
                     }
                     break;
+                case CategoryActions.PATCH_CATEGORY_RESPONSE:
+                    return ArticleModel.INITIAL_STATE;
             }
         });
     };
+
+    public reducer = produce(
+        reducerWithInitialState<IArticleState>(ArticleModel.INITIAL_STATE)
+            .case(ArticleActions.putReactACs.done, (nextState, payload) => {
+                const { articleID } = payload.params;
+                const { reactions } = payload.result;
+                const existingArticle = nextState.articlesByID[articleID];
+                if (existingArticle) {
+                    existingArticle.reactions = reactions;
+                }
+
+                return nextState;
+            })
+            .case(NavigationActions.patchNavigationFlatACs.done, () => {
+                return ArticleModel.INITIAL_STATE;
+            })
+            .default(this.internalReducer),
+    );
 }
