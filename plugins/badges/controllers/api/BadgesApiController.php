@@ -121,9 +121,9 @@ class BadgesApiController extends AbstractApiController {
         $this->schema([], 'out');
 
         $this->badgeByID($id);
-        $this->userBadgeByID($id, $userID);
+        $this->userBadgeByID($userID, $id);
 
-        $this->userBadgeModel->revoke($id, $userID);
+        $this->userBadgeModel->revoke($userID, $id);
     }
 
     /**
