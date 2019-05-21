@@ -21,7 +21,7 @@ import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 
 interface IProps {
     exitHandler: (e: React.SyntheticEvent) => void;
