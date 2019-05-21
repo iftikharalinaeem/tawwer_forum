@@ -138,7 +138,7 @@ class GroupController extends Gdn_Controller {
         if ($Group['Icon']) {
             $this->image(Gdn_Upload::url($Group['Icon']));
         }
-
+        $this->setData('Category.CategoryID', $Group['CategoryID']);
         $this->Data['_properties']['newdiscussionmodule'] =['CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$GroupID];
 
         require_once $this->fetchViewLocation('event_functions', 'event');
