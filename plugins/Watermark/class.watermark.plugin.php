@@ -45,6 +45,8 @@ class WatermarkPlugin extends Gdn_Plugin {
                 return true;
             }
         }
+
+        return true;
     }
 
     /**
