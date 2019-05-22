@@ -171,7 +171,7 @@ export const itemListClasses = useThemeCache(() => {
         color: "inherit",
         fontSize: unit(globalVars.userContent.font.sizes.default),
         fontWeight: globalVars.fonts.weights.semiBold,
-        $nest: lineHeightAdjustment() as NestedCSSSelectors,
+        $nest: lineHeightAdjustment(),
     });
 
     const status = style("status", {
