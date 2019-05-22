@@ -1,71 +1,110 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * Reaction functions
+ *
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ * @package Core
+ * @since 2.0
+ */
+
+if (!defined('APPLICATION')) {
+    exit();
+}
 
 if (!function_exists('FormatScore')) {
+    /**
+     * Formats the score as an integer.
+     *
+     * @param string|int $score
+     * @return int
+     */
     function formatScore($score) {
         return (int)$score;
     }
 }
+/**
+ * Filter buttons by column.
+ *
+ * @param string $column
+ * @param bool $label
+ * @param string $defaultOrder
+ * @param string $cssClass
+ * @return string
+ */
+function orderByButton($column, $label = false, $defaultOrder = '', $cssClass = '') {
+    $qSParams = $_GET;
+    $qSParams['orderby'] = urlencode($column);
+    $url = Gdn::controller()->SelfUrl.'?'.http_build_query($qSParams);
+    if (!$label) {
+        $label = t('by '.$column);
+    }
 
-function orderByButton($column, $label = FALSE, $defaultOrder = '', $cssClass = '') {
-   $qSParams = $_GET;
-   $qSParams['orderby'] = urlencode($column);
-   $url = Gdn::controller()->SelfUrl.'?'.http_build_query($qSParams);
-   if (!$label) {
-       $label = t('by '.$column);
-   }
+    $cssClass = ' '.$cssClass;
+    $currentColumn = Gdn::controller()->data('CommentOrder.Column');
+    if ($column == $currentColumn) {
+        $cssClass .= ' OrderBy-'.ucfirst(Gdn::controller()->data('CommentOrder.Direction')).' Selected';
+    }
 
-   $cssClass = ' '.$cssClass;
-   $currentColumn = Gdn::controller()->data('CommentOrder.Column');
-   if ($column == $currentColumn) {
-      $cssClass .= ' OrderBy-'.ucfirst(Gdn::controller()->data('CommentOrder.Direction')).' Selected';
-   }
-
-   return anchor($label, $url, 'FilterButton OrderByButton OrderBy-'.$column.$cssClass, ['rel' => 'nofollow']);
+    return anchor($label, $url, 'FilterButton OrderByButton OrderBy-'.$column.$cssClass, ['rel' => 'nofollow']);
 }
 
+/**
+ * Count reactions.
+ *
+ * @param object $row
+ * @param array $urlCodes
+ * @return mixed reaction count
+ */
 function reactionCount($row, $urlCodes) {
-   if ($iD = getValue('CommentID', $row)) {
-      $recordType = 'comment';
-   } elseif ($iD = getValue('ActivityID', $row)) {
-      $recordType = 'activity';
-   } else {
-      $recordType = 'discussion';
-      $iD = getValue('DiscussionID', $row);
-   }
+    if ($iD = getValue('CommentID', $row)) {
+        $recordType = 'comment';
+    } elseif ($iD = getValue('ActivityID', $row)) {
+        $recordType = 'activity';
+    } else {
+        $recordType = 'discussion';
+        $iD = getValue('DiscussionID', $row);
+    }
 
-   if ($recordType == 'activity') {
-       $data = getValueR('Data.React', $row, []);
-   }
-   else {
-       $data = getValueR("Attributes.React", $row, []);
-   }
+    if ($recordType == 'activity') {
+        $data = getValueR('Data.React', $row, []);
+    } else {
+        $data = getValueR("Attributes.React", $row, []);
+    }
 
-   if (!is_array($data)) {
-      return 0;
-   }
+    if (!is_array($data)) {
+        return 0;
+    }
 
-   $urlCodes = (array)$urlCodes;
+    $urlCodes = (array)$urlCodes;
 
-   $count = 0;
-   foreach ($urlCodes as $urlCode) {
-      if (is_array($urlCode)) {
-          $count += getValue($urlCode['UrlCode'], $data, 0);
-      }
-      else {
-          $count += getValue($urlCode, $data, 0);
-      }
-   }
-   return $count;
+    $count = 0;
+    foreach ($urlCodes as $urlCode) {
+        if (is_array($urlCode)) {
+            $count += getValue($urlCode['UrlCode'], $data, 0);
+        } else {
+            $count += getValue($urlCode, $data, 0);
+        }
+    }
+     return $count;
 }
 
 if (!function_exists('ReactionButton')) {
+    /**
+     * Builds and returns the formated reaction button.
+     *
+     * @param object $row
+     * @param string $urlCode
+     * @param array $options
+     * @return string
+     */
     function reactionButton($row, $urlCode, $options = []) {
         $reactionType = ReactionModel::reactionTypes($urlCode);
 
-        $isHeading = val('IsHeading', $options, FALSE);
+        $isHeading = val('IsHeading', $options, false);
         if (!$reactionType) {
             $reactionType = ['UrlCode' => $urlCode, 'Name' => $urlCode];
-            $isHeading = TRUE;
+            $isHeading = true;
         }
 
         if (val('Hidden', $reactionType)) {
@@ -112,8 +151,7 @@ if (!function_exists('ReactionButton')) {
             } else {
                 if ($recordType == 'activity') {
                     $count = getValueR("Data.React.$urlCode", $row, 0);
-                }
-                else {
+                } else {
                     $count = getValueR("Attributes.React.$urlCode", $row, 0);
                 }
             }
@@ -144,7 +182,6 @@ EOT;
 <a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 
 EOT;
-
         }
 
         return $result;
@@ -152,7 +189,14 @@ EOT;
 }
 
 if (!function_exists('ScoreCssClass')) {
-    function scoreCssClass($row, $all = FALSE) {
+    /**
+     * Build the score css class.
+     *
+     * @param object $row
+     * @param bool $all
+     * @return array|string
+     */
+    function scoreCssClass($row, $all = false) {
         $score = getValue('Score', $row);
         if (!$score) {
             $score = 0;
@@ -163,24 +207,27 @@ if (!function_exists('ScoreCssClass')) {
 
         if ($score <= $bury) {
             $result = $all ? 'Un-Buried' : 'Buried';
-        }
-        elseif ($score >= $promote) {
+        } elseif ($score >= $promote) {
             $result = 'Promoted';
-        }
-        else {
+        } else {
             $result = '';
         }
 
         if ($all) {
             return [$result, 'Promoted Buried Un-Buried'];
-        }
-        else {
+        } else {
             return $result;
         }
     }
 }
 
 if (!function_exists('WriteImageItem')) {
+    /**
+     * Write Image tile items.
+     *
+     * @param array $record
+     * @param string $cssClass
+     */
     function writeImageItem($record, $cssClass = 'Tile ImageWrap') {
         if (val('CategoryCssClass', $record)) {
             $cssClass .= " ".val('CategoryCssClass', $record);
@@ -190,7 +237,7 @@ if (!function_exists('WriteImageItem')) {
             $attributes = dbdecode($attributes);
         }
 
-        $image = FALSE;
+        $image = false;
         if (getValue('Image', $attributes)) {
             $image = [
                 'Image' => getValue('Image', $attributes),
@@ -199,8 +246,8 @@ if (!function_exists('WriteImageItem')) {
                 'Size' => getValue('Size', $attributes, '')
             ];
         }
-        $type = FALSE;
-        $title = FALSE;
+        $type = false;
+        $title = false;
         $body = getValue('Body', $record, '');
 
         $recordID = getValue('RecordID', $record); // Explicitly defined?
@@ -224,12 +271,12 @@ if (!function_exists('WriteImageItem')) {
             }
         }
 
-        $wide = FALSE;
+        $wide = false;
         $formattedBody = Gdn_Format::to($body, $record['Format']);
-        if (stripos($formattedBody, '<div class="Video') !== FALSE) {
-            $wide = TRUE; // Video?
-        } else if (inArrayI($record['Format'], ['Html', 'Text', 'Display']) && strlen($body) > 800) {
-            $wide = TRUE; // Lots of text?
+        if (stripos($formattedBody, '<div class="Video') !== false) {
+            $wide = true; // Video?
+        } elseif (inArrayI($record['Format'], ['Html', 'Text', 'Display']) && strlen($body) > 800) {
+            $wide = true; // Lots of text?
         }
         if ($wide) {
             $cssClass .= ' Wide';
@@ -239,8 +286,7 @@ if (!function_exists('WriteImageItem')) {
             <?php
             if ($type == 'Discussion' && function_exists('WriteDiscussionOptions')) {
                 writeDiscussionOptions();
-            }
-            elseif ($type == 'Comment' && function_exists('WriteCommentOptions')) {
+            } elseif ($type == 'Comment' && function_exists('WriteCommentOptions')) {
                 $comment = (object)$record;
                 writeCommentOptions($comment);
             }
@@ -265,9 +311,9 @@ if (!function_exists('WriteImageItem')) {
             <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo userPhoto($record, ['Px' => 'Insert']);
-               echo userAnchor($record, ['Px' => 'Insert']);
-               ?>
+                echo userPhoto($record, ['Px' => 'Insert']);
+                echo userAnchor($record, ['Px' => 'Insert']);
+                ?>
             </span>
                 <?php writeReactions($record); ?>
             </div>
@@ -275,23 +321,28 @@ if (!function_exists('WriteImageItem')) {
         <?php
     }
 }
-
+/**
+ * Filter buttons by column.
+ */
 function writeOrderByButtons() {
-   if (!Gdn::session()->isValid()) {
-       return;
-   }
+    if (!Gdn::session()->isValid()) {
+        return;
+    }
 
-   echo '<span class="OrderByButtons">'.
-      orderByButton('DateInserted', t('by Date')).
-      ' '.
-      orderByButton('Score').
-      '</span>';
+    echo '<span class="OrderByButtons">'.
+       orderByButton('DateInserted', t('by Date')).
+       ' '.
+       orderByButton('Score').
+       '</span>';
 }
 
 
 if (!function_exists('WriteProfileCounts')) {
+    /**
+     * Writes the counts under profiles.
+     */
     function writeProfileCounts() {
-        $currentUrl = url('', TRUE);
+        $currentUrl = url('', true);
 
         echo '<div class="DataCounts">';
 
@@ -322,6 +373,11 @@ if (!function_exists('WriteProfileCounts')) {
 }
 
 if (!function_exists('WriteRecordReactions')) {
+    /**
+     * Writes reactions on a post.
+     *
+     * @param object $row
+     */
     function writeRecordReactions($row) {
         $userTags = getValue('UserTags', $row, []);
         if (empty($userTags)) {
@@ -360,3 +416,5 @@ if (!function_exists('WriteRecordReactions')) {
         }
     }
 }
+
+
