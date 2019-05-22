@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\EventManager;
 use Garden\Web\Exception\ClientException;
 use Gdn_Session as SessionInterface;
 use MediaModel;
@@ -91,6 +92,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var PageRouteAliasModel */
     private $pageRouteAliasModel;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * ArticlesApiController constructor
      *
@@ -129,7 +133,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         SessionInterface $sessionInterface,
         BreadcrumbModel $breadcrumbModel,
         DiscussionArticleModel $discussionArticleModel,
-        PageRouteAliasModel $pageRouteAliasModel
+        PageRouteAliasModel $pageRouteAliasModel,
+        EventManager $eventManager
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -145,6 +150,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->breadcrumbModel = $breadcrumbModel;
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
+        $this->eventManager = $eventManager;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -658,8 +664,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body, true);
         $this->save($body, $id);
+        
         $row = $this->articleByID($id, true);
-
+        $this->eventManager->fire("afterArticleUpdate", $row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
 
@@ -913,6 +920,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
 
         $this->reactionModel->insert($fields);
+        
         $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
         $row = $this->articleByID($id, true);
@@ -930,10 +938,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'total' => (int)$reactionCounts['allCount'],
             'userReaction' => $newReactionValue,
         ];
+        $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
+
     /**
      * Create a new article.
      *
@@ -954,6 +964,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
+        $this->eventManager->fire("afterArticleCreate", $row);
         $row = $this->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
