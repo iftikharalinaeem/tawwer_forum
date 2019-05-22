@@ -20,6 +20,49 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Track adding articles in Knowledge.
+     *
+     * @param array $article
+     */
+    public function afterArticleCreate_handler(array $article) {
+        AnalyticsTracker::getInstance()->trackEvent(
+            "article",
+            "article_add",
+            ["article" => AnalyticsData::filterArticle($article)]
+        );
+    }
+
+    /**
+     * Track when an article receives a reaction.
+     *
+     * @param array $article
+     * @param mixed $reaction
+     */
+    public function afterArticleReact_handler(array $article, string $reaction) {
+        AnalyticsTracker::getInstance()->trackEvent(
+            "article_reaction",
+            "article_reaction_add",
+            [
+                "article" => AnalyticsData::filterArticle($article),
+                "reaction" => $reaction
+            ]
+        );
+    }
+
+    /**
+     * Track articles updates in Knowledge.
+     *
+     * @param array $article
+     */
+    public function afterArticleUpdate_handler(array $article) {
+        AnalyticsTracker::getInstance()->trackEvent(
+            "article_modify",
+            "article_edit",
+            ["article" => AnalyticsData::filterArticle($article)]
+        );
+    }
+
+    /**
      * Adds items to dashboard menu.
      *
      * @param object $sender DashboardController.
@@ -165,6 +208,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     public function userModel_afterRegister_handler($sender, $args) {
         AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
     }
+
 
     /**
      * Hook into requests for /settings/analyticstick.json.
