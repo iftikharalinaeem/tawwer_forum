@@ -20,6 +20,7 @@ import {
     singleBorder,
     userSelect,
 } from "@library/styles/styleHelpers";
+import { NestedCSSSelectors } from "typestyle/lib/types";
 
 export const itemListVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -166,11 +167,11 @@ export const itemListClasses = useThemeCache(() => {
     });
 
     const userName = style("userName", {
-        ...lineHeightAdjustment(globalVars.lineHeights.condensed),
         textDecoration: "none",
         color: "inherit",
         fontSize: unit(globalVars.userContent.font.sizes.default),
         fontWeight: globalVars.fonts.weights.semiBold,
+        $nest: lineHeightAdjustment(),
     });
 
     const status = style("status", {
