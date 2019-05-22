@@ -416,5 +416,3 @@ if (!function_exists('WriteRecordReactions')) {
         }
     }
 }
-
-
