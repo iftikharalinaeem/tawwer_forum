@@ -115,6 +115,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param BreadcrumbModel $breadcrumbModel
      * @param DiscussionArticleModel $discussionArticleModel
      * @param PageRouteAliasModel $pageRouteAliasModel
+     * @param EventManager $eventManager
      */
     public function __construct(
         ArticleModel $articleModel,
