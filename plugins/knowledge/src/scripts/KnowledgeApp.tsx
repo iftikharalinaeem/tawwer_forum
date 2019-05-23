@@ -25,6 +25,7 @@ import { LiveAnnouncer } from "react-aria-live";
 import { hot } from "react-hot-loader";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
+import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
 
 interface IState {
     app: React.ReactNode;
@@ -55,7 +56,9 @@ class KnowledgeApp extends React.Component<{}, IState> {
                                             <DeviceProvider>
                                                 <BrowserRouter basename={formatUrl("")}>
                                                     <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                                        <Route component={KnowledgeRoutes} />
+                                                        <FontSizeCalculatorProvider>
+                                                            <Route component={KnowledgeRoutes} />
+                                                        </FontSizeCalculatorProvider>
                                                     </LinkContextProvider>
                                                 </BrowserRouter>
                                             </DeviceProvider>
