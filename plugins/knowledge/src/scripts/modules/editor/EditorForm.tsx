@@ -8,14 +8,13 @@ import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import EditorPageModel, { IEditorPageForm, IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { useMeasure } from "@library/dom/hookUtils";
 import AccessibleError from "@library/forms/AccessibleError";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -39,20 +38,8 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { animated, useSpring } from "react-spring";
 import Message from "@library/messages/Message";
 import { TouchScrollable } from "react-scrolllock";
-
-interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
-    actions: EditorPageActions;
-    className?: string;
-    titleID?: string;
-    mobileDropDownTitle?: string;
-    kbID?: number;
-    categoryError?: string;
-    titleError?: string;
-    bodyError?: string;
-    removeCategoryError: () => void;
-    removeTitleError: () => void;
-    removeBodyError: () => void;
-}
+import { Dispatch } from "redux";
+import { IStoreState } from "@knowledge/state/model";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -60,7 +47,7 @@ export function EditorForm(props: IProps) {
     const domTitleErrorsID = domTitleID + "Errors";
     const domEditorErrorID = domID + "editorError";
     const domDescriptionID = domID + "description";
-    const { article, draft, revision, form, formNeedsRefresh, saveDraft, bodyError } = props;
+    const { article, draft, revision, form, formNeedsRefresh, saveDraft } = props;
     const classesRichEditor = richEditorClasses(false);
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
@@ -79,36 +66,7 @@ export function EditorForm(props: IProps) {
         />
     );
 
-    const canSubmit = (() => {
-        const minTitleLength = 1;
-        const title = props.form.name || "";
-
-        return (
-            title.length >= minTitleLength &&
-            props.form.knowledgeCategoryID !== null &&
-            !isLoading &&
-            !props.notifyConversion
-        );
-    })();
-
-    /**
-     * Update the draft from the contents of the form.
-     *
-     * This it throttled to happen at most and every 10 seconds.
-     */
-    const updateDraft = useCallback(
-        throttle(
-            () => {
-                void props.actions.syncDraft();
-            },
-            10000,
-            {
-                leading: false,
-                trailing: true,
-            },
-        ),
-        [props.actions.syncDraft],
-    );
+    const updateDraft = useDraftThrottling(props.actions.syncDraft);
 
     /**
      * Handle changes in the form. Updates the draft.
@@ -126,10 +84,9 @@ export function EditorForm(props: IProps) {
      */
     const locationPickerChangeHandler = useCallback(
         (categoryID: number, sort?: number) => {
-            props.removeCategoryError();
             handleFormChange({ knowledgeCategoryID: categoryID, sort });
         },
-        [props.removeCategoryError, handleFormChange],
+        [handleFormChange],
     );
 
     /**
@@ -138,20 +95,23 @@ export function EditorForm(props: IProps) {
     const editorChangeHandler = useCallback(
         debounce((content: DeltaOperation[]) => {
             handleFormChange({ body: content });
-            props.removeBodyError();
         }, 1000 / 60),
-        [handleFormChange, props.removeBodyError],
+        [handleFormChange],
     );
     /**
      * Change handler for the title
      */
     const titleChangeHandler = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            props.removeTitleError();
             handleFormChange({ name: event.target.value });
         },
-        [props.removeTitleError, handleFormChange],
+        [handleFormChange],
     );
+
+    const categoryError = undefined;
+    const titleError = undefined;
+    const bodyError = undefined;
+    const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
 
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
@@ -207,11 +167,7 @@ export function EditorForm(props: IProps) {
                     <DocumentTitle title={props.form.name || "Untitled"} />
                 </div>
                 <div className={classesEditorForm.containerWidth}>
-                    <LocationInput
-                        disabled={isLoading}
-                        onChange={locationPickerChangeHandler}
-                        error={props.categoryError}
-                    />
+                    <LocationInput disabled={isLoading} onChange={locationPickerChangeHandler} error={categoryError} />
                     <label>
                         <input
                             id={domTitleID}
@@ -221,13 +177,13 @@ export function EditorForm(props: IProps) {
                             value={props.form.name || ""}
                             onChange={titleChangeHandler}
                             disabled={isLoading}
-                            aria-invalid={!!props.titleError}
-                            aria-errormessage={!!props.titleError ? domTitleErrorsID : undefined}
+                            aria-invalid={!!titleError}
+                            aria-errormessage={!!titleError ? domTitleErrorsID : undefined}
                         />
-                        {!!props.titleError && (
+                        {!!titleError && (
                             <AccessibleError
                                 id={domTitleErrorsID}
-                                error={props.titleError}
+                                error={titleError}
                                 className={classesEditorForm.titleErrorMessage}
                             />
                         )}
@@ -314,6 +270,21 @@ export function EditorForm(props: IProps) {
 }
 
 /**
+ * We need to throttle savinga draft.
+ * We have this configured to only happen on the trailing edge of a 10 second interval.
+ */
+function useDraftThrottling(handler: () => void) {
+    const throttledDraft = useCallback(
+        throttle(handler, 10000, {
+            leading: false,
+            trailing: true,
+        }),
+        [handler],
+    );
+    return throttledDraft;
+}
+
+/**
  * Hook for the scroll transition in the editor page.
  *
  * The following should happen on scroll
@@ -387,9 +358,44 @@ function useFormScrollTransition(
     };
 }
 
+interface IOwnProps extends RouteComponentProps<any> {
+    titleID?: string;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState) {
+    const {
+        article,
+        saveDraft,
+        submit,
+        form,
+        formNeedsRefresh,
+        editorOperationsQueue,
+        notifyConversion,
+    } = EditorPageModel.getStateSlice(state);
+
+    return {
+        article,
+        saveDraft,
+        submit,
+        form,
+        formNeedsRefresh,
+        revision: EditorPageModel.selectActiveRevision(state),
+        draft: EditorPageModel.selectDraft(state),
+        editorOperationsQueue,
+        notifyConversion,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    const actions = new EditorPageActions(dispatch, apiv2);
+    return { actions };
+}
+
 const withRedux = connect(
-    EditorPageModel.getInjectableProps,
-    dispatch => ({ actions: new EditorPageActions(dispatch, apiv2) }),
+    mapStateToProps,
+    mapDispatchToProps,
 );
 
-export default withRedux(withRouter(withDevice(EditorForm)));
+export default withRedux(withRouter(EditorForm));

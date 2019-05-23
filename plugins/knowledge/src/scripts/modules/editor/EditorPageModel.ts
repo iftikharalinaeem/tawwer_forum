@@ -18,7 +18,6 @@ import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
-import { boolean } from "@storybook/addon-knobs";
 
 export interface IEditorPageForm {
     name: string;
@@ -45,58 +44,14 @@ export interface IEditorPageState {
     notifyConversion: boolean;
 }
 
-export interface IInjectableEditorProps {
-    article: ILoadable<IArticle>;
-    draft: ILoadable<IResponseArticleDraft>;
-    form: IEditorPageForm;
-    formNeedsRefresh: boolean;
-    editorOperationsQueue: EditorQueueItem[];
-    revision: ILoadable<IRevision>;
-    saveDraft: ILoadable<{}>;
-    submit: ILoadable<{}>;
-    notifyConversion: boolean;
-    currentError: IApiError | null;
-}
-
 type ReducerType = KnowledgeReducer<IEditorPageState>;
 
 /**
  * Reducer for the article page.
  */
 export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
-    /**
-     * Get properties for injection into components.
-     *
-     * @param state A full state tree.
-     */
-    public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const {
-            article,
-            saveDraft,
-            submit,
-            form,
-            formNeedsRefresh,
-            editorOperationsQueue,
-            notifyConversion,
-            currentError,
-        } = EditorPageModel.getStateSlice(state);
-
-        return {
-            article,
-            saveDraft,
-            submit,
-            form,
-            formNeedsRefresh,
-            revision: EditorPageModel.selectActiveRevision(state),
-            draft: EditorPageModel.selectDraft(state),
-            editorOperationsQueue,
-            notifyConversion,
-            currentError,
-        };
-    }
-
     private static selectRevisionLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).revision;
-    private static selectActiveRevision = createSelector(
+    public static selectActiveRevision = createSelector(
         (state: IStoreState) => state,
         EditorPageModel.selectRevisionLoadable,
         (state, revLoadable) => {
@@ -115,7 +70,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     );
 
     private static selectDraftLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).draft;
-    private static selectDraft = createSelector(
+    public static selectDraft = createSelector(
         (state: IStoreState) => state,
         EditorPageModel.selectDraftLoadable,
         (state, draftLoadable) => {
@@ -139,7 +94,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state instance.
      * @throws An error if the state wasn't initialized properly.
      */
-    private static getStateSlice(state: IStoreState): IEditorPageState {
+    public static getStateSlice(state: IStoreState): IEditorPageState {
         if (!state.knowledge || !state.knowledge.editorPage) {
             throw new Error(
                 "The revision page model has not been wired up properly. Expected to find 'state.knowledge.editorPage'.",
@@ -248,8 +203,6 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case ArticleActions.GET_DRAFT_ERROR:
             case ArticleActions.GET_REVISION_ERROR:
             case ArticleActions.PATCH_DRAFT_ERROR:
-            case ArticleActions.PATCH_ARTICLE_ERROR:
-            case ArticleActions.POST_ARTICLE_ERROR:
             case ArticleActions.POST_DRAFT_ERROR:
                 nextState.currentError = action.payload;
         }
@@ -349,12 +302,10 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 nextState.article.status = LoadStatus.LOADING;
                 break;
             case EditorPageActions.GET_ARTICLE_RESPONSE:
-            case ArticleActions.POST_ARTICLE_RESPONSE:
                 nextState.article.status = LoadStatus.SUCCESS;
                 nextState.article.data = action.payload.data;
                 break;
             case EditorPageActions.GET_ARTICLE_ERROR:
-            case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.article.status = LoadStatus.ERROR;
                 nextState.article.error = action.payload;
                 break;
@@ -363,6 +314,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 nextState.submit.status = LoadStatus.LOADING;
                 break;
             case ArticleActions.PATCH_ARTICLE_ERROR:
+            case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.submit.status = LoadStatus.ERROR;
                 nextState.submit.error = action.payload;
                 break;

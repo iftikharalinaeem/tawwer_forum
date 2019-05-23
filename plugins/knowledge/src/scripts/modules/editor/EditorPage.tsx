@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { Dispatch } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { connect } from "react-redux";
 import apiv2 from "@library/apiv2";
 import Modal from "@library/modal/Modal";
 import EditorForm from "@knowledge/modules/editor/EditorForm";
 import { LoadStatus } from "@library/@types/api/core";
-import EditorPageModel, { IInjectableEditorProps } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ModalSizes from "@library/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -21,29 +21,14 @@ import QueryString from "@library/routing/QueryString";
 import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import Message from "@library/messages/Message";
 import { t } from "@library/utility/appUtils";
-
-interface IOwnProps
-    extends RouteComponentProps<{
-        id?: string;
-    }> {}
-
-interface IProps extends IOwnProps, IInjectableEditorProps {
-    actions: EditorPageActions;
-}
-
-interface IState {
-    categoryError?: string;
-    titleError?: string;
-    bodyError?: string;
-}
+import { IStoreState } from "@knowledge/state/model";
+import { action } from "@storybook/addon-actions";
 
 /**
  * Page for editing an article.
  */
-export class EditorPage extends React.Component<IProps, IState> {
+export class EditorPage extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("editorPage");
-
-    public state: IState = {};
 
     public render() {
         return (
@@ -56,15 +41,7 @@ export class EditorPage extends React.Component<IProps, IState> {
                 {this.renderErrorMessage()}
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}
-                    <EditorForm
-                        titleID={this.titleID}
-                        categoryError={this.state.categoryError}
-                        titleError={this.state.titleError}
-                        bodyError={this.state.bodyError}
-                        removeCategoryError={this.removeCategoryError}
-                        removeTitleError={this.removeTitleError}
-                        removeBodyError={this.removeBodyError}
-                    />
+                    <EditorForm titleID={this.titleID} />
                 </Permission>
             </Modal>
         );
@@ -76,13 +53,9 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Either creates an article and changes to the edit page, or gets an existing article.
      */
     public componentDidMount() {
-        const { article, match, actions, history } = this.props;
+        const { article, requestData } = this.props;
         if (article.status === LoadStatus.PENDING) {
-            if (match.params.id === undefined) {
-                void actions.initializeAddPage(history);
-            } else {
-                void actions.initializeEditPage(history, parseInt(match.params.id, 10));
-            }
+            requestData();
         }
     }
 
@@ -90,7 +63,7 @@ export class EditorPage extends React.Component<IProps, IState> {
      * Cleanup the page contents.
      */
     public componentWillUnmount() {
-        this.props.actions.reset();
+        this.props.reset();
     }
 
     /**
@@ -104,7 +77,7 @@ export class EditorPage extends React.Component<IProps, IState> {
         return (
             <Message
                 confirmText={t("Dismiss")}
-                onConfirm={this.props.actions.resetError}
+                onConfirm={this.props.resetError}
                 contents={this.props.currentError.message}
                 stringContents={this.props.currentError.message}
                 isFixed={true}
@@ -139,44 +112,44 @@ export class EditorPage extends React.Component<IProps, IState> {
             this.props.history.push("/kb");
         }
     };
-
-    /**
-     * Remove error message for body
-     */
-    private removeBodyError = () => {
-        this.setState({
-            bodyError: undefined,
-        });
-    };
-
-    /**
-     * Remove error message for title
-     */
-    private removeTitleError = () => {
-        this.setState({
-            titleError: undefined,
-        });
-    };
-
-    /**
-     * Remove error message for category
-     */
-    private removeCategoryError = () => {
-        this.setState({
-            categoryError: undefined,
-        });
-    };
 }
 
-function mapDispatchToProps(dispatch) {
+interface IOwnProps
+    extends RouteComponentProps<{
+        id?: string;
+    }> {}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: IStoreState) {
+    const { article, saveDraft, submit, currentError } = EditorPageModel.getStateSlice(state);
+
     return {
-        actions: new EditorPageActions(dispatch, apiv2),
+        article,
+        saveDraft,
+        submit,
+        draft: EditorPageModel.selectDraft(state),
+        currentError,
     };
 }
 
-const withRedux = connect(
-    EditorPageModel.getInjectableProps,
-    mapDispatchToProps,
-);
+function mapDispatchToProps(dispatch: Dispatch<any>, ownProps: IOwnProps) {
+    const actions = new EditorPageActions(dispatch, apiv2);
+    const requestData = () => {
+        if (ownProps.match.params.id === undefined) {
+            void actions.initializeAddPage(ownProps.history);
+        } else {
+            void actions.initializeEditPage(ownProps.history, parseInt(ownProps.match.params.id, 10));
+        }
+    };
+    return {
+        requestData,
+        reset: actions.reset,
+        resetError: actions.resetError,
+    };
+}
 
-export default withRedux(EditorPage);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(EditorPage);
