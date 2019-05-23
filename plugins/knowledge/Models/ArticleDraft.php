@@ -45,8 +45,7 @@ class ArticleDraft {
         $outline = [];
         $body = json_decode($body, true);
         if (is_array($body) && count($body) > 0) {
-            $parser = (new Parser())
-                ->addBlot(HeadingTerminatorBlot::class);
+            $parser = \Gdn::getContainer()->get(Parser::class);
             $blotGroups = $parser->parse($body);
 
             /** @var BlotGroup $blotGroup */
