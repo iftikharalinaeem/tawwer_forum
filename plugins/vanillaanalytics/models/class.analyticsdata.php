@@ -18,6 +18,20 @@ class AnalyticsData extends Gdn_Model {
     private static $defaultTimeZone = null;
 
     /**
+     * Filter an article's fields down to only those relevant to analytics.
+     *
+     * @param array $article
+     */
+    public static function filterArticle(array $article) {
+        $allowedFields = [
+            "articleID", "articleRevisionID", "dateInserted", "dateUpdated", "featuredSort", "format", "insertUserID",
+            "isFeatured", "knowledgeBaseID", "knowledgeCategoryID", "locale", "score", "sort", "views", "updateUserID",
+        ];
+        $filtered = array_intersect_key($article, array_flip($allowedFields));
+        return $filtered;
+    }
+
+    /**
      * Grab basic information about a category, based on a category ID.
      *
      * @param int $categoryID The target category's integer ID.
