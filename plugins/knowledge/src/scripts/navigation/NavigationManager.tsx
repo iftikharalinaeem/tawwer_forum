@@ -37,7 +37,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerToolbarStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { PublishStatus } from "@library/@types/api/core";
 import CombineAwareTree from "@knowledge/navigation/CombineAwareTree";

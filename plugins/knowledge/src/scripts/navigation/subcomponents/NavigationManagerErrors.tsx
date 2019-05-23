@@ -12,7 +12,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import Message from "@library/messages/Message";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@library/utility/appUtils";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerToolbarStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 
 type RetryHandler = (() => void) | null;
 

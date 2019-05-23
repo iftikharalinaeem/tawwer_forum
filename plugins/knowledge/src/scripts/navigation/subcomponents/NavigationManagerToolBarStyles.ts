@@ -10,7 +10,7 @@ import { borders, colorOut, margins, paddings, unit } from "@library/styles/styl
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {calc} from "csx";
+import { calc } from "csx";
 
 export const navigationManagerToolbarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,32 +42,23 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
         bottomMargin = unit(vars.spacer.default - vars.spacer.bottomOffset);
     }
 
-    const root = style(margins: {
+    const root = style(
+        margins({
             top: vars.spacer.default,
             horizontal: 0,
             bottom: bottomMargin,
-        },
+        }),
     );
 
-    const root = style({
+    // const root = style({});
 
-    });
+    // const root = style({});
 
-    const root = style({
+    // const root = style({});
 
-    });
+    // const root = style({});
 
-    const root = style({
-
-    });
-
-    const root = style({
-
-    });
-
-    const root = style({
-
-    });
+    // const root = style({});
 
     return {
         root,
