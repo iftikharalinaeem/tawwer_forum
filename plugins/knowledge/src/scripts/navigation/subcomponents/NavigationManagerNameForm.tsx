@@ -10,7 +10,7 @@ import ButtonSubmit from "@library/forms/ButtonSubmit";
 import classNames from "classnames";
 import React from "react";
 import { nextTick } from "process";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerToolbarStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {

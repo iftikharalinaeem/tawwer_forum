@@ -9,7 +9,7 @@ import Button from "@library/forms/Button";
 import { newFolder } from "@library/icons/common";
 import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerToolbarStyles";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useDevice, Devices } from "@library/layout/DeviceContext";

@@ -21,7 +21,7 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerToolbarStyles";
 import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
