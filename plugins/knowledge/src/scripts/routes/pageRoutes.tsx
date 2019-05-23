@@ -10,7 +10,7 @@ import ErrorPage from "@knowledge/pages/ErrorPage";
 import { formatUrl } from "@library/utility/appUtils";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 import RouteHandler from "@library/routing/RouteHandler";
 import ModalLoader from "@library/modal/ModalLoader";
 import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
