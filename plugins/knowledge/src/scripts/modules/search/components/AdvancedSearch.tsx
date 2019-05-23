@@ -24,7 +24,7 @@ import classNames from "classnames";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import DateRange from "@library/forms/DateRange";
-import CommunityCategoryInput from "@vanilla/forms/CommunityCategoryInput";
+import CommunityCategoryInput from "@vanilla/addon-vanilla/CommunityCategoryInput";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
 import RadioTab from "@library/forms/radioTabs/RadioTab";
 import { advancedSearchClasses } from "@knowledge/modules/search/components/advancedSearchStyles";
