@@ -512,7 +512,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/ArticlePost"
+                            $ref: "#/components/schemas/ArticlePatch"
                 required: true
             summary: Update an existing article.
     "/articles/{id}/edit":
@@ -993,8 +993,7 @@ components:
             properties:
                 body:
                     description: Body contents.
-                    minLength: 0
-                    nullable: true
+                    minLength: 1
                     type: string
                 draftID:
                     description: Unique ID of a draft to remove upon updating an article.
@@ -1010,21 +1009,17 @@ components:
                         - bbcode
                         - rich
                     minLength: 1
-                    nullable: true
                     type: string
                 knowledgeCategoryID:
                     description: Category the article belongs in.
-                    nullable: true
                     type: integer
                 locale:
                     description: Locale the article was written in.
                     minLength: 1
-                    nullable: true
                     type: string
                 name:
                     description: Title of the article.
-                    minLength: 0
-                    nullable: true
+                    minLength: 1
                     type: string
                 sort:
                     description: Manual sort order of the article.
@@ -1032,10 +1027,53 @@ components:
                     type: integer
                 discussionID:
                     description: Discussion ID to link article url as discussion canonical url.
-                    nullable: false
                     type: integer
             required:
                 - knowledgeCategoryID
+                - name
+                - body
+                - locale
+                - format
+            type: object
+        ArticlePatch:
+            properties:
+                body:
+                    description: Body contents.
+                    minLength: 1
+                    type: string
+                draftID:
+                    description: Unique ID of a draft to remove upon updating an article.
+                    type: integer
+                format:
+                    description: Format of the raw body content.
+                    enum:
+                        - text
+                        - textex
+                        - markdown
+                        - wysiwyg
+                        - html
+                        - bbcode
+                        - rich
+                    minLength: 1
+                    type: string
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    type: integer
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 1
+                    type: string
+                name:
+                    description: Title of the article.
+                    minLength: 1
+                    type: string
+                sort:
+                    description: Manual sort order of the article.
+                    nullable: true
+                    type: integer
+                discussionID:
+                    description: Discussion ID to link article url as discussion canonical url.
+                    type: integer
             type: object
         ArticleSimple:
             type: object
