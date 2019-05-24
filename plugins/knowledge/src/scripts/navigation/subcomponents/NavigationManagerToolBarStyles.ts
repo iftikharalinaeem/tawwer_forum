@@ -15,7 +15,7 @@ export const navigationManagerToolbarVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navigationManagerToolbar");
 
     const colors = makeThemeVars("colors", {
-        separator: globalVars.mixBgAndFg(0.8),
+        separator: globalVars.mixBgAndFg(0.2),
     });
 
     const spacer = makeThemeVars("spacer", {
