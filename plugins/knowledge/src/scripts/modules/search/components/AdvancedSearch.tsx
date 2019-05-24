@@ -27,6 +27,8 @@ import DateRange from "@library/forms/DateRange";
 import CommunityCategoryInput from "@vanilla/forms/CommunityCategoryInput";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
 import RadioTab from "@library/forms/radioTabs/RadioTab";
+import { advancedSearchClasses } from "@knowledge/modules/search/components/advancedSearchStyles";
+import { typographyClasses } from "@library/styles/typographyStyles";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -41,10 +43,15 @@ export class AdvancedSearch extends React.Component<IProps> {
         const vars = globalVariables();
         const buttons = buttonClasses();
         const classesDateRange = dateRangeClasses();
+        const classes = advancedSearchClasses();
+        const classesTypography = typographyClasses();
         return (
-            <form className="advancedSearch" onSubmit={this.handleSubmit}>
+            <form className={classes.root} onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
-                    <Heading className="advancedSearch-title pageSubTitle" title={t("Filter Results")} />
+                    <Heading
+                        className={classNames(classes.title, classesTypography.subTitle)}
+                        title={t("Filter Results")}
+                    />
                 )}
                 <RadioTabs
                     accessibleTitle={t("Search in:")}
@@ -93,11 +100,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                         className="inputBlock"
                     />
                 </Permission>
-                <Button
-                    type="submit"
-                    className={classNames("advancedSearch-submit", buttons.standard)}
-                    prefix="submitButton"
-                >
+                <Button type="submit" className={classNames(classes.submit, buttons.standard)} prefix="submitButton">
                     {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Filter")}
                 </Button>
             </form>
