@@ -25,6 +25,9 @@ trait ArticlesApiSchemes {
     private $articlePostSchema;
 
     /** @var Schema */
+    private $articlePatchSchema;
+
+    /** @var Schema */
     private $articleSchema;
 
     /** @var Schema */
@@ -110,12 +113,11 @@ trait ArticlesApiSchemes {
             $this->articlePostSchema = $this->schema(
                 Schema::parse([
                     "knowledgeCategoryID",
-                    "body?",
-                    "format?",
-                    "name?",
+                    "body",
+                    "format",
+                    "name",
                     "locale?",
                     "sort?",
-                    "discussionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -127,6 +129,36 @@ trait ArticlesApiSchemes {
 
         return $this->schema($this->articlePostSchema, $type);
     }
+
+    /**
+     * Get an article schema with minimal add/edit fields.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function articlePatchSchema(string $type = ""): Schema {
+        if ($this->articlePatchSchema === null) {
+            $this->articlePatchSchema = $this->schema(
+                Schema::parse([
+                    "knowledgeCategoryID?",
+                    "format?",
+                    "body?",
+                    "name?",
+                    "locale?",
+                    "sort?",
+                    "discussionID",
+                    "draftID?" => [
+                        "type" => "integer",
+                        "description" => "Unique ID of a draft to remove upon updating an article.",
+                    ]
+                ])->add($this->fullSchema()),
+                "ArticlePost"
+            );
+        }
+
+        return $this->schema($this->articlePatchSchema, $type);
+    }
+
 
     /**
      * Get an article schema with minimal fields.
@@ -343,6 +375,8 @@ trait ArticlesApiSchemes {
                 "name",
                 "format",
                 "body",
+                "excerpt",
+                "outline",
                 "bodyRendered",
                 "locale",
             ])->add($this->fullRevisionSchema()));
@@ -391,19 +425,10 @@ trait ArticlesApiSchemes {
                 'description' => "Article status.",
                 'enum' => ArticleModel::getAllStatuses(),
             ],
-            "excerpt:s?" => [
-                "allowNull" => true,
-                "description" => "Plain-text excerpt of the current article body.",
-            ],
             "discussionID:i?" => [
                 "allowNull" => false,
                 "description" => "Discussion ID to link article url as discussion canonical url.",
             ],
-            "outline:a?" => Schema::parse([
-                'ref:s' => 'Heading blot reference id. Ex: #title',
-                'level:i' => 'Heading level',
-                'text:s' => 'Heading text line',
-            ]),
             "reactions:a?" => Schema::parse([
                 'reactionType:s' => [
                     'enum' => ArticleReactionModel::getReactionTypes(),
@@ -415,7 +440,6 @@ trait ArticlesApiSchemes {
                     'enum' => ArticleReactionModel::getHelpfulReactions(),
                 ]
             ]),
-            //"aliases:a?" =>  Schema::parse(["alias" => "string"]),
             "aliases:a?" => ['items' => ['type' => 'string']],
         ]);
     }
@@ -434,20 +458,20 @@ trait ArticlesApiSchemes {
                 "description" => "",
                 "enum" => ["published"],
             ],
-            "name:s" => [
-                "allowNull" => true,
-                "description" => "Title of the article.",
-                "minLength" => 0,
-            ],
             "format:s" => [
-                "allowNull" => true,
+                "allowNull" => false,
                 "enum" => ["text", "textex", "markdown", "wysiwyg", "html", "bbcode", "rich"],
                 "description" => "Format of the raw body content.",
             ],
+            "name:s" => [
+                "allowNull" => false,
+                "description" => "Title of the article.",
+                "minLength" => 1,
+            ],
             "body:s" => [
-                "allowNull" => true,
+                "allowNull" => false,
                 "description" => "Body contents.",
-                "minLength" => 0,
+                "minLength" => 1,
             ],
             "bodyRendered:s" => [
                 "allowNull" => true,
@@ -457,6 +481,15 @@ trait ArticlesApiSchemes {
                 "allowNull" => true,
                 "description" => "Locale the article was written in.",
             ],
+            "excerpt:s?" => [
+                "allowNull" => true,
+                "description" => "Plain-text excerpt of the current article body.",
+            ],
+            "outline:a?" => Schema::parse([
+                'ref:s' => 'Heading blot reference id. Ex: #title',
+                'level:i' => 'Heading level',
+                'text:s' => 'Heading text line',
+            ]),
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
             "insertUser?" => $this->getUserFragmentSchema(),
