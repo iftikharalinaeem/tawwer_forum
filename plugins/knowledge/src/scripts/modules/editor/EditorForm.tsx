@@ -130,6 +130,13 @@ export function EditorForm(props: IProps) {
     const formRef = useRef<HTMLFormElement>(null);
     const contentSize = useMeasure(contentRef);
     const transition = useFormScrollTransition(formRef, embedBarRef);
+    // Never changes.
+    const extraQuillOptions = useMemo(
+        () => ({
+            placeholder: t("Type your article."),
+        }),
+        [],
+    );
 
     return (
         <TouchScrollable>
@@ -138,6 +145,7 @@ export function EditorForm(props: IProps) {
                 onSubmit={onSubmit}
                 onScroll={transition.scrollHandler}
                 ref={formRef}
+                autoComplete="off"
             >
                 <animated.div
                     className={classesEditorForm.header}
