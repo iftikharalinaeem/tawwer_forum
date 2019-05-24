@@ -146,13 +146,13 @@ trait ArticlesApiSchemes {
                     "name?",
                     "locale?",
                     "sort?",
-                    "discussionID",
+                    "discussionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
                     ]
                 ])->add($this->fullSchema()),
-                "ArticlePost"
+                "ArticlePatch"
             );
         }
 
