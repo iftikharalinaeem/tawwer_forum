@@ -131,6 +131,10 @@ export const editorFormClasses = useThemeCache(() => {
             minHeight: calc(`100vh - ${px(topWindowPosition)}`),
         });
 
+    const bodyHasError = style("bodyHasError", {
+        paddingTop: globalVars.gutter.half,
+    });
+
     const embedBarContainer = style("embedBarContainer", sticky(), {
         top: titleBarVars.sizing.height,
         zIndex: 2,
@@ -172,8 +176,13 @@ export const editorFormClasses = useThemeCache(() => {
             }),
     );
 
+    const bodyErrorWrap = style("bodyErrorWrap", {
+        position: "relative",
+    });
+
     const bodyErrorMessage = style("bodyErrorMessage", {
-        ...absolutePosition.topLeft(),
+        ...absolutePosition.topLeft(percent(100)),
+        ...paddings({ vertical: 6 }),
     });
 
     const titleErrorMessage = style("titleErrorMessage", {
@@ -207,9 +216,11 @@ export const editorFormClasses = useThemeCache(() => {
         header,
         embedBarContainer,
         bodyErrorMessage,
+        bodyErrorWrap,
         containerWidth,
         conversionNotice,
         modernFrame,
+        bodyHasError,
         embedBarTop,
         embedBarBottom,
         titleErrorMessage,

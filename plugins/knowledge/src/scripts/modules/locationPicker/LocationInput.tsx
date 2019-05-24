@@ -154,7 +154,7 @@ interface IOwnProps {
     initialRecord?: ILocationPickerRecord | null;
     disabled?: boolean;
     onChange?: (categoryID: number | null, sort?: number) => void;
-    error?: string;
+    error?: string | null;
 }
 
 interface IState {

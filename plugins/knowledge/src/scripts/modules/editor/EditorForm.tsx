@@ -47,7 +47,7 @@ export function EditorForm(props: IProps) {
     const domTitleErrorsID = domTitleID + "Errors";
     const domEditorErrorID = domID + "editorError";
     const domDescriptionID = domID + "description";
-    const { article, draft, revision, form, formNeedsRefresh, saveDraft } = props;
+    const { article, draft, revision, form, formNeedsRefresh, saveDraft, formErrors } = props;
     const classesRichEditor = richEditorClasses(false);
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
@@ -108,9 +108,9 @@ export function EditorForm(props: IProps) {
         [handleFormChange],
     );
 
-    const categoryError = undefined;
-    const titleError = undefined;
-    const bodyError = undefined;
+    const categoryError = formErrors.knowledgeCategoryID;
+    const titleError = formErrors.name;
+    const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
 
     /**
@@ -223,6 +223,20 @@ export function EditorForm(props: IProps) {
                                 opacity: transition.embedBarBorderOpacity,
                             }}
                         />
+                        {bodyError && (
+                            <div className={classNames(classesEditorForm.containerWidth)}>
+                                <div className={classesEditorForm.bodyErrorWrap}>
+                                    <AccessibleError
+                                        id={domEditorErrorID}
+                                        ariaHidden={true}
+                                        error={bodyError}
+                                        className={classNames(classesEditorForm.bodyErrorMessage)}
+                                        paragraphClassName={classesEditorForm.categoryErrorParagraph}
+                                        wrapClassName={classesUserContent.root}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {conversionNotice}
@@ -232,6 +246,7 @@ export function EditorForm(props: IProps) {
                             { isDisabled: isLoading },
                             "FormWrapper",
                             classesEditorForm.editor(contentSize.top),
+                            bodyError && classesEditorForm.bodyHasError,
                             classesRichEditor.root,
                             classesEditorForm.containerWidth,
                         )}
@@ -246,21 +261,9 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
-                            <>
-                                {bodyError && (
-                                    <AccessibleError
-                                        id={domEditorErrorID}
-                                        ariaHidden={true}
-                                        error={bodyError}
-                                        className={classesEditorForm.bodyErrorMessage}
-                                        paragraphClassName={classesEditorForm.categoryErrorParagraph}
-                                        wrapClassName={classesUserContent.root}
-                                    />
-                                )}
-                                <EditorContent />
-                                <EditorInlineMenus />
-                                <EditorParagraphMenu />
-                            </>
+                            <EditorContent options={extraQuillOptions} />
+                            <EditorInlineMenus />
+                            <EditorParagraphMenu />
                         </div>
                     </div>
                 </Editor>
@@ -373,6 +376,7 @@ function mapStateToProps(state: IStoreState) {
         formNeedsRefresh,
         editorOperationsQueue,
         notifyConversion,
+        formErrors,
     } = EditorPageModel.getStateSlice(state);
 
     return {
@@ -385,6 +389,7 @@ function mapStateToProps(state: IStoreState) {
         draft: EditorPageModel.selectDraft(state),
         editorOperationsQueue,
         notifyConversion,
+        formErrors,
     };
 }
 

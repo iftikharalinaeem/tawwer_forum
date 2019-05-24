@@ -34,6 +34,11 @@ export interface IEditorPageState {
         draftID?: number;
     }>; // The draft ID. Actual draft will live in normalized drafts resource.
     form: IEditorPageForm;
+    formErrors: {
+        name: string | null;
+        knowledgeCategoryID: string | null;
+        body: string | null;
+    };
     formNeedsRefresh: boolean;
     editorOperationsQueue: EditorQueueItem[];
     currentError: IApiError | null;
@@ -117,6 +122,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             body: [],
             knowledgeCategoryID: null,
         },
+        formErrors: {
+            name: null,
+            body: null,
+            knowledgeCategoryID: null,
+        },
         formNeedsRefresh: false,
         editorOperationsQueue: [],
         currentError: null,
@@ -165,6 +175,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 const { forceRefresh } = action.payload;
                 nextState.formNeedsRefresh = forceRefresh;
                 nextState.isDirty = !forceRefresh;
+
+                // Clean up the form errors on the fields that were modified.
+                for (const key of Object.keys(action.payload.formData)) {
+                    nextState.formErrors[key] = null;
+                }
                 break;
             case EditorPageActions.RESET_ERROR:
                 nextState.currentError = null;
@@ -205,6 +220,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case ArticleActions.PATCH_DRAFT_ERROR:
             case ArticleActions.POST_DRAFT_ERROR:
                 nextState.currentError = action.payload;
+                break;
         }
 
         return nextState;
@@ -295,9 +311,6 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
     private reduceArticle: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
-            case ArticleActions.POST_ARTICLE_REQUEST:
-                nextState.article.status = LoadStatus.LOADING;
-                break;
             case EditorPageActions.GET_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
@@ -310,12 +323,26 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 nextState.article.error = action.payload;
                 break;
             // Patching the article
+            case ArticleActions.POST_ARTICLE_REQUEST:
             case ArticleActions.PATCH_ARTICLE_REQUEST:
                 nextState.submit.status = LoadStatus.LOADING;
                 break;
             case ArticleActions.PATCH_ARTICLE_ERROR:
             case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.submit.status = LoadStatus.ERROR;
+
+                const responseData = action.payload.response && action.payload.response.data;
+                if (!responseData || !responseData.errors) {
+                    // No actual error message at all. Let's just use the main error message.
+                    nextState.currentError = action.payload;
+                } else {
+                    // We should have some specific form errors here.
+                    for (const [key, value] of Object.entries(responseData.errors)) {
+                        // This is a bit of a kludge, but we only designed to show 1 error at at time.
+                        nextState.formErrors[key] = value[0].message;
+                    }
+                }
+
                 nextState.submit.error = action.payload;
                 break;
             // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
