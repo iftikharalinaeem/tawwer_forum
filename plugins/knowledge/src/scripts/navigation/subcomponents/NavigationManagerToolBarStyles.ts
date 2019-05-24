@@ -6,11 +6,9 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc } from "csx";
+import { margins, unit } from "@library/styles/styleHelpers";
+import { calc, percent } from "csx";
+import { singleBorder } from "@library/styles/styleHelpers";
 
 export const navigationManagerToolbarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,17 +48,42 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
         }),
     );
 
-    // const root = style({});
+    const icon = style("icon", {
+        display: "inline-flex",
+    });
 
-    // const root = style({});
+    const bar = style("bar", {
+        display: "flex",
+        justifyContent: "flex-start",
+        flexWrap: "wrap",
+        position: "relative",
+        width: percent(100),
+        marginBottom: unit(3),
+    });
 
-    // const root = style({});
+    const newFolder = style("newFolder", {
+        marginLeft: "auto",
+        transform: `translateY(-2px)`,
+    });
 
-    // const root = style({});
+    const separator = style("separator", {
+        margin: "auto",
+        width: calc(`100% - 24px`),
+        borderBottom: singleBorder({
+            color: vars.colors.separator,
+        }),
+    });
 
-    // const root = style({});
+    const buttonLabel = style("buttonLabel", {
+        marginLeft: unit(4),
+    });
 
     return {
         root,
+        icon,
+        bar,
+        newFolder,
+        separator,
+        buttonLabel,
     };
 });
