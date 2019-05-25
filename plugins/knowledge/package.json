@@ -1,10 +1,12 @@
 {
+    "name": "@vanilla/addon-knowledge",
+    "version": "3.0.0",
     "dependencies": {
         "@atlaskit/tree": "^4.1.8",
         "@vanilla/utils": "*"
     },
     "devDependencies": {
         "@vanillaforums/prettier-config": "1.0.0",
-        "prettier": "1.17.0"
+        "prettier": "1.17.1"
     }
 }
