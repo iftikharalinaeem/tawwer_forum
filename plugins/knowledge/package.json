@@ -1,12 +1,18 @@
 {
     "name": "@vanilla/addon-knowledge",
+    "private": true,
     "version": "3.0.0",
+    "workspaces": {},
+    "prettier": "@vanilla/prettier-config",
     "dependencies": {
         "@atlaskit/tree": "^4.1.8",
-        "@vanilla/utils": "*"
+        "@vanilla/utils": "*",
+        "@vanilla/library": "*",
+        "@vanilla/addon-rich-editor": "*",
+        "@vanilla/addon-vanilla": "*"
     },
     "devDependencies": {
-        "@vanillaforums/prettier-config": "1.0.0",
+        "@vanilla/prettier-config": "*",
         "prettier": "1.17.1"
     }
 }
