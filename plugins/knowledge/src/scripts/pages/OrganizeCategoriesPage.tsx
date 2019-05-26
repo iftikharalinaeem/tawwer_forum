@@ -79,7 +79,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
 interface IOwnProps {
     match: match<{
         id: string;
-        page?: number;
+        page?: string;
     }>;
 }
 
