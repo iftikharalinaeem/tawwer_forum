@@ -52,7 +52,7 @@ export class KnowledgeRoutes extends React.Component<IProps> {
         );
     }
 
-    private unlisten: UnregisterCallback;
+    private unlisten: UnregisterCallback | null = null;
 
     public componentDidMount() {
         if (this.props.kbLoadable.status === LoadStatus.PENDING) {
