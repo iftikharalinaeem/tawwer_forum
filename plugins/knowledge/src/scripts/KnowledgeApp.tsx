@@ -18,66 +18,62 @@ import { LinkContextProvider } from "@library/routing/links/LinkContextProvider"
 import PagesContext from "@library/routing/PagesContext";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { formatUrl, getMeta } from "@library/utility/appUtils";
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { Provider } from "react-redux";
-import { BrowserRouter, Route } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
 import { LiveAnnouncer } from "react-aria-live";
 import { hot } from "react-hot-loader";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
-
-interface IState {
-    app: React.ReactNode;
-}
+import { createBrowserHistory } from "history";
+import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
 
 /*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
-class KnowledgeApp extends React.Component<{}, IState> {
-    private store = getStore<IStoreState>();
+function KnowledgeApp() {
+    const store = useMemo(() => getStore<IStoreState>(), []);
+    const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
 
-    /**
-     * Device checker detects device and calls a force update if needed to update the current device.
-     */
-    public render() {
-        return (
-            <Provider store={this.store}>
-                <LiveAnnouncer>
-                    <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
-                        <PagesContext.Provider value={{ pages: this.pages }}>
-                            <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                                <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
-                                    <SearchContext.Provider
-                                        value={{ searchOptionProvider: new KnowledgeSearchProvider() }}
-                                    >
-                                        <NavHistoryContextProvider>
-                                            <DeviceProvider>
-                                                <BrowserRouter basename={formatUrl("")}>
-                                                    <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                                        <FontSizeCalculatorProvider>
-                                                            <Route component={KnowledgeRoutes} />
-                                                        </FontSizeCalculatorProvider>
-                                                    </LinkContextProvider>
-                                                </BrowserRouter>
-                                            </DeviceProvider>
-                                        </NavHistoryContextProvider>
-                                    </SearchContext.Provider>
-                                </SiteNavProvider>
-                            </ScrollOffsetProvider>
-                        </PagesContext.Provider>
-                    </ThemeProvider>
-                </LiveAnnouncer>
-            </Provider>
-        );
-    }
+    useEffect(() => {
+        initPageViewTracking(history);
+    }, [history]);
 
-    private get pages() {
-        return {
-            search: SearchRoute,
-        };
-    }
+    return (
+        <Provider store={store}>
+            <LiveAnnouncer>
+                <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
+                    <PagesContext.Provider
+                        value={{
+                            pages: {
+                                search: SearchRoute,
+                            },
+                        }}
+                    >
+                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
+                            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+                                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                                    <NavHistoryContextProvider>
+                                        <DeviceProvider>
+                                            <Router history={history}>
+                                                <LinkContextProvider linkContext={formatUrl("/kb", true)}>
+                                                    <FontSizeCalculatorProvider>
+                                                        <Route component={KnowledgeRoutes} />
+                                                    </FontSizeCalculatorProvider>
+                                                </LinkContextProvider>
+                                            </Router>
+                                        </DeviceProvider>
+                                    </NavHistoryContextProvider>
+                                </SearchContext.Provider>
+                            </SiteNavProvider>
+                        </ScrollOffsetProvider>
+                    </PagesContext.Provider>
+                </ThemeProvider>
+            </LiveAnnouncer>
+        </Provider>
+    );
 }
 
 export default hot(module)(KnowledgeApp);
