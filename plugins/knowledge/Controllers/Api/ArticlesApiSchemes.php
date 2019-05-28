@@ -131,7 +131,7 @@ trait ArticlesApiSchemes {
     }
 
     /**
-     * Get an article schema with minimal add/edit fields.
+     * Get an article schema with minimal editable fields.
      *
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
