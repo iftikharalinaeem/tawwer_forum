@@ -120,7 +120,7 @@ trait ArticlesApiSchemes {
                     "sort?",
                     "draftID?" => [
                         "type" => "integer",
-                        "description" => "Unique ID of a draft to remove upon updating an article.",
+                        "description" => "Unique ID of a draft to remove upon creating an article.",
                     ]
                 ])->add($this->fullSchema()),
                 "ArticlePost"
