@@ -121,7 +121,7 @@ trait ArticlesApiSchemes {
                     "discussionID?",
                     "draftID?" => [
                         "type" => "integer",
-                        "description" => "Unique ID of a draft to remove upon updating an article.",
+                        "description" => "Unique ID of a draft to remove upon creating an article.",
                     ]
                 ])->add($this->fullSchema()),
                 "ArticlePost"
@@ -132,7 +132,7 @@ trait ArticlesApiSchemes {
     }
 
     /**
-     * Get an article schema with minimal add/edit fields.
+     * Get an article schema with minimal editable fields.
      *
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
