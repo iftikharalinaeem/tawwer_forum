@@ -118,6 +118,7 @@ trait ArticlesApiSchemes {
                     "name",
                     "locale?",
                     "sort?",
+                    "discussionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -459,17 +460,14 @@ trait ArticlesApiSchemes {
                 "enum" => ["published"],
             ],
             "format:s" => [
-                "allowNull" => false,
                 "enum" => ["text", "textex", "markdown", "wysiwyg", "html", "bbcode", "rich"],
                 "description" => "Format of the raw body content.",
             ],
             "name:s" => [
-                "allowNull" => false,
                 "description" => "Title of the article.",
                 "minLength" => 1,
             ],
             "body:s" => [
-                "allowNull" => false,
                 "description" => "Body contents.",
                 "minLength" => 1,
             ],
