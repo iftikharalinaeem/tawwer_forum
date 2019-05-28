@@ -39,6 +39,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { animated, useSpring } from "react-spring";
 import Message from "@library/messages/Message";
 import { TouchScrollable } from "react-scrolllock";
+import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 
 interface IProps extends IInjectableEditorProps, IDeviceProps, RouteComponentProps<any> {
     actions: EditorPageActions;
@@ -174,7 +175,7 @@ export function EditorForm(props: IProps) {
     return (
         <TouchScrollable>
             <form
-                className={classNames(classesEditorForm.root)}
+                className={classNames(classesEditorForm.root, EDITOR_SCROLL_CONTAINER_CLASS)}
                 onSubmit={onSubmit}
                 onScroll={transition.scrollHandler}
                 ref={formRef}
