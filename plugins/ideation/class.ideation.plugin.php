@@ -515,6 +515,11 @@ EOT
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
+        // Prevent force browsing to post an idea in a group.
+        $groupID = Gdn::request()->get('groupid');
+        if (isset($groupID)) {
+            throw forbiddenException('@'.t(" You cannot post an idea inside a group."));
+        }
         //Get tag values from form and append default status.
         if ($sender->Form->authenticatedPostBack()) {
             $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
