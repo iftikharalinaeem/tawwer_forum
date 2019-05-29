@@ -134,7 +134,7 @@ export function EditorForm(props: IProps) {
     return (
         <TouchScrollable>
             <form
-                className={classNames(classesEditorForm.root)}
+                className={classNames(classesEditorForm.root, EDITOR_SCROLL_CONTAINER_CLASS)}
                 onSubmit={onSubmit}
                 onScroll={transition.scrollHandler}
                 ref={formRef}
@@ -317,7 +317,6 @@ function useFormScrollTransition(
     }, [setScrollPos, formRef.current]);
 
     // Calculate some dimensions.
-    const { y } = useSpring({ y: scrollPos, tension: 100 });
     let start = 0;
     let end = 0;
     if (embedBarRef.current) {
@@ -325,6 +324,7 @@ function useFormScrollTransition(
         start = rect.top / 2;
         end = rect.top + rect.height * 2;
     }
+    const { y } = useSpring({ y: Math.max(start, Math.min(end, scrollPos)), tension: 100 });
 
     // Fades in.
     const headerBorderOpacity = y.interpolate({
