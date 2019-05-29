@@ -132,10 +132,15 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function setCurrent(int $themeID): array {
-        return $this->normalizeTheme(
-            $this->themeModel->setCurrentTheme($themeID),
-            $this->themeAssetModel->get(['themeID' => $themeID], ['select' => ['assetKey', 'data']])
-        );
+        try {
+            $theme = $this->normalizeTheme(
+                $this->themeModel->setCurrentTheme($themeID),
+                $this->themeAssetModel->get(['themeID' => $themeID], ['select' => ['assetKey', 'data']])
+            );
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
+        }
+        return $theme;
     }
 
     /**
