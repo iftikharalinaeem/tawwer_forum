@@ -18,9 +18,14 @@ enum Collection {
     SESSION = "session",
 }
 
-export const trackPageView = () => {
-    const { eventDefaults } = getStore<IStoreState>().getState().analytics;
-    trackEvent(Collection.PAGE, eventDefaults);
+const eventDefaults = () => {
+    return getStore<IStoreState>().getState().analytics.eventDefaults;
+};
+
+export const trackPageView = (url: string) => {
+    const data = eventDefaults();
+    data.url = url;
+    trackEvent(Collection.PAGE, data);
 };
 
 export const trackEvent = (collection: Collection, data) => {
