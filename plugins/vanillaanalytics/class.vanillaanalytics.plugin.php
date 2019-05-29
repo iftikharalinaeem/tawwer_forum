@@ -7,6 +7,9 @@
  * @package vanillaanalytics
  */
 
+use Garden\Container\Container;
+use Vanilla\Analytics\KeenClient;
+
 /**
  * Facilitate the tracking of events from Vanilla to one (or more) analytics services.
  */
@@ -76,6 +79,16 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $analyticsDashboardModel = new AnalyticsDashboard();
 
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
+    }
+
+    /**
+     * Update the container configuration.
+     *
+     * @param Container $container
+     */
+    public function container_init(Container $container) {
+        $container->rule(\Vanilla\Analytics\Client::class)
+            ->setClass(KeenClient::class);
     }
 
     /**
