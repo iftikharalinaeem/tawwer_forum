@@ -658,14 +658,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function patch(int $id, array $body = []): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->articlePostSchema("in")
+        $in = $this->articlePatchSchema("in")
             ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
             ->setDescription("Update an existing article.");
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body, true);
         $this->save($body, $id);
-        
+
         $row = $this->articleByID($id, true);
         $this->eventManager->fire("afterArticleUpdate", $row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
@@ -772,7 +772,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "items" => ["type" => "string"]
             ],
         ], "in")
-            ->addValidator("aliases", [$this, 'validateAliases'])
+            ->addValidator("aliases", [ArticlesApiSchemes::class, 'validateAliases'])
             ->setDescription("Set article aliases.");
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
@@ -921,7 +921,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
 
         $this->reactionModel->insert($fields);
-        
+
         $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
         $row = $this->articleByID($id, true);

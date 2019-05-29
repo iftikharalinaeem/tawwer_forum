@@ -272,7 +272,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
     /**
      * Synchronize the current editor draft state to the server.
      */
-    public async syncDraft(newDraftID: string = uniqueId()) {
+    public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
         const { form, article, draft, isDirty } = state.knowledge.editorPage;
 
@@ -307,7 +307,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
                 tempID,
             );
         }
-    }
+    };
 
     /**
      * Publish the current article/revision to the server.
@@ -318,13 +318,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
      *
      * @param history History object for redirecting.
      */
-    public async publish(history: History) {
+    public publish = async (history: History) => {
         const editorState = this.getState().knowledge.editorPage;
         // We don't have an article so go create one.
+        const isBodyEmpty = isEqual(editorState.form.body, [{ insert: "\n" }]) || isEqual(editorState.form.body, []);
         const draft = editorState.draft;
         const request: IPostArticleRequestBody = {
             ...editorState.form,
-            body: JSON.stringify(editorState.form.body),
+            body: isBodyEmpty ? "" : JSON.stringify(editorState.form.body),
             draftID: draft.data ? draft.data.draftID : undefined,
             format: Format.RICH,
         };
@@ -332,9 +333,13 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
             const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
             const { body, name, knowledgeCategoryID, sort } = request;
+
+            // We only want to submit the body if it is not the default value.
+            const shouldSubmitBody = prevBody !== body;
+
             const patchRequest: IPatchArticleRequestBody = {
                 articleID: editorState.article.data.articleID,
-                body: !isEqual(prevBody, body) ? body : undefined,
+                body: shouldSubmitBody ? body : undefined,
                 name: prevName !== name ? name : undefined,
                 knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
                 sort,
@@ -367,7 +372,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         history.push({
             pathname,
         });
-    }
+    };
 
     /**
      * Fetch an existing article for editing.

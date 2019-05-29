@@ -18,7 +18,6 @@ import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
-import { boolean } from "@storybook/addon-knobs";
 
 export interface IEditorPageForm {
     name: string;
@@ -35,6 +34,11 @@ export interface IEditorPageState {
         draftID?: number;
     }>; // The draft ID. Actual draft will live in normalized drafts resource.
     form: IEditorPageForm;
+    formErrors: {
+        name: string | null;
+        knowledgeCategoryID: string | null;
+        body: string | null;
+    };
     formNeedsRefresh: boolean;
     editorOperationsQueue: EditorQueueItem[];
     currentError: IApiError | null;
@@ -45,58 +49,14 @@ export interface IEditorPageState {
     notifyConversion: boolean;
 }
 
-export interface IInjectableEditorProps {
-    article: ILoadable<IArticle>;
-    draft: ILoadable<IResponseArticleDraft>;
-    form: IEditorPageForm;
-    formNeedsRefresh: boolean;
-    editorOperationsQueue: EditorQueueItem[];
-    revision: ILoadable<IRevision>;
-    saveDraft: ILoadable<{}>;
-    submit: ILoadable<{}>;
-    notifyConversion: boolean;
-    currentError: IApiError | null;
-}
-
 type ReducerType = KnowledgeReducer<IEditorPageState>;
 
 /**
  * Reducer for the article page.
  */
 export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
-    /**
-     * Get properties for injection into components.
-     *
-     * @param state A full state tree.
-     */
-    public static getInjectableProps(state: IStoreState): IInjectableEditorProps {
-        const {
-            article,
-            saveDraft,
-            submit,
-            form,
-            formNeedsRefresh,
-            editorOperationsQueue,
-            notifyConversion,
-            currentError,
-        } = EditorPageModel.getStateSlice(state);
-
-        return {
-            article,
-            saveDraft,
-            submit,
-            form,
-            formNeedsRefresh,
-            revision: EditorPageModel.selectActiveRevision(state),
-            draft: EditorPageModel.selectDraft(state),
-            editorOperationsQueue,
-            notifyConversion,
-            currentError,
-        };
-    }
-
     private static selectRevisionLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).revision;
-    private static selectActiveRevision = createSelector(
+    public static selectActiveRevision = createSelector(
         (state: IStoreState) => state,
         EditorPageModel.selectRevisionLoadable,
         (state, revLoadable) => {
@@ -115,7 +75,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     );
 
     private static selectDraftLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).draft;
-    private static selectDraft = createSelector(
+    public static selectDraft = createSelector(
         (state: IStoreState) => state,
         EditorPageModel.selectDraftLoadable,
         (state, draftLoadable) => {
@@ -139,7 +99,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state instance.
      * @throws An error if the state wasn't initialized properly.
      */
-    private static getStateSlice(state: IStoreState): IEditorPageState {
+    public static getStateSlice(state: IStoreState): IEditorPageState {
         if (!state.knowledge || !state.knowledge.editorPage) {
             throw new Error(
                 "The revision page model has not been wired up properly. Expected to find 'state.knowledge.editorPage'.",
@@ -160,6 +120,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         form: {
             name: "",
             body: [],
+            knowledgeCategoryID: null,
+        },
+        formErrors: {
+            name: null,
+            body: null,
             knowledgeCategoryID: null,
         },
         formNeedsRefresh: false,
@@ -210,6 +175,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 const { forceRefresh } = action.payload;
                 nextState.formNeedsRefresh = forceRefresh;
                 nextState.isDirty = !forceRefresh;
+
+                // Clean up the form errors on the fields that were modified.
+                for (const key of Object.keys(action.payload.formData)) {
+                    nextState.formErrors[key] = null;
+                }
                 break;
             case EditorPageActions.RESET_ERROR:
                 nextState.currentError = null;
@@ -248,10 +218,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             case ArticleActions.GET_DRAFT_ERROR:
             case ArticleActions.GET_REVISION_ERROR:
             case ArticleActions.PATCH_DRAFT_ERROR:
-            case ArticleActions.PATCH_ARTICLE_ERROR:
-            case ArticleActions.POST_ARTICLE_ERROR:
             case ArticleActions.POST_DRAFT_ERROR:
                 nextState.currentError = action.payload;
+                break;
         }
 
         return nextState;
@@ -342,28 +311,38 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
     private reduceArticle: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
-            case ArticleActions.POST_ARTICLE_REQUEST:
-                nextState.article.status = LoadStatus.LOADING;
-                break;
             case EditorPageActions.GET_ARTICLE_REQUEST:
                 nextState.article.status = LoadStatus.LOADING;
                 break;
             case EditorPageActions.GET_ARTICLE_RESPONSE:
-            case ArticleActions.POST_ARTICLE_RESPONSE:
                 nextState.article.status = LoadStatus.SUCCESS;
                 nextState.article.data = action.payload.data;
                 break;
             case EditorPageActions.GET_ARTICLE_ERROR:
-            case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.article.status = LoadStatus.ERROR;
                 nextState.article.error = action.payload;
                 break;
             // Patching the article
+            case ArticleActions.POST_ARTICLE_REQUEST:
             case ArticleActions.PATCH_ARTICLE_REQUEST:
                 nextState.submit.status = LoadStatus.LOADING;
                 break;
             case ArticleActions.PATCH_ARTICLE_ERROR:
+            case ArticleActions.POST_ARTICLE_ERROR:
                 nextState.submit.status = LoadStatus.ERROR;
+
+                const responseData = action.payload.response && action.payload.response.data;
+                if (!responseData || !responseData.errors) {
+                    // No actual error message at all. Let's just use the main error message.
+                    nextState.currentError = action.payload;
+                } else {
+                    // We should have some specific form errors here.
+                    for (const [key, value] of Object.entries(responseData.errors)) {
+                        // This is a bit of a kludge, but we only designed to show 1 error at at time.
+                        nextState.formErrors[key] = value[0].message;
+                    }
+                }
+
                 nextState.submit.error = action.payload;
                 break;
             // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
