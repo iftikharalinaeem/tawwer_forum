@@ -9,10 +9,11 @@ import Button from "@library/forms/Button";
 import { newFolder } from "@library/icons/common";
 import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
+import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcomponents/navigationManagerToolBarStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 
 interface IProps {
     expandAll: () => void;
@@ -23,53 +24,42 @@ interface IProps {
 
 export default function NavigationManagerToolBar(props: IProps) {
     const classesNavigationManager = navigationManagerClasses();
+    const classes = navigationManagerToolbarClasses();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
     return (
-        <div className="navigationManagerToolbar">
-            <div className="navigationManagerToolbar-bar">
+        <div className={classes.root}>
+            <div className={classes.bar}>
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
-                    className={classNames(
-                        "navigationManagerToolbar-button",
-                        "navigationManagerToolbar-expandAll",
-                        classesNavigationManager.button,
-                    )}
+                    className={classNames(classesNavigationManager.button)}
                     onClick={props.expandAll}
                     ariaLabel={t("Expand All")}
                 >
-                    {expandAll("navigationManagerToolbar-icon")}
-                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("Expand All")}</span>}
+                    {expandAll(classes.icon)}
+                    {!isMobile && <span className={classes.buttonLabel}>{t("Expand All")}</span>}
                 </Button>
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
-                    className={classNames(
-                        "navigationManagerToolbar-button",
-                        "navigationManagerToolbar-collapseAll",
-                        classesNavigationManager.button,
-                    )}
+                    className={classNames(classesNavigationManager.button)}
                     onClick={props.collapseAll}
                     ariaLabel={t("Collapse All")}
                 >
-                    {collapseAll("navigationManagerToolbar-icon")}
-                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("Collapse All")}</span>}
+                    {collapseAll(classes.icon)}
+                    {!isMobile && <span className={classes.buttonLabel}>{t("Collapse All")}</span>}
                 </Button>
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
-                    className={classNames(
-                        "navigationManagerToolbar-button",
-                        "navigationManagerToolbar-newFolder",
-                        classesNavigationManager.button,
-                    )}
+                    className={classNames(classes.newFolder, classesNavigationManager.button)}
                     onClick={props.newCategory}
                     ariaLabel={t("New Category")}
                     buttonRef={props.newCategoryButtonRef}
                 >
-                    {newFolder("navigationManagerToolbar-icon navigationManagerToolbar-newFolder")}
-                    {!isMobile && <span className="navigationManagerToolbar-buttonLabel">{t("New Category")}</span>}
+                    {newFolder(classNames(classes.icon, classes.newFolder))}
+                    {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
                 </Button>
             </div>
-            <hr role="separator" className="navigationManagerToolbar-separator" />
+            <hr role="separator" className={classes.separator} />
         </div>
     );
 }
