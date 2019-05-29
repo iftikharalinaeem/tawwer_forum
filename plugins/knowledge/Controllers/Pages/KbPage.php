@@ -21,12 +21,16 @@ use Vanilla\Web\JsInterpop\ReduxAction;
 use \ThemesApiController;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\ThemedPage;
+use Vanilla\Contracts\Analytics\ClientInterface as AnalyticsClient;
 
 /**
  * Base knowledge base page.
  */
 abstract class KbPage extends ThemedPage {
     const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
+
+    /** @var AnalyticsClient */
+    protected $analyticsClient;
 
     /** @var \UsersApiController */
     protected $usersApi;
@@ -58,7 +62,8 @@ abstract class KbPage extends ThemedPage {
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
-        DeploymentCacheBuster $deploymentCacheBuster = null // Default needed for method extensions
+        DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
+        AnalyticsClient $analyticsClient = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $themesApi, $cspModel);
         $this->usersApi = $usersApi;
@@ -66,6 +71,7 @@ abstract class KbPage extends ThemedPage {
         $this->navApi = $navApi;
         $this->categoriesApi = $categoriesApi;
         $this->deploymentCacheBuster = $deploymentCacheBuster;
+        $this->analyticsClient = $analyticsClient;
 
         // Shared initialization.
         $this->initSharedData();
@@ -101,6 +107,18 @@ abstract class KbPage extends ThemedPage {
         $this->addReduxAction(new ReduxAction(
             ActionConstants::SET_LOCAL_DEPLOYMENT_KEY,
             new Data($this->deploymentCacheBuster->value()),
+            []
+        ));
+
+        $this->addReduxAction(new ReduxAction(
+            \Vanilla\Analytics\ActionConstants::GET_CONFIG,
+            new Data($this->analyticsClient->config()),
+            []
+        ));
+
+        $this->addReduxAction(new ReduxAction(
+            \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
+            new Data($this->analyticsClient->eventDefaults()),
             []
         ));
     }
