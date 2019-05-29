@@ -3,9 +3,10 @@
  * @license Proprietary
  */
 
-import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { produce } from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 import AnalyticsActions from "./AnalyticsActions";
+import { IExpandedDateTime } from "./tracking";
 
 export interface IAnalyticsConfig {
     projectID?: string | null;
@@ -13,17 +14,7 @@ export interface IAnalyticsConfig {
 }
 
 export interface IAnalyticsEventDefaults {
-    dateTime?: {
-        year: number;
-        month: number;
-        day: number;
-        hour: number;
-        minute: number;
-        dayOfWeek: number;
-        startOfWeek: number;
-        timestamp: number;
-        timeZone: string | null;
-    };
+    dateTime?: IExpandedDateTime;
     ip?: string;
     site?: {
         accountID: number | null;
