@@ -1,6 +1,20 @@
 openapi: 3.0.0
 info:
 paths:
+  /themes:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/Theme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Create a new theme.
   /themes/{themeID}:
     patch:
       parameters:
