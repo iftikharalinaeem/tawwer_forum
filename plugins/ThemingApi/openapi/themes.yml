@@ -50,7 +50,7 @@ paths:
                   example: {"themeID": 3}
                   required:
                     - themeID
-              required: true
+          required: true
         responses:
           200:
             content:
@@ -89,17 +89,3 @@ components:
                   required:
                     - name
       required: true
-  schemas:
-    NewTheme:
-      properties:
-        name:
-          type: string
-        themeID:
-          type: integer
-        current:
-          type: boolean
-      required:
-        - name
-        - themeID
-        - current
-      type: object
