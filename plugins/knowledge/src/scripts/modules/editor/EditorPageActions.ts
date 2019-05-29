@@ -325,9 +325,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         const draft = editorState.draft;
         const request: IPostArticleRequestBody = {
             ...editorState.form,
-            body: isBodyEmpty
-                ? ""
-                : JSON.stringify(editorState.form.body),
+            body: isBodyEmpty ? "" : JSON.stringify(editorState.form.body),
             draftID: draft.data ? draft.data.draftID : undefined,
             format: Format.RICH,
         };
