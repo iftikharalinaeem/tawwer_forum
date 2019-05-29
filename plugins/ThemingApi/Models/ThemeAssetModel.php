@@ -7,6 +7,7 @@
 namespace ThemingApi\Models;
 
 use Gdn_Session;
+use Vanilla\Models\PipelineModel;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Exception\Database\NoResultsException;
