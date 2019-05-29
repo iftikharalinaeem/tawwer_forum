@@ -5,6 +5,7 @@
  */
 
 namespace ThemingApi\Models;
+
 use Gdn_Session;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
