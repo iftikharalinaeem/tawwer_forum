@@ -2,26 +2,6 @@ openapi: 3.0.2
 info:
 paths:
   /themes/{themeID}:
-    patch:
-      parameters:
-        - description: Unique themeID.
-          in: path
-          name: themeID
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        $ref: "#/components/requestBodies/Theme"
-      responses:
-        200:
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Theme"
-          description: Success
-      tags:
-        - Themes
-      summary: Update theme name.
     delete:
       parameters:
         - description: Unique theme ID.
@@ -36,56 +16,3 @@ paths:
       tags:
         - Themes
       summary: Delete theme.
-  /themes/current:
-      put:
-        requestBody:
-          content:
-            application/json:
-              schema:
-                  type: object
-                  properties:
-                    themeID:
-                      description: Theme ID.
-                      type: integer
-                  example: {"themeID": 3}
-                  required:
-                    - themeID
-          required: true
-        responses:
-          200:
-            content:
-              "application/json":
-                schema:
-                  $ref: "#/components/schemas/Theme"
-            description: Success
-        tags:
-          - Themes
-        summary:
-          - Set theme as "current".
-      get:
-        responses:
-          200:
-            content:
-                "application/json":
-                  schema:
-                    $ref: "#/components/schemas/Theme"
-            description: Success
-        tags:
-          - Themes
-        summary:
-          - Get current theme.
-components:
-  requestBodies:
-    Theme:
-      content:
-          application/json:
-              schema:
-                  type: object
-                  properties:
-                    name:
-                      description: Theme name.
-                      type: string
-                  example: {"name":"custom client theme"}
-                  required:
-                    - name
-      required: true
