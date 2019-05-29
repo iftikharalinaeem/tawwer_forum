@@ -57,8 +57,8 @@ class ThemingApiPlugin extends \Gdn_Plugin {
      * @param \Garden\Container\Container $container Container to support dependency injection
      */
     public function container_init(\Garden\Container\Container $container) {
-        $container->rule(ThemesApiController::class)
-            ->addCall("setCustomThemeProvider", [new Reference(CustomThemeApiController::class)])
+        $container->rule(ThemeModel::class)
+            ->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)])
         ;
     }
 
@@ -76,7 +76,6 @@ class ThemingApiPlugin extends \Gdn_Plugin {
      * Ensure the database is configured.
      */
     public function structure() {
-
         $this->database->structure()
             ->table("theme")
             ->primaryKey("themeID")
@@ -99,7 +98,5 @@ class ThemingApiPlugin extends \Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime")
             ->set();
-
-
     }
 }
