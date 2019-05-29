@@ -4,114 +4,14 @@
  * @license Proprietary
  */
 import { expect } from "chai";
-import { DeepPartial } from "redux";
-import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
-import EditorPageModel, { IInjectableEditorProps, IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IArticleDraftAttrs } from "@knowledge/@types/api/article";
 import { Format } from "@knowledge/@types/api/articleRevision";
 
 describe("EditorPageModel", () => {
-    describe("getInjectableProps()", () => {
-        it("can map the injectable props for the loading state", () => {
-            const state: DeepPartial<IStoreState> = {
-                knowledge: {
-                    editorPage: EditorPageModel.INITIAL_STATE,
-                },
-            };
-
-            const { isDirty, ...expected } = EditorPageModel.INITIAL_STATE;
-
-            expect(EditorPageModel.getInjectableProps(state as any)).deep.eq(expected);
-        });
-        it("can map the injectable props for the successful state", () => {
-            const revision = {
-                articleRevisionID: 3,
-                bodyRendered: "Hello revision",
-            };
-
-            const draft = {
-                draftID: 1,
-                attributes: {},
-                body: [{ insert: "Hello draft" }] as any,
-            };
-
-            const mixedState: IEditorPageState = {
-                ...EditorPageModel.INITIAL_STATE,
-                article: {
-                    status: LoadStatus.LOADING,
-                },
-                draft: {
-                    status: LoadStatus.SUCCESS,
-                    error: undefined,
-                    data: {
-                        draftID: draft.draftID,
-                    },
-                },
-                revision: {
-                    status: LoadStatus.SUCCESS,
-                    error: undefined,
-                    data: revision.articleRevisionID,
-                },
-                form: {
-                    name: "test",
-                    body: [{ insert: "foo bar" }],
-                    knowledgeCategoryID: 29,
-                },
-                formNeedsRefresh: true,
-            };
-
-            const state: DeepPartial<IStoreState> = {
-                knowledge: {
-                    editorPage: mixedState,
-                    articles: {
-                        revisionsByID: {
-                            [revision.articleRevisionID]: revision,
-                        },
-                        draftsByID: {
-                            [draft.draftID]: draft,
-                        },
-                    },
-                },
-            };
-
-            const expected: IInjectableEditorProps = {
-                article: {
-                    status: LoadStatus.LOADING,
-                },
-                draft: {
-                    status: LoadStatus.SUCCESS,
-                    error: undefined,
-                    data: draft as any,
-                },
-                revision: {
-                    status: LoadStatus.SUCCESS,
-                    error: undefined,
-                    data: revision as any,
-                },
-                saveDraft: {
-                    status: LoadStatus.PENDING,
-                },
-                submit: {
-                    status: LoadStatus.PENDING,
-                },
-                form: {
-                    name: "test",
-                    body: [{ insert: "foo bar" }],
-                    knowledgeCategoryID: 29,
-                },
-                formNeedsRefresh: true,
-                editorOperationsQueue: [],
-                notifyConversion: false,
-                currentError: null,
-            };
-
-            expect(EditorPageModel.getInjectableProps(state as any)).deep.eq(expected);
-        });
-    });
-
     describe("reducer()", () => {
         it("can handle tempIDs for drafts", () => {
             const TEMP_ID = "some id";
