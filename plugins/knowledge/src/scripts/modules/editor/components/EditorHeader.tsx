@@ -188,17 +188,7 @@ export class EditorHeader extends React.Component<IProps, IState> {
         }
 
         if (content) {
-            return (
-                <li
-                    className={classNames(
-                        "editorHeader-item",
-                        "editorHeader-itemDraftStatus",
-                        classesMetas.draftStatus,
-                    )}
-                >
-                    {content}
-                </li>
-            );
+            return <li className={classNames(classesMetas.meta, classesMetas.draftStatus)}>{content}</li>;
         } else {
             return null;
         }
