@@ -107,14 +107,12 @@ class RankModel extends Gdn_Model {
                 'RecordType' => 'Rank',
                 'RecordID' => $rankID,
                 'Route' => "/profile",
-                'Emailed' => ActivityModel::SENT_PENDING,
-                'Notified' => ActivityModel::SENT_PENDING,
                 'Photo' => 'https://images.v-cdn.net/ranks_100.png',
                 'Data' => ['Name' => $rank['Name'], 'Label' => $rank['Label']]
         ];
 
         $activityModel = new ActivityModel();
-        $activityModel->queue($activity, false, ['Force' => true]);
+        $activityModel->queue($activity, 'Rank', ['Force' => true]);
 
         // Notify everyone else of your badge.
         $activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
