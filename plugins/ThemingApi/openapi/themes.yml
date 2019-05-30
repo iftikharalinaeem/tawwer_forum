@@ -167,16 +167,11 @@ components:
                     - name
       required: true
   schemas:
-    AssetData:
-      content:
-          application/json:
-              schema:
-                  type: object
-                  properties:
-                    data:
-                      description: Asset content data.
-                      type: string
-                  example: {"data":"some content"}
-                  required:
-                    - data
-      required: true
+    type: object
+    properties:
+      data:
+        description: Asset content data.
+        type: string
+    example: {"data":"some content"}
+    required:
+      - data
