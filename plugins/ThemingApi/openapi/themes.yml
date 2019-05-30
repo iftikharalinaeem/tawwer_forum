@@ -86,6 +86,71 @@ paths:
         tags:
           - Themes
         summary: Get current theme.
+  /themes/{themeID}/assets/{assetKey}:
+      put:
+        parameters:
+          - description: Unique themeID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - header.html
+                - footer.html
+                - variables.json
+                - fonts.json
+                - scripts.json
+                - variables.json
+                - styles.css
+                - javascript.js
+        requestBody:
+          $ref: "#/components/requestBodies/AssetData"
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/AssetData"
+            description: Success
+        tags:
+          - Themes
+        summary: Update theme name.
+      delete:
+        parameters:
+          - description: Unique theme ID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - header.html
+                - footer.html
+                - variables.json
+                - fonts.json
+                - scripts.json
+                - variables.json
+                - styles.css
+                - javascript.js
+        responses:
+          204:
+            description: Success
+        tags:
+          - Themes
+        summary: Delete theme asset.
 components:
   requestBodies:
     Theme:
@@ -101,3 +166,16 @@ components:
                   required:
                     - name
       required: true
+    AssetData:
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        data:
+                          description: Asset content data.
+                          type: string
+                      example: {"data":"some content"}
+                      required:
+                        - data
+          required: true

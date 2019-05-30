@@ -16,6 +16,7 @@ use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
+use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ImageAsset;
 
 /**
@@ -164,7 +165,6 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function setAsset(int $themeID, string $assetKey, string $data): array {
         $asset = $this->themeAssetModel->setAsset($themeID, $assetKey, $data);
-
         return [$assetKey => $this->generateAsset($assetKey, $asset['data'])];
     }
 
@@ -179,6 +179,13 @@ class DbThemeProvider implements ThemeProviderInterface {
             $content = Vanilla\Models\ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
         }
         return $content;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteAsset($themeKey, string $assetKey) {
+        $this->themeAssetModel->deleteAsset($themeKey, $assetKey);
     }
 
     /**
@@ -201,10 +208,9 @@ class DbThemeProvider implements ThemeProviderInterface {
         ];
 
         $res["assets"] = $this->getDefaultAssets($theme);
-
         $primaryAssets = array_intersect_key(
             $assets,
-            array_flip(["fonts", "footer", "header", "scripts", "variables"])
+            array_flip(["fonts", "footer", "header", "scripts", "variables", "styles", "javascript"])
         );
 
         foreach ($primaryAssets as $assetKey => $asset) {
@@ -263,6 +269,7 @@ class DbThemeProvider implements ThemeProviderInterface {
                     return new JsonAsset($data);
                 }
             case "js":
+                return new JavascriptAsset($data);
             case "css":
                 return new StyleAsset($data);
             default:
