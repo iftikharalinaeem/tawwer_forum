@@ -816,6 +816,7 @@ class RanksPlugin extends Gdn_Plugin {
             'rank?' => $this->getRankFragment()
         ]));
     }
+    
     /**
      * Update the /users/get input schema.
      *
