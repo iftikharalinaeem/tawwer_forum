@@ -816,7 +816,7 @@ class RanksPlugin extends Gdn_Plugin {
             'rank?' => $this->getRankFragment()
         ]));
     }
-    
+
     /**
      * Update the /users/get input schema.
      *
@@ -841,8 +841,8 @@ class RanksPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      */
     public function profileController_afterPreferencesDefined_handler($sender) {
-        $sender->Preferences['Notifications']['Email.Rank'] = t('PreferenceRankEmail', 'Notify me when my rank is updated.');
-        $sender->Preferences['Notifications']['Popup.Rank'] = t('PreferenceRankPopup', 'Notify me when my rank is updated.');
+        $sender->Preferences['Notifications']['Email.Rank'] = t('PreferenceRankEmail', 'Notify me when my rank changes.');
+        $sender->Preferences['Notifications']['Popup.Rank'] = t('PreferenceRankPopup', 'Notify me when my rank changes.');
     }
 }
 
