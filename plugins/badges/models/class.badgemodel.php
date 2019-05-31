@@ -146,7 +146,6 @@ class BadgeModel extends Gdn_Model {
             $this->SQL->where('Active', 1);
             $this->SQL->where('Visible', 1);
         }
-   
         $this->SQL->orderBy('Class, Threshold, Name', 'asc');
 
         return $this->get();
