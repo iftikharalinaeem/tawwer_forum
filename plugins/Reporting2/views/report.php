@@ -2,7 +2,7 @@
 <h2><?php echo t($this->data('Title')); ?></h2>
 <?php
 $Row = $this->data('Row');
-echo formatQuote($Row);
+echo gdn_formatter_quote($Row);
 ?>
 <?php
 echo $this->Form->open();
