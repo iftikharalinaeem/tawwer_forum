@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace ThemingApi\Models;
+namespace Vanilla\ThemingApi\Models;
 
 use Gdn_Session;
 use Vanilla\Models\PipelineModel;

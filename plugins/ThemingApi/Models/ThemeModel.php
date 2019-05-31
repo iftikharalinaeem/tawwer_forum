@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace ThemingApi\Models;
+namespace Vanilla\ThemingApi\Models;
 
 use Garden\Web\Exception\ClientException;
 use Gdn_Session;

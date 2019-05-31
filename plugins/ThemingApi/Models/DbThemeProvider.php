@@ -5,8 +5,8 @@
  */
 
 use Vanilla\Theme\ThemeProviderInterface;
-use ThemingApi\Models\ThemeModel;
-use ThemingApi\Models\ThemeAssetModel;
+use Vanilla\ThemingApi\Models\ThemeModel;
+use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\Models\ThemeVarialblesTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
