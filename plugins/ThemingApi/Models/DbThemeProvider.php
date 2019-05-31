@@ -7,7 +7,7 @@
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\ThemingApi\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
-use Vanilla\Models\ThemeVarialblesTrait;
+use Vanilla\Models\ThemeVariablesTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -24,7 +24,7 @@ use Vanilla\Theme\ImageAsset;
  * Class DbThemeProvider
  */
 class DbThemeProvider implements ThemeProviderInterface {
-    use ThemeVarialblesTrait;
+    use ThemeVariablesTrait;
     /**
      * @var ThemeAssetModel
      */
