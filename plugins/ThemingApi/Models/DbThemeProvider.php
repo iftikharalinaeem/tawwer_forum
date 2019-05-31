@@ -7,6 +7,7 @@
 use Vanilla\Theme\ThemeProviderInterface;
 use ThemingApi\Models\ThemeModel;
 use ThemingApi\Models\ThemeAssetModel;
+use Vanilla\Models\ThemeVarialblesTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -23,6 +24,7 @@ use Vanilla\Theme\ImageAsset;
  * Class DbThemeProvider
  */
 class DbThemeProvider implements ThemeProviderInterface {
+    use ThemeVarialblesTrait;
     /**
      * @var ThemeAssetModel
      */
@@ -177,6 +179,9 @@ class DbThemeProvider implements ThemeProviderInterface {
             $content = $asset['data'];
         } catch (NoResultsException $e) {
             $content = Vanilla\Models\ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
+            if ($assetKey === 'variables') {
+                $content = $this->addAddonVariables($content);
+            }
         }
         return $content;
     }
@@ -240,8 +245,13 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getDefaultAssets(array $theme): array {
         $assets = [];
         foreach (Vanilla\Models\ThemeModel::ASSET_LIST as $assetKey => $assetDefinition) {
-            $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
+            if ($assetKey === 'variables') {
+                $assets[$assetKey] =  $this->generateAsset($assetKey, $this->addAddonVariables($assetDefinition['default']));
+            } else {
+                $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
+            }
         }
+
         $assets['styles'] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
         $assets['javascript'] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
         return $assets;
