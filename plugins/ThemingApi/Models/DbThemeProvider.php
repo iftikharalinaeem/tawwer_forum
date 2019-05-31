@@ -65,7 +65,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function themeKeyType(): bool {
-        return self::TYPE_INT;
+        return self::TYPE_DB;
     }
 
     /**
@@ -166,6 +166,20 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function setAsset(int $themeID, string $assetKey, string $data): array {
+        $asset = $this->themeAssetModel->setAsset($themeID, $assetKey, $data);
+        return [$assetKey => $this->generateAsset($assetKey, $asset['data'])];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function sparseAsset(int $themeID, string $assetKey, string $data): array {
+        $flat = flattenArray('^|^', json_decode($this->getAssetData($themeID, $assetKey, $data), true));
+        $assetData = flattenArray('^|^', json_decode($data, true));
+        foreach ($assetData as $key => $val) {
+            $flat[$key] = $val;
+        }
+        $data = json_encode(unflattenArray('^|^', $flat));
         $asset = $this->themeAssetModel->setAsset($themeID, $assetKey, $data);
         return [$assetKey => $this->generateAsset($assetKey, $asset['data'])];
     }

@@ -121,7 +121,35 @@ paths:
             description: Success
         tags:
           - Themes
-        summary: Update theme name.
+        summary: Set theme asset or replace if already exists.
+      patch:
+        parameters:
+          - description: Unique themeID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - variables.json
+        requestBody:
+          $ref: "#/components/requestBodies/AssetData"
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/AssetData"
+            description: Success
+        tags:
+          - Themes
+        summary: "Sparse update or set theme asset. Note: only variables.json asset supported."
       delete:
         parameters:
           - description: Unique theme ID.
