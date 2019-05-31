@@ -5,22 +5,25 @@
  * @license Proprietary
  */
 
-use Gdn_Router as Router;
+namespace Vanilla\ThemingApi;
+
+use \Gdn_Router as Router;
 use Garden\Container\Reference;
-use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use \Gdn_Request;
+use \Gdn_Database;
+use \Gdn_Plugin;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;
-use Vanilla\Knowledge\Models\KnowledgeVariablesProvider;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
  */
-class ThemingApiPlugin extends \Gdn_Plugin {
+class ThemingApiPlugin extends Gdn_Plugin {
 
-    /** @var \Gdn_Database */
+    /** @var Gdn_Database */
     private $database;
 
-    /** @var \Gdn_Request */
+    /** @var Gdn_Request */
     private $request;
 
     /** @var Router */
@@ -32,16 +35,16 @@ class ThemingApiPlugin extends \Gdn_Plugin {
     /**
      * KnowledgePlugin constructor.
      *
-     * @param \Gdn_Database $database
+     * @param Gdn_Database $database
      * @param Router $router
      * @param SessionInterface $session
-     * @param \Gdn_Request $request
+     * @param Gdn_Request $request
      */
     public function __construct(
-        \Gdn_Database $database,
+        Gdn_Database $database,
         Router $router,
         SessionInterface $session,
-        \Gdn_Request $request
+        Gdn_Request $request
     ) {
         parent::__construct();
         $this->database = $database;

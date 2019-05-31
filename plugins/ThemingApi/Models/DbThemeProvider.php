@@ -4,12 +4,15 @@
  * @license GPL-2.0-only
  */
 
+namespace Vanilla\ThemingApi;
+
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\ThemingApi\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\Models\ThemeVariablesTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn_Request;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
@@ -192,7 +195,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             $asset = $this->themeAssetModel->getAsset($themeKey, $assetKey);
             $content = $asset['data'];
         } catch (NoResultsException $e) {
-            $content = Vanilla\Models\ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
+            $content = \Vanilla\Models\ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
             if ($assetKey === 'variables') {
                 $content = $this->addAddonVariables($content);
             }
@@ -258,7 +261,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function getDefaultAssets(array $theme): array {
         $assets = [];
-        foreach (Vanilla\Models\ThemeModel::ASSET_LIST as $assetKey => $assetDefinition) {
+        foreach (\Vanilla\Models\ThemeModel::ASSET_LIST as $assetKey => $assetDefinition) {
             if ($assetKey === 'variables') {
                 $assets[$assetKey] =  $this->generateAsset($assetKey, $this->addAddonVariables($assetDefinition['default']));
             } else {
@@ -279,7 +282,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @return Asset
      */
     private function generateAsset(string $key, string $data): ?Asset {
-        $type = Vanilla\Models\ThemeModel::ASSET_LIST[$key]["type"];
+        $type = \Vanilla\Models\ThemeModel::ASSET_LIST[$key]["type"];
 
         switch ($type) {
             case "html":
