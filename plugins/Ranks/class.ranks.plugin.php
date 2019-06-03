@@ -69,6 +69,10 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function structure() {
         require dirname(__FILE__).'/structure.php';
+        \Gdn::config()->touch([
+            'Preferences.Email.Rank' => 1,
+            'Preferences.Popup.Rank' => 1
+        ]);
     }
 
     /**
@@ -829,6 +833,16 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function userIndexSchema_init(Schema $schema) {
         $this->updateSchemaExpand($schema);
+    }
+
+    /**
+     * Adds status notification options to profiles.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_afterPreferencesDefined_handler($sender) {
+        $sender->Preferences['Notifications']['Email.Rank'] = t('PreferenceRankEmail', 'Notify me when my rank changes.');
+        $sender->Preferences['Notifications']['Popup.Rank'] = t('PreferenceRankPopup', 'Notify me when my rank changes.');
     }
 }
 
