@@ -217,8 +217,8 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         };
     }
 
-    public static queueEditorOpAC = createAction<EditorQueueItem>("QUEUE_EDITOR_OP");
-    public queueEditorOp = this.bindDispatch(EditorPageActions.queueEditorOpAC);
+    public static queueEditorOpsAC = createAction<EditorQueueItem[]>("QUEUE_EDITOR_OP");
+    public queueEditorOps = this.bindDispatch(EditorPageActions.queueEditorOpsAC);
 
     public static clearEditorOpsAC = createAction("CLEAR_EDITOR_OPS");
     public clearEditorOps = this.bindDispatch(EditorPageActions.clearEditorOpsAC);
@@ -232,29 +232,31 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         // Set the title of the article.
         this.updateForm({ name }, true);
 
-        // Add the "created from" text.
-        this.queueEditorOp([
-            { attributes: { italic: true }, insert: "This article was created from a " },
-            { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },
-            { attributes: { italic: true }, insert: "." },
-            { insert: "\n" },
-        ]);
-
-        // Add the discussion content.
-        this.queueEditorOp(discussion.body);
+        const queuedOps = [
+            [
+                { attributes: { italic: true }, insert: "This article was created from a " },
+                { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },
+                { attributes: { italic: true }, insert: "." },
+                { insert: "\n" },
+            ],
+            // Add the discussion content.
+            discussion.body,
+        ];
 
         // If we have any answers, add those too.
         if (discussion.acceptedAnswers) {
-            this.queueEditorOp([
+            queuedOps.push([
                 { insert: discussion.acceptedAnswers.length > 1 ? "Answers" : "Answer" },
                 { attributes: { header: { level: 2, ref: "answer" } }, insert: "\n" },
             ]);
 
             discussion.acceptedAnswers.forEach(answer => {
-                this.queueEditorOp(answer.body);
+                queuedOps.push(answer.body);
             });
         }
 
+        // Add the "created from" text.
+        this.queueEditorOps(queuedOps);
         this.updateForm({ discussionID });
     }
 

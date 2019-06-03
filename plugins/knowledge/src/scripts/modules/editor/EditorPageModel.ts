@@ -192,8 +192,8 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     };
 
     private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
-        .case(EditorPageActions.queueEditorOpAC, (nextState, payload) => {
-            nextState.editorOperationsQueue.push(payload);
+        .case(EditorPageActions.queueEditorOpsAC, (nextState, payload) => {
+            nextState.editorOperationsQueue = payload;
             if (typeof payload === "string") {
                 // The item needs conversion.
                 nextState.notifyConversion = true;
