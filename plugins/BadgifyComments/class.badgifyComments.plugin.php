@@ -65,17 +65,24 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      *
      * @param BadgeController $sender
      * @param array $args
+     *
+     * @throws Gdn_UserException
      */
     public function badgeController_manageBadgeForm_handler($sender, $args) {
-        if ($sender->Form->authenticatedPostBack()) {
-            $formArray = $sender->Form->formValues();
-            $awardManually = $sender->Form->getFormValue('AwardManually');
+        /** @var Gdn_Form $form */
+        $form = $sender->Form;
+        if ($form->authenticatedPostBack()) {
+            $formArray = $form->formValues();
+            $awardManually = $form->getFormValue('AwardManually');
             if ($awardManually) {
                 $sender->BadgeModel->removeFilterField('Attributes');
-                $sender->Form->formValues($formArray + ['Attributes' => ['AwardManually' => true]]);
+                $form->formValues($formArray + ['Attributes' => ['AwardManually' => true]]);
+            } else {
+                $sender->BadgeModel->removeFilterField('Attributes');
+                $form->formValues($formArray + ['Attributes' => ['AwardManually' => false]]);
             }
         } else {
-            $formArray = (array) $sender->Form->formData();
+            $formArray = (array) $form->formData();
             // check for lowercase discussionID because Garden Request lowercases all get vars.
             $discussionID = Gdn::request()->get('discussionid');
             $discussion = DiscussionModel::instance();
@@ -92,8 +99,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
                 $defaults = array_merge($defaultValues, $formArray);
 
                 // Add a hidden field to save the DiscussionId to the badge.
-                $sender->Form->addHidden('BadgeDiscussion', $discussionID);
-                $sender->Form->setData($defaults);
+                $form->addHidden('BadgeDiscussion', $discussionID);
+                $form->setData($defaults);
             }
         }
     }
@@ -102,10 +109,24 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * Add a checkbox to the Badge Creation form to mark if the badge should be given out automatically or generate a request for a badge.
      *
      * @param BadgeController $sender
+     * @param array $args
      */
-    public function badgeController_badgeFormFields_handler($sender) {
-            echo wrap($sender->Form->labelwrap('Award Manually', 'AwardManually').
-                $sender->Form->inputwrap('AwardManually', 'Checkbox', ['value' => 1, 'checked' => c('Badgify.Default.AwardManually')]), 'li', ['class' => 'form-group']);
+    public function badgeController_badgeFormFields_handler($sender, $args) {
+        /** @var Gdn_Form $form  */
+        $form = $sender->Form;
+        $formData = $form->formData();
+        $isDiscusisonBadge = $formData['BadgeDiscussion'] ?? 0;
+        // If this badge is not for a discussion, do not put a Award Manually toggle.
+        if (!$isDiscusisonBadge) {
+            return;
+        }
+
+        $attributes = $form->getValue('Attributes');
+        $awardManually = $attributes['AwardManually'] ?? [];
+        $value = ($awardManually === false) ? false : true;
+        echo wrap($form->labelwrap('Award Manually', 'AwardManually[]').
+            $form->toggle('AwardManually[]', '', ['value' => $value], '', true), 'li', ['class' => 'form-group']);
+
     }
 
 
