@@ -115,9 +115,9 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         /** @var Gdn_Form $form  */
         $form = $sender->Form;
         $formData = $form->formData();
-        $is_a_discusison_badge = $formData['BadgeDiscussion'] ?? 0;
+        $isDiscusisonBadge = $formData['BadgeDiscussion'] ?? 0;
         // If this badge is not for a discussion, do not put a Award Manually toggle.
-        if (!$is_a_discusison_badge) {
+        if (!$isDiscusisonBadge) {
             return;
         }
 
