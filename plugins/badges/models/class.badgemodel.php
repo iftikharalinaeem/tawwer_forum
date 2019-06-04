@@ -143,9 +143,9 @@ class BadgeModel extends Gdn_Model {
      */
     public function getList() {
         if (!checkPermission('Reputation.Badges.Give') && !checkPermission('Garden.Settings.Manage')) {
+            $this->SQL->where('Active', 1);
             $this->SQL->where('Visible', 1);
         }
-
         $this->SQL->orderBy('Class, Threshold, Name', 'asc');
 
         return $this->get();
