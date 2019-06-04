@@ -48,7 +48,6 @@ class ThemeModel extends PipelineModel {
      * @return array
      */
     public function setCurrentTheme(int $themeID): array {
-        //check if theme exists
         try {
             $theme = $this->selectSingle(['themeID' => $themeID]);
         } catch (NoResultsException $e) {
