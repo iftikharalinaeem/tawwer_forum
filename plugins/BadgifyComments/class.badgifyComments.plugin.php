@@ -124,8 +124,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         $attributes = $form->getValue('Attributes');
         $awardManually = $attributes['AwardManually'] ?? [];
         $value = ($awardManually === false) ? false : true;
-        echo wrap($form->labelwrap('Award Manually', 'AwardManually[]').
-            $form->toggle('AwardManually[]', '', ['value' => $value], '', true), 'li', ['class' => 'form-group']);
+        echo wrap($form->toggle('AwardManually[]', 'Award Manually', ['value' => $value], '', true), 'li', ['class' => 'form-group']);
 
     }
 
