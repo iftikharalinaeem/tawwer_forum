@@ -107,7 +107,6 @@ paths:
                 - variables.json
                 - fonts.json
                 - scripts.json
-                - variables.json
                 - styles.css
                 - javascript.js
         requestBody:
@@ -170,7 +169,6 @@ paths:
                 - variables.json
                 - fonts.json
                 - scripts.json
-                - variables.json
                 - styles.css
                 - javascript.js
         responses:
