@@ -271,6 +271,8 @@ class PollsPlugin extends Gdn_Plugin {
 
     /**
      * Create the new poll method on post controller.
+     *
+     * @param PostController $sender
      */
     public function postController_poll_create($sender) {
         $categoryUrlCode = val(0, $sender->RequestArgs);
@@ -293,6 +295,11 @@ class PollsPlugin extends Gdn_Plugin {
 
         if ($category) {
             $sender->Category = (object)$category;
+            // Ensure AllowedDiscussionTypes is dbdecoded.
+            $category = (object)$categoryModel::permissionCategory($category);
+            if (!in_array('Poll', $category->allowedDiscussionType) && isset($category->AllowedDiscussionTypes)) {
+                $sender->Form->addError(t('You are not allowed to post a poll in this category.'));
+            }
             $sender->setData('Category', $category);
             $sender->Form->addHidden('CategoryID', $sender->Category->CategoryID);
             if (val('DisplayAs', $sender->Category) == 'Discussions') {
