@@ -297,7 +297,9 @@ class PollsPlugin extends Gdn_Plugin {
             $sender->Category = (object)$category;
             // Ensure AllowedDiscussionTypes is dbdecoded.
             $category = (object)$categoryModel::permissionCategory($category);
-            if (!in_array('Poll', $category->AllowedDiscussionTypes) && isset($category->AllowedDiscussionTypes)) {
+            $isAllowedPolls = in_array('Poll', $category->AllowedDiscussionTypes);
+            $isAllowedTypes = isset($category->AllowedDiscussionTypes);
+            if (!$isAllowedPolls && $isAllowedTypes) {
                 $sender->Form->addError(t('You are not allowed to post a poll in this category.'));
             }
             $sender->setData('Category', $category);
