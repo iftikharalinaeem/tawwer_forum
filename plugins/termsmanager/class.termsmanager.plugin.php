@@ -45,6 +45,18 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
+     * Add a small CSS file to style the display of the Terms.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     *
+     */
+    public function base_render_before($sender, $args) {
+        $sender->Head->addCss('/plugins/termsmanager/design/termsmanager.css');
+    }
+
+
+    /**
      * Settings form in dashboard to save the custom terms, activate and disactivate.
      *
      * @param SettingsController $sender
@@ -184,12 +196,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $userModel = Gdn::userModel();
         $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
         $userID = val('UserID', $auth);
+        $user = [];
         if ($userID) {
             $user = $userModel->getID($userID, 'array');
-        } elseif (c('Garden.Registration.AutoConnect')) {
+        } else {
             $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
         }
-
+        $existingName = $user['Name'] ?? '';
         if (!$sender->Form->getFormValue('Terms')) {
 
             if (!val('Name', $user) && !$sender->Form->getFormValue('Name')) {
@@ -204,6 +217,14 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $sender->setData('NoConnectName', true);
                 $sender->setData('AllowConnect', true);
                 $sender->setData('ExistingUsers', [$user]);
+                $sender->Form->setFormValue('Name', $existingName);
+
+                // Because we are interrupting the connect process, the Password Field will be presented.
+                // If the forum is configured for AutoConnect or if the user has already connected
+                // over SSO, do not show the Password Field on the connect form.
+                if ($auth || (!$auth && c('Garden.Registration.AutoConnect'))) {
+                    $sender->setData('HidePassword', true);
+                }
                 Gdn::locale()->setTranslation('ConnectAccountExists', ' ');
                 Gdn::locale()->setTranslation('ConnectRegisteredName', ' ');
             }
@@ -300,7 +321,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
-        $sender->Head->addCss('/plugins/termsmanager/design/termsmanager.css');
         // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
         if (!c('TermsManager.ShowDefault')) {
             $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
