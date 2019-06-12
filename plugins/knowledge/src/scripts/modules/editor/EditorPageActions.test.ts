@@ -182,7 +182,7 @@ describe("EditorPageActions", () => {
             assertDraftLoaded(dummyDraft);
         });
 
-        it.only("initializes with discussionID", async () => {
+        it("initializes with discussionID", async () => {
             registerReducer("knowledge", rootReducer);
             await _executeReady();
             const store = getStore<IStoreState>();
