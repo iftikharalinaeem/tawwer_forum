@@ -21,6 +21,8 @@ import { expect } from "chai";
 import { createMemoryHistory } from "history";
 import { DeepPartial } from "redux";
 import { createMockStore, mockStore as MockStore } from "redux-test-utils";
+import { _executeReady } from "@library/utility/appUtils";
+import { promiseTimeout } from "@library/utility/utils";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,
@@ -50,28 +52,6 @@ describe("EditorPageActions", () => {
             .replyOnce(200, dummyEditArticle)
             .onGet("/api/v2/articles/1")
             .replyOnce(200, dummyArticle);
-    };
-
-    const assertDiscussionLoaded = (store: any, discussion: any) => {
-        expect(store.isActionTypeDispatched(ArticleActions.getFromDiscussionACs.started)).eq(true);
-        expect(store.isActionTypeDispatched(ArticleActions.getFromDiscussionACs.done)).eq(true);
-
-        expect(
-            store.isActionTypeDispatched({
-                payload: {
-                    formData: {
-                        name: discussion.name,
-                    },
-                    forceRefresh: true,
-                },
-                type: EditorPageActions.UPDATE_FORM,
-            }),
-        );
-
-        const state = store.getState();
-        expect(state.knowledge.editorPage.form.discussionID).eq(discussion.discussionID);
-        expect(state.knowledge.editorPage.form.name).eq(discussion.name);
-        expect(state.knowledge.editorPage.form.body).eq(EditorPageActions.discussionOps(discussion));
     };
 
     const assertDraftLoaded = (draft: any) => {
@@ -123,6 +103,7 @@ describe("EditorPageActions", () => {
     };
 
     const dummyDiscussionArticle = {
+        discussionID: 1,
         name: "Hello World",
         body: [
             {
@@ -202,17 +183,28 @@ describe("EditorPageActions", () => {
         });
 
         it.only("initializes with discussionID", async () => {
-            const store = getStore();
             registerReducer("knowledge", rootReducer);
+            await _executeReady();
+            const store = getStore<IStoreState>();
             const pageActions = new EditorPageActions(store.dispatch, apiv2);
 
-            mockApi.onGet("/api/v2/articles/from-discussion?discussionID=1").replyOnce(200, dummyDiscussionArticle);
+            mockApi
+                .onGet("/api/v2/articles/from-discussion", { params: { discussionID: 1 } })
+                .replyOnce(200, dummyDiscussionArticle);
 
             const history = createMemoryHistory();
             history.push("/kb/articles/add?discussionID=1");
-            void (await pageActions.initializeAddPage(history));
+            await pageActions.initializeAddPage(history);
 
-            assertDiscussionLoaded(store, dummyDiscussionArticle);
+            // EditorOperationQueue needs some time to finish.
+            await promiseTimeout(10);
+
+            const state = store.getState();
+            expect(state.knowledge.editorPage.form.discussionID).eq(dummyDiscussionArticle.discussionID);
+            expect(state.knowledge.editorPage.form.name).eq(dummyDiscussionArticle.name);
+            expect(state.knowledge.editorPage.editorOperationsQueue).deep.eq(
+                EditorPageActions.discussionOps(dummyDiscussionArticle),
+            );
         });
     });
 
