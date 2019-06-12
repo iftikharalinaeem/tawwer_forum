@@ -111,7 +111,7 @@ describe("EditorPageActions", () => {
             },
         ],
         format: "Rich",
-        url: "/discussion/15/hello-world",
+        url: "/discussion/1/hello-world",
     };
 
     const dummyEditArticle = {
