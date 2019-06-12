@@ -197,7 +197,7 @@ describe("EditorPageActions", () => {
             await pageActions.initializeAddPage(history);
 
             // EditorOperationQueue needs some time to finish.
-            await promiseTimeout(10);
+            await promiseTimeout(0);
 
             const state = store.getState();
             expect(state.knowledge.editorPage.form.discussionID).eq(dummyDiscussionArticle.discussionID);
