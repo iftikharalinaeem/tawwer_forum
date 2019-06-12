@@ -7,10 +7,12 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
+use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Pages\ArticlePage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
 use Vanilla\Web\PageDispatchController;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 
 /**
  * Dispatch controller for /kb/articles
@@ -18,6 +20,20 @@ use Vanilla\Web\PageDispatchController;
 class ArticlesPageController extends PageDispatchController {
 
     protected $simplePageClass = SimpleKbPage::class;
+
+    /**
+     * @var ArticlesApiController
+     */
+    private $articlesApi;
+
+    /**
+     * ArticlesPageController constructor.
+     * @param Container $container
+     */
+    public function __construct(Container $container) {
+        parent::__construct($container);
+        $this->articlesApi = $container->get(ArticlesApiController::class);
+    }
 
     /**
      * Render out the /kb/articles/:id-:article page.
@@ -74,5 +90,18 @@ class ArticlesPageController extends PageDispatchController {
             ->requiresSession("/kb/articles/$id/revisions/$revisionID")
             ->render()
         ;
+    }
+
+    /**
+     * Redirect out the /kb/articles/aliases{$path} request.
+     *
+     * @param string $path Alias part of url. Should start with slash symbol.
+     *
+     * @return Data
+     */
+    public function get_aliases(string $path): Data {
+        $article = $this->articlesApi->get_byAlias(['alias' => $path]);
+
+        return (new Data('', ['status' => 301]))->setHeader('Location', $article['url']);
     }
 }

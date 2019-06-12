@@ -868,7 +868,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         try {
             $articleID = $this->pageRouteAliasModel->getRecordID(ArticleModel::RECORD_TYPE, $query['alias']);
         } catch (NoResultsException $e) {
-            throw new NotFoundException("Article");
+            throw new NotFoundException("Article with alias: ".$query['alias'].' not found.');
         }
 
         return $this->get($articleID);

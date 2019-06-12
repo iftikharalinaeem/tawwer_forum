@@ -278,7 +278,7 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Handle a request to flag a knoweldge base as published.
+     * Handle a request to flag a knowledge base as published.
      *
      * @param integer $knowledgeBaseID
      */
