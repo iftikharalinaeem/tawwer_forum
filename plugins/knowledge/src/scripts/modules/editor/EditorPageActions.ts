@@ -226,13 +226,8 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
     public static clearConversionNoticeAC = createAction("CLEAR_CONVERSION_NOTICE");
     public clearConversionNotice = this.bindDispatch(EditorPageActions.clearConversionNoticeAC);
 
-    private pushDiscussionToForm(discussionID: number, discussion: IGetArticleFromDiscussionResponse) {
-        const { name } = discussion;
-
-        // Set the title of the article.
-        this.updateForm({ name }, true);
-
-        const queuedOps = [
+    public static discussionOps(discussion: IGetArticleFromDiscussionResponse) {
+        return [
             [
                 { attributes: { italic: true }, insert: "This article was created from a " },
                 { attributes: { italic: true, link: formatUrl(discussion.url) }, insert: "community discussion" },
@@ -242,6 +237,15 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             // Add the discussion content.
             discussion.body,
         ];
+    }
+
+    private pushDiscussionToForm(discussionID: number, discussion: IGetArticleFromDiscussionResponse) {
+        const { name } = discussion;
+
+        // Set the title of the article.
+        this.updateForm({ name }, true);
+
+        const queuedOps = EditorPageActions.discussionOps(discussion);
 
         // If we have any answers, add those too.
         if (discussion.acceptedAnswers) {

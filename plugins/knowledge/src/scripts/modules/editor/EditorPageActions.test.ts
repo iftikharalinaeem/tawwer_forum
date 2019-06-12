@@ -3,22 +3,24 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
+import { IArticle } from "@knowledge/@types/api/article";
+import { Format } from "@knowledge/@types/api/articleRevision";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import NavigationModel from "@knowledge/navigation/state/NavigationModel";
+import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
+import rootReducer from "@knowledge/state/reducer";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
+import getStore from "@library/redux/getStore";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import MockAdapter from "axios-mock-adapter";
 import { expect } from "chai";
 import { createMemoryHistory } from "history";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import apiv2 from "@library/apiv2";
-import MockAdapter from "axios-mock-adapter";
-import { createMockStore, mockStore as MockStore } from "redux-test-utils";
-import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
-import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
-import { LoadStatus, PublishStatus } from "@library/@types/api/core";
-import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import NavigationModel from "@knowledge/navigation/state/NavigationModel";
-import { Format } from "@knowledge/@types/api/articleRevision";
-import { IArticle } from "@knowledge/@types/api/article";
-import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,
@@ -48,6 +50,28 @@ describe("EditorPageActions", () => {
             .replyOnce(200, dummyEditArticle)
             .onGet("/api/v2/articles/1")
             .replyOnce(200, dummyArticle);
+    };
+
+    const assertDiscussionLoaded = (store: any, discussion: any) => {
+        expect(store.isActionTypeDispatched(ArticleActions.getFromDiscussionACs.started)).eq(true);
+        expect(store.isActionTypeDispatched(ArticleActions.getFromDiscussionACs.done)).eq(true);
+
+        expect(
+            store.isActionTypeDispatched({
+                payload: {
+                    formData: {
+                        name: discussion.name,
+                    },
+                    forceRefresh: true,
+                },
+                type: EditorPageActions.UPDATE_FORM,
+            }),
+        );
+
+        const state = store.getState();
+        expect(state.knowledge.editorPage.form.discussionID).eq(discussion.discussionID);
+        expect(state.knowledge.editorPage.form.name).eq(discussion.name);
+        expect(state.knowledge.editorPage.form.body).eq(EditorPageActions.discussionOps(discussion));
     };
 
     const assertDraftLoaded = (draft: any) => {
@@ -96,6 +120,17 @@ describe("EditorPageActions", () => {
         locale: "en",
         url: "/kb/articles/1-example-article",
         reactions: [],
+    };
+
+    const dummyDiscussionArticle = {
+        name: "Hello World",
+        body: [
+            {
+                insert: "I am a discussion.\n",
+            },
+        ],
+        format: "Rich",
+        url: "/discussion/15/hello-world",
     };
 
     const dummyEditArticle = {
@@ -164,6 +199,20 @@ describe("EditorPageActions", () => {
             void (await editorPageActions.initializeAddPage(history));
 
             assertDraftLoaded(dummyDraft);
+        });
+
+        it.only("initializes with discussionID", async () => {
+            const store = getStore();
+            registerReducer("knowledge", rootReducer);
+            const pageActions = new EditorPageActions(store.dispatch, apiv2);
+
+            mockApi.onGet("/api/v2/articles/from-discussion?discussionID=1").replyOnce(200, dummyDiscussionArticle);
+
+            const history = createMemoryHistory();
+            history.push("/kb/articles/add?discussionID=1");
+            void (await pageActions.initializeAddPage(history));
+
+            assertDiscussionLoaded(store, dummyDiscussionArticle);
         });
     });
 
