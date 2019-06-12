@@ -3,22 +3,26 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
+import { IArticle } from "@knowledge/@types/api/article";
+import { Format } from "@knowledge/@types/api/articleRevision";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
+import NavigationModel from "@knowledge/navigation/state/NavigationModel";
+import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
+import rootReducer from "@knowledge/state/reducer";
+import { LoadStatus, PublishStatus } from "@library/@types/api/core";
+import apiv2 from "@library/apiv2";
+import getStore from "@library/redux/getStore";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import MockAdapter from "axios-mock-adapter";
 import { expect } from "chai";
 import { createMemoryHistory } from "history";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import apiv2 from "@library/apiv2";
-import MockAdapter from "axios-mock-adapter";
-import { createMockStore, mockStore as MockStore } from "redux-test-utils";
-import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
-import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
-import { LoadStatus, PublishStatus } from "@library/@types/api/core";
-import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import NavigationModel from "@knowledge/navigation/state/NavigationModel";
-import { Format } from "@knowledge/@types/api/articleRevision";
-import { IArticle } from "@knowledge/@types/api/article";
-import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { createMockStore, mockStore as MockStore } from "redux-test-utils";
+import { _executeReady } from "@library/utility/appUtils";
+import { promiseTimeout } from "@library/utility/utils";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,
@@ -98,6 +102,18 @@ describe("EditorPageActions", () => {
         reactions: [],
     };
 
+    const dummyDiscussionArticle = {
+        discussionID: 1,
+        name: "Hello World",
+        body: [
+            {
+                insert: "I am a discussion.\n",
+            },
+        ],
+        format: "Rich",
+        url: "/discussion/1/hello-world",
+    };
+
     const dummyEditArticle = {
         articleID: 1,
         knowledgeCategoryID: 4,
@@ -164,6 +180,31 @@ describe("EditorPageActions", () => {
             void (await editorPageActions.initializeAddPage(history));
 
             assertDraftLoaded(dummyDraft);
+        });
+
+        it("initializes with discussionID", async () => {
+            registerReducer("knowledge", rootReducer);
+            await _executeReady();
+            const store = getStore<IStoreState>();
+            const pageActions = new EditorPageActions(store.dispatch, apiv2);
+
+            mockApi
+                .onGet("/api/v2/articles/from-discussion", { params: { discussionID: 1 } })
+                .replyOnce(200, dummyDiscussionArticle);
+
+            const history = createMemoryHistory();
+            history.push("/kb/articles/add?discussionID=1");
+            await pageActions.initializeAddPage(history);
+
+            // EditorOperationQueue needs some time to finish.
+            await promiseTimeout(0);
+
+            const state = store.getState();
+            expect(state.knowledge.editorPage.form.discussionID).eq(dummyDiscussionArticle.discussionID);
+            expect(state.knowledge.editorPage.form.name).eq(dummyDiscussionArticle.name);
+            expect(state.knowledge.editorPage.editorOperationsQueue).deep.eq(
+                EditorPageActions.discussionOps(dummyDiscussionArticle),
+            );
         });
     });
 

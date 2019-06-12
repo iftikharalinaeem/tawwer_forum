@@ -202,6 +202,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         })
         .case(EditorPageActions.clearEditorOpsAC, nextState => {
             nextState.editorOperationsQueue = [];
+            nextState.isDirty = false;
             return nextState;
         })
         .case(EditorPageActions.clearConversionNoticeAC, nextState => {
