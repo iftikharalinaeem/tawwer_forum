@@ -279,6 +279,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      */
     protected function isRecordClean($recordType, $recordData) {
         $words = $this->getBlockedWords();
+
         if ($recordType === 'Group') {
             $redordContentField = 'Description';
         } else {
@@ -286,6 +287,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         }
 
         foreach ($words as $word) {
+
             $toTest = Gdn_Format::plaintext($recordData[$redordContentField], $recordData['Format']);
             if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
                 $toTest = $recordData['Name']."\n".$toTest;
