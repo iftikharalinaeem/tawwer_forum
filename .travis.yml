@@ -19,6 +19,7 @@ jobs:
       install:
         - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
         - ./travis/install.sh
+        - cd vanilla
       before_script:
         - composer self-update
         - composer install --optimize-autoloader
