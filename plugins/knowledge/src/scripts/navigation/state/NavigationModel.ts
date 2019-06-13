@@ -9,12 +9,10 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KnowledgeReducer } from "@knowledge/state/model";
 import { formatUrl } from "@library/utility/appUtils";
 import ReduxReducer from "@library/redux/ReduxReducer";
-import { compare } from "@library/utility/utils";
 import { produce } from "immer";
 import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { INavigationItem, LoadStatus, IApiError } from "@library/@types/api/core";
-import { IArticle } from "@knowledge/@types/api/article";
 
 export type ReducerType = KnowledgeReducer<INavigationStoreState>;
 

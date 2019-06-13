@@ -15,6 +15,10 @@ jobs:
             - realpath
         hosts:
           - vanilla.test
+      install:
+        - phpenv config-rm xdebug.ini
+        - ./travis/install.sh
+        - cd vanilla
       before_script:
         - composer self-update
         - composer install --optimize-autoloader
@@ -28,7 +32,13 @@ jobs:
   # Frontend JS Job
     - name: JS Build & Test
       language: node_js
-      node_js: 10.9
+      node_js: lts/*
+      install:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
+        - ./travis/install.sh
+        - cd vanilla
+        - yarn install --pure-lockfile
       addons:
         chrome: stable
       env:
@@ -41,17 +51,6 @@ jobs:
         - yarn test
         - set +e
 
-install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
-  - export PATH=$HOME/.yarn/bin:$PATH
-  - phpenv config-rm xdebug.ini
-  - ./travis/install.sh
-  - cd vanilla
-  - yarn install --pure-lockfile
-  - cd plugins/knowledge
-  - yarn install --pure-lockfile
-  - cd ../..
-
 cache:
   directories:
     - $HOME/.composer/cache/files
@@ -60,15 +59,5 @@ cache:
   yarn: true
 
 notifications:
-  hipchat:
-    rooms:
-      secure: nsgPkFc5PvdyGOYpH2MkZCrmIw3OnfjldV+wAskqvhTQt726OjlF3aeeu1zVpkEYy0GaWbASdz7QffzMTwdoSdyC0VfG+PcJN7MbthGn+7s2eSo87v23MdxmZO1SH4LpDZU0w0hvVIn5BN9WajJC6fFbEqXT555vUoMN/ATu1+g=
-    template:
-      - >
-        Build <a href="%{build_url}">#%{build_number}</a>
-        (<a href="%{compare_url}">%{commit}</a>)
-        of <a href="https://github.com/%{repository}/tree/%{branch}">%{repository}@%{branch}</a>
-        by %{author}: %{message}
-    format: html
   slack:
     secure: C/DEretqnvfm2mFlmt9N3H4DMzLfxHfIoR4s3X1N4M1X7NiElxjv7bx0XatylDA4jEhnrDAitzrwJRSkUU5bVf1kmVXHP26m65ketEFf8RPlx8FH6bDeftmmeWD7Od6Oo1E7Uv6oT410pCOJR1tlJp16fNKePpu+CmivDBr9eQ61XrMdu6UlNYmseNuLCB5ss2Z5+EuS9ftkD5B9QdIHw7Fqc3JTMw5aYMPVYweI4pn3zwFQ1Xt3lAYVAvfkk71/Gj65+/4PMPs3PPTSe+9+qrepei246K9T/8IdTmQyjFoqCwiP+KxtkQdjr69pIRqf8LPYyNUrNTrjjGxy7Zb2dkhN7la7pYWf1JMNnSscy43a1ZIp26ewAPk4ym/Bt5EO1VpX5JR98I7aofIcP2EW/DmMMaFbRhbe36ZdzrdufIdn0kLKM/mfZBxJuBfFg1aPaQzVi15hJfyMHKVLmkVtH1evk1C+A3r5aoQXAGljJga7IK5VtIyLEVPdl/gRPELPyTs1vN8c2Hh310pU/W+9joHqkwHxyz7w2CH5KlY7uyFb/7zIr/Xv6rzpMBvr5hin8DjU9YslrN8IDN4t+HjXLDSMI6i0B+IlXFQIFLBaNjHH+5J6IxLtglBwVXPbKfy427AAjgOwdJSRzX0Tpxulez67NeDhlXUxwHqUxi5HUEM=

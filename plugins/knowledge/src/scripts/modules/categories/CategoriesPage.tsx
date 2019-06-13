@@ -44,7 +44,12 @@ export function CategoriesPage(props: IProps) {
             return;
         }
 
-        void requestArticles(id, page);
+        let pageNumber;
+        if (page !== undefined) {
+            pageNumber = Number.parseInt(page, 10);
+        }
+
+        void requestArticles(id, pageNumber);
         void requestCategory(id);
     }, [id, page]);
 
@@ -97,7 +102,7 @@ export function CategoriesPage(props: IProps) {
 interface IOwnProps {
     match: match<{
         id: string;
-        page?: number;
+        page?: string;
     }>;
 }
 
