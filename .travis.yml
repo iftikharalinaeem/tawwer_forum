@@ -25,7 +25,12 @@ jobs:
   # Frontend JS Job
     - name: JS Build & Test
       language: node_js
-      node_js: 10.9
+      node_js: lts
+      install:
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
+        - cd vanilla
+        - yarn install --pure-lockfile
       addons:
         chrome: stable
       env:
@@ -35,12 +40,9 @@ jobs:
         - yarn test
 
 install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
-  - export PATH=$HOME/.yarn/bin:$PATH
   - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
   - ./travis/install.sh
-  - cd vanilla
-  - yarn install --pure-lockfile
+
 
 cache:
   directories:
