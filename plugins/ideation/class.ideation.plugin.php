@@ -353,7 +353,8 @@ EOT
      */
     public function base_beforeCategoryDropDown_handler($sender, $args) {
         $type = val('Type', $sender->formValues());
-        if ($type !== 'Idea') {
+        $isIdea = $args['Options']['DiscussionType'] === 'Idea';
+        if ($type !== 'Idea' && !$isIdea) {
             return;
         }
         $value = arrayValueI('Value', $options = $args['Options']); // The selected category id
