@@ -1,9 +1,10 @@
 {
-    "name": "@vanilla/analytics",
+    "name": "@vanilla/addon-analytics",
     "private": true,
     "version": "3.0.0",
     "dependencies": {
-        "keen-tracking": "4.4.0"
+        "keen-tracking": "4.4.0",
+        "@vanilla/utils": "*"
     },
     "devDependencies": {
         "@types/keen-tracking": "2.0.1",
@@ -20,11 +21,7 @@
         "grunt-wiredep": "3.0.x",
         "load-grunt-tasks": "3.3.x",
         "time-grunt": "1.2.x",
-        "wiredep": "3.0.x",
-        "@vanilla/utils": "*"
-    },
-    "engines": {
-        "node": ">=10.0.0"
+        "wiredep": "3.0.x"
     },
     "scripts": {
         "install": "bower install",

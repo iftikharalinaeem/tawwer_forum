@@ -4,7 +4,7 @@
  */
 
 import getStore from "@library/redux/getStore";
-import { logError } from "@library/utils";
+import { logError } from "@vanilla/utils";
 import KeenTracking from "keen-tracking";
 import { IStoreState } from "./analyticsReducer";
 import { clone } from "lodash";
