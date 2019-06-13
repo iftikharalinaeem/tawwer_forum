@@ -114,8 +114,7 @@ export const editorFormClasses = useThemeCache(() => {
     const modernFrame = style("modernFrame", {
         position: "relative",
         ...paddings({
-            top: globalVars.gutter.half,
-            bottom: globalVars.gutter.size,
+            vertical: 16,
         }),
     });
 
@@ -168,13 +167,11 @@ export const editorFormClasses = useThemeCache(() => {
         {
             top: percent(100),
             left: percent(50),
-            width: layoutVars.middleColumn.width,
+            width: layoutVars.middleColumn.width + globalVars.gutter.half,
         },
-        layoutVariables()
-            .mediaQueries()
-            .oneColumnDown({
-                width: calc(`100% - ${mobileGutter * 2}px`),
-            }),
+        mediaQueries.oneColumnDown({
+            width: calc(`100% - ${unit(mobileGutter)}`),
+        }),
     );
 
     const titleErrorMessage = style("titleErrorMessage", {
