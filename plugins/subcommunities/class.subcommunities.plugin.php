@@ -476,12 +476,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $subCommunityCategoryIDs = $this->getCategoryIDs();
-
+        $categoryModel = new CategoryModel();
+        $visibleCategories = $categoryModel->getVisibleCategories() ?? null;
+        $visibleCategoriesIDs = array_column($visibleCategories, 'CategoryID');
         $isEditing = $sender->data('Discussion', false);
         $currentCategoryID = val('CategoryID', $sender->data('Category'), -1);
 
         // Check that we are in a category we can post in (ie. not the root category)
-        $isInCategory = in_array($currentCategoryID, $subCommunityCategoryIDs);
+        $isInCategory = in_array($currentCategoryID, $visibleCategoriesIDs);
 
         if ($isInCategory || $isEditing) {
             return;
