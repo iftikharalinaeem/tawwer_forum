@@ -1,6 +1,7 @@
 {
-    "name": "assets",
+    "name": "@vanilla/analytics",
     "private": true,
+    "version": "3.0.0",
     "dependencies": {
         "keen-tracking": "4.4.0"
     },
