@@ -168,11 +168,18 @@ export function EditorForm(props: IProps) {
                     <DocumentTitle title={props.form.name || "Untitled"} />
                 </div>
                 <div className={classesEditorForm.containerWidth}>
-                    <LocationInput disabled={isLoading} onChange={locationPickerChangeHandler} error={categoryError} />
+                    <LocationInput
+                        disabled={isLoading}
+                        onChange={locationPickerChangeHandler}
+                        error={categoryError}
+                        inputClassName={classNames({ [classesEditorForm.hasError]: categoryError })}
+                    />
                     <label>
                         <input
                             id={domTitleID}
-                            className={classNames("inputText", classesEditorForm.title)}
+                            className={classNames("inputText", classesEditorForm.title, {
+                                [classesEditorForm.hasError]: !!titleError,
+                            })}
                             type="text"
                             placeholder={t("Title")}
                             value={props.form.name || ""}
@@ -247,7 +254,7 @@ export function EditorForm(props: IProps) {
                             { isDisabled: isLoading },
                             "FormWrapper",
                             classesEditorForm.editor(contentSize.top),
-                            bodyError && classesEditorForm.bodyHasError,
+                            { [classesEditorForm.hasError]: bodyError },
                             classesRichEditor.root,
                             classesEditorForm.containerWidth,
                         )}
