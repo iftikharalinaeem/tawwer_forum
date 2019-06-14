@@ -17,7 +17,7 @@ import { AppContainer } from "react-hot-loader";
 import apiv2 from "@library/apiv2";
 import { onReady } from "@library/utility/appUtils";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { debug } from "@library/utility/utils";
+import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import ConversationsModel from "@library/features/conversations/ConversationsModel";

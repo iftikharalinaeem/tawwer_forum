@@ -22,7 +22,7 @@ import { createMemoryHistory } from "history";
 import { DeepPartial } from "redux";
 import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 import { _executeReady } from "@library/utility/appUtils";
-import { promiseTimeout } from "@library/utility/utils";
+import { promiseTimeout } from "@vanilla/utils";
 
 const DEFAULT_KB_STATE = {
     articles: ArticleModel.INITIAL_STATE,

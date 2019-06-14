@@ -42,7 +42,7 @@ interface IState {
 export default class NavigationManagerContent extends React.Component<IProps, IState> {
     private renameButtonRef = React.createRef<HTMLButtonElement>();
     private deleteButtonRef = React.createRef<HTMLButtonElement>();
-    private selfRef: HTMLDivElement | null;
+    private selfRef: HTMLDivElement | null = null;
 
     public state: IState = {
         newName: this.props.item.data.name,
