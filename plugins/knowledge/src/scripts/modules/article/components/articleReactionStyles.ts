@@ -4,15 +4,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, unit, spinnerLoader, colorOut } from "@library/styles/styleHelpers";
+import { flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
-import { important, percent, px, ColorHelper } from "csx";
-import { buttonVariables } from "@library/forms/buttonStyles";
+import { important, percent, px, ColorHelper, em } from "csx";
 import { setAllLinkColors } from "@library/styles/styleHelpers";
 
 export const reactionClasses = useThemeCache(() => {
-    const style = styleFactory("reactions");
+    const style = styleFactory("articleReactions");
     const vars = globalVariables();
 
     const frame = style({
@@ -54,6 +53,7 @@ export const reactionClasses = useThemeCache(() => {
 
     const signInText = style("signIn", {
         fontSize: vars.fonts.size.large,
+        marginBottom: px(8),
     });
 
     const linkColors = setAllLinkColors();
