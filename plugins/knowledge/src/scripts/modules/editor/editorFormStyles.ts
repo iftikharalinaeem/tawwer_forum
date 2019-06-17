@@ -11,7 +11,6 @@ import {
     absolutePosition,
     colorOut,
     margins,
-    negative,
     paddings,
     placeholderStyles,
     pointerEvents,
@@ -34,6 +33,9 @@ export const editorFormClasses = useThemeCache(() => {
     const style = styleFactory("editorFormClasses");
     const classesRichEditor = richEditorClasses(false);
     const mediaQueries = layoutVars.mediaQueries();
+
+    const hasError = style("hasError", {});
+
     const root = style({
         position: "fixed",
         top: 0,
@@ -82,6 +84,9 @@ export const editorFormClasses = useThemeCache(() => {
                 padding: "inherit",
                 color: colorOut(formElementVars.placeholder.color),
             }),
+            [`&.${hasError}`]: {
+                marginBottom: 0,
+            },
         },
     });
 
@@ -109,8 +114,7 @@ export const editorFormClasses = useThemeCache(() => {
     const modernFrame = style("modernFrame", {
         position: "relative",
         ...paddings({
-            top: globalVars.gutter.half,
-            bottom: globalVars.gutter.size,
+            vertical: 16,
         }),
     });
 
@@ -130,10 +134,6 @@ export const editorFormClasses = useThemeCache(() => {
             marginTop: unit(-formElementVars.border.width),
             minHeight: calc(`100vh - ${px(topWindowPosition)}`),
         });
-
-    const bodyHasError = style("bodyHasError", {
-        paddingTop: globalVars.gutter.half,
-    });
 
     const embedBarContainer = style("embedBarContainer", sticky(), {
         top: titleBarVars.sizing.height,
@@ -167,30 +167,27 @@ export const editorFormClasses = useThemeCache(() => {
         {
             top: percent(100),
             left: percent(50),
-            width: layoutVars.middleColumn.width,
+            width: layoutVars.middleColumn.width + globalVars.gutter.half,
         },
-        layoutVariables()
-            .mediaQueries()
-            .oneColumnDown({
-                width: calc(`100% - ${mobileGutter * 2}px`),
-            }),
+        mediaQueries.oneColumnDown({
+            width: calc(`100% - ${unit(mobileGutter)}`),
+        }),
     );
+
+    const titleErrorMessage = style("titleErrorMessage", {
+        minHeight: unit(globalVars.spacer.size),
+        ...paddings({
+            bottom: unit(6),
+        }),
+    });
 
     const bodyErrorWrap = style("bodyErrorWrap", {
         position: "relative",
     });
 
     const bodyErrorMessage = style("bodyErrorMessage", {
-        ...absolutePosition.topLeft(percent(100)),
-        ...paddings({ vertical: 6 }),
-    });
-
-    const titleErrorMessage = style("titleErrorMessage", {
         ...pointerEvents(),
-        ...margins({
-            top: unit(negative(globalVars.spacer.size)),
-            bottom: globalVars.spacer.size,
-        }),
+        ...absolutePosition.topLeft(globalVars.fonts.size.large * globalVars.lineHeights.base + 19),
     });
 
     const categoryErrorParagraph = style("categoryErrorParagraph", {
@@ -220,12 +217,12 @@ export const editorFormClasses = useThemeCache(() => {
         containerWidth,
         conversionNotice,
         modernFrame,
-        bodyHasError,
         embedBarTop,
         embedBarBottom,
         titleErrorMessage,
         categoryErrorParagraph,
         titleErrorParagraph,
         publish,
+        hasError,
     };
 });
