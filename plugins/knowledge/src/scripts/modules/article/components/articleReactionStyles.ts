@@ -51,7 +51,7 @@ export const reactionClasses = useThemeCache(() => {
         color: vars.meta.text.color.toString(),
     });
 
-    const signInText = style("signIn", {
+    const signInText = style("signInText", {
         fontSize: vars.fonts.size.large,
         marginBottom: px(8),
     });
