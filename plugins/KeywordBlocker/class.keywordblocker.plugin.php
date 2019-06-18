@@ -286,9 +286,9 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
             $redordContentField = 'Body';
         }
 
-        foreach($words as $word) {
+        foreach ($words as $word) {
 
-            $toTest = $recordData[$redordContentField];
+            $toTest = Gdn_Format::plaintext($recordData[$redordContentField], $recordData['Format']);
             if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
                 $toTest = $recordData['Name']."\n".$toTest;
             }
