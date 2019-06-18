@@ -22,7 +22,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
     protected $emailDomains = [
         'vanillaforums.com' => 'vanillaforums.email',
         'vanillacommunity.com' => 'vanillacommunity.email',
-        'vanillacommunities.com' => 'vanillacommunities.email'
+        'vanillacommunities.com' => 'vanillacommunities.email',
+        'vanillawip.com' => 'dev.vanillaforums.email'
     ];
 
 

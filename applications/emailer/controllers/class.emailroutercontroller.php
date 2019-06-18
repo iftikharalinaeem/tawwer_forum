@@ -28,7 +28,8 @@ class EmailRouterController extends Gdn_Controller {
       'email.vanillaforums.com' => 'vanillaforums.com',
       'vanillaforums.email' => 'vanillaforums.com',
       'vanillacommunity.email' => 'vanillacommunity.com',
-      'vanillacommunities.email' => 'vanillacommunities.com'
+      'vanillacommunities.email' => 'vanillacommunities.com',
+      'dev.vanillaforums.email' => 'vanillawip.com'
    ];
    
    /// Methods ///
