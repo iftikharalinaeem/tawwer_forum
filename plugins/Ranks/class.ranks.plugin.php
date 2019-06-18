@@ -214,7 +214,18 @@ class RanksPlugin extends Gdn_Plugin {
          }
          $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
      }
-
+    /**
+     * Prior to saving a draft, check whether the user can post links.
+     *
+     * @param DraftModel $sender The draft model.
+     * @param BeforeSaveDiscussion $args The event properties.
+     */
+    public function draftModel_beforeSaveDiscussion_handler($sender, $args) {
+        if ($this->CommentLinks !== 'no') {
+            return;
+        }
+        $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
+    }
      /**
       * Prior to saving a new private conversation, check whether the user can post links.
       *
