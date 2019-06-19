@@ -17,12 +17,13 @@ import {
     sticky,
     unit,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
+import { standardAnimations } from "@library/styles/animationHelpers";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -114,14 +115,14 @@ export const editorFormClasses = useThemeCache(() => {
     const modernFrame = style("modernFrame", {
         position: "relative",
         ...paddings({
-            vertical: 16,
+            vertical: vars.modernFrame.padding,
         }),
     });
 
     const conversionNotice = style(
         "conversionNotice",
         margins({
-            top: unit(16),
+            top: unit(vars.modernFrame.margin),
         }),
     );
 
