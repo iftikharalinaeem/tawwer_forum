@@ -115,14 +115,14 @@ export const editorFormClasses = useThemeCache(() => {
     const modernFrame = style("modernFrame", {
         position: "relative",
         ...paddings({
-            vertical: vars.moderFrame.padding,
+            vertical: vars.modernFrame.padding,
         }),
     });
 
     const conversionNotice = style(
         "conversionNotice",
         margins({
-            top: unit(vars.moderFrame.margin),
+            top: unit(vars.modernFrame.margin),
         }),
     );
 
