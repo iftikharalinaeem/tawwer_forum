@@ -176,9 +176,9 @@ class LinkedInPlugin extends Gdn_Plugin {
     public function getProfile() {
         $profile = $this->aPI('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
         $emailArray =  $this->aPI('/emailAddress?q=members&projection=(elements*(handle~))');
-        $profile['email'] = val('emailAddress', $emailArray['elements'][0]['handle~']);
         $firstName = $profile['firstName']['localized']['en_US'];
         $lastName =  $profile['lastName']['localized']['en_US'];
+        $profile['email'] = val('emailAddress', $emailArray['elements'][0]['handle~']);
         $profile['fullname'] = $firstName.' '.$lastName;
         $profilePictureArray  = $profile['profilePicture']['displayImage~']['elements'];
         $profile['photo'] = $this->getUserPhotoUrl($profilePictureArray);
