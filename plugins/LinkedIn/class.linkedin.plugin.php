@@ -69,7 +69,6 @@ class LinkedInPlugin extends Gdn_Plugin {
             $url .= '&';
         }
         $url .= 'oauth2_access_token='.urlencode($accessToken);
-        //$url .= '&format=json';
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
