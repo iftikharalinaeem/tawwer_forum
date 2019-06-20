@@ -315,7 +315,7 @@ class EventsApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
-        $this->permission();
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
             'groupID:i' => 'Filter by group ID.',
@@ -360,7 +360,11 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = [];
         if (array_key_exists('groupID', $query)) {
-            if (!$this->groupModel->checkPermission('Access', $query['groupID'])) {
+            $group = $this->groupModel->getID($query['groupID']);
+            $groupPrivacy = $group['Privacy'];
+            $groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ? $access= 'Member' : $access = 'Access';
+            $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+            if (!$this->groupModel->checkPermission($access, $query['groupID']) && !$isAdmin) {
                 // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                 $where['GroupID'] = -1;
             } else {
