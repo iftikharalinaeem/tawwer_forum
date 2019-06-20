@@ -48,7 +48,7 @@ export const reactionClasses = useThemeCache(() => {
 
     const resultText = style("resultText", {
         fontSize: unit(vars.meta.text.fontSize),
-        color: colorOut(vars.links.colors.default),
+        color: colorOut(vars.meta.text.color),
     });
 
     const signInText = style("signInText", {
