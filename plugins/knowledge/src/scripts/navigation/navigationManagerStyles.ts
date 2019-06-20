@@ -38,7 +38,7 @@ export const navigationManagerVariables = useThemeCache(() => {
     });
 
     const error = makeThemeVars("error", {
-        color: globalVars.feedbackColors.error,
+        color: globalVars.messageColors.error,
     });
 
     const item = makeThemeVars("item", {
@@ -47,7 +47,7 @@ export const navigationManagerVariables = useThemeCache(() => {
     });
 
     const deleteButton = makeThemeVars("deleteButton", {
-        color: globalVars.feedbackColors.error,
+        color: globalVars.messageColors.error,
     });
 
     const actionButton = makeThemeVars("actionButton", {
@@ -193,7 +193,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             },
 
             "&.hasError .navigationManager-itemLabel": {
-                color: colorOut(globalVars.feedbackColors.error.fg),
+                color: colorOut(globalVars.messageColors.error.fg),
             },
         },
     });
