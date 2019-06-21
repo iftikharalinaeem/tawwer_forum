@@ -27,7 +27,7 @@ class MustachePlugin extends Gdn_Plugin {
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
         // Mustache Templating Engine and Handler
-        require_once($this->getResource('vendors/mustache/class.mustache_engine.php'));
+        require_once(__DIR__.'/vendors/mustache/class.mustache_engine.php');
         Gdn::factoryInstall('ViewHandler.mustache', 'MustacheHandler');
     }
 
