@@ -194,7 +194,7 @@ class LinkedInPlugin extends Gdn_Plugin {
     public function getUserPhotoUrl($profilePictureArray) {
         $photoUrl = '';
         if(is_array($profilePictureArray)){
-            $element = end($profilePictureArray);
+            $profilePictureArray = end($profilePictureArray);
             $photoUrl = $profilePictureArray['identifiers'][0]['identifier'];
         }
         return $photoUrl;
