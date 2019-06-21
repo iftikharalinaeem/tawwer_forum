@@ -685,6 +685,10 @@ class UserBadgeModel extends Gdn_Model {
 
             if ($current['_New']) {
                 $this->addInsertFields($fields);
+                $fieldExist = $this->Schema->fieldExists($this->Name, $this->InsertUserID);
+                if (!isset($fields['InsertUserID']) && $fieldExist) {
+                    $fields['InsertUserID'] = $fields['UserID'];
+                }
                 $this->SQL->insert($this->Name, $fields);
             } else {
                 $where = [
