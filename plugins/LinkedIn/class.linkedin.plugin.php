@@ -181,7 +181,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         $preferredLocale = $language.'_'.$country;
         $firstName = $profile['firstName']['localized'][$preferredLocale];
         $lastName =  $profile['lastName']['localized'][$preferredLocale];
-        $profile['email'] = val('emailAddress', $emailArray['elements'][0]['handle~']);
+        $profile['email'] = $emailArray['elements'][0]['handle~']['emailAddress'];
         $profile['fullname'] = $firstName.' '.$lastName;
         $profilePictureArray  = $profile['profilePicture']['displayImage~']['elements'];
         $profile['photo'] = $this->getUserPhotoUrl($profilePictureArray);
