@@ -1025,19 +1025,36 @@ class GroupsHooks extends Gdn_Plugin {
 
 
     /**
-     * Add the "new image" button after the new discussion button.
+     * Add the group ID to the new discussion module.
+     *
+     * @param $sender NewdiscussionModule.
+     * @throws Exception.
      */
     public function base_beforeNewDiscussionButton_handler($sender) {
         $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
 
-        //1. get the group from the category
-        //2. verify it's a valid group and user can see it
-        //3. set the query string
+        $groupID = '';
+
+        if (array_key_exists('GroupID', $sender->Data['Group'])) {
+            $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : '';
+        } elseif (array_key_exists('GroupID', $sender->Data['Discussion'])) {
+            $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : '';
+        }
 
         $groupModel = new GroupModel();
-        $group = $groupModel->getID(4);
+        $groupIDs = $groupModel::getGroupCategoryIDs();
+        $inAGroupCategory = in_array($groupID, $groupIDs);
 
-        $newDiscussionModule->QueryString = 'groupid=4';
-        //$newDiscussionModule->QueryString = 'groupid='.$group['GroupID'];
+        if (!$inAGroupCategory) {
+            return;
+        }
+
+        $hasPermission = $groupModel->checkPermission('Member', $groupID);
+
+        if (!$hasPermission ) {
+            throw permissionException('Vanilla.Discussions.Add');
+        }
+
+        $newDiscussionModule->QueryString = 'groupid='.$groupID;
     }
 }
