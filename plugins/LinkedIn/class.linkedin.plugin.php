@@ -56,7 +56,7 @@ class LinkedInPlugin extends Gdn_Plugin {
      */
     public function aPI($path, $post = false) {
         // Build the url.
-        $url = 'https://api.linkedin.com/v1/'.ltrim($path, '/');
+        $url = 'https://api.linkedin.com/v2/'.ltrim($path, '/');
 
         $accessToken = $this->accessToken();
         if (!$accessToken) {
@@ -69,7 +69,6 @@ class LinkedInPlugin extends Gdn_Plugin {
             $url .= '&';
         }
         $url .= 'oauth2_access_token='.urlencode($accessToken);
-        $url .= '&format=json';
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
@@ -112,7 +111,7 @@ class LinkedInPlugin extends Gdn_Plugin {
      */
     public function authorizeUri($redirectUri = false) {
         $appID = c('Plugins.LinkedIn.ApplicationID');
-        $scope = c('Plugins.LinkedIn.Scope', 'r_basicprofile r_emailaddress');
+        $scope = c('Plugins.LinkedIn.Scope', 'r_liteprofile r_emailaddress');
 
         if (!$redirectUri) {
             $redirectUri = $this->redirectUri();
@@ -175,9 +174,33 @@ class LinkedInPlugin extends Gdn_Plugin {
      * @return array|mixed
      */
     public function getProfile() {
-        $profile = $this->aPI('/people/~:(id,formatted-name,picture-url,email-address)');
-        $profile = arrayTranslate(array_change_key_case($profile), ['id', 'emailaddress' => 'email', 'formattedname' => 'fullname', 'pictureurl' => 'photo']);
+        $profile = $this->aPI('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
+        $emailArray =  $this->aPI('/emailAddress?q=members&projection=(elements*(handle~))');
+        $language = $profile['firstName']['preferredLocale']['language'] ?? 'en';
+        $country = $profile['firstName']['preferredLocale']['country'] ?? 'US';
+        $preferredLocale = $language.'_'.$country;
+        $firstName = $profile['firstName']['localized'][$preferredLocale];
+        $lastName =  $profile['lastName']['localized'][$preferredLocale];
+        $profile['email'] = $emailArray['elements'][0]['handle~']['emailAddress'];
+        $profile['fullname'] = $firstName.' '.$lastName;
+        $profilePictureArray  = $profile['profilePicture']['displayImage~']['elements'];
+        $profile['photo'] = $this->getUserPhotoUrl($profilePictureArray);
         return $profile;
+    }
+
+    /**
+     * Get the user's profile picture.
+     *
+     * @param array $elements Profile picture values.
+     * @return string The user's profile picture url.
+     */
+    public function getUserPhotoUrl($profilePictureArray) {
+        $photoUrl = '';
+        if(is_array($profilePictureArray)){
+            $profilePictureArray = end($profilePictureArray);
+            $photoUrl = $profilePictureArray['identifiers'][0]['identifier'];
+        }
+        return $photoUrl;
     }
 
     /**
