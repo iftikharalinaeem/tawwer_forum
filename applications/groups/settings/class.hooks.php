@@ -1043,9 +1043,10 @@ class GroupsHooks extends Gdn_Plugin {
 
         $groupModel = new GroupModel();
         $groupIDs = $groupModel::getGroupCategoryIDs();
-        $inAGroupCategory = in_array($groupID, $groupIDs);
+        $groupCategory = (array)$groupModel->getID($groupID);
+        $inGroupCategory = in_array($groupCategory['CategoryID'], $groupIDs);
 
-        if (!$inAGroupCategory) {
+        if (!$inGroupCategory) {
             return;
         }
 
