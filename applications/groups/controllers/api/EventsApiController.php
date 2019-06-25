@@ -362,7 +362,7 @@ class EventsApiController extends AbstractApiController {
         if (array_key_exists('groupID', $query)) {
             $group = $this->groupModel->getID($query['groupID']);
             $groupPrivacy = $group['Privacy'];
-            $groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ? $access = 'Member' : $access = 'Access';
+            $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
             $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
             if (!$this->groupModel->checkPermission($access, $query['groupID']) && !$isAdmin) {
                 // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
