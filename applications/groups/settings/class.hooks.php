@@ -1022,4 +1022,22 @@ class GroupsHooks extends Gdn_Plugin {
         }
         return $subcommunityCategories;
     }
+
+
+    /**
+     * Add the "new image" button after the new discussion button.
+     */
+    public function base_beforeNewDiscussionButton_handler($sender) {
+        $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
+
+        //1. get the group from the category
+        //2. verify it's a valid group and user can see it
+        //3. set the query string
+
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID(4);
+
+        $newDiscussionModule->QueryString = 'groupid=4';
+        //$newDiscussionModule->QueryString = 'groupid='.$group['GroupID'];
+    }
 }
