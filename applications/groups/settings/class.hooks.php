@@ -1031,16 +1031,20 @@ class GroupsHooks extends Gdn_Plugin {
      * @throws Exception.
      */
     public function base_beforeNewDiscussionButton_handler($sender) {
-        $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
 
-        $groupID = '';
+        $groupID = null;
 
         if (array_key_exists('GroupID', $sender->Data['Group'])) {
-            $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : '';
+            $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : null;
         } elseif (array_key_exists('GroupID', $sender->Data['Discussion'])) {
-            $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : '';
+            $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : null;
         }
 
+        if (!$groupID) {
+            return;
+        }
+
+        $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
         $groupModel = new GroupModel();
         $groupIDs = $groupModel::getGroupCategoryIDs();
         $groupCategory = (array)$groupModel->getID($groupID);
