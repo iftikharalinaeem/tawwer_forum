@@ -192,6 +192,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function entryController_afterConnectData_handler($sender, $args) {
+        $terms = $this->getTerms();
+        // If disabled abort.
+        $termsActive = $terms->Active ?? false;
+        if (!$termsActive) {
+            return;
+        }
+
         // Check if the user already exists
         $userModel = Gdn::userModel();
         $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
@@ -203,26 +210,28 @@ class TermsManagerPlugin extends Gdn_Plugin {
             $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
         }
         $existingName = $user['Name'] ?? '';
+        $connectName = '';
+        $sender->setData('HidePassword', true);
         if (!$sender->Form->getFormValue('Terms')) {
 
             if (!val('Name', $user) && !$sender->Form->getFormValue('Name')) {
                 // If no name is being passed over SSO and this user does not already exist, pass data to
                 // the connect view to display a "ConnectName" form field.
-                $sender->setData('NoConnectName', false);
-                $sender->setData('AllowConnect', true);
                 $connectName = $sender->Form->getFormValue('ConnectName');
+                $sender->setData('HideName', false);
+                $sender->setData('HidePassword', true);
+
             } else {
                 // If a name has been passed over SSO or this user already exists set the conditions in the
                 // in the connect view to not show the strings telling the user he already exists etc.
-                $sender->setData('NoConnectName', true);
-                $sender->setData('AllowConnect', true);
                 $sender->setData('ExistingUsers', [$user]);
+                $sender->setData('HideName', true);
                 $sender->Form->setFormValue('Name', $existingName);
 
                 // Because we are interrupting the connect process, the Password Field will be presented.
                 // If the forum is configured for AutoConnect or if the user has already connected
                 // over SSO, do not show the Password Field on the connect form.
-                if ($auth || (!$auth && c('Garden.Registration.AutoConnect'))) {
+                if (!$auth || ($auth && !c('Garden.Registration.AutoConnect'))) {
                     $sender->setData('HidePassword', true);
                 }
                 Gdn::locale()->setTranslation('ConnectAccountExists', ' ');
@@ -236,12 +245,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
-        // If there is no name, exiting user or connectname created, show the ConnectName form field in connect view.
-        if (!$sender->Form->getFormValue('Name') && !$sender->Form->getFormValue('ConnectName') && !val('Name', $user)) {
-            $sender->setData('AllowConnect', false);
-            $sender->setData('NoConnectName', false);
-            $sender->Form->setFormValue('ConnectName');
-        }
         $sender->Form->addHidden('LatestTerms', val('Terms', $user));
         $this->addTermsValidation($sender, true);
     }
