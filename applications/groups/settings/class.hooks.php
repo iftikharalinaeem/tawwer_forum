@@ -1047,8 +1047,8 @@ class GroupsHooks extends Gdn_Plugin {
         $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
         $groupModel = new GroupModel();
         $groupIDs = $groupModel::getGroupCategoryIDs();
-        $groupCategory = (array)$groupModel->getID($groupID);
-        $inGroupCategory = in_array($groupCategory['CategoryID'], $groupIDs);
+        $group = (array)$groupModel->getID($groupID);
+        $inGroupCategory = in_array($group['CategoryID'], $groupIDs);
 
         if (!$inGroupCategory) {
             return;
