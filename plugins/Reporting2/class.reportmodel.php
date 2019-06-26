@@ -114,7 +114,9 @@ class ReportModel extends Gdn_Model {
                 $reportedRecord['InsertName'], // Author Name
                 $contextDiscussion['Category']
             );
-
+            if (array_key_exists('Body', $reportedRecord) && array_key_exists('Format', $reportedRecord)) {
+                $reportedRecord['Body'] = Gdn_Format::plainText($reportedRecord['Body'], $reportedRecord['Format']);
+            }
             // Build discussion record
             $discussion = [
                 // Limit new name to 100 char (db column size)
