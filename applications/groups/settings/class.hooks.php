@@ -1022,4 +1022,44 @@ class GroupsHooks extends Gdn_Plugin {
         }
         return $subcommunityCategories;
     }
+
+
+    /**
+     * Add the group ID to the new discussion module.
+     *
+     * @param $sender NewdiscussionModule.
+     * @throws Exception.
+     */
+    public function base_beforeNewDiscussionButton_handler($sender) {
+
+        $groupID = null;
+
+        if (array_key_exists('GroupID', $sender->Data['Group'])) {
+            $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : null;
+        } elseif (array_key_exists('GroupID', $sender->Data['Discussion'])) {
+            $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : null;
+        }
+
+        if (!$groupID) {
+            return;
+        }
+
+        $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
+        $groupModel = new GroupModel();
+        $groupIDs = $groupModel::getGroupCategoryIDs();
+        $group = (array)$groupModel->getID($groupID);
+        $inGroupCategory = in_array($group['CategoryID'], $groupIDs);
+
+        if (!$inGroupCategory) {
+            return;
+        }
+
+        $hasPermission = $groupModel->checkPermission('Member', $groupID);
+
+        if (!$hasPermission ) {
+            throw permissionException('Vanilla.Discussions.Add');
+        }
+
+        $newDiscussionModule->QueryString = 'groupid='.$groupID;
+    }
 }
