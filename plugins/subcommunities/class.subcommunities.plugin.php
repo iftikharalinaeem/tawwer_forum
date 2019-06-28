@@ -309,14 +309,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         $defaultSite = null;
-        
-        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
-            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
-            $nodeSlug = $siteNode->slug();
-            if ($root !== $nodeSlug) {
-                $root =  $nodeSlug . '/'. $root;
-            }
-        }
 
         if (!$site) {
             $defaultSite = SubcommunityModel::getDefaultSite();
@@ -639,6 +631,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public static function getCanonicalUrl($path, $subcommunity) {
         if ($subcommunity !== null) {
+            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
+                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+                $nodeSlug = $siteNode->slug();
+                if (self::$originalWebRoot !== $nodeSlug) {
+                    self::$originalWebRoot =  $nodeSlug;
+                }
+            }
             // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
             $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
             // Temporarily swap out the current web root for the modified one, before generating the URL.
@@ -768,10 +767,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             // Skip webroot / return as is
             $url = $path;
         } else {
-
             $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
-
-
+            
             $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
 
             // The url is supposed to be relative.
