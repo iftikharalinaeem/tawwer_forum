@@ -309,6 +309,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         $defaultSite = null;
+        
+        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
+            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+            $nodeSlug = $siteNode->slug();
+            if ($root !== $nodeSlug) {
+                $root =  $nodeSlug . '/'. $root;
+            }
+        }
 
         if (!$site) {
             $defaultSite = SubcommunityModel::getDefaultSite();
@@ -325,13 +333,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
-            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
-            $nodeSlug = $siteNode->slug();
-            if ($root !== $nodeSlug) {
-                $root =  $nodeSlug . '/'. $root;
-            }
-        }
 
         self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
