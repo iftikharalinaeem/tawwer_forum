@@ -759,7 +759,18 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             // Skip webroot / return as is
             $url = $path;
         } else {
+
             $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
+
+            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) && $subcommunity) {
+                $hubUrlPath = parse_url(c('Hub.Url', Gdn::request()->domain().'/hub'), PHP_URL_PATH);
+                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+                $nodeSlug = $siteNode->slug();
+                if ($hubUrlPath !== $nodeSlug) {
+                    $path =  $nodeSlug.$path;
+                }
+            }
+
             $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
 
             // The url is supposed to be relative.
@@ -776,6 +787,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($page && ($page > 1 || Gdn::session()->UserID)) {
             $url .= "/p{$page}";
         }
+
 
         return $url;
     }
