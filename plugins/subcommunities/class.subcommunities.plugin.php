@@ -325,7 +325,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-
         self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
             Gdn::request()->path($path);
@@ -635,7 +634,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
                 $nodeSlug = $siteNode->slug();
                 if (self::$originalWebRoot !== $nodeSlug) {
-                    self::$originalWebRoot =  $nodeSlug;
+                    self::$originalWebRoot = $nodeSlug;
                 }
             }
             // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
@@ -768,7 +767,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $url = $path;
         } else {
             $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
-            
             $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
 
             // The url is supposed to be relative.
@@ -785,7 +783,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($page && ($page > 1 || Gdn::session()->UserID)) {
             $url .= "/p{$page}";
         }
-
 
         return $url;
     }
