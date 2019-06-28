@@ -325,6 +325,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
+        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
+            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+            $nodeSlug = $siteNode->slug();
+            if ($root !== $nodeSlug) {
+                $root =  $nodeSlug . '/'. $root;
+            }
+        }
+
         self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
             Gdn::request()->path($path);
@@ -762,14 +770,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
             $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
 
-            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) && $subcommunity) {
-                $hubUrlPath = parse_url(c('Hub.Url', Gdn::request()->domain().'/hub'), PHP_URL_PATH);
-                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
-                $nodeSlug = $siteNode->slug();
-                if ($hubUrlPath !== $nodeSlug) {
-                    $path =  $nodeSlug.$path;
-                }
-            }
 
             $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
 
