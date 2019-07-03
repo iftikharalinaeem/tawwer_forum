@@ -632,6 +632,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public static function getCanonicalUrl($path, $subcommunity) {
         if ($subcommunity !== null) {
+            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
+                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+                $nodeSlug = $siteNode->slug();
+                if (self::$originalWebRoot !== $nodeSlug) {
+                    self::$originalWebRoot = $nodeSlug;
+                }
+            }
             // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
             $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
             // Temporarily swap out the current web root for the modified one, before generating the URL.
