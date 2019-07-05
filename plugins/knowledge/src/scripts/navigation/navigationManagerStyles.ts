@@ -14,7 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -282,7 +282,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 borderColor: colorOut(globalVars.mainColors.primary.fade(0.5)),
             },
         },
-    }as NestedCSSProperties);
+    } as NestedCSSProperties);
     const itemLabel = style("itemLabel", {
         flex: 1,
         width: percent(100),

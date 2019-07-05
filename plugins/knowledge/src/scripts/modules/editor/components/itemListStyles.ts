@@ -20,7 +20,7 @@ import {
     singleBorder,
     userSelect,
 } from "@library/styles/styleHelpers";
-import {NestedCSSProperties, NestedCSSSelectors} from "typestyle/lib/types";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const itemListVariables = useThemeCache(() => {
     const globalVars = globalVariables();
