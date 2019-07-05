@@ -14,6 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -196,7 +197,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 color: colorOut(globalVars.messageColors.error.fg),
             },
         },
-    });
+    } as NestedCSSProperties);
 
     const draggable = style("draggable", {
         position: "relative",
@@ -214,7 +215,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             color: "transparent",
         }),
         marginLeft: unit(18),
-    });
+    } as NestedCSSProperties);
 
     const action = style("action", {
         fontSize: unit(globalVars.fonts.size.medium),
@@ -246,7 +247,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 outline: 0,
             },
         }),
-    });
+    } as NestedCSSProperties);
 
     const deleteItem = style("deleteItem", {
         color: colorOut(vars.deleteButton.color.fg),
@@ -281,7 +282,7 @@ export const navigationManagerClasses = useThemeCache(() => {
                 borderColor: colorOut(globalVars.mainColors.primary.fade(0.5)),
             },
         },
-    });
+    }as NestedCSSProperties);
     const itemLabel = style("itemLabel", {
         flex: 1,
         width: percent(100),
