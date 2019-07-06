@@ -116,14 +116,14 @@ if ($mergeReactions) {
 
 if (Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
     // Define some badges for the reactions.
-    $BadgeModel = new BadgeModel();
+    $badgeModel = new BadgeModel();
 
-    $Reactions = ['Insightful' => 'Insightfuls', 'Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'];
-    $Thresholds = [
+    $reactions = ['Insightful' => 'Insightfuls', 'Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'];
+    $thresholds = [
         5 => 5, 25 => 5, 100 => 10, 250 => 25, 500 => 50,
         1000 => 50, 1500 => 50, 2500 => 50, 5000 => 50, 10000 => 50,
     ];
-    $Sentences = [
+    $sentences = [
         1 => "We like that.",
         2 => "You're posting some good content. Great!",
         3 => "When you're liked this much, you'll be an MVP in no time!",
@@ -136,28 +136,29 @@ if (Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
         10 => "Wow! You are being swarmed with reactions.",
     ];
 
-    foreach ($Reactions as $Class => $NameSuffix) {
-        $ClassSlug = strtolower($Class);
-        $Level = 1;
+    foreach ($reactions as $class => $nameSuffix) {
+        $classSlug = strtolower($class);
+        $level = 1;
 
-        foreach ($Thresholds as $Threshold => $Points) {
-            $Sentence = $Sentences[$Level];
+        foreach ($thresholds as $threshold => $points) {
+            $sentence = $sentences[$level];
+            $thresholdFormatted = number_format($threshold);
 
             //foreach ($Likes as $Count => $Body) {
-            $BadgeModel->define([
-                'Name' => "$Threshold $NameSuffix",
-                'Slug' => "$ClassSlug-$Threshold",
+            $badgeModel->define([
+                'Name' => "$thresholdFormatted $nameSuffix",
+                'Slug' => "$classSlug-$threshold",
                 'Type' => 'Reaction',
-                'Body' => "You received $Threshold $NameSuffix. $Sentence",
-                'Photo' => "https://badges.v-cdn.net/svg/$ClassSlug-$Level.svg",
-                'Points' => $Points,
-                'Threshold' => $Threshold,
-                'Class' => $Class,
-                'Level' => $Level,
+                'Body' => "You received $thresholdFormatted $nameSuffix. $sentence",
+                'Photo' => "https://badges.v-cdn.net/svg/$classSlug-$level.svg",
+                'Points' => $points,
+                'Threshold' => $threshold,
+                'Class' => $class,
+                'Level' => $level,
                 'CanDelete' => 0
             ]);
 
-            $Level++;
+            $level++;
         }
     }
 }
