@@ -17,7 +17,12 @@
     padding: 10px 20px 2px 10px;
 }
 
-/* Badges list */
+.Badge-Details .BadgePhotoDisplay {
+    height: 100px;
+    width: 100px;
+}
+
+    /* Badges list */
 .ItemBadge .BadgePhoto {
     float: left;
 }

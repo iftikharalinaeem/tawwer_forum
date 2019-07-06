@@ -55,9 +55,17 @@ class BadgeModel extends Gdn_Model {
      */
     public function define($data) {
         $slug = val('Slug', $data);
-        $existingBadge = $this->getID($slug);
+        $existingBadge = $this->getID($slug, DATASET_TYPE_ARRAY);
 
-        return ($existingBadge) ? val('BadgeID', $existingBadge) : $this->save($data);
+        // Check for a default image upgrade.
+        if ($existingBadge &&
+            parse_url($existingBadge['Photo'], PHP_URL_HOST) === 'badges.v-cdn.net' &&
+            $existingBadge['Photo'] !== $data['Photo']) {
+
+            $this->setField($existingBadge['BadgeID'], ['Photo' => $data['Photo']]);
+        }
+
+        return ($existingBadge) ? ($existingBadge['BadgeID'] ?? 0) : $this->save($data);
     }
 
     /**

@@ -119,21 +119,28 @@ if (Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
     $BadgeModel = new BadgeModel();
 
     $Reactions = ['Insightful' => 'Insightfuls', 'Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'];
-    $Thresholds = [1 => 5, 2 => 25, 3 => 100, 4 => 250, 5 => 500];
+    $Thresholds = [
+        5 => 5, 25 => 5, 100 => 10, 250 => 25, 500 => 50,
+        1000 => 50, 1500 => 50, 2500 => 50, 5000 => 50, 10000 => 50,
+    ];
     $Sentences = [
         1 => "We like that.",
         2 => "You're posting some good content. Great!",
         3 => "When you're liked this much, you'll be an MVP in no time!",
         4 => "Looks like you're popular around these parts.",
-        5 => "It ain't no fluke, you post great stuff and we're lucky to have you here."];
+        5 => "It ain't no fluke, you post great stuff and we're lucky to have you here.",
+        6 => "The more you post, the more people like it. Keep it up!",
+        7 => "You must be a source of inspiration for the community.",
+        8 => "People really notice you, in case you haven't noticed.",
+        9 => "Your ratio of signal to noise is something to be proud of.",
+        10 => "Wow! You are being swarmed with reactions.",
+    ];
 
     foreach ($Reactions as $Class => $NameSuffix) {
         $ClassSlug = strtolower($Class);
-        foreach ($Thresholds as $Level => $Threshold) {
-            $Points = round($Threshold / 10);
-            if ($Points < 5)
-                $Points = 5;
+        $Level = 1;
 
+        foreach ($Thresholds as $Threshold => $Points) {
             $Sentence = $Sentences[$Level];
 
             //foreach ($Likes as $Count => $Body) {
@@ -142,13 +149,15 @@ if (Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
                 'Slug' => "$ClassSlug-$Threshold",
                 'Type' => 'Reaction',
                 'Body' => "You received $Threshold $NameSuffix. $Sentence",
-                'Photo' => "https://badges.v-cdn.net/100/$ClassSlug-$Level.png",
+                'Photo' => "https://badges.v-cdn.net/svg/$ClassSlug-$Level.svg",
                 'Points' => $Points,
                 'Threshold' => $Threshold,
                 'Class' => $Class,
                 'Level' => $Level,
                 'CanDelete' => 0
             ]);
+
+            $Level++;
         }
     }
 }
