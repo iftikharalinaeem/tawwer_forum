@@ -8,6 +8,8 @@ use Garden\EventManager;
  * Class SubcommunitiesPlugin
  */
 class SubcommunitiesPlugin extends Gdn_Plugin {
+    const MODE_SUBCOMMUNITY = 0;
+    const MODE_LANGUAGE_TOGGLE = 1;
     /// Properties ///
 
     /**
@@ -48,6 +50,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('Sort', 'smallint', '1000')
             ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->set();
+
+        if (Gdn::config()->get('Plugins.Subcommunities.Mode', null) === null) {
+            Gdn::config()->saveToConfig('Plugins.Subcommunities.Mode', self::MODE_SUBCOMMUNITY);
+        }
     }
 
     /**
@@ -275,7 +281,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function discussionController_render_before($sender, $args) {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
-        if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET) {
+        if (c('Plugins.Subcommunities.Mode', self::MODE_SUBCOMMUNITY) === self::MODE_SUBCOMMUNITY &&
+            Gdn::request()->getMethod() === Gdn_Request::METHOD_GET) {
             $subPath = '/'.$subcommunity['Folder'];
             $fullPath = Gdn::request()->getFullPath();
             if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
