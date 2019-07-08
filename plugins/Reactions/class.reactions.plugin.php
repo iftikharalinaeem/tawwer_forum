@@ -1009,7 +1009,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $reactionModel = new ReactionModel();
         if ($reaction == 'everything') {
             $promotedTagID = $reactionModel->defineTag('Promoted', 'BestOf');
-            $data = $reactionModel->detRecordsWhere(
+            $data = $reactionModel->getRecordsWhere(
                 ['TagID' => $promotedTagID, 'RecordType' => ['Discussion', 'Comment']],
                 'DateInserted', 'desc',
                 $limit + 1, $offset);
