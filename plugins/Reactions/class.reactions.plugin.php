@@ -1007,7 +1007,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $sender->setData('_Limit', $limit + 1);
 
         $reactionModel = new ReactionModel();
-        if ($reaction == 'everything') {
+        if ($reaction === 'everything') {
             $promotedTagID = $reactionModel->defineTag('Promoted', 'BestOf');
             $data = $reactionModel->getRecordsWhere(
                 ['TagID' => $promotedTagID, 'RecordType' => ['Discussion', 'Comment']],
