@@ -275,6 +275,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function discussionController_render_before($sender, $args) {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
+        if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET
+            && empty($sender->Discussion->GroupID)) {
+            $subPath = '/'.$subcommunity['Folder'];
+            $fullPath = Gdn::request()->getFullPath();
+            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
+                redirectTo(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $subcommunity), 301);
+            }
+        }
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
     }
 
