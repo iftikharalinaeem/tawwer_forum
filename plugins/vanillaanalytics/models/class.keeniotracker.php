@@ -417,7 +417,7 @@ class KeenIOTracker implements TrackerInterface {
             "type" => "leaderboard",
             "chart" => [
                 "labels" => [
-                    "record" => "Title",
+                    "record" => "Name",
                     "count" => "Votes",
                 ]
             ],
@@ -428,8 +428,8 @@ class KeenIOTracker implements TrackerInterface {
             "type" => "leaderboard",
             "chart" => [
                 "labels" => [
-                    "record" => "Title",
-                    "count" => "Votes",
+                    "record" => "Name",
+                    "count" => "Articles",
                 ]
             ],
         ],
