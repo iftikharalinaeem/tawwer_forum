@@ -117,7 +117,7 @@ class IdeationPlugin extends Gdn_Plugin {
      * Get idea metadata for a discussion.
      *
      * @param array $discussion
-     * @return array
+     * @return array|null
      */
     private function getIdeaMetadata(array $discussion) {
         $result = null;
@@ -126,12 +126,12 @@ class IdeationPlugin extends Gdn_Plugin {
         $categoryID = $discussion['categoryID'] ?? $discussion['CategoryID'] ?? null;
 
         if (!$discussionID || !$categoryID) {
-            return $result;
+            return null;
         }
 
         $category = CategoryModel::categories($categoryID);
         if (!$this->isIdeaCategory($category)) {
-            return $result;
+            return null;
         }
 
         $type = $category['IdeationType'];
@@ -163,6 +163,17 @@ class IdeationPlugin extends Gdn_Plugin {
         if ($type === 'idea') {
             $schema = $this->getIdeaMetadataFragment();
             $metadata = $this->getIdeaMetadata($row);
+
+            if ($metadata === null) {
+                // We added this to relax the schema so that we don't end up with a 422 error when an idea is in a
+                // non-ideation category.
+                $metadata = [
+                    'statusID' => 0,
+                    'status' => ['name' => 'Invalid', 'state' => 'open'],
+                    'statusNotes' => 'This idea is in an invalid category.',
+                    'type' => 'up-down'
+                ];
+            }
             $metadata = $schema->validate($metadata);
             if (is_array($metadata)) {
                 $key = array_key_exists('attributes', $row) ? 'attributes.idea' : 'Attributes.Idea';

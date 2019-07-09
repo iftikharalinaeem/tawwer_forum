@@ -231,4 +231,24 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
                 $this->assertEquals($new['statusNotes'], $attachment['StatusNotes']);
         }
     }
+
+    /**
+     * An idea that is in a non idea category should return an invalid idea attribute.
+     */
+    public function testIdeaInNonIdeaCategory() {
+        $record = [
+            'categoryID' => static::$categoryID,
+            'name' => 'Test Idea',
+            'body' => 'Hello world!',
+            'format' => 'markdown'
+        ];
+        $response = $this->api()->post('discussions/idea', $record);
+
+        // Switch the idea to another category.
+        $this->api()->patch("/discussions/{$response['discussionID']}", ['categoryID' => 123]);
+        $discussion = $this->api()->get("/discussions/{$response['discussionID']}");
+
+        $this->assertSame(0, $discussion['attributes']['idea']['statusID']);
+        $this->assertSame("Invalid", $discussion['attributes']['idea']['status']['name']);
+    }
 }
