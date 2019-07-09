@@ -289,8 +289,8 @@ class AnalyticsDashboard implements JsonSerializable {
                         "article-helpful",
                         // Leaderboards
                         "top-helpful-articles",
-                        "top-user-helpful-articles",
-                        "top-user-new-articles",
+                        "top-users-helpful-votes",
+                        "top-users-articles",
                     ],
                 ];
             }

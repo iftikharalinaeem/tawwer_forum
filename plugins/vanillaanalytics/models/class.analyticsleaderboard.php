@@ -110,6 +110,7 @@ class AnalyticsLeaderboard {
                 'discussion.discussionID',
                 'reaction.recordID',
                 "article.articleID",
+                "article.insertUserID",
             ];
             $typeID = false;
 
@@ -128,7 +129,7 @@ class AnalyticsLeaderboard {
                         } else {
                             throw new Gdn_UserException('Comments are not supported yet!');
                         }
-                    } else if (substr($currentType, -strlen('.userID')) === '.userID') {
+                    } elseif (substr($currentType, -strlen('.userID')) === '.userID') {
                         $emulatedTypeID = 'user.userID';
                     } else {
                         $emulatedTypeID = $typeID;
@@ -148,6 +149,7 @@ class AnalyticsLeaderboard {
                     $recordUrl = '/discussion/%d';
                     $titleAttribute = 'Name';
                     break;
+                case "article.insertUserID":
                 case 'user.userID':
                     $userModel = Gdn::getContainer()->get("UserModel");
                     $lookup = [$userModel, "getID"];

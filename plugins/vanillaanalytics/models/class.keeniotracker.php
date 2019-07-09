@@ -411,6 +411,28 @@ class KeenIOTracker implements TrackerInterface {
                 ]
             ],
         ],
+        "top-users-helpful-votes" => [
+            "title" => "Users with the Most Helpful Votes",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "leaderboard",
+            "chart" => [
+                "labels" => [
+                    "record" => "Title",
+                    "count" => "Votes",
+                ]
+            ],
+        ],
+        "top-users-articles" => [
+            "title" => "Users with the Most Articles",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "leaderboard",
+            "chart" => [
+                "labels" => [
+                    "record" => "Title",
+                    "count" => "Votes",
+                ]
+            ],
+        ],
     ];
 
     /**
@@ -693,6 +715,32 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy("article.articleID");
 
         $this->widgets["top-helpful-articles"]["query"] = $topHelpfulArticlesQuery;
+
+        // Top users with the most helpful votes
+        $topUsersHelpfulVotesQuery = new KeenIOQuery();
+        $topUsersHelpfulVotesQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection("article_reaction")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "reaction",
+                "property_value" => "yes",
+            ])
+            ->setGroupBy("article.insertUserID");
+
+        $this->widgets["top-users-helpful-votes"]["query"] = $topUsersHelpfulVotesQuery;
+
+        // Top users with the most articles
+        $topUsersArticlesQuery = new KeenIOQuery();
+        $topUsersArticlesQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection("article")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_add",
+            ])
+            ->setGroupBy("article.insertUserID");
+
+        $this->widgets["top-users-articles"]["query"] = $topUsersArticlesQuery;
 
         /**
          * Metrics
