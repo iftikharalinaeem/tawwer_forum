@@ -109,6 +109,8 @@ class AnalyticsLeaderboard {
                 'insertUser.userID',
                 'discussion.discussionID',
                 'reaction.recordID',
+                "article.articleID",
+                "article.insertUserID",
             ];
             $typeID = false;
 
@@ -127,7 +129,7 @@ class AnalyticsLeaderboard {
                         } else {
                             throw new Gdn_UserException('Comments are not supported yet!');
                         }
-                    } else if (substr($currentType, -strlen('.userID')) === '.userID') {
+                    } elseif (substr($currentType, -strlen('.userID')) === '.userID') {
                         $emulatedTypeID = 'user.userID';
                     } else {
                         $emulatedTypeID = $typeID;
@@ -142,14 +144,23 @@ class AnalyticsLeaderboard {
             // Prepare to build out the values we need for the leaderboard.
             switch ($emulatedTypeID) {
                 case 'discussion.discussionID':
-                    $recordModel = new DiscussionModel();
+                    $discussionModel = Gdn::getContainer()->get("DiscussionModel");
+                    $lookup = [$discussionModel, "getID"];
                     $recordUrl = '/discussion/%d';
                     $titleAttribute = 'Name';
                     break;
+                case "article.insertUserID":
                 case 'user.userID':
-                    $recordModel = Gdn::userModel();
+                    $userModel = Gdn::getContainer()->get("UserModel");
+                    $lookup = [$userModel, "getID"];
                     $recordUrl = '/profile?UserID=%d';
                     $titleAttribute = 'Name';
+                    break;
+                case "article.articleID":
+                    $articleModel = Gdn::getContainer()->get("Vanilla\Knowledge\Models\ArticleModel");
+                    $lookup = [$articleModel, "getIDWithRevision"];
+                    $recordUrl = "/kb/articles/%d";
+                    $titleAttribute = "name";
                     break;
                 default:
                     throw new Gdn_UserException('Invalid type ID.');
@@ -175,8 +186,12 @@ class AnalyticsLeaderboard {
             foreach ($result as $currentResult) {
                 $i++;
                 $recordID = $currentResult[$typeID];
+                if ($recordID === null) {
+                    // Probably bad data. Skip this row.
+                    continue;
+                }
                 $count = $currentResult['result'];
-                $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $record = (array)$lookup($recordID);
                 $previousPosition = val($ptfResultIndexed[$recordID], $ptfPositionByResult);
 
                 if ($previousRecordCount && $previousRecordCount != $count) {

@@ -278,6 +278,23 @@ class AnalyticsDashboard implements JsonSerializable {
                 ];
             }
 
+            if (Gdn::addonManager()->isEnabled("knowledge", \Vanilla\Addon::TYPE_ADDON)) {
+                $defaults["Knowledge"] = [
+                    "widgets" => [
+                        // Metrics
+                        "total-articles-added",
+                        "total-article-helpful",
+                        "total-articles-updated",
+                        // Charts
+                        "article-helpful",
+                        // Leaderboards
+                        "top-helpful-articles",
+                        "top-users-helpful-votes",
+                        "top-users-articles",
+                    ],
+                ];
+            }
+
             foreach ($defaults as $title => $dashboardConfig) {
                 $widgets = val('widgets', $dashboardConfig, []);
                 $dashboard = new AnalyticsDashboard($title, $widgets);

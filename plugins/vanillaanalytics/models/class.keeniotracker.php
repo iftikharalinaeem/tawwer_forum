@@ -380,7 +380,59 @@ class KeenIOTracker implements TrackerInterface {
             'callback' => 'formatSeconds',
             'supportCategoryFilter' => true,
         ],
-
+        "total-articles-added" => [
+            "title" => "Articles Added",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "metric",
+        ],
+        "total-article-helpful" => [
+            "title" => "Helpful Votes",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "metric",
+        ],
+        "total-articles-updated" => [
+            "title" => "Articles Updated",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "metric",
+        ],
+        "article-helpful" => [
+            "title" => "Helpful Votes",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "chart"
+        ],
+        "top-helpful-articles" => [
+            "title" => "Articles with the Most Helpful Votes",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "leaderboard",
+            "chart" => [
+                "labels" => [
+                    "record" => "Title",
+                    "count" => "Votes",
+                ]
+            ],
+        ],
+        "top-users-helpful-votes" => [
+            "title" => "Users with the Most Helpful Votes",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "leaderboard",
+            "chart" => [
+                "labels" => [
+                    "record" => "Name",
+                    "count" => "Votes",
+                ]
+            ],
+        ],
+        "top-users-articles" => [
+            "title" => "Users with the Most Articles",
+            "rank" => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            "type" => "leaderboard",
+            "chart" => [
+                "labels" => [
+                    "record" => "Name",
+                    "count" => "Articles",
+                ]
+            ],
+        ],
     ];
 
     /**
@@ -655,6 +707,40 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy('point.user.userID');
 
         $this->widgets['top-member-by-total-reputation']['query'] = $topMembersByTotalReputation;
+
+        // Top articles by helpful votes
+        $topHelpfulArticlesQuery = new KeenIOQuery();
+        $topHelpfulArticlesQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection("article_reaction")
+            ->setGroupBy("article.articleID");
+
+        $this->widgets["top-helpful-articles"]["query"] = $topHelpfulArticlesQuery;
+
+        // Top users with the most helpful votes
+        $topUsersHelpfulVotesQuery = new KeenIOQuery();
+        $topUsersHelpfulVotesQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection("article_reaction")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "reaction",
+                "property_value" => "yes",
+            ])
+            ->setGroupBy("article.insertUserID");
+
+        $this->widgets["top-users-helpful-votes"]["query"] = $topUsersHelpfulVotesQuery;
+
+        // Top users with the most articles
+        $topUsersArticlesQuery = new KeenIOQuery();
+        $topUsersArticlesQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection("article")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_add",
+            ])
+            ->setGroupBy("article.insertUserID");
+
+        $this->widgets["top-users-articles"]["query"] = $topUsersArticlesQuery;
 
         /**
          * Metrics
@@ -1029,6 +1115,55 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['average-time-to-resolve-discussion']['query'] = $averageTimeToResolveDiscussionQuery;
 
+        // Total articles added (metric)
+        $totalArticlesAddedQuery = new KeenIOQuery();
+        $totalArticlesAddedQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t("Articles Added"))
+            ->setEventCollection("article")
+            ->setTargetProperty("article.articleID")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_add",
+            ])
+        ;
+
+        $this->widgets["total-articles-added"]["query"] = $totalArticlesAddedQuery;
+
+        // Total "This article was helpful" article reactions (metric)
+        $totalArticleHelpful = new KeenIOQuery();
+        $totalArticleHelpful->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t("Helpful Votes"))
+            ->setEventCollection("article_reaction")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_reaction_add",
+            ])
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "reaction",
+                "property_value" => "yes",
+            ])
+        ;
+
+        $this->widgets["total-article-helpful"]["query"] = $totalArticleHelpful;
+
+        // Total articles edited (metric)
+        $totalArticlesUpdated = new KeenIOQuery();
+        $totalArticlesUpdated->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t("Articles Updated"))
+            ->setEventCollection("article_modify")
+            ->setTargetProperty("article.articleID")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_edit",
+            ])
+        ;
+
+        $this->widgets["total-articles-updated"]["query"] = $totalArticlesUpdated;
+
         /**
          * Pie Charts
          */
@@ -1396,6 +1531,25 @@ class KeenIOTracker implements TrackerInterface {
             ],
             'finalAnalysis' => 'merged-resolved-discussion'
         ];
+
+        // Total "This article was helpful" article reactions (chart)
+        $articleHelpfulQuery = new KeenIOQuery();
+        $articleHelpfulQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t("Helpful Votes"))
+            ->setEventCollection("article_reaction")
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "type",
+                "property_value" => "article_reaction_add",
+            ])
+            ->addFilter([
+                "operator" => "eq",
+                "property_name" => "reaction",
+                "property_value" => "yes",
+            ])
+            ->setInterval("daily");
+
+        $this->widgets['article-helpful']['query'] = $articleHelpfulQuery;
     }
 
     /**
