@@ -241,8 +241,11 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         }
 
         // Send some information that will be helpful for page view tracking.
-        Gdn::controller()->setData('clientIP', anonymizeIP(Gdn::request()->ipAddress()));
-        Gdn::controller()->setData('dateTime', AnalyticsData::getDateTime());
+        $controller = Gdn::controller();
+        if ($controller) {
+            $controller->setData('clientIP', anonymizeIP(Gdn::request()->ipAddress()));
+            $controller->setData('dateTime', AnalyticsData::getDateTime());
+        }
 
         AnalyticsTracker::getInstance()->refreshCookies();
     }
