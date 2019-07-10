@@ -20,7 +20,7 @@ import {
     singleBorder,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { NestedCSSSelectors } from "typestyle/lib/types";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const itemListVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -141,7 +141,7 @@ export const itemListClasses = useThemeCache(() => {
         height: unit(vars.avatar.size + vars.avatar.border.width * 2),
         marginRight: unit(vars.avatar.margin),
         overflow: "hidden",
-    });
+    } as NestedCSSProperties);
 
     const content = style("content", {
         display: "flex",

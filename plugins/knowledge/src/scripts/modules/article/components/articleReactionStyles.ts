@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, unit } from "@library/styles/styleHelpers";
+import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px, ColorHelper, em } from "csx";
@@ -48,7 +48,7 @@ export const reactionClasses = useThemeCache(() => {
 
     const resultText = style("resultText", {
         fontSize: unit(vars.meta.text.fontSize),
-        color: vars.meta.text.color.toString(),
+        color: colorOut(vars.meta.text.color),
     });
 
     const signInText = style("signInText", {

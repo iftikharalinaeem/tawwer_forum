@@ -14,6 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,7 +39,7 @@ export const navigationManagerVariables = useThemeCache(() => {
     });
 
     const error = makeThemeVars("error", {
-        color: globalVars.feedbackColors.error,
+        color: globalVars.messageColors.error,
     });
 
     const item = makeThemeVars("item", {
@@ -47,7 +48,7 @@ export const navigationManagerVariables = useThemeCache(() => {
     });
 
     const deleteButton = makeThemeVars("deleteButton", {
-        color: globalVars.feedbackColors.error,
+        color: globalVars.messageColors.error,
     });
 
     const actionButton = makeThemeVars("actionButton", {
@@ -193,7 +194,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             },
 
             "&.hasError .navigationManager-itemLabel": {
-                color: colorOut(globalVars.feedbackColors.error.fg),
+                color: colorOut(globalVars.messageColors.error.fg),
             },
         },
     });
