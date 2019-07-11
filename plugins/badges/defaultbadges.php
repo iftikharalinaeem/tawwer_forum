@@ -48,45 +48,6 @@ $BadgeModel->define([
      'CanDelete' => 0
 ]);
 
-// Helper
-//$BadgeModel->define(array(
-//     'Name' => 'Welcoming Committee',
-//     'Slug' => 'welcome',
-//     'Type' => 'Custom',
-//     'Body' => 'Commenting on a new member&rsquo;s first discussion is a great way to make them feel at home.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/group.svg',
-//     'Points' => 10
-//));
-
-// Holiday / Timing
-//$BadgeModel->define(array(
-//     'Name' => 'Fresh Start',
-//     'Slug' => 'fresh-start',
-//     'Type' => 'Custom',
-//     'Body' => 'Visiting on the first day of the year is the best way to start it off on the right foot.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/flower.svg',
-//     'Points' => 5
-//));
-//$BadgeModel->define(array(
-//     'Name' => 'Morning Treat',
-//     'Slug' => 'morning',
-//     'Type' => 'Custom',
-//     'Body' => 'Visiting first thing in the morning is a great way to start the day. Are you up super early or super late?',
-//     'Photo' => 'https://badges.v-cdn.net/svg/doughnut.svg',
-//     'Points' => 5
-//));
-
-// Timeouts
-/*$BadgeModel->define(array(
-     'Name' => 'Comment Marathon',
-     'Slug' => 'marathon',
-     'Type' => 'Timeout',
-     'Body' => 'Commenting that many times in one day is above and beyond the call of duty. They better be good ones!',
-     'Photo' => 'https://badges.v-cdn.net/svg/run.svg',
-     'Points' => 5,
-     'Attributes' => array('Timeout' => 86400), // 24 hours
-     'Threshold' => 42,
-)); */
 $BadgeModel->define([
      'Name' => 'Combo Breaker',
      'Slug' => 'combo',
@@ -98,16 +59,6 @@ $BadgeModel->define([
      'Threshold' => 5,
      'CanDelete' => 0
 ]);
-
-// Speed
-/*$BadgeModel->define(array(
-     'Name' => 'Lightning Reflexes',
-     'Slug' => 'lightning',
-     'Type' => 'Custom',
-     'Body' => 'Commenting on a new discussion within 60 seconds takes superhuman skills.',
-     'Photo' => 'https://badges.v-cdn.net/svg/power.svg',
-     'Points' => 5
-));*/
 
 // Comment Counts
 $BadgeModel->define([
@@ -241,94 +192,6 @@ $BadgeModel->define([
      'CanDelete' => 0
 ]);
 
-// Likes
-//$Likes = array(
-//     1 => 'Someone liked something you posted! We like that!',
-//     10 => 'You&rsquo;re posting some good content. Great!',
-//     50 => 'When you&rsquo;re liked this much, you&rsquo;ll be an MVP in no time!',
-//     100 => 'Looks like you&rsquo;re popular around these parts.',
-//     250 => 'It ain&rsquo;t no fluke, you post great stuff and we&rsquo;re lucky to have you here.');
-//
-//$Level = 1;
-//foreach ($Likes as $Count => $Body) {
-//    $BadgeModel->define(array(
-//         'Name' => $Count == 1 ? 'First Like' : ("$Count Likes"),
-//         'Slug' => 'like-'.$Count,
-//         'Type' => 'UserCount',
-//         'Body' => $Body,
-//         'Photo' => 'https://badges.v-cdn.net/svg/like-'.$Level.'.svg',
-//         'Points' => defaultPoints($Count),
-//         'Attributes' => array('Column' => 'Likes'),
-//         'Threshold' => $Count,
-//         'Class' => 'Liked',
-//         'Level' => $Level
-//    ));
-//
-//    $Level++;
-//}
-
-// Attendance
-//$BadgeModel->define(array(
-//     'Name' => 'Welcome Back',
-//     'Slug' => 'day-3',
-//     'Type' => 'Attendance',
-//     'Body' => 'Third day in a row you stopped by! You&rsquo;ll be a regular in no time.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/attend.svg',
-//     'Points' => 2,
-//     'Attributes' => array(),
-//     'Threshold' => 5,
-//     'Class' => 'Attendance',
-//     'Level' => 1
-//));
-//$BadgeModel->define(array(
-//     'Name' => 'Perfect Week',
-//     'Slug' => 'day-7',
-//     'Type' => 'Attendance',
-//     'Body' => 'Visited 7 days in a row. You show up here more than the office.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/attend-2.svg',
-//     'Points' => 5,
-//     'Attributes' => array(),
-//     'Threshold' => 7,
-//     'Class' => 'Attendance',
-//     'Level' => 2
-//));
-//$BadgeModel->define(array(
-//     'Name' => 'A Month To Remember',
-//     'Slug' => 'day-30',
-//     'Type' => 'Attendance',
-//     'Body' => 'Mark your calendar: you visited every day for a month.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/attend-3.svg',
-//     'Points' => 10,
-//     'Attributes' => array(),
-//     'Threshold' => 30,
-//     'Class' => 'Attendance',
-//     'Level' => 3
-//));
-//$BadgeModel->define(array(
-//     'Name' => 'Seasoned Veteran',
-//     'Slug' => 'day-90',
-//     'Type' => 'Attendance',
-//     'Body' => 'Visited every day for an entire season. If the site were a person, it would file a restraining order.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/attend-4.svg',
-//     'Points' => 15,
-//     'Attributes' => array(),
-//     'Threshold' => 90,
-//     'Class' => 'Attendance',
-//     'Level' => 4
-//));
-//$BadgeModel->define(array(
-//     'Name' => 'It Was A Very Good Year',
-//     'Slug' => 'day-365',
-//     'Type' => 'Attendance',
-//     'Body' => 'When you&rsquo;re dedicated enough to visit every day for a year, the leap day is on us.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/attend-5.svg',
-//     'Points' => 20,
-//     'Attributes' => array(),
-//     'Threshold' => 365,
-//     'Class' => 'Attendance',
-//     'Level' => 5
-//));
-
 // Anniversary
 $Order = [1 => 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
 for ($i = 1; $i < 11; $i++) {
@@ -361,7 +224,6 @@ $BadgeModel->define([
 ]);
 
 // Social badges.
-
 $BadgeModel->define([
      'Name' => 'Facebook Connector',
      'Slug' => 'facebook-connect',
@@ -385,54 +247,3 @@ $BadgeModel->define([
      'Level' => 1,
      'CanDelete' => 0
 ]);
-
-// Silly
-//$BadgeModel->define(array(
-//     'Name' => 'Say Cheese!',
-//     'Slug' => 'cheese',
-//     'Type' => 'DiscussionContent',
-//     'Body' => 'Cheeeeeeeeese.',
-//     'Photo' => 'https://badges.v-cdn.net/svg/cheese.svg',
-//     'Points' => 1,
-//     'Attributes' => array('Pattern' => '/cheese/i'),
-//     'Threshold' => 1
-//));
-
-// Ambassador 
-// @see Garden issue #1265
-/*$BadgeModel->define(array(
-     'Name' => 'Junior Ambassador',
-     'Slug' => 'ambassador',
-     'Type' => 'UserCount',
-     'Body' => 'Inviting a friend to join the community is the best way to fill it up with awesome people like you.',
-     'Photo' => 'https://badges.v-cdn.net/svg/users.svg',
-     'Points' => 10,
-     'Attributes' => array(),
-     'Threshold' => 1,
-     'Class' => 'Ambassador',
-     'Level' => 1
-));
-$BadgeModel->define(array(
-     'Name' => 'Ambassador, First Class',
-     'Slug' => 'ambassador-3',
-     'Type' => 'UserCount',
-     'Body' => 'Recruiting new members is the surest path to a strong community.',
-     'Photo' => 'https://badges.v-cdn.net/svg/users-2.svg',
-     'Points' => 20,
-     'Attributes' => array(),
-     'Threshold' => 3,
-     'Class' => 'Ambassador',
-     'Level' => 2
-));
-$BadgeModel->define(array(
-     'Name' => 'Ambassador Extraordinaire',
-     'Slug' => 'ambassador-10',
-     'Type' => 'UserCount',
-     'Body' => 'People like you are the true community builders.',
-     'Photo' => 'https://badges.v-cdn.net/svg/users-3.svg',
-     'Points' => 30,
-     'Attributes' => array(),
-     'Threshold' => 10,
-     'Class' => 'Ambassador',
-     'Level' => 3
-));*/
