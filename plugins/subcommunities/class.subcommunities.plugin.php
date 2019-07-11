@@ -116,17 +116,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::locale()->set($site['Locale']);
         }
 
-//        // Set the default routes.
-//        if ($site['CategoryID']) {
-//            $category = CategoryModel::categories($site['CategoryID']);
-//            Gdn::router()->setRoute('categories$', ltrim(categoryUrl($category, '', '/'), '/'), 'Internal', false);
-//
-//            $defaultRoute = Gdn::router()->getRoute('DefaultController');
-//            if ($defaultRoute['Destination'] === 'categories') {
-//                Gdn::router()->setRoute('DefaultController', ltrim(categoryUrl($category, '', '/'), '/'), 'Temporary', false);
-//            }
-//        }
-
         SubcommunityModel::setCurrent($site);
     }
 
@@ -277,7 +266,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
         if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET
             && empty($sender->Discussion->GroupID)) {
-            $subPath = '/'.$subcommunity['Folder'];
+            $subPath = self::getNodeWebRoot().'/'.$subcommunity['Folder'];
             $fullPath = Gdn::request()->getFullPath();
             if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
                 redirectTo(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $subcommunity), 301);
@@ -640,15 +629,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public static function getCanonicalUrl($path, $subcommunity) {
         if ($subcommunity !== null) {
-            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
-                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
-                $nodeSlug = $siteNode->slug();
-                if (self::$originalWebRoot !== $nodeSlug) {
-                    self::$originalWebRoot = $nodeSlug;
-                }
-            }
-            // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
-            $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
+            $webRoot = self::getNodeWebRoot();
+            $targetWebRoot = trim($webRoot."/{$subcommunity['Folder']}", '/');
             // Temporarily swap out the current web root for the modified one, before generating the URL.
             $currentWebRoot = Gdn::request()->webRoot();
             Gdn::request()->webRoot($targetWebRoot);
@@ -666,8 +648,26 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             }
         }
 
-
         return $canonicalUrl;
+    }
+
+    /**
+     * Get hub node web root
+     * (if Sitenode plugin enabled adds node slug to the web root)
+     *
+     * @return string
+     */
+    public static function getNodeWebRoot(): string {
+        $webRoot = self::$originalWebRoot;
+        $nodeSlug = '';
+        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
+            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+            $nodeSlug = $siteNode->slug();
+        }
+        if (!empty($nodeSlug)) {
+            $webRoot .= '/'.$nodeSlug;
+        }
+        return $webRoot;
     }
 
     /**
