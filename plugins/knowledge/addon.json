@@ -1,7 +1,7 @@
 {
     "name": "Knowledge",
     "description": "A community centered knowledge base that helps your customers with self-service and tribal knowledge.",
-    "version": "1.0",
+    "version": "1.1",
     "mobileFriendly": true,
     "hasLocale": true,
     "icon": "knowledge.svg",
