@@ -252,6 +252,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
         // Populate the form with values from the profile so they can be saved in UserMeta.
         $formValues = array_replace($form->formValues(), $convertedProfile);
         
+        // Remove UserID if it is passed over SSO, it will trigger unwanted behaviour in entry/connect
+        unset($formValues['UserID']);
+
         $form->formValues($formValues);
 
         $this->EventArguments['Profile'] = $profile;
