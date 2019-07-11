@@ -32,7 +32,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
 
     public render() {
         const { knowledgeBase } = this.props;
-        const pageTitle = t("Navigation Manager");
+        const pageTitle = t("Organize Categories");
         const classesNavigationManager = navigationManagerClasses();
 
         if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
