@@ -302,6 +302,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function gdn_dispatcher_appStartup_handler($sender) {
         $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
+        self::$originalWebRoot = Gdn::request()->webRoot();
 
         if (SubcommunityModel::isReservedSlug($root)) {
             return;
@@ -313,7 +314,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         $defaultSite = null;
-        self::$originalWebRoot = Gdn::request()->webRoot();
 
         if (!$site) {
             $defaultSite = SubcommunityModel::getDefaultSite();
