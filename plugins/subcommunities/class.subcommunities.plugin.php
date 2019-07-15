@@ -330,7 +330,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-        self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
             Gdn::request()->path($path);
             $webroot = self::$originalWebRoot;
