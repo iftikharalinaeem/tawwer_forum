@@ -5,7 +5,6 @@
  */
 
 import { IKbCategory } from "@knowledge/@types/api/kbCategory";
-import ErrorMessage, { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
@@ -27,6 +26,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
+import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -60,7 +60,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     <SimplePager url={category.url + "/p:page:"} pages={pages} />
                 </>
             ) : (
-                <ErrorMessage
+                <PageErrorMessage
                     className={inheritHeightClass()}
                     defaultError={DefaultError.CATEGORY_NO_ARTICLES}
                     knowledgeBaseID={category.knowledgeBaseID}
@@ -79,7 +79,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 <PanelLayout
                     device={this.props.device}
                     breadcrumbs={
-                        category.breadcrumbs && <Breadcrumbs children={category.breadcrumbs} forceDisplay={false} />
+                        category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
                     }
                     leftBottom={
                         <PanelWidget>

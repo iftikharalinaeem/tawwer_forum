@@ -16,7 +16,7 @@ import ModalLoader from "@library/modal/ModalLoader";
 import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 
 interface IEditorURLData {
     articleID?: number;

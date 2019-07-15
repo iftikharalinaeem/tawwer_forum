@@ -100,7 +100,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                         className="inputBlock"
                     />
                 </Permission>
-                <Button type="submit" className={classNames(classes.submit, buttons.standard)} prefix="submitButton">
+                <Button submit={true} className={classNames(classes.submit, buttons.standard)} prefix="submitButton">
                     {this.props.results.status === LoadStatus.LOADING ? <ButtonLoader /> : t("Filter")}
                 </Button>
             </form>

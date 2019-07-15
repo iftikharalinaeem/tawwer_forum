@@ -25,7 +25,7 @@ import { navigationManagerClasses } from "@knowledge/navigation/navigationManage
 import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");

@@ -101,7 +101,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                     baseClass={ButtonTypes.TEXT_PRIMARY}
                                     className={classesFrameFooter.actionButton}
                                     disabled={!this.state.valid}
-                                    type="submit"
+                                    submit={true}
                                 >
                                     {this.state.isSubmitLoading ? <ButtonLoader /> : t("Save")}
                                 </Button>

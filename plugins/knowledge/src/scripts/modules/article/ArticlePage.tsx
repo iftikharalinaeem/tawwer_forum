@@ -24,7 +24,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import { hot } from "react-hot-loader";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 
 interface IState {

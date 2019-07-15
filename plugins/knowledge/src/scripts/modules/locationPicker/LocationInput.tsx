@@ -64,7 +64,6 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                     <Button
                         id={this.domID}
                         title={buttonTitle}
-                        type="button"
                         aria-label={t("Page Location")}
                         className="pageLocation-picker"
                         onClick={this.showLocationPicker}
@@ -72,7 +71,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         buttonRef={this.changeLocationButton}
                         disabled={!!this.props.disabled}
                         aria-invalid={!!this.props.error}
-                        aria-errormessage={!!this.props.error ? this.domErrorID : undefined}
+                        aria-errormessage={this.props.error ? this.domErrorID : undefined}
                     >
                         {buttonContents}
                     </Button>

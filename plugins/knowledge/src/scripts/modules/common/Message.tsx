@@ -33,7 +33,7 @@ export default class Message extends React.Component<IProps> {
                     <p className="message-text">{text}</p>
                 </div>
                 {actionTitle && (
-                    <Button className={classNames("message-button", buttons.primary)} onClick={actionHandler}>
+                    <Button className={classNames("message-button")} onClick={actionHandler}>
                         {isActionLoading ? <ButtonLoader /> : actionTitle}
                     </Button>
                 )}
