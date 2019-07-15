@@ -8,7 +8,7 @@ import * as React from "react";
 import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import classNames from "classnames";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     className?: string;
@@ -33,7 +33,7 @@ export default class Message extends React.Component<IProps> {
                     <p className="message-text">{text}</p>
                 </div>
                 {actionTitle && (
-                    <Button className={classNames("message-button", buttons.primary)} onClick={actionHandler}>
+                    <Button className={classNames("message-button")} onClick={actionHandler}>
                         {isActionLoading ? <ButtonLoader /> : actionTitle}
                     </Button>
                 )}
