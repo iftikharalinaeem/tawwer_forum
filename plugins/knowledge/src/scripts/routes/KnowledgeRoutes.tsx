@@ -5,7 +5,6 @@
  */
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { getModalRoutes } from "@knowledge/routes/modalRoutes";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
@@ -21,6 +20,7 @@ import { UnregisterCallback } from "history";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 
 /**
  * Routing component for pages and modals in the /kb directory.

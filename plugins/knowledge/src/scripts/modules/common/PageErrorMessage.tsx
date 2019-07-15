@@ -20,46 +20,19 @@ import { percent, px, viewHeight } from "csx";
 import React, { ReactNode } from "react";
 import { connect } from "react-redux";
 import { style } from "typestyle";
+import { pageErrorMessageClasses } from "@knowledge/modules/common/pageErrorMessageStyles";
 
-class ErrorMessage extends React.Component<IProps> {
+class PageErrorMessage extends React.Component<IProps> {
     public render() {
         const error = this.getError(this.props);
-        const vars = globalVariables();
-        const flexClasses = flexHelper();
-        const debug = debugHelper("errorPage");
-        const classes = {
-            root: style({
-                ...flexClasses.middle(),
-                maxWidth: percent(100),
-                width: px(400),
-                margin: "auto",
-                marginBottom: viewHeight(25),
-                ...debug.name(),
-            }),
-            title: style({
-                fontSize: px(vars.fonts.size.smallTitle),
-                lineHeight: vars.lineHeights.condensed,
-                fontWeight: vars.fonts.weights.semiBold,
-                textAlign: "center",
-                ...debug.name("title"),
-            }),
-            description: style({
-                textAlign: "center",
-                fontSize: px(vars.fonts.size.large),
-                marginTop: px(12),
-                ...debug.name("description"),
-            }),
-            cta: style({
-                marginTop: px(21),
-                ...debug.name("cta"),
-            }),
-        };
-
+        const classes = pageErrorMessageClasses();
+        const { message, messageAsParagraph, description, actionItem, icon } = error;
         return (
             <div className={classNames(this.props.className, classes.root)}>
                 {error.icon}
-                <Heading depth={1} className={classes.title} title={error.message} />
-                {error.description && <Paragraph className={classes.description}>{error.description}</Paragraph>}
+                {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
+                {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
+                {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
                 {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
             </div>
         );
@@ -76,14 +49,7 @@ class ErrorMessage extends React.Component<IProps> {
     private parseErrorCode(errorCode?: string | number): IError {
         const globalVars = globalVariables();
         const debug = debugHelper("errorPage");
-        const errorIconClass = style({
-            display: "block",
-            color: globalVars.mainColors.primary.toString(),
-            height: px(85),
-            width: px(85),
-            marginBottom: px(12),
-            ...debug.name("icon"),
-        });
+        const classes = pageErrorMessageClasses();
         const buttons = buttonClasses();
         const message = messageFromErrorCode(errorCode);
 
@@ -94,7 +60,7 @@ class ErrorMessage extends React.Component<IProps> {
                     message,
                     description: t("You don't have permission to view this resource."),
                     actionItem: this.renderSignin(),
-                    icon: searchError(message, errorIconClass),
+                    icon: searchError(message, classes.errorIcon),
                 };
             }
             case 404:
@@ -107,7 +73,7 @@ class ErrorMessage extends React.Component<IProps> {
                             {t("Back to home page")}
                         </LinkAsButton>
                     ),
-                    icon: searchError(message, errorIconClass),
+                    icon: searchError(message, classes.errorIcon),
                 };
             }
             case DefaultError.NO_KNOWLEDGE_BASE: {
@@ -123,7 +89,7 @@ class ErrorMessage extends React.Component<IProps> {
                             </LinkAsButton>
                         </Permission>
                     ),
-                    icon: searchError(message, errorIconClass),
+                    icon: searchError(message, classes.errorIcon),
                 };
             }
             case DefaultError.NO_ARTICLES: {
@@ -143,25 +109,15 @@ class ErrorMessage extends React.Component<IProps> {
                             </EditorRoute.Link>
                         </Permission>
                     ) : null,
-                    icon: searchError(message, errorIconClass),
+                    icon: searchError(message, classes.errorIcon),
                 };
             }
             case DefaultError.CATEGORY_NO_ARTICLES: {
                 const { knowledgeBaseID, knowledgeCategoryID } = this.props;
                 return {
                     message,
-                    description: null,
-                    actionItem: knowledgeCategoryID ? (
-                        <Permission permission="articles.add">
-                            <EditorRoute.Link
-                                className={buttons.primary}
-                                data={{ knowledgeBaseID, knowledgeCategoryID }}
-                            >
-                                {t("New Article")}
-                            </EditorRoute.Link>
-                        </Permission>
-                    ) : null,
-                    icon: searchError(message, errorIconClass),
+                    messageAsParagraph: true,
+                    icon: null,
                 };
             }
             case DefaultError.GENERIC:
@@ -174,7 +130,7 @@ class ErrorMessage extends React.Component<IProps> {
                             {t("Back to Home")}
                         </LinkAsButton>
                     ),
-                    icon: searchError(message, errorIconClass),
+                    icon: searchError(message, classes.errorIcon),
                 };
             }
         }
@@ -228,8 +184,9 @@ export interface IErrorMessageProps {
 
 export interface IError {
     message: string;
-    description: ReactNode;
-    actionItem: ReactNode;
+    messageAsParagraph?: boolean;
+    description?: ReactNode;
+    actionItem?: ReactNode;
     icon?: ReactNode;
 }
 
@@ -248,4 +205,4 @@ interface IProps extends IErrorMessageProps, IInjectableUserState {
 
 const withCurrentUser = connect(mapUsersStoreState);
 
-export default withCurrentUser(ErrorMessage);
+export default withCurrentUser(PageErrorMessage);

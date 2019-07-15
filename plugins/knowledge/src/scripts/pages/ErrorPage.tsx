@@ -4,11 +4,6 @@
  * @license Proprietary
  */
 
-import ErrorMessage, {
-    getErrorCode,
-    IErrorMessageProps,
-    messageFromErrorCode,
-} from "@knowledge/modules/common/ErrorMessage";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
@@ -16,6 +11,11 @@ import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLa
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
+import PageErrorMessage, {
+    getErrorCode,
+    IErrorMessageProps,
+    messageFromErrorCode,
+} from "@knowledge/modules/common/PageErrorMessage";
 
 export class ErrorPage extends React.Component<IProps> {
     public render() {
@@ -31,7 +31,7 @@ export class ErrorPage extends React.Component<IProps> {
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>
-                            <ErrorMessage {...this.props} className={classes.inheritHeight} />
+                            <PageErrorMessage {...this.props} className={classes.inheritHeight} />
                         </PanelWidget>
                     </PanelWidgetVerticalPadding>
                 </Container>

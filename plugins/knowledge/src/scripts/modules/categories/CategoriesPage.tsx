@@ -8,7 +8,7 @@ import { IArticleFragment } from "@knowledge/@types/api/article";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage from "@knowledge/pages/ErrorPage";

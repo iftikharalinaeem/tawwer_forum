@@ -106,7 +106,7 @@ export class EditorHeader extends React.Component<IProps, IState> {
                     className={classNames(classesEditorHeader.item, classesEditorHeader.itemMarginLeft)}
                 >
                     <Button
-                        type="submit"
+                        submit={true}
                         title={this.props.callToAction}
                         disabled={!this.props.canSubmit}
                         baseClass={ButtonTypes.TEXT_PRIMARY}

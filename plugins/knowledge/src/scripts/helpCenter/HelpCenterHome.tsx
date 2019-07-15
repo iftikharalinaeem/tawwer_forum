@@ -26,8 +26,8 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
-import { DefaultError } from "@knowledge/modules/common/ErrorMessage";
 import TitleBar from "@library/headers/TitleBar";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 
 /**
  * Component representing the the full home page of a help center.
