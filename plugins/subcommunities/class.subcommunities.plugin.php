@@ -273,6 +273,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $subPath = self::$originalWebRoot.'/'.$subcommunity['Folder'];
             $fullPath = Gdn::request()->getFullPath();
             if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
+                print_r($subcommunity);
+                var_dump($subPath);
+                var_dump($fullPath);
+                die();
                 redirectTo($this->getCanonicalSubcommunityUrl(Gdn::request()->pathAndQuery(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID), 301);
             }
         }
