@@ -657,6 +657,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $canonicalUrl = Gdn::request()->url(strval($path), true);
             //var_dump($path);
             // Restore current webroot
+            if ($recordType === self::URL_TYPE_DISCUSSION) {
+                var_dump($path);
+                var_dump($targetWebRoot);
+                var_dump($currentWebRoot);
+                var_dump(self::$originalWebRoot);
+                var_dump($canonicalUrl);
+            }
             Gdn::request()->webRoot($currentWebRoot);
 
             // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
