@@ -275,10 +275,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0
                 && !(substr($fullPath, 0, 1) === '/' && strcmp($subPath, substr($fullPath, 1, strlen($subPath))) === 0)
             ) {
-                print_r($subcommunity);
-                var_dump($subPath);
-                var_dump($fullPath);
-                die();
                 redirectTo($this->getCanonicalSubcommunityUrl(Gdn::request()->pathAndQuery(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID), 301);
             }
         }
@@ -658,19 +654,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
             // Temporarily swap out the current web root for the modified one, before generating the URL.
             $currentWebRoot = Gdn::request()->webRoot();
-            //var_dump($targetWebRoot);
             Gdn::request()->webRoot($targetWebRoot);
 
             $canonicalUrl = Gdn::request()->url(strval($path), true);
-            //var_dump($path);
             // Restore current webroot
-            if ($recordType === self::URL_TYPE_DISCUSSION) {
-                var_dump($path);
-                var_dump($targetWebRoot);
-                var_dump($currentWebRoot);
-                var_dump(self::$originalWebRoot);
-                var_dump($canonicalUrl);
-            }
             Gdn::request()->webRoot($currentWebRoot);
 
             // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
