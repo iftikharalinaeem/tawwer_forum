@@ -272,7 +272,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             && empty($sender->Discussion->GroupID)) {
             $subPath = self::$originalWebRoot.'/'.$subcommunity['Folder'];
             $fullPath = Gdn::request()->getFullPath();
-            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
+            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0
+                && !(substr($fullPath, 0, 1) === '/' && strcmp($subPath, substr($fullPath, 1, strlen($subPath))) === 0)
+            ) {
                 print_r($subcommunity);
                 var_dump($subPath);
                 var_dump($fullPath);
