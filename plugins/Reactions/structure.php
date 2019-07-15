@@ -33,7 +33,7 @@ $St->table('UserTag')
     ->column('RecordID', 'int', FALSE, 'primary')
     ->column('TagID', 'int', FALSE, ['primary', 'key'])
     ->column('UserID', 'int', FALSE, ['primary', 'key'])
-    ->column('DateInserted', 'datetime')
+    ->column('DateInserted', 'datetime', false, 'index')
     ->column('Total', 'int', 0)
     ->set();
 
