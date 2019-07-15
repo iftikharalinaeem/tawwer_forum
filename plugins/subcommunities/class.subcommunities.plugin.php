@@ -311,6 +311,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         $defaultSite = null;
+        self::$originalWebRoot = Gdn::request()->webRoot();
 
         if (!$site) {
             $defaultSite = SubcommunityModel::getDefaultSite();
