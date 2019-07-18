@@ -100,9 +100,9 @@ function writeUserNoteWarning($row) {
         }
 
         if (val('RecordBody', $row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::text($row['RecordBody']) . '</blockquote>';
+            echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
         } elseif (val('Record', $row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::text($record['Body']) . '</blockquote>';
+            echo '<blockquote class="Quote">' . Gdn_Format::to($record['Body'], $record['Format'] ?? null) . '</blockquote>';
         }
 
 
