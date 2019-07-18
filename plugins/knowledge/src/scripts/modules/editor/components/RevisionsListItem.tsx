@@ -14,12 +14,12 @@ import {
     revisionStatus_revision,
 } from "@library/icons/revision";
 import SmartLink from "@library/routing/links/SmartLink";
-import Hoverable from "@library/dom/Hoverable";
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";
 import { IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import { itemListClasses } from "@knowledge/modules/editor/components/itemListStyles";
+import { Hoverable } from "@vanilla/react-utils";
 
 interface IProps extends IRevisionFragment {
     url: string;
