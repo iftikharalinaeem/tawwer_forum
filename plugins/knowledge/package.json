@@ -9,7 +9,9 @@
         "@vanilla/utils": "*",
         "@vanilla/library": "*",
         "@vanilla/addon-rich-editor": "*",
-        "@vanilla/addon-vanilla": "*"
+        "@vanilla/addon-vanilla": "*",
+        "@vanilla/dom-utils": "*",
+        "@vanilla/react-utils": "*"
     },
     "devDependencies": {
         "@vanilla/prettier-config": "*",
