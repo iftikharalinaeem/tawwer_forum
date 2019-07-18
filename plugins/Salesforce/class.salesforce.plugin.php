@@ -1006,7 +1006,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         if (!c('Plugins.Salesforce.SyncUsers')) {
             return;
         }
-        $this->syncUser($sender, $args['FormPostValues']);
+        $this->syncUser($sender, $args['RegisteringUser']);
     }
 
     /**

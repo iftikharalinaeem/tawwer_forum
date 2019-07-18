@@ -691,7 +691,7 @@ class Salesforce {
                 'client_id' => c('Plugins.Salesforce.ApplicationID'),
                 'client_secret' => c('Plugins.Salesforce.Secret'),
                 'refresh_token' => $token
-            ]
+            ], "", "POST"
         );
         trace($response);
         if ($response['HttpCode'] == 400) {
