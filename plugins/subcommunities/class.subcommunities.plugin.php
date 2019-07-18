@@ -922,7 +922,6 @@ if (!function_exists('commentUrl')) {
             return '/home/notfound';
         }
 
-       // return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain);
         return Gdn::getContainer()
             ->get(SubcommunitiesPlugin::class)
             ->subcommunityURL($categoryID, $path, $withDomain, false, SubcommunitiesPlugin::URL_TYPE_COMMENT);
