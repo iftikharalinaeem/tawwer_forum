@@ -24,6 +24,8 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 import { standardAnimations } from "@library/styles/animationHelpers";
+import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
+import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -205,6 +207,30 @@ export const editorFormClasses = useThemeCache(() => {
         whiteSpace: "nowrap",
     });
 
+    const embedMetaDataMenu = style(
+        "embedMetaDataMenu",
+        {
+            ...absolutePosition.topLeft(),
+            width: globalVars.buttonIcon.size,
+            height: globalVars.buttonIcon.size,
+            transform: `translateX(-100%)`,
+            zIndex: 1,
+        },
+        embedMenuClasses()
+            .mediaQueries()
+            .noRoomForMenuOnLeft({
+                position: "relative",
+                top: 0,
+                left: 0,
+                transform: `translateY(-${unit(globalVars.buttonIcon.size)})`,
+                height: 0,
+                marginTop: unit(globalVars.buttonIcon.size),
+                maxWidth: unit(embedContainerVariables().dimensions.maxEmbedWidth),
+                width: percent(100),
+                margin: "auto",
+            }),
+    );
+
     return {
         root,
         spacer,
@@ -225,5 +251,6 @@ export const editorFormClasses = useThemeCache(() => {
         titleErrorParagraph,
         publish,
         hasError,
+        embedMetaDataMenu,
     };
 });
