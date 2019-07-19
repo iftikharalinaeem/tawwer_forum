@@ -779,13 +779,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             // Skip webroot / return as is
             $url = $path;
         } else {
-            try {
-                $subcommunity = $this->getNonCanonicalSubcommunity($categoryID);
-            } catch (Throwable $e) {
-                debug_print_backtrace();
-                die();
-            }
-
+            $subcommunity = $this->getNonCanonicalSubcommunity($categoryID);
             $cannonicalURL = $this->getCanonicalSubcommunityUrl($path, $subcommunity, $recordType, $categoryID);
 
             // The url is supposed to be relative.
