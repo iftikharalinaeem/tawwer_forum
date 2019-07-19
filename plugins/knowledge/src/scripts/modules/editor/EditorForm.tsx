@@ -13,7 +13,6 @@ import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { userContentClasses } from "@library/content/userContentStyles";
-import { useMeasure } from "@library/dom/hookUtils";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -40,6 +39,7 @@ import Message from "@library/messages/Message";
 import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
+import { useMeasure } from "@vanilla/react-utils";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
