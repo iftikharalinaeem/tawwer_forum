@@ -28,6 +28,10 @@ use Vanilla\Contracts\Analytics\ClientInterface as AnalyticsClient;
  * Base knowledge base page.
  */
 abstract class KbPage extends ThemedPage {
+
+    /** Regex pattern for retrieving the record ID from a URL path. */
+    protected const ID_PATH_PATTERN = "/^\/(?<recordID>\d+)(-[^\/]*)?/";
+
     const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
 
     /** @var AnalyticsClient */
@@ -180,11 +184,11 @@ abstract class KbPage extends ThemedPage {
         }
 
         $matches = [];
-        if (preg_match('/^\/(?<articleID>\d+)(-[^\/]*)?$/', $path, $matches) === 0) {
+        if (preg_match(static::ID_PATH_PATTERN, $path, $matches) === 0) {
             return null;
         }
 
-        $id = filter_var($matches["articleID"], FILTER_VALIDATE_INT);
+        $id = filter_var($matches["recordID"], FILTER_VALIDATE_INT);
 
         if ($id === false) {
             return null;
