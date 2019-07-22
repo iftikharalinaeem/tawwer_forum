@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Formatting\FormatCompatibilityService;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\NotFoundException;
@@ -227,6 +228,14 @@ class ArticleDraftsTest extends AbstractResourceTest {
     public function testGetExcerpt(string $body, string $excerpt) {
         $res = ArticleDraft::getExcerpt($body);
         $this->assertEquals($excerpt, $res);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function testEditFormatCompat(string $editSuffix = "unused") {
+        // Pass in an empty edit suffix. We don't have a get_edit for drafts. Just get.
+        parent::testEditFormatCompat("");
     }
 
     /**
