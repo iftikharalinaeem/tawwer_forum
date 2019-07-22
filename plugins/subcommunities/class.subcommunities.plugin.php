@@ -8,6 +8,10 @@ use Garden\EventManager;
  * Class SubcommunitiesPlugin
  */
 class SubcommunitiesPlugin extends Gdn_Plugin {
+    const URL_TYPE_UNKNOWN = 0;
+    const URL_TYPE_DISCUSSION = 1;
+    const URL_TYPE_COMMENT = 2;
+    const URL_TYPE_CATEGORY = 3;
     /// Properties ///
 
     /**
@@ -115,17 +119,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($site['Locale'] !== Gdn::locale()->current()) {
             Gdn::locale()->set($site['Locale']);
         }
-
-//        // Set the default routes.
-//        if ($site['CategoryID']) {
-//            $category = CategoryModel::categories($site['CategoryID']);
-//            Gdn::router()->setRoute('categories$', ltrim(categoryUrl($category, '', '/'), '/'), 'Internal', false);
-//
-//            $defaultRoute = Gdn::router()->getRoute('DefaultController');
-//            if ($defaultRoute['Destination'] === 'categories') {
-//                Gdn::router()->setRoute('DefaultController', ltrim(categoryUrl($category, '', '/'), '/'), 'Temporary', false);
-//            }
-//        }
 
         SubcommunityModel::setCurrent($site);
     }
@@ -274,16 +267,19 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($sender, $args) {
         $categoryID = val('CategoryID', $sender->data('Category'));
-        $subcommunity = self::getCanonicalSubcommunity($categoryID);
+        $subcommunity = $this->getCanonicalSubcommunity($categoryID);
         if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET
             && empty($sender->Discussion->GroupID)) {
-            $subPath = '/'.$subcommunity['Folder'];
+            $subPath = self::$originalWebRoot.'/'.$subcommunity['Folder'];
             $fullPath = Gdn::request()->getFullPath();
-            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0) {
-                redirectTo(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $subcommunity), 301);
+            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0
+                && !(substr($fullPath, 0, 1) === '/' && strcmp($subPath, substr($fullPath, 1, strlen($subPath))) === 0)
+            ) {
+                redirectTo($this->getCanonicalSubcommunityUrl(Gdn::request()->pathAndQuery(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID), 301);
             }
         }
-        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
+        $discussionUrl = $this->getCanonicalSubcommunityUrl(Gdn::request()->path(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID);
+        $sender->canonicalUrl($discussionUrl);
     }
 
     /**
@@ -306,6 +302,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function gdn_dispatcher_appStartup_handler($sender) {
         $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
+        self::$originalWebRoot = Gdn::request()->webRoot();
 
         if (SubcommunityModel::isReservedSlug($root)) {
             return;
@@ -333,7 +330,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-        self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
             Gdn::request()->path($path);
             $webroot = self::$originalWebRoot;
@@ -632,43 +628,49 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     /**
      * Get the canonical URL of a path.
+     * This method is deprecated. Use private getCanonicalSubcommunityUrl() instead.
+     *
+     * @deprecated
+     */
+    public static function getCanonicalUrl($path, $subcommunity) {
+        return Gdn::getContainer()
+            ->get(SubcommunitiesPlugin::class)
+            ->getCanonicalSubcommunityUrl($path, $subcommunity, self::URL_TYPE_UNKNOWN);
+
+        return $canonicalUrl;
+    }
+
+    /**
+     * Get the canonical URL of a path.
      *
      * @param string $path The path we want te canonical of.
      * @param array|null $subcommunity The subcommunity to which belong that path.
      *
      * @return string
      */
-    public static function getCanonicalUrl($path, $subcommunity) {
+    private function getCanonicalSubcommunityUrl($path, $subcommunity, int $recordType, int $categoryID = null): string {
         if ($subcommunity !== null) {
-            if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON) ) {
-                $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
-                $nodeSlug = $siteNode->slug();
-                if (self::$originalWebRoot !== $nodeSlug) {
-                    self::$originalWebRoot = $nodeSlug;
-                }
-            }
-            // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
             $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
             // Temporarily swap out the current web root for the modified one, before generating the URL.
             $currentWebRoot = Gdn::request()->webRoot();
             Gdn::request()->webRoot($targetWebRoot);
-        }
 
-        $canonicalUrl = url($path, true);
-
-        if ($subcommunity !== null) {
+            $canonicalUrl = Gdn::request()->url(strval($path), true);
+            // Restore current webroot
             Gdn::request()->webRoot($currentWebRoot);
 
             // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
             $canonicalUrl = trim($canonicalUrl, '/');
-            if (stringEndsWith($canonicalUrl, "categories/$subcommunity[Folder]")) {
-                $canonicalUrl = substr($canonicalUrl, 0, -strlen('/'.$subcommunity['Folder']));
+            if ($recordType === self::URL_TYPE_CATEGORY && $categoryID == $subcommunity['CategoryID']) {
+                $canonicalUrl = substr($canonicalUrl, 0, strrpos($canonicalUrl,'/categories/') + 11);
             }
+        } else {
+            $canonicalUrl = url($path, true);
         }
-
 
         return $canonicalUrl;
     }
+
 
     /**
      * Attempt to get a category's subcommunity.
@@ -769,15 +771,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $path A relative path.
      * @param bool $withDomain See Gdn_Request->url() option.
      * @param bool $page (optional) Current page.
+     * @param int $recordType Url record type. Ex: URL_TYPE_DISCUSSION, URL_TYPE_COMMENT, URL_TYPE_CATEGORY, etc...
      * @return string The URL.
      */
-    public static function subcommunityURL($categoryID, $path, $withDomain = true, $page = false) {
+    public function subcommunityURL($categoryID, $path, $withDomain = true, $page = false, int $recordType = self::URL_TYPE_UNKNOWN): string {
         if ($withDomain === '/') {
             // Skip webroot / return as is
             $url = $path;
         } else {
-            $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
-            $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
+            $subcommunity = $this->getNonCanonicalSubcommunity($categoryID);
+            $cannonicalURL = $this->getCanonicalSubcommunityUrl($path, $subcommunity, $recordType, $categoryID);
 
             // The url is supposed to be relative.
             if (!$withDomain) {
@@ -913,7 +916,9 @@ if (!function_exists('commentUrl')) {
             return '/home/notfound';
         }
 
-        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain);
+        return Gdn::getContainer()
+            ->get(SubcommunitiesPlugin::class)
+            ->subcommunityURL($categoryID, $path, $withDomain, false, SubcommunitiesPlugin::URL_TYPE_COMMENT);
     }
 }
 
@@ -939,7 +944,9 @@ if (!function_exists('discussionUrl')) {
 
         $path = "/discussion/$discussionID/$name";
 
-        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain, $page);
+        return Gdn::getContainer()
+            ->get(SubcommunitiesPlugin::class)
+            ->subcommunityURL($categoryID, $path, $withDomain, $page, SubcommunitiesPlugin::URL_TYPE_DISCUSSION);
     }
 }
 
@@ -959,7 +966,8 @@ if (!function_exists('categoryUrl')) {
         $category = (array)$category;
         $categoryID = $category['CategoryID'];
         $path = '/categories/'.rawurlencode($category['UrlCode']);
-
-        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain, $page);
+        return Gdn::getContainer()
+            ->get(SubcommunitiesPlugin::class)
+            ->subcommunityURL($categoryID, $path, $withDomain, $page, SubcommunitiesPlugin::URL_TYPE_CATEGORY);
     }
 }
