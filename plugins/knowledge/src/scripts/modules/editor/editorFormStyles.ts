@@ -219,15 +219,7 @@ export const editorFormClasses = useThemeCache(() => {
         embedMenuClasses()
             .mediaQueries()
             .noRoomForMenuOnLeft({
-                position: "relative",
-                top: 0,
-                left: 0,
-                transform: `translateY(-${unit(globalVars.buttonIcon.size)})`,
-                height: 0,
-                marginTop: unit(globalVars.buttonIcon.size),
-                maxWidth: unit(embedContainerVariables().dimensions.maxEmbedWidth),
-                width: percent(100),
-                margin: "auto",
+                transform: `translateY(-100%)`,
             }),
     );
 
