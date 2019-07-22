@@ -26,6 +26,7 @@ import { match } from "react-router";
 import { hot } from "react-hot-loader";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -41,6 +42,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
     public render(): React.ReactNode {
         const { article } = this.props;
         const articleID = this.articleID;
+
         if (!articleID) {
             return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
@@ -49,14 +51,21 @@ export class ArticlePage extends React.Component<IProps, IState> {
             return <ErrorPage error={article.error} />;
         }
 
-        const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
+        const activeRecord = {
+            recordID: articleID,
+            recordType: KbRecordType.ARTICLE,
+        };
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) || !article.data) {
             return <NavigationLoadingLayout activeRecord={activeRecord} />;
         }
 
+        const analyticsData = {
+            article: article.data,
+        };
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
+                <AnalyticsData data={analyticsData} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
                     article={article.data}
