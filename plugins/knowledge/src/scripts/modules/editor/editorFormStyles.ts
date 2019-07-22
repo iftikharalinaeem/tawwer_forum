@@ -211,18 +211,20 @@ export const editorFormClasses = useThemeCache(() => {
 
     const mediaQueriesEmbed = embedMenuClasses().mediaQueries();
 
+    const menuTransformWithGutter = unit(globalVars.buttonIcon.size);
+    const menuTransformWithoutGutter = unit((globalVars.buttonIcon.size - globalVars.icon.sizes.default) / 2);
+
     const embedMetaDataMenu = style(
         "embedMetaDataMenu",
         {
             ...absolutePosition.topLeft(),
             width: globalVars.buttonIcon.size,
             height: globalVars.buttonIcon.size,
-            transform: `translateX(-100%)`,
+            transform: `translateX(-${menuTransformWithGutter}) translateY(-${menuTransformWithoutGutter})`,
             zIndex: 1,
         },
-
         mediaQueriesEmbed.noRoomForMenuOnLeft({
-            transform: `translateY(-100%)`,
+            transform: `translateX(-${menuTransformWithoutGutter}) translateY(-${menuTransformWithGutter})`,
         }),
     );
 
