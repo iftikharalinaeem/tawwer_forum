@@ -15,6 +15,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
+use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -44,6 +45,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     use ArticlesApiSchemes;
 
     use UpdateMediaTrait;
+
+    use FormatCompatTrait;
 
     const REVISIONS_LIMIT = 10;
 
@@ -313,6 +316,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $draft = $this->draftByID($draftID);
         $draft = (new ArticleDraft($this->parser))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 
@@ -345,6 +349,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $article = $this->normalizeOutput($article);
         $article['body'] = $body;
         $result = $out->validate($article);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 
