@@ -40,6 +40,7 @@ import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
+import {EmbedMenu} from "@library/embeddedContent/EmbedMenu";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -109,7 +110,7 @@ export function EditorForm(props: IProps) {
     );
 
     const categoryError = formErrors.knowledgeCategoryID;
-    const titleError = formErrors.name;
+    const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
 
@@ -130,6 +131,10 @@ export function EditorForm(props: IProps) {
     const formRef = useRef<HTMLFormElement>(null);
     const contentSize = useMeasure(contentRef);
     const transition = useFormScrollTransition(formRef, embedBarRef);
+    // const embedMenu = useRef<HTMLDivElement>(null);
+
+    const [embedMenuStyles, setEmbedMenuStyles] = useState();
+    const [embedMenuVisibility, setEmbedMenuVisibility] = useState();
 
     return (
         <TouchScrollable>
@@ -186,7 +191,7 @@ export function EditorForm(props: IProps) {
                             onChange={titleChangeHandler}
                             disabled={isLoading}
                             aria-invalid={!!titleError}
-                            aria-errormessage={!!titleError ? domTitleErrorsID : undefined}
+                            aria-errormessage={titleError ? domTitleErrorsID : undefined}
                         />
                         {!!titleError && (
                             <AccessibleError
@@ -269,6 +274,12 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
+                            <EmbedMenu
+                                positionStyles={embedMenuStyles}
+                                setPositionStyles={setEmbedMenuStyles}
+                                isVisible={embedMenuVisibility}
+                                setVisibility={setEmbedMenuVisibility}
+                            />
                             <EditorContent placeholder={t("Type your article.")} />
                             <EditorInlineMenus />
                             <EditorParagraphMenu />
