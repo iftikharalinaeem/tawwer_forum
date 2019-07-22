@@ -40,7 +40,6 @@ import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
-import {EmbedMenu} from "@library/embeddedContent/EmbedMenu";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -274,12 +273,6 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
-                            <EmbedMenu
-                                positionStyles={embedMenuStyles}
-                                setPositionStyles={setEmbedMenuStyles}
-                                isVisible={embedMenuVisibility}
-                                setVisibility={setEmbedMenuVisibility}
-                            />
                             <EditorContent placeholder={t("Type your article.")} />
                             <EditorInlineMenus />
                             <EditorParagraphMenu />

@@ -26,7 +26,6 @@ import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 import { standardAnimations } from "@library/styles/animationHelpers";
 import { embedMenuClasses } from "@library/embeddedContent/menus/embedMenuStyles";
 import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
-import { IEmbedStyles } from "@library/embeddedContent/EmbedMenu";
 import { merge } from "lodash";
 import { media } from "typestyle";
 
@@ -227,29 +226,6 @@ export const editorFormClasses = useThemeCache(() => {
         }),
     );
 
-    const embedMetaDataMenuPosition = (positionData: IEmbedStyles | null) => {
-        const data = positionData
-            ? merge(
-                  {
-                      ...absolutePosition.topLeft(positionData.top, 0),
-                      maxWidth: percent(100),
-                      transform: `translateX(-100%)`,
-                      width: unit(positionData.width),
-                  },
-                  positionData,
-                  mediaQueriesEmbed.noRoomForMenuOnLeft({
-                      transform: `translateY(-100%)`,
-                  }),
-              )
-            : {
-                  display: "none",
-              };
-
-        window.console.log("embedMetaDataMenuPosition data: ", data);
-
-        return style(data);
-    };
-
     return {
         root,
         spacer,
@@ -271,6 +247,5 @@ export const editorFormClasses = useThemeCache(() => {
         publish,
         hasError,
         embedMetaDataMenu,
-        embedMetaDataMenuPosition,
     };
 });
