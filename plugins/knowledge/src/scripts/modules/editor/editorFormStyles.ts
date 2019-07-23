@@ -209,25 +209,6 @@ export const editorFormClasses = useThemeCache(() => {
         whiteSpace: "nowrap",
     });
 
-    const mediaQueriesEmbed = embedMenuClasses().mediaQueries();
-
-    const menuTransformWithGutter = unit(globalVars.buttonIcon.size);
-    const menuTransformWithoutGutter = unit((globalVars.buttonIcon.size - globalVars.icon.sizes.default) / 2);
-
-    const embedMetaDataMenu = style(
-        "embedMetaDataMenu",
-        {
-            ...absolutePosition.topLeft(),
-            width: globalVars.buttonIcon.size,
-            height: globalVars.buttonIcon.size,
-            transform: `translateX(-${menuTransformWithGutter}) translateY(-${menuTransformWithoutGutter})`,
-            zIndex: 1,
-        },
-        mediaQueriesEmbed.noRoomForMenuOnLeft({
-            transform: `translateX(-${menuTransformWithoutGutter}) translateY(-${menuTransformWithGutter})`,
-        }),
-    );
-
     return {
         root,
         spacer,
@@ -248,6 +229,5 @@ export const editorFormClasses = useThemeCache(() => {
         titleErrorParagraph,
         publish,
         hasError,
-        embedMetaDataMenu,
     };
 });
