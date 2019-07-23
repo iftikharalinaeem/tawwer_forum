@@ -10,10 +10,10 @@ import { newFolder } from "@library/icons/common";
 import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import classNames from "classnames";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcomponents/navigationManagerToolBarStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     expandAll: () => void;

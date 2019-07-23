@@ -10,8 +10,8 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { px, percent } from "csx";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
 export const siteNavAdminLinksClasses = useThemeCache(() => {
     const globalVars = globalVariables();
