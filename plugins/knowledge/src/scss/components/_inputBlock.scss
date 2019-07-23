@@ -6,7 +6,7 @@
 
 .inputBlock {
     display: block;
-    margin-bottom: $formElement_margin;
+    margin-bottom: 8px; // temporary, will change to CSS in JS
 
     &.hasError {
         .inputText {
