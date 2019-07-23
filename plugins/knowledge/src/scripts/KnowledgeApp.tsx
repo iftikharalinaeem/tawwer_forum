@@ -37,10 +37,6 @@ function KnowledgeApp() {
     const store = useMemo(() => getStore<IStoreState>(), []);
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
 
-    useEffect(() => {
-        initPageViewTracking(history);
-    }, [history]);
-
     return (
         <Provider store={store}>
             <LiveAnnouncer>

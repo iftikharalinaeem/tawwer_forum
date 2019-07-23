@@ -4,25 +4,25 @@
  * @license Proprietary
  */
 
-import React, { Dispatch } from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { connect } from "react-redux";
-import apiv2 from "@library/apiv2";
-import Modal from "@library/modal/Modal";
-import EditorForm from "@knowledge/modules/editor/EditorForm";
-import { LoadStatus } from "@library/@types/api/core";
-import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
-import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import ModalSizes from "@library/modal/ModalSizes";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import Permission from "@library/features/users/Permission";
-import ErrorPage from "@knowledge/pages/ErrorPage";
-import QueryString from "@library/routing/QueryString";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
-import Message from "@library/messages/Message";
-import { t } from "@library/utility/appUtils";
+import EditorForm from "@knowledge/modules/editor/EditorForm";
+import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
+import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
-import { action } from "@storybook/addon-actions";
+import { LoadStatus } from "@library/@types/api/core";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import apiv2 from "@library/apiv2";
+import Permission from "@library/features/users/Permission";
+import Message from "@library/messages/Message";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import QueryString from "@library/routing/QueryString";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import React, { Dispatch } from "react";
+import { connect } from "react-redux";
+import { RouteComponentProps } from "react-router-dom";
 
 /**
  * Page for editing an article.
@@ -38,6 +38,7 @@ export class EditorPage extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
+                <AnalyticsData uniqueKey={this.id} />
                 {this.renderErrorMessage()}
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}

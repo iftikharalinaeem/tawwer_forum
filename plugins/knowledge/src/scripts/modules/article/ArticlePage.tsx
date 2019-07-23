@@ -27,6 +27,7 @@ import { hot } from "react-hot-loader";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { articleEventFields } from "../analytics/KnowledgeAnalytics";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -60,12 +61,9 @@ export class ArticlePage extends React.Component<IProps, IState> {
             return <NavigationLoadingLayout activeRecord={activeRecord} />;
         }
 
-        const analyticsData = {
-            article: article.data,
-        };
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
-                <AnalyticsData data={analyticsData} />
+                <AnalyticsData data={articleEventFields(article.data)} uniqueKey={article.data.articleID} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
                     article={article.data}
