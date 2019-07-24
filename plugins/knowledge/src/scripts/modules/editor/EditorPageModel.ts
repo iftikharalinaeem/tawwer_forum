@@ -120,7 +120,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
         form: {
             name: "",
-            body: [],
+            body: [{ insert: "\n" }],
             knowledgeCategoryID: null,
         },
         formErrors: {
