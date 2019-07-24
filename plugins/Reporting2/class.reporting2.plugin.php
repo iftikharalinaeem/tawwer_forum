@@ -249,11 +249,11 @@ if (!function_exists('gdn_formatter_quote')):
         $user = Gdn::userModel()->getID(val('InsertUserID', $body));
 
         // Already formatted to plaintext in rootController_report_create.
-        $content = htmlspecialchars($body['Body']);
+        $content = Gdn_Format::to($body['Body'], $body['Format']);
         if ($user) {
             $result = '<blockquote class="Quote UserQuote Media">'.
                 '<div class="Img QuoteAuthor">'.userPhoto($user).'</div>'.
-                '<div class="Media-Body QuoteText">'.
+                '<div class="Media-Body QuoteText userContent">'.
                 '<div>'.userAnchor($user).' - '.Gdn_Format::dateFull($body['DateInserted'], 'html').'</div>'.
                 $content.
                 '</div>'.
