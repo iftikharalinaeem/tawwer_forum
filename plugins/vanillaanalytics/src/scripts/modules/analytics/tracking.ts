@@ -52,9 +52,14 @@ const eventDefaults = () => {
     return data;
 };
 
-export const trackPageView = (url: string) => {
-    const data = eventDefaults();
+export const trackPageView = (url: string, context?: object) => {
+    let data = eventDefaults();
     data.url = url;
+
+    if (context) {
+        data = { ...data, ...context };
+    }
+
     trackEvent(Collection.PAGE, data);
 };
 
