@@ -13,12 +13,12 @@ import DraftsListItem from "@knowledge/modules/editor/components/DraftsListItem"
 import RevisionsLayout from "@knowledge/modules/editor/components/RevisionsLayout";
 import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
-import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import { EditorAddRoute, EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
 import UserContent from "@library/content/UserContent";
 import Button from "@library/forms/Button";
@@ -50,6 +50,16 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     public render() {
         const { article, history, revisions, selectedRevision } = this.props;
         const loadStatus = revisions.data ? LoadStatus.SUCCESS : revisions.status;
+        let analyticsDataID;
+
+        // Determine if this warrants a new analytics page view event.
+        if (selectedRevision.data) {
+            analyticsDataID = `revision_${selectedRevision.data.articleRevisionID}`;
+        } else if (article.data) {
+            analyticsDataID = `article_${article.data.articleID}`;
+        } else {
+            analyticsDataID = -1;
+        }
 
         return (
             <Modal
@@ -59,6 +69,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 label={t("Article Revisions")}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
+                <AnalyticsData uniqueKey={analyticsDataID} />
                 <PageLoader status={loadStatus}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className={classNames(inheritHeightClass())} onSubmit={this.onSubmit}>

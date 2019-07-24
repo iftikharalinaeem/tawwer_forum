@@ -28,6 +28,7 @@ import React from "react";
 import { connect } from "react-redux";
 import TitleBar from "@library/headers/TitleBar";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 /**
  * Component representing the the full home page of a help center.
@@ -71,6 +72,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
         return (
             <>
+                <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
                 <Splash action={splashAction} outerBackgroundImage={bannerImage} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>

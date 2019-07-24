@@ -9,11 +9,13 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
 import { ResultMeta } from "@library/result/ResultMeta";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -21,7 +23,7 @@ import React, { useEffect, useMemo } from "react";
 import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
+import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
 
 /**
  * Page component for a flat category list.
@@ -93,6 +95,10 @@ export function CategoriesPage(props: IProps) {
     // Render either a loading layout or a full layout.
     return (
         <DocumentTitle title={category.data.name}>
+            <AnalyticsData
+                data={knowledgeCategoryEventFields(category.data)}
+                uniqueKey={category.data.knowledgeCategoryID}
+            />
             <NavHistoryUpdater lastKbID={category.data.knowledgeBaseID} />
             <CategoriesLayout results={articleResults} category={category.data} pages={pages} />
         </DocumentTitle>
