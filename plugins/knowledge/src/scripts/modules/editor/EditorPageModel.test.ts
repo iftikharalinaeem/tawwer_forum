@@ -5,11 +5,13 @@
  */
 import { expect } from "chai";
 import { LoadStatus } from "@library/@types/api/core";
-import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel, { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { IArticleDraftAttrs } from "@knowledge/@types/api/article";
 import { Format } from "@knowledge/@types/api/articleRevision";
+import OpUtils from "@rich-editor/__tests__/OpUtils";
+import cloneDeep from "lodash/cloneDeep";
 
 describe("EditorPageModel", () => {
     describe("reducer()", () => {
@@ -52,6 +54,25 @@ describe("EditorPageModel", () => {
             expect(state.saveDraft.status).eq(LoadStatus.SUCCESS);
             expect(state.draft.data!.draftID).eq(DRAFT_ID);
             expect(state.draft.data!.tempID).eq(undefined);
+        });
+
+        it("does not dirty the form unless a value has actually changed", () => {
+            const initialState = { ...EditorPageModel.INITIAL_STATE };
+            const model = new EditorPageModel();
+
+            let state = model.reducer(initialState, EditorPageActions.updateFormAC({}));
+            expect(state.isDirty).eq(false, "Empty form update should not dirty the form");
+
+            const valueState: IEditorPageState = {
+                ...EditorPageModel.INITIAL_STATE,
+                form: {
+                    name: "name",
+                    knowledgeCategoryID: 24,
+                    body: [OpUtils.op("Hello world\n")],
+                },
+            };
+            state = model.reducer(valueState, EditorPageActions.updateFormAC(cloneDeep(valueState.form)));
+            expect(state.isDirty).eq(false, "A form update with the same vlaues should not dirty the form");
         });
     });
 });
