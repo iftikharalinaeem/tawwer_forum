@@ -12,6 +12,8 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * API controller for managing the article revisions resource.
@@ -37,8 +39,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var Schema */
+    private $reRenderSchema;
+
     /** @var UserModel */
     private $userModel;
+
+    /** @var Parser */
+    private $parser;
 
     /**
      * ArticleRevisionsApiController constructor.
@@ -47,10 +55,12 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
+        $this->parser = $parser;
+
     }
 
     /**
@@ -94,6 +104,15 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         return $this->schema($this->articleRevisionSchema, $type);
     }
 
+    public function reRenderSchema(string $type = ""): Schema {
+        if ($this->reRenderSchema === null) {
+            $this->reRenderSchema = $this->schema(Schema::parse([
+                "processed",
+                "nonRich",
+            ]));
+        }
+        return $this->schema($this->reRenderSchema, $type);
+    }
     /**
      * Get a schema representing an article revision.
      *
@@ -185,5 +204,46 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      */
     private function normalizeOutput(array $row): array {
         return $row;
+    }
+
+    public function get_reRender(array $body = []): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(
+            Schema::parse(["articleID:i?" => "The article ID."]),
+            'in'
+        );
+
+        $body = $in->validate($body);
+
+        $where = [];
+        if (!empty($body['id']  ?? null)) {
+            $where = ['articleID' => $body['articleID']];
+        }
+
+        $allRevisions = $this->articleRevisionModel->get($where);
+        $processed = 0;
+        $noRich = 0;
+
+        foreach ($allRevisions as $revision) {
+            $updateRev = [];
+            $updateRev["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
+
+            if ($revision["format"] === "rich") {
+                $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
+                $updateRev["plainText"] = $plainText;
+                $updateRev["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
+            } else {
+                $noRich++;
+            }
+
+            $this->articleRevisionModel->update($updateRev, ['articleRevisionID' => $revision['articleRevisionID']]);
+            $processed++;
+        }
+        $records = ['processed' => $processed, 'nonRich' => $noRich];
+        $out = $this->reRenderSchema("out");
+        $result = $out->validate($records);
+        return $result;
     }
 }

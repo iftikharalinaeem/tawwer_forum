@@ -21,6 +21,25 @@ paths:
       tags:
       - Article Revisions
       summary: Get an article revision.
+  '/article-revisions/re-render':
+    get:
+      parameters:
+      - description: The article ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReRender'
+          description: Success
+      tags:
+      - Article Revisions
+      summary: Get an article revision.
 components:
   schemas:
     ArticleRevision:
@@ -78,3 +97,15 @@ components:
       - insertUserID
       - dateInserted
       type: object
+    ReRender:
+      properties:
+        processed:
+          description: The number or articles rerender.
+          type: integer
+        nonRich:
+          description: The Number of non rich articles.
+          type: integer
+      required:
+          - processed
+          - nonRich
+          type: array
