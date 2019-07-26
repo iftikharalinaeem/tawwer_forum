@@ -122,23 +122,27 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         $where = ["articleID" => $article["articleID"]];
 
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
+        
+        // Change body text and set the rendered content to null, to see if the rerender works.
+        $newBody = json_encode([["insert" => "Some brand new text"]]);
 
-        $revisionBefore = $articleRevisionModel->get($where);
+        $updateSuccess = $articleRevisionModel->update(["body" => $newBody], $where);
+        $this->assertTrue($updateSuccess);
 
-        // set the rendered content to null, to see if the rerender works.
         $updateSuccess = $articleRevisionModel->update(["bodyRendered" => "", "plainText" => "", "excerpt" => ""], $where);
         $this->assertTrue($updateSuccess);
 
         $reRenderResponse = $this->api()->patch(
-            "article-revisions/re-render"
+            "article-revisions/re-render",
+            $where
         );
 
         $this->assertEquals(200, $reRenderResponse->getStatusCode());
 
-        $revisionAfter = $articleRevisionModel->get($where);
+        $reRenderContent = $articleRevisionModel->selectSingle($where);
 
-        $this->assertEquals($revisionBefore[0]["bodyRendered"], $revisionAfter[0]["bodyRendered"]);
-        $this->assertEquals($revisionBefore[0]["plainText"], $revisionAfter[0]["plainText"]);
-        $this->assertEquals($revisionBefore[0]["excerpt"], $revisionAfter[0]["excerpt"]);
+        $this->assertEquals("<p>Some brand new text</p>", $reRenderContent["bodyRendered"]);
+        $this->assertEquals("Some brand new text", $reRenderContent["plainText"]);
+        $this->assertEquals("Some brand new text", $reRenderContent["excerpt"]);
     }
 }
