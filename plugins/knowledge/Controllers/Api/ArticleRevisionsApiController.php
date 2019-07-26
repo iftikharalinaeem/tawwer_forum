@@ -206,19 +206,25 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         return $row;
     }
 
-    public function get_reRender(array $body = []): array {
+    /**
+     * ReRender articles currently living in the articleRevision table.
+     *
+     * @param array $body A specific id to rerender.
+     * @return array $results The number of records processed.
+     */
+    public function patch_reRender(array $body = []): array {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema(
             Schema::parse(["articleID:i?" => "The article ID."]),
-            'in'
+            "in"
         );
 
         $body = $in->validate($body);
 
         $where = [];
-        if (!empty($body['id']  ?? null)) {
-            $where = ['articleID' => $body['articleID']];
+        if (!empty($body["articleID"]  ?? null)) {
+            $where = ["articleID" => $body["articleID"]];
         }
 
         $allRevisions = $this->articleRevisionModel->get($where);
@@ -238,12 +244,13 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 $noRich++;
             }
 
-            $this->articleRevisionModel->update($updateRev, ['articleRevisionID' => $revision['articleRevisionID']]);
+            $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
             $processed++;
         }
-        $records = ['processed' => $processed, 'nonRich' => $noRich];
+        $records = ["processed" => $processed, "nonRich" => $noRich];
         $out = $this->reRenderSchema("out");
         $result = $out->validate($records);
+
         return $result;
     }
 }
