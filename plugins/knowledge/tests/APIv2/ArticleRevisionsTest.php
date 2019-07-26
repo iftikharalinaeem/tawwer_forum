@@ -55,7 +55,6 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             "knowledgeCategoryID" => self::$knowledgeCategoryID,
             "sort" => 1,
         ]);
-
     }
 
     /**

@@ -106,7 +106,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
     /**
      * Get the schema for the reRender.
-     * 
+     *
      * @param string $type
      * @return Schema
      */
@@ -119,6 +119,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         }
         return $this->schema($this->reRenderSchema, $type);
     }
+    
     /**
      * Get a schema representing an article revision.
      *
