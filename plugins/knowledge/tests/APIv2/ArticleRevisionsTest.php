@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 
 /**
  * Test the /api/v2/article-revisions endpoint.
@@ -23,6 +24,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
 
     /** @var int */
     private static $knowledgeCategoryID;
+
 
     /**
      * This method is called before the first test of this test class is run.
@@ -53,6 +55,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             "knowledgeCategoryID" => self::$knowledgeCategoryID,
             "sort" => 1,
         ]);
+
     }
 
     /**
@@ -91,5 +94,52 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         unset($row['knowledgeCategoryID']);
         $this->assertRowsEqual($row, $body);
+    }
+
+    /**
+     * Tests if that the article-revisions/render endpoint renders a selected revision.
+     */
+    public function testReRender() {
+
+        $bodyText = json_encode([["insert" => "Rich Article"]]);
+        // Create an article.
+        $row = [
+            "body" => $bodyText,
+            "format" => "rich",
+            "locale" => "en",
+            "knowledgeCategoryID" => 1,
+            "name" => uniqid(__FUNCTION__, true),
+        ];
+
+        // Create the revision.
+        $response = $this->api()->post(
+            "/articles",
+            $row
+        );
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $article = $response->getBody();
+        $where = ["articleID" => $article["articleID"]];
+
+        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
+
+        $revisionBefore = $articleRevisionModel->get($where);
+
+        // set the rendered content to null, to see if the rerender works.
+        $updateSuccess = $articleRevisionModel->update(["bodyRendered" => "", "plainText" => "", "excerpt" => ""], $where);
+        $this->assertTrue($updateSuccess);
+
+        $reRenderResponse = $this->api()->patch(
+            "article-revisions/re-render"
+        );
+
+        $this->assertEquals(200, $reRenderResponse->getStatusCode());
+
+        $revisionAfter = $articleRevisionModel->get($where);
+
+        $this->assertEquals($revisionBefore[0]["bodyRendered"], $revisionAfter[0]["bodyRendered"]);
+        $this->assertEquals($revisionBefore[0]["plainText"], $revisionAfter[0]["plainText"]);
+        $this->assertEquals($revisionBefore[0]["excerpt"], $revisionAfter[0]["excerpt"]);
     }
 }

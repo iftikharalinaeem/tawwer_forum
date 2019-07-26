@@ -98,6 +98,7 @@ components:
                 - dateInserted
             type: object
         ReRender:
+            type: object
             properties:
                 processed:
                     description: The number or articles rerender.
@@ -108,4 +109,4 @@ components:
             required:
                 - processed
                 - nonRich
-            type: object
+

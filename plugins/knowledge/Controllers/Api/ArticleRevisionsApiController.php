@@ -54,13 +54,13 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
+     * @param Parser $parser
      */
     public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->parser = $parser;
-
     }
 
     /**
@@ -104,6 +104,12 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         return $this->schema($this->articleRevisionSchema, $type);
     }
 
+    /**
+     * Get the schema for the reRender.
+     * 
+     * @param string $type
+     * @return Schema
+     */
     public function reRenderSchema(string $type = ""): Schema {
         if ($this->reRenderSchema === null) {
             $this->reRenderSchema = $this->schema(Schema::parse([
@@ -207,7 +213,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * ReRender articles currently living in the articleRevision table.
+     * ReRender article revisions currently living in the articleRevision table.
      *
      * @param array $body A specific id to rerender.
      * @return array $results The number of records processed.
