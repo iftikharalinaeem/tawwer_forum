@@ -234,7 +234,7 @@ class Zendesk {
                 'request' => $action.' '.$apiURL,
                 'response' => $response,
             ]);
-            $decoded = ['errorMessage' => $errorMessage];
+            $decoded = ['errorMessage' => $errorMessage, 'httpCode' => $httpCode];
         }
 
         return $decoded;
@@ -246,7 +246,8 @@ class Zendesk {
      *
      * @param bool|int $userId Defaults to authenticated user.
      *
-     * @throws Gdn_UserException Exception
+     * @throws Gdn_Exception
+     * @throws Exception
      *
      * @return array Profile User Profile. Array with the following keys:
      *      [id]
@@ -254,8 +255,8 @@ class Zendesk {
      *      [email]
      *      [photo]
      * @return array Error Message. Array with the following keys:
-     *  [error] bool
-     *  [message] string
+     *      [error] bool
+     *      [message] string
      */
     public function getProfile($userId = false) {
         if (!$userId) {
@@ -265,7 +266,8 @@ class Zendesk {
         if ($fullProfile['errorMessage']) {
             return [
                 'error' => true,
-                'message' => $fullProfile['errorMessage']
+                'message' => $fullProfile['errorMessage'],
+                'code' => $fullProfile['httpCode']
             ];
         } else {
             return [

@@ -758,6 +758,10 @@ class ZendeskPlugin extends Gdn_Plugin {
         $this->setZendesk($this->accessToken);
         $profile = $this->zendesk->getProfile();
 
+        if ($profile['error']) {
+            throw new Gdn_UserException($profile['message'], $profile['code']);
+        }
+
         Gdn::userModel()->saveAuthentication(
             [
                 'UserID' => $sender->User->UserID,
