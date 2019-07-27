@@ -7,13 +7,18 @@
 
 namespace Vanilla\Knowledge;
 
+use Garden\Container\Callback;
+use Garden\Container\Container;
 use Gdn_Router as Router;
 use Garden\Container\Reference;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Sphinx\SearchType;
+use Vanilla\Sphinx\searchmodel;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;
@@ -101,6 +106,24 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->rule(ThemeModel::class)
             ->addCall("addVariableProvider", [new Reference(KnowledgeVariablesProvider::class)])
         ;
+
+        $container->rule(searchmodel::class)
+            ->addCall('addDocumentType', [5, new Callback(function (Container $container) {
+                $model = $container->get(ArticleModel::class);
+                return [$model, 'getSearchRecords'];
+            })]);
+
+        if (class_exists(SearchType::class)) {
+            $article = new SearchType();
+            $article
+                ->setApiValue('article')
+                ->setIndexes('KnowledgeArticle')
+                ->setAttributeValue(500)
+                ->setLabelCode('articles');
+
+            $container
+                ->addCall('addSearchType', [$article]);
+        }
     }
 
     /**
