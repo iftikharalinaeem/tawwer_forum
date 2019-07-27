@@ -333,20 +333,32 @@ EOT;
      * @deprecated
      */
     public static function types() {
-        if (!class_exists(\Vanilla\Sphinx\SphinxSearchModel::class)) {
-            return [];
-        }
-
         if (!isset(self::$types)) {
             $types = [];
+            if (Gdn::addonManager()->isEnabled('knowledge', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['knowledgeArticle']['article'] = 'articles';
+            }
 
-            /* @var \Vanilla\Sphinx\SphinxSearchModel $searchModel */
-            $searchModel = Gdn::getContainer()->get(\Vanilla\Sphinx\SphinxSearchModel::class);
-            foreach ($searchModel->getSearchTypes() as $type) {
-                if (!empty($type->getOldAPIField())) {
-                    list($table, $subType) = explode('_', $type->getOldAPIField(), 2);
-                    $types[$table][$subType] = $type->getLabelCode();
-                }
+            $types += [
+                'discussion' => ['d' => 'discussions'],
+                'comment' => ['c' => 'comments']
+            ];
+
+            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['discussion']['question'] = 'questions';
+                $types['comment']['answer'] = 'answers';
+            }
+
+            if (Gdn::addonManager()->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['discussion']['poll'] = 'polls';
+            }
+
+            if (Gdn::addonManager()->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['page']['p'] = 'docs';
+            }
+
+            if (Gdn::addonManager()->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['group']['group'] = 'group';
             }
 
             self::$types = $types;
