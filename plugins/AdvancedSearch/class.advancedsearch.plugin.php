@@ -8,6 +8,7 @@
 use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Sphinx\SphinxSearchModel;
 
 /**
  * Class AdvancedSearchPlugin
@@ -15,7 +16,11 @@ use Vanilla\AddonManager;
 class AdvancedSearchPlugin extends Gdn_Plugin {
     /// Properties ///
 
-    public static $Types;
+    /**
+     * @var array
+     * @deprecated
+     */
+    public static $Types = [];
 
     /**
      * @var AddonManager
@@ -46,32 +51,11 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $this->addonManager = $addonManager;
         $this->container = $container;
 
-        self::$Types = [
-            'discussion' => ['d' => 'discussions'],
-            'comment' => ['c' => 'comments']
-        ];
-
-        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
-            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['question'] = 'questions';
-                self::$Types['comment']['answer'] = 'answers';
-            }
-
-            if ($this->addonManager->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['poll'] = 'polls';
-            }
-
-            if ($this->addonManager->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['page']['p'] = 'docs';
-            }
-
-            $group = $this->addonManager->lookupAddon('Groups');
-            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['group']['group'] = 'groups';
-            }
-        }
-
         $this->fireEvent('Init');
+    }
+
+    public function addRecordType(string $table, string $type, string $label) {
+        self::$Types[$table][$type] = $label;
     }
 
     /**
@@ -602,7 +586,7 @@ if (!function_exists('searchBoxAdvanced')):
             'value' => null,
         ], $options);
 
-        echo Gdn_Theme::module('AdvancedSearchModule', ['value' => $options['value']]);
+        echo Gdn_Theme::module(AdvancedSearchModule::class, ['value' => $options['value']]);
     }
 
 endif;

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
 <div class="AdvancedSearch <?php echo getIncomingValue('adv') ? 'Open' : ''; ?>">
     <?php
-    $Form = new Gdn_Form();
+    /* @var Gdn_Form $Form */
     $Form = $this->Form;
     echo $Form->open(['action' => url('/search')]),
         $Form->hidden('adv');
@@ -63,16 +63,18 @@
             ?>
         </div>
         <?php endif; ?>
+        <?php if ($this->IncludeTypes): ?>
         <div class="P AdvancedSearch-Author-WhatToSearch">
             <?php
             echo $Form->label('What to search', '', ['class' => 'Heading']);
             echo '<div class="Inline">';
-            foreach ($this->Types as $name => $label) {
-                 echo ' '.$Form->checkBox($name, $label, ['nohidden' => true]).' ';
+            foreach ($this->Types as $typeValue => $label) {
+                 echo ' '.$Form->checkBox('types[]', $label, ['value' => $typeValue, 'nohidden' => true]).' ';
             }
             echo '</div>';
             ?>
         </div>
+        <?php endif; ?>
         <div class="P Inline AdvancedSearch-Date">
             <?php
             echo $Form->label('Date within', 'within').' '.
