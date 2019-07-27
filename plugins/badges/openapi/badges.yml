@@ -5,7 +5,7 @@ paths:
     get:
       parameters:
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -76,7 +76,7 @@ paths:
         schema:
           type: integer
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -136,7 +136,7 @@ paths:
         schema:
           type: integer
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
