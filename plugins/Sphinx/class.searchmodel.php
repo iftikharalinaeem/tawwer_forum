@@ -778,17 +778,6 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     /**
-     * Determine whether or not a sphinx index has been set up for an application.
-     *
-     * @param string $name The name of the index template to search for.
-     * @return bool Returns **true** there is a template configured for the given name or **false** otherwise.
-     */
-    public function hasIndex(string $name): bool {
-        $r = in_array($name, c('Plugins.Sphinx.Templates', []));
-        return $r;
-    }
-
-    /**
      * Get SphinxClient object
      *
      * @return SphinxClient

@@ -54,10 +54,6 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $this->fireEvent('Init');
     }
 
-    public function addRecordType(string $table, string $type, string $label) {
-        self::$Types[$table][$type] = $label;
-    }
-
     /**
      * Get the SearchModel.
      * We lazy load this so that other plugins can update the container rules with the container_init event.
