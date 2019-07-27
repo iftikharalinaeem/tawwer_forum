@@ -26,7 +26,7 @@ paths:
           - '-countDiscussions'
           type: string
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -104,7 +104,7 @@ paths:
           - '-countDiscussions'
           type: string
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -112,7 +112,7 @@ paths:
           default: 1
           minimum: 1
       - description: |
-          <p>Desired number of items per page.</p>
+          Desired number of items per page.
         in: query
         name: limit
         schema:
@@ -136,7 +136,7 @@ paths:
     delete:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
@@ -151,7 +151,7 @@ paths:
     get:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
@@ -195,14 +195,14 @@ paths:
     get:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -210,7 +210,7 @@ paths:
           default: 1
           minimum: 1
       - description: |
-          <p>Desired number of items per page.</p>
+          Desired number of items per page.
         in: query
         name: limit
         schema:
@@ -219,7 +219,7 @@ paths:
           maximum: 100
           minimum: 1
       - description: |
-          <p>Expand associated records.</p>
+          Expand associated records.
         in: query
         name: expand
         schema:
@@ -344,7 +344,7 @@ paths:
     get:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
@@ -364,14 +364,14 @@ paths:
     get:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -379,7 +379,7 @@ paths:
           default: 1
           minimum: 1
       - description: |
-          <p>Desired number of items per page.</p>
+          Desired number of items per page.
         in: query
         name: limit
         schema:
@@ -388,7 +388,7 @@ paths:
           maximum: 100
           minimum: 1
       - description: |
-          <p>Expand associated records.</p>
+          Expand associated records.
         in: query
         name: expand
         schema:
@@ -438,14 +438,14 @@ paths:
     delete:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
       - description: |
-          <p>The group member user ID.</p>
+          The group member user ID.
         in: path
         name: userID
         required: true
@@ -461,7 +461,7 @@ paths:
     post:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
@@ -481,7 +481,7 @@ paths:
     post:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
@@ -497,14 +497,14 @@ paths:
     get:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -512,7 +512,7 @@ paths:
           default: 1
           minimum: 1
       - description: |
-          <p>Desired number of items per page.</p>
+          Desired number of items per page.
         in: query
         name: limit
         schema:
@@ -521,7 +521,7 @@ paths:
           maximum: 100
           minimum: 1
       - description: |
-          <p>Expand associated records.</p>
+          Expand associated records.
         in: query
         name: expand
         schema:
@@ -579,14 +579,14 @@ paths:
     delete:
       parameters:
       - description: |
-          <p>The group ID.</p>
+          The group ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
       - description: |
-          <p>The group member user ID.</p>
+          The group member user ID.
         in: path
         name: userID
         required: true

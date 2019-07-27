@@ -25,7 +25,7 @@ paths:
           - '-dateStarts'
           type: string
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
@@ -180,7 +180,7 @@ paths:
           - unanswered
           - all
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:
