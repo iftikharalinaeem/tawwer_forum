@@ -85,6 +85,11 @@ export const itemListClasses = useThemeCache(() => {
 
     const item = style("item", {
         display: "block",
+        $nest: {
+            "&:hover": {
+                background: colorOut(globalVars.mainColors.primary.fade(0.05)),
+            }
+        }
     });
 
     const dateTime = style("dateTime", {
