@@ -88,8 +88,8 @@ export const itemListClasses = useThemeCache(() => {
         $nest: {
             "&:hover": {
                 background: colorOut(globalVars.mainColors.primary.fade(0.05)),
-            }
-        }
+            },
+        },
     });
 
     const dateTime = style("dateTime", {
