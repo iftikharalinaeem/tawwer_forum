@@ -188,18 +188,24 @@ class MultisiteModel extends Gdn_Model {
             return false;
         }
 
-        $deleteQuery = Communication::orchestration('/site/delete')
-            ->method('post')
-            ->parameter('siteid', val('SiteID', $site))
-            ->parameter('callback', [
+        $parameters = [
+            '__path' => '/site/delete',
+            '__method' => 'POST',
+            'siteid' => val('SiteID', $site),
+            'callback' => [
                 'url' => Gdn::request()->domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/deletecallback.json",
                 'headers' => [
                     'Authorization' => self::apikey(true)
                 ]
-            ]);
-        $deleteResponse = $deleteQuery->send();
+            ]
+        ];
+        $deleteQuery = Communication::data('/orcProxy?'.http_build_query($parameters))
+            ->method('POST');
+        $proxyDeleteData = $deleteQuery->send();
 
-        if ($deleteQuery->responseClass('2xx')) {
+        $httpCode = valr('proxyResponse.code', $proxyDeleteData, 0);
+        $deleteResponse = valr('proxyResponse.data', $proxyDeleteData, 0);
+        if ($deleteQuery->responseClass('2xx') && $httpCode >= 200 && $httpCode < 300) {
             // The site built.
             $this->setField($id, [
                 'Status' => 'deleting',
@@ -212,7 +218,7 @@ class MultisiteModel extends Gdn_Model {
             return $this->delete([$this->PrimaryKey => $id]);
         } else {
             // The site has an error.
-            $error = $deleteQuery->errorMsg();
+            $error = val('status', $deleteResponse, $deleteQuery->errorMsg());
             $this->Validation->addValidationResult('MultisiteID', '@'.$error);
             return false;
         }
@@ -268,39 +274,54 @@ class MultisiteModel extends Gdn_Model {
             ]
         ];
 
-        $buildQuery = Communication::orchestration('/site/createnode')
-            ->method('post')
-            ->parameter('name', $name)
-            ->parameter('accountid', Infrastructure::site('accountid'))
-            ->parameter('domain', Gdn::request()->host()) // TODO: make work for non-dirs
-            ->parameter('flavor', 'node')
-            ->parameter('config', $config)
-            ->parameter('callback', [
+        $parameters = [
+            '__path' => '/site/createnode',
+            '__method' => 'POST',
+            'name' => $name,
+            'accountid' => Infrastructure::site('accountid'),
+            'domain' => Gdn::request()->host(),
+            'flavor' => 'node',
+            'config' => $config,
+            'callback' => [
                 'url' => Gdn::request()->domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
                 'headers' => [
                     'Authorization' => self::apikey(true)
                 ]
-            ]);
-        $build = $buildQuery->send();
+            ],
+        ];
+        $buildQuery = Communication::data('/orcProxy?'.http_build_query($parameters))
+            ->method('POST');
+        $proxyBuildData = $buildQuery->send();
+
+        $httpCode = valr('proxyResponse.code', $proxyBuildData, 0);
+        $error = false;
 
         if ($buildQuery->responseClass('2xx')) {
-            // The site built.
-            $this->setField($id, [
-                'Status' => 'building',
-                'DateStatus' => Gdn_Format::toDateTime(),
-                'SiteID' => valr('site.SiteID', $build)
-            ]);
-            return true;
-        } elseif ($buildQuery->code() == 409 && val('site', $build)) {
-            // The site already existed.
-            $this->status($id, 'active');
-            $siteID = valr('site.SiteID', $build);
-            if ($siteID) {
-                $this->setField($id, 'SiteID', $siteID);
+            $build = valr('proxyResponse.data', $proxyBuildData, []);
+            if ($httpCode >= 200 && $httpCode < 300) {
+                // The site built.
+                $this->setField($id, [
+                    'Status' => 'building',
+                    'DateStatus' => Gdn_Format::toDateTime(),
+                    'SiteID' => valr('site.SiteID', $build)
+                ]);
+                return true;
+            } elseif ($httpCode == 409 && val('site', $build)) {
+                // The site already existed.
+                $this->status($id, 'active');
+                $siteID = valr('site.SiteID', $build);
+                if ($siteID) {
+                    $this->setField($id, 'SiteID', $siteID);
+                }
+            } else {
+                $error = valr('proxyResponse.data.status', $proxyBuildData, 'Unknown error');
             }
         } else {
-            // The site has an error.
             $error = $buildQuery->errorMsg();
+        }
+
+        if ($error) {
+            // The site has an error.
             $this->status($id, 'error', $error);
             return false;
         }
