@@ -214,7 +214,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * ReRender article revisions currently living in the articleRevision table.
+     * ReRender content in the articleRevision Table (bodyRendered, format, plainText, excerpt, outline).
      *
      * @param array $body A specific id to rerender.
      * @return array $results The number of records processed.
