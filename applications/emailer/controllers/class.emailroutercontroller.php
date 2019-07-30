@@ -2,10 +2,10 @@
 
 class EmailRouterController extends Gdn_Controller {
    /// Properties ///
-   
+
    /**
     *
-    * @var Gdn_Form 
+    * @var Gdn_Form
     */
    public $Form;
 
@@ -31,14 +31,14 @@ class EmailRouterController extends Gdn_Controller {
       'vanillacommunities.email' => 'vanillacommunities.com',
       'dev.vanillaforums.email' => 'vanillawip.com'
    ];
-   
+
    /// Methods ///
-   
+
    /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
@@ -46,9 +46,9 @@ class EmailRouterController extends Gdn_Controller {
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('global.js');
-      
+
       $this->AddCssFile('style.css');
-      
+
 //      $this->MasterView = 'default';
       parent::Initialize();
    }
@@ -65,15 +65,15 @@ class EmailRouterController extends Gdn_Controller {
          $Name = trim(trim($Matches[1]), '"');
          $Email = trim($Matches[2]);
       }
-         
+
       if (!$Name) {
          $Name = trim(substr($Email, 0, strpos($Email, '@')), '@');
-         
+
          $NameParts = explode('.', $Name);
          $NameParts = array_map('ucfirst', $NameParts);
          $Name = implode(' ', $NameParts);
       }
-      
+
       $Result = array($Name, $Email);
       return $Result;
    }
@@ -95,7 +95,7 @@ class EmailRouterController extends Gdn_Controller {
          return [$to, $domain];
       }
    }
-   
+
    public static function ParseEmailHeader($Header) {
       $Result = array();
       $Parts = explode("\n", $Header);
@@ -122,7 +122,7 @@ class EmailRouterController extends Gdn_Controller {
 
       return $Result;
    }
-   
+
    public function Sendgrid() {
       $this->SetData('Title', T('Sendgrid Proxy'));
       try {
@@ -137,7 +137,7 @@ class EmailRouterController extends Gdn_Controller {
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
             Logger::event('email_received', Logger::DEBUG, "Email received.", ['data' => $Post]);
-            
+
             // All of the post data can come in a variety of encodings.
             $Charsets = @json_decode($Post['charsets']);
 
@@ -158,7 +158,7 @@ class EmailRouterController extends Gdn_Controller {
                   $Post[$Key] = mb_convert_encoding($Post[$Key], 'utf-8', $Charset);
                }
             }
-            
+
 //            self::Log("Post got...");
             $Data = ArrayTranslate($Post, array(
                 'from' => 'From',
@@ -173,7 +173,7 @@ class EmailRouterController extends Gdn_Controller {
             $Headers = self::ParseEmailHeader(GetValue('headers', $Post, ''));
    //         self::Log('Headers: '.print_r($Headers, TRUE));
             $Headers = array_change_key_case($Headers);
-            
+
             $HeaderData = ArrayTranslate($Headers, array('message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo'));
             $Data = array_merge($Data, $HeaderData);
 
@@ -185,10 +185,10 @@ class EmailRouterController extends Gdn_Controller {
                $Data['Format'] = 'Html';
             }
             $Data['Subject'] = substr($Data['Subject'], 0, 100);
-            
+
 //            self::Log("Saving data...");
             $this->Data['_Status'][] = 'Saving data.';
-            
+
             // Figure out the url from the email's address.
             $To = GetValue('x-forwarded-to', $Headers);
             $quotedDomains = array_map('preg_quote', array_keys($this->emailDomains));
@@ -202,7 +202,7 @@ class EmailRouterController extends Gdn_Controller {
                   $To = $Data['To'];
                }
             }
-            
+
             $LogModel = new EmailLogModel();
             $Data['Post'] = $Data;
             $Data['Charsets'] = GetValue('charsets', $Post, NULL);
@@ -220,7 +220,7 @@ class EmailRouterController extends Gdn_Controller {
             }
 
             $LogID = $LogModel->Insert($Data);
-            
+
             list($Name, $Email) = self::ParseEmailAddress($To);
             list($slug, $emailDomain) = $this->parseEmailDomain($Email, true);
 
@@ -309,7 +309,7 @@ class EmailRouterController extends Gdn_Controller {
                $this->Render();
                return;
             }
-            
+
             // Curl the data to the new forum.
             $C = curl_init();
             curl_setopt($C, CURLOPT_URL, $Url);
@@ -320,10 +320,10 @@ class EmailRouterController extends Gdn_Controller {
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
             curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data['Post'], '', '&'));
-            
+
             $Result = curl_exec($C);
             $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
-            
+
             if ($Code == 200) {
                $ResultData = @json_decode($Result);
                if ($ResultData) {
@@ -351,14 +351,14 @@ class EmailRouterController extends Gdn_Controller {
             }
          }
 
-         
+
          $this->Render();
       } catch (Exception $Ex) {
          $Contents = $Ex->getMessage()."\n"
             .$Ex->getTraceAsString()."\n"
             .print_r($_POST, TRUE);
 //         file_put_contents(PATH_UPLOADS.'/email/error_'.time().'.txt', $Contents);
-         
+
          throw $Ex;
       }
    }
@@ -436,11 +436,17 @@ class EmailRouterController extends Gdn_Controller {
          if (preg_match('`-s(\d+)@`', $source, $matches)) {
             $siteID = $matches[1];
 
-            $response = Communication::orchestration('/site/full')
-               ->method('get')
-               ->parameter('siteid', $siteID)
-               ->cache(60)
-               ->send();
+            $parameters = [
+                '__path' => '/site/full',
+                '__method' => 'GET',
+                'siteid' => $siteID,
+            ];
+            // Look up the site.
+            $response = Communication::data('/orcProxy?'.http_build_query($parameters))
+                ->method('POST')
+                ->cache(60)
+                ->send();
+            $response = valr('proxyResponse.data', $response);
 
             if (is_array(val('site', $response))) {
                $site = $response['site'];
@@ -502,13 +508,13 @@ class EmailRouterController extends Gdn_Controller {
       }
       return false;
    }
-   
+
    protected function CurlHeader($Handler, $HeaderString) {
       $this->LastHeaderString = $HeaderString;
    }
-   
+
    public static function StripEmail($Body) {
-      $SigFound = FALSE; 
+      $SigFound = FALSE;
       $InQuotes = 0;
 
       $Lines = explode("\n", trim($Body));
@@ -565,25 +571,36 @@ class EmailRouterController extends Gdn_Controller {
          return $default;
       }
 
+      $parameters = [
+        '__path' => '/site/query',
+        '__method' => 'GET',
+        'query' => $host,
+        'users' => 0,
+        'verbose' => 0,
+      ];
       // Look up the site ID.
-      $queryResponse = Communication::orchestration('/site/query')
-          ->method('get')
-          ->parameter('query', $host)
-          ->parameter('users', 0)
-          ->parameter('verbose', 0)
+      $queryResponse = Communication::data('/site/query')
+          ->method('POST')
           ->cache(60)
           ->send();
+      $queryResponse = valr('proxyResponse.data', $queryResponse);
+
 //      Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
       if (empty(val('sites', $queryResponse))) {
          return '';
       }
 
+      $parameters = [
+        '__path' => '/site/full',
+        '__method' => 'GET',
+        'siteid' => valr('sites.0.SiteID', $queryResponse),
+      ];
       // Look up the site.
-      $siteResponse = Communication::orchestration('/site/full')
-          ->method('get')
-          ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
+      $siteResponse = Communication::data('/orcProxy?'.http_build_query($parameters))
+          ->method('POST')
           ->cache(60)
           ->send();
+      $siteResponse = valr('proxyResponse.data', $siteResponse);
 
       if (!empty($siteResponse['site'])) {
          $found = true;
