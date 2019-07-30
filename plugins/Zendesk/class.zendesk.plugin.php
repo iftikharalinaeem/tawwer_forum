@@ -255,7 +255,13 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (c('Plugins.Zendesk.GlobalLogin.Enabled') && c('Plugins.Zendesk.GlobalLogin.AccessToken')) {
             $this->setZendesk(c('Plugins.Zendesk.GlobalLogin.AccessToken'));
             $globalLoginProfile = $this->zendesk->getProfile();
-            $sender->setData('GlobalLoginProfile', $globalLoginProfile);
+            if ($globalLoginProfile['error']) {
+                $sender->setData('GlobalLoginError',  $globalLoginProfile);
+                $sender->setData('GlobalLoginConnected', false);
+            } else {
+                $sender->setData('GlobalLoginProfile', $globalLoginProfile);
+            }
+
         }
 
         $sender->render($this->getView('dashboard.php'));
@@ -751,6 +757,10 @@ class ZendeskPlugin extends Gdn_Plugin {
         $this->accessToken = val('access_token', $tokens);
         $this->setZendesk($this->accessToken);
         $profile = $this->zendesk->getProfile();
+
+        if ($profile['error']) {
+            throw new Gdn_UserException($profile['message'], $profile['code']);
+        }
 
         Gdn::userModel()->saveAuthentication(
             [
