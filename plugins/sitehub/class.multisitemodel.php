@@ -242,8 +242,7 @@ class MultisiteModel extends Gdn_Model {
         return true;
     }
 
-    public function build($id)
-    {
+    public function build($id) {
         if (!class_exists('Communication')) {
             $this->status($id, 'error', 'Communication with the orchestration server is not enabled.');
             return false;
