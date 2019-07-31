@@ -14,7 +14,7 @@ import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { compose } from "@library/icons/header";
+import { compose } from "@library/icons/titleBar";
 import Container from "@library/layout/components/Container";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
