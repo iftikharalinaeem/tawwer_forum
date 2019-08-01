@@ -51,7 +51,7 @@ paths:
           description: Success
       tags:
       - Article revisions re-render.
-      summary: Re-render the article revisions.
+      summary: Re-render content in the article revisions table.
 components:
   schemas:
     ArticleRevision:
