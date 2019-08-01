@@ -25,7 +25,6 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     /** @var int */
     private static $knowledgeCategoryID;
 
-
     /**
      * This method is called before the first test of this test class is run.
      */
