@@ -280,9 +280,9 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
      */
     public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
-        const { form, article, draft, isDirty } = state.knowledge.editorPage;
+        const { form, article, draft, isDirty, notifyConversion } = state.knowledge.editorPage;
 
-        if (!isDirty) {
+        if (!isDirty || notifyConversion) {
             return;
         }
 
@@ -395,25 +395,34 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         ]);
 
         // Merge together the two results and re-dispatch with the full data.
-        if (editArticleResponse && articleResponse) {
-            const article: IArticle = {
-                ...articleResponse.data,
-                ...editArticleResponse.data,
-            };
-            editArticleResponse.data = article;
-
-            this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
+        if (!editArticleResponse || !articleResponse) {
+            return;
         }
+        const article: IArticle = {
+            ...articleResponse.data,
+            ...editArticleResponse.data,
+        };
+        editArticleResponse.data = article;
+
+        this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
 
         if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
-            this.updateForm(
-                {
-                    name: editArticleResponse.data.name,
-                    body: JSON.parse(editArticleResponse.data.body),
-                    knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
-                },
-                true,
-            );
+            const newFormValue: Partial<IEditorPageForm> = {
+                name: editArticleResponse.data.name,
+                knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
+            };
+
+            const { body, format } = editArticleResponse.data;
+            // Check if we have another format loaded. If we do we need to use the queue.
+            if (format.toLowerCase() === "rich") {
+                newFormValue.body = JSON.parse(body);
+            } else {
+                newFormValue.body = [];
+                const renderedBody = articleResponse.data.body;
+                this.queueEditorOps([renderedBody]);
+            }
+
+            this.updateForm(newFormValue, true);
         }
 
         return editArticleResponse;

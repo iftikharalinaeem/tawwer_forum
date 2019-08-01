@@ -213,10 +213,13 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
         .case(EditorPageActions.queueEditorOpsAC, (nextState, payload) => {
             nextState.editorOperationsQueue = payload;
-            if (typeof payload === "string") {
-                // The item needs conversion.
-                nextState.notifyConversion = true;
-            }
+            payload.forEach(queuedItem => {
+                if (typeof queuedItem === "string") {
+                    // The item needs conversion.
+                    nextState.notifyConversion = true;
+                }
+            });
+
             return nextState;
         })
         .case(EditorPageActions.clearEditorOpsAC, nextState => {
