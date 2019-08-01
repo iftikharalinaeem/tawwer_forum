@@ -27,6 +27,12 @@ use Vanilla\Formatting\Quill\Parser;
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
+    /** The maximum limit of revisions that can be re-rendered at a time. */
+    const LIMIT = 1000;
+
+    /** The default re-render starting point. */
+    const OFFSET = 0;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -115,6 +121,8 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             $this->reRenderSchema = $this->schema(Schema::parse([
                 "processed",
                 "nonRich",
+                "first articleRevision ID",
+                "last articleRevision ID"
             ]));
         }
         return $this->schema($this->reRenderSchema, $type);
@@ -223,22 +231,39 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema(
-            Schema::parse(["articleID:i?" => "The article ID."]),
+            Schema::parse([
+                "articleID:i?" => "The article ID.",
+                "limit:i?" => [
+                    "Description" => "The desired number of revisions to process.",
+                    'default' => self::LIMIT,
+                    'minimum' => 1,
+                    'maximum' => self::LIMIT
+                ],
+                "offset:i?" => "The number revisions to exclude."
+                ]),
             "in"
         );
 
         $body = $in->validate($body);
 
         $where = [];
-        if (!empty($body["articleID"]  ?? null)) {
+        if (!empty($body["articleID"] ?? null)) {
             $where = ["articleID" => $body["articleID"]];
         }
 
-        $allRevisions = $this->articleRevisionModel->get($where);
+        $limit = $body["limit"] ?? self::LIMIT;
+        $offset = $body["offset"] ?? self::OFFSET;
+
+        $options = ["limit" => $limit, "offset" => $offset];
+
+        $revisions = $this->articleRevisionModel->get($where, $options);
         $processed = 0;
         $noRich = 0;
 
-        foreach ($allRevisions as $revision) {
+        $firstRevision = reset($revisions);
+        $lastRevision = end($revisions);
+
+        foreach ($revisions as $revision) {
             $updateRev = [];
             $updateRev["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
 
@@ -254,7 +279,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
             $processed++;
         }
-        $records = ["processed" => $processed, "nonRich" => $noRich];
+
+        $records = [
+            "processed" => $processed,
+            "nonRich" => $noRich,
+            "first articleRevision ID" => $firstRevision["articleRevisionID"],
+            "last articleRevision ID" => $lastRevision["articleRevisionID"]
+        ];
+
         $out = $this->reRenderSchema("out");
         $result = $out->validate($records);
 

@@ -27,9 +27,21 @@ paths:
       - description: The article ID.
         in: path
         name: id
-        required: true
         schema:
           type: integer
+      - description: The desired number of revisions to process.
+        in: path
+        name: limit
+        schema:
+            type: integer
+            default: 1000
+            minimum: 1
+            maximum: 1000
+      - description: The number revisions to exclude.
+        in: path
+        name: offset
+        schema:
+            type: integer
         responses:
           '200':
             content:
@@ -96,16 +108,14 @@ components:
       - locale
       - insertUserID
       - dateInserted
-      type: object
     ReRender:
       properties:
         processed:
-          description: The number or articles rerender.
+          description: The number of articles re-render.
           type: integer
         nonRich:
-          description: The Number of non rich articles.
+          description: The Number of non rich articles re-rendered (only bodyRendered column)
           type: integer
       required:
       - processed
       - nonRich
-      type: object
