@@ -27,13 +27,11 @@ paths:
       - description: The article ID.
         in: path
         name: id
-        required: false
         schema:
           type: integer
       - description: The desired number of revisions to process.
         in: path
         name: limit
-        required: false
         schema:
             type: integer
             default: 1000
@@ -42,19 +40,18 @@ paths:
       - description: The number revisions to exclude.
         in: path
         name: offset
-        required: false
         schema:
             type: integer
-        responses:
-          '200':
-            content:
-              'application/json':
-                schema:
-                  $ref: '#/components/schemas/ReRender'
-            description: Success
-        tags:
-        - Article revisions re-render.
-        summary: Re-render the article revisions.
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReRender'
+          description: Success
+      tags:
+      - Article revisions re-render.
+      summary: Re-render the article revisions.
 components:
   schemas:
     ArticleRevision:
