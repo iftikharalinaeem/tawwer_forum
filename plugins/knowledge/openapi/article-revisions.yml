@@ -116,6 +116,14 @@ components:
         nonRich:
           description: The Number of non rich articles re-rendered (only bodyRendered column)
           type: integer
+        first article RevisionID:
+          description: The id of the first article revision re-render.
+          type: integer
+        last article RevisionID:
+          description: The id of the last article revision re-render.
+          type: integer
       required:
       - processed
       - nonRich
+      - first articleRevision ID
+      - last articleRevision ID
