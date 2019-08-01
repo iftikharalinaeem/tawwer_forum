@@ -50,7 +50,7 @@ describe("EditorPageActions", () => {
         mockApi
             .onGet("/api/v2/articles/1/edit")
             .replyOnce(200, dummyEditArticle)
-            .onGet("/api/v2/articles/1")
+            .onGet("/api/v2/articles/1?expand=all")
             .replyOnce(200, dummyArticle);
     };
 
@@ -95,7 +95,7 @@ describe("EditorPageActions", () => {
         dateInserted: "",
         dateUpdated: "",
         name: "Example Article",
-        body: '[{"insert":"Hello Article."}]',
+        body: "<p",
         format: "rich",
         locale: "en",
         url: "/kb/articles/1-example-article",

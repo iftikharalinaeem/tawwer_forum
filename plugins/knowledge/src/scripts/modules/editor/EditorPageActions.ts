@@ -415,20 +415,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             const { body, format } = editArticleResponse.data;
             // Check if we have another format loaded. If we do we need to use the queue.
             if (format.toLowerCase() === "rich") {
-                newFormValue.body = JSON.parse(editArticleResponse.data.body);
+                newFormValue.body = JSON.parse(body);
             } else {
                 newFormValue.body = [];
                 const renderedBody = articleResponse.data.body;
                 this.queueEditorOps([renderedBody]);
             }
 
-            this.updateForm(
-                {
-                    name: editArticleResponse.data.name,
-                    knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
-                },
-                true,
-            );
+            this.updateForm(newFormValue, true);
         }
 
         return editArticleResponse;
