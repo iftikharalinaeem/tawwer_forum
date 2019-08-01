@@ -114,7 +114,7 @@ components:
           description: The number of articles re-render.
           type: integer
         nonRich:
-          description: The Number of non rich articles re-rendered (only bodyRendered column)
+          description: The number of non rich articles re-rendered (only bodyRendered column)
           type: integer
         first article RevisionID:
           description: The id of the first article revision re-render.
