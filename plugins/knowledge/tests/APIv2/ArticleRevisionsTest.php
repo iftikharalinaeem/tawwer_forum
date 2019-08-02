@@ -128,25 +128,9 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Tests if the limit option on the article-revisions/reRender endpoint.
-     *
-     * @expectedException Garden\Web\Exception\ClientException
-     * @expectedExceptionCode 422
-     * @expectedExceptionMessage limit is greater than 1000.
-     */
-    public function testReRenderLimit() {
-        $options = ['limit' => 1001];
-        $this->api()->patch(
-            "article-revisions/re-render",
-            $options
-        );
-    }
-
-    /**
-     * Tests if the limit option on the article-revisions/reRender endpoint.
+     * Tests the offset parameter on the article-revisions/reRender endpoint.
      */
     public function testReRenderOffSet() {
-        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
         $articles = [];
 
         // create 10 articles
@@ -154,24 +138,72 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             $articles[] = $this->createArticle();
         }
 
-        $allRevisions = $articleRevisionModel->get();
-        $numberOfArticles = count($allRevisions);
-
-        // There are 12 articles, 2 from existing from previous tests.
-        $this->assertEquals(12, $numberOfArticles);
-
-        $options = ['offset' => 5];
-
-        $response = $this->api()->patch(
+        $options = ['offset' => 0];
+        $response1 = $this->api()->patch(
             "article-revisions/re-render",
             $options
         );
+        $response1 = $response1->getBody();
 
-        $response = $response->getBody();
+        $options = ['offset' => 5];
+        $response2 = $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
+        $response2 = $response2->getBody();
 
-        $this->assertEquals(7, $response['processed']);
-        $this->assertEquals(6, $response['firstArticleRevisionID']);
-        $this->assertEquals(12, $response['lastArticleRevisionID']);
+        $difference1 = $response1['processed'] - $response2['processed'];
+        $difference2 = $response2['firstArticleRevisionID'] - $response1['firstArticleRevisionID'];
+
+        $this->assertEquals(5, $difference1);
+        $this->assertEquals(5, $difference2);
+    }
+
+    /**
+     * Tests the limit parameter on the article-revisions/reRender endpoint.
+     */
+    public function testReRenderLimitPass() {
+        $articles = [];
+
+        // create 10 articles
+        for ($i = 0; $i < 10; $i++) {
+            $articles[] = $this->createArticle();
+        }
+
+        $options = ['limit' => 10];
+        $response1 = $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
+        $response1 = $response1->getBody();
+
+        $options = ['limit' => 5];
+        $response2 = $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
+        $response2 = $response2->getBody();
+
+        $difference = $response1['processed'] - $response2['processed'];
+
+        $this->assertEquals(5, $difference);
+
+    }
+
+    /**
+     * Tests that an exception is thrown if the limit parameter is higher than the maximum
+     * on the article-revisions/reRender endpoint.
+     *
+     * @expectedException Garden\Web\Exception\ClientException
+     * @expectedExceptionCode 422
+     * @expectedExceptionMessage limit is greater than 1000.
+     */
+    public function testReRenderLimitFail() {
+        $options = ['limit' => 1001];
+        $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
     }
 
     /**
@@ -196,7 +228,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         );
 
         $article = $response->getBody();
-
+       
         return $article;
     }
 }
