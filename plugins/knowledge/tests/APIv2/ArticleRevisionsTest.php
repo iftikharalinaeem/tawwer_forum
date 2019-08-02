@@ -195,8 +195,6 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             $row
         );
 
-        $this->assertEquals(201, $response->getStatusCode());
-
         $article = $response->getBody();
 
         return $article;
