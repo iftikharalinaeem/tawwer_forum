@@ -12,7 +12,6 @@ import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { newFolder } from "@library/icons/common";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -21,6 +20,7 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
+import { NewFolderIcon } from "@library/icons/common";
 
 /**
  * Component for choosing a location for a new article.
@@ -58,7 +58,7 @@ class LocationPicker extends React.Component<IProps, IState> {
                                     onClick={this.showNewCategoryModal}
                                     buttonRef={this.newFolderButtonRef}
                                 >
-                                    {newFolder()}
+                                    <NewFolderIcon />
                                 </Button>
                             )}
                             <FlexSpacer />
