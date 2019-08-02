@@ -10,10 +10,13 @@ use UserModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\Formats;
 
 /**
  * API controller for managing the article revisions resource.
@@ -54,6 +57,9 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var Parser */
     private $parser;
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * ArticleRevisionsApiController constructor.
      *
@@ -61,12 +67,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      * @param Parser $parser
+     * @param FormatService $formatService
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser, FormatService $formatService) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->parser = $parser;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -122,7 +130,8 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 "processed",
                 "nonRich",
                 "firstArticleRevisionID",
-                "lastArticleRevisionID"
+                "lastArticleRevisionID",
+                "errors:a"
             ]));
         }
         return $this->schema($this->reRenderSchema, $type);
@@ -259,36 +268,46 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         $revisions = $this->articleRevisionModel->get($where, $options);
         $processed = 0;
         $noRich = 0;
+        $notProcessed = 0;
 
         $firstRevision = null;
         $lastRevision = null;
+        $errors =[];
 
         foreach ($revisions as $revision) {
             $updateRev = [];
-            $updateRev["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
 
-            if ($revision["format"] === "rich") {
-                $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
-                $updateRev["plainText"] = $plainText;
-                $updateRev["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
-                $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
-            } else {
-                $noRich++;
+            try {
+                $revision["body"] = $this->formatService->filter($revision["body"], $revision["format"]);
+                $updateRev["bodyRendered"] = $this->formatService->renderHTML($revision["body"], $revision["format"]);
+
+                if ($revision["format"] === "rich") {
+                    $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
+                    $updateRev["plainText"] = $plainText;
+                    $updateRev["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                    $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
+                } else {
+                    $noRich++;
+                }
+                $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
+                $processed++;
+            } catch (FormattingException $e){
+                $errors[] = [
+                        "articleRevisionID" => $revision["articleRevisionID"],
+                        "error message" => $e->getMessage()
+                    ];
+                $notProcessed++;
             }
-
-            $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
-
             $firstRevision = $firstRevision ?? $revision["articleRevisionID"];
             $lastRevision = $revision["articleRevisionID"];
-
-            $processed++;
         }
 
         $records = [
             "processed" => $processed,
             "nonRich" => $noRich,
             "firstArticleRevisionID" => $firstRevision,
-            "lastArticleRevisionID" => $lastRevision
+            "lastArticleRevisionID" => $lastRevision,
+            "errors" => $errors
         ];
 
         $out = $this->reRenderSchema("out");
