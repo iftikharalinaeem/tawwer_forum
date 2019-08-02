@@ -121,8 +121,8 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             $this->reRenderSchema = $this->schema(Schema::parse([
                 "processed",
                 "nonRich",
-                "first articleRevision ID",
-                "last articleRevision ID"
+                "firstArticleRevisionID",
+                "lastArticleRevisionID"
             ]));
         }
         return $this->schema($this->reRenderSchema, $type);
@@ -260,8 +260,8 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         $processed = 0;
         $noRich = 0;
 
-        $firstRevision = reset($revisions);
-        $lastRevision = end($revisions);
+        $firstRevision = null;
+        $lastRevision = null;
 
         foreach ($revisions as $revision) {
             $updateRev = [];
@@ -277,14 +277,18 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             }
 
             $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
+
+            $firstRevision = $firstRevision ?? $revision["articleRevisionID"];
+            $lastRevision = $revision["articleRevisionID"];
+
             $processed++;
         }
 
         $records = [
             "processed" => $processed,
             "nonRich" => $noRich,
-            "first articleRevision ID" => $firstRevision["articleRevisionID"],
-            "last articleRevision ID" => $lastRevision["articleRevisionID"]
+            "firstArticleRevisionID" => $firstRevision,
+            "lastArticleRevisionID" => $lastRevision
         ];
 
         $out = $this->reRenderSchema("out");

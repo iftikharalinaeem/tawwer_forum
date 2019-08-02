@@ -125,5 +125,5 @@ components:
       required:
       - processed
       - nonRich
-      - first articleRevision ID
-      - last articleRevision ID
+      - firstArticleRevisionID
+      - lastArticleRevisionID

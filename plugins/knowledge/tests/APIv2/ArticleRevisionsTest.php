@@ -95,29 +95,11 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Tests if that the article-revisions/render endpoint renders a selected revision.
+     * Tests if that the article-revisions/reRender endpoint renders a selected revision.
      */
     public function testReRender() {
+        $article = $this->createArticle();
 
-        $bodyText = json_encode([["insert" => "Rich Article"]]);
-        // Create an article.
-        $row = [
-            "body" => $bodyText,
-            "format" => "rich",
-            "locale" => "en",
-            "knowledgeCategoryID" => 1,
-            "name" => uniqid(__FUNCTION__, true),
-        ];
-
-        // Create the revision.
-        $response = $this->api()->post(
-            "/articles",
-            $row
-        );
-
-        $this->assertEquals(201, $response->getStatusCode());
-
-        $article = $response->getBody();
         $where = ["articleID" => $article["articleID"]];
 
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
@@ -143,5 +125,85 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         $this->assertEquals("<p>Some brand new text</p>", $reRenderContent["bodyRendered"]);
         $this->assertEquals("Some brand new text", $reRenderContent["plainText"]);
         $this->assertEquals("Some brand new text", $reRenderContent["excerpt"]);
+    }
+
+    /**
+     * Tests if the limit option on the article-revisions/reRender endpoint.
+     *
+     * @expectedException Garden\Web\Exception\ClientException
+     * @expectedExceptionCode 422
+     * @expectedExceptionMessage limit is greater than 1000.
+     */
+
+    public function testReRenderLimit() {
+        $options = ['limit' => 1001];
+        
+         $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
+    }
+
+    /**
+     *
+     * Tests if the limit option on the article-revisions/reRender endpoint.
+     * 
+     */
+
+    public function testReRenderOffSet() {
+        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
+        $articles = [];
+
+        
+        // create 10 articles
+        for($i = 0; $i < 10; $i++) {
+            $articles[] = $this->createArticle();
+        }
+
+
+        $allRevisions = $articleRevisionModel->get();
+        $numberOfArticles = count($allRevisions);
+
+        // There are 12 articles, 2 from existing from previous tests.
+        $this->assertEquals(12, $numberOfArticles);
+
+        $options = ['offset' => 5];
+
+        $response = $this->api()->patch(
+            "article-revisions/re-render",
+            $options
+        );
+
+        $response = $response->getBody();
+
+        $this->assertEquals(7, $response['processed']);
+        $this->assertEquals(6, $response['firstArticleRevisionID']);
+        $this->assertEquals(12, $response['lastArticleRevisionID']);
+    }
+
+    /**
+     * @return array
+     */
+    protected function createArticle(): array {
+        $bodyText = json_encode([["insert" => uniqid("Rich Article")]]);
+
+        $row = [
+            "body" => $bodyText,
+            "format" => "rich",
+            "locale" => "en",
+            "knowledgeCategoryID" => 1,
+            "name" => uniqid(__FUNCTION__, true),
+        ];
+
+        $response = $this->api()->post(
+            "/articles",
+            $row
+        );
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $article = $response->getBody();
+
+        return $article;
     }
 }
