@@ -187,7 +187,6 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
         $difference = $response1['processed'] - $response2['processed'];
 
         $this->assertEquals(5, $difference);
-
     }
 
     /**
