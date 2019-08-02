@@ -7,12 +7,12 @@
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { categoryIcon, checkCompact, rightChevron } from "@library/icons/common";
 import classNames from "classnames";
 import React from "react";
 import { knowldedgeBaseItem } from "@knowledge/icons/common";
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { CategoryIcon, CheckCompactIcon, RightChevronIcon } from "@library/icons/common";
 
 interface IProps {
     isInitialSelection: boolean;
@@ -60,7 +60,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                             )}
                             aria-hidden={true}
                         >
-                            {isSelected ? checkCompact() : this.typeIcon}
+                            {isSelected ? <CheckCompactIcon /> : this.typeIcon}
                         </span>
                         <span className={classNames("folderContents-label", classesFolderContents.label)}>
                             {value.name}
@@ -73,7 +73,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
                         baseClass={ButtonTypes.CUSTOM}
                         className={classNames("folderContents-subFolder", classesFolderContents.subFolder)}
                     >
-                        {rightChevron("folderContents-chevron isSmall", true)}
+                        <RightChevronIcon className={classNames("folderContents-chevron", "isSmall")} centred={true} />
                         <span className="sr-only">{t("Sub folder")}</span>
                     </Button>
                 )}
@@ -84,7 +84,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
     private get typeIcon(): React.ReactNode {
         switch (this.props.value.recordType) {
             case KbRecordType.CATEGORY:
-                return categoryIcon();
+                return <CategoryIcon />;
             case KbRecordType.KB:
                 return knowldedgeBaseItem();
         }
