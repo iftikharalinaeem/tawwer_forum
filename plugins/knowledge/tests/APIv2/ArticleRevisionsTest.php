@@ -134,32 +134,25 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
      * @expectedExceptionCode 422
      * @expectedExceptionMessage limit is greater than 1000.
      */
-
     public function testReRenderLimit() {
         $options = ['limit' => 1001];
-        
-         $this->api()->patch(
+        $this->api()->patch(
             "article-revisions/re-render",
             $options
         );
     }
 
     /**
-     *
      * Tests if the limit option on the article-revisions/reRender endpoint.
-     * 
      */
-
     public function testReRenderOffSet() {
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
         $articles = [];
 
-        
         // create 10 articles
-        for($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $articles[] = $this->createArticle();
         }
-
 
         $allRevisions = $articleRevisionModel->get();
         $numberOfArticles = count($allRevisions);
@@ -182,6 +175,8 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Creates an article for testing.
+     *
      * @return array
      */
     protected function createArticle(): array {
