@@ -21,6 +21,37 @@ paths:
       tags:
       - Article Revisions
       summary: Get an article revision.
+  '/article-revisions/re-render':
+    patch:
+      parameters:
+      - description: The article ID.
+        in: path
+        name: id
+        schema:
+          type: integer
+      - description: The desired number of revisions to process.
+        in: path
+        name: limit
+        schema:
+            type: integer
+            default: 1000
+            minimum: 1
+            maximum: 1000
+      - description: The number revisions to exclude.
+        in: path
+        name: offset
+        schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReRender'
+          description: Success
+      tags:
+      - Article revisions re-render.
+      summary: Re-render content in the article revisions table.
 components:
   schemas:
     ArticleRevision:
@@ -77,4 +108,22 @@ components:
       - locale
       - insertUserID
       - dateInserted
-      type: object
+    ReRender:
+      properties:
+        processed:
+          description: The number of articles re-render.
+          type: integer
+        nonRich:
+          description: The number of non rich articles re-rendered (only bodyRendered column)
+          type: integer
+        first article RevisionID:
+          description: The id of the first article revision re-render.
+          type: integer
+        last article RevisionID:
+          description: The id of the last article revision re-render.
+          type: integer
+      required:
+      - processed
+      - nonRich
+      - firstArticleRevisionID
+      - lastArticleRevisionID
