@@ -22,6 +22,7 @@ import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import VanillaHomeHeader from "@library/headers/TitleBarHome";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
@@ -39,6 +40,7 @@ export class HomePage extends React.Component<IProps> {
 
         return (
             <>
+                <AnalyticsData uniqueKey="homePage" />
                 <Splash title={title} />
                 <Container>
                     <DocumentTitle title={t("Home")}>

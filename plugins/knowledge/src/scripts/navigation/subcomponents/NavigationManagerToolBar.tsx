@@ -6,7 +6,6 @@
 
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { newFolder } from "@library/icons/common";
 import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import classNames from "classnames";
@@ -14,6 +13,7 @@ import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcomponents/navigationManagerToolBarStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { NewFolderIcon } from "@library/icons/common";
 
 interface IProps {
     expandAll: () => void;
@@ -55,7 +55,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     ariaLabel={t("New Category")}
                     buttonRef={props.newCategoryButtonRef}
                 >
-                    {newFolder(classNames(classes.icon, classes.newFolder))}
+                    <NewFolderIcon className={classNames(classes.icon, classes.newFolder)} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
                 </Button>
             </div>

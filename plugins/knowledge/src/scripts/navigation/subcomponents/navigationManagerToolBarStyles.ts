@@ -63,7 +63,7 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
 
     const newFolder = style("newFolder", {
         marginLeft: "auto",
-        transform: `translateY(-2px)`,
+        transform: `translateY(1.5px)`,
     });
 
     const separator = style("separator", {

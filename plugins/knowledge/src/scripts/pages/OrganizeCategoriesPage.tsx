@@ -26,6 +26,7 @@ import Permission from "@library/features/users/Permission";
 import { hot } from "react-hot-loader";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 class OrganizeCategoriesPage extends React.Component<IProps> {
     private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
@@ -45,6 +46,7 @@ class OrganizeCategoriesPage extends React.Component<IProps> {
 
         return (
             <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
+                <AnalyticsData uniqueKey="organizeCategoriesPage" />
                 <FullKnowledgeModal scrollable={true} titleID={this.titleID}>
                     <NavigationManagerMenu />
                     <div className={classNames(classesNavigationManager.container)}>

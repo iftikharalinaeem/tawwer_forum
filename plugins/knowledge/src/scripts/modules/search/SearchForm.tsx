@@ -31,6 +31,8 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ISearchResult } from "@knowledge/@types/api/search";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { hashString } from "@vanilla/utils";
 
 interface IProps extends ISearchFormActionProps, ISearchPageState, IWithSearchProps {
     placeholder?: string;
@@ -176,8 +178,10 @@ class SearchForm extends React.Component<IProps, IState> {
                     };
                 }
 
+                const uniqueKey = hashString(this.props.form.query + JSON.stringify(this.props.pages));
                 return (
                     <>
+                        <AnalyticsData uniqueKey={uniqueKey} />
                         <ResultList results={this.props.results.data!.map(this.mapResult)} />
                         <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                     </>

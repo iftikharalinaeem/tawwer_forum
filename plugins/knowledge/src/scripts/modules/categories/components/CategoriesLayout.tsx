@@ -11,9 +11,12 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import TitleBar from "@library/headers/TitleBar";
-import { compose } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import {
+    Devices,
+    IDeviceProps,
+    withDevice
+} from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
@@ -25,8 +28,11 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import PageErrorMessage, {
+    DefaultError
+} from "@knowledge/modules/common/PageErrorMessage";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ComposeIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -41,23 +47,28 @@ interface IState {
 
 export class CategoriesLayout extends React.Component<IProps, IState> {
     public state: IState = {
-        query: this.props.query || "",
+        query: this.props.query || ""
     };
 
     public render() {
         const { category, device, pages, results } = this.props;
         const activeRecord = {
             recordType: KbRecordType.CATEGORY,
-            recordID: category.knowledgeCategoryID,
+            recordID: category.knowledgeCategoryID
         };
-        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(
+            device
+        ); // This compoment doesn't care about the no bleed, it's the same as desktop
         const classesSearchBar = searchBarClasses();
 
         const pageContent =
             results.length > 0 ? (
                 <>
                     <ResultList results={this.props.results} />
-                    <SimplePager url={category.url + "/p:page:"} pages={pages} />
+                    <SimplePager
+                        url={category.url + "/p:page:"}
+                        pages={pages}
+                    />
                 </>
             ) : (
                 <PageErrorMessage
@@ -73,13 +84,21 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                 <TitleBar
                     title={category.name}
                     mobileDropDownContent={
-                        <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
+                        <Navigation
+                            collapsible={false}
+                            activeRecord={activeRecord}
+                            kbID={category.knowledgeBaseID}
+                        />
                     }
                 />
                 <PanelLayout
                     device={this.props.device}
                     breadcrumbs={
-                        category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
+                        category.breadcrumbs && (
+                            <Breadcrumbs forceDisplay={false}>
+                                {category.breadcrumbs}
+                            </Breadcrumbs>
+                        )
                     }
                     leftBottom={
                         <PanelWidget>
@@ -99,15 +118,23 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     <LinkAsButton
                                         to={EditorRoute.url(category)}
                                         onMouseOver={EditorRoute.preload}
-                                        className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
+                                        className={classNames(
+                                            "searchBar-actionButton",
+                                            classesSearchBar.actionButton
+                                        )}
                                         baseClass={ButtonTypes.ICON_COMPACT}
                                         title={t("Compose")}
                                     >
-                                        {compose()}
+                                        <ComposeIcon />
                                     </LinkAsButton>
                                 }
                             >
-                                <label className={classNames("searchBar-label", classesSearchBar.label)}>
+                                <label
+                                    className={classNames(
+                                        "searchBar-label",
+                                        classesSearchBar.label
+                                    )}
+                                >
                                     {category.name}
                                 </label>
                             </PageTitle>

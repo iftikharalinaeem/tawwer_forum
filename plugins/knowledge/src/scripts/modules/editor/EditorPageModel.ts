@@ -18,6 +18,7 @@ import { IArticle, IResponseArticleDraft } from "@knowledge/@types/api/article";
 import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
+import isEqual from "lodash/isEqual";
 
 export interface IEditorPageForm {
     name: string;
@@ -119,7 +120,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
         form: {
             name: "",
-            body: [],
+            body: [{ insert: "\n" }],
             knowledgeCategoryID: null,
         },
         formErrors: {
@@ -168,12 +169,30 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     private reduceCommon: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
             case EditorPageActions.UPDATE_FORM:
+                // Check for changed values.
+                const hasChange = (): boolean => {
+                    if (action.payload.forceRefresh) {
+                        return true;
+                    }
+                    for (const key of Object.keys(action.payload.formData)) {
+                        if (!isEqual(action.payload.formData[key], nextState.form[key])) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+
+                if (!hasChange()) {
+                    return nextState;
+                }
+
                 nextState.form = {
                     ...nextState.form,
                     ...action.payload.formData,
                 };
                 const { forceRefresh } = action.payload;
                 nextState.formNeedsRefresh = forceRefresh;
+
                 nextState.isDirty = !forceRefresh;
 
                 // Clean up the form errors on the fields that were modified.
@@ -194,10 +213,13 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
     private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
         .case(EditorPageActions.queueEditorOpsAC, (nextState, payload) => {
             nextState.editorOperationsQueue = payload;
-            if (typeof payload === "string") {
-                // The item needs conversion.
-                nextState.notifyConversion = true;
-            }
+            payload.forEach(queuedItem => {
+                if (typeof queuedItem === "string") {
+                    // The item needs conversion.
+                    nextState.notifyConversion = true;
+                }
+            });
+
             return nextState;
         })
         .case(EditorPageActions.clearEditorOpsAC, nextState => {

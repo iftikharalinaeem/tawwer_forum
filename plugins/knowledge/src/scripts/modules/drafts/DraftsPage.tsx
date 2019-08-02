@@ -7,8 +7,9 @@
 import DraftsLayout from "@knowledge/modules/drafts/components/DraftsLayout";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
-import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -42,6 +43,7 @@ export class DraftsPage extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
+                <AnalyticsData uniqueKey="draftsPage" />
                 <PageLoader status={this.props.userDrafts.status}>
                     <DocumentTitle title={t("Drafts")}>
                         <DraftsLayout {...this.props} data={this.props.userDrafts.data || []} />

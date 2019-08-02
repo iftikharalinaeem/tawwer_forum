@@ -7,11 +7,11 @@
 import { t } from "@library/utility/appUtils";
 import DateTime from "@library/content/DateTime";
 import {
-    revisionStatus_deleted,
-    revisionStatus_draft,
-    revisionStatus_pending,
-    revisionStatus_published,
-    revisionStatus_revision,
+    RevisionStatusDeletedIcon,
+    RevisionStatusDraftIcon,
+    RevisionStatusPendingIcon,
+    RevisionStatusPublishedIcon,
+    RevisionStatusRevisionIcon,
 } from "@library/icons/revision";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
@@ -82,15 +82,15 @@ export default class RevisionsListItem extends React.Component<IProps> {
         const commonClass = classNames("itemList-icon", classes.icon);
         switch (status) {
             case "draft":
-                return revisionStatus_draft(commonClass);
+                return <RevisionStatusDraftIcon className={commonClass} />;
             case "pending":
-                return revisionStatus_pending(commonClass);
+                return <RevisionStatusPendingIcon className={commonClass} />;
             case "published":
-                return revisionStatus_published(commonClass);
+                return <RevisionStatusPublishedIcon className={commonClass} />;
             case "deleted":
-                return revisionStatus_deleted(commonClass);
+                return <RevisionStatusDeletedIcon className={commonClass} />;
             default:
-                return revisionStatus_revision(commonClass);
+                return <RevisionStatusRevisionIcon className={commonClass} />;
         }
     }
 }
