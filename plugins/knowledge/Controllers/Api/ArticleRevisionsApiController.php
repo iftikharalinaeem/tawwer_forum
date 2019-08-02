@@ -12,6 +12,8 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * API controller for managing the article revisions resource.
@@ -25,6 +27,12 @@ use Vanilla\Knowledge\Models\ArticleModel;
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
+    /** The maximum limit of revisions that can be re-rendered at a time. */
+    const LIMIT = 1000;
+
+    /** The default re-render starting point. */
+    const OFFSET = 0;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -37,8 +45,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var Schema */
+    private $reRenderSchema;
+
     /** @var UserModel */
     private $userModel;
+
+    /** @var Parser */
+    private $parser;
 
     /**
      * ArticleRevisionsApiController constructor.
@@ -46,11 +60,13 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
+     * @param Parser $parser
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
+        $this->parser = $parser;
     }
 
     /**
@@ -92,6 +108,24 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             ])->add($this->fullSchema()), "ArticleRevision");
         }
         return $this->schema($this->articleRevisionSchema, $type);
+    }
+
+    /**
+     * Get the schema for the reRender.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function reRenderSchema(string $type = ""): Schema {
+        if ($this->reRenderSchema === null) {
+            $this->reRenderSchema = $this->schema(Schema::parse([
+                "processed",
+                "nonRich",
+                "firstArticleRevisionID",
+                "lastArticleRevisionID"
+            ]));
+        }
+        return $this->schema($this->reRenderSchema, $type);
     }
 
     /**
@@ -185,5 +219,81 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      */
     private function normalizeOutput(array $row): array {
         return $row;
+    }
+
+    /**
+     * ReRender content in the articleRevision Table (bodyRendered, format, plainText, excerpt, outline).
+     *
+     * @param array $body A specific id to rerender.
+     * @return array $results The number of records processed.
+     */
+    public function patch_reRender(array $body = []): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(
+            Schema::parse([
+                "articleID:i?" => "The article ID.",
+                "limit:i?" => [
+                    "Description" => "The desired number of revisions to process.",
+                    'default' => self::LIMIT,
+                    'minimum' => 1,
+                    'maximum' => self::LIMIT
+                ],
+                "offset:i?" => "The number revisions to exclude."
+                ]),
+            "in"
+        );
+
+        $body = $in->validate($body);
+
+        $where = [];
+        if (!empty($body["articleID"] ?? null)) {
+            $where = ["articleID" => $body["articleID"]];
+        }
+
+        $limit = $body["limit"] ?? self::LIMIT;
+        $offset = $body["offset"] ?? self::OFFSET;
+
+        $options = ["limit" => $limit, "offset" => $offset];
+
+        $revisions = $this->articleRevisionModel->get($where, $options);
+        $processed = 0;
+        $noRich = 0;
+
+        $firstRevision = null;
+        $lastRevision = null;
+
+        foreach ($revisions as $revision) {
+            $updateRev = [];
+            $updateRev["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
+
+            if ($revision["format"] === "rich") {
+                $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
+                $updateRev["plainText"] = $plainText;
+                $updateRev["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
+            } else {
+                $noRich++;
+            }
+
+            $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
+
+            $firstRevision = $firstRevision ?? $revision["articleRevisionID"];
+            $lastRevision = $revision["articleRevisionID"];
+
+            $processed++;
+        }
+
+        $records = [
+            "processed" => $processed,
+            "nonRich" => $noRich,
+            "firstArticleRevisionID" => $firstRevision,
+            "lastArticleRevisionID" => $lastRevision
+        ];
+
+        $out = $this->reRenderSchema("out");
+        $result = $out->validate($records);
+
+        return $result;
     }
 }
