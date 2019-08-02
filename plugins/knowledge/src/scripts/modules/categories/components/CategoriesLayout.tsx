@@ -12,7 +12,6 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import TitleBar from "@library/headers/TitleBar";
-import { compose } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
@@ -27,6 +26,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { ComposeIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -103,7 +103,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                         baseClass={ButtonTypes.ICON_COMPACT}
                                         title={t("Compose")}
                                     >
-                                        {compose()}
+                                        <ComposeIcon />
                                     </LinkAsButton>
                                 }
                             >
