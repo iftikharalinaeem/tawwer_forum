@@ -8,9 +8,11 @@ import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderC
 import classNames from "classnames";
 import React from "react";
 import { article } from "@knowledge/navigation/navigationManagerIcons";
+import { CheckCompactIcon } from "@library/icons/common";
 
 interface IProps {
     name: string;
+    isSelected: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ interface IProps {
  */
 export default class LocationPickerArticleItem extends React.Component<IProps> {
     public render() {
-        const { name } = this.props;
+        const { name, isSelected } = this.props;
         const classesFolderContents = folderContentsClasses();
         return (
             <li className={classNames("folderContents-item", classesFolderContents.item)}>
@@ -30,7 +32,7 @@ export default class LocationPickerArticleItem extends React.Component<IProps> {
                             classesFolderContents.icon,
                         )}
                     >
-                        {article()}
+                        {isSelected ? <CheckCompactIcon /> : article()}
                     </span>
                     <span className={classNames("folderContents-label", classesFolderContents.label)}>{name}</span>
                 </span>

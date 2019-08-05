@@ -38,6 +38,7 @@ class LocationContents extends React.Component<IProps> {
 
     public render() {
         const { childRecords, chosenRecord, navigatedRecord, navigatedKB, selectedRecord, title } = this.props;
+        const { selectedArticle } = this.props;
 
         const isSelectedInNavigated =
             navigatedRecord &&
@@ -77,6 +78,10 @@ class LocationContents extends React.Component<IProps> {
                         !!selectedRecord &&
                         item.recordType === selectedRecord.recordType &&
                         item.recordID === selectedRecord.recordID;
+                    const isSelectedArticle =
+                        !!selectedArticle &&
+                        item.recordID === selectedArticle.articleID &&
+                        item.recordType === KbRecordType.ARTICLE;
                     const isChosen =
                         !!chosenRecord &&
                         item.recordType === chosenRecord.recordType &&
@@ -89,6 +94,13 @@ class LocationContents extends React.Component<IProps> {
                     const itemSort = item.sort === null ? 0 : item.sort;
                     const isLast = recordCount === index + 1;
                     const isCurrentLocation = currentSort === index + 1;
+                    const nextRecord = !isLast && childRecords.data[index + 1];
+                    const isNextSelectedArticle =
+                        !!selectedArticle &&
+                        nextRecord &&
+                        nextRecord.recordID === selectedArticle.articleID &&
+                        nextRecord.recordType === KbRecordType.ARTICLE;
+                    const shouldRenderInsertButton = !isSelectedArticle && !isNextSelectedArticle;
 
                     const setArticlePosition = () => {
                         this.setArticleLocation(itemSort + 1);
@@ -107,15 +119,21 @@ class LocationContents extends React.Component<IProps> {
                         ) : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
+                        const { selectedArticle } = this.props;
                         return (
                             <React.Fragment key={itemKey}>
                                 {insertArticleFirst}
-                                <LocationPickerArticleItem name={item.name} />
-                                <LocationPickerInsertArticle
-                                    onClick={setArticlePosition}
-                                    className={classNames({ isLast })}
-                                    isSelected={isCurrentLocation}
+                                <LocationPickerArticleItem
+                                    name={item.name}
+                                    isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
                                 />
+                                {shouldRenderInsertButton && (
+                                    <LocationPickerInsertArticle
+                                        onClick={setArticlePosition}
+                                        className={classNames({ isLast })}
+                                        isSelected={isCurrentLocation}
+                                    />
+                                )}
                             </React.Fragment>
                         );
                     } else {
@@ -131,7 +149,7 @@ class LocationContents extends React.Component<IProps> {
                                     onSelect={selectHandler}
                                     selectable={!pickArticleLocation}
                                 />
-                                {pickArticleLocation && (
+                                {pickArticleLocation && shouldRenderInsertButton && (
                                     <LocationPickerInsertArticle
                                         onClick={setArticlePosition}
                                         className={classNames({ isLast })}
@@ -207,20 +225,11 @@ interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-interface IMapResult {
-    title: string;
-    navigatedRecord: ILocationPickerRecord | null;
-    navigatedKB: IKnowledgeBase | null;
-    selectedRecord: ILocationPickerRecord | null;
-    chosenRecord: ILocationPickerRecord | null;
-    childRecords: ILoadable<IKbNavigationItem[]>;
-}
-
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord } = locationPicker;
+    const { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
-    const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title };
+    const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title, selectedArticle };
 
     // If nothing is selected we are at the root of the nav picker.
     if (

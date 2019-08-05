@@ -32,6 +32,7 @@ import actionCreatorFactory from "typescript-fsa";
 import { EditorQueueItem } from "@rich-editor/editor/context";
 import { EditorPage } from "@knowledge/modules/editor/EditorPage";
 import { getRelativeUrl } from "@library/utility/appUtils";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -147,7 +148,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
                 recordType: KbRecordType.CATEGORY,
                 recordID: initialCategoryID,
                 knowledgeBaseID: initialKbID,
-            });
+            }, null);
         }
     }
 
@@ -194,7 +195,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
 
         const initialRecord = this.getInitialRecordForEdit();
         if (initialRecord) {
-            await this.locationActions.initLocationPickerFromRecord(initialRecord);
+            await this.locationActions.initLocationPickerFromRecord(initialRecord, this.getCurrentArticle());
         }
     }
 
@@ -215,6 +216,12 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             recordID: categoryID,
             recordType: KbRecordType.CATEGORY,
         };
+    }
+
+    private getCurrentArticle(): IArticle | null {
+        const { article } = this.getState().knowledge.editorPage;
+
+        return article.data || null;
     }
 
     public static queueEditorOpsAC = createAction<EditorQueueItem[]>("QUEUE_EDITOR_OP");
