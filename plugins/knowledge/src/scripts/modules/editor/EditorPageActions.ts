@@ -144,11 +144,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         }
 
         if (initialCategoryID !== null && initialKbID !== null) {
-            await this.locationActions.initLocationPickerFromRecord({
-                recordType: KbRecordType.CATEGORY,
-                recordID: initialCategoryID,
-                knowledgeBaseID: initialKbID,
-            }, null);
+            await this.locationActions.initLocationPickerFromRecord(
+                {
+                    recordType: KbRecordType.CATEGORY,
+                    recordID: initialCategoryID,
+                    knowledgeBaseID: initialKbID,
+                },
+                null,
+            );
         }
     }
 
