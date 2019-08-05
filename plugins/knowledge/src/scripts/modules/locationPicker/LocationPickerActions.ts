@@ -13,6 +13,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IArticle } from "@knowledge/@types/api/article";
 
 const createAction = actionCreatorFactory("@@loationPicker");
 
@@ -27,8 +28,9 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
      * @param parentID The parent ID of the category.
      */
     public static initAC = createAction<{
-        selected: ILocationPickerRecord | null;
-        parent: ILocationPickerRecord | null;
+        selectedCategory: ILocationPickerRecord | null;
+        parentCategory: ILocationPickerRecord | null;
+        article: IArticle | null;
     }>("init");
 
     /**
@@ -85,7 +87,7 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
      *
      * @param article The article to init from.
      */
-    public initLocationPickerFromRecord = async (record: ILocationPickerRecord) => {
+    public initLocationPickerFromRecord = async (record: ILocationPickerRecord, article: IArticle | null) => {
         if (record) {
             const { knowledgeBases, navigation } = this.getState().knowledge;
             const { recordID, recordType, knowledgeBaseID } = record;
@@ -126,8 +128,8 @@ export default class LocationPickerActions extends ReduxActions<IStoreState> {
             }
 
             const parentRecord = navigationItems[KbRecordType.CATEGORY + ownFullRecord.parentID] || null;
-            const selected = ownKnowledgeBase || ownFullRecord;
-            this.init({ selected, parent: parentRecord });
+            const selectedCategory = ownKnowledgeBase || ownFullRecord;
+            this.init({ selectedCategory, parentCategory: parentRecord, article });
         }
     };
 }
