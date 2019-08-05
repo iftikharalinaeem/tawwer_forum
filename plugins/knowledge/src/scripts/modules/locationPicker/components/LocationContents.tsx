@@ -73,6 +73,7 @@ class LocationContents extends React.Component<IProps> {
                     contents = <LocationPickerEmpty />;
                 }
             } else {
+                let isPassedSelectedArticle = false;
                 contents = childRecords.data.map((item, index) => {
                     const isSelected =
                         !!selectedRecord &&
@@ -91,9 +92,20 @@ class LocationContents extends React.Component<IProps> {
                     };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
-                    const itemSort = item.sort === null ? 0 : item.sort;
+                    let itemSort = item.sort === null ? 0 : item.sort;
+
+                    // Adjust sort offset to handle current article selected.
+                    // https://github.com/vanilla/knowledge/issues/988
+                    if (isSelectedArticle) {
+                        isPassedSelectedArticle = true;
+                    }
+
+                    if (!isPassedSelectedArticle) {
+                        itemSort++;
+                    }
+
                     const isLast = recordCount === index + 1;
-                    const isCurrentLocation = currentSort === index + 1;
+                    const isCurrentLocation = currentSort === itemSort;
                     const nextRecord = !isLast && childRecords.data[index + 1];
                     const isNextSelectedArticle =
                         !!selectedArticle &&
@@ -103,11 +115,12 @@ class LocationContents extends React.Component<IProps> {
                     const shouldRenderInsertButton = !isSelectedArticle && !isNextSelectedArticle;
 
                     const setArticlePosition = () => {
-                        this.setArticleLocation(itemSort + 1);
+                        this.setArticleLocation(itemSort);
                     };
 
+                    const isSelectedArticleFirst = selectedArticle && selectedArticle.sort === 0;
                     const insertArticleFirst =
-                        pickArticleLocation && index === 0 ? (
+                        pickArticleLocation && index === 0 && !isSelectedArticleFirst ? (
                             <React.Fragment key="potentialLocation-0">
                                 {message}
                                 <LocationPickerInsertArticle
