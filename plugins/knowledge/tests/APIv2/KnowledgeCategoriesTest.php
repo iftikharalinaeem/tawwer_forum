@@ -136,7 +136,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
      *
      * @return array
      */
-    public function testPost(array $record = null, array $extra = []): array {
+    public function testPost($record = null, array $extra = []): array {
         if ($record === null) {
             $record = $this->record();
             $kb = [
@@ -174,9 +174,12 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * @inheritdoc
+     * Generate rows for the index test.
+     *
+     * @param array $record The record to insert for the index.
+     * @return array
      */
-    protected function generateIndexRows($record) {
+    private function generateIndexRowsRecord($record) {
         $rows = [];
 
         // Insert a few rows.
@@ -199,7 +202,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $originalRows = $originalIndex->getBody();
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
-        $rows = $this->generateIndexRows($recordPlaceholder);
+        $rows = $this->generateIndexRowsRecord($recordPlaceholder);
 
         $newIndex = $this->api()->get($indexUrl);
 
@@ -229,7 +232,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         $originalIndex = $this->api()->get($indexUrl);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
-        $rows = $this->generateIndexRows($recordPlaceholder);
+        $rows = $this->generateIndexRowsRecord($recordPlaceholder);
 
         $this->api()->patch("/knowledge-bases/{$record['knowledgeBaseID']}", ['status' => KnowledgeBaseModel::STATUS_DELETED]);
 
