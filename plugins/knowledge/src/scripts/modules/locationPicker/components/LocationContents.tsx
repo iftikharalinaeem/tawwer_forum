@@ -28,6 +28,9 @@ import { loaderClasses } from "@library/loaders/loaderStyles";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
+import LocationPickerSelectedArticle from "./LocationPickerSelectedArticle";
+import { select } from "@storybook/addon-knobs";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -47,28 +50,32 @@ class LocationContents extends React.Component<IProps> {
             navigatedRecord.recordID === selectedRecord.recordID;
 
         const currentSort = selectedRecord && isSelectedInNavigated ? selectedRecord.position : null;
-        const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
+        const canPickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
 
         const setArticleFirstPosition = () => {
             this.setArticleLocation(0);
         };
 
+        const firstLocationPickerPlaceholder = (
+            <>
+                <LocationPickerInstructions />
+                {selectedArticle && currentSort === 0 ? (
+                    <LocationPickerSelectedArticle title={selectedArticle.name} className="isFirst" />
+                ) : (
+                    <LocationPickerInsertArticle
+                        onClick={setArticleFirstPosition}
+                        className="isFirst"
+                        isSelected={currentSort === 0}
+                    />
+                )}
+            </>
+        );
         let contents;
         if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
             const recordCount = childRecords.data.length;
-            const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
-                if (pickArticleLocation) {
-                    contents = (
-                        <>
-                            {message}
-                            <LocationPickerInsertArticle
-                                onClick={setArticleFirstPosition}
-                                className="isFirst"
-                                isSelected={currentSort === 0}
-                            />
-                        </>
-                    );
+                if (canPickArticleLocation) {
+                    contents = firstLocationPickerPlaceholder;
                 } else {
                     contents = <LocationPickerEmpty />;
                 }
@@ -118,37 +125,63 @@ class LocationContents extends React.Component<IProps> {
                         this.setArticleLocation(itemSort);
                     };
 
+                    const isSelectedArticleInCurrentCategory =
+                        selectedArticle &&
+                        this.props.navigatedRecord &&
+                        this.props.navigatedRecord.recordType === KbRecordType.CATEGORY &&
+                        selectedArticle.knowledgeCategoryID === this.props.navigatedRecord.recordID;
+
                     const isSelectedArticleFirst = selectedArticle && selectedArticle.sort === 0;
+                    const isSelectedFirstArticleInCurrentCategory =
+                        isSelectedArticleInCurrentCategory && isSelectedArticleFirst;
+                    const articlePlaceholder =
+                        isCurrentLocation && selectedArticle ? (
+                            <LocationPickerSelectedArticle
+                                title={selectedArticle.name}
+                                className={classNames({ isLast })}
+                            />
+                        ) : (
+                            <LocationPickerInsertArticle
+                                onClick={setArticlePosition}
+                                className={classNames({ isLast })}
+                                isSelected={isCurrentLocation}
+                            />
+                        );
                     const insertArticleFirst =
-                        pickArticleLocation && index === 0 && !isSelectedArticleFirst ? (
-                            <React.Fragment key="potentialLocation-0">
-                                {message}
-                                <LocationPickerInsertArticle
-                                    onClick={setArticleFirstPosition}
-                                    className="isFirst"
-                                    isSelected={currentSort === 0} // first one is exception
-                                />
-                            </React.Fragment>
-                        ) : null;
+                        canPickArticleLocation && index === 0 && !isSelectedFirstArticleInCurrentCategory
+                            ? firstLocationPickerPlaceholder
+                            : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
                         const { selectedArticle } = this.props;
-                        return (
-                            <React.Fragment key={itemKey}>
-                                {insertArticleFirst}
-                                <LocationPickerArticleItem
-                                    name={item.name}
-                                    isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
+                        if (
+                            selectedArticle &&
+                            item.recordID === selectedArticle.articleID &&
+                            !isCurrentLocation &&
+                            selectedRecord &&
+                            selectedRecord.position !== undefined &&
+                            selectedRecord.position !== selectedArticle.sort
+                        ) {
+                            return (
+                                <LocationPickerInsertArticle
+                                    key={itemKey}
+                                    onClick={setArticlePosition}
+                                    className={classNames({ isLast })}
+                                    isSelected={isCurrentLocation}
                                 />
-                                {shouldRenderInsertButton && (
-                                    <LocationPickerInsertArticle
-                                        onClick={setArticlePosition}
-                                        className={classNames({ isLast })}
-                                        isSelected={isCurrentLocation}
+                            );
+                        } else {
+                            return (
+                                <React.Fragment key={itemKey}>
+                                    {insertArticleFirst}
+                                    <LocationPickerArticleItem
+                                        name={item.name}
+                                        isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
                                     />
-                                )}
-                            </React.Fragment>
-                        );
+                                    {shouldRenderInsertButton && articlePlaceholder}
+                                </React.Fragment>
+                            );
+                        }
                     } else {
                         return (
                             <React.Fragment key={itemKey}>
@@ -160,15 +193,9 @@ class LocationContents extends React.Component<IProps> {
                                     value={item}
                                     onNavigate={navigateHandler}
                                     onSelect={selectHandler}
-                                    selectable={!pickArticleLocation}
+                                    selectable={!canPickArticleLocation}
                                 />
-                                {pickArticleLocation && shouldRenderInsertButton && (
-                                    <LocationPickerInsertArticle
-                                        onClick={setArticlePosition}
-                                        className={classNames({ isLast })}
-                                        isSelected={isCurrentLocation}
-                                    />
-                                )}
+                                {canPickArticleLocation && shouldRenderInsertButton && articlePlaceholder}
                             </React.Fragment>
                         );
                     }
@@ -240,8 +267,26 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
+    let { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
+
+    // Normalize the selected/chosen/navigated records from knowledge bases into categories.
+    const kbs = knowledgeBases.knowledgeBasesByID.data;
+    const normalizeRecord = (record: ILocationPickerRecord | null): ILocationPickerRecord | null => {
+        if (kbs && record && record.recordType === KbRecordType.KB) {
+            const fullKb = kbs[record.recordID];
+            return {
+                ...record,
+                recordType: KbRecordType.CATEGORY,
+                recordID: fullKb.rootCategoryID,
+            };
+        } else {
+            return record;
+        }
+    };
+    selectedRecord = normalizeRecord(selectedRecord);
+    navigatedRecord = normalizeRecord(navigatedRecord)!; // Definitely not null
+    selectedRecord = normalizeRecord(selectedRecord);
     const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title, selectedArticle };
 
     // If nothing is selected we are at the root of the nav picker.
