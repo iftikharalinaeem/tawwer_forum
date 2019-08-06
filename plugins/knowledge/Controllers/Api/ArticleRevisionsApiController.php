@@ -65,7 +65,8 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param UserModel $userModel
      * @param FormatService $formatService
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, FormatService $formatService) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel,
+                                UserModel $userModel, FormatService $formatService) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
