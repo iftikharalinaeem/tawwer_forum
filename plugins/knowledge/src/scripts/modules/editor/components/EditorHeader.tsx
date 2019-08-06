@@ -75,13 +75,11 @@ export default function EditorHeader(props: IProps) {
                 ref={backRef}
                 style={minButtonSizeStyles}
             >
-                {showMobileDropDown && (
-                    <BackLink
-                        title={t("Cancel")}
-                        visibleLabel={true}
-                        className={classNames("editorHeader-backLink", classesEditorHeader.backLink)}
-                    />
-                )}
+                <BackLink
+                    title={t("Cancel")}
+                    visibleLabel={true}
+                    className={classNames("editorHeader-backLink", classesEditorHeader.backLink)}
+                />
             </li>
             <DraftIndicator
                 draftData={props.draft && props.draft.data}
