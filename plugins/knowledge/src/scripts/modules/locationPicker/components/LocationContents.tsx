@@ -28,6 +28,9 @@ import { loaderClasses } from "@library/loaders/loaderStyles";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
+import LocationPickerSelectedArticle from "./LocationPickerSelectedArticle";
+import { select } from "@storybook/addon-knobs";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -53,22 +56,26 @@ class LocationContents extends React.Component<IProps> {
             this.setArticleLocation(0);
         };
 
+        const firstLocationPickerPlaceholder = (
+            <>
+                <LocationPickerInstructions />
+                {selectedArticle && currentSort === 0 ? (
+                    <LocationPickerSelectedArticle title={selectedArticle.name} className="isFirst" />
+                ) : (
+                    <LocationPickerInsertArticle
+                        onClick={setArticleFirstPosition}
+                        className="isFirst"
+                        isSelected={currentSort === 0}
+                    />
+                )}
+            </>
+        );
         let contents;
         if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
             const recordCount = childRecords.data.length;
-            const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
                 if (canPickArticleLocation) {
-                    contents = (
-                        <>
-                            {message}
-                            <LocationPickerInsertArticle
-                                onClick={setArticleFirstPosition}
-                                className="isFirst"
-                                isSelected={currentSort === 0}
-                            />
-                        </>
-                    );
+                    contents = firstLocationPickerPlaceholder;
                 } else {
                     contents = <LocationPickerEmpty />;
                 }
@@ -127,17 +134,23 @@ class LocationContents extends React.Component<IProps> {
                     const isSelectedArticleFirst = selectedArticle && selectedArticle.sort === 0;
                     const isSelectedFirstArticleInCurrentCategory =
                         isSelectedArticleInCurrentCategory && isSelectedArticleFirst;
+                    const articlePlaceholder =
+                        isCurrentLocation && selectedArticle ? (
+                            <LocationPickerSelectedArticle
+                                title={selectedArticle.name}
+                                className={classNames({ isLast })}
+                            />
+                        ) : (
+                            <LocationPickerInsertArticle
+                                onClick={setArticlePosition}
+                                className={classNames({ isLast })}
+                                isSelected={isCurrentLocation}
+                            />
+                        );
                     const insertArticleFirst =
-                        canPickArticleLocation && index === 0 && !isSelectedFirstArticleInCurrentCategory ? (
-                            <React.Fragment key="potentialLocation-0">
-                                {message}
-                                <LocationPickerInsertArticle
-                                    onClick={setArticleFirstPosition}
-                                    className="isFirst"
-                                    isSelected={currentSort === 0} // first one is exception
-                                />
-                            </React.Fragment>
-                        ) : null;
+                        canPickArticleLocation && index === 0 && !isSelectedFirstArticleInCurrentCategory
+                            ? firstLocationPickerPlaceholder
+                            : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
                         const { selectedArticle } = this.props;
@@ -148,13 +161,7 @@ class LocationContents extends React.Component<IProps> {
                                     name={item.name}
                                     isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
                                 />
-                                {shouldRenderInsertButton && (
-                                    <LocationPickerInsertArticle
-                                        onClick={setArticlePosition}
-                                        className={classNames({ isLast })}
-                                        isSelected={isCurrentLocation}
-                                    />
-                                )}
+                                {shouldRenderInsertButton && articlePlaceholder}
                             </React.Fragment>
                         );
                     } else {
@@ -170,13 +177,7 @@ class LocationContents extends React.Component<IProps> {
                                     onSelect={selectHandler}
                                     selectable={!canPickArticleLocation}
                                 />
-                                {canPickArticleLocation && shouldRenderInsertButton && (
-                                    <LocationPickerInsertArticle
-                                        onClick={setArticlePosition}
-                                        className={classNames({ isLast })}
-                                        isSelected={isCurrentLocation}
-                                    />
-                                )}
+                                {canPickArticleLocation && shouldRenderInsertButton && articlePlaceholder}
                             </React.Fragment>
                         );
                     }
