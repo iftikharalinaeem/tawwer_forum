@@ -1027,16 +1027,19 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Add the group ID to the new discussion module.
      *
-     * @param $sender NewdiscussionModule.
+     * @param Gdn_Module|Gdn_Controller $sender
      * @throws Exception.
      */
     public function base_beforeNewDiscussionButton_handler($sender) {
+        if (!method_exists($sender, 'data')) {
+            return;
+        }
 
         $groupID = null;
 
-        if (array_key_exists('GroupID', $sender->Data['Group'])) {
+        if (!empty($sender->data('Group.GroupID'))) {
             $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : null;
-        } elseif (array_key_exists('GroupID', $sender->Data['Discussion'])) {
+        } elseif (!empty($sender->data('Discussion.GroupID'))) {
             $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : null;
         }
 
