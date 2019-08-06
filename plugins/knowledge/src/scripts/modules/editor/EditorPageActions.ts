@@ -356,6 +356,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             const patchRequest: IPatchArticleRequestBody = {
                 articleID: editorState.article.data.articleID,
                 body: shouldSubmitBody ? body : undefined,
+                format: shouldSubmitBody ? Format.RICH : undefined, // forced to always be rich on insert
                 name: prevName !== name ? name : undefined,
                 knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
                 sort,
