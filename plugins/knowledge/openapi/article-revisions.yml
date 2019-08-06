@@ -125,6 +125,11 @@ components:
         errors:
           description: The article id that were not processed and along with the error thrown.
           type: object
+          properties:
+              articleRevisionID:
+                type: integer
+              errorMessage:
+                type: string
       required:
       - processed
       - errorCount

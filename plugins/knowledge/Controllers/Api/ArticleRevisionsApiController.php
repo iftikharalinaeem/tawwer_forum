@@ -131,7 +131,20 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 "errorCount",
                 "firstArticleRevisionID",
                 "lastArticleRevisionID",
-                "errors"
+                "errors" => [
+                    "items" => [
+                        "properties" => [
+                            "articleRevisionID" => [
+                                "type" => "integer",
+                                "description" => "Article revision ID ",
+                            ],
+                            "errorMessage" => [
+                                "type" => "string",
+                                "description" => "Error message thrown when re-rendering the revision",
+                            ]
+                        ]
+                    ]
+                ]
             ]));
         }
         return $this->schema($this->reRenderSchema, $type);
@@ -292,7 +305,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             } catch (FormattingException $e) {
                 $errors[] = [
                         "articleRevisionID" => $revision["articleRevisionID"],
-                        "error message" => $e->getMessage()
+                        "errorMessage" => $e->getMessage()
                     ];
                 $notProcessed++;
             }
