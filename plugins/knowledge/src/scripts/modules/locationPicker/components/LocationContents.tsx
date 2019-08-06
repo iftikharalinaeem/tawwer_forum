@@ -154,16 +154,34 @@ class LocationContents extends React.Component<IProps> {
 
                     if (item.recordType === KbRecordType.ARTICLE) {
                         const { selectedArticle } = this.props;
-                        return (
-                            <React.Fragment key={itemKey}>
-                                {insertArticleFirst}
-                                <LocationPickerArticleItem
-                                    name={item.name}
-                                    isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
+                        if (
+                            selectedArticle &&
+                            item.recordID === selectedArticle.articleID &&
+                            !isCurrentLocation &&
+                            selectedRecord &&
+                            selectedRecord.position !== undefined &&
+                            selectedRecord.position !== selectedArticle.sort
+                        ) {
+                            return (
+                                <LocationPickerInsertArticle
+                                    key={itemKey}
+                                    onClick={setArticlePosition}
+                                    className={classNames({ isLast })}
+                                    isSelected={isCurrentLocation}
                                 />
-                                {shouldRenderInsertButton && articlePlaceholder}
-                            </React.Fragment>
-                        );
+                            );
+                        } else {
+                            return (
+                                <React.Fragment key={itemKey}>
+                                    {insertArticleFirst}
+                                    <LocationPickerArticleItem
+                                        name={item.name}
+                                        isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
+                                    />
+                                    {shouldRenderInsertButton && articlePlaceholder}
+                                </React.Fragment>
+                            );
+                        }
                     } else {
                         return (
                             <React.Fragment key={itemKey}>
