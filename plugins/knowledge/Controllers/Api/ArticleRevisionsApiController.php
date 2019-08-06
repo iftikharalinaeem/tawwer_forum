@@ -54,9 +54,6 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var UserModel */
     private $userModel;
 
-    /** @var Parser */
-    private $parser;
-
     /** @var FormatService */
     private $formatService;
 
@@ -66,14 +63,12 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
-     * @param Parser $parser
      * @param FormatService $formatService
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, Parser $parser, FormatService $formatService) {
+    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel, FormatService $formatService) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
-        $this->parser = $parser;
         $this->formatService = $formatService;
     }
 
@@ -128,10 +123,10 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
         if ($this->reRenderSchema === null) {
             $this->reRenderSchema = $this->schema(Schema::parse([
                 "processed",
-                "nonRich",
+                "errorCount",
                 "firstArticleRevisionID",
                 "lastArticleRevisionID",
-                "errors:a"
+                "errors"
             ]));
         }
         return $this->schema($this->reRenderSchema, $type);
@@ -267,7 +262,6 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
         $revisions = $this->articleRevisionModel->get($where, $options);
         $processed = 0;
-        $noRich = 0;
         $notProcessed = 0;
 
         $firstRevision = null;
@@ -282,13 +276,12 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                 $updateRev["bodyRendered"] = $this->formatService->renderHTML($revision["body"], $revision["format"]);
 
                 if ($revision["format"] === "rich") {
-                    $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
+                    $plainText = $this->formatService->renderPlainText($revision["body"], $revision["format"]);
                     $updateRev["plainText"] = $plainText;
-                    $updateRev["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
+                    $updateRev["excerpt"] =  $this->formatService->renderExcerpt($revision["body"], $revision["format"]);
                     $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
-                } else {
-                    $noRich++;
                 }
+
                 $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
                 $processed++;
             } catch (FormattingException $e){
@@ -304,7 +297,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
         $records = [
             "processed" => $processed,
-            "nonRich" => $noRich,
+            "errorCount" => $notProcessed,
             "firstArticleRevisionID" => $firstRevision,
             "lastArticleRevisionID" => $lastRevision,
             "errors" => $errors
