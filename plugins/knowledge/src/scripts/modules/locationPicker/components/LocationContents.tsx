@@ -47,7 +47,7 @@ class LocationContents extends React.Component<IProps> {
             navigatedRecord.recordID === selectedRecord.recordID;
 
         const currentSort = selectedRecord && isSelectedInNavigated ? selectedRecord.position : null;
-        const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
+        const canPickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
 
         const setArticleFirstPosition = () => {
             this.setArticleLocation(0);
@@ -58,7 +58,7 @@ class LocationContents extends React.Component<IProps> {
             const recordCount = childRecords.data.length;
             const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
-                if (pickArticleLocation) {
+                if (canPickArticleLocation) {
                     contents = (
                         <>
                             {message}
@@ -118,9 +118,17 @@ class LocationContents extends React.Component<IProps> {
                         this.setArticleLocation(itemSort);
                     };
 
+                    const isSelectedArticleInCurrentCategory =
+                        selectedArticle &&
+                        this.props.navigatedRecord &&
+                        this.props.navigatedRecord.recordType === KbRecordType.CATEGORY &&
+                        selectedArticle.knowledgeCategoryID === this.props.navigatedRecord.recordID;
+
                     const isSelectedArticleFirst = selectedArticle && selectedArticle.sort === 0;
+                    const isSelectedFirstArticleInCurrentCategory =
+                        isSelectedArticleInCurrentCategory && isSelectedArticleFirst;
                     const insertArticleFirst =
-                        pickArticleLocation && index === 0 && !isSelectedArticleFirst ? (
+                        canPickArticleLocation && index === 0 && !isSelectedFirstArticleInCurrentCategory ? (
                             <React.Fragment key="potentialLocation-0">
                                 {message}
                                 <LocationPickerInsertArticle
@@ -160,9 +168,9 @@ class LocationContents extends React.Component<IProps> {
                                     value={item}
                                     onNavigate={navigateHandler}
                                     onSelect={selectHandler}
-                                    selectable={!pickArticleLocation}
+                                    selectable={!canPickArticleLocation}
                                 />
-                                {pickArticleLocation && shouldRenderInsertButton && (
+                                {canPickArticleLocation && shouldRenderInsertButton && (
                                     <LocationPickerInsertArticle
                                         onClick={setArticlePosition}
                                         className={classNames({ isLast })}
@@ -240,8 +248,26 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
+    let { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
+
+    // Normalize the selected/chosen/navigated records from knowledge bases into categories.
+    const kbs = knowledgeBases.knowledgeBasesByID.data;
+    const normalizeRecord = (record: ILocationPickerRecord | null): ILocationPickerRecord | null => {
+        if (kbs && record && record.recordType === KbRecordType.KB) {
+            const fullKb = kbs[record.recordID];
+            return {
+                ...record,
+                recordType: KbRecordType.CATEGORY,
+                recordID: fullKb.rootCategoryID,
+            };
+        } else {
+            return record;
+        }
+    };
+    selectedRecord = normalizeRecord(selectedRecord);
+    navigatedRecord = normalizeRecord(navigatedRecord)!; // Definitely not null
+    selectedRecord = normalizeRecord(selectedRecord);
     const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title, selectedArticle };
 
     // If nothing is selected we are at the root of the nav picker.
