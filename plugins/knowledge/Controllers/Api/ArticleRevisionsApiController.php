@@ -284,7 +284,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
                 $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
                 $processed++;
-            } catch (FormattingException $e){
+            } catch (FormattingException $e) {
                 $errors[] = [
                         "articleRevisionID" => $revision["articleRevisionID"],
                         "error message" => $e->getMessage()
