@@ -109,7 +109,7 @@ export function EditorForm(props: IProps) {
     );
 
     const categoryError = formErrors.knowledgeCategoryID;
-    const titleError = formErrors.name;
+    const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
 
@@ -130,6 +130,10 @@ export function EditorForm(props: IProps) {
     const formRef = useRef<HTMLFormElement>(null);
     const contentSize = useMeasure(contentRef);
     const transition = useFormScrollTransition(formRef, embedBarRef);
+    // const embedMenu = useRef<HTMLDivElement>(null);
+
+    const [embedMenuStyles, setEmbedMenuStyles] = useState();
+    const [embedMenuVisibility, setEmbedMenuVisibility] = useState();
 
     return (
         <TouchScrollable>
@@ -186,7 +190,7 @@ export function EditorForm(props: IProps) {
                             onChange={titleChangeHandler}
                             disabled={isLoading}
                             aria-invalid={!!titleError}
-                            aria-errormessage={!!titleError ? domTitleErrorsID : undefined}
+                            aria-errormessage={titleError ? domTitleErrorsID : undefined}
                         />
                         {!!titleError && (
                             <AccessibleError

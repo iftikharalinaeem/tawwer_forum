@@ -7,7 +7,7 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import ModalConfirm from "@library/modal/ModalConfirm";
@@ -51,7 +51,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
                     buttonRef={this.toggleButtonRef}
                     toggleButtonClassName="draftPreview-actionsToggle"
                     className={classNames("draftPreview-actions", this.props.className)}
-                    paddedList={true}
+                    flyoutType={FlyoutType.LIST}
                 >
                     <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
                     <DropDownItemButton

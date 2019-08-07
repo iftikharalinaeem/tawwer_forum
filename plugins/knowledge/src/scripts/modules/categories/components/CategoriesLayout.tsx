@@ -10,7 +10,6 @@ import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
@@ -26,6 +25,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/common";
 
 interface IProps extends IDeviceProps {

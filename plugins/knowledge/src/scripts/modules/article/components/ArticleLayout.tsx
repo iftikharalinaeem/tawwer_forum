@@ -19,9 +19,9 @@ import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle } from "@knowledge/@types/api/article";
-import { buttonClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
+import { buttonClasses } from "@library/forms/buttonStyles";
 
 /**
  * Implements the article's layout

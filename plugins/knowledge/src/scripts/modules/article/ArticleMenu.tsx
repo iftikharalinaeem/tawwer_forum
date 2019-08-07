@@ -10,7 +10,7 @@ import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import Permission from "@library/features/users/Permission";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
@@ -62,7 +62,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     renderLeft={true}
                     openAsModal={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}
                     title={isMobile ? t("Article") : undefined}
-                    paddedList={true}
+                    flyoutType={FlyoutType.LIST}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
