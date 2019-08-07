@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 
 /**
@@ -35,7 +36,7 @@ class ArticleDraft {
     public function prepareDraftFields(array $body): array {
         if ($bodyContent = ($body['body'] ?? false)) {
             $body['attributes']['body'] = $bodyContent;
-            $body['attributes']['format'] = $body['format'] ?? self::BODY_TYPE_RICH;
+            $body['attributes']['format'] = $body['format'] ?? RichFormat::FORMAT_KEY;
             $body['attributes']['excerpt'] = $this->formatService->renderExcerpt($bodyContent, $body['attributes']['format']);
         }
 
@@ -61,7 +62,7 @@ class ArticleDraft {
                 $draftRow['body'] = json_encode($draftRow['body']);
             }
             $draftRow['excerpt'] = $draftRow['attributes']['excerpt'] ?? '';
-            $draftRow['format'] = $draftRow['attributes']['format'] ?? self::BODY_TYPE_RICH;
+            $draftRow['format'] = $draftRow['attributes']['format'] ?? RichFormat::FORMAT_KEY;
             unset($draftRow['attributes']['body']);
             unset($draftRow['attributes']['format']);
             unset($draftRow['attributes']['excerpt']);

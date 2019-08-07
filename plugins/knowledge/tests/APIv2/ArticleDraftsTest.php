@@ -6,8 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Formatting\FormatCompatibilityService;
-use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\NotFoundException;
 
@@ -91,7 +89,7 @@ class ArticleDraftsTest extends AbstractResourceTest {
             ],
             "body" => "**Hello world**.",
             "format" => "markdown",
-            "excerpt" => "**Hello world**.",
+            "excerpt" => "Hello world.",
         ];
         return $record;
     }
