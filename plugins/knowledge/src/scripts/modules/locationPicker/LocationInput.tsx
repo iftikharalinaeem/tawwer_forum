@@ -108,7 +108,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
 
     public componentDidMount() {
         if (this.props.initialRecord) {
-            void this.props.initLocationPickerFromRecord(this.props.initialRecord);
+            void this.props.initLocationPickerFromRecord(this.props.initialRecord, null);
         }
     }
 

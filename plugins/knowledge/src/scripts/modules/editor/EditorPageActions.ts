@@ -32,6 +32,7 @@ import actionCreatorFactory from "typescript-fsa";
 import { EditorQueueItem } from "@rich-editor/editor/context";
 import { EditorPage } from "@knowledge/modules/editor/EditorPage";
 import { getRelativeUrl } from "@library/utility/appUtils";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -143,11 +144,14 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
         }
 
         if (initialCategoryID !== null && initialKbID !== null) {
-            await this.locationActions.initLocationPickerFromRecord({
-                recordType: KbRecordType.CATEGORY,
-                recordID: initialCategoryID,
-                knowledgeBaseID: initialKbID,
-            });
+            await this.locationActions.initLocationPickerFromRecord(
+                {
+                    recordType: KbRecordType.CATEGORY,
+                    recordID: initialCategoryID,
+                    knowledgeBaseID: initialKbID,
+                },
+                null,
+            );
         }
     }
 
@@ -194,7 +198,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
 
         const initialRecord = this.getInitialRecordForEdit();
         if (initialRecord) {
-            await this.locationActions.initLocationPickerFromRecord(initialRecord);
+            await this.locationActions.initLocationPickerFromRecord(initialRecord, this.getCurrentArticle());
         }
     }
 
@@ -215,6 +219,12 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             recordID: categoryID,
             recordType: KbRecordType.CATEGORY,
         };
+    }
+
+    private getCurrentArticle(): IArticle | null {
+        const { article } = this.getState().knowledge.editorPage;
+
+        return article.data || null;
     }
 
     public static queueEditorOpsAC = createAction<EditorQueueItem[]>("QUEUE_EDITOR_OP");
@@ -346,6 +356,7 @@ export default class EditorPageActions extends ReduxActions<IStoreState> {
             const patchRequest: IPatchArticleRequestBody = {
                 articleID: editorState.article.data.articleID,
                 body: shouldSubmitBody ? body : undefined,
+                format: shouldSubmitBody ? Format.RICH : undefined, // forced to always be rich on insert
                 name: prevName !== name ? name : undefined,
                 knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
                 sort,

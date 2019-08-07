@@ -66,11 +66,4 @@ export default class EditorMenu extends React.PureComponent<IProps> {
     private get domID(): string {
         return "articleMenuDropDown-" + this.props.article.articleID;
     }
-
-    /**
-     * Fallback click handle until all functionaility has been implemented.
-     */
-    private dummyClick = () => {
-        alert("Click works");
-    };
 }

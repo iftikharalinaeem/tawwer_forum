@@ -1,7 +1,37 @@
 dist: xenial
-jobs:
+matrix:
   fast_finish: true
+  allow_failures:
+    - php: 7.3
+jobs:
   include:
+    # PHP 7.3 Job. This should always run, but is allwed to fail.
+    - name: PHP 7.3
+      language: php
+      php: 7.3
+      services:
+        - mysql
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      install:
+        - phpenv config-rm xdebug.ini
+        - ./travis/install.sh
+        - cd vanilla
+      before_script:
+        - composer self-update
+        - composer install --optimize-autoloader
+      script:
+        - set -e
+        - ./vendor/bin/phpunit --exclude-group=large
+        - ./vendor/bin/phpcs -v --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --extensions=php ./plugins/knowledge
+        - set +e
+      env:
+        - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
     # PHP 7.2 Job. This should always run.
     - name: PHP 7.2
       language: php

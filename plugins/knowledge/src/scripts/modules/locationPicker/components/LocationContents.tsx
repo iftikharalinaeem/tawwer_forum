@@ -28,6 +28,9 @@ import { loaderClasses } from "@library/loaders/loaderStyles";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
+import LocationPickerSelectedArticle from "./LocationPickerSelectedArticle";
+import { select } from "@storybook/addon-knobs";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -38,6 +41,7 @@ class LocationContents extends React.Component<IProps> {
 
     public render() {
         const { childRecords, chosenRecord, navigatedRecord, navigatedKB, selectedRecord, title } = this.props;
+        const { selectedArticle } = this.props;
 
         const isSelectedInNavigated =
             navigatedRecord &&
@@ -46,37 +50,46 @@ class LocationContents extends React.Component<IProps> {
             navigatedRecord.recordID === selectedRecord.recordID;
 
         const currentSort = selectedRecord && isSelectedInNavigated ? selectedRecord.position : null;
-        const pickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
+        const canPickArticleLocation = !!navigatedRecord && !!navigatedKB && navigatedKB.viewType === KbViewType.GUIDE;
 
         const setArticleFirstPosition = () => {
             this.setArticleLocation(0);
         };
 
+        const firstLocationPickerPlaceholder = (
+            <>
+                <LocationPickerInstructions />
+                {selectedArticle && currentSort === 0 ? (
+                    <LocationPickerSelectedArticle title={selectedArticle.name} className="isFirst" />
+                ) : (
+                    <LocationPickerInsertArticle
+                        onClick={setArticleFirstPosition}
+                        className="isFirst"
+                        isSelected={currentSort === 0}
+                    />
+                )}
+            </>
+        );
         let contents;
         if (childRecords.status === LoadStatus.SUCCESS && childRecords.data) {
             const recordCount = childRecords.data.length;
-            const message = <LocationPickerInstructions />;
             if (recordCount === 0) {
-                if (pickArticleLocation) {
-                    contents = (
-                        <>
-                            {message}
-                            <LocationPickerInsertArticle
-                                onClick={setArticleFirstPosition}
-                                className="isFirst"
-                                isSelected={currentSort === 0}
-                            />
-                        </>
-                    );
+                if (canPickArticleLocation) {
+                    contents = firstLocationPickerPlaceholder;
                 } else {
                     contents = <LocationPickerEmpty />;
                 }
             } else {
+                let isPassedSelectedArticle = false;
                 contents = childRecords.data.map((item, index) => {
                     const isSelected =
                         !!selectedRecord &&
                         item.recordType === selectedRecord.recordType &&
                         item.recordID === selectedRecord.recordID;
+                    const isSelectedArticle =
+                        !!selectedArticle &&
+                        item.recordID === selectedArticle.articleID &&
+                        item.recordType === KbRecordType.ARTICLE;
                     const isChosen =
                         !!chosenRecord &&
                         item.recordType === chosenRecord.recordType &&
@@ -86,38 +99,89 @@ class LocationContents extends React.Component<IProps> {
                     };
                     const selectHandler = () => this.props.selectRecord(item);
                     const itemKey = item.recordType + item.recordID;
-                    const itemSort = item.sort === null ? 0 : item.sort;
+                    let itemSort = item.sort === null ? 0 : item.sort;
+
+                    // Adjust sort offset to handle current article selected.
+                    // https://github.com/vanilla/knowledge/issues/988
+                    if (isSelectedArticle) {
+                        isPassedSelectedArticle = true;
+                    }
+
+                    if (!isPassedSelectedArticle) {
+                        itemSort++;
+                    }
+
                     const isLast = recordCount === index + 1;
-                    const isCurrentLocation = currentSort === index + 1;
+                    const isCurrentLocation = currentSort === itemSort;
+                    const nextRecord = !isLast && childRecords.data[index + 1];
+                    const isNextSelectedArticle =
+                        !!selectedArticle &&
+                        nextRecord &&
+                        nextRecord.recordID === selectedArticle.articleID &&
+                        nextRecord.recordType === KbRecordType.ARTICLE;
+                    const shouldRenderInsertButton = !isSelectedArticle && !isNextSelectedArticle;
 
                     const setArticlePosition = () => {
-                        this.setArticleLocation(itemSort + 1);
+                        this.setArticleLocation(itemSort);
                     };
 
+                    const isSelectedArticleInCurrentCategory =
+                        selectedArticle &&
+                        this.props.navigatedRecord &&
+                        this.props.navigatedRecord.recordType === KbRecordType.CATEGORY &&
+                        selectedArticle.knowledgeCategoryID === this.props.navigatedRecord.recordID;
+
+                    const isSelectedArticleFirst = selectedArticle && selectedArticle.sort === 0;
+                    const isSelectedFirstArticleInCurrentCategory =
+                        isSelectedArticleInCurrentCategory && isSelectedArticleFirst;
+                    const articlePlaceholder =
+                        isCurrentLocation && selectedArticle ? (
+                            <LocationPickerSelectedArticle
+                                title={selectedArticle.name}
+                                className={classNames({ isLast })}
+                            />
+                        ) : (
+                            <LocationPickerInsertArticle
+                                onClick={setArticlePosition}
+                                className={classNames({ isLast })}
+                                isSelected={isCurrentLocation}
+                            />
+                        );
                     const insertArticleFirst =
-                        pickArticleLocation && index === 0 ? (
-                            <React.Fragment key="potentialLocation-0">
-                                {message}
-                                <LocationPickerInsertArticle
-                                    onClick={setArticleFirstPosition}
-                                    className="isFirst"
-                                    isSelected={currentSort === 0} // first one is exception
-                                />
-                            </React.Fragment>
-                        ) : null;
+                        canPickArticleLocation && index === 0 && !isSelectedFirstArticleInCurrentCategory
+                            ? firstLocationPickerPlaceholder
+                            : null;
 
                     if (item.recordType === KbRecordType.ARTICLE) {
-                        return (
-                            <React.Fragment key={itemKey}>
-                                {insertArticleFirst}
-                                <LocationPickerArticleItem name={item.name} />
+                        const { selectedArticle } = this.props;
+                        if (
+                            selectedArticle &&
+                            item.recordID === selectedArticle.articleID &&
+                            !isCurrentLocation &&
+                            selectedRecord &&
+                            selectedRecord.position !== undefined &&
+                            selectedRecord.position !== selectedArticle.sort
+                        ) {
+                            return (
                                 <LocationPickerInsertArticle
+                                    key={itemKey}
                                     onClick={setArticlePosition}
                                     className={classNames({ isLast })}
                                     isSelected={isCurrentLocation}
                                 />
-                            </React.Fragment>
-                        );
+                            );
+                        } else {
+                            return (
+                                <React.Fragment key={itemKey}>
+                                    {insertArticleFirst}
+                                    <LocationPickerArticleItem
+                                        name={item.name}
+                                        isSelected={!!selectedArticle && item.recordID === selectedArticle.articleID}
+                                    />
+                                    {shouldRenderInsertButton && articlePlaceholder}
+                                </React.Fragment>
+                            );
+                        }
                     } else {
                         return (
                             <React.Fragment key={itemKey}>
@@ -129,15 +193,9 @@ class LocationContents extends React.Component<IProps> {
                                     value={item}
                                     onNavigate={navigateHandler}
                                     onSelect={selectHandler}
-                                    selectable={!pickArticleLocation}
+                                    selectable={!canPickArticleLocation}
                                 />
-                                {pickArticleLocation && (
-                                    <LocationPickerInsertArticle
-                                        onClick={setArticlePosition}
-                                        className={classNames({ isLast })}
-                                        isSelected={isCurrentLocation}
-                                    />
-                                )}
+                                {canPickArticleLocation && shouldRenderInsertButton && articlePlaceholder}
                             </React.Fragment>
                         );
                     }
@@ -207,20 +265,29 @@ interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-interface IMapResult {
-    title: string;
-    navigatedRecord: ILocationPickerRecord | null;
-    navigatedKB: IKnowledgeBase | null;
-    selectedRecord: ILocationPickerRecord | null;
-    chosenRecord: ILocationPickerRecord | null;
-    childRecords: ILoadable<IKbNavigationItem[]>;
-}
-
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps): IMapResult {
+function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
-    const { navigatedRecord, selectedRecord, chosenRecord } = locationPicker;
+    let { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);
-    const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title };
+
+    // Normalize the selected/chosen/navigated records from knowledge bases into categories.
+    const kbs = knowledgeBases.knowledgeBasesByID.data;
+    const normalizeRecord = (record: ILocationPickerRecord | null): ILocationPickerRecord | null => {
+        if (kbs && record && record.recordType === KbRecordType.KB) {
+            const fullKb = kbs[record.recordID];
+            return {
+                ...record,
+                recordType: KbRecordType.CATEGORY,
+                recordID: fullKb.rootCategoryID,
+            };
+        } else {
+            return record;
+        }
+    };
+    selectedRecord = normalizeRecord(selectedRecord);
+    navigatedRecord = normalizeRecord(navigatedRecord)!; // Definitely not null
+    selectedRecord = normalizeRecord(selectedRecord);
+    const commonReturn = { selectedRecord, chosenRecord, navigatedRecord, title, selectedArticle };
 
     // If nothing is selected we are at the root of the nav picker.
     if (
