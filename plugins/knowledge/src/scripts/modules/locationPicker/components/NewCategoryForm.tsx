@@ -77,7 +77,7 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                                 <InputTextBlock
                                     ref={this.inputRef}
                                     label={t("New Category")}
-                                    labelClass="sr-only"
+                                    labelClassName="sr-only"
                                     className="isFirst isLast"
                                     inputProps={{
                                         value: this.state.categoryName,
