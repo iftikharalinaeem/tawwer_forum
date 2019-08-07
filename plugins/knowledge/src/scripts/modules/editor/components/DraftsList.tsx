@@ -11,7 +11,7 @@ import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownSty
 import { itemListClasses } from "@knowledge/modules/editor/components/itemListStyles";
 
 interface IProps {
-    children: React.ReactNode[];
+    children: React.ReactNodeArray;
     hideTitle?: boolean;
     classes?: string;
 }

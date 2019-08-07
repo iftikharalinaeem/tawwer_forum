@@ -43,13 +43,15 @@ export default class DraftsListItem extends React.Component<IProps> {
                     className={classNames("itemList-link", classes.link, "panelList-link", classesPanelList.link)}
                     tabIndex={-1}
                 >
-                    <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
-                        <img
-                            src={photoUrl}
-                            className={classNames("itemList-photo", classes.photo)}
-                            alt={`${t("User") + ": "}${name}`}
-                        />
-                    </div>
+                    {photoUrl && photoUrl !== "" && (
+                        <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
+                            <img
+                                src={photoUrl}
+                                className={classNames("itemList-photo", classes.photo)}
+                                alt={`${t("User") + ": "}${name}`}
+                            />
+                        </div>
+                    )}
                     <div className={classNames("itemList-content", classes.content)}>
                         <div className={classNames("itemList-userName", classes.userName)}>{name}</div>
                         <div className={classNames("itemList-dateTime", classes.dateTime)}>

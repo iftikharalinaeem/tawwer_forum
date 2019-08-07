@@ -5,6 +5,7 @@
  */
 
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { negative, unit } from "@library/styles/styleHelpers";
 
 export const draftPreviewClasses = useThemeCache(() => {
     const style = styleFactory("draftPreview");
@@ -14,7 +15,12 @@ export const draftPreviewClasses = useThemeCache(() => {
         alignItems: "flex-start",
     });
 
+    const metas = style("metas", {
+        marginTop: unit(negative(6)),
+    });
+
     return {
         header,
+        metas,
     };
 });
