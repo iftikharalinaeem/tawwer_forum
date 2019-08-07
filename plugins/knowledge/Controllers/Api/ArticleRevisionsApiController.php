@@ -297,7 +297,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
                     $plainText = $this->formatService->renderPlainText($revision["body"], $revision["format"]);
                     $updateRev["plainText"] = $plainText;
                     $updateRev["excerpt"] =  $this->formatService->renderExcerpt($revision["body"], $revision["format"]);
-                    $updateRev["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
+                    $updateRev["outline"] = json_encode($this->formatService->parseHeadings($revision["body"], $revision["format"]));
                 }
 
                 $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
