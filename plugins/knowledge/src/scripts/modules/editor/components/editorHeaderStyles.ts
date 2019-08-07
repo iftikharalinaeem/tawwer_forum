@@ -38,10 +38,20 @@ export const editorHeaderClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         $nest: {
-            "&.isPullLeft": margins({
-                left: 0,
-                right: "auto",
-            }),
+            "&.isPullLeft": {
+                ...margins({
+                    left: 0,
+                    right: "auto",
+                }),
+                justifyContent: "flex-start",
+            },
+            "&.isPullRight": {
+                ...margins({
+                    left: "auto",
+                    right: 0,
+                }),
+                justifyContent: "flex-end",
+            },
             "&.editorHeader-itemDraftStatus": {
                 marginLeft: 0,
             },

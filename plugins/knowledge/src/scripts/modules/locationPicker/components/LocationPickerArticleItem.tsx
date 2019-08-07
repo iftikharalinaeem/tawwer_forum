@@ -32,7 +32,7 @@ export default class LocationPickerArticleItem extends React.Component<IProps> {
                             classesFolderContents.icon,
                         )}
                     >
-                        {isSelected ? <CheckCompactIcon /> : article()}
+                        {isSelected ? <CheckCompactIcon className={classesFolderContents.checkIcon} /> : article()}
                     </span>
                     <span className={classNames("folderContents-label", classesFolderContents.label)}>{name}</span>
                 </span>
