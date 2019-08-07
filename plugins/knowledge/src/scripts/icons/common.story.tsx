@@ -16,9 +16,9 @@ import { StoryTiles } from "@library/storybook/StoryTiles";
 import * as icons from "@knowledge/icons/common";
 import { StoryTile } from "@library/storybook/StoryTile";
 
-const reactionsStory = storiesOf("KnowledgeBase", module);
+const story = storiesOf("KnowledgeBase", module);
 
-reactionsStory.add("Icons", () => {
+story.add("Icons", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Knowledge Base Icons</StoryHeading>
