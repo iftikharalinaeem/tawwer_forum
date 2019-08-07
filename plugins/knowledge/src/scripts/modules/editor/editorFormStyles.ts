@@ -24,10 +24,6 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 import { standardAnimations } from "@library/styles/animationHelpers";
-import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import { embedContainerVariables } from "@library/embeddedContent/embedStyles";
-import { merge } from "lodash";
-import { media } from "typestyle";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
