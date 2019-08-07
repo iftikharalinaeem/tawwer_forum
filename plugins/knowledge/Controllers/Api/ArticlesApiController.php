@@ -108,7 +108,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param DraftModel $draftModel
      * @param ReactionModel $reactionModel
      * @param ReactionOwnerModel $reactionOwnerModel
-     * @param Parser $parser
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param FormatService $formatService
@@ -128,7 +127,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         DraftModel $draftModel,
         ReactionModel $reactionModel,
         ReactionOwnerModel $reactionOwnerModel,
-        Parser $parser,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         KnowledgeBaseModel $knowledgeBaseModel,
         FormatService $formatService,
@@ -150,7 +148,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->discussionApi = $discussionApi;
-        $this->parser = $parser;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
@@ -314,7 +311,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema($this->fullDraftSchema(), "out");
 
         $draft = $this->draftByID($draftID);
-        $draft = (new ArticleDraft($this->parser))->normalizeDraftFields($draft);
+        $draft = (new ArticleDraft($this->formatterService))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
         $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
@@ -505,7 +502,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
         $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
         $rows = $this->draftModel->get($where, $options);
-        $rows = (new ArticleDraft($this->parser))->normalizeDraftFields($rows, false);
+        $rows = (new ArticleDraft($this->formatterService))->normalizeDraftFields($rows, false);
 
         $expandUsers = $this->resolveExpandFields(
             $query,
@@ -703,7 +700,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body, true);
 
         $body["recordType"] = "article";
-        $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
+        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
 
         $draft = $this->draftByID($draftID);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
@@ -712,7 +709,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
         $row = $this->draftByID($draftID);
-        $row = (new ArticleDraft($this->parser))->normalizeDraftFields($row);
+        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -1001,11 +998,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $this->articleByID($body['recordID']);
         }
 
-        $body = (new ArticleDraft($this->parser))->prepareDraftFields($body);
+        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
 
         $draftID = $this->draftModel->insert($body);
         $row = $this->draftByID($draftID);
-        $row = (new ArticleDraft($this->parser))->normalizeDraftFields($row);
+        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -1135,14 +1132,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $revision["body"] = "[]";
             }
 
-            $revision["bodyRendered"] = \Gdn_Format::to($revision["body"], $revision["format"]);
-
-            if ($revision["format"] === "rich") {
-                $plainText = (new ArticleDraft($this->parser))->getPlainText($revision["body"]);
-                $revision["plainText"] = $plainText;
-                $revision["excerpt"] = (new ArticleDraft($this->parser))->getExcerpt($plainText);
-                $revision["outline"] = json_encode(ArticleDraft::getOutline($revision["body"]));
-            }
+            $revision["bodyRendered"] = $this->formatterService->renderHTML($revision['body'], $revision['format']);
+            $revision["plainText"] = $this->formatterService->renderPlainText($revision['body'], $revision['format']);
+            $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
+            $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
 
             $articleRevisionID = $this->articleRevisionModel->insert($revision);
             $this->articleRevisionModel->publish($articleRevisionID);
