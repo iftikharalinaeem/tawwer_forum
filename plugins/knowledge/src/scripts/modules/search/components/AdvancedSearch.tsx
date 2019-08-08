@@ -29,6 +29,7 @@ import RadioTab from "@library/forms/radioTabs/RadioTab";
 import { advancedSearchClasses } from "@knowledge/modules/search/components/advancedSearchStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export interface IProps extends ISearchFormActionProps, ISearchPageState {
     hideTitle?: boolean;
@@ -70,7 +71,11 @@ export class AdvancedSearch extends React.Component<IProps> {
                         value: formData.title,
                     }}
                 />
-                <MultiUserInput onChange={this.handleUserChange} value={this.props.form.authors} />
+                <MultiUserInput
+                    className={inputBlockClasses.root}
+                    onChange={this.handleUserChange}
+                    value={this.props.form.authors}
+                />
                 {this.props.form.domain === SearchDomain.EVERYWHERE && (
                     <CommunityCategoryInput
                         className="inputBlock"
@@ -80,7 +85,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                 )}
                 {this.props.form.domain === SearchDomain.ARTICLES && (
                     <KnowledgeBaseInput
-                        className="inputBlock"
+                        className={inputBlockClasses.root}
                         onChange={this.handleKnowledgeBaseChange}
                         value={this.props.form.kb}
                     />
