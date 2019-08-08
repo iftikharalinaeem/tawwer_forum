@@ -46,6 +46,7 @@ export class AdvancedSearch extends React.Component<IProps> {
         const classesDateRange = dateRangeClasses();
         const classes = advancedSearchClasses();
         const classesTypography = typographyClasses();
+        const classesInputBlock = inputBlockClasses();
         return (
             <form className={classes.root} onSubmit={this.handleSubmit}>
                 {!this.props.hideTitle && (
@@ -72,7 +73,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                     }}
                 />
                 <MultiUserInput
-                    className={inputBlockClasses.root}
+                    className={classesInputBlock.root}
                     onChange={this.handleUserChange}
                     value={this.props.form.authors}
                 />
@@ -85,7 +86,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                 )}
                 {this.props.form.domain === SearchDomain.ARTICLES && (
                     <KnowledgeBaseInput
-                        className={inputBlockClasses.root}
+                        className={classesInputBlock.root}
                         onChange={this.handleKnowledgeBaseChange}
                         value={this.props.form.kb}
                     />
@@ -102,7 +103,7 @@ export class AdvancedSearch extends React.Component<IProps> {
                         label={t("Deleted Articles")}
                         onChange={this.handleCheckBoxDeletedArticleChange}
                         checked={formData.includeDeleted}
-                        className="inputBlock"
+                        className={classesInputBlock.root}
                     />
                 </Permission>
                 <Button submit={true} className={classNames(classes.submit, buttons.standard)} prefix="submitButton">
