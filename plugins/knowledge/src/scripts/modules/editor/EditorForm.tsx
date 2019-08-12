@@ -25,7 +25,7 @@ import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
