@@ -20,7 +20,7 @@ interface IProps extends ISelectOneProps {
  * Form component for searching/selecting a category.
  */
 export class KnowledgeBaseInput extends React.Component<IProps> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IProps> = {
         label: t("Knowledge Base"),
         options: [],
         value: undefined,
