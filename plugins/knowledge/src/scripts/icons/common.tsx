@@ -10,6 +10,7 @@ import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { iconClasses } from "@library/icons/iconClasses";
 
 const debug = debugHelper("knowledgeBaseIcons");
 
@@ -79,7 +80,7 @@ export function knowledgeBaseNoIcon(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 50 69"
-            className={classNames("icon", "icon-knowledgeBase", className)}
+            className={classNames(iconClasses().standard, "icon-knowledgeBase", className)}
             aria-hidden="true"
         >
             <title>{title}</title>

@@ -12,7 +12,6 @@ import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/Edit
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { userContentClasses } from "@library/content/userContentStyles";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -25,7 +24,6 @@ import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
@@ -40,6 +38,8 @@ import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { userContentClasses } from "@library/content/userContentStyles";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
