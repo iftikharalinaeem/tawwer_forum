@@ -38,8 +38,8 @@ import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { userContentClasses } from "@library/content/userContentStyles";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);

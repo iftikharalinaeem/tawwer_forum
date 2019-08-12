@@ -23,7 +23,7 @@ import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 import { standardAnimations } from "@library/styles/animationHelpers";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 export const editorFormClasses = useThemeCache(() => {
     const globalVars = globalVariables();
