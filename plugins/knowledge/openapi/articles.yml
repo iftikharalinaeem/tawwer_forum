@@ -1105,10 +1105,6 @@ components:
                     description: Category the article belongs in.
                     nullable: true
                     type: integer
-                articleRevisionID:
-                    description: Article content published revision ID.
-                    nullable: true
-                    type: integer
                 name:
                     description: Title of the article.
                     minLength: 0
