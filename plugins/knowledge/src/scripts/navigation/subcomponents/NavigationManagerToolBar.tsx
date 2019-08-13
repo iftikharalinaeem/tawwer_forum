@@ -6,7 +6,7 @@
 
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
+import { CollapseAll, ExpandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import classNames from "classnames";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
@@ -36,7 +36,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     onClick={props.expandAll}
                     ariaLabel={t("Expand All")}
                 >
-                    {expandAll(classes.icon)}
+                    <ExpandAll className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("Expand All")}</span>}
                 </Button>
                 <Button
@@ -45,7 +45,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     onClick={props.collapseAll}
                     ariaLabel={t("Collapse All")}
                 >
-                    {collapseAll(classes.icon)}
+                    <CollapseAll className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("Collapse All")}</span>}
                 </Button>
                 <Button
@@ -55,7 +55,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     ariaLabel={t("New Category")}
                     buttonRef={props.newCategoryButtonRef}
                 >
-                    <NewFolderIcon className={classNames(classes.icon, classes.newFolder)} />
+                    <NewFolderIcon className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
                 </Button>
             </div>

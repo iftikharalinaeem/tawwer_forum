@@ -72,7 +72,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
 
         return (
             <span className="locationBreadcrumb">
-                {this.props.icon && <span className="locationBreadcrumb-icon breadcrumb-icon">{this.props.icon}</span>}
+                {this.props.icon}
                 {crumbs}
             </span>
         );
