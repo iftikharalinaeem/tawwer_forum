@@ -266,6 +266,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionController_render_before($sender, $args) {
+        // Avoid attempting to determine the canonical URL or redirecting the request if we aren't displaying a full page.
+        if ($sender->deliveryType() !== \DELIVERY_TYPE_ALL) {
+            return;
+        }
+
         // We only need to set the canonical or redirect for discussion pages.
         if (!in_array(strtolower($sender->RequestMethod), ["comment", "embed", "index"])) {
             return;
