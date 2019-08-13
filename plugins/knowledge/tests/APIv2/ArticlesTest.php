@@ -249,12 +249,24 @@ class ArticlesTest extends AbstractResourceTest {
         $row = $this->testGetEdit();
 
         $patchRow = $this->modifyRow($row);
+        $revisions = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/revisions")->getBody();
+
+        // Verify there is one, and only one, published revision and that it is the latest revision.
+        $publishedRevision = null;
+        foreach ($revisions as $revision) {
+            if ($revision["status"] === ArticleModel::STATUS_PUBLISHED) {
+                if ($publishedRevision) {
+                    $this->fail("Multiple published revisions detected for a single article.");
+                }
+                $publishedRevision = $revision;
+            }
+        }
 
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}",
             [
                 'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
-                'previousRevisionID' => $patchRow['articleRevisionID'],
+                'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
         );
@@ -269,7 +281,7 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             [
                 'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
-                'previousRevisionID' => $patchRow['articleRevisionID'],
+                'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
         );

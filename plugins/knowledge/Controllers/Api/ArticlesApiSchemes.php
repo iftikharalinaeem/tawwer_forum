@@ -210,7 +210,6 @@ trait ArticlesApiSchemes {
                 "knowledgeCategoryID",
                 "breadcrumbs",
                 "knowledgeBaseID",
-                "articleRevisionID",
                 "name",
                 "body",
                 "outline",

@@ -334,7 +334,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema(Schema::parse([
             "articleID",
             "knowledgeCategoryID",
-            "articleRevisionID",
             "sort",
             "name",
             "body",
