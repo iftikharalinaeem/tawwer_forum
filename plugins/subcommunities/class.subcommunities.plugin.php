@@ -266,19 +266,47 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionController_render_before($sender, $args) {
-        $categoryID = val('CategoryID', $sender->data('Category'));
+        // Avoid attempting to determine the canonical URL or redirecting the request if we aren't displaying a full page.
+        if ($sender->deliveryType() !== \DELIVERY_TYPE_ALL) {
+            return;
+        }
+
+        // We only need to set the canonical or redirect for discussion pages.
+        if (!in_array(strtolower($sender->RequestMethod), ["comment", "embed", "index"])) {
+            return;
+        }
+
+        // We need a category ID to get the subcommunity. No category? Bail.
+        $categoryID = val('CategoryID', $sender->data('Category'), null);
+        if ($categoryID === null) {
+            return;
+        }
+
         $subcommunity = $this->getCanonicalSubcommunity($categoryID);
-        if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET
-            && empty($sender->Discussion->GroupID)) {
-            $subPath = self::$originalWebRoot.'/'.$subcommunity['Folder'];
-            $fullPath = Gdn::request()->getFullPath();
-            if (strcmp($subPath, substr($fullPath, 0, strlen($subPath))) !== 0
-                && !(substr($fullPath, 0, 1) === '/' && strcmp($subPath, substr($fullPath, 1, strlen($subPath))) === 0)
-            ) {
-                redirectTo($this->getCanonicalSubcommunityUrl(Gdn::request()->pathAndQuery(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID), 301);
+
+        // If the discussion isn't in the current subcommunity, redirect to the proper subcommunity.
+        $isGetRequest = Gdn::request()->getMethod() === Gdn_Request::METHOD_GET;
+        $isGroupDiscussion = !empty($sender->Discussion->GroupID);
+        if ($isGetRequest && $isGroupDiscussion === false) {
+            $subPath = ltrim(self::$originalWebRoot.'/'.$subcommunity['Folder'], "/");
+            $fullPath = ltrim(Gdn::request()->getFullPath(), "/");
+
+            $isInSubcommunity = strcmp($subPath, substr($fullPath, 0, strlen($subPath))) === 0;
+            if ($isInSubcommunity === false) {
+                redirectTo(
+                    $this->getCanonicalSubcommunityUrl(Gdn::request()->pathAndQuery(),
+                    $subcommunity,
+                    self::URL_TYPE_DISCUSSION, $categoryID),
+                    301
+                );
             }
         }
-        $discussionUrl = $this->getCanonicalSubcommunityUrl(Gdn::request()->path(), $subcommunity, self::URL_TYPE_DISCUSSION, $categoryID);
+
+        $discussionUrl = $this->getCanonicalSubcommunityUrl(
+            Gdn::request()->path(),
+            $subcommunity,
+            self::URL_TYPE_DISCUSSION, $categoryID
+        );
         $sender->canonicalUrl($discussionUrl);
     }
 
