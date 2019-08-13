@@ -7,7 +7,8 @@
 import { percent, px } from "csx";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, flexHelper, colorOut, paddings } from "@library/styles/styleHelpers";
+import { unit, flexHelper, colorOut, paddings, margins } from "@library/styles/styleHelpers";
+import { iconVariables } from "@library/icons/iconClasses";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -68,10 +69,28 @@ export const locationPickerClasses = useThemeCache(() => {
         minHeight: unit(50),
     });
 
+    const iconVars = iconVariables();
+
+    const iconWrapper = style("iconWrapper", {
+        display: "inline-flex",
+        ...margins({
+            right: ".4em",
+            bottom: "-.05em",
+        }),
+        flexBasis: unit(iconVars.categoryIcon.width),
+    });
+
+    const initialText = style("initialText", {
+        whiteSpace: "nowrap",
+        paddingLeft: "0.2em",
+    });
+
     return {
         root,
         articlePlaceholder,
         checkMark,
         instructions,
+        iconWrapper,
+        initialText,
     };
 });

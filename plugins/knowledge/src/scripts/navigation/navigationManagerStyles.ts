@@ -367,6 +367,9 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...userSelect(),
         border: important(0),
         ...paddings({ horizontal: 12 }),
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
         $nest: {
             ...buttonStates({
                 focusNotKeyboard: {
