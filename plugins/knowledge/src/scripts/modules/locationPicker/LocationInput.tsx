@@ -26,6 +26,7 @@ import AccessibleError from "@library/forms/AccessibleError";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
+import { locationPickerClasses } from "./locationPickerStyles";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -48,6 +49,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             ? LocationBreadcrumbs.renderString(locationBreadcrumb)
             : LocationInput.SELECT_MESSAGE;
         const classesEditorForm = editorFormClasses();
+        const classesLocationPicker = locationPickerClasses();
 
         const buttonContents = locationBreadcrumb ? (
             <LocationBreadcrumbs
@@ -56,8 +58,10 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             />
         ) : (
             <React.Fragment>
-                <PlusCircleIcon className={"pageLocation-icon"} />
-                {LocationInput.SELECT_MESSAGE}
+                <span className={classesLocationPicker.iconWrapper}>
+                    <PlusCircleIcon className={"pageLocation-icon"} />
+                </span>
+                <span className={classesLocationPicker.initialText}>{LocationInput.SELECT_MESSAGE}</span>
             </React.Fragment>
         );
 

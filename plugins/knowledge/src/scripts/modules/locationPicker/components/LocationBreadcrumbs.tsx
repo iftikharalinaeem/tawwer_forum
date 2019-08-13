@@ -7,6 +7,7 @@
 import { t } from "@library/utility/appUtils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import * as React from "react";
+import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 
 interface IProps {
     locationData: ICrumb[];
@@ -52,6 +53,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         const { locationData } = this.props;
         const accessibleCrumbSeparator = `/`;
         const crumbCount = locationData.length - 1;
+        const classesLocationPicker = locationPickerClasses();
         const crumbs = locationData.map((crumb, index) => {
             const lastElement = index === crumbCount;
             const crumbSeparator = `›`;
@@ -72,7 +74,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
 
         return (
             <span className="locationBreadcrumb">
-                {this.props.icon && <span className="locationBreadcrumb-icon breadcrumb-icon">{this.props.icon}</span>}
+                {this.props.icon && <span className={classesLocationPicker.iconWrapper}>{this.props.icon}</span>}
                 {crumbs}
             </span>
         );

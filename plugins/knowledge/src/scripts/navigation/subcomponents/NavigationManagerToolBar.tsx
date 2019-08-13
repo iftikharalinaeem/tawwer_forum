@@ -14,6 +14,7 @@ import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcompon
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { NewFolderIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IProps {
     expandAll: () => void;
@@ -27,6 +28,7 @@ export default function NavigationManagerToolBar(props: IProps) {
     const classes = navigationManagerToolbarClasses();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
+    const classesIcon = iconClasses();
     return (
         <div className={classes.root}>
             <div className={classes.bar}>
