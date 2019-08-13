@@ -63,7 +63,6 @@ export function EditorForm(props: IProps) {
             onConfirm={clearConversionNotice}
             contents={message}
             stringContents={message}
-            noContainer={true}
         />
     );
 
