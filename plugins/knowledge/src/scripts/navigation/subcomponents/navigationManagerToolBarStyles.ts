@@ -50,6 +50,7 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
 
     const icon = style("icon", {
         display: "inline-flex",
+        verticalAlign: "middle",
     });
 
     const bar = style("bar", {
