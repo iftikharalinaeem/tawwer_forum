@@ -23,6 +23,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
+import Container from "@library/layout/components/Container";
 
 /**
  * Page for editing an article.
@@ -76,13 +77,15 @@ export class EditorPage extends React.Component<IProps> {
         }
 
         return (
-            <Message
-                confirmText={t("Dismiss")}
-                onConfirm={this.props.resetError}
-                contents={this.props.currentError.message}
-                stringContents={this.props.currentError.message}
-                isFixed={true}
-            />
+            <Container>
+                <Message
+                    confirmText={t("Dismiss")}
+                    onConfirm={this.props.resetError}
+                    contents={this.props.currentError.message}
+                    stringContents={this.props.currentError.message}
+                    isFixed={true}
+                />
+            </Container>
         );
     }
     /**

@@ -13,6 +13,7 @@ import Message from "@library/messages/Message";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@library/utility/appUtils";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import Container from "@library/layout/components/Container";
 
 type RetryHandler = (() => void) | null;
 
@@ -28,15 +29,18 @@ class NavigationManagerErrors extends React.Component<IProps> {
         const retryHandler = this.getRetryHandler();
 
         return (
-            <Message
-                className={classes.formError}
-                onConfirm={retryHandler ? this.handleRetry : undefined}
-                confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
-                onCancel={this.props.onClear}
-                stringContents={
-                    getGlobalErrorMessage(currentError.error) || t("Something went wrong while contacting the server.")
-                }
-            />
+            <Container>
+                <Message
+                    className={classes.formError}
+                    onConfirm={retryHandler ? this.handleRetry : undefined}
+                    confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
+                    onCancel={this.props.onClear}
+                    stringContents={
+                        getGlobalErrorMessage(currentError.error) ||
+                        t("Something went wrong while contacting the server.")
+                    }
+                />
+            </Container>
         );
     }
 
