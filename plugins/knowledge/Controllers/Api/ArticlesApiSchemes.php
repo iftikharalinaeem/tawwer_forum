@@ -155,6 +155,7 @@ trait ArticlesApiSchemes {
                     "locale?",
                     "sort?",
                     "discussionID?",
+                    "previousRevisionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -209,6 +210,7 @@ trait ArticlesApiSchemes {
                 "knowledgeCategoryID",
                 "breadcrumbs",
                 "knowledgeBaseID",
+                "articleRevisionID",
                 "name",
                 "body",
                 "outline",
@@ -463,6 +465,7 @@ trait ArticlesApiSchemes {
     private function fullRevisionSchema(): Schema {
         return Schema::parse([
             "articleRevisionID:i" => "Unique article revision ID.",
+            "previousRevisionID:i" => "Article last known revision ID. Need to be passed when patch existing article body.",
             "articleID:i" => "Associated article ID.",
             "status:s" => [
                 "allowNull" => true,

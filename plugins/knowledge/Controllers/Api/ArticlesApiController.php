@@ -334,6 +334,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema(Schema::parse([
             "articleID",
             "knowledgeCategoryID",
+            "articleRevisionID",
             "sort",
             "name",
             "body",
@@ -1024,7 +1025,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         if ($articleID !== null) {
             // this means we patch existing Article
-            $prevState = $this->articleModel->getID($articleID);
+
+            if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
+                $prevState = $this->articleModel->getIDWithRevision($articleID);
+                if ($prevState['articleRevisionID'] !== $previousRevisionID) {
+                    throw new \Garden\Web\Exception\ClientException("Article revision ID is outdated.".json_encode($prevState), 409);
+                }
+            } else {
+                $prevState = $this->articleModel->getID($articleID);
+            }
 
             //check if knowledge category exists and knowledge base is "published"
             $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
