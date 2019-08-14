@@ -1028,7 +1028,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
                 $prevState = $this->articleModel->getIDWithRevision($articleID);
                 if ($prevState['articleRevisionID'] !== $previousRevisionID) {
-                    throw new \Garden\Web\Exception\ClientException("Article revision ID is outdated.".json_encode($prevState), 409);
+                    throw new \Garden\Web\Exception\ClientException("Article revision ID is outdated. Current revision ID is: ".$prevState['articleRevisionID'], 409);
                 }
             } else {
                 $prevState = $this->articleModel->getID($articleID);
