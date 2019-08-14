@@ -1024,7 +1024,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         if ($articleID !== null) {
             // this means we patch existing Article
-            $prevState = $this->articleModel->getID($articleID);
+
+            if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
+                $prevState = $this->articleModel->getIDWithRevision($articleID);
+                if ($prevState['articleRevisionID'] !== $previousRevisionID) {
+                    throw new ClientException("Article revision ID is outdated. Current revision ID is: ".$prevState['articleRevisionID'], 409);
+                }
+            } else {
+                $prevState = $this->articleModel->getID($articleID);
+            }
 
             //check if knowledge category exists and knowledge base is "published"
             $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);

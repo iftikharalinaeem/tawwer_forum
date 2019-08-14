@@ -155,6 +155,7 @@ trait ArticlesApiSchemes {
                     "locale?",
                     "sort?",
                     "discussionID?",
+                    "previousRevisionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -463,6 +464,7 @@ trait ArticlesApiSchemes {
     private function fullRevisionSchema(): Schema {
         return Schema::parse([
             "articleRevisionID:i" => "Unique article revision ID.",
+            "previousRevisionID:i" => "Article's last known revision ID. Needs to be passed when patching an existing article.",
             "articleID:i" => "Associated article ID.",
             "status:s" => [
                 "allowNull" => true,
