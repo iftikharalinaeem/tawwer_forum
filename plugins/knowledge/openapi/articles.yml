@@ -1060,7 +1060,7 @@ components:
                     description: Category the article belongs in.
                     type: integer
                 previousRevisionID:
-                    description: Article last known revision ID. Need to be passed when patch existing article body.
+                    description: Article's last known revision ID. Needs to be passed when patching an existing article.
                     type: integer
                 locale:
                     description: Locale the article was written in.
