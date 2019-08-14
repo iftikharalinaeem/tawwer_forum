@@ -115,19 +115,16 @@ class ReportModel extends Gdn_Model {
                 $contextDiscussion['Category']
             );
             if (array_key_exists('Body', $reportedRecord) && array_key_exists('Format', $reportedRecord)) {
-                $reportedRecord['Body'] = Gdn_Format::plainText($reportedRecord['Body'], $reportedRecord['Format']);
+                $reportedRecord['Body'] = \Gdn::formatService()->filter($reportedRecord['Body'], $reportedRecord['Format']);
             }
             // Build discussion record
             $discussion = [
                 // Limit new name to 100 char (db column size)
                 'Name' => sliceString($reportName, 100),
-                'Body' => sprintf(t('Report Body Format', "%s\n\n%s"),
-                    formatQuote($reportedRecord),
-                    reportContext($reportedRecord)
-                ),
+                'Body' => $reportedRecord['Body'],
                 'Type' => 'Report',
                 'ForeignID' => $foreignID,
-                'Format' => 'Quote',
+                'Format' => $reportedRecord['Format'],
                 'CategoryID' => $category['CategoryID'],
                 'Attributes' => ['Report' => $reportAttributes]
             ];
@@ -151,6 +148,9 @@ class ReportModel extends Gdn_Model {
 
         if ($discussionID) {
             // Now that we have the discussion add the report.
+
+            // Will remove this, currently the rich editor isn't mounting correctly in the report view.
+            $data['Body'] = ($data['Format'] === 'rich') ?  json_encode([["insert" => "{$data['Body']}"]]) : $data['Body'];
             $newcommenT = [
                 'DiscussionID' => $discussionID,
                 'Body' => $data['Body'],

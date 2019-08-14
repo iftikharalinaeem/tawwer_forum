@@ -5,6 +5,24 @@
 
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
+    ///
+
+    /**
+     * \Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    var $embedService;
+
+    /**
+     * Reporting2Plugin constructor.
+     *
+     * @param \Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    public function __construct(\Vanilla\EmbeddedContent\EmbedService $embedService) {
+        parent::__construct();
+
+        $this->embedService = $embedService;
+    }
+
     public function setup() {
         $this->structure();
     }
@@ -95,6 +113,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @return string
      */
     public function reportButton($row, $recordType, $recordID) {
+        $row = (array)$row;
         $result = anchor(
             '<span class="ReactSprite ReactFlag"></span> '.t('Report'),
             '/report/'.$recordType.'/'.$recordID,
@@ -144,7 +163,7 @@ class Reporting2Plugin extends Gdn_Plugin {
 
         $sender->Form->setFormValue('RecordID', $iD);
         $sender->Form->setFormValue('RecordType', $recordType);
-        $sender->Form->setFormValue('Format', 'TextEx');
+        $sender->Form->setFormValue('Format', 'rich');
 
         $sender->setData('Title', sprintf(t('Report %s'), t($recordType), 'Report'));
 
@@ -164,6 +183,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             if ($reason = $sender->Form->getFormValue('Reason')) {
                 $body = 'Reason: '.$reason."\n".'Notes: '.$sender->Form->getFormValue('Body');
                 $sender->Form->setFormValue('Body', $body);
+                $sender->Form->setFormValue('Format', 'rich');
             }
 
             if ($sender->Form->save()) {
@@ -171,9 +191,14 @@ class Reporting2Plugin extends Gdn_Plugin {
             }
         } else {
             // Create excerpt to show in form popup
+
             $row = getRecord($recordType, $iD);
-            $row['Body'] = sliceString(Gdn_Format::plainText($row['Body'], $row['Format']), 150);
-            $sender->setData('Row', $row);
+
+            $jsonOperations = $this->renderQuote($row);
+
+            $quoteHtml = \Gdn::formatService()->renderHTML($jsonOperations, 'rich');
+
+            $sender->setData('quote', $quoteHtml);
         }
 
         $sender->render('report', '', 'plugins/Reporting2');
@@ -216,7 +241,29 @@ class Reporting2Plugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * @param $row
+     * @return string
+     */
+    protected function renderQuote($row): string {
+        $quote = $this->embedService->createEmbedForUrl($row['Url']);
+        $quoteData = $quote->jsonSerialize();
+        $quotebodyRaw = $quoteData['bodyRaw'];
+        $encodedBody = json_encode($quotebodyRaw);
+
+        $jsonOperations = "[{\"insert\":{\"embed-external\":" .
+            "{\"data\":{\"recordID\":\"{$quoteData['recordID']}\",\"recordType\":\"{$quoteData['recordType']}\"," .
+            "\"body\":\"{$quoteData['body']}\",\"bodyRaw\":{$encodedBody},\"format\":\"{$quoteData['format']}\"," .
+            "\"dateInserted\":\"{$quoteData['dateInserted']}\"," .
+            "\"insertUser\":{\"userID\":\"{$quoteData['insertUser']['userID']}\",\"name\":\"{$quoteData['insertUser']['name']}\"," .
+            "\"photoUrl\":\"{$quoteData['insertUser']['photoUrl']}\"," .
+            "\"dateLastActive\":\"{$quoteData['insertUser']['dateLastActive']}\"},\"url\":\"{$quoteData['url']}\"," .
+            "\"embedType\":\"{$quoteData['embedType']}\",\"name\":\"{$quoteData['name']}\"}}}}]";
+
+        return $jsonOperations;
+    }
 }
+
 
 if (!function_exists('formatQuote')):
 

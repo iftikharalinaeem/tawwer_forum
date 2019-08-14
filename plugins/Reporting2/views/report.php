@@ -2,7 +2,8 @@
 <h2><?php echo t($this->data('Title')); ?></h2>
 <?php
 $Row = $this->data('Row');
-echo gdn_formatter_quote($Row);
+$quote = $this->data('quote');
+echo $quote;
 ?>
 <?php
 echo $this->Form->open();
@@ -22,7 +23,7 @@ echo $this->Form->errors();
             <?php
             $BodyLabel = $this->data('Reasons') ? '@'.t('Report Notes', 'Notes') : '@'.t('Report Reason', 'Reason');
             echo $this->Form->label($BodyLabel, 'Body');
-            echo $this->Form->textBox('Body', ['MultiLine' => true]);
+            echo $this->Form->bodyBox('Body', ['MultiLine' => true]);
             ?>
         </li>
         <?php
