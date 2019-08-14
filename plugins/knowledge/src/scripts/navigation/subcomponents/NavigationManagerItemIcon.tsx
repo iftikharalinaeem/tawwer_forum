@@ -86,9 +86,11 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
         if (this.props.expanded) {
             return (
                 <>
-                    <span className={classNames("navigationManager-triangle", classes.triangle)}>
-                        {this.props.hasChildren && <DownTriangleIcon className={"navigationManager-triangleDown"} />}
-                    </span>
+                    {this.props.hasChildren && (
+                        <span className={classNames("navigationManager-triangle", classes.triangle)}>
+                            <DownTriangleIcon className={"navigationManager-triangleDown"} />
+                        </span>
+                    )}
                     <span className={classNames("navigationManager-folderIcon", classes.folderIcon)}>
                         {folderOpen(
                             classNames("navigationManager-folder", "navigationManager-folderOpen", classes.folder),
