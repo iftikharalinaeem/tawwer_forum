@@ -151,6 +151,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         // Set up the form.
         $formFields = [
+            'AllowAPIAuth' => ['LabelCode' => 'Allow JWTs to authorize API calls', 'Control' => 'toggle'],
             'Algorithm' => ['LabelCode' => 'Algorithm', 'Control' => 'RadioList', 'Items' => $algsItems, 'Options' => ['Default' => 'HS256']],
             'SignInUrl' =>  ['LabelCode' => 'Sign In URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
             'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Control' => 'TextBox', 'Description' => 'Enter the URL of the server that is issuing this token.'],
