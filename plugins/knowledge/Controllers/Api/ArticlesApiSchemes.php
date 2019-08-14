@@ -464,7 +464,7 @@ trait ArticlesApiSchemes {
     private function fullRevisionSchema(): Schema {
         return Schema::parse([
             "articleRevisionID:i" => "Unique article revision ID.",
-            "previousRevisionID:i" => "Article last known revision ID. Need to be passed when patch existing article body.",
+            "previousRevisionID:i" => "Article's last known revision ID. Needs to be passed when patching an existing article.",
             "articleID:i" => "Associated article ID.",
             "status:s" => [
                 "allowNull" => true,
