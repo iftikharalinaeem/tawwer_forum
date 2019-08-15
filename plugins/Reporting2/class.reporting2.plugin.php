@@ -107,11 +107,13 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Generates the 'Report' button in the Reactions Flag menu.
      *
+     * @param $row
      * @param $recordType
      * @param $recordID
      * @return string
      */
-    public function reportButton($recordType, $recordID) {
+    public function reportButton($row, $recordType, $recordID) {
+        $row = (array)$row;
         $result = anchor(
             '<span class="ReactSprite ReactFlag"></span> '.t('Report'),
             '/report/'.$recordType.'/'.$recordID,
