@@ -22,7 +22,7 @@ use UserModel;
 class AuthorizationMiddleware {
 
     /** @var string  */
-    public const AUTHORIZATION_REGEX = '`^Bearer\s+([a-z0-9\-_]+?\.[a-z0-9\-_]+?\.(?:[a-z0-9\-_]+))`i';
+    public const AUTHORIZATION_REGEX = '`^Bearer\s+([a-z0-9\-_]+?\.[a-z0-9\-_]+?\.(?:[a-z0-9\-_]+))$`i';
 
     /** @var string  */
     public const PROVIDER_KEY = 'JWTSSODefault';
@@ -100,15 +100,15 @@ class AuthorizationMiddleware {
         $provider = $this->authenticationProviderModel->getProviderByKey(static::PROVIDER_KEY);
 
         if (empty($provider)) {
-            throw new ServerException("The Oracle SSO provider has not been configured.", 500);
-        } elseif (empty($provider['JWTSecret'])) {
-            throw new ServerException("The Oracle SSO provider does not have a JWT key configured.", 500);
+            throw new ServerException("The SSO provider has not been configured.", 500);
+        } elseif (empty($provider['AssociationSecret'])) {
+            throw new ServerException("The SSO provider does not have a JWT key configured.", 500);
         }
 
-        $key = $provider['JWTSecret'];
+        $key = $provider['AssociationSecret'];
         $payload = JWT::decode($jwt, $key, array_keys(JWT::$supported_algs));
 
-        $userID = $this->sso((array)$payload);
+        $userID = $this->sso((array)$payload, $provider['KeyMap']); //TODO: spread keymap and send as string params
         return $userID;
     }
 
@@ -116,26 +116,43 @@ class AuthorizationMiddleware {
      * Connect the user's JWT payload with a user.
      *
      * @param array $payload The payload to connect.
+     * @param array $keymap
      * @return int Returns the User ID of the new or existing user.
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
      * @throws \Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
-    private function sso(array $payload): int {
-        $sch = \Garden\Schema\Schema::parse([
-            'user_id:s',
-            'user_displayname:s'
-        ]);
+    private function sso(array $payload, string $uniqueID, string $email, string $name, ?string $photo = null, ?string $fullName = null): int {
+        $schemaFields = [
+            "{$uniqueID}:s",
+            "{$email}:s",
+            "{$name}:s",
+        ];
+
+        if ($photo) {
+            $schemaFields[] = "{$photo}:s?";
+        }
+
+        if ($fullName) {
+            $schemaFields[] = "{$fullName}:s?";
+        }
+
+        $sch = \Garden\Schema\Schema::parse($schemaFields);
+
         $valid = $sch->validate($payload);
 
         // Check for an existing user first so that we don't sync bearer token data on existing users.
-        $auth = $this->userModel->getAuthentication($valid['user_id'], static::PROVIDER_KEY);
+        $auth = $this->userModel->getAuthentication($valid['sub'], static::PROVIDER_KEY);
         if (empty($auth)) {
             $userData = [
-                'Name' => $valid['user_displayname'],
-                'Email' => $valid['user_id'] . '@example.com', // kludge, but we don't have a valid ID.
+                'Name' => $valid[$keymap['Name']], //TODO: fix
+                'Email' => $valid[$keymap['Email']] //TODO: fix
             ];
 
-            $userID = $this->userModel->connect($valid['user_id'], static::PROVIDER_KEY, $userData);
+            if ($payload[$keymap['Photo']]) {
+                $userData['Photo'] = $payload[$keymap['Photo']];
+            }
+
+            $userID = $this->userModel->connect($valid[$keymap['UniqueID']], static::PROVIDER_KEY, $userData);
         } else {
             $userID = $auth['UserID'];
         }

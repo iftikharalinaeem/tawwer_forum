@@ -65,7 +65,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     protected $jtiClaim = null;
 
     /** @var array supported alorithms */
-    public  $supportedAlgs = [
+    public $supportedAlgs = [
         'HS256' => 'sha256',
         'HS512' => 'sha512',
         'HS384' => 'sha384'
@@ -76,7 +76,21 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /** @var \Gdn_AuthenticationProviderModel */
     private $authenticationProviderModel;
 
-    public function __construct(\Gdn_AuthenticationProviderModel $authenticationProviderModel) {
+    /** @var \Gdn_Session */
+    private $session;
+
+    /**
+     * JWTSSOPlugin constructor.
+     *
+     * @param \Gdn_Session $session
+     * @param \Gdn_AuthenticationProviderModel $authenticationProviderModel
+     */
+    public function __construct(
+        \Gdn_Session $session,
+        \Gdn_AuthenticationProviderModel $authenticationProviderModel
+    ) {
+        parent::__construct();
+        $this->session = $session;
         $this->authenticationProviderModel = $authenticationProviderModel;
         $provider = $this->provider();
         // Use the values of the KeyMap as keys and keys as values
@@ -110,9 +124,9 @@ class JWTSSOPlugin extends \Gdn_Plugin {
         $provider = $this->provider();
         if (!val('AuthenticationKey', $provider)) {
             $provider = [
-                'AuthenticationKey' => DEFAULT_PROVIDER_KEY,
-                'AuthenticationSchemeAlias' => PROVIDER_SCHEME_ALIAS,
-                'Name' => DEFAULT_PROVIDER_KEY,
+                'AuthenticationKey' => self::DEFAULT_PROVIDER_KEY,
+                'AuthenticationSchemeAlias' => self::PROVIDER_SCHEME_ALIAS,
+                'Name' => self::DEFAULT_PROVIDER_KEY,
                 'KeyMap' => [
                     'Email' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                     'Photo' => 'picture',
@@ -132,14 +146,13 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param SettingsController $sender.
-     * @param SettingsController $args.
+     * @param \SettingsController $sender
      */
-    public function settingsController_jwtsso_create($sender, $args) {
+    public function settingsController_jwtsso_create($sender) {
         $sender->permission('Garden.Settings.Manage');
 
-        /* @var Gdn_Form $form */
-        $form = new Gdn_Form();
+        /* @var \Gdn_Form $form */
+        $form = new \Gdn_Form();
         $form->setModel($this->authenticationProviderModel);
         $sender->Form = $form;
         $generate = false;
@@ -210,7 +223,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
         }
 
         // Create the URL to display to the forum connect endpoint.
-        $connectURL = url('/entry/connect/'.PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true);
+        $connectURL = url('/entry/connect/'.self::PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true);
         $sender->setData('ConnectURL', $connectURL);
 
         // For auto generating a secret for the client.
@@ -221,7 +234,6 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             $sender->render('settings', '', 'plugins/jwtsso');
         }
     }
-
 
     /**
      * Generate a JSON Web Token signed with the client's secret
@@ -243,7 +255,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             'iss' => $baseUrl,
             'sub' => c('JWTSSO.TestToken.ForeignKey', '12345'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
+            'email' => c('JWTSSO.TestToken.Email', $this->session->User->Email),
             'displayname' => c('JWTSSO.TestToken.Name'),
             'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
@@ -281,12 +293,12 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             throw new \Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
         }
 
-        if (val(0, $args) != PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
+        if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
             $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
             throw new \Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
         }
 
-        /* @var Gdn_Form $form */
+        /* @var \Gdn_Form $form */
         $form = $sender->Form; //new gdn_Form();
 
         if (!$this->isConfigured()) {
@@ -519,7 +531,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Set the data from the token header in an array
      *
-     * @param $head
+     * @param string $head
      * @return bool
      */
     protected function setJWTHeader($head) {
@@ -656,13 +668,13 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      *  Return all the information saved in provider table.
      *
-     * @return array Stored provider data (secret, client_id, etc.).
+     * @return array stored provider data (secret, client_id, etc.).
      */
     protected function provider() {
         if (!$this->provider && $this->providerKey) {
             $this->provider = $this->authenticationProviderModel->getProviderByKey($this->providerKey);
         } else {
-            $this->provider = $this->authenticationProviderModel->getProviderByScheme(PROVIDER_SCHEME_ALIAS);
+            $this->provider = $this->authenticationProviderModel->getProviderByScheme(self::PROVIDER_SCHEME_ALIAS);
         }
         return $this->provider;
     }
@@ -692,16 +704,16 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Convenience method for updating the log.
      *
-     * @param $message
-     * @param $data
+     * @param string $message
+     * @param string $data
      */
     public function log($message, $data) {
         if (!is_array($data)) {
             $data = (array) $data;
         }
-        Logger::event(
+        \Logger::event(
             'jwt_logging',
-            Logger::INFO,
+            \Logger::INFO,
             $message,
             $data
         );
