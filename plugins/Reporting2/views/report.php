@@ -23,7 +23,7 @@ echo $this->Form->errors();
             <?php
             $BodyLabel = $this->data('Reasons') ? '@'.t('Report Notes', 'Notes') : '@'.t('Report Reason', 'Reason');
             echo $this->Form->label($BodyLabel, 'Body');
-            echo $this->Form->bodyBox('Body', ['MultiLine' => true]);
+            echo $this->Form->textBox('Body', ['MultiLine' => true]);
             ?>
         </li>
         <?php

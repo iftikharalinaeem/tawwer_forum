@@ -4,8 +4,15 @@
  */
 class ReportModel extends Gdn_Model {
 
-    public function __construct($name = '') {
+    /**
+     * \Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    var $embedService;
+
+    public function __construct($name = '', \Vanilla\EmbeddedContent\EmbedService $embedService ) {
         parent::__construct('Comment');
+
+        $this->embedService = $embedService;
     }
 
     /**
@@ -54,7 +61,7 @@ class ReportModel extends Gdn_Model {
         $this->Validation->applyRule('Body', 'ValidateRequired');
         $this->Validation->applyRule('Format', 'ValidateRequired');
 
-        touchValue('Format', $data, c('Garden.InputFormatter'));
+
 
         if (!$this->Validation->validate($data, true)) {
             return false;
@@ -114,17 +121,24 @@ class ReportModel extends Gdn_Model {
                 $reportedRecord['InsertName'], // Author Name
                 $contextDiscussion['Category']
             );
+
             if (array_key_exists('Body', $reportedRecord) && array_key_exists('Format', $reportedRecord)) {
                 $reportedRecord['Body'] = \Gdn::formatService()->filter($reportedRecord['Body'], $reportedRecord['Format']);
             }
+            if (array_key_exists('Body', $data) && array_key_exists('Format', $data)) {
+                $data['Body'] = \Gdn::formatService()->filter($data['Body'], $data['Format']);
+            }
+
+            $discussionBody = $this->encodeBody($reportedRecord, $data) ?? '';
+
             // Build discussion record
             $discussion = [
                 // Limit new name to 100 char (db column size)
                 'Name' => sliceString($reportName, 100),
-                'Body' => $reportedRecord['Body'],
+                'Body' => $discussionBody,
                 'Type' => 'Report',
                 'ForeignID' => $foreignID,
-                'Format' => $reportedRecord['Format'],
+                'Format' => \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY,
                 'CategoryID' => $category['CategoryID'],
                 'Attributes' => ['Report' => $reportAttributes]
             ];
@@ -135,38 +149,83 @@ class ReportModel extends Gdn_Model {
             $this->fireEvent('BeforeDiscussion');
 
             $discussionID = $discussionModel->save($discussion);
+            SpamModel::$Disabled = $spamCheckDisabled;
+
+            return $discussionID;
+
             if (!$discussionID) {
                 trace('Discussion not saved.');
                 $this->Validation->addValidationResult($discussionModel->validationResults());
                 SpamModel::$Disabled = $spamCheckDisabled;
                 return false;
             }
-            $discussion['DiscussionID'] = $discussionID;
         } else {
-            $discussionID = val('DiscussionID', $discussion);
+            // If a report exists add append to the report body.
+            $discussion = (array)$discussion;
+            $discussionBody = $this->updateBody($discussion['Body'], $data['Body']);
+            $discussionModel->setField($discussion['discussionID'], 'Body', $discussionBody);
+            return true;
         }
-
-        if ($discussionID) {
-            // Now that we have the discussion add the report.
-
-            // Will remove this, currently the rich editor isn't mounting correctly in the report view.
-            $data['Body'] = ($data['Format'] === 'rich') ?  json_encode([["insert" => "{$data['Body']}"]]) : $data['Body'];
-            $newcommenT = [
-                'DiscussionID' => $discussionID,
-                'Body' => $data['Body'],
-                'Format' => $data['Format'],
-                'Attributes' => ['Type' => 'Report']
-            ];
-            $commentModel = new CommentModel();
-            $commentID = $commentModel->save($newcommenT);
-            $this->Validation->addValidationResult($commentModel->validationResults());
-            SpamModel::$Disabled = $spamCheckDisabled;
-            return $commentID;
-        }
-
-        // Failed to add report
-        SpamModel::$Disabled = $spamCheckDisabled;
-        return false;
     }
 
+    /**
+     * Encode the record to render and save.
+     *
+     * @param array $record The record that needs to be processed.
+     * @param array $data Optionally data that needs to be added to the record.
+     * @return string Json encoded data for the be rendered in the view and saved.
+     */
+    public function encodeBody(array $record, array $data = []): string {
+        $quote = $this->embedService->createEmbedForUrl($record['Url']);
+        $jsonOperations = [
+            [
+                "insert" => [
+                    "embed-external" => [
+                        "data" => $quote,
+                        ],
+                    ],
+                ],
+            ];
+
+        if (array_key_exists('Body', $data) && isset($data['Body'])) {
+            $jsonOperations[] =
+                [
+                    "insert" => "\n {$data['Body']} \n",
+                ];
+        }
+        return json_encode($jsonOperations);
+    }
+
+    /**
+     * Update the body of the reported discussion.
+     *
+     * @param string $body The body of the Discussion.
+     * @param string $data The data string to append to the body.
+     * @return false|string Encoded string.
+     */
+    private function updateBody(string $body, string $data = ''): string {
+       if ($data) {
+           $body = json_decode($body);
+           if (is_array($body)) {
+               $body[] =
+                   [
+                       "insert" => "\n {$data}",
+                   ];
+         }
+           return json_encode($body);
+       }
+       return false;
+    }
+
+    /**
+     * Render the Quote html for the view.
+     *
+     * @param array $record The Record to create a quote from.
+     * @return string $quoteHtml The html markup to generate a quote.
+     */
+    public function renderQuote(array $record): string {
+        $encodeData = $this->encodeBody($record);
+        $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        return $quoteHtml;
+    }
 }

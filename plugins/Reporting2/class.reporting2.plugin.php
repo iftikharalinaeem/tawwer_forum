@@ -158,12 +158,12 @@ class Reporting2Plugin extends Gdn_Plugin {
         $sender->permission('Reactions.Flag.Add');
 
         $sender->Form = new Gdn_Form();
-        $reportModel = new ReportModel();
+        $reportModel = new ReportModel('', $this->embedService);
         $sender->Form->setModel($reportModel);
 
         $sender->Form->setFormValue('RecordID', $iD);
         $sender->Form->setFormValue('RecordType', $recordType);
-        $sender->Form->setFormValue('Format', 'rich');
+        $sender->Form->setFormValue('Format', 'TextEx');
 
         $sender->setData('Title', sprintf(t('Report %s'), t($recordType), 'Report'));
 
@@ -183,7 +183,6 @@ class Reporting2Plugin extends Gdn_Plugin {
             if ($reason = $sender->Form->getFormValue('Reason')) {
                 $body = 'Reason: '.$reason."\n".'Notes: '.$sender->Form->getFormValue('Body');
                 $sender->Form->setFormValue('Body', $body);
-                $sender->Form->setFormValue('Format', 'rich');
             }
 
             if ($sender->Form->save()) {
@@ -191,13 +190,8 @@ class Reporting2Plugin extends Gdn_Plugin {
             }
         } else {
             // Create excerpt to show in form popup
-
             $row = getRecord($recordType, $iD);
-
-            $jsonOperations = $this->renderQuote($row);
-
-            $quoteHtml = \Gdn::formatService()->renderHTML($jsonOperations, 'rich');
-
+            $quoteHtml = $reportModel->renderQuote($row);
             $sender->setData('quote', $quoteHtml);
         }
 
@@ -241,24 +235,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         }
     }
 
-    /**
-     * @param $row
-     * @return string
-     */
-    protected function renderQuote($row): string {
-        $quote = $this->embedService->createEmbedForUrl($row['Url']);
 
-        $jsonOperations = [[
-            "insert" => [
-                "embed-external" => [
-                    "data" => $quote,
-                ],
-            ],
-        ]];
-
-
-        return json_encode($jsonOperations);;
-    }
 }
 
 
