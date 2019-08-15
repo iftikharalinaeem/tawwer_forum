@@ -3,7 +3,7 @@
 <?php
 $Row = $this->data('Row');
 $quote = $this->data('quote');
-echo $quote;
+echo $this->data('quote');
 ?>
 <?php
 echo $this->Form->open();
