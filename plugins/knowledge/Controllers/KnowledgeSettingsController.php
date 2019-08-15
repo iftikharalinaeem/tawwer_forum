@@ -99,6 +99,15 @@ class KnowledgeSettingsController extends SettingsController {
                     "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
                 ],
             ],
+            "Knowledge.ThemeKludge.UserBannerImageOverlay" => [
+                "Control" => "toggle",
+                "LabelCode" => "Use Banner Image Filter",
+                "Description" => self::t(
+                    "Banner Image Filter Description",
+                    "It can be hard to read text on top of certain banner images."
+                    . "Enable this setting to add a filter over banner images which makes text easier to read."
+                ),
+            ],
             "Knowledge.ChooserTitle" => [
                 "LabelCode" => "Knowledge Base Chooser Title",
                 "Control" => "textbox",
@@ -109,6 +118,30 @@ class KnowledgeSettingsController extends SettingsController {
                 "Options" => [
                     "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
                 ]
+            ],
+            "Title" => [
+                "Control" => "title",
+                "Title" => "Colors",
+            ],
+            "Knowledge.ThemeKludge.PrimaryColor" => [
+                "LabelCode" => "Site Primary Color",
+                "Control" => "color"
+            ],
+            "Knowledge.ThemeKludge.FgColor" => [
+                "LabelCode" => "Site Default Text Color",
+                "Control" => "color"
+            ],
+            "Knowledge.ThemeKludge.BgColor" => [
+                "LabelCode" => "Site Default Background Color",
+                "Control" => "color"
+            ],
+            "Knowledge.ThemeKludge.TitleBarBg" => [
+                "LabelCode" => "TitleBar Background Color",
+                "Control" => "color"
+            ],
+            "Knowledge.ThemeKludge.TitleBarFg" => [
+                "LabelCode" => "TitleBar Text Color",
+                "Control" => "color"
             ],
         ]);
 
