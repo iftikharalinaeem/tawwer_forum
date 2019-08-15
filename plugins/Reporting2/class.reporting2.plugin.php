@@ -112,7 +112,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @param $recordID
      * @return string
      */
-    public function reportButton($row, $recordType, $recordID) {
+    public function reportButton($row, $recordType, $recordID): string {
         $row = (array)$row;
         $result = anchor(
             '<span class="ReactSprite ReactFlag"></span> '.t('Report'),
