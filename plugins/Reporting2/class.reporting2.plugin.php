@@ -5,7 +5,6 @@
 
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
-    ///
 
     /**
      * \Vanilla\EmbeddedContent\EmbedService $embedService
