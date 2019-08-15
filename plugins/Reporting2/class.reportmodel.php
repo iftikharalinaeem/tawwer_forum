@@ -60,9 +60,7 @@ class ReportModel extends Gdn_Model {
         $this->Validation->applyRule('RecordID', 'ValidateRequired');
         $this->Validation->applyRule('Body', 'ValidateRequired');
         $this->Validation->applyRule('Format', 'ValidateRequired');
-
-
-
+        
         if (!$this->Validation->validate($data, true)) {
             return false;
         }

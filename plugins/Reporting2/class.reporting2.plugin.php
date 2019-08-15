@@ -234,10 +234,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             $args['DashboardCount'] = $args['DashboardCount'];
         }
     }
-
-
 }
-
 
 if (!function_exists('formatQuote')):
 
@@ -250,6 +247,7 @@ if (!function_exists('formatQuote')):
         deprecated('formatQuote', 'gdn_formatter_quote');
         return gdn_formatter_quote($body);
     }
+
 endif;
 
 if (!function_exists('gdn_formatter_quote')):
