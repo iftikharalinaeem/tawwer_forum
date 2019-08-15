@@ -247,20 +247,17 @@ class Reporting2Plugin extends Gdn_Plugin {
      */
     protected function renderQuote($row): string {
         $quote = $this->embedService->createEmbedForUrl($row['Url']);
-        $quoteData = $quote->jsonSerialize();
-        $quotebodyRaw = $quoteData['bodyRaw'];
-        $encodedBody = json_encode($quotebodyRaw);
 
-        $jsonOperations = "[{\"insert\":{\"embed-external\":" .
-            "{\"data\":{\"recordID\":\"{$quoteData['recordID']}\",\"recordType\":\"{$quoteData['recordType']}\"," .
-            "\"body\":\"{$quoteData['body']}\",\"bodyRaw\":{$encodedBody},\"format\":\"{$quoteData['format']}\"," .
-            "\"dateInserted\":\"{$quoteData['dateInserted']}\"," .
-            "\"insertUser\":{\"userID\":\"{$quoteData['insertUser']['userID']}\",\"name\":\"{$quoteData['insertUser']['name']}\"," .
-            "\"photoUrl\":\"{$quoteData['insertUser']['photoUrl']}\"," .
-            "\"dateLastActive\":\"{$quoteData['insertUser']['dateLastActive']}\"},\"url\":\"{$quoteData['url']}\"," .
-            "\"embedType\":\"{$quoteData['embedType']}\",\"name\":\"{$quoteData['name']}\"}}}}]";
+        $jsonOperations = [[
+            "insert" => [
+                "embed-external" => [
+                    "data" => $quote,
+                ],
+            ],
+        ]];
 
-        return $jsonOperations;
+
+        return json_encode($jsonOperations);;
     }
 }
 
