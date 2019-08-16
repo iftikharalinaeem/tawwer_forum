@@ -149,21 +149,35 @@ class ReportModel extends Gdn_Model {
             $discussionID = $discussionModel->save($discussion);
             SpamModel::$Disabled = $spamCheckDisabled;
 
-            return $discussionID;
-
             if (!$discussionID) {
                 trace('Discussion not saved.');
                 $this->Validation->addValidationResult($discussionModel->validationResults());
                 SpamModel::$Disabled = $spamCheckDisabled;
                 return false;
             }
+            $discussion['DiscussionID'] = $discussionID;
         } else {
-            // If a report exists add append to the report body.
-            $discussion = (array)$discussion;
-            $discussionBody = $this->updateBody($discussion['Body'], $data['Body']);
-            $discussionModel->setField($discussion['discussionID'], 'Body', $discussionBody);
-            return true;
+            $discussionID = val('DiscussionID', $discussion);
         }
+
+        if ($discussionID) {
+            // Now that we have the discussion add the report.
+            $newcommenT = [
+                'DiscussionID' => $discussionID,
+                'Body' => $data['Body'],
+                'Format' => $data['Format'],
+                'Attributes' => ['Type' => 'Report']
+            ];
+            $commentModel = new CommentModel();
+            $commentID = $commentModel->save($newcommenT);
+            $this->Validation->addValidationResult($commentModel->validationResults());
+            SpamModel::$Disabled = $spamCheckDisabled;
+            return $commentID;
+        }
+
+        // Failed to add report
+        SpamModel::$Disabled = $spamCheckDisabled;
+        return false;
     }
 
     /**
@@ -185,34 +199,7 @@ class ReportModel extends Gdn_Model {
                 ],
             ];
 
-        if (array_key_exists('Body', $data) && isset($data['Body'])) {
-            $jsonOperations[] =
-                [
-                    "insert" => "\n {$data['Body']} \n",
-                ];
-        }
         return json_encode($jsonOperations);
-    }
-
-    /**
-     * Update the body of the reported discussion.
-     *
-     * @param string $body The body of the Discussion.
-     * @param string $data The data string to append to the body.
-     * @return false|string Encoded string.
-     */
-    private function updateBody(string $body, string $data = ''): string {
-       if ($data) {
-           $body = json_decode($body);
-           if (is_array($body)) {
-               $body[] =
-                   [
-                       "insert" => "\n {$data}",
-                   ];
-         }
-           return json_encode($body);
-       }
-       return false;
     }
 
     /**
