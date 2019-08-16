@@ -2,7 +2,7 @@
 <h2><?php echo t($this->data('Title')); ?></h2>
 <?php
 $quote = $this->data('quote');
-echo $quote;
+echo $this->data('quote');
 ?>
 <?php
 echo $this->Form->open();
