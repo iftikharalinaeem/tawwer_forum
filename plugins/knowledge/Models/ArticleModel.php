@@ -234,7 +234,6 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $row['Summary'] = $row['excerpt'];
             $row['Url'] = static::url($row, true);
             $row['UserID'] = $row['insertUserID'];
-
         }
 
         return $articles;
