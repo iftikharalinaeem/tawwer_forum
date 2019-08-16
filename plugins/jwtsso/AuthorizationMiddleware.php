@@ -108,32 +108,45 @@ class AuthorizationMiddleware {
         $key = $provider['AssociationSecret'];
         $payload = JWT::decode($jwt, $key, array_keys(JWT::$supported_algs));
 
-        $userID = $this->sso((array)$payload, $provider['KeyMap']); //TODO: spread keymap and send as string params
+        $userID = $this->sso((array)$payload, $provider['KeyMap']);
         return $userID;
     }
 
     /**
      * Connect the user's JWT payload with a user.
      *
-     * @param array $payload The payload to connect.
-     * @param array $keymap
-     * @return int Returns the User ID of the new or existing user.
+     * @param array $payload
+     * @param array $fields
+     * @return int
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
      * @throws \Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
-    private function sso(array $payload, string $uniqueID, string $email, string $name, ?string $photo = null, ?string $fullName = null): int {
-        $schemaFields = [
-            "{$uniqueID}:s",
-            "{$email}:s",
-            "{$name}:s",
-        ];
+    private function sso(array $payload, array $fields): int {
 
-        if ($photo) {
-            $schemaFields[] = "{$photo}:s?";
+        if (empty($fields['UniqueID'])) {
+            throw new ServerException("UniqueID field is required.", 500);
         }
 
-        if ($fullName) {
-            $schemaFields[] = "{$fullName}:s?";
+        if (empty($fields['Email'])) {
+            throw new ServerException("Email field is required.", 500);
+        }
+
+        if (empty($fields['Name'])) {
+            throw new ServerException("Name field is required.", 500);
+        }
+
+        $schemaFields = [
+            "{$fields['UniqueID']}:s",
+            "{$fields['Email']}:s",
+            "{$fields['Name']}:s",
+        ];
+
+        if ($fields['Photo']) {
+            $schemaFields[] = "{$fields['Photo']}:s?";
+        }
+
+        if ($fields['FullName']) {
+            $schemaFields[] = "{$fields['FullName']}:s?";
         }
 
         $sch = \Garden\Schema\Schema::parse($schemaFields);
@@ -144,15 +157,15 @@ class AuthorizationMiddleware {
         $auth = $this->userModel->getAuthentication($valid['sub'], static::PROVIDER_KEY);
         if (empty($auth)) {
             $userData = [
-                'Name' => $valid[$keymap['Name']], //TODO: fix
-                'Email' => $valid[$keymap['Email']] //TODO: fix
+                'Name' => $fields['Name'],
+                'Email' => $fields['Email']
             ];
 
-            if ($payload[$keymap['Photo']]) {
-                $userData['Photo'] = $payload[$keymap['Photo']];
+            if ($fields['Photo']) {
+                $userData['Photo'] = $fields['Photo'];
             }
 
-            $userID = $this->userModel->connect($valid[$keymap['UniqueID']], static::PROVIDER_KEY, $userData);
+            $userID = $this->userModel->connect($fields['UniqueID'], static::PROVIDER_KEY, $userData);
         } else {
             $userID = $auth['UserID'];
         }

@@ -170,6 +170,9 @@ class JWTSSOPlugin extends \Gdn_Plugin {
                 $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
                 $sender->Form->validateRule('SignInUrl', 'isUrl', 'You must provide a complete URL in the Sign In  URL field.');
                 $sender->Form->validateRule('BaseUrl', 'isUrl', 'You must provide a complete URL in the Issuer URL field.');
+//                $sender->Form->validateRule('KeyMap[UniqueID]', 'ValidateRequired', 'You must provide a UniqueID key');
+//                $sender->Form->validateRule('KeyMap[Email]', 'ValidateRequired', 'You must provide a Email key');
+//                $sender->Form->validateRule('KeyMap[Name]', 'ValidateRequired', 'You must provide a Display Name key');
 
                 if ($form->save()) {
                     $sender->informMessage(t('Saved'));
@@ -199,7 +202,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             'KeyMap[FullName]' => ['LabelCode' => 'Full Name', 'Options' => ['Value' => val('FullName', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
-        // Allow a client to hook in and add fields that might be relevent to their set up.
+        // Allow a client to hook in and add fields that might be relevant to their set up.
         $sender->EventArguments['FormFields'] = &$formFields;
         $sender->fireEvent('JWTSettingsFields');
 
