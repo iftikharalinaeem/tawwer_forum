@@ -170,9 +170,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
                 $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
                 $sender->Form->validateRule('SignInUrl', 'isUrl', 'You must provide a complete URL in the Sign In  URL field.');
                 $sender->Form->validateRule('BaseUrl', 'isUrl', 'You must provide a complete URL in the Issuer URL field.');
-//                $sender->Form->validateRule('KeyMap[UniqueID]', 'ValidateRequired', 'You must provide a UniqueID key');
-//                $sender->Form->validateRule('KeyMap[Email]', 'ValidateRequired', 'You must provide a Email key');
-//                $sender->Form->validateRule('KeyMap[Name]', 'ValidateRequired', 'You must provide a Display Name key');
+                $this->validateKeyMap($sender->Form);
 
                 if ($form->save()) {
                     $sender->informMessage(t('Saved'));
@@ -235,6 +233,25 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             $sender->render('Blank', 'Utility', 'Dashboard');
         } else {
             $sender->render('settings', '', 'plugins/jwtsso');
+        }
+    }
+
+    /**
+     * Custom validation for required array fields
+     *
+     * @param \Gdn_Form $form
+     */
+    private function validateKeyMap($form) {
+        if (!valr('UniqueID', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a UniqueID key.'));
+        }
+
+        if (!valr('Email', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a Email key.'));
+        }
+
+        if (!valr('Name', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a Name key.'));
         }
     }
 
