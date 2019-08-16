@@ -6,14 +6,15 @@
 
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { newFolder } from "@library/icons/common";
-import { collapseAll, expandAll } from "@knowledge/navigation/navigationManagerIcons";
+import { CollapseAll, ExpandAll } from "@knowledge/navigation/navigationManagerIcons";
 import React from "react";
 import classNames from "classnames";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcomponents/navigationManagerToolBarStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { NewFolderIcon } from "@library/icons/common";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IProps {
     expandAll: () => void;
@@ -27,6 +28,7 @@ export default function NavigationManagerToolBar(props: IProps) {
     const classes = navigationManagerToolbarClasses();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
+    const classesIcon = iconClasses();
     return (
         <div className={classes.root}>
             <div className={classes.bar}>
@@ -36,7 +38,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     onClick={props.expandAll}
                     ariaLabel={t("Expand All")}
                 >
-                    {expandAll(classes.icon)}
+                    <ExpandAll className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("Expand All")}</span>}
                 </Button>
                 <Button
@@ -45,7 +47,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     onClick={props.collapseAll}
                     ariaLabel={t("Collapse All")}
                 >
-                    {collapseAll(classes.icon)}
+                    <CollapseAll className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("Collapse All")}</span>}
                 </Button>
                 <Button
@@ -55,7 +57,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     ariaLabel={t("New Category")}
                     buttonRef={props.newCategoryButtonRef}
                 >
-                    {newFolder(classNames(classes.icon, classes.newFolder))}
+                    <NewFolderIcon className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
                 </Button>
             </div>

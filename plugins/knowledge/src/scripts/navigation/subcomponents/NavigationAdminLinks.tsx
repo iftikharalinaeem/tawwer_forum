@@ -11,11 +11,11 @@ import Permission from "@library/features/users/Permission";
 import classNames from "classnames";
 import React, { useState, useRef } from "react";
 import { siteNavAdminLinksClasses } from "@knowledge/navigation/subcomponents/navigationAdminLinksStyles";
-import { newFolder } from "@library/icons/common";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { NewFolderIcon } from "@library/icons/common";
 
 interface IProps {
     className?: string;
@@ -57,7 +57,7 @@ export default function NavigationAdminLinks(props: IProps) {
                         baseClass={ButtonTypes.CUSTOM}
                         className={classNames(classes.link)}
                     >
-                        {newFolder(classes.linkIcon)}
+                        <NewFolderIcon className={classes.linkIcon} />
                         {t("New Category")}
                     </Button>
                 </li>

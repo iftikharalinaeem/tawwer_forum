@@ -6,8 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Formatting\FormatCompatibilityService;
-use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\NotFoundException;
 
@@ -91,7 +89,7 @@ class ArticleDraftsTest extends AbstractResourceTest {
             ],
             "body" => "**Hello world**.",
             "format" => "markdown",
-            "excerpt" => "**Hello world**.",
+            "excerpt" => "Hello world.",
         ];
         return $record;
     }
@@ -219,18 +217,6 @@ class ArticleDraftsTest extends AbstractResourceTest {
     }
 
     /**
-     * Test ArticleDraft::getExcerpt with few scenarios
-     *
-     * @param string $body Plain body to truncate
-     * @param string $excerpt Expected excerpt to be returned
-     * @dataProvider provideExcerpts
-     */
-    public function testGetExcerpt(string $body, string $excerpt) {
-        $res = ArticleDraft::getExcerpt($body);
-        $this->assertEquals($excerpt, $res);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function testEditFormatCompat(string $editSuffix = "unused") {
@@ -305,38 +291,5 @@ class ArticleDraftsTest extends AbstractResourceTest {
         $r = $this->api()->delete(
             "{$this->baseUrl}/{$draft['draftID']}"
         );
-    }
-
-
-    /**
-     * Data provider for testGetExcerpt
-     *
-     * @return array
-     */
-    public function provideExcerpts(): array {
-        return [
-            'Short body' => [
-                'Test body just few words. Nothing to truncate.',
-                'Test body just few words. Nothing to truncate.'
-            ],
-            'Short but dirty body' => [
-                "Test body just few words. But few      spaces. And few \n \n \n new lines to truncate.",
-                'Test body just few words. But few spaces. And few new lines to truncate.'
-            ],
-            'Long body' => [
-                '123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
-                .'1st line was 100 characters long '
-                .'123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
-                .'2nd line was 100 characters too '
-                .'123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
-                .'Now we have enough to truncate '
-                ,
-                '123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
-                .'1st line was 100 characters long '
-                .'123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 '
-                .'2nd line was 100 characters too '
-                .'123456789 123456789 123456789 123456789 123456789 123456789…'
-            ]
-        ];
     }
 }

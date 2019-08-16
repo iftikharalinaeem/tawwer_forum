@@ -20,7 +20,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api/article";
-import { checkCompact } from "@library/icons/common";
+import { CheckCompactIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export function ArticleReactions(props: IProps) {
@@ -97,7 +97,11 @@ function ReactionButton(props: {
     let content: React.ReactNode = title;
     const checked = userReaction === reactionValue;
     if (checked) {
-        content = <span className={styles.checkedButtonContent}>{checkCompact()}</span>;
+        content = (
+            <span className={styles.checkedButtonContent}>
+                <CheckCompactIcon />
+            </span>
+        );
     }
     if (isSubmitting) {
         content = <ButtonLoader />;

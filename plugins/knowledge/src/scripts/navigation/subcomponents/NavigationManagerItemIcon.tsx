@@ -7,12 +7,12 @@
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Button from "@library/forms/Button";
-import { downTriangle, rightTriangle } from "@library/icons/common";
 import { article, folderClosed, folderOpen } from "@knowledge/navigation/navigationManagerIcons";
 import classNames from "classnames";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
 
 interface IProps {
     expanded: boolean;
@@ -86,9 +86,11 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
         if (this.props.expanded) {
             return (
                 <>
-                    <span className={classNames("navigationManager-triangle", classes.triangle)}>
-                        {this.props.hasChildren && downTriangle("navigationManager-triangleDown")}
-                    </span>
+                    {this.props.hasChildren && (
+                        <span className={classNames("navigationManager-triangle", classes.triangle)}>
+                            <DownTriangleIcon className={"navigationManager-triangleDown"} />
+                        </span>
+                    )}
                     <span className={classNames("navigationManager-folderIcon", classes.folderIcon)}>
                         {folderOpen(
                             classNames("navigationManager-folder", "navigationManager-folderOpen", classes.folder),
@@ -100,7 +102,7 @@ export default class NavigationManagerItemIcon extends React.Component<IProps> {
             return (
                 <>
                     <span className={classNames("navigationManager-triangle", classes.triangle)}>
-                        {this.props.hasChildren && rightTriangle("navigationManager-triangleRight")}
+                        {this.props.hasChildren && <RightTriangleIcon className={"navigationManager-triangleRight"} />}
                     </span>
                     <span className={classNames("navigationManager-folderIcon", classes.folderIcon)}>
                         {folderClosed(

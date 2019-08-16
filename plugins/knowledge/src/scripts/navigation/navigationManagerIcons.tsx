@@ -7,18 +7,16 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
+import { iconClasses } from "@library/icons/iconClasses";
 
-const currentColorFill = {
-    fill: "currentColor",
-};
-
-export function expandAll(className?: string) {
+export function ExpandAll(props: { className?: string }) {
     const title = t("Expand All");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-revision", className)}
+            className={classNames(classes.standard, props.className)}
             role="img"
             aria-label={title}
         >
@@ -32,13 +30,14 @@ export function expandAll(className?: string) {
     );
 }
 
-export function collapseAll(className?: string) {
+export function CollapseAll(props: { className?: string }) {
     const title = t("Collapse All");
+    const classes = iconClasses();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            className={classNames("icon", "revisionIcon", "revisionIcon-revision", className)}
+            className={classNames(classes.standard, props.className)}
             role="img"
             aria-label={title}
         >

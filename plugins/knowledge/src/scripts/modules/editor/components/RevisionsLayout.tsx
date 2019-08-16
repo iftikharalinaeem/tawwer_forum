@@ -34,7 +34,7 @@ export class RevisionsLayout extends React.Component<IProps> {
         const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
         const isDesktop = device === Devices.DESKTOP || device === Devices.NO_BLEED;
         const isMobile = device === Devices.MOBILE || device === Devices.XS;
-        const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("Revision History");
+        const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("History");
 
         const classesMobileDropdown = mobileDropDownClasses();
 

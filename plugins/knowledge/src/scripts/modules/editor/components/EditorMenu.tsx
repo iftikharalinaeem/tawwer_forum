@@ -6,7 +6,7 @@
 
 import { RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@library/utility/appUtils";
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Permission from "@library/features/users/Permission";
 import * as React from "react";
@@ -38,7 +38,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
-                    paddedList={true}
+                    flyoutType={FlyoutType.LIST}
                 >
                     <InsertUpdateMetas
                         dateInserted={dateInserted}
@@ -66,11 +66,4 @@ export default class EditorMenu extends React.PureComponent<IProps> {
     private get domID(): string {
         return "articleMenuDropDown-" + this.props.article.articleID;
     }
-
-    /**
-     * Fallback click handle until all functionaility has been implemented.
-     */
-    private dummyClick = () => {
-        alert("Click works");
-    };
 }

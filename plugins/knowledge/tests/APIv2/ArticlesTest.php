@@ -11,6 +11,7 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -227,6 +228,63 @@ class ArticlesTest extends AbstractResourceTest {
 
         $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
         $this->assertSame($patchRow[$field], $newRow[$field]);
+    }
+
+    /**
+     * Test PATCH /resource/<id> with previousRevisionID.
+     *
+     * Patch endpoints should be able to update 1st attempt and generate conflict with 2nd one.
+     */
+    public function testPatchPreviousRevisionID() {
+        if (empty($this->defaultKB)) {
+            $this->defaultKB = $this->api()->post('knowledge-bases', [
+                "name" => __FUNCTION__ . " KB #1",
+                "Description" => 'Test knowledge base description',
+                "urlCode" => slugify('test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000)),
+                "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
+                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
+            ])->getBody();
+        }
+
+        $row = $this->testGetEdit();
+
+        $patchRow = $this->modifyRow($row);
+        $revisions = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/revisions")->getBody();
+
+        // Verify there is one, and only one, published revision and that it is the latest revision.
+        $publishedRevision = null;
+        foreach ($revisions as $revision) {
+            if ($revision["status"] === ArticleModel::STATUS_PUBLISHED) {
+                if ($publishedRevision) {
+                    $this->fail("Multiple published revisions detected for a single article.");
+                }
+                $publishedRevision = $revision;
+            }
+        }
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            [
+                'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
+                'previousRevisionID' => $publishedRevision['articleRevisionID'],
+                'body' => $patchRow['body']
+            ]
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+
+        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $this->assertSame($patchRow['body'], $newRow['body']);
+
+        $this->expectException(ClientException::class);
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            [
+                'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
+                'previousRevisionID' => $publishedRevision['articleRevisionID'],
+                'body' => $patchRow['body']
+            ]
+        );
     }
 
     /**

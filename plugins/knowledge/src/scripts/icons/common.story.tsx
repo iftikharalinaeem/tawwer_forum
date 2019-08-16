@@ -1,0 +1,27 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+import { StoryHeading } from "@library/storybook/StoryHeading";
+import { storiesOf } from "@storybook/react";
+import React from "react";
+import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryTiles } from "@library/storybook/StoryTiles";
+import * as icons from "@knowledge/icons/common";
+import { StoryTile } from "@library/storybook/StoryTile";
+
+const story = storiesOf("KnowledgeBase", module);
+
+story.add("Icons", () => {
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>Knowledge Base Icons</StoryHeading>
+            <StoryTiles>
+                <StoryTile>{icons.knowldedgeBaseItem()}</StoryTile>
+                <StoryTile>{icons.knowledgeBaseNoIcon()}</StoryTile>
+            </StoryTiles>
+        </StoryContent>
+    );
+});

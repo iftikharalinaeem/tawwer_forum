@@ -7,6 +7,13 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\Schema\Schema;
+use Vanilla\Formatting\Formats\BBCodeFormat;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\Formats\TextExFormat;
+use Vanilla\Formatting\Formats\TextFormat;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -148,6 +155,7 @@ trait ArticlesApiSchemes {
                     "locale?",
                     "sort?",
                     "discussionID?",
+                    "previousRevisionID?",
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
@@ -347,13 +355,16 @@ trait ArticlesApiSchemes {
             ],
             "format" => [
                 "description" => 'Body content format: rich, text, html.',
-                "default" => ArticleDraft::BODY_TYPE_RICH,
+                "default" => RichFormat::FORMAT_KEY,
                 "type" => "string",
                 "enum" => [
-                    ArticleDraft::BODY_TYPE_RICH,
-                    ArticleDraft::BODY_TYPE_HTML,
-                    ArticleDraft::BODY_TYPE_TEXT,
-                    ArticleDraft::BODY_TYPE_MD,
+                    RichFormat::FORMAT_KEY,
+                    BBCodeFormat::FORMAT_KEY,
+                    MarkdownFormat::FORMAT_KEY,
+                    HtmlFormat::FORMAT_KEY,
+                    WysiwygFormat::FORMAT_KEY,
+                    TextFormat::FORMAT_KEY,
+                    TextExFormat::FORMAT_KEY,
                 ]
             ],
             "excerpt" => [
@@ -453,6 +464,7 @@ trait ArticlesApiSchemes {
     private function fullRevisionSchema(): Schema {
         return Schema::parse([
             "articleRevisionID:i" => "Unique article revision ID.",
+            "previousRevisionID:i" => "Article's last known revision ID. Needs to be passed when patching an existing article.",
             "articleID:i" => "Associated article ID.",
             "status:s" => [
                 "allowNull" => true,

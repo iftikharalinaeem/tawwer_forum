@@ -15,7 +15,7 @@ import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
-import { EditorAddRoute, EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { IStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -129,7 +129,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                         return (
                             <DraftsListItem
                                 {...item}
-                                url={EditorAddRoute.url({ draftID: item.draftID, articleID: this.articleID })}
+                                url={EditorRoute.url({ draftID: item.draftID, articleID: this.articleID })}
                                 key={item.draftID}
                             />
                         );

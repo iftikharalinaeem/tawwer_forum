@@ -14,7 +14,6 @@ import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { compose } from "@library/icons/header";
 import Container from "@library/layout/components/Container";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -29,6 +28,7 @@ import { connect } from "react-redux";
 import TitleBar from "@library/headers/TitleBar";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { ComposeIcon } from "@library/icons/common";
 
 /**
  * Component representing the the full home page of a help center.
@@ -65,7 +65,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                     baseClass={ButtonTypes.ICON}
                     title={t("Compose")}
                 >
-                    {compose()}
+                    <ComposeIcon />
                 </LinkAsButton>
             </Permission>
         );

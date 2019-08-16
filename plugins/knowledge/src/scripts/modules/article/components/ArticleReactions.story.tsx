@@ -15,7 +15,7 @@ import { IDeviceProps } from "@library/layout/DeviceContext";
 import { optionsKnob as options } from "@storybook/addon-knobs";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 
-const reactionsStory = storiesOf("KnowledgeBase/Articles", module);
+const story = storiesOf("KnowledgeBase", module);
 
 // Add Knobs
 
@@ -27,7 +27,7 @@ interface IArticleReactionProps extends IArticleReaction {
 
 // interface IArticleReactionOption
 
-reactionsStory.add("Was this Helpful?", () => {
+story.add("Was this Helpful?", () => {
     const noop = () => {
         return;
     };

@@ -50,6 +50,7 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
 
     const icon = style("icon", {
         display: "inline-flex",
+        verticalAlign: "middle",
     });
 
     const bar = style("bar", {
@@ -63,7 +64,7 @@ export const navigationManagerToolbarClasses = useThemeCache(() => {
 
     const newFolder = style("newFolder", {
         marginLeft: "auto",
-        transform: `translateY(-2px)`,
+        transform: `translateY(1.5px)`,
     });
 
     const separator = style("separator", {

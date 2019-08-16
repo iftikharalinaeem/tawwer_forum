@@ -12,7 +12,6 @@ import { IStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { categoryIcon, plusCircle } from "@library/icons/common";
 import ModalSizes from "@library/modal/ModalSizes";
 import classNames from "classnames";
 import * as React from "react";
@@ -26,6 +25,8 @@ import uniqueId from "lodash/uniqueId";
 import AccessibleError from "@library/forms/AccessibleError";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
+import { locationPickerClasses } from "./locationPickerStyles";
 
 /**
  * This component allows to display and edit the location of the current page.
@@ -48,13 +49,19 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
             ? LocationBreadcrumbs.renderString(locationBreadcrumb)
             : LocationInput.SELECT_MESSAGE;
         const classesEditorForm = editorFormClasses();
+        const classesLocationPicker = locationPickerClasses();
 
         const buttonContents = locationBreadcrumb ? (
-            <LocationBreadcrumbs locationData={locationBreadcrumb} icon={categoryIcon("pageLocation-icon")} />
+            <LocationBreadcrumbs
+                locationData={locationBreadcrumb}
+                icon={<CategoryIcon className={"pageLocation-icon"} />}
+            />
         ) : (
             <React.Fragment>
-                {plusCircle("pageLocation-icon")}
-                {LocationInput.SELECT_MESSAGE}
+                <span className={classesLocationPicker.iconWrapper}>
+                    <PlusCircleIcon className={"pageLocation-icon"} />
+                </span>
+                <span className={classesLocationPicker.initialText}>{LocationInput.SELECT_MESSAGE}</span>
             </React.Fragment>
         );
 
@@ -105,7 +112,7 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
 
     public componentDidMount() {
         if (this.props.initialRecord) {
-            void this.props.initLocationPickerFromRecord(this.props.initialRecord);
+            void this.props.initLocationPickerFromRecord(this.props.initialRecord, null);
         }
     }
 

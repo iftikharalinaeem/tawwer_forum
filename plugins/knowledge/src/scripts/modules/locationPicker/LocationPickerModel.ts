@@ -15,6 +15,7 @@ import { createSelector } from "reselect";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import { IArticle } from "@knowledge/@types/api/article";
 
 export interface ILPConnectedData extends ILocationPickerState {
     pageContents: INavigationTreeItem[];
@@ -104,6 +105,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         selectedRecord: null,
         navigatedRecord: null,
         chosenRecord: null,
+        selectedArticle: null,
     };
 
     /**
@@ -115,10 +117,11 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
 
     public reduceSelf: ReducerType = reducerWithoutInitialState<ILocationPickerState>()
         .case(LocationPickerActions.initAC, (state, payload) => {
-            const { selected, parent } = payload;
-            state.navigatedRecord = parent === NavigationModel.SYNTHETIC_ROOT ? null : parent;
-            state.selectedRecord = selected;
-            state.chosenRecord = selected;
+            const { selectedCategory, parentCategory } = payload;
+            state.navigatedRecord = parentCategory === NavigationModel.SYNTHETIC_ROOT ? null : parentCategory;
+            state.selectedRecord = selectedCategory;
+            state.chosenRecord = selectedCategory;
+            state.selectedArticle = payload.article;
             return state;
         })
         .case(LocationPickerActions.chooseAC, (state, payload) => {
@@ -146,6 +149,7 @@ export interface ILocationPickerState {
     navigatedRecord: ILocationPickerRecord | null; // What page the user is on in the picker.
     selectedRecord: ILocationPickerRecord | null; // What category is selected (still not chosen).
     chosenRecord: ILocationPickerRecord | null; // What category is chosen (input closes after a selection)
+    selectedArticle: IArticle | null; // What article is currently selected.
 }
 
 export type ReducerType = KnowledgeReducer<ILocationPickerState>;

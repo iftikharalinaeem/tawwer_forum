@@ -11,18 +11,24 @@ import React from "react";
 import { connect } from "react-redux";
 import { IKnowledgeBase } from "./KnowledgeBaseModel";
 
+interface IProps extends ISelectOneProps {
+    className?: string;
+    placeholder?: string;
+}
+
 /**
  * Form component for searching/selecting a category.
  */
-export class KnowledgeBaseInput extends React.Component<ISelectOneProps> {
-    public static defaultProps = {
+export class KnowledgeBaseInput extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
         label: t("Knowledge Base"),
         options: [],
         value: undefined,
+        placeholder: "",
     };
 
     public render() {
-        return <SelectOne {...this.props} placeholder="" />;
+        return <SelectOne {...this.props} />;
     }
 }
 

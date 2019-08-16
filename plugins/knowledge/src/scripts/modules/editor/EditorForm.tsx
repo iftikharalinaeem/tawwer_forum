@@ -12,7 +12,6 @@ import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/Edit
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { userContentClasses } from "@library/content/userContentStyles";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -25,7 +24,6 @@ import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
@@ -40,6 +38,8 @@ import { TouchScrollable } from "react-scrolllock";
 import { IStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
+import { userContentClasses } from "@library/content/userContentStyles";
+import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -109,7 +109,7 @@ export function EditorForm(props: IProps) {
     );
 
     const categoryError = formErrors.knowledgeCategoryID;
-    const titleError = formErrors.name;
+    const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
 
@@ -130,6 +130,10 @@ export function EditorForm(props: IProps) {
     const formRef = useRef<HTMLFormElement>(null);
     const contentSize = useMeasure(contentRef);
     const transition = useFormScrollTransition(formRef, embedBarRef);
+    // const embedMenu = useRef<HTMLDivElement>(null);
+
+    const [embedMenuStyles, setEmbedMenuStyles] = useState();
+    const [embedMenuVisibility, setEmbedMenuVisibility] = useState();
 
     return (
         <TouchScrollable>
@@ -186,7 +190,7 @@ export function EditorForm(props: IProps) {
                             onChange={titleChangeHandler}
                             disabled={isLoading}
                             aria-invalid={!!titleError}
-                            aria-errormessage={!!titleError ? domTitleErrorsID : undefined}
+                            aria-errormessage={titleError ? domTitleErrorsID : undefined}
                         />
                         {!!titleError && (
                             <AccessibleError

@@ -20,6 +20,7 @@ import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftP
 interface IProps extends IResponseArticleDraft, RouteComponentProps<any> {
     headingLevel?: 2 | 3 | 4 | 5 | 6;
     className?: string;
+    menuOverwrite?: JSX.Element;
 }
 
 /**
@@ -31,7 +32,7 @@ export class DraftPreview extends React.Component<IProps> {
     };
 
     public render() {
-        const { dateUpdated, draftID, headingLevel, className, excerpt } = this.props;
+        const { dateUpdated, draftID, headingLevel, className, excerpt, menuOverwrite } = this.props;
         const { name } = this.props.attributes;
         const HeadingTag = `h${headingLevel}` as "h1" | "h3" | "h4" | "h5" | "h6";
         const classesSearchResults = searchResultsClasses();
@@ -52,16 +53,24 @@ export class DraftPreview extends React.Component<IProps> {
                                 className={classNames("draftPreview-link", classesResult.title)}
                             >
                                 <HeadingTag className={classNames("draftPreview-title", classesResult.title)}>
-                                    {!!name ? name : <em>{t("(Untitled)")}</em>}
+                                    {name ? name : <em>{t("(Untitled)")}</em>}
                                 </HeadingTag>
                             </a>
-                            <DraftMenu
-                                className={classNames("draftPreview-menu")}
-                                draftID={draftID}
-                                url={EditorRoute.url(this.props)}
-                            />
+
+                            {menuOverwrite ? (
+                                menuOverwrite
+                            ) : (
+                                <DraftMenu
+                                    className={classNames("draftPreview-menu")}
+                                    draftID={draftID}
+                                    url={EditorRoute.url(this.props)}
+                                />
+                            )}
                         </div>
-                        <DraftPreviewMeta className={classesResult.metas} dateUpdated={dateUpdated} />
+                        <DraftPreviewMeta
+                            className={classNames(classesResult.metas, classes.metas)}
+                            dateUpdated={dateUpdated}
+                        />
                         <Paragraph className={classNames("draftPreview-excerpt", classesResult.excerpt)}>
                             <TruncatedText>{excerpt ? <em>{excerpt}</em> : <em>{t("(No Body)")}</em>}</TruncatedText>
                         </Paragraph>

@@ -63,17 +63,12 @@ function makeEditorUrl(data?: IEditorURLData) {
     return baseUrl;
 }
 
+const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
+
 // Editor
 const EDITOR_KEY = "EditorPageKey";
 const loadEditor = () => import(/* webpackChunkName: "pages/kb/editor" */ "@knowledge/modules/editor/EditorPage");
-export const EditorAddRoute = new RouteHandler(loadEditor, "/kb/articles/add", makeEditorUrl, ModalLoader, EDITOR_KEY);
-export const EditorRoute = new RouteHandler(
-    loadEditor,
-    "/kb/articles/:id(\\d+)/editor",
-    makeEditorUrl,
-    ModalLoader,
-    EDITOR_KEY,
-);
+export const EditorRoute = new RouteHandler(loadEditor, editorPaths, makeEditorUrl, ModalLoader, EDITOR_KEY);
 
 /**
  * Get the route for editing a particular article ID.
@@ -164,7 +159,6 @@ const NotFound = () => {
  */
 export function getPageRoutes() {
     return [
-        EditorAddRoute.route,
         EditorRoute.route,
         RevisionsRoute.route,
         ArticleRoute.route,

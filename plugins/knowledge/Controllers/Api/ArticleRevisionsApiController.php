@@ -10,8 +10,13 @@ use UserModel;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Formatting\Quill\Parser;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\Formats;
 
 /**
  * API controller for managing the article revisions resource.
@@ -25,6 +30,12 @@ use Vanilla\Knowledge\Models\ArticleModel;
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
+    /** The maximum limit of revisions that can be re-rendered at a time. */
+    const LIMIT = 1000;
+
+    /** The default re-render starting point. */
+    const OFFSET = 0;
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -37,8 +48,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var Schema */
+    private $reRenderSchema;
+
     /** @var UserModel */
     private $userModel;
+
+    /** @var FormatService */
+    private $formatService;
 
     /**
      * ArticleRevisionsApiController constructor.
@@ -46,11 +63,18 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
+     * @param FormatService $formatService
      */
-    public function __construct(ArticleRevisionModel $articleRevisionModel, ArticleModel $articleModel, UserModel $userModel) {
+    public function __construct(
+        ArticleRevisionModel $articleRevisionModel,
+        ArticleModel $articleModel,
+        UserModel $userModel,
+        FormatService $formatService
+    ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -92,6 +116,38 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
             ])->add($this->fullSchema()), "ArticleRevision");
         }
         return $this->schema($this->articleRevisionSchema, $type);
+    }
+
+    /**
+     * Get the schema for the reRender.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function reRenderSchema(string $type = ""): Schema {
+        if ($this->reRenderSchema === null) {
+            $this->reRenderSchema = $this->schema(Schema::parse([
+                "processed",
+                "errorCount",
+                "firstArticleRevisionID",
+                "lastArticleRevisionID",
+                "errors" => [
+                    "items" => [
+                        "properties" => [
+                            "articleRevisionID" => [
+                                "type" => "integer",
+                                "description" => "Article revision ID ",
+                            ],
+                            "errorMessage" => [
+                                "type" => "string",
+                                "description" => "Error message thrown when re-rendering the revision",
+                            ]
+                        ]
+                    ]
+                ]
+            ]));
+        }
+        return $this->schema($this->reRenderSchema, $type);
     }
 
     /**
@@ -185,5 +241,89 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      */
     private function normalizeOutput(array $row): array {
         return $row;
+    }
+
+    /**
+     * ReRender content in the articleRevision Table (bodyRendered, format, plainText, excerpt, outline).
+     *
+     * @param array $body A specific id to rerender.
+     * @return array $results The number of records processed.
+     */
+    public function patch_reRender(array $body = []): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(
+            Schema::parse([
+                "articleID:i?" => "The article ID.",
+                "limit:i?" => [
+                    "Description" => "The desired number of revisions to process.",
+                    'default' => self::LIMIT,
+                    'minimum' => 1,
+                    'maximum' => self::LIMIT
+                ],
+                "offset:i?" => "The number revisions to exclude."
+                ]),
+            "in"
+        );
+
+        $body = $in->validate($body);
+
+        $where = [];
+        if (!empty($body["articleID"] ?? null)) {
+            $where = ["articleID" => $body["articleID"]];
+        }
+
+        $limit = $body["limit"] ?? self::LIMIT;
+        $offset = $body["offset"] ?? self::OFFSET;
+
+        $options = ["limit" => $limit, "offset" => $offset];
+
+        $revisions = $this->articleRevisionModel->get($where, $options);
+        $processed = 0;
+        $notProcessed = 0;
+
+        $firstRevision = null;
+        $lastRevision = null;
+        $errors =[];
+
+        foreach ($revisions as $revision) {
+            $updateRev = [];
+
+            try {
+                $revision["body"] = $this->formatService->filter($revision["body"], $revision["format"]);
+                $updateRev["bodyRendered"] = $this->formatService->renderHTML($revision["body"], $revision["format"]);
+
+                if ($revision["format"] === "rich") {
+                    $plainText = $this->formatService->renderPlainText($revision["body"], $revision["format"]);
+                    $updateRev["plainText"] = $plainText;
+                    $updateRev["excerpt"] =  $this->formatService->renderExcerpt($revision["body"], $revision["format"]);
+                    $updateRev["outline"] = json_encode($this->formatService->parseHeadings($revision["body"], $revision["format"]));
+                }
+
+                $this->articleRevisionModel->update($updateRev, ["articleRevisionID" => $revision["articleRevisionID"]]);
+                $processed++;
+            } catch (FormattingException $e) {
+                $errors[] = [
+                        "articleRevisionID" => $revision["articleRevisionID"],
+                        "errorMessage" => $e->getMessage()
+                    ];
+                $notProcessed++;
+            }
+            $firstRevision = $firstRevision ?? $revision["articleRevisionID"];
+            $lastRevision = $revision["articleRevisionID"];
+        }
+
+        $records = [
+            "processed" => $processed,
+            "errorCount" => $notProcessed,
+            "firstArticleRevisionID" => $firstRevision,
+            "lastArticleRevisionID" => $lastRevision,
+            "errors" => $errors
+        ];
+
+        $out = $this->reRenderSchema("out");
+        $result = $out->validate($records);
+
+        return $result;
     }
 }

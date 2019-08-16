@@ -8,7 +8,7 @@ import { IApiError, LoadStatus } from "@library/@types/api/core";
 import Permission from "@library/features/users/Permission";
 import { IInjectableUserState, isUserGuest, mapUsersStoreState } from "@library/features/users/userModel";
 import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
-import { searchError } from "@library/icons/common";
+import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -60,7 +60,7 @@ class PageErrorMessage extends React.Component<IProps> {
                     message,
                     description: t("You don't have permission to view this resource."),
                     actionItem: this.renderSignin(),
-                    icon: searchError(message, classes.errorIcon),
+                    icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
                 };
             }
             case 404:
@@ -73,7 +73,7 @@ class PageErrorMessage extends React.Component<IProps> {
                             {t("Back to home page")}
                         </LinkAsButton>
                     ),
-                    icon: searchError(message, classes.errorIcon),
+                    icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
                 };
             }
             case DefaultError.NO_KNOWLEDGE_BASE: {
@@ -89,7 +89,7 @@ class PageErrorMessage extends React.Component<IProps> {
                             </LinkAsButton>
                         </Permission>
                     ),
-                    icon: searchError(message, classes.errorIcon),
+                    icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
                 };
             }
             case DefaultError.NO_ARTICLES: {
@@ -109,7 +109,7 @@ class PageErrorMessage extends React.Component<IProps> {
                             </EditorRoute.Link>
                         </Permission>
                     ) : null,
-                    icon: searchError(message, classes.errorIcon),
+                    icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
                 };
             }
             case DefaultError.CATEGORY_NO_ARTICLES: {
@@ -130,7 +130,7 @@ class PageErrorMessage extends React.Component<IProps> {
                             {t("Back to Home")}
                         </LinkAsButton>
                     ),
-                    icon: searchError(message, classes.errorIcon),
+                    icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
                 };
             }
         }

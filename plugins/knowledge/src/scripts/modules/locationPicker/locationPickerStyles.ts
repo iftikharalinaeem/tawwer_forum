@@ -7,7 +7,8 @@
 import { percent, px } from "csx";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { unit, flexHelper, colorOut, paddings, margins } from "@library/styles/styleHelpers";
+import { iconVariables } from "@library/icons/iconClasses";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -35,7 +36,12 @@ export const locationPickerClasses = useThemeCache(() => {
                 borderStyle: "solid",
             },
             "&.isActive": {
-                backgroundColor: globalVars.mainColors.primary.toString(),
+                backgroundColor: globalVars.mixPrimaryAndBg(0.08).toString(),
+                ...paddings({
+                    vertical: 0,
+                    horizontal: 2,
+                }),
+                ...flexHelper().middleLeft(),
             },
             "&.isFirst": {
                 marginTop: px(18),
@@ -44,6 +50,13 @@ export const locationPickerClasses = useThemeCache(() => {
                 marginBottom: px(18),
             },
         },
+    });
+
+    const checkMark = style("checkMark", {
+        color: colorOut(globalVars.mainColors.primary),
+        height: 20,
+        width: 20,
+        marginRight: 4,
     });
 
     const instructions = style("instructions", {
@@ -56,9 +69,28 @@ export const locationPickerClasses = useThemeCache(() => {
         minHeight: unit(50),
     });
 
+    const iconVars = iconVariables();
+
+    const iconWrapper = style("iconWrapper", {
+        display: "inline-flex",
+        ...margins({
+            right: ".4em",
+            bottom: "-.05em",
+        }),
+        flexBasis: unit(iconVars.categoryIcon.width),
+    });
+
+    const initialText = style("initialText", {
+        whiteSpace: "nowrap",
+        paddingLeft: "0.2em",
+    });
+
     return {
         root,
         articlePlaceholder,
+        checkMark,
         instructions,
+        iconWrapper,
+        initialText,
     };
 });
