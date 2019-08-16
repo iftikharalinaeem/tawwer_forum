@@ -55,10 +55,10 @@ class SearchType {
     /**
      * Set the API value.
      *
-     * @param string $apiVaue The API value.
+     * @param string $apiValue The API value.
      * @return $this
      */
-    public function setApiValue(string $apiValue) {
+    public function setApiValue(string $apiValue): self {
         $this->apiValue = $apiValue;
         return $this;
     }
@@ -80,7 +80,7 @@ class SearchType {
      * @param string ...$indexes The names of the indexes.
      * @return $this
      */
-    public function setIndexes(string ...$indexes) {
+    public function setIndexes(string ...$indexes): self {
         $this->indexes = $indexes;
         return $this;
     }
@@ -100,7 +100,7 @@ class SearchType {
      * @param int $attributeValue
      * @return $this
      */
-    public function setAttributeValue(int $attributeValue) {
+    public function setAttributeValue(int $attributeValue): self {
         $this->attributeValue = $attributeValue;
         return $this;
     }
@@ -118,7 +118,7 @@ class SearchType {
      * @param string $labelCode
      * @return $this
      */
-    public function setLabelCode(string $labelCode) {
+    public function setLabelCode(string $labelCode): self {
         $this->labelCode = $labelCode;
         return $this;
     }
@@ -138,7 +138,7 @@ class SearchType {
      * @param string $oldAPIField The name of the old field.
      * @return $this
      */
-    public function setOldAPIField(string $oldAPIField) {
+    public function setOldAPIField(string $oldAPIField): self {
         $this->oldAPIField = $oldAPIField;
         return $this;
     }

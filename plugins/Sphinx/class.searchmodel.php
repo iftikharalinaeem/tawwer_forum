@@ -208,13 +208,15 @@ class SphinxSearchModel extends \SearchModel {
      * @param array $query A querystring.
      * @return array Returns the new array of types being searched.
      */
-    public function fixOldSearchTypes(array $query) {
+    public function fixOldSearchTypes(array $query): array {
         $types = $query['types'] ?? [];
         $result = [];
 
         foreach ($this->searchTypes as $type) {
             /* @var SearchType $type */
-            if (in_array($type->getApiValue(), $types, true) || (!empty($type->getOldAPIField()) && !empty($query[$type->getOldAPIField()]))) {
+            if (in_array($type->getApiValue(), $types, true) ||
+                (!empty($type->getOldAPIField()) && !empty($query[$type->getOldAPIField()]))) {
+
                 $result[] = $type->getApiValue();
             }
         }
