@@ -435,7 +435,7 @@ class KnowledgeApiController extends AbstractApiController {
             $results = [];
             foreach ($ids as $dtype => $recordIds) {
                 $method = self::RECORD_TYPES[$dtype]['getRecordsFunction'];
-                if (method_exists($this, $method)){
+                if (method_exists($this, $method)) {
                     array_push($results, ...$this->{$method}($recordIds, $dtype));
                 } else {
                     trigger_error("Incorrect Dtype in article search, dtype of {$dtype}", E_USER_NOTICE);
