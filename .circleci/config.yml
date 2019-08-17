@@ -10,17 +10,17 @@ orbs:
         executors:
             php71:
                 docker:
-                - image: circleci/php:7.1.30-fpm-stretch-node
+                - image: circleci/php:7.1.30-fpm-node
                 - image: mysql:5.7.26
                   environment: *db_env
             php72:
                 docker:
-                - image: circleci/php:7.2.19-fpm-stretch-node
+                - image: circleci/php:7.2.19-fpm-node
                 - image: mysql:5.7.26
                   environment: *db_env
             php73:
                 docker:
-                - image: circleci/php:7.3.6-fpm-stretch-node
+                - image: circleci/php:7.3.6-fpm-node
                 - image: mysql:5.7.26
                   environment: *db_env
             node:
@@ -196,40 +196,12 @@ jobs:
                 command: |
                     cd ~/workspace/vanilla
                     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
-    php_72_integration:
-        executor: vanilla/php72
-        steps: &php_integration_test_steps
-            - *attach_workspace
-            - vanilla/prepare_nginx
-            - vanilla/prepare_php_tests
-            - run:
-                name: APIv0 Tests
-                command: |
-                    cd ~/workspace/vanilla
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv0"
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/vanilla
-                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
     php_73_lint:
         executor: vanilla/php73
         steps: *php_lint_steps
     php_73_tests:
         executor: vanilla/php73
         steps: *php_unit_test_steps
-    php_73_integration:
-        executor: vanilla/php73
-        steps: *php_integration_test_steps
-    php_71_lint:
-        executor: vanilla/php71
-        steps: *php_lint_steps
-    php_71_tests:
-        executor: vanilla/php71
-        steps: *php_unit_test_steps
-    php_71_integration:
-        executor: vanilla/php71
-        steps: *php_integration_test_steps
     dependency_audit:
         executor: vanilla/php72
         steps:
@@ -244,9 +216,6 @@ workflows:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
             - php_72_lint
-            - php_72_integration:
-                requires:
-                    - php_setup
             - php_72_tests:
                 requires:
                     - php_setup
@@ -276,21 +245,8 @@ workflows:
             - dependency_audit
             # PHP and serverside
             - php_setup
-            - php_71_lint
             - php_72_lint
             - php_73_lint
-            - php_71_integration:
-                requires:
-                    - php_setup
-            - php_72_integration:
-                requires:
-                    - php_setup
-            - php_73_integration:
-                requires:
-                    - php_setup
-            - php_71_tests:
-                requires:
-                    - php_setup
             - php_72_tests:
                 requires:
                     - php_setup
