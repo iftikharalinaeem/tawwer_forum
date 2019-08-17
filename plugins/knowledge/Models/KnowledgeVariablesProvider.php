@@ -14,74 +14,36 @@ use Vanilla\Theme\VariablesProviderInterface;
  */
 class KnowledgeVariablesProvider implements VariablesProviderInterface {
 
-    /** @var ConfigurationInterface */
-    private $config;
+    /** @var KnowledgeBaseKludgedVars */
+    private $kludgedVars;
 
     /**
      * Initial configuration of the instance.
      *
-     * @param ConfigurationInterface $config
+     * @param KnowledgeBaseKludgedVars $kludgedVars
      */
-    public function __construct(ConfigurationInterface $config) {
-        $this->config = $config;
+    public function __construct(KnowledgeBaseKludgedVars $kludgedVars) {
+        $this->kludgedVars = $kludgedVars;
     }
 
     /**
      * @inheritDoc
      */
     public function getVariables(): array {
-        $result = [
-            'splash' => [],
-            'global' => [
-                'mainColors' => [],
-            ],
-            'titleBar' => [
-                'colors' => [],
-            ]
-        ];
+        $kludgedVars = array_merge(
+            $this->kludgedVars->getBannerVariables(),
+            $this->kludgedVars->getHeaderVars(),
+            $this->kludgedVars->getGlobalColors()
+        );
+        $result = [];
 
-        $defaultBannerImage = $this->config->get("Knowledge.DefaultBannerImage", null);
-        $useFilter = $this->config->get('Knowledge.ThemeKludge.UserBannerImageOverlay', null);
-        if ($defaultBannerImage || $useFilter) {
-            $bg = [];
-            if (isset($defaultBannerImage)) {
-                $bg["image"] = \Gdn_Upload::url($defaultBannerImage);
+        foreach ($kludgedVars as $varInfo) {
+            $value = $this->kludgedVars->readKludgedConfigValue($varInfo);
+            if ($value === null) {
+                continue;
             }
-
-            if (isset($useFilter)) {
-                $bg["useFilter"] = $useFilter;
-            }
-
-            $result["splash"]["outerBackground"] = $bg;
-        }
-
-        if ($chooserTitle = $this->config->get("Knowledge.ChooserTitle")) {
-            $result["splash"]["title"] = [
-                "text" => $chooserTitle
-            ];
-        }
-
-        $themeKludgeVars = $this->config->get('Knowledge.ThemeKludge');
-        if ($themeKludgeVars) {
-            if ($primaryColor = $themeKludgeVars['PrimaryColor'] ?? null) {
-                $result['global']['mainColors']['primary'] = $primaryColor;
-            }
-
-            if ($fgColor = $themeKludgeVars['FgColor'] ?? null) {
-                $result['global']['mainColors']['fg'] = $fgColor;
-            }
-
-            if ($bgColor = $themeKludgeVars['BgColor'] ?? null) {
-                $result['global']['mainColors']['bg'] = $bgColor;
-            }
-
-            if ($titleBarFgColor = $themeKludgeVars['TitleBarFg'] ?? null) {
-                $result['titleBar']['colors']['fg'] = $titleBarFgColor;
-            }
-
-            if ($titleBarBgColor = $themeKludgeVars['TitleBarBg'] ?? null) {
-                $result['titleBar']['colors']['bg'] = $titleBarBgColor;
-            }
+            $varName = $varInfo['VariableName'];
+            setvalr($varName, $result, $value);
         }
 
         return $result;
