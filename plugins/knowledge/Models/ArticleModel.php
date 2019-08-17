@@ -223,7 +223,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @param array $ids An array of article IDs to get.
      * @return array Returns an article dataset with massaged fields for advanced search.
      */
-    public function getSearchRecords($ids): array {
+    public function getSearchRecords(array $ids): array {
         $articles = $this->getWithRevision(['a.articleID' => $ids]);
 
         foreach ($articles as &$row) {
