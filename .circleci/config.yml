@@ -99,6 +99,7 @@ jobs:
                     node --version
                     yarn --version
             - vanilla/checkout
+            - run: ~/workspace/ci-scripts/clone-vanilla.sh
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -157,6 +158,7 @@ jobs:
                     php --version
                     composer --version
             - vanilla/checkout
+            - run: ~/workspace/ci-scripts/clone-vanilla.sh
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
@@ -170,6 +172,7 @@ jobs:
         executor: vanilla/php72
         steps: &php_lint_steps
             - vanilla/checkout
+            - run: ~/workspace/ci-scripts/clone-vanilla.sh
             - *run_composer
             - *run_php_lint
     php_72_tests:
@@ -230,6 +233,7 @@ jobs:
         executor: vanilla/php72
         steps:
             - vanilla/checkout
+            - run: ~/workspace/ci-scripts/clone-vanilla.sh
             - run: yarn audit
 
 workflows:
