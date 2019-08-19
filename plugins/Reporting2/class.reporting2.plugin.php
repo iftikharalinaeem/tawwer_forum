@@ -7,9 +7,9 @@ class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
 
     /**
-     * \Vanilla\EmbeddedContent\EmbedService $embedService
+     * @var \\Vanilla\EmbeddedContent\EmbedService $embedService
      */
-    var $embedService;
+    private $embedService;
 
     /**
      * Reporting2Plugin constructor.
