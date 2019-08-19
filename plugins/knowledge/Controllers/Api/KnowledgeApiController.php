@@ -426,6 +426,8 @@ class KnowledgeApiController extends AbstractApiController {
             foreach ($searchResults['matches'] as $guid => $record) {
                 $this->results['matches'][$guid]['orderIndex'] = $record['weight'];
                 $dtype = $record['attrs']['dtype'];
+                // Kludge until infrastructure updates sphinx templates.
+
                 $dtype = $dtype == 5 ? 500 : $dtype; // kludge for changed dtype.
 
                 $type = self::RECORD_TYPES[$dtype] ?? null;
@@ -435,7 +437,12 @@ class KnowledgeApiController extends AbstractApiController {
             };
             $results = [];
             foreach ($ids as $dtype => $recordIds) {
-                array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype));
+                $method = self::RECORD_TYPES[$dtype]['getRecordsFunction'];
+                if (method_exists($this, $method)) {
+                    array_push($results, ...$this->{$method}($recordIds, $dtype));
+                } else {
+                    trigger_error("Incorrect Dtype in article search, dtype of {$dtype}", E_USER_NOTICE);
+                }
             }
         }
         usort($results, function ($a, $b) {
