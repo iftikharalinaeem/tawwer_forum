@@ -5,6 +5,23 @@
 
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
+
+    /**
+     * @var \\Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    private $embedService;
+
+    /**
+     * Reporting2Plugin constructor.
+     *
+     * @param \Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    public function __construct(\Vanilla\EmbeddedContent\EmbedService $embedService) {
+        parent::__construct();
+
+        $this->embedService = $embedService;
+    }
+
     public function setup() {
         $this->structure();
     }
@@ -94,7 +111,8 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @param $recordID
      * @return string
      */
-    public function reportButton($row, $recordType, $recordID) {
+    public function reportButton($row, $recordType, $recordID): string {
+        $row = (array)$row;
         $result = anchor(
             '<span class="ReactSprite ReactFlag"></span> '.t('Report'),
             '/report/'.$recordType.'/'.$recordID,
@@ -139,7 +157,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         $sender->permission('Reactions.Flag.Add');
 
         $sender->Form = new Gdn_Form();
-        $reportModel = new ReportModel();
+        $reportModel = new ReportModel('', $this->embedService);
         $sender->Form->setModel($reportModel);
 
         $sender->Form->setFormValue('RecordID', $iD);
@@ -172,8 +190,8 @@ class Reporting2Plugin extends Gdn_Plugin {
         } else {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
-            $row['Body'] = sliceString(Gdn_Format::plainText($row['Body'], $row['Format']), 150);
-            $sender->setData('Row', $row);
+            $quoteHtml = $this->renderQuote($row);
+            $sender->setData('quote', $quoteHtml);
         }
 
         $sender->render('report', '', 'plugins/Reporting2');
@@ -216,6 +234,18 @@ class Reporting2Plugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Render the Quote html for the view.
+     *
+     * @param array $record The Record to create a quote from.
+     * @return string $quoteHtml The html markup to generate a quote.
+     */
+    private function renderQuote(array $record): string {
+        $reportModel = new ReportModel('', $this->embedService);
+        $encodeData =  $reportModel->encodeBody($record);
+        $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        return $quoteHtml;
+    }
 }
 
 if (!function_exists('formatQuote')):
@@ -229,6 +259,7 @@ if (!function_exists('formatQuote')):
         deprecated('formatQuote', 'gdn_formatter_quote');
         return gdn_formatter_quote($body);
     }
+
 endif;
 
 if (!function_exists('gdn_formatter_quote')):

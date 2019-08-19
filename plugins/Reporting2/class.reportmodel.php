@@ -4,8 +4,15 @@
  */
 class ReportModel extends Gdn_Model {
 
-    public function __construct($name = '') {
+    /**
+     * \Vanilla\EmbeddedContent\EmbedService $embedService
+     */
+    var $embedService;
+
+    public function __construct($name = '', \Vanilla\EmbeddedContent\EmbedService $embedService ) {
         parent::__construct('Comment');
+
+        $this->embedService = $embedService;
     }
 
     /**
@@ -53,9 +60,7 @@ class ReportModel extends Gdn_Model {
         $this->Validation->applyRule('RecordID', 'ValidateRequired');
         $this->Validation->applyRule('Body', 'ValidateRequired');
         $this->Validation->applyRule('Format', 'ValidateRequired');
-
-        touchValue('Format', $data, c('Garden.InputFormatter'));
-
+        
         if (!$this->Validation->validate($data, true)) {
             return false;
         }
@@ -114,20 +119,24 @@ class ReportModel extends Gdn_Model {
                 $reportedRecord['InsertName'], // Author Name
                 $contextDiscussion['Category']
             );
+
             if (array_key_exists('Body', $reportedRecord) && array_key_exists('Format', $reportedRecord)) {
-                $reportedRecord['Body'] = Gdn_Format::plainText($reportedRecord['Body'], $reportedRecord['Format']);
+                $reportedRecord['Body'] = \Gdn::formatService()->filter($reportedRecord['Body'], $reportedRecord['Format']);
             }
+            if (array_key_exists('Body', $data) && array_key_exists('Format', $data)) {
+                $data['Body'] = \Gdn::formatService()->filter($data['Body'], $data['Format']);
+            }
+
+            $discussionBody = $this->encodeBody($reportedRecord, $data) ?? '';
+
             // Build discussion record
             $discussion = [
                 // Limit new name to 100 char (db column size)
                 'Name' => sliceString($reportName, 100),
-                'Body' => sprintf(t('Report Body Format', "%s\n\n%s"),
-                    formatQuote($reportedRecord),
-                    reportContext($reportedRecord)
-                ),
+                'Body' => $discussionBody,
                 'Type' => 'Report',
                 'ForeignID' => $foreignID,
-                'Format' => 'Quote',
+                'Format' => \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY,
                 'CategoryID' => $category['CategoryID'],
                 'Attributes' => ['Report' => $reportAttributes]
             ];
@@ -167,6 +176,28 @@ class ReportModel extends Gdn_Model {
         // Failed to add report
         SpamModel::$Disabled = $spamCheckDisabled;
         return false;
+    }
+
+    /**
+     * Encode the record to render and save.
+     *
+     * @param array $record The record that needs to be processed.
+     * @param array $data Optionally data that needs to be added to the record.
+     * @return string Json encoded data for the be rendered in the view and saved.
+     */
+    public function encodeBody(array $record, array $data = []): string {
+        $quote = $this->embedService->createEmbedForUrl($record['Url']);
+        $jsonOperations = [
+            [
+                "insert" => [
+                    "embed-external" => [
+                        "data" => $quote,
+                        ],
+                    ],
+                ],
+            ];
+
+        return json_encode($jsonOperations);
     }
 
 }
