@@ -147,8 +147,6 @@ class ReportModel extends Gdn_Model {
             $this->fireEvent('BeforeDiscussion');
 
             $discussionID = $discussionModel->save($discussion);
-            SpamModel::$Disabled = $spamCheckDisabled;
-
             if (!$discussionID) {
                 trace('Discussion not saved.');
                 $this->Validation->addValidationResult($discussionModel->validationResults());
