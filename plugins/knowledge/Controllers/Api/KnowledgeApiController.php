@@ -427,8 +427,7 @@ class KnowledgeApiController extends AbstractApiController {
                 $this->results['matches'][$guid]['orderIndex'] = $record['weight'];
                 $dtype = $record['attrs']['dtype'];
                 // Kludge until infrastructure updates sphinx templates.
-
-                $dtype = $dtype == 5 ? 500 : $dtype; // kludge for changed dtype.
+                $dtype = [5 => 500, 6 => 501][$dtype] ?? $dtype;
 
                 $type = self::RECORD_TYPES[$dtype] ?? null;
                 if ($type) {
