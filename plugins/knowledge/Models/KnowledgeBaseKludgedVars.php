@@ -154,10 +154,10 @@ class KnowledgeBaseKludgedVars {
                 ],
             ],
             [
-                "VariableName" => "splash.outerBackground.useFilter",
-                "LabelCode" => "Use Banner Image Filter",
+                "VariableName" => "splash.outerBackground.useOverlay",
+                "LabelCode" => "Use Banner Image Overlay",
                 "Description" => "It can be hard to read text on top of certain banner images. "
-                    . "Enable this setting to add a filter over banner images which makes text easier to read.",
+                    . "Enable this setting to add an overlay over banner images which makes text easier to read.",
                 "Control" => "toggle",
             ],
             [
