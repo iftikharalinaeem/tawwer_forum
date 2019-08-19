@@ -154,7 +154,7 @@ class KnowledgeBaseKludgedVars {
                 ],
             ],
             [
-                "VariableName" => "splash.outerBackground.useOverlay",
+                "VariableName" => "splash.backgrounds.useOverlay",
                 "LabelCode" => "Use Banner Image Overlay",
                 "Description" => "It can be hard to read text on top of certain banner images. "
                     . "Enable this setting to add an overlay over banner images which makes text easier to read.",
