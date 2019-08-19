@@ -184,7 +184,7 @@ class RanksPlugin extends Gdn_Plugin {
       * @param string $fieldName The field name in the form to check for links.
       */
      public function checkForLinks($sender, $formValues, $fieldName) {
-          if (preg_match('`https?://`i', $formValues[$fieldName])) {
+         if (preg_match('`https?:/+`i', stripslashes($formValues[$fieldName]))) {
                 $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
           }
      }
