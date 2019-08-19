@@ -190,7 +190,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         } else {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
-            $quoteHtml = $reportModel->renderQuote($row);
+            $quoteHtml = $this->renderQuote($row);
             $sender->setData('quote', $quoteHtml);
         }
 
@@ -232,6 +232,19 @@ class Reporting2Plugin extends Gdn_Plugin {
         if (checkPermission('Garden.Moderation.Manage')) {
             $args['DashboardCount'] = $args['DashboardCount'];
         }
+    }
+
+    /**
+     * Render the Quote html for the view.
+     *
+     * @param array $record The Record to create a quote from.
+     * @return string $quoteHtml The html markup to generate a quote.
+     */
+    private function renderQuote(array $record): string {
+        $reportModel = new ReportModel('', $this->embedService);
+        $encodeData =  $reportModel->encodeBody($record);
+        $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        return $quoteHtml;
     }
 }
 

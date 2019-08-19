@@ -200,15 +200,4 @@ class ReportModel extends Gdn_Model {
         return json_encode($jsonOperations);
     }
 
-    /**
-     * Render the Quote html for the view.
-     *
-     * @param array $record The Record to create a quote from.
-     * @return string $quoteHtml The html markup to generate a quote.
-     */
-    public function renderQuote(array $record): string {
-        $encodeData = $this->encodeBody($record);
-        $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
-        return $quoteHtml;
-    }
 }
