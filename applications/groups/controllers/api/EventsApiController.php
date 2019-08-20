@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -18,6 +19,8 @@ use Vanilla\Utility\CapitalCaseScheme;
  * API Controller for the `/events` resource.
  */
 class EventsApiController extends AbstractApiController {
+
+    use FormatCompatTrait;
 
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
@@ -274,6 +277,7 @@ class EventsApiController extends AbstractApiController {
         );
 
         $event = $this->eventByID($id);
+        $this->applyFormatCompatibility($event, 'body', 'format');
 
         if (!$this->eventModel->checkPermission('View', $event)) {
             throw new ClientException('You do not have the rights to view this event.');
