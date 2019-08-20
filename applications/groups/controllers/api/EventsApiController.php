@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -18,6 +19,8 @@ use Vanilla\Utility\CapitalCaseScheme;
  * API Controller for the `/events` resource.
  */
 class EventsApiController extends AbstractApiController {
+
+    use FormatCompatTrait;
 
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
@@ -280,6 +283,7 @@ class EventsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($event);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 
