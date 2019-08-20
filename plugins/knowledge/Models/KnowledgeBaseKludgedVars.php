@@ -23,6 +23,9 @@ class KnowledgeBaseKludgedVars {
     /** Maximum length allowed for the KB chooser page. */
     const CHOOSER_TITLE_MAX_LENGTH = 50;
 
+    const FG_MESSAGE = "Foreground colors are used mostly used for text and icons. This should contrast with the background color.";
+    const BG_MESSAGE = "Background colors are used as the background of elements. This should have good constrast with the foreground color.";
+
     /** @var ConfigurationInterface */
     private $config;
 
@@ -99,12 +102,14 @@ class KnowledgeBaseKludgedVars {
             [
                 "VariableName" => "global.mainColors.bg",
                 "LabelCode" => "Default Background Color",
+                "Description" => self::BG_MESSAGE,
                 "Control" => "color",
                 'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "global.mainColors.fg",
                 "LabelCode" => "Default Foreground Color",
+                "Description" => self::FG_MESSAGE,
                 "Control" => "color",
                 'Options' => ['AllowEmpty' => true]
             ],
@@ -121,12 +126,14 @@ class KnowledgeBaseKludgedVars {
             [
                 "VariableName" => "titleBar.colors.bg",
                 "LabelCode" => "Title Bar Background Color",
+                "Description" => self::BG_MESSAGE,
                 "Control" => "color",
                 'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "titleBar.colors.fg",
                 "LabelCode" => "Title Bar Foreground Color",
+                "Description" => self::FG_MESSAGE,
                 "Control" => "color",
                 'Options' => ['AllowEmpty' => true]
             ],
@@ -151,6 +158,16 @@ class KnowledgeBaseKludgedVars {
     public function getBannerVariables() {
         return [
             [
+                "VariableName" => "splash.title.text",
+                "ConfigName" => "Knowledge.ChooserTitle",
+                "LabelCode" => "Knowledge Base Chooser Title",
+                "Description" => "This title will appear on the Knowledge homepage. It should be 20 characters or less.",
+                "Control" => "textbox",
+                "Options" => [
+                    "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
+                ]
+            ],
+            [
                 "VariableName" => "splash.outerBackground.image",
                 "ConfigName" => "Knowledge.DefaultBannerImage",
                 "Description" =>
@@ -169,16 +186,6 @@ class KnowledgeBaseKludgedVars {
                     . "Enable this setting to add an overlay over banner images which makes text easier to read.",
                 "Control" => "toggle",
             ],
-            [
-                "VariableName" => "splash.title.text",
-                "ConfigName" => "Knowledge.ChooserTitle",
-                "LabelCode" => "Knowledge Base Chooser Title",
-                "Description" => "This title will appear on the Knowledge homepage. It should be 20 characters or less.",
-                "Control" => "textbox",
-                "Options" => [
-                    "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
-                ]
-            ]
         ];
     }
 }
