@@ -21,7 +21,7 @@ export interface IArticlePageState {
     }>;
 }
 
-const INITIAL_STATE: IArticlePageState = {
+export const ARTICLE_PAGE_INITIAL_STATE: IArticlePageState = {
     articleID: null,
     articleLoadable: {
         status: LoadStatus.PENDING,
@@ -33,7 +33,7 @@ const INITIAL_STATE: IArticlePageState = {
 };
 
 export const articlePageReducer = produce(
-    reducerWithInitialState(clone(INITIAL_STATE))
+    reducerWithInitialState(clone(ARTICLE_PAGE_INITIAL_STATE))
         .case(ArticleActions.putReactACs.started, (nextState, payload) => {
             if (payload.articleID !== nextState.articleID) {
                 return nextState;
@@ -48,7 +48,7 @@ export const articlePageReducer = produce(
             if (payload.params.articleID !== nextState.articleID) {
                 return nextState;
             }
-            nextState.reactionLoadable = INITIAL_STATE.reactionLoadable;
+            nextState.reactionLoadable = ARTICLE_PAGE_INITIAL_STATE.reactionLoadable;
             return nextState;
         })
         .case(ArticleActions.putReactACs.failed, (nextState, payload) => {
@@ -69,7 +69,7 @@ export const articlePageReducer = produce(
                     }
                     break;
                 case ArticlePageActions.RESET:
-                    return INITIAL_STATE;
+                    return ARTICLE_PAGE_INITIAL_STATE;
             }
 
             if (

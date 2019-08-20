@@ -16,7 +16,7 @@ import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsLis
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
@@ -261,7 +261,7 @@ interface IOwnProps
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { revisionsPage } = state.knowledge;
     const {
         selectedRevisionID,

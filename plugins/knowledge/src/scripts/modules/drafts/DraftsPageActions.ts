@@ -6,9 +6,9 @@
 
 import ReduxActions from "@library/redux/ReduxActions";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 
-export default class DraftsPageActions extends ReduxActions<IStoreState> {
+export default class DraftsPageActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static readonly IDENTIFIER = "@@articleDrafts/IDENTIFIER";
 
     public static readonly RESET = "@@articleDrafts/RESET";

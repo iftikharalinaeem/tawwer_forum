@@ -20,7 +20,7 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { formatUrl } from "@library/utility/appUtils";
@@ -36,7 +36,7 @@ import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
-export default class EditorPageActions extends ReduxActions<IStoreState> {
+export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreState> {
     // API actions
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";

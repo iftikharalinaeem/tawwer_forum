@@ -6,7 +6,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
@@ -63,7 +63,7 @@ interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof m
     className?: string;
 }
 
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     return {
         knowledgeBases: KnowledgeBaseModel.selectKnowledgeBases(state),
         loadStatus: state.knowledge.knowledgeBases.knowledgeBasesByID.status,

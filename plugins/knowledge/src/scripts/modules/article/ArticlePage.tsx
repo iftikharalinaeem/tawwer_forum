@@ -14,7 +14,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { CategoryRoute } from "@knowledge/routes/pageRoutes";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -163,7 +163,7 @@ interface IOwnProps extends IDeviceProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { restoreStatus } = state.knowledge.articlePage;
     const article = ArticlePageSelector.selectArticle(state);
     const categoryID = article.data ? article.data.knowledgeCategoryID : null;

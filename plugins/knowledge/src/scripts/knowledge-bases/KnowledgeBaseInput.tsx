@@ -2,7 +2,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";
@@ -32,7 +32,7 @@ export class KnowledgeBaseInput extends React.Component<IProps> {
     }
 }
 
-function mapStateToProps(state: IStoreState, ownProps: ISelectOneProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: ISelectOneProps) {
     const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
     const options: IComboBoxOption[] = [];
 

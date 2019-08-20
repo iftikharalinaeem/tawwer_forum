@@ -8,7 +8,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
@@ -20,7 +20,7 @@ const createAction = actionCreatorFactory("@@loationPicker");
 /**
  * Actions for the article page.
  */
-export default class LocationPickerActions extends ReduxActions<IStoreState> {
+export default class LocationPickerActions extends ReduxActions<IKnowledgeAppStoreState> {
     /**
      * Initialize the state from a category.
      *

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import MessageAndRefresh from "@library/messages/MessageAndRefresh";
 import React from "react";
 import { connect } from "react-redux";
@@ -24,7 +24,7 @@ const UpdatePrompt: React.FunctionComponent<IProps> = (props: IProps = defaultPr
     return null;
 };
 
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     return {
         localDeploymentKey: state.server.localDeploymentKey,
         serverDeploymentKey: state.server.serverDeploymentKey,

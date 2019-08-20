@@ -10,7 +10,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
@@ -88,7 +88,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(store: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(store: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { navigation, knowledgeBases } = store.knowledge;
     const kbsByID = knowledgeBases.knowledgeBasesByID;
     const knowledgeBase: ILoadable<IKnowledgeBase> = {

@@ -5,7 +5,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { connect } from "react-redux";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import getStore from "@library/redux/getStore";
 
 interface INavHistoryContext {
@@ -28,7 +28,7 @@ export function useNavHistory() {
 
 export function NavHistoryContextProvider(props: IProviderProps) {
     const [lastKbID, setLastKbID] = useState<number | null>(null);
-    const { knowledgeBasesByID } = getStore<IStoreState>().getState().knowledge.knowledgeBases;
+    const { knowledgeBasesByID } = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases;
     const knowledgeBase = lastKbID !== null && knowledgeBasesByID.data ? knowledgeBasesByID.data[lastKbID] : null;
 
     return (

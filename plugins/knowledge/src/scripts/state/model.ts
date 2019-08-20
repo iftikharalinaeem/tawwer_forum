@@ -56,9 +56,9 @@ export interface IKbState {
     knowledgeBases: IKnowledgeBasesState;
 }
 
-export interface IStoreState extends ICoreStoreState {
+export interface IKnowledgeAppStoreState extends ICoreStoreState {
     knowledge: IKbState;
     server: IServerState;
 }
 
-export type IPartialStoreState = DeepPartial<IStoreState>;
+export type IPartialStoreState = DeepPartial<IKnowledgeAppStoreState>;

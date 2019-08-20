@@ -10,7 +10,7 @@ import { getModalRoutes } from "@knowledge/routes/modalRoutes";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import RouteActions from "@knowledge/routes/RouteActions";
 import UpdatePrompt from "@knowledge/server/UpdatePrompt";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Loader from "@library/loaders/Loader";
@@ -75,7 +75,7 @@ interface IOwnProps extends RouteComponentProps<never> {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     return {
         kbLoadable: state.knowledge.knowledgeBases.knowledgeBasesByID,
         routeState: state.knowledge.route,

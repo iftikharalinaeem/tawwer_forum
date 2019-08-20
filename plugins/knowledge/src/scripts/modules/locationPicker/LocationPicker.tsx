@@ -8,7 +8,7 @@ import LocationContents from "@knowledge/modules/locationPicker/components/Locat
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -147,7 +147,7 @@ interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { selectedRecord, navigatedRecord } = state.knowledge.locationPicker;
     const navigatedCategory = LocationPickerModel.selectNavigatedCategory(state);
     const parentRecord = LocationPickerModel.selectParentRecord(state);

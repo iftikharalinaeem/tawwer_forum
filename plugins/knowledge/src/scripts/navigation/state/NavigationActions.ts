@@ -4,7 +4,7 @@
  */
 
 import { IKbNavigationItem, IPatchFlatItem } from "@knowledge/navigation/state/NavigationModel";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
@@ -15,7 +15,7 @@ const createAction = actionCreatorFactory("@@navigation");
 /**
  * Redux actions for knowledge base navigation data.
  */
-export default class NavigationActions extends ReduxActions<IStoreState> {
+export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static getNavigationFlatACs = createAction.async<
         { knowledgeBaseID: number },
         IKbNavigationItem[],

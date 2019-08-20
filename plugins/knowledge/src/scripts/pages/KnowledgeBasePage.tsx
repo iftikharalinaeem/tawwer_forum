@@ -7,7 +7,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Loader from "@library/loaders/Loader";
 import React from "react";
@@ -64,7 +64,7 @@ interface IOwnProps extends RouteComponentProps<{ urlCode: string }> {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const knowledgeBase = KnowledgeBaseModel.selectByUrlCode(state, ownProps.match.params.urlCode);
     return {
         knowledgeBase,

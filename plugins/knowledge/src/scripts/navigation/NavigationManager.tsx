@@ -27,7 +27,7 @@ import NavigationModel, {
 } from "@knowledge/navigation/state/NavigationModel";
 import NavigationManagerContent from "@knowledge/navigation/subcomponents/NavigationManagerContent";
 import NavigationManagerToolBar from "@knowledge/navigation/subcomponents/NavigationManagerToolBar";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -831,7 +831,7 @@ interface IActions {
     articleActions: ArticleActions;
     categoryActions: CategoryActions;
 }
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     return state.knowledge.navigation;
 }
 

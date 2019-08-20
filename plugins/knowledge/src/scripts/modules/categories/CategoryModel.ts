@@ -17,12 +17,12 @@ export interface IKbCategoriesState {
 }
 
 export default class CategoryModel implements ReduxReducer<IKbCategoriesState> {
-    public initialState: IKbCategoriesState = {
+    public static INITIAL_STATE: IKbCategoriesState = {
         categoriesByID: {},
     };
 
     public reducer = produce(
-        reducerWithInitialState(this.initialState)
+        reducerWithInitialState(CategoryModel.INITIAL_STATE)
             .case(CategoryActions.getCategoryACs.done, (nextState, payload) => {
                 nextState.categoriesByID[payload.params.id] = payload.result;
                 return nextState;
