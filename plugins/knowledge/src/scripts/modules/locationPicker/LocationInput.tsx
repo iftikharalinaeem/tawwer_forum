@@ -8,7 +8,7 @@ import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/Lo
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
@@ -169,7 +169,7 @@ interface IState {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
     const { chosenRecord } = state.knowledge.locationPicker;
     const { navigationItems } = state.knowledge.navigation;

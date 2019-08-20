@@ -5,7 +5,7 @@
 
 import React from "react";
 import { connect } from "react-redux";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { NavigationActionType } from "@knowledge/navigation/state/NavigationModel";
 import apiv2, { getGlobalErrorMessage } from "@library/apiv2";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
@@ -74,7 +74,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     return {
         currentError: state.knowledge.navigation.currentError,
     };

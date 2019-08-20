@@ -35,7 +35,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { animated, useSpring } from "react-spring";
 import Message from "@library/messages/Message";
 import { TouchScrollable } from "react-scrolllock";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModule";
 import { useMeasure } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/userContentStyles";
@@ -379,7 +379,7 @@ interface IOwnProps extends RouteComponentProps<any> {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     const {
         article,
         saveDraft,

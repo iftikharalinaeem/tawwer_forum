@@ -35,7 +35,7 @@ import {
     IGetRevisionResponseBody,
 } from "@knowledge/@types/api/articleRevision";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
@@ -56,7 +56,7 @@ interface IHelpfulParams {
 /**
  * Actions for the article page.
  */
-export default class ArticleActions extends ReduxActions<IStoreState> {
+export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState> {
     private static readonly DEFAULT_ARTICLES_LIMIT = 10;
 
     public static putReactACs = createAction.async<IHelpfulParams, IArticle, IApiError>("PUT_REACT");

@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
 import produce from "immer";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
@@ -67,11 +67,11 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         communityCategory: undefined,
     };
 
-    public static mapStateToProps(state: IStoreState): ISearchPageState {
+    public static mapStateToProps(state: IKnowledgeAppStoreState): ISearchPageState {
         return SearchPageModel.stateSlice(state);
     }
 
-    public static stateSlice(state: IStoreState) {
+    public static stateSlice(state: IKnowledgeAppStoreState) {
         if (!state.knowledge || !state.knowledge.searchPage) {
             throw new Error(`Could not find "knowledge.searchPage" in state ${state}`);
         }
@@ -79,7 +79,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
         return state.knowledge.searchPage;
     }
 
-    public readonly initialState: ISearchPageState = {
+    public static INITIAL_STATE: ISearchPageState = {
         results: {
             status: LoadStatus.PENDING,
         },
@@ -88,7 +88,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
     };
 
     public reducer = (
-        state: ISearchPageState = this.initialState,
+        state: ISearchPageState = SearchPageModel.INITIAL_STATE,
         action: typeof SearchPageActions.ACTION_TYPES,
     ): ISearchPageState => {
         return produce(state, next => {
@@ -115,7 +115,7 @@ export default class SearchPageModel implements ReduxReducer<ISearchPageState> {
 
                     break;
                 case SearchPageActions.RESET:
-                    return this.initialState;
+                    return SearchPageModel.INITIAL_STATE;
             }
         });
     };

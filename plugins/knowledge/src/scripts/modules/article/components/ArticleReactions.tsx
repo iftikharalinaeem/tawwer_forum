@@ -5,7 +5,7 @@
 
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import { reactionClasses } from "@knowledge/modules/article/components/articleReactionStyles";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
@@ -158,7 +158,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 /**
  * Map in state from the redux store.
  */
-function mapStateToProps(state: IUsersStoreState & IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IUsersStoreState & IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const currentUser = state.users.current;
     const reactionLoadable = state.knowledge.articlePage.reactionLoadable;
     let isSignedIn = false;

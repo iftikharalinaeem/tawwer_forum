@@ -8,7 +8,7 @@ import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchPr
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import SearchContext from "@library/contexts/SearchContext";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
@@ -34,7 +34,7 @@ import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
  * This is made to mounted with ReactDOM.
  */
 function KnowledgeApp() {
-    const store = useMemo(() => getStore<IStoreState>(), []);
+    const store = useMemo(() => getStore<IKnowledgeAppStoreState>(), []);
     const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
 
     return (

@@ -11,7 +11,7 @@ import NavigationModel, {
     IKbNavigationItem,
 } from "@knowledge/navigation/state/NavigationModel";
 import { createSelector } from "reselect";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { INavigationTreeItem, ILinkListData, ILinkGroup } from "@library/@types/api/core";
 
 export interface ISortedNavItem {
@@ -23,7 +23,7 @@ export interface ISortedNavItem {
 export default class NavigationSelector {
     public static selectNavigationItems = createSelector(
         [
-            (state: IStoreState) => state.knowledge.navigation.navigationItems,
+            (state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems,
             KnowledgeBaseModel.selectKnowledgeBasesAsNavItems,
         ],
         (navItems, kbNavItems): INormalizedNavigationItems => {
@@ -48,8 +48,8 @@ export default class NavigationSelector {
      */
     public static selectSortedArticleData = createSelector(
         [
-            (state: IStoreState) => state.knowledge.navigation.navigationItems,
-            (state: IStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+            (state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems,
+            (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
         ],
         (navItems, knowledgeBasesByID) => {
             const root = NavigationModel.SYNTHETIC_ROOT;

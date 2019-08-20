@@ -9,7 +9,7 @@ import EditorForm from "@knowledge/modules/editor/EditorForm";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
@@ -125,7 +125,7 @@ interface IOwnProps
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     const { article, saveDraft, submit, currentError } = EditorPageModel.getStateSlice(state);
 
     return {

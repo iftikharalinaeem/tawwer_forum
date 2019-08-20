@@ -8,7 +8,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
@@ -87,7 +87,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
     const kbID = parseInt(ownProps.match.params.id, 10);
 

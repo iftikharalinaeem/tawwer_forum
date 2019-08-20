@@ -10,7 +10,7 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import NavigationModel from "@knowledge/navigation/state/NavigationModel";
-import { IPartialStoreState, IStoreState } from "@knowledge/state/model";
+import { IPartialStoreState, IKnowledgeAppStoreState } from "@knowledge/state/model";
 import rootReducer from "@knowledge/state/reducer";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -23,12 +23,7 @@ import { DeepPartial } from "redux";
 import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 import { _executeReady } from "@library/utility/appUtils";
 import { promiseTimeout } from "@vanilla/utils";
-
-const DEFAULT_KB_STATE = {
-    articles: ArticleModel.INITIAL_STATE,
-    navigation: NavigationModel.DEFAULT_STATE,
-    editorPage: EditorPageModel.INITIAL_STATE,
-};
+import { KB_TEST_INITIAL_STATE } from "@knowledge/__tests__/initialState";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -37,13 +32,7 @@ describe("EditorPageActions", () => {
 
     beforeEach(() => {
         mockApi = new MockAdapter(apiv2);
-        initWithState({
-            knowledge: {
-                articles: ArticleModel.INITIAL_STATE,
-                navigation: NavigationModel.DEFAULT_STATE,
-                editorPage: EditorPageModel.INITIAL_STATE,
-            },
-        });
+        initWithState(KB_TEST_INITIAL_STATE);
     });
 
     const mockGetEditAPI = () => {
@@ -185,7 +174,7 @@ describe("EditorPageActions", () => {
         it("initializes with discussionID", async () => {
             registerReducer("knowledge", rootReducer);
             await _executeReady();
-            const store = getStore<IStoreState>();
+            const store = getStore<IKnowledgeAppStoreState>();
             const pageActions = new EditorPageActions(store.dispatch, apiv2);
 
             mockApi
@@ -283,7 +272,9 @@ describe("EditorPageActions", () => {
             mockGetEditAPI();
             mockApi.onGet("/api/v2/article-revisions/6").replyOnce(200, dummyRevision);
 
-            initWithState({ knowledge: { ...DEFAULT_KB_STATE, articles: { revisionsByID: {}, articlesByID: {} } } });
+            initWithState({
+                knowledge: { ...KB_TEST_INITIAL_STATE, articles: { revisionsByID: {}, articlesByID: {} } },
+            });
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -298,7 +289,7 @@ describe("EditorPageActions", () => {
 
             initWithState({
                 knowledge: {
-                    ...DEFAULT_KB_STATE,
+                    ...KB_TEST_INITIAL_STATE,
                     articles: {
                         revisionsByID: {
                             6: dummyRevision,
@@ -339,7 +330,7 @@ describe("EditorPageActions", () => {
                 knowledgeCategoryID: null,
             };
 
-            const initialState: DeepPartial<IStoreState> = {
+            const initialState: DeepPartial<IKnowledgeAppStoreState> = {
                 knowledge: {
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
@@ -381,7 +372,7 @@ describe("EditorPageActions", () => {
                 knowledgeCategoryID: null,
             };
 
-            const initialState: DeepPartial<IStoreState> = {
+            const initialState: DeepPartial<IKnowledgeAppStoreState> = {
                 knowledge: {
                     editorPage: {
                         ...EditorPageModel.INITIAL_STATE,
@@ -419,7 +410,7 @@ describe("EditorPageActions", () => {
                 knowledgeCategoryID: 1,
             };
 
-            const initialState: DeepPartial<IStoreState> = {
+            const initialState: DeepPartial<IKnowledgeAppStoreState> = {
                 knowledge: {
                     navigation: NavigationModel.DEFAULT_STATE,
                     editorPage: {
@@ -461,7 +452,7 @@ describe("EditorPageActions", () => {
                 knowledgeCategoryID: 1,
             };
 
-            const initialState: DeepPartial<IStoreState> = {
+            const initialState: DeepPartial<IKnowledgeAppStoreState> = {
                 knowledge: {
                     navigation: NavigationModel.DEFAULT_STATE,
 

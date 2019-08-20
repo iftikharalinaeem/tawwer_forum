@@ -17,12 +17,12 @@ export interface IRouteState {
     error: IRouteError | null;
 }
 
-const INITIAL_STATE: IRouteState = {
+export const ROUTE_INITIAL_STATE: IRouteState = {
     error: null,
 };
 
-const routeReducer = reducerWithInitialState<IRouteState>(INITIAL_STATE)
-    .case(RouteActions.resetAC, () => INITIAL_STATE)
+const routeReducer = reducerWithInitialState<IRouteState>(ROUTE_INITIAL_STATE)
+    .case(RouteActions.resetAC, () => ROUTE_INITIAL_STATE)
     .cases([RouteActions.errorAC, RouteActions.serverErrorAC], (state, payload) => {
         return {
             error: "data" in payload ? payload.data : payload,

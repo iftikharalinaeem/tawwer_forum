@@ -4,7 +4,7 @@
  */
 
 import ReduxReducer from "@library/redux/ReduxReducer";
-import { KnowledgeReducer, IStoreState } from "@knowledge/state/model";
+import { KnowledgeReducer, IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
@@ -19,7 +19,7 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for our own state.
      */
-    private static selectSelf = (state: IStoreState) => state.knowledge.knowledgeBases;
+    private static selectSelf = (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases;
 
     /**
      * Selector for a list of loaded knowledge bases.
@@ -47,7 +47,7 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         },
     );
 
-    public static selectByUrlCode = (state: IStoreState, urlCode: string) => {
+    public static selectByUrlCode = (state: IKnowledgeAppStoreState, urlCode: string) => {
         // We could index these by urlCode as well, but right now it doesn't seem necessary.
         const selfState = KnowledgeBaseModel.selectKnowledgeBases(state);
         return selfState.find(kb => kb.urlCode === urlCode) || null;

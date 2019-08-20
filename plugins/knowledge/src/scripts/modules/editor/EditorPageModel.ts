@@ -5,7 +5,7 @@
  */
 
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus, IApiError } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
@@ -56,9 +56,10 @@ type ReducerType = KnowledgeReducer<IEditorPageState>;
  * Reducer for the article page.
  */
 export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
-    private static selectRevisionLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).revision;
+    private static selectRevisionLoadable = (state: IKnowledgeAppStoreState) =>
+        EditorPageModel.getStateSlice(state).revision;
     public static selectActiveRevision = createSelector(
-        (state: IStoreState) => state,
+        (state: IKnowledgeAppStoreState) => state,
         EditorPageModel.selectRevisionLoadable,
         (state, revLoadable) => {
             const { status, error, data } = revLoadable;
@@ -75,9 +76,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
     );
 
-    private static selectDraftLoadable = (state: IStoreState) => EditorPageModel.getStateSlice(state).draft;
+    private static selectDraftLoadable = (state: IKnowledgeAppStoreState) => EditorPageModel.getStateSlice(state).draft;
     public static selectDraft = createSelector(
-        (state: IStoreState) => state,
+        (state: IKnowledgeAppStoreState) => state,
         EditorPageModel.selectDraftLoadable,
         (state, draftLoadable) => {
             const { status, error, data } = draftLoadable;
@@ -100,7 +101,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      * @param state A full state instance.
      * @throws An error if the state wasn't initialized properly.
      */
-    public static getStateSlice(state: IStoreState): IEditorPageState {
+    public static getStateSlice(state: IKnowledgeAppStoreState): IEditorPageState {
         if (!state.knowledge || !state.knowledge.editorPage) {
             throw new Error(
                 "The revision page model has not been wired up properly. Expected to find 'state.knowledge.editorPage'.",

@@ -13,7 +13,7 @@ import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
@@ -117,7 +117,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 /**
  * Map in the state from the redux store.
  */
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { categoriesPage, categories } = state.knowledge;
     const categoryID = parseInt(ownProps.match.params.id, 10);
 

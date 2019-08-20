@@ -7,7 +7,7 @@
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import NavigationModel, { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { t } from "@library/utility/appUtils";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
@@ -28,7 +28,7 @@ export interface ILPConnectedData extends ILocationPickerState {
  * Reducer for the article page.
  */
 export default class LocationPickerModel extends ReduxReducer<ILocationPickerState> {
-    private static stateSlice = (state: IStoreState) => state.knowledge.locationPicker;
+    private static stateSlice = (state: IKnowledgeAppStoreState) => state.knowledge.locationPicker;
 
     public static selectParentRecord = createSelector(
         LocationPickerModel.stateSlice,
@@ -63,8 +63,8 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
      * use its root category ID. Otherwise, use the navigated category.
      */
     public static selectNavigatedCategory = createSelector(
-        (state: IStoreState) => state.knowledge.locationPicker.navigatedRecord,
-        (state: IStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+        (state: IKnowledgeAppStoreState) => state.knowledge.locationPicker.navigatedRecord,
+        (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
         NavigationSelector.selectNavigationItems,
         (navigatedRecord, knowledgeBasesByID, navItems) => {
             if (!navigatedRecord) {
@@ -101,7 +101,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
         },
     );
 
-    public initialState: ILocationPickerState = {
+    public static INITIAL_STATE: ILocationPickerState = {
         selectedRecord: null,
         navigatedRecord: null,
         chosenRecord: null,
@@ -111,7 +111,7 @@ export default class LocationPickerModel extends ReduxReducer<ILocationPickerSta
     /**
      * @inheritDoc
      */
-    public reducer: ReducerType = (state = this.initialState, action) => {
+    public reducer: ReducerType = (state = LocationPickerModel.INITIAL_STATE, action) => {
         return produce(state, nextState => this.reduceSelf(nextState, action));
     };
 

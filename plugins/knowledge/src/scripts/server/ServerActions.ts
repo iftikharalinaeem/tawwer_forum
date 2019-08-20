@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 
@@ -13,7 +13,7 @@ interface ISetDeploymentKey {
     result: string | null;
 }
 
-export default class ServerActions extends ReduxActions<IStoreState> {
+export default class ServerActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static setLocalDeploymentKey = createAction<ISetDeploymentKey>("SET_LOCAL_DEPLOYMENT_KEY");
     public setLocalDeploymentKey = this.bindDispatch(ServerActions.setLocalDeploymentKey);
 

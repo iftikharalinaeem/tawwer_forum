@@ -4,7 +4,7 @@
  */
 
 import { createSelector } from "reselect";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import NavigationSelector, { ISortedNavItem } from "@knowledge/navigation/state/NavigationSelector";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
@@ -14,8 +14,8 @@ export default class ArticlePageSelector {
      */
     public static selectArticle = createSelector(
         [
-            (state: IStoreState) => state.knowledge.articlePage,
-            (state: IStoreState) => state.knowledge.articles.articlesByID,
+            (state: IKnowledgeAppStoreState) => state.knowledge.articlePage,
+            (state: IKnowledgeAppStoreState) => state.knowledge.articles.articlesByID,
         ],
         (pageState, articlesByID) => {
             const { articleID, articleLoadable } = pageState;
@@ -44,7 +44,7 @@ export default class ArticlePageSelector {
      */
     public static selectNextNavArticle = createSelector(
         [
-            (state: IStoreState) => state.knowledge.navigation.navigationItems,
+            (state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems,
             ArticlePageSelector.selectCurrentArticleSortData,
         ],
         (navItemsByFullID, sortData) => {
@@ -61,7 +61,7 @@ export default class ArticlePageSelector {
      */
     public static selectPrevNavArticle = createSelector(
         [
-            (state: IStoreState) => state.knowledge.navigation.navigationItems,
+            (state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems,
             ArticlePageSelector.selectCurrentArticleSortData,
         ],
         (navItemsByFullID, sortData) => {

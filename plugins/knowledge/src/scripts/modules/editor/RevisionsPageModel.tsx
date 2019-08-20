@@ -9,7 +9,7 @@ import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevis
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
@@ -43,7 +43,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      *
      * @param state A full state object.
      */
-    public static selectLatestRevision(state: IStoreState): IRevisionFragment | null {
+    public static selectLatestRevision(state: IKnowledgeAppStoreState): IRevisionFragment | null {
         const revs = this.selectRevisions(state);
         if (revs.length === 0) {
             return null;
@@ -57,7 +57,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      *
      * @param state A full state object.
      */
-    public static selectActiveRevision(state: IStoreState): IRevision | null {
+    public static selectActiveRevision(state: IKnowledgeAppStoreState): IRevision | null {
         const stateSlice = this.stateSlice(state);
         const { selectedRevisionID } = stateSlice;
         return selectedRevisionID ? ArticleModel.selectRevision(state, selectedRevisionID)! : null;
@@ -68,7 +68,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      *
      * @param state A full state object.
      */
-    public static selectDrafts(state: IStoreState): IResponseArticleDraft[] {
+    public static selectDrafts(state: IKnowledgeAppStoreState): IResponseArticleDraft[] {
         const stateSlice = this.stateSlice(state);
         return stateSlice.draftIDs.map(id => ArticleModel.selectDraft(state, id)!);
     }
@@ -78,7 +78,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      *
      * @param state A full state object.
      */
-    public static selectRevisions(state: IStoreState): IRevisionFragment[] {
+    public static selectRevisions(state: IKnowledgeAppStoreState): IRevisionFragment[] {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionIDs.map(id => ArticleModel.selectRevisionFragment(state, id)!);
     }
@@ -89,7 +89,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      * @param state A full state instance.
      * @throws An error if the state wasn't initialized properly.
      */
-    private static stateSlice(state: IStoreState): IRevisionsPageState {
+    private static stateSlice(state: IKnowledgeAppStoreState): IRevisionsPageState {
         if (!state.knowledge || !state.knowledge.revisionsPage) {
             throw new Error(
                 "The revision page model has not been wired up properly. Expected to find 'state.knowledge.revisionsPage'.",
@@ -99,7 +99,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         return state.knowledge.revisionsPage;
     }
 
-    public initialState: IRevisionsPageState = {
+    public static INITIAL_STATE: IRevisionsPageState = {
         articleID: null,
         articleStatus: {
             status: LoadStatus.PENDING,
@@ -127,7 +127,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
      * Reducer implementation for the revisions page resources.
      */
     public reducer = (
-        state: IRevisionsPageState = this.initialState,
+        state: IRevisionsPageState = RevisionsPageModel.INITIAL_STATE,
         action: typeof ArticleActions.ACTION_TYPES | typeof RevisionsPageActions.ACTION_TYPES,
     ): IRevisionsPageState => {
         return produce(state, draft => {
@@ -139,7 +139,7 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
                     draft.selectedRevisionID = action.payload.revisionID;
                     break;
                 case RevisionsPageActions.RESET:
-                    return this.initialState;
+                    return RevisionsPageModel.INITIAL_STATE;
             }
 
             // Handle some revision actions if they pertain to our own revision.

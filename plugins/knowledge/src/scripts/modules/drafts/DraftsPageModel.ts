@@ -7,7 +7,7 @@ import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
@@ -28,7 +28,7 @@ type ReducerType = KnowledgeReducer<IDraftsPageState>;
  *
  */
 export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
-    public initialState: IDraftsPageState = {
+    public static INITIAL_STATE: IDraftsPageState = {
         deleteDraft: {
             status: LoadStatus.PENDING,
         },
@@ -37,7 +37,7 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
         },
     };
 
-    public static mapStateToProps(state: IStoreState): IInjectableDraftsPageProps {
+    public static mapStateToProps(state: IKnowledgeAppStoreState): IInjectableDraftsPageProps {
         const { deleteDraft, userDrafts } = state.knowledge.draftsPage;
         const currentUserDrafts: ILoadable<IResponseArticleDraft[]> = {
             status: userDrafts.status,
@@ -53,10 +53,10 @@ export default class DraftsPageModel implements ReduxReducer<IDraftsPageState> {
         };
     }
 
-    public reducer: ReducerType = (state = this.initialState, action) => {
+    public reducer: ReducerType = (state = DraftsPageModel.INITIAL_STATE, action) => {
         return produce(state, nextState => {
             if (action.type === DraftsPageActions.RESET) {
-                return this.initialState;
+                return DraftsPageModel.INITIAL_STATE;
             } else if (
                 "meta" in action &&
                 action.meta &&

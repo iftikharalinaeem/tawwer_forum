@@ -9,7 +9,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { EditorRoute } from "@knowledge/routes/pageRoutes";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
@@ -108,7 +108,7 @@ interface IOwnProps {
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { knowledgeBaseID } = ownProps.knowledgeBase;
     const knowledgeState = state.knowledge.navigation;
     const loadStatus = knowledgeState.fetchStatusesByKbID[knowledgeBaseID] || LoadStatus.PENDING;

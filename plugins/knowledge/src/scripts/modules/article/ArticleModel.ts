@@ -9,7 +9,7 @@ import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevis
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
@@ -44,7 +44,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @param articleID The ID of the article to select.
      */
-    public static selectArticle(state: IStoreState, articleID: number): IArticle | null {
+    public static selectArticle(state: IKnowledgeAppStoreState, articleID: number): IArticle | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.articlesByID[articleID] || null;
     }
@@ -55,7 +55,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @param revisionID The ID of the revision to select.
      */
-    public static selectRevision(state: IStoreState, revisionID: number): IRevision | null {
+    public static selectRevision(state: IKnowledgeAppStoreState, revisionID: number): IRevision | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionsByID[revisionID] || null;
     }
@@ -66,7 +66,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @param revisionID The ID of the revision to select.
      */
-    public static selectRevisionFragment(state: IStoreState, revisionID: number): IRevisionFragment | null {
+    public static selectRevisionFragment(state: IKnowledgeAppStoreState, revisionID: number): IRevisionFragment | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.revisionFragmentsByID[revisionID] || null;
     }
@@ -77,7 +77,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @param draftID The ID of the draft to select.
      */
-    public static selectDraft(state: IStoreState, draftID: number): IResponseArticleDraft | null {
+    public static selectDraft(state: IKnowledgeAppStoreState, draftID: number): IResponseArticleDraft | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.draftsByID[draftID] || null;
     }
@@ -88,7 +88,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @throws An error if the state wasn't initialized properly.
      */
-    private static stateSlice(state: IStoreState): IArticleState {
+    private static stateSlice(state: IKnowledgeAppStoreState): IArticleState {
         if (!state.knowledge || !state.knowledge.articles) {
             throw new Error(
                 `It seems the ArticleModel's reducer was not properly configured. Expected to find 'knowledge.articles' in the passed state tree ${state}`,

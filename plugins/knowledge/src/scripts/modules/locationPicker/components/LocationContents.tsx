@@ -12,7 +12,7 @@ import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPic
 import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -265,7 +265,7 @@ interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
-function mapStateToProps(state: IStoreState, ownProps: IOwnProps) {
+function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { locationPicker, knowledgeBases, navigation } = state.knowledge;
     let { navigatedRecord, selectedRecord, chosenRecord, selectedArticle } = locationPicker;
     const title = LocationPickerModel.selectNavigatedTitle(state);

@@ -8,7 +8,7 @@ import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseAction
 import KnowledgeBaseList from "@knowledge/knowledge-bases/KnowledgeBaseList";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import KnowledgeBasePage from "@knowledge/pages/KnowledgeBasePage";
-import { IStoreState } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Container from "@library/layout/components/Container";
@@ -58,7 +58,7 @@ interface IOwnProps extends RouteComponentProps<any> {
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
-function mapStateToProps(state: IStoreState) {
+function mapStateToProps(state: IKnowledgeAppStoreState) {
     return {
         knowledgeBases: KnowledgeBaseModel.selectKnowledgeBases(state),
         loadStatus: state.knowledge.knowledgeBases.knowledgeBasesByID.status,

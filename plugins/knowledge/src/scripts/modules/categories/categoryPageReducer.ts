@@ -21,7 +21,7 @@ export interface ICategoriesPageState {
     pages: ILinkPages;
 }
 
-const INITIAL_STATE: ICategoriesPageState = {
+export const CATEGORY_PAGE_INITIAL_STATE: ICategoriesPageState = {
     articles: {
         status: LoadStatus.PENDING,
     },
@@ -37,9 +37,9 @@ const INITIAL_STATE: ICategoriesPageState = {
  */
 
 export const categoryPageReducer = produce(
-    reducerWithInitialState(clone(INITIAL_STATE))
+    reducerWithInitialState(clone(CATEGORY_PAGE_INITIAL_STATE))
         .case(CategoriesPageActions.resetAction, () => {
-            return INITIAL_STATE;
+            return CATEGORY_PAGE_INITIAL_STATE;
         })
         // The active category is the only one we care about in this page reducer.
         .case(CategoriesPageActions.setCategoryIDAction, (nextState, categoryID) => {

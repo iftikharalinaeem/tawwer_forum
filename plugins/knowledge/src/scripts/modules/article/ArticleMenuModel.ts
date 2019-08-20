@@ -5,7 +5,7 @@
  */
 
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
-import { IStoreState, KnowledgeReducer } from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
@@ -20,17 +20,17 @@ type ReducerType = KnowledgeReducer<IArticleMenuState>;
  * Model and reducer for the ArticleMenu
  */
 export default class ArticleMenuModel implements ReduxReducer<IArticleMenuState> {
-    public static mapStateToProps(storeState: IStoreState): IArticleMenuState {
+    public static mapStateToProps(storeState: IKnowledgeAppStoreState): IArticleMenuState {
         return storeState.knowledge.articleMenu;
     }
 
-    public initialState: IArticleMenuState = {
+    public static INITIAL_STATE: IArticleMenuState = {
         delete: {
             status: LoadStatus.PENDING,
         },
     };
 
-    public reducer: ReducerType = (state = this.initialState, action) => {
+    public reducer: ReducerType = (state = ArticleMenuModel.INITIAL_STATE, action) => {
         return produce(state, draft => {
             switch (action.type) {
                 case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
