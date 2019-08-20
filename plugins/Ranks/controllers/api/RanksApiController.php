@@ -104,7 +104,7 @@ class RanksApiController extends AbstractApiController {
                     'minLength' => 0,
                     'description' => 'Message for the users when they earn this rank.'
                 ],
-                'cssClass:s|n' => 'Custom CSS class for users of this rank.',
+                'cssClass:s|n?' => 'Custom CSS class for users of this rank.',
                 'criteria:o?' => [
                     'points:i?' => 'User points.',
                     'time:s?' => 'Age of user account (e.g. 1 day, 3 weeks, 1 month).',
