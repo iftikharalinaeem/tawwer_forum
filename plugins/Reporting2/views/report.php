@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
 <h2><?php echo t($this->data('Title')); ?></h2>
 <?php
-$Row = $this->data('Row');
-echo gdn_formatter_quote($Row);
+$quote = $this->data('quote');
+echo "<div class='userContent'>$quote</div>";
 ?>
 <?php
 echo $this->Form->open();

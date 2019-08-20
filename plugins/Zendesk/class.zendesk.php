@@ -226,17 +226,15 @@ class Zendesk {
             $errorMessage = 'Unknown error.';
         }
 
+        //If there is an error connecting, log it and pass the error message through to the form.
         if ($errorMessage) {
-            $errorMessage .= "\nZendesk Request ID: $requestID\nAPI call: $apiURL\nResponse: $responseBody\n";
-
             Logger::log(Logger::DEBUG, 'zendesk_request_error', [
-                'error' => $errorMessage,
+                'error' => $errorMessage . "\nZendesk Request ID: $requestID\nAPI call: $apiURL\nResponse: $responseBody\n",
                 'access_token' => $this->AccessToken,
                 'request' => $action.' '.$apiURL,
                 'response' => $response,
             ]);
-
-            throw new Gdn_UserException($errorMessage, $httpCode);
+            $decoded = ['errorMessage' => $errorMessage, 'httpCode' => $httpCode];
         }
 
         return $decoded;
@@ -248,24 +246,36 @@ class Zendesk {
      *
      * @param bool|int $userId Defaults to authenticated user.
      *
+     * @throws Gdn_Exception
+     * @throws Exception
+     *
      * @return array Profile User Profile. Array with the following keys:
      *      [id]
      *      [fullname]
      *      [email]
      *      [photo]
+     * @return array Error Message. Array with the following keys:
+     *      [error] bool
+     *      [message] string
      */
     public function getProfile($userId = false) {
         if (!$userId) {
             $userId = 'me';
         }
         $fullProfile = $this->zendeskRequest("/users/$userId.json");
-
-        return [
-            'id' => $fullProfile['user']['id'],
-            'email' => $fullProfile['user']['email'],
-            'fullname' => $fullProfile['user']['name'],
-            'photo' => valr('user.photo.content_url', $fullProfile)
-        ];
-
+        if ($fullProfile['errorMessage']) {
+            return [
+                'error' => true,
+                'message' => $fullProfile['errorMessage'],
+                'code' => $fullProfile['httpCode']
+            ];
+        } else {
+            return [
+                'id' => $fullProfile['user']['id'],
+                'email' => $fullProfile['user']['email'],
+                'fullname' => $fullProfile['user']['name'],
+                'photo' => valr('user.photo.content_url', $fullProfile)
+            ];
+        }
     }
 }

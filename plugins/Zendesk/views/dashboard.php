@@ -43,18 +43,24 @@ echo $this->Form->errors();
 
 <div class="form-group">
     <div class="label-wrap-wide">
+        <?php if ($this->Data['GlobalLoginConnected']) { ?>
         <div class="label"><?php echo t('Global Login'); ?>
             <span class="text-success">
-                <?php if ($this->Data['GlobalLoginConnected']) { ?>
                     <?php echo t('You are connected as'); ?>
                     <strong><?php echo Gdn_Format::html($this->Data['GlobalLoginProfile']['fullname']); ?></strong>
-                <?php } ?>
             </span></div>
         <div class="info">
             <p><?php echo t('This feature will allow you to have all Staff use one Zendesk connection.')
                     .' '.t('If a user has a connection already established we will use that instead.'); ?></p>
         </div>
+        <?php } elseif ($this->Data['GlobalLoginError']) {?>
+        <div class="label text-danger"><?php echo t('Error connecting to Zendesk:'); ?></div>
+            <span class="text-warning">
+                <?php echo Gdn_Format::html($this->Data['GlobalLoginError']['message']); ?>
+            </span>
+        <?php } ?>
     </div>
+
     <?php if (!$this->Data['GlobalLoginEnabled']) { ?>
         <div class="input-wrap-right">
             <a class="btn btn-primary" href="<?php echo $this->Data['ToggleUrl']; ?>"><?php echo t('Enable'); ?></a>
