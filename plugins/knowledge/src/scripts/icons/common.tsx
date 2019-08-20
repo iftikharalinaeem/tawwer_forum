@@ -14,7 +14,7 @@ import { iconClasses } from "@library/icons/iconClasses";
 
 const debug = debugHelper("knowledgeBaseIcons");
 
-export function knowldedgeBaseItem(className?: string) {
+export function knowledgeBaseItem(className?: string) {
     const title = t("Knowledge Base Item");
     const globalVars = globalVariables();
 

@@ -20,8 +20,8 @@ story.add("Icons", () => {
         <StoryContent>
             <StoryHeading depth={1}>Knowledge Base Icons</StoryHeading>
             <StoryTiles>
-                <StoryTileAndTextCompact text={`knowldedgeBaseItem`}>
-                    {icons.knowldedgeBaseItem()}
+                <StoryTileAndTextCompact text={`knowledgeBaseItem`}>
+                    {icons.knowledgeBaseItem()}
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={`knowledgeBaseNoIcon`}>
                     {icons.knowledgeBaseNoIcon()}
