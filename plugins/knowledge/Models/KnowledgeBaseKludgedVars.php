@@ -68,6 +68,7 @@ class KnowledgeBaseKludgedVars {
         if ($value !== null && $varInfo['Control'] === "imageupload") {
             $value = \Gdn_Upload::url($value);
         }
+
         return $value;
     }
 
@@ -93,16 +94,19 @@ class KnowledgeBaseKludgedVars {
                 "LabelCode" => "Primary Color",
                 "Description" => "The primary color is used for buttons, inputs, and various indicators.",
                 "Control" => "color",
+                'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "global.mainColors.bg",
                 "LabelCode" => "Default Background Color",
                 "Control" => "color",
+                'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "global.mainColors.fg",
-                "LabelCode" => "Default Text Color",
+                "LabelCode" => "Default Foreground Color",
                 "Control" => "color",
+                'Options' => ['AllowEmpty' => true]
             ],
         ];
     }
@@ -116,13 +120,15 @@ class KnowledgeBaseKludgedVars {
         return [
             [
                 "VariableName" => "titleBar.colors.bg",
-                "LabelCode" => "Header Background Color",
+                "LabelCode" => "Title Bar Background Color",
                 "Control" => "color",
+                'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "titleBar.colors.fg",
-                "LabelCode" => "Header Text Color",
+                "LabelCode" => "Title Bar Foreground Color",
                 "Control" => "color",
+                'Options' => ['AllowEmpty' => true]
             ],
             [
                 "VariableName" => "titleBar.border.type",

@@ -107,7 +107,7 @@ class KnowledgeSettingsController extends SettingsController {
         $configValues += [
             "HeaderVarstitle" => [
                 "Control" => "title",
-                "Title" => "Header Variables",
+                "Title" => "Title Bar Variables",
             ],
         ];
         $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getHeaderVars());
