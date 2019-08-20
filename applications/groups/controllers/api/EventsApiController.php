@@ -277,13 +277,13 @@ class EventsApiController extends AbstractApiController {
         );
 
         $event = $this->eventByID($id);
-        $this->applyFormatCompatibility($event, 'body', 'format');
 
         if (!$this->eventModel->checkPermission('View', $event)) {
             throw new ClientException('You do not have the rights to view this event.');
         }
 
         $result = $out->validate($event);
+        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 

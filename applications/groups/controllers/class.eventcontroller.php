@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Vanilla\Formatting\FormatCompatTrait;
+
 /**
  * Groups Application - Event Controller
  *
@@ -12,6 +14,8 @@
  * @since 1.0
  */
 class EventController extends Gdn_Controller {
+
+    use FormatCompatTrait;
 
     /** @var array  */
     protected $Uses = ['Form', 'GroupModel'];
@@ -92,6 +96,8 @@ class EventController extends Gdn_Controller {
             $eventModel = new EventModel();
             $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
             if (!$event) throw notFoundException('Event');
+
+            $this->applyFormatCompatibility($event, 'Body', 'Format');
             $this->setData('Event', $event);
             $groupID = $event['GroupID'];
         }
