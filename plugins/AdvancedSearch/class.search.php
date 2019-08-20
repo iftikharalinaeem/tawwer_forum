@@ -190,41 +190,19 @@ class Search {
             }
         }
 
-        if (!$api) {
-            /// Types ///
-            $types = [];
-            $typecount = 0;
-            $selectedcount = 0;
+        if (!$api && class_exists(\Vanilla\Sphinx\SphinxSearchModel::class)) {
+            /* @var \Vanilla\Sphinx\SphinxSearchModel $searchModel */
+            $searchModel = Gdn::getContainer()->get(\Vanilla\Sphinx\SphinxSearchModel::class);
 
-            foreach (self::types() as $table => $type) {
-                $allselected = true;
-
-                foreach ($type as $name => $label) {
-                    $typecount++;
-                    $key = $table.'_'.$name;
-
-                    if (getValue($key, $search)) {
-                        $selectedcount++;
-                        $types[$table][] = $name;
-                    } else {
-                        $allselected = false;
-                    }
-                    unset($search[$key]);
-                }
-                // If all of the types are selected then don't filter.
-                if ($allselected) {
-                    unset($type[$table]);
-                }
-            }
+            $types = $searchModel->fixOldSearchTypes($search);
 
             // At least one type has to be selected to filter.
-            if ($selectedcount > 0 && $selectedcount < $typecount) {
+            if (count($types) > 0 && count($types) < count($searchModel->getSearchTypes())) {
                 $search['types'] = $types;
             } else {
                 unset($search['types']);
             }
         }
-
 
         /// Group ///
         if (!isset($search['group']) || $search['group']) {
@@ -344,17 +322,24 @@ EOT;
      * Whether or not groups can be searched.
      *
      * @return bool Returns true if groups can be searched or false otherwise.
+     * @deprecated
      */
     public static function searchGroups() {
-        return method_exists('SearchModel', 'searchGroups') && SearchModel::searchGroups();
+        return class_exists(\Vanilla\Sphinx\SphinxSearchModel::class) && \Vanilla\Sphinx\SphinxSearchModel::searchGroups();
     }
 
     /**
      * Return an array of all of the valid search types.
+     * @deprecated
      */
     public static function types() {
         if (!isset(self::$types)) {
-            $types = [
+            $types = [];
+            if (Gdn::addonManager()->isEnabled('knowledge', \Vanilla\Addon::TYPE_ADDON)) {
+                $types['knowledgeArticle']['article'] = 'articles';
+            }
+
+            $types += [
                 'discussion' => ['d' => 'discussions'],
                 'comment' => ['c' => 'comments']
             ];
