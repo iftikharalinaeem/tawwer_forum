@@ -21,7 +21,7 @@ class KnowledgeBaseKludgedVars {
     use StaticCacheTranslationTrait;
 
     /** Maximum length allowed for the KB chooser page. */
-    const CHOOSER_TITLE_MAX_LENGTH = 20;
+    const CHOOSER_TITLE_MAX_LENGTH = 50;
 
     /** @var ConfigurationInterface */
     private $config;
@@ -153,6 +153,9 @@ class KnowledgeBaseKludgedVars {
             [
                 "VariableName" => "splash.outerBackground.image",
                 "ConfigName" => "Knowledge.DefaultBannerImage",
+                "Description" =>
+                    "The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
+                    . " Recommended dimensions are about 1000px by 400px or a similar ratio.",
                 "LabelCode" => "Banner Image",
                 "Control" => "imageupload",
                 "Options" => [
