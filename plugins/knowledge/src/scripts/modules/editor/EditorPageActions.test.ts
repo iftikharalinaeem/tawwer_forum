@@ -23,12 +23,7 @@ import { DeepPartial } from "redux";
 import { createMockStore, mockStore as MockStore } from "redux-test-utils";
 import { _executeReady } from "@library/utility/appUtils";
 import { promiseTimeout } from "@vanilla/utils";
-
-const DEFAULT_KB_STATE = {
-    articles: ArticleModel.INITIAL_STATE,
-    navigation: NavigationModel.DEFAULT_STATE,
-    editorPage: EditorPageModel.INITIAL_STATE,
-};
+import { KB_TEST_INITIAL_STATE } from "@knowledge/__tests__/initialState";
 
 describe("EditorPageActions", () => {
     let mockStore: MockStore<any>;
@@ -37,13 +32,7 @@ describe("EditorPageActions", () => {
 
     beforeEach(() => {
         mockApi = new MockAdapter(apiv2);
-        initWithState({
-            knowledge: {
-                articles: ArticleModel.INITIAL_STATE,
-                navigation: NavigationModel.DEFAULT_STATE,
-                editorPage: EditorPageModel.INITIAL_STATE,
-            },
-        });
+        initWithState(KB_TEST_INITIAL_STATE);
     });
 
     const mockGetEditAPI = () => {
@@ -283,7 +272,9 @@ describe("EditorPageActions", () => {
             mockGetEditAPI();
             mockApi.onGet("/api/v2/article-revisions/6").replyOnce(200, dummyRevision);
 
-            initWithState({ knowledge: { ...DEFAULT_KB_STATE, articles: { revisionsByID: {}, articlesByID: {} } } });
+            initWithState({
+                knowledge: { ...KB_TEST_INITIAL_STATE, articles: { revisionsByID: {}, articlesByID: {} } },
+            });
 
             void (await editorPageActions.initializeEditPage(history, 1));
 
@@ -298,7 +289,7 @@ describe("EditorPageActions", () => {
 
             initWithState({
                 knowledge: {
-                    ...DEFAULT_KB_STATE,
+                    ...KB_TEST_INITIAL_STATE,
                     articles: {
                         revisionsByID: {
                             6: dummyRevision,
