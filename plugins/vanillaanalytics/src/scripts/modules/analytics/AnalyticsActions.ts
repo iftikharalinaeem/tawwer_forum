@@ -3,7 +3,6 @@
  * @license Proprietary
  */
 
-import { IStoreState } from "@knowledge/state/model";
 import ReduxActions from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import { IAnalyticsConfig, IAnalyticsEventDefaults } from "./analyticsReducer";
@@ -18,7 +17,7 @@ interface IGetEventDefaults {
 
 const createAction = actionCreatorFactory("@@analytics");
 
-export default class AnalyticsActions extends ReduxActions<IStoreState> {
+export default class AnalyticsActions extends ReduxActions {
     public static getConfig = createAction<IGetConfig>("GET_CONFIG");
     public getConfig = this.bindDispatch(AnalyticsActions.getConfig);
 
