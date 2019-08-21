@@ -11,6 +11,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import * as icons from "@knowledge/icons/common";
 import { StoryTile } from "@library/storybook/StoryTile";
+import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 
 const story = storiesOf("KnowledgeBase", module);
 
@@ -19,8 +20,12 @@ story.add("Icons", () => {
         <StoryContent>
             <StoryHeading depth={1}>Knowledge Base Icons</StoryHeading>
             <StoryTiles>
-                <StoryTile>{icons.knowldedgeBaseItem()}</StoryTile>
-                <StoryTile>{icons.knowledgeBaseNoIcon()}</StoryTile>
+                <StoryTileAndTextCompact text={`knowledgeBaseItem`}>
+                    {icons.knowledgeBaseItem()}
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`knowledgeBaseNoIcon`}>
+                    {icons.knowledgeBaseNoIcon()}
+                </StoryTileAndTextCompact>
             </StoryTiles>
         </StoryContent>
     );

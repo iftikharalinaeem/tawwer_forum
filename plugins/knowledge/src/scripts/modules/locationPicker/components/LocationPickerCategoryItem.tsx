@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import classNames from "classnames";
 import React from "react";
-import { knowldedgeBaseItem } from "@knowledge/icons/common";
+import { knowledgeBaseItem } from "@knowledge/icons/common";
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { CategoryIcon, CheckCompactIcon, RightChevronIcon } from "@library/icons/common";
@@ -86,7 +86,7 @@ export default class LocationPickerCategoryItem extends React.Component<IProps> 
             case KbRecordType.CATEGORY:
                 return <CategoryIcon />;
             case KbRecordType.KB:
-                return knowldedgeBaseItem();
+                return knowledgeBaseItem();
         }
     }
 }
