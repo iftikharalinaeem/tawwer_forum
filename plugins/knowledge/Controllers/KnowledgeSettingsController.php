@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Vanilla\Knowledge\Models\KnowledgeBaseKludgedVars;
 use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Garden\Schema\ValidationException;
@@ -22,9 +23,6 @@ class KnowledgeSettingsController extends SettingsController {
 
     use StaticCacheTranslationTrait;
 
-    /** Maximum length allowed for the KB chooser page. */
-    const CHOOSER_TITLE_MAX_LENGTH = 20;
-
     /** @var \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController */
     private $apiController;
 
@@ -34,21 +32,27 @@ class KnowledgeSettingsController extends SettingsController {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var KnowledgeBaseKludgedVars */
+    private $kludgedVars;
+
     /**
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $apiController
      * @param MediaApiController $mediaApiController
      * @param Gdn_Request $request
+     * @param KnowledgeBaseKludgedVars $kludgedVars
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
         MediaApiController $mediaApiController,
-        Gdn_Request $request
+        Gdn_Request $request,
+        KnowledgeBaseKludgedVars $kludgedVars
     ) {
         $this->apiController = $apiController;
         $this->mediaApiController = $mediaApiController;
         $this->request = $request;
+        $this->kludgedVars = $kludgedVars;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
     }
@@ -91,26 +95,24 @@ class KnowledgeSettingsController extends SettingsController {
         $this->permission("Garden.Settings.Manage");
 
         $configurationModule = new ConfigurationModule($this);
-        $configurationModule->initialize([
-            "Knowledge.DefaultBannerImage" => [
-                "Control" => "imageupload",
-                "LabelCode" => "Banner Image",
-                "Options" => [
-                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
-                ],
+        $configValues = [];
+        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getBannerVariables());
+        $configValues += [
+            "GlobalColorsTitle" => [
+                "Control" => "title",
+                "Title" => "Global Site Colors",
             ],
-            "Knowledge.ChooserTitle" => [
-                "LabelCode" => "Knowledge Base Chooser Title",
-                "Control" => "textbox",
-                "Description" => self::t(
-                    "This title will appear on the Knowledge homepage.",
-                    sprintf("This title will appear on the Knowledge homepage. It should be %d characters or less.", self::CHOOSER_TITLE_MAX_LENGTH)
-                ),
-                "Options" => [
-                    "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
-                ]
+        ];
+        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getGlobalColors());
+        $configValues += [
+            "HeaderVarstitle" => [
+                "Control" => "title",
+                "Title" => "Title Bar Variables",
             ],
-        ]);
+        ];
+        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getHeaderVars());
+
+        $configurationModule->initialize($configValues);
 
         $this->setData("ConfigurationModule", $configurationModule);
         $this->render();

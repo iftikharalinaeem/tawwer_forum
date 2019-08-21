@@ -14,39 +14,36 @@ use Vanilla\Theme\VariablesProviderInterface;
  */
 class KnowledgeVariablesProvider implements VariablesProviderInterface {
 
-    /** @var ConfigurationInterface */
-    private $config;
+    /** @var KnowledgeBaseKludgedVars */
+    private $kludgedVars;
 
     /**
      * Initial configuration of the instance.
      *
-     * @param ConfigurationInterface $config
+     * @param KnowledgeBaseKludgedVars $kludgedVars
      */
-    public function __construct(ConfigurationInterface $config) {
-        $this->config = $config;
+    public function __construct(KnowledgeBaseKludgedVars $kludgedVars) {
+        $this->kludgedVars = $kludgedVars;
     }
 
     /**
      * @inheritDoc
      */
     public function getVariables(): array {
+        $kludgedVars = array_merge(
+            $this->kludgedVars->getBannerVariables(),
+            $this->kludgedVars->getHeaderVars(),
+            $this->kludgedVars->getGlobalColors()
+        );
         $result = [];
 
-        if ($defaultBannerImage = $this->config->get("Knowledge.DefaultBannerImage")) {
-            $result["splash"] = [
-                "outerBackground" => [
-                    "image" => \Gdn_Upload::url($defaultBannerImage)
-                ]
-            ];
-        }
-
-        if ($chooserTitle = $this->config->get("Knowledge.ChooserTitle")) {
-            if (!array_key_exists("splash", $result)) {
-                $result["splash"] = [];
+        foreach ($kludgedVars as $varInfo) {
+            $value = $this->kludgedVars->readKludgedConfigValue($varInfo);
+            if ($value === null) {
+                continue;
             }
-            $result["splash"]["title"] = [
-                "text" => $chooserTitle
-            ];
+            $varName = $varInfo['VariableName'];
+            setvalr($varName, $result, $value);
         }
 
         return $result;
