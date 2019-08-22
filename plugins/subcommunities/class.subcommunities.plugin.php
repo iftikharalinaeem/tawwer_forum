@@ -51,6 +51,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('Attributes', 'text', true)
             ->column('Sort', 'smallint', '1000')
             ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
+            ->column('productID', 'smallint', true)
+            ->set();
+
+        Gdn::structure()
+            ->table('product')
+            ->primaryKey('productID')
+            ->column('name', 'varchar(255)')
+            ->column('body', 'varchar(255)', true)
+            ->column("dateInserted", "datetime", true)
+            ->column("dateUpdated", "datetime", true )
             ->set();
     }
 
