@@ -114,7 +114,10 @@ class SitemapPage extends KbPage {
             return new Data('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!', ['status' => 404]);
         }
         if ($kb['status'] === KnowledgeBaseModel::STATUS_DELETED) {
-            return new Data('Knowledge base with ID: ' . $knowledgeBaseID . ' is not available', ['status' => 410]);
+            // Do not use 410 here. 410 responses are cached by defealt regardless of your cache headers.
+            // If the knowledge base was "undeleted" crawlers such as google would likely not recrawl this resource.
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410
+            return new Data('Knowledge base with ID: ' . $knowledgeBaseID . ' is not available', ['status' => 404]);
         }
 
         $options = [
