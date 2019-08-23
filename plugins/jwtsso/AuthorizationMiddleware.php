@@ -157,15 +157,15 @@ class AuthorizationMiddleware {
         $auth = $this->userModel->getAuthentication($valid['sub'], static::PROVIDER_KEY);
         if (empty($auth)) {
             $userData = [
-                'Name' => $fields['Name'],
-                'Email' => $fields['Email']
+                'Name' => $payload[$fields['Name']],
+                'Email' => $payload[$fields['Email']]
             ];
 
             if ($fields['Photo']) {
-                $userData['Photo'] = $fields['Photo'];
+                $userData['Photo'] = $payload[$fields['Photo']];
             }
 
-            $userID = $this->userModel->connect($fields['UniqueID'], static::PROVIDER_KEY, $userData);
+            $userID = $this->userModel->connect($payload[$fields['UniqueID']], static::PROVIDER_KEY, $userData);
         } else {
             $userID = $auth['UserID'];
         }
