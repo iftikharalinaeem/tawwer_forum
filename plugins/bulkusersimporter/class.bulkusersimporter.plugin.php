@@ -743,7 +743,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Email successfully added users, but not users who already had an
          // account (according to username) with forum.
          // This is only for 'insert' $userin_mode
-         if ($userin_mode == 'invite'
+         if ($userin_mode == 'insert'
          && $send_email
          && $complete_code == 1) {
             if ($debug_mode == 0) {
