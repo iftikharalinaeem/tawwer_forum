@@ -17,7 +17,7 @@ use Gdn_Session;
 use UserModel;
 
 /**
- * A middleware that will look for an Oracle bearer token.
+ * A middleware that will look for a bearer token.
  */
 class AuthorizationMiddleware {
 
@@ -59,7 +59,7 @@ class AuthorizationMiddleware {
      * @param RequestInterface $request The request being processed.
      * @param callable $next The next middleware.
      * @return mixed Returns the response mostly unchanged accept for some added debug headers.
-     * @throws ServerException Throws an exception when Oracle isn't configured.
+     * @throws ServerException Throws an exception when JWTSSO isn't configured.
      */
     public function __invoke(RequestInterface $request, callable $next) {
         $authorization = $request->getHeader('Authorization');
@@ -94,7 +94,7 @@ class AuthorizationMiddleware {
      *
      * @param string $jwt
      * @return int
-     * @throws ServerException The Oracle SSO provider has not been configured.
+     * @throws ServerException The SSO provider has not been configured.
      */
     private function authenticateJWT(string $jwt): int {
         $provider = $this->authenticationProviderModel->getProviderByKey(static::PROVIDER_KEY);
