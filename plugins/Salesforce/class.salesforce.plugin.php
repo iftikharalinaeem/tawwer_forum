@@ -100,7 +100,7 @@ class SalesforcePlugin extends Gdn_Plugin {
         $sender->Data["Connections"][Salesforce::PROVIDERKEY] = [
             'Icon' => $this->getWebResource('icon.svg', '/'),
             'Name' => Salesforce::PROVIDERKEY,
-            'PROVIDERKEY' => Salesforce::PROVIDERKEY,
+            'ProviderKey' => Salesforce::PROVIDERKEY,
             'ConnectUrl' => Salesforce::authorizeUri(Salesforce::profileConnecUrl()),
             'Profile' => [
                 'Name' => val('fullname', $profile),
