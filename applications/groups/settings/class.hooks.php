@@ -1060,7 +1060,7 @@ class GroupsHooks extends Gdn_Plugin {
         $hasPermission = $groupModel->checkPermission('Member', $groupID);
 
         if (!$hasPermission ) {
-            throw permissionException('Vanilla.Discussions.Add');
+            return;
         }
 
         $newDiscussionModule->QueryString = 'groupid='.$groupID;
