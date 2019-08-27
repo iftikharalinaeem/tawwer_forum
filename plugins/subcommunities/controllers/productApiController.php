@@ -1,7 +1,7 @@
 <?php
 
 use Garden\Schema\Schema;
-
+use Vanilla\FeatureFlagHelper;
 
 class productApiController extends AbstractApiController {
 
@@ -21,6 +21,7 @@ class productApiController extends AbstractApiController {
      */
     public function __construct(productModel $productModel) {
         $this->productModel = $productModel;
+        FeatureFlagHelper::ensureFeature(productModel::FEATURE_FLAG);
     }
 
     /**
