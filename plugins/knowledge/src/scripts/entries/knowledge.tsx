@@ -28,10 +28,14 @@ import { deploymentKeyMiddleware } from "@knowledge/server/deploymentKeyMiddlewa
 import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
 import { serverReducer } from "@knowledge/server/serverReducer";
+import { Router } from "@library/Router";
+import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 
 debug(getMeta("context.debug"));
 
 const deploymentKeyInterceptor = apiv2.interceptors.response.use(deploymentKeyMiddleware);
+
+Router.addRoutes(getPageRoutes());
 
 const render = () => {
     const app = document.querySelector("#app");
