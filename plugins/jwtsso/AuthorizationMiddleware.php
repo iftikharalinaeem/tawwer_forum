@@ -4,8 +4,6 @@
  * @license Proprietary
  */
 
-namespace Vanilla\JWTSSO;
-
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
@@ -13,8 +11,6 @@ use Firebase\JWT\SignatureInvalidException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
-use Gdn_Session;
-use UserModel;
 
 /**
  * A middleware that will look for a JWT authentication bearer token.
@@ -33,7 +29,7 @@ class AuthorizationMiddleware {
     /** @var UserModel  */
     private $userModel;
 
-    /** @var \Gdn_AuthenticationProviderModel */
+    /** @var Gdn_AuthenticationProviderModel */
     private $authenticationProviderModel;
 
     /**
@@ -41,12 +37,12 @@ class AuthorizationMiddleware {
      *
      * @param Gdn_Session $session For starting user sessions.
      * @param UserModel $userModel For checking SSO.
-     * @param \Gdn_AuthenticationProviderModel $authenticationProviderModel
+     * @param Gdn_AuthenticationProviderModel $authenticationProviderModel
      */
     public function __construct(
         Gdn_Session $session,
         UserModel $userModel,
-        \Gdn_AuthenticationProviderModel $authenticationProviderModel
+        Gdn_AuthenticationProviderModel $authenticationProviderModel
     ) {
         $this->session = $session;
         $this->userModel = $userModel;
@@ -119,7 +115,7 @@ class AuthorizationMiddleware {
      * @param array $fields
      * @return int
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
-     * @throws \Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
+     * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
     private function sso(array $payload, array $fields): int {
 
@@ -149,7 +145,7 @@ class AuthorizationMiddleware {
             $schemaFields[] = "{$fields['FullName']}:s?";
         }
 
-        $sch = \Garden\Schema\Schema::parse($schemaFields);
+        $sch = Garden\Schema\Schema::parse($schemaFields);
 
         $valid = $sch->validate($payload);
 

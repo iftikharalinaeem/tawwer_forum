@@ -4,8 +4,6 @@
  * @license Proprietary
  */
 
-namespace Vanilla\JWTSSO;
-
 use Garden\Container\Container;
 use Garden\Container\Reference;
 
@@ -14,7 +12,7 @@ use Garden\Container\Reference;
  *
  * Plugin to authenticate users by interpreting a JSON Web Token.
  */
-class JWTSSOPlugin extends \Gdn_Plugin {
+class JWTSSOPlugin extends Gdn_Plugin {
 
     /** @var string  */
     const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
@@ -73,21 +71,21 @@ class JWTSSOPlugin extends \Gdn_Plugin {
 
     public $translatedKeys = [];
 
-    /** @var \Gdn_AuthenticationProviderModel */
+    /** @var Gdn_AuthenticationProviderModel */
     private $authenticationProviderModel;
 
-    /** @var \Gdn_Session */
+    /** @var Gdn_Session */
     private $session;
 
     /**
      * JWTSSOPlugin constructor.
      *
-     * @param \Gdn_Session $session
-     * @param \Gdn_AuthenticationProviderModel $authenticationProviderModel
+     * @param Gdn_Session $session
+     * @param Gdn_AuthenticationProviderModel $authenticationProviderModel
      */
     public function __construct(
-        \Gdn_Session $session,
-        \Gdn_AuthenticationProviderModel $authenticationProviderModel
+        Gdn_Session $session,
+        Gdn_AuthenticationProviderModel $authenticationProviderModel
     ) {
         parent::__construct();
         $this->session = $session;
@@ -104,7 +102,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
      */
     public function container_init(Container $dic) {
         if ($this->allowApiAuth()) {
-            $dic->rule(\Garden\Web\Dispatcher::class)
+            $dic->rule(Garden\Web\Dispatcher::class)
                 ->addCall('addMiddleware', [new Reference(AuthorizationMiddleware::class)]);
         }
     }
@@ -146,13 +144,13 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param \SettingsController $sender
+     * @param SettingsController $sender
      */
     public function settingsController_jwtsso_create($sender) {
         $sender->permission('Garden.Settings.Manage');
 
-        /* @var \Gdn_Form $form */
-        $form = new \Gdn_Form();
+        /* @var Gdn_Form $form */
+        $form = new Gdn_Form();
         $form->setModel($this->authenticationProviderModel);
         $sender->Form = $form;
         $generate = false;
@@ -239,7 +237,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Custom validation for required array fields
      *
-     * @param \Gdn_Form $form
+     * @param Gdn_Form $form
      */
     private function validateKeyMap($form) {
         if (!valr('UniqueID', $form->getValue('KeyMap'), false)) {
@@ -289,7 +287,7 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Inject Javascript file into dashboard to a allow adding auto-generated secret and clientID;
      *
-     * @param \SettingsController $sender
+     * @param SettingsController $sender
      */
     public function settingsController_render_before($sender) {
         $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso');
@@ -302,28 +300,28 @@ class JWTSSOPlugin extends \Gdn_Plugin {
     /**
      * Inject into the process of the base connection.
      *
-     * @param \Gdn_Controller $sender
-     * @param \Gdn_Controller $args
-     * @throws \Gdn_UserException Configuration issues.
+     * @param Gdn_Controller $sender
+     * @param Gdn_Controller $args
+     * @throws Gdn_UserException Configuration issues.
      */
     public function base_connectData_handler($sender, $args) {
         $authenticationKey = $sender->Request->get('authKey');
         if (!$authenticationKey) {
             $this->log('not_configured', ['provider' => $this->provider()]);
-            throw new \Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
+            throw new Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
         }
 
         if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
             $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
-            throw new \Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
+            throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
         }
 
-        /* @var \Gdn_Form $form */
+        /* @var Gdn_Form $form */
         $form = $sender->Form; //new gdn_Form();
 
         if (!$this->isConfigured()) {
             $this->log('not_configured', ['provider' => $this->provider()]);
-            throw new \Gdn_UserException('JWT authentication is not configured.', 400);
+            throw new Gdn_UserException('JWT authentication is not configured.', 400);
         }
 
         // get the Bearer token from the Authorization header
@@ -335,12 +333,12 @@ class JWTSSOPlugin extends \Gdn_Plugin {
                 $this->extractToken($token);
                 if (!$this->validateTime()) {
                     $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
-                    throw new \Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+                    throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
                 }
             } else {
                 // If there was no token in the header or GET
                 $this->log('no_bearer', ['tokentype' => $tokenType]);
-                throw new \Gdn_UserException('Unable to proceed, no JSON Web Token found.', 400);
+                throw new Gdn_UserException('Unable to proceed, no JSON Web Token found.', 400);
             }
         } else {
             // If a token was found in the header extract it.
@@ -348,24 +346,24 @@ class JWTSSOPlugin extends \Gdn_Plugin {
             // If we ever remove time validation, we should also disable passing the token in GET as per best practices.
             if (!$this->validateTime()) {
                 $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
-                throw new \Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+                throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
             }
 
         }
 
         if (!$this->validateAudience()) {
             $this->log('invalid_audience', ['aud' => $this->audClaim, 'payload' => $this->jwtPayload, 'provider' => $this->provider()]);
-            throw new \Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "aud" value.', 400);
+            throw new Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "aud" value.', 400);
         }
 
         if (!$this->validateIssuer()) {
             $this->log('invalid_issuer', ['iss' => $this->issClaim, 'payload' => $this->jwtPayload, 'provider' => $this->provider()]);
-            throw new \Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "iss" value.', 400);
+            throw new Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "iss" value.', 400);
         }
 
         if (!$this->validateSignature()) {
             $this->log('invalid_signature', ['secret' => val('AssociationSecret', $this->provider), 'token' => $token]);
-            throw new \Gdn_UserException('Unable to proceed, verify the signature on your JSON Web Token.', 400);
+            throw new Gdn_UserException('Unable to proceed, verify the signature on your JSON Web Token.', 400);
         }
 
         // Allow custom plugins to translate custom keys being passed in SSO
@@ -725,15 +723,15 @@ class JWTSSOPlugin extends \Gdn_Plugin {
      * Convenience method for updating the log.
      *
      * @param string $message
-     * @param string $data
+     * @param array $data
      */
     public function log($message, $data) {
         if (!is_array($data)) {
             $data = (array) $data;
         }
-        \Logger::event(
+        Logger::event(
             'jwt_logging',
-            \Logger::INFO,
+            Logger::INFO,
             $message,
             $data
         );
