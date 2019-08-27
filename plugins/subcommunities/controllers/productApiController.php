@@ -24,7 +24,6 @@ class productApiController extends AbstractApiController {
     }
 
     /**
-     * Get the schema for the reRender.
      *
      * @param string $type
      * @return Schema
@@ -43,7 +42,6 @@ class productApiController extends AbstractApiController {
     }
 
     /**
-     * Get a schema representing an article revision.
      *
      * @return Schema
      */
@@ -63,16 +61,24 @@ class productApiController extends AbstractApiController {
         ]);
     }
 
-
+    /**
+     * @param string $type
+     * @return Schema
+     */
     private function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema =  Schema::parse(["id:i" => "The article ID."]);
+            $this->idParamSchema =  Schema::parse([
+                "id:i" => "The article ID."
+            ]);
         }
         return $this->schema($this->idParamSchema, $type);
     }
 
+    /**
+     * @return array|mixed
+     */
     public function index() {
-        //$this->permission();
+        $this->permission("Garden.Moderation.Manage");
         $out = $this->schema([
             ":a" => $this->fullSchema(),
         ], "out");
@@ -88,9 +94,8 @@ class productApiController extends AbstractApiController {
      * @param int $id
      * @return array
      */
-
     public function get(int $id): array {
-        //$this->permission();
+        $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $id = $id ?? null;
@@ -103,8 +108,12 @@ class productApiController extends AbstractApiController {
         return $result;
     }
 
+    /**
+     * @param array $body
+     * @return array|mixed
+     */
     public function post(array $body) {
-        //$this->permission();
+        $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
                 "name",
@@ -124,8 +133,14 @@ class productApiController extends AbstractApiController {
         return $product;
     }
 
+    /**
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+
     public function patch(int $id, array $body = []): array {
-        //$this->permission();
+        $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
                 "name:s",
@@ -139,7 +154,7 @@ class productApiController extends AbstractApiController {
         ]));
 
         $product = $this->productModel->selectSingle(["productID" => $id]);
-    // needs rework
+
         if ($product) {
             $body = $in->validate($body);
             $where = ["productID" => $id];
@@ -150,6 +165,18 @@ class productApiController extends AbstractApiController {
             }
         }
 
+    }
+
+    /**
+     * @param int $id
+     */
+    public function delete(int $id) {
+        $this->permission("Garden.Moderation.Manage");
+        $this->idParamSchema()->setDescription("Delete a product id.");
+        $product = $this->productModel->selectSingle(["productID" => $id]);
+
+        if (is_array($product) && array_key_exists('productID', $product))
+        $this->productModel->delete(["productID" => $product["productID"]]);
     }
 
 }
