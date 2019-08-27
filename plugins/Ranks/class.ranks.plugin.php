@@ -29,15 +29,19 @@ class RanksPlugin extends Gdn_Plugin {
     /** @var string  */
     public $LinksNotAllowedMessage = 'You have to be around for a little while longer before you can post links.';
 
+    /** @var HtmlFormat */
+    private $htmlFormat;
+
     /**
      * RanksPlugin constructor.
      *
      * @param RankModel $rankModel
      * @param UserModel $userModel
      */
-    public function __construct(RankModel $rankModel, UserModel $userModel) {
+    public function __construct(RankModel $rankModel, UserModel $userModel, \Vanilla\Formatting\Formats\HtmlFormat $htmlFormat) {
         $this->rankModel = $rankModel;
         $this->userModel = $userModel;
+        $this->htmlFormat = $htmlFormat;
         parent::__construct();
     }
 
@@ -184,7 +188,8 @@ class RanksPlugin extends Gdn_Plugin {
       * @param string $fieldName The field name in the form to check for links.
       */
      public function checkForLinks($sender, $formValues, $fieldName) {
-         if (preg_match('`https?:/+`i', stripslashes($formValues[$fieldName]))) {
+         $body = $this->htmlFormat->renderHtml($formValues[$fieldName]);
+         if (preg_match('`https?://?`i', $body)) {
                 $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
           }
      }
