@@ -12,16 +12,23 @@ import { setAllLinkColors } from "@library/styles/styleHelpers";
 
 export const articleTOCClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");
-    const vars = globalVariables();
+    const globalVars = globalVariables();
 
-    const frame = style({
-        paddingTop: px(12),
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+    const link = style({
+        color: colorOut(globalVars.meta.colors.fg),
+        fontSize: unit(globalVars.fonts.size.medium),
+    });
+
+    const item = style({
+        $nest: {
+            [`&.isActive .${link}`]: {
+                fontWeight: globalVars.fonts.weights.bold,
+            },
+        },
     });
 
     return {
         link,
+        item,
     };
 });
