@@ -118,12 +118,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * Create a row in the UserAuthenticationTable with default values for JSON Web Token SSO
      */
     public function structure() {
-        // Make sure we have the a provider.
+        // Make sure we have the provider.
         $provider = $this->provider();
         if (!val('AuthenticationKey', $provider)) {
             $provider = [
                 'AuthenticationKey' => self::DEFAULT_PROVIDER_KEY,
                 'AuthenticationSchemeAlias' => self::PROVIDER_SCHEME_ALIAS,
+                'AllowAPIAuth' => false,
                 'Name' => self::DEFAULT_PROVIDER_KEY,
                 'KeyMap' => [
                     'Email' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
@@ -677,7 +678,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     public function getProviderKey() {
         if (!$this->providerKey) {
             $this->provider();
-            $this->setProviderKey(val('AuthenticationKey', $this->provider, DEFAULT_PROVIDER_KEY));
+            $this->setProviderKey(val('AuthenticationKey', $this->provider, self::DEFAULT_PROVIDER_KEY));
         }
         return $this->providerKey;
     }
