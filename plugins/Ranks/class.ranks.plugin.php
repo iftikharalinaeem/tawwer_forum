@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatService;
 
 class RanksPlugin extends Gdn_Plugin {
 
@@ -29,8 +30,8 @@ class RanksPlugin extends Gdn_Plugin {
     /** @var string  */
     public $LinksNotAllowedMessage = 'You have to be around for a little while longer before you can post links.';
 
-    /** @var HtmlFormat */
-    private $htmlFormat;
+    /** @var FormatService */
+    private $formatService;
 
     /**
      * RanksPlugin constructor.
@@ -38,10 +39,10 @@ class RanksPlugin extends Gdn_Plugin {
      * @param RankModel $rankModel
      * @param UserModel $userModel
      */
-    public function __construct(RankModel $rankModel, UserModel $userModel, \Vanilla\Formatting\Formats\HtmlFormat $htmlFormat) {
+    public function __construct(RankModel $rankModel, UserModel $userModel, FormatService $formatService) {
         $this->rankModel = $rankModel;
         $this->userModel = $userModel;
-        $this->htmlFormat = $htmlFormat;
+        $this->formatService = $formatService;
         parent::__construct();
     }
 
@@ -188,8 +189,22 @@ class RanksPlugin extends Gdn_Plugin {
       * @param string $fieldName The field name in the form to check for links.
       */
      public function checkForLinks($sender, $formValues, $fieldName) {
-         $body = $this->htmlFormat->renderHtml($formValues[$fieldName]);
-         if (preg_match('`https?://?`i', $body)) {
+         $content = $formValues[$fieldName] ?? "";
+         $format = $formValues["Format"] ?? "";
+         $body = $this->formatService->renderPlainText($content, $format);
+
+         // Allow links to upload hosts, so we can avoid flagging attachments.
+         $uploadHosts = [];
+         foreach (array_values(Gdn_Upload::urls()) as $uploadPath) {
+            $uploadHosts[] = preg_quote(parse_url($uploadPath, PHP_URL_HOST), "`");
+         }
+         $uploadHosts = array_unique($uploadHosts);
+
+         $linkPattern = "https?://?";
+         if (!empty($uploadHosts)) {
+             $linkPattern .= "(?!/|".implode("|", $uploadHosts).")";
+         }
+         if (preg_match("`{$linkPattern}`i", $body)) {
                 $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
           }
      }
