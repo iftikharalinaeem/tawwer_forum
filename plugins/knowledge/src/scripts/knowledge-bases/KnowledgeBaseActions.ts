@@ -7,6 +7,9 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api/core";
+import { useDispatch } from "react-redux";
+import apiv2 from "@library/apiv2";
+import { useMemo } from "react";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 
@@ -23,4 +26,10 @@ export default class KnowledgeBaseActions extends ReduxActions {
         })();
         return this.dispatch(thunk);
     };
+}
+
+export function useKnowledgeBaseActions() {
+    const dispatch = useDispatch();
+    const actions = useMemo(() => new KnowledgeBaseActions(dispatch, apiv2), [dispatch]);
+    return actions;
 }

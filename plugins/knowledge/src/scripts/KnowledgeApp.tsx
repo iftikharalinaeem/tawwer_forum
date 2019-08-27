@@ -4,42 +4,84 @@
  * @license Proprietary
  */
 
+import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
-import { AppContext } from "@library/AppContext";
+import RouteActions from "@knowledge/routes/RouteActions";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api/core";
 import SearchContext from "@library/contexts/SearchContext";
+import Loader from "@library/loaders/Loader";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
-import PagesContext from "@library/routing/PagesContext";
-import React from "react";
 import { Router } from "@library/Router";
+import PagesContext from "@library/routing/PagesContext";
+import React, { useCallback, useEffect } from "react";
 import { hot } from "react-hot-loader";
+import { useDispatch, useSelector } from "react-redux";
 
 /*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
 function KnowledgeApp() {
+    const { kbLoadable, routeState, clearError, requestKnowledgeBases } = useConnect();
+
+    useEffect(() => {
+        if (kbLoadable.status === LoadStatus.PENDING) {
+            requestKnowledgeBases();
+        }
+    });
+
+    if (routeState.error) {
+        return <ErrorPage error={routeState.error} />;
+    }
+
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
+        return <Loader />;
+    }
+
+    if (kbLoadable.status === LoadStatus.SUCCESS && kbLoadable.data && Object.values(kbLoadable.data).length === 0) {
+        return <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />;
+    }
+
     return (
-        <AppContext>
-            <PagesContext.Provider
-                value={{
-                    pages: {
-                        search: SearchRoute,
-                    },
-                }}
-            >
-                <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
-                    <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                        <NavHistoryContextProvider>
-                            <Router sectionRoot="/kb" />
-                        </NavHistoryContextProvider>
-                    </SearchContext.Provider>
-                </SiteNavProvider>
-            </PagesContext.Provider>
-        </AppContext>
+        <PagesContext.Provider
+            value={{
+                pages: {
+                    search: SearchRoute,
+                },
+            }}
+        >
+            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                    <NavHistoryContextProvider>
+                        <Router sectionRoot="/kb" onRouteChange={clearError} />
+                    </NavHistoryContextProvider>
+                </SearchContext.Provider>
+            </SiteNavProvider>
+        </PagesContext.Provider>
     );
+}
+
+function useConnect() {
+    const kbLoadable = useSelector(
+        (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+    );
+    const routeState = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.route);
+    const dispatch = useDispatch();
+    const clearError = useCallback(() => dispatch(RouteActions.resetAC), [dispatch]);
+    const kbActions = useKnowledgeBaseActions();
+
+    return {
+        kbLoadable,
+        routeState,
+        clearError,
+        requestKnowledgeBases: kbActions.getAll,
+    };
 }
 
 export default hot(module)(KnowledgeApp);

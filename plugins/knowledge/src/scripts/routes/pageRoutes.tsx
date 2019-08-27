@@ -7,7 +7,6 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { formatUrl } from "@library/utility/appUtils";
 import qs from "qs";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@vanilla/utils";
