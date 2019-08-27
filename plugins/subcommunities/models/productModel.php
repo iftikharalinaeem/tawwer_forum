@@ -2,6 +2,8 @@
 
 class productModel extends \Vanilla\Models\PipelineModel {
 
+    const FEATURE_FLAG = 'SubcommunityProducts';
+
     /** Default limit on the number of results returned. */
     const LIMIT_DEFAULT = 1000;
 
