@@ -26,22 +26,22 @@ story.add("Table of Contents", () => {
             <StoryHeading depth={1}>{t("Table of Contents")}</StoryHeading>
             <ArticleTOC
                 items={[
-                        {
-                            ref: "things-to-do",
-                            level: 2,
-                            text: "Things to do\n",
-                        },
-                        {
-                            ref: "things-to-avoid",
-                            level: 2,
-                            text: "Things to avoid\n",
-                        },
-                        {
-                            ref: "things-you-absolutely-cannot-do",
-                            level: 2,
-                            text: "Things you absolutely cannot do\n",
-                        },
-                    ]},
+                    {
+                        ref: "things-to-do",
+                        level: 2,
+                        text: "Things to do\n",
+                    },
+                    {
+                        ref: "things-to-avoid",
+                        level: 2,
+                        text: "Things to avoid\n",
+                    },
+                    {
+                        ref: "things-you-absolutely-cannot-do",
+                        level: 2,
+                        text: "Things you absolutely cannot do\n",
+                    },
+                ]}
             />
         </>
     );
