@@ -8,6 +8,7 @@ import { t } from "@library/utility/appUtils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import * as React from "react";
 import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
+import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
 
 interface IProps {
     locationData: ICrumb[];
@@ -53,16 +54,16 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         const { locationData } = this.props;
         const accessibleCrumbSeparator = `/`;
         const crumbCount = locationData.length - 1;
-        const classesLocationPicker = locationPickerClasses();
+        const classes = breadcrumbsClasses();
         const crumbs = locationData.map((crumb, index) => {
             const lastElement = index === crumbCount;
             const crumbSeparator = `›`;
             return (
                 <React.Fragment key={`locationBreadcrumb-${index}`}>
-                    <span className="locationBreadcrumb-link">{crumb.name}</span>
+                    <span className={classes.crumb}>{crumb.name}</span>
                     {!lastElement && (
-                        <span className="locationBreadcrumb-item locationBreadcrumb-separator">
-                            <span aria-hidden={true} className="locationBreadcrumb-separatorIcon">
+                        <span className={classes.separator}>
+                            <span aria-hidden={true} className={classes.separatorIcon}>
                                 {crumbSeparator}
                             </span>
                             <span className="sr-only">{accessibleCrumbSeparator}</span>
@@ -73,7 +74,7 @@ export default class LocationBreadcrumbs extends React.Component<IProps> {
         });
 
         return (
-            <span className="locationBreadcrumb">
+            <span className={classes.root}>
                 {this.props.icon}
                 {crumbs}
             </span>
