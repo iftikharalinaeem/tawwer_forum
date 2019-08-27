@@ -204,14 +204,14 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
 
         if ($proxyPath !== '') {
             $this->proxyRoot = $proxyPath;
-            $request->assetRoot($proxyPath);
-            $request->webRoot($proxyPath);
+            $request->setAssetRoot($proxyPath);
+            $request->setRoot($proxyPath);
         }
 
         $this->rewrittenRequest = $request;
 
         // Assign the new request object to the container.
-        $dic->setInstance('Request', $request);
+        $dic->setInstance(Gdn_Request::class, $request);
 
         // Clear the cache of the Gdn object.
         Gdn::setContainer($dic);
