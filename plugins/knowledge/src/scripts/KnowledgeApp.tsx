@@ -8,7 +8,7 @@ import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchPr
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
-import { Application } from "@library/Application";
+import { AppContext } from "@library/AppContext";
 import SearchContext from "@library/contexts/SearchContext";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 import PagesContext from "@library/routing/PagesContext";
@@ -22,7 +22,7 @@ import { hot } from "react-hot-loader";
  */
 function KnowledgeApp() {
     return (
-        <Application>
+        <AppContext>
             <PagesContext.Provider
                 value={{
                     pages: {
@@ -38,7 +38,7 @@ function KnowledgeApp() {
                     </SearchContext.Provider>
                 </SiteNavProvider>
             </PagesContext.Provider>
-        </Application>
+        </AppContext>
     );
 }
 
