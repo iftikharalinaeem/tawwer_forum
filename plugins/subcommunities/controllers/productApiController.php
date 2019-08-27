@@ -3,7 +3,7 @@
 use Garden\Schema\Schema;
 use Vanilla\FeatureFlagHelper;
 
-class productApiController extends AbstractApiController {
+class ProductApiController extends AbstractApiController {
 
     /** @var Schema */
     private $productSchema;
@@ -79,7 +79,7 @@ class productApiController extends AbstractApiController {
      * @return array|mixed
      */
     public function index() {
-        $this->permission("Garden.Moderation.Manage");
+        $this->permission("'Garden.SignIn.Allow'");
         $out = $this->schema([
             ":a" => $this->fullSchema(),
         ], "out");
@@ -96,7 +96,7 @@ class productApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id): array {
-        $this->permission("Garden.Moderation.Manage");
+        $this->permission("Garden.SignIn.Allow");
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $id = $id ?? null;
@@ -150,22 +150,17 @@ class productApiController extends AbstractApiController {
             "in"
         );
 
-        $out = $this->schema(Schema::parse([
-            "productID",
-        ]));
+        $out = $this->productSchema("out");
 
-        $product = $this->productModel->selectSingle(["productID" => $id]);
+        $body = $in->validate($body);
 
-        if ($product) {
-            $body = $in->validate($body);
-            $where = ["productID" => $id];
-            $updated = $this->productModel->update($body, $where);
-            if ($updated) {
-                $product["productID"] = $out->validate(["productID" => $product["productID"]]);
-                return $product["productID"];
-            }
-        }
+        $where = ["productID" => $id];
 
+        $this->productModel->update($body, $where);
+        $product = $this->productModel->selectSingle($where);
+        $product = $out->validate($product);
+
+        return $product;
     }
 
     /**
@@ -176,8 +171,9 @@ class productApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Delete a product id.");
         $product = $this->productModel->selectSingle(["productID" => $id]);
 
-        if (is_array($product) && array_key_exists('productID', $product))
-        $this->productModel->delete(["productID" => $product["productID"]]);
+        if (is_array($product) && array_key_exists('productID', $product)) {
+            $this->productModel->delete(["productID" => $product["productID"]]);
+        }
     }
 
 }
