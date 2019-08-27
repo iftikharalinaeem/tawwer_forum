@@ -716,7 +716,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     protected function allowApiAuth(): bool {
         $provider = $this->provider();
-        return (bool)$provider['AllowAPIAuth'];
+        $allowAPIAuth = $provider["AllowAPIAuth"] ?? false;
+
+        return (bool)$allowAPIAuth;
     }
 
 
