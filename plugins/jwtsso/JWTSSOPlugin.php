@@ -713,7 +713,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      *
      * @return bool Return the value of the allowApiAuth row of GDN_UserAuthenticationProvider .
      */
-    protected function allowApiAuth() {
+    protected function allowApiAuth(): bool {
         $provider = $this->provider();
         return (bool)$provider['AllowAPIAuth'];
     }

@@ -18,7 +18,7 @@ use Garden\Web\RequestInterface;
 class AuthorizationMiddleware {
 
     /** @var string  */
-    public const AUTHORIZATION_REGEX = '`^Bearer\s+([a-z0-9\-_]+?\.[a-z0-9\-_]+?\.(?:[a-z0-9\-_]+))$`i';
+    public const AUTHORIZATION_REGEX = '`^Bearer\s+(?<jwt>[a-z0-9\-_]+?\.[a-z0-9\-_]+?\.[a-z0-9\-_]+)$`i';
 
     /** @var string  */
     public const PROVIDER_KEY = 'JWTSSODefault';
@@ -60,8 +60,8 @@ class AuthorizationMiddleware {
     public function __invoke(RequestInterface $request, callable $next) {
         $authorization = $request->getHeader('Authorization');
 
-        if (!empty($authorization) && preg_match(static::AUTHORIZATION_REGEX, $authorization, $m)) {
-            $jwt = $m[1];
+        if (!empty($authorization) && preg_match(static::AUTHORIZATION_REGEX, $authorization, $authParts)) {
+            $jwt = $authParts["jwt"];
 
             try {
                 $userID = $this->authenticateJWT($jwt);
