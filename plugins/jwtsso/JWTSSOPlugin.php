@@ -4,9 +4,8 @@
  * @license Proprietary
  */
 
-const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
-
-const PROVIDER_SCHEME_ALIAS = "JWTSSO";
+use Garden\Container\Container;
+use Garden\Container\Reference;
 
 /**
  * Class JWTSSOPlugin
@@ -14,6 +13,12 @@ const PROVIDER_SCHEME_ALIAS = "JWTSSO";
  * Plugin to authenticate users by interpreting a JSON Web Token.
  */
 class JWTSSOPlugin extends Gdn_Plugin {
+
+    /** @var string  */
+    const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
+
+    /** @var string  */
+    const PROVIDER_SCHEME_ALIAS = "JWTSSO";
 
     /** @var string unique key for a JWTSSO setup stored in GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -58,7 +63,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     protected $jtiClaim = null;
 
     /** @var array supported alorithms */
-    public  $supportedAlgs = [
+    public $supportedAlgs = [
         'HS256' => 'sha256',
         'HS512' => 'sha512',
         'HS384' => 'sha384'
@@ -66,10 +71,40 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
     public $translatedKeys = [];
 
-    public function __construct() {
+    /** @var Gdn_AuthenticationProviderModel */
+    private $authenticationProviderModel;
+
+    /** @var Gdn_Session */
+    private $session;
+
+    /**
+     * JWTSSOPlugin constructor.
+     *
+     * @param Gdn_Session $session
+     * @param Gdn_AuthenticationProviderModel $authenticationProviderModel
+     */
+    public function __construct(
+        Gdn_Session $session,
+        Gdn_AuthenticationProviderModel $authenticationProviderModel
+    ) {
+        parent::__construct();
+        $this->session = $session;
+        $this->authenticationProviderModel = $authenticationProviderModel;
         $provider = $this->provider();
         // Use the values of the KeyMap as keys and keys as values
         $this->translatedKeys = array_flip(val('KeyMap', $provider));
+    }
+
+    /**
+     * Configure the container for authentication middleware.
+     *
+     * @param Container $dic The container to configure.
+     */
+    public function container_init(Container $dic) {
+        if ($this->allowApiAuth()) {
+            $dic->rule(Garden\Web\Dispatcher::class)
+                ->addCall('addMiddleware', [new Reference(AuthorizationMiddleware::class)]);
+        }
     }
 
     /**
@@ -83,14 +118,14 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * Create a row in the UserAuthenticationTable with default values for JSON Web Token SSO
      */
     public function structure() {
-        // Make sure we have the a provider.
+        // Make sure we have the provider.
         $provider = $this->provider();
         if (!val('AuthenticationKey', $provider)) {
-            $model = new Gdn_AuthenticationProviderModel();
             $provider = [
-                'AuthenticationKey' => DEFAULT_PROVIDER_KEY,
-                'AuthenticationSchemeAlias' => PROVIDER_SCHEME_ALIAS,
-                'Name' => DEFAULT_PROVIDER_KEY,
+                'AuthenticationKey' => self::DEFAULT_PROVIDER_KEY,
+                'AuthenticationSchemeAlias' => self::PROVIDER_SCHEME_ALIAS,
+                'AllowAPIAuth' => false,
+                'Name' => self::DEFAULT_PROVIDER_KEY,
                 'KeyMap' => [
                     'Email' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                     'Photo' => 'picture',
@@ -99,7 +134,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
                     'UniqueID' => 'sub'
                 ]
             ];
-            $model->save($provider);
+            $this->authenticationProviderModel->save($provider);
         }
         saveToConfig('Garden.SignIn.Popup', false);
     }
@@ -110,16 +145,14 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param SettingsController $sender.
-     * @param SettingsController $args.
+     * @param SettingsController $sender
      */
-    public function settingsController_jwtsso_create($sender, $args) {
+    public function settingsController_jwtsso_create($sender) {
         $sender->permission('Garden.Settings.Manage');
-        $model = new Gdn_AuthenticationProviderModel();
 
         /* @var Gdn_Form $form */
         $form = new Gdn_Form();
-        $form->setModel($model);
+        $form->setModel($this->authenticationProviderModel);
         $sender->Form = $form;
         $generate = false;
         if (!$form->authenticatedPostBack()) {
@@ -136,6 +169,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
                 $sender->Form->validateRule('SignInUrl', 'isUrl', 'You must provide a complete URL in the Sign In  URL field.');
                 $sender->Form->validateRule('BaseUrl', 'isUrl', 'You must provide a complete URL in the Issuer URL field.');
+                $this->validateKeyMap($sender->Form);
 
                 if ($form->save()) {
                     $sender->informMessage(t('Saved'));
@@ -165,11 +199,12 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'KeyMap[FullName]' => ['LabelCode' => 'Full Name', 'Options' => ['Value' => val('FullName', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
-        // Allow a client to hook in and add fields that might be relevent to their set up.
+        // Allow a client to hook in and add fields that might be relevant to their set up.
         $sender->EventArguments['FormFields'] = &$formFields;
         $sender->fireEvent('JWTSettingsFields');
 
         $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+        $formFields['AllowAPIAuth'] = ['LabelCode' => 'Allow JWTs to authorize API calls', 'Control' => 'toggle'];
 
         $sender->setData('_Form', $formFields);
 
@@ -188,7 +223,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         }
 
         // Create the URL to display to the forum connect endpoint.
-        $connectURL = url('/entry/connect/'.PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true);
+        $connectURL = url('/entry/connect/'.self::PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true);
         $sender->setData('ConnectURL', $connectURL);
 
         // For auto generating a secret for the client.
@@ -200,6 +235,24 @@ class JWTSSOPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Custom validation for required array fields
+     *
+     * @param Gdn_Form $form
+     */
+    private function validateKeyMap($form) {
+        if (!valr('UniqueID', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a UniqueID key.'));
+        }
+
+        if (!valr('Email', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a Email key.'));
+        }
+
+        if (!valr('Name', $form->getValue('KeyMap'), false)) {
+            $form->addError(t('You must provide a Name key.'));
+        }
+    }
 
     /**
      * Generate a JSON Web Token signed with the client's secret
@@ -221,7 +274,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'iss' => $baseUrl,
             'sub' => c('JWTSSO.TestToken.ForeignKey', '12345'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
+            'email' => c('JWTSSO.TestToken.Email', $this->session->User->Email),
             'displayname' => c('JWTSSO.TestToken.Name'),
             'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
@@ -235,7 +288,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Inject Javascript file into dashboard to a allow adding auto-generated secret and clientID;
      *
-     * @param $sender SettingsController
+     * @param SettingsController $sender
      */
     public function settingsController_render_before($sender) {
         $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso');
@@ -248,9 +301,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Inject into the process of the base connection.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
-     * @throws Gdn_UserException.
+     * @param Gdn_Controller $sender
+     * @param Gdn_Controller $args
+     * @throws Gdn_UserException Configuration issues.
      */
     public function base_connectData_handler($sender, $args) {
         $authenticationKey = $sender->Request->get('authKey');
@@ -259,7 +312,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
         }
 
-        if (val(0, $args) != PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
+        if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
             $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
             throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
         }
@@ -406,9 +459,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
 
     /**
-     * Parse out the segements of the JWT, assign the values as properties of this object.
+     * Parse out the segments of the JWT, assign the values as properties of this object.
      *
-     * @param $token
+     * @param string $token
      */
     public function extractToken($token) {
         $this->jwtRawToken = $token;
@@ -434,7 +487,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Special encoding function strings for JWT
      *
-     * @param $data
+     * @param string $data
      * @return mixed
      */
     protected function base64url_encode($data) {
@@ -445,7 +498,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Special encoding function strings for JWT
      *
-     * @param $data
+     * @param string $data
      * @return mixed
      */
     protected function base64url_decode($data) {
@@ -456,9 +509,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Sign the raw JSON Header and Payload from the token for comparison purposes.
      *
-     * @param $rawJWTHeader JSON string
-     * @param $rawJWTPayload JSON string
-     * @param $secret the AssociationSecret shared with the client.
+     * @param string $rawJWTHeader JSON
+     * @param string $rawJWTPayload JSON
+     * @param string $secret the AssociationSecret shared with the client
+     * @param string $alg
      * @return string JSON Web Token
      */
     public function signJWT($rawJWTHeader, $rawJWTPayload, $secret, $alg) {
@@ -482,7 +536,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Return the data from the token payload in an array
      *
-     * @param $payload
+     * @param string $payload
      * @return bool
      */
     protected function setJWTPayload($payload) {
@@ -496,7 +550,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Set the data from the token header in an array
      *
-     * @param $head
+     * @param string $head
      * @return bool
      */
     protected function setJWTHeader($head) {
@@ -624,7 +678,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     public function getProviderKey() {
         if (!$this->providerKey) {
             $this->provider();
-            $this->setProviderKey(val('AuthenticationKey', $this->provider, DEFAULT_PROVIDER_KEY));
+            $this->setProviderKey(val('AuthenticationKey', $this->provider, self::DEFAULT_PROVIDER_KEY));
         }
         return $this->providerKey;
     }
@@ -633,13 +687,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      *  Return all the information saved in provider table.
      *
-     * @return array Stored provider data (secret, client_id, etc.).
+     * @return array stored provider data (secret, client_id, etc.).
      */
     protected function provider() {
         if (!$this->provider && $this->providerKey) {
-            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+            $this->provider = $this->authenticationProviderModel->getProviderByKey($this->providerKey);
         } else {
-            $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme(PROVIDER_SCHEME_ALIAS);
+            $this->provider = $this->authenticationProviderModel->getProviderByScheme(self::PROVIDER_SCHEME_ALIAS);
         }
         return $this->provider;
     }
@@ -655,12 +709,24 @@ class JWTSSOPlugin extends Gdn_Plugin {
         return val('IsDefault', $provider);
     }
 
+    /**
+     * Check authentication provider table to see if it should allow API authentication.
+     *
+     * @return bool Return the value of the allowApiAuth row of GDN_UserAuthenticationProvider .
+     */
+    protected function allowApiAuth(): bool {
+        $provider = $this->provider();
+        $allowAPIAuth = $provider["AllowAPIAuth"] ?? false;
+
+        return (bool)$allowAPIAuth;
+    }
+
 
     /**
      * Convenience method for updating the log.
      *
-     * @param $message
-     * @param $data
+     * @param string $message
+     * @param array $data
      */
     public function log($message, $data) {
         if (!is_array($data)) {
