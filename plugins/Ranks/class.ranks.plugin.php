@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatService;
 
 class RanksPlugin extends Gdn_Plugin {
 
@@ -29,15 +30,19 @@ class RanksPlugin extends Gdn_Plugin {
     /** @var string  */
     public $LinksNotAllowedMessage = 'You have to be around for a little while longer before you can post links.';
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
      * RanksPlugin constructor.
      *
      * @param RankModel $rankModel
      * @param UserModel $userModel
      */
-    public function __construct(RankModel $rankModel, UserModel $userModel) {
+    public function __construct(RankModel $rankModel, UserModel $userModel, FormatService $formatService) {
         $this->rankModel = $rankModel;
         $this->userModel = $userModel;
+        $this->formatService = $formatService;
         parent::__construct();
     }
 
@@ -184,9 +189,17 @@ class RanksPlugin extends Gdn_Plugin {
       * @param string $fieldName The field name in the form to check for links.
       */
      public function checkForLinks($sender, $formValues, $fieldName) {
-          if (preg_match('`https?://`i', $formValues[$fieldName])) {
-                $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
-          }
+         $content = $formValues[$fieldName] ?? "";
+         $format = $formValues["Format"] ?? "";
+         $body = $this->formatService->renderHTML($content, $format);
+
+         // Do not allow any anchors. This could include links to attachments in some formats, like rich.
+         $dom = new DOMDocument();
+         $dom->loadHTML($body);
+         $anchors = $dom->getElementsByTagName("a");
+         if ($anchors->count() > 0) {
+            $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
+         }
      }
 
      /**
