@@ -218,28 +218,6 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Get records associated with a global search result.
-     *
-     * @param array $ids An array of article IDs to get.
-     * @return array Returns an article dataset with massaged fields for advanced search.
-     */
-    public function getSearchRecords(array $ids): array {
-        $articles = $this->getWithRevision(['a.articleID' => $ids]);
-
-        foreach ($articles as &$row) {
-            $row['PrimaryID'] = $row['articleID'];
-            $row['RecordType'] = $row['Type'] = 'Article';
-            $row['DateInserted'] = date_format($row['dateUpdated'], \DateTime::ISO8601);
-            $row['Title'] = $row['name'];
-            $row['Summary'] = $row['excerpt'];
-            $row['Url'] = static::url($row, true);
-            $row['UserID'] = $row['insertUserID'];
-        }
-
-        return $articles;
-    }
-
-    /**
      * Get articles with a published revision in a particular category.
      *
      * @param int $knowledgeCategoryID
