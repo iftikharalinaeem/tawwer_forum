@@ -193,6 +193,7 @@ class RanksPlugin extends Gdn_Plugin {
          $format = $formValues["Format"] ?? "";
          $body = $this->formatService->renderHTML($content, $format);
 
+         // Do not allow any anchors. This could include links to attachments in some formats, like rich.
          $dom = new DOMDocument();
          $dom->loadHTML($body);
          $anchors = $dom->getElementsByTagName("a");
