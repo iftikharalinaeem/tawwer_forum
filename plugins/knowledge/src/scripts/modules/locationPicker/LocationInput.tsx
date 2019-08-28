@@ -24,8 +24,8 @@ import AccessibleError from "@library/forms/AccessibleError";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
-import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
+import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
 
 /**
  * This component allows to display and edit the location of the current page.
