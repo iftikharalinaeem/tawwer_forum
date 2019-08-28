@@ -28,7 +28,6 @@ class ProductApiController extends AbstractApiController {
     public function __construct(productModel $productModel) {
         $this->productModel = $productModel;
         $this->productFeatureEnabled = false;
-
     }
 
     /**
@@ -40,10 +39,10 @@ class ProductApiController extends AbstractApiController {
     public function productSchema(string $type = ""): Schema {
         if ($this->productSchema === null) {
             $this->productSchema = $this->schema(Schema::parse([
-                "productID?",
+                "productID",
                 "name",
                 "body",
-                "dateInserted?",
+                "dateInserted",
                 "dateUpdated?"
             ])->add($this->fullSchema()), "Product");
         }
@@ -67,7 +66,7 @@ class ProductApiController extends AbstractApiController {
                 "allowNull" => true,
                 "description" => "description of the product",
             ],
-            "dateInserted:dt?" => "When the product was created.",
+            "dateInserted:dt" => "When the product was created.",
             "dateUpdated:dt?" => "When the product was updated.",
         ]);
     }
@@ -208,7 +207,7 @@ class ProductApiController extends AbstractApiController {
      * 
      * @return array
      */
-    public function put_enableProductFeature() {
+    public function put_setProductFeatureFlag() {
         $this->permission("Garden.Moderation.Manage");
 
         $config = "Feature." . productModel::FEATURE_FLAG . ".Enabled";
@@ -221,7 +220,7 @@ class ProductApiController extends AbstractApiController {
             $this->productFeatureEnabled = false;
         }
 
-        $enabled["Status"] = ($this->productFeatureEnabled) ? productModel::ENABLED : productModel::DISABLED;
+        $enabled["status"] = ($this->productFeatureEnabled) ? productModel::ENABLED : productModel::DISABLED;
 
         return $enabled;
     }
