@@ -3,8 +3,6 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-
-import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 import LocationPicker from "@knowledge/modules/locationPicker/LocationPicker";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
@@ -26,7 +24,7 @@ import AccessibleError from "@library/forms/AccessibleError";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
-import { locationPickerClasses } from "./locationPickerStyles";
+import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
 
 /**
  * This component allows to display and edit the location of the current page.
