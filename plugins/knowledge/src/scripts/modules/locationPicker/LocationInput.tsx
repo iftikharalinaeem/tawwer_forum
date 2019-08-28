@@ -25,6 +25,7 @@ import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { CategoryIcon, PlusCircleIcon } from "@library/icons/common";
 import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
+import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 
 /**
  * This component allows to display and edit the location of the current page.
