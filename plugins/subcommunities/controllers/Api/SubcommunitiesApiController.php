@@ -1,16 +1,9 @@
 <?php
-/**
- * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license Proprietary
- */
+
 
 use Garden\Schema\Schema;
-use Garden\Web\Exception\NotFoundException;
-use Vanilla\ApiUtils;
 
-
-class subcommunityApiController extends AbstractApiController {
+class SubcommunitiesApiController extends AbstractApiController {
    
     /** @var Schema */
     private $subcommunitySchema;
@@ -33,10 +26,10 @@ class subcommunityApiController extends AbstractApiController {
     public function subcommunitySchema(string $type = ""): Schema {
         if ($this->subcommunitySchema === null) {
             $this->subcommunitySchema = $this->schema(Schema::parse([
-                "SubcommunityID?",
+                "SubcommunityID",
                 "Name",
                 "Folder",
-                "CategoryID?",
+                "CategoryID",
                 "Locale",
                 "productID?"
             ])->add($this->fullSchema()), "Product");
@@ -50,38 +43,39 @@ class subcommunityApiController extends AbstractApiController {
     private function fullSchema(): Schema {
         return Schema::parse([
             "SubcommunityID:i" => "Unique Subcommunity ID.",
-            "Name:s" =>  "Name of the Subcommunity.",
-            "Folder:s" => "Subcomunity folder",
-            "CategoryID:i" => [
+            "Name:s?" =>  "Name of the Subcommunity.",
+            "Folder:s?" => "Subcomunity folder",
+            "CategoryID:i?" => [
                 "allowNull" => true,
                 "description" => "Category ID associated with the subcommunity",
             ],
-            "Locale:s" => "Locale associated with the subcommunity",
-            "DateInserted:dt" => "",
-            "InsertUserID:s" => "",
-            "DateUpdated:dt" => [
+            "Locale:s?" => "Locale associated with the subcommunity",
+            "DateInserted:dt?" => "",
+            "InsertUserID:s?" => "",
+            "DateUpdated:dt?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "UpdateUserID:i" => [
+            "UpdateUserID:i?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "Attributes:s" => [
+            "Attributes:s?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "Sort:i" => "",
-            "IsDefault:i" => [
+            "Sort:i?" => "",
+            "IsDefault:i?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "productID:i" => [
+            "productID:i?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
         ]);
     }
+
     /**
      * @param string $type
      * @return Schema
@@ -95,13 +89,35 @@ class subcommunityApiController extends AbstractApiController {
         return $this->schema($this->idParamSchema, $type);
     }
 
+    /**
+     * @return array
+     */
     public function index() {
-        //this->permission("Garden.SignIn.Allow");
+        $this->permission("Garden.SignIn.Allow");
         $out = $this->schema([
             ":a" => $this->fullSchema(),
         ], "out");
-        $subcommunities = $this->subcommunityModel->get();
+
+        $subcommunities = $this->subcommunityModel->get()->datasetType(DATASET_TYPE_ARRAY);
+
         $subcommunities = $out->validate($subcommunities);
         return $subcommunities;
     }
+
+    /**
+     * @param int $id
+     * @return array
+     */
+
+    public function get(int $id): array {
+        $this->permission("Garden.SignIn.Allow");
+        $this->idParamSchema()->setDescription("Get a Subcommunity ID");
+        $id = $id ?? null;
+        $subcommunity = $this->subcommunityModel->getID($id);
+        $out = $this->subcommunitySchema("out");
+        $result = $out->validate($subcommunity);
+
+        return $result;
+    }
+
 }
