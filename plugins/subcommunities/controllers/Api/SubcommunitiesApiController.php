@@ -1,7 +1,11 @@
 <?php
 
+namespace Vanilla\Subcommunities\Controllers\API;
+
 
 use Garden\Schema\Schema;
+use AbstractApiController;
+use SubcommunityModel;
 
 class SubcommunitiesApiController extends AbstractApiController {
    
