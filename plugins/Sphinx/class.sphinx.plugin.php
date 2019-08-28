@@ -4,13 +4,8 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Sphinx;
-
-use CategoryModel;
-use DiscussionModel;
 use Garden\Container\Container;
 use Garden\Schema\Schema;
-use Gdn_Session;
 use Interop\Container\ContainerInterface;
 
 /**
@@ -19,7 +14,7 @@ use Interop\Container\ContainerInterface;
  * @author Todd Burry <todd@vanillaforums.com>
  * @package internal
  */
-class plugin extends \Gdn_Plugin {
+class SphinxPlugin extends Gdn_Plugin {
 
     /** The highest value for "limit" in the default, generic schema. */
     const MAX_SCHEMA_LIMIT = 100;
@@ -67,7 +62,7 @@ class plugin extends \Gdn_Plugin {
     public function container_init(Container $dic) {
         $dic->rule(\SearchModel::class)
             ->setShared(true)
-            ->setAliasOf(SphinxSearchModel::class)
+            ->setClass(\SphinxSearchModel::class)
         ;
     }
 
@@ -116,7 +111,7 @@ class plugin extends \Gdn_Plugin {
      *
      */
     public function structure() {
-        \Gdn::structure()
+        Gdn::structure()
             ->table('SphinxCounter')
             ->column('CounterID', 'uint', false, 'primary')
             ->column('MaxID', 'uint', '0')
@@ -276,8 +271,8 @@ class plugin extends \Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
 
         // Load up config options we'll be setting
-        $validation = new \Gdn_Validation();
-        $configurationModel = new \Gdn_ConfigurationModel($validation);
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
             'Plugins.Sphinx.Server'     => 'auto',
             'Plugins.Sphinx.Port'       => 9312,
@@ -285,7 +280,7 @@ class plugin extends \Gdn_Plugin {
         ]);
 
         // Set the model on the form.
-        $sender->Form = new \Gdn_Form();
+        $sender->Form = new Gdn_Form();
         $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...

@@ -4,13 +4,6 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Sphinx;
-
-use Gdn;
-use Search;
-use SphinxClient;
-use Vanilla\Addon;
-
 if (!defined('SPH_RANK_SPH04')) {
     define('SPH_RANK_SPH04', 7);
 }
@@ -25,10 +18,6 @@ class SphinxSearchModel extends \SearchModel {
 
     /// PROPERTIES ///
 
-    /**
-     * @var array
-     * @deprecated
-     */
     public $types = [];
     public $typeInfo = [];
     public $dataPath = '/var/data/searchd';
@@ -39,37 +28,20 @@ class SphinxSearchModel extends \SearchModel {
     public static $maxResults = 1000;
     public static $ranker = [];
     public static $rankingMode = SPH_RANK_SPH04; //SPH_RANK_PROXIMITY_BM25;
-
-    /**
-     * @var array
-     * @deprecated
-     */
     public static $typeMap = [
         'd' => 0,
         'c' => 100,
         'question' => 1,
         'poll' => 2,
         'answer' => 101,
-        'group' => 400,
-        'article' => 500,
+        'group' => 400
     ];
-
-    /**
-     * @var SearchType[]
-     */
-    private $searchTypes = [];
-
-    /**
-     * @var array
-     */
-    private $documentTypes = [];
 
     protected $_fp = null;
 
     /**
      * Sphinx Client Object
-     *
-     * @var \SphinxClient
+     * @var SphinxClient
      */
     protected $_sphinxClient = null;
 
@@ -84,86 +56,23 @@ class SphinxSearchModel extends \SearchModel {
         require_once PATH_PLUGINS . '/AdvancedSearch/class.search.php';
 
         $this->useDeltas = c('Plugins.Sphinx.UseDeltas');
-        $addonManager = Gdn::addonManager();
 
-        if ($addonManager->isEnabled('vanilla', Addon::TYPE_ADDON)) {
-            $this->addDocumentType(1, [$this, 'getDiscussions']);
-            $this->addDocumentType(2, [$this, 'getComments']);
+        if (array_key_exists("Vanilla", Gdn::applicationManager()->enabledApplications())) {
+            $this->types[1] = 'Discussion';
+            $this->addTypeInfo('Discussion', [$this, 'getDiscussions'], [$this, 'indexDiscussions']);
 
-            $discussion = new SearchType();
-            $discussion
-                ->setApiValue('discussion')
-                ->setOldAPIField('discussion_d')
-                ->setIndexes('Discussion')
-                ->setAttributeValue(0)
-                ->setLabelCode('discussions');
-            $this->addSearchType($discussion);
-
-            $comment = new SearchType();
-            $comment
-                ->setApiValue('comment')
-                ->setOldAPIField('comment_c')
-                ->setIndexes('Comment')
-                ->setAttributeValue(100)
-                ->setLabelCode('comments');
-            $this->addSearchType($comment);
-
-            if ($addonManager->isEnabled('qna', Addon::TYPE_ADDON)) {
-                $question = new SearchType();
-                $question
-                    ->setApiValue('question')
-                    ->setOldAPIField('discussion_question')
-                    ->setIndexes('Discussion')
-                    ->setAttributeValue(1)
-                    ->setLabelCode('questions');
-                $this->addSearchType($question);
-
-                $answer = new SearchType();
-                $answer
-                    ->setApiValue('answer')
-                    ->setOldAPIField('comment_answer')
-                    ->setIndexes('Comment')
-                    ->setAttributeValue(101)
-                    ->setLabelCode('answers');
-                $this->addSearchType($answer);
-            }
-
-            if ($addonManager->isEnabled('polls', Addon::TYPE_ADDON)) {
-                $poll = new SearchType();
-                $poll
-                    ->setApiValue('poll')
-                    ->setOldAPIField('discussion_poll')
-                    ->setIndexes('Discussion')
-                    ->setAttributeValue(2)
-                    ->setLabelCode('polls');
-                $this->addSearchType($poll);
-            }
+            $this->types[2] = 'Comment';
+            $this->addTypeInfo('Comment', [$this, 'getComments'], [$this, 'indexComments']);
         }
 
-        if ($addonManager->isEnabled('pages', Addon::TYPE_ADDON)) {
-            $this->addDocumentType(3, [$this, 'getPages']);
-
-            $page = new SearchType();
-            $page
-                ->setApiValue('page')
-                ->setOldAPIField('page_p')
-                ->setIndexes('Page')
-                ->setAttributeValue(300)
-                ->setLabelCode('docs');
-            $this->addSearchType($page);
+        if (array_key_exists("Pages", Gdn::applicationManager()->enabledApplications())) {
+            $this->types[3] = 'Page';
+            $this->addTypeInfo('Page', [$this, 'getPages'], [$this, 'indexPages']);
         }
 
         if (static::searchGroups()) {
-            $this->addDocumentType(4, [$this, 'getGroups']);
-
-            $group = new SearchType();
-            $group
-                ->setApiValue('group')
-                ->setOldAPIField('group_group')
-                ->setIndexes('Group')
-                ->setAttributeValue(400)
-                ->setLabelCode('groups');
-            $this->addSearchType($group);
+            $this->types[4] = 'Group';
+            $this->addTypeInfo('Group', [$this, 'getGroups']);
         }
 
         self::$ranker['score'] = [
@@ -202,61 +111,6 @@ class SphinxSearchModel extends \SearchModel {
         return $i + 1;
     }
 
-    /**
-     * Fix a querystring that may have old search types defined.
-     *
-     * @param array $query A querystring.
-     * @return array Returns the new array of types being searched.
-     */
-    public function fixOldSearchTypes(array $query): array {
-        $types = $query['types'] ?? [];
-        $result = [];
-
-        foreach ($this->searchTypes as $type) {
-            /* @var SearchType $type */
-            if (in_array($type->getApiValue(), $types, true) ||
-                (!empty($type->getOldAPIField()) && !empty($query[$type->getOldAPIField()]))) {
-
-                $result[] = $type->getApiValue();
-            }
-        }
-
-        $result = array_unique($result);
-        return $result;
-    }
-
-    /**
-     * Add a new search type.
-     *
-     * @param SearchType $type
-     * @return $this
-     */
-    public function addSearchType(SearchType $type) {
-        $this->searchTypes[$type->getApiValue()] = $type;
-        return $this;
-    }
-
-    /**
-     * Add a document type.
-     *
-     * You must add a document type in order to join records from the sphinx search result to the database.
-     *
-     * @param int $number A number from 0-9 used to define the document type. Look for this in the sphinx template under the `id` attribute.
-     * @param callable $get A callback that gets the records from an array of IDs. The function must take the form: `function(int[] $ids): array`.
-     * @return $this
-     */
-    public function addDocumentType(int $number, callable $get) {
-        $this->documentTypes[$number] = ['number' => $number, 'get' => $get];
-
-        return $this;
-    }
-
-    /**
-     * @param $type
-     * @param $getCallback
-     * @param null $indexCallback
-     * @deprecated Use `addSearchType()` and `addDocumentType()` instead.
-     */
     public function addTypeInfo($type, $getCallback, $indexCallback = null) {
         if (!is_numeric($type)) {
             $type = array_search($type, $this->types);
@@ -275,13 +129,13 @@ class SphinxSearchModel extends \SearchModel {
 
         $this->fireEvent("GetComments");
 
-        $sql = \Gdn::sql()
+        $sql = Gdn::sql()
             ->select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, c.Body as Summary, c.Format, d.CategoryID')
             ->select('"RE: ", d.Name', 'concat', 'Title')
             ->select('c.DateInserted, c.Score, d.Type')
             ->select('c.InsertUserID as UserID');
 
-        if (\Gdn::applicationManager()->checkApplication('Groups')) {
+        if (Gdn::applicationManager()->checkApplication('Groups')) {
             $sql->select('d.GroupID');
         }
 
@@ -301,10 +155,10 @@ class SphinxSearchModel extends \SearchModel {
     /**
      * Get discussions by ID list
      *
-     * @param array $ids
+     * @param array $iDs
      * @return array
      */
-    public function getDiscussions($ids) {
+    public function getDiscussions($iDs) {
 
         $this->fireEvent("GetDiscussions");
 
@@ -318,7 +172,7 @@ class SphinxSearchModel extends \SearchModel {
         }
 
         $result = $sql->from('Discussion d')
-            ->whereIn('d.DiscussionID', $ids)
+            ->whereIn('d.DiscussionID', $iDs)
             ->get()->resultArray();
 
         foreach ($result as &$row) {
@@ -406,30 +260,30 @@ class SphinxSearchModel extends \SearchModel {
         $result = [];
 
         // Loop through the matches to figure out which IDs we have to grab.
-        $ids = [];
+        $iDs = [];
         if (!is_array($search) || !isset($search['matches'])) {
             return [];
         }
 
         foreach ($search['matches'] as $documentID => $info) {
-            $id = (int) ($documentID / 10);
+            $iD = (int) ($documentID / 10);
             $type = $documentID % 10;
 
-            $ids[$type][] = $id;
+            $iDs[$type][] = $iD;
         }
 
         // Grab all of the documents.
         $documents = [];
-        foreach ($ids as $type => $idIn) {
-            if (!isset($this->documentTypes[$type])) {
+        foreach ($iDs as $type => $iDin) {
+            if (!isset($this->typeInfo[$type])) {
                 continue;
             }
-            $docs = call_user_func($this->documentTypes[$type]['get'], $idIn);
+            $docs = call_user_func($this->typeInfo[$type]['GetCallback'], $iDin);
 
             // Index the document according to the type again.
             foreach ($docs as $row) {
-                $id = $row['PrimaryID'] * 10 + $type;
-                $documents[$id] = $row;
+                $iD = $row['PrimaryID'] * 10 + $type;
+                $documents[$iD] = $row;
             }
         }
 
@@ -467,7 +321,7 @@ class SphinxSearchModel extends \SearchModel {
 
         $doSearch = $search['dosearch'];
         $filtered = false;
-        $indexes = $this->getIndexes(null);
+        $indexes = $this->indexes();
         $query = '';
         $terms = [];
 
@@ -512,7 +366,7 @@ class SphinxSearchModel extends \SearchModel {
         }
 
         if (isset($search['title'])) {
-            $indexes = $this->getIndexes(['Discussion']);
+            $indexes = $this->indexes('Discussion');
             list($titleQuery, $titleTerms) = $this->splitTags($search['title']);
             $query .= ' @name ' . $titleQuery;
             $terms = array_merge($terms, $titleTerms);
@@ -539,20 +393,20 @@ class SphinxSearchModel extends \SearchModel {
             $indexes = [];
             $values = [];
 
-            foreach ($search['types'] as $typeName) {
-                $type = $this->searchTypes[$typeName] ?? null;
+            foreach ($search['types'] as $table => $types) {
+                $indexes[] = ucfirst($table);
 
-                if (isset($type)) {
-                    $indexes = array_merge($indexes, $type->getIndexes());
-                    $values[] = $type->getAttributeValue();
+                foreach ($types as $t) {
+                    $v = val($t, self::$typeMap);
+                    if ($v !== false) {
+                        $values[] = $v;
+                    }
                 }
             }
-            $indexes = array_unique($indexes);
-            $values = array_unique($values);
 
             trace($values, "dtype");
             $sphinx->setFilter('dtype', $values);
-            $indexes = $this->getIndexes($indexes);
+            $indexes = $this->indexes($indexes);
         }
 
         if (isset($search['discussionid'])) {
@@ -593,7 +447,7 @@ class SphinxSearchModel extends \SearchModel {
     public function autoComplete($search, $limit = 10) {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, $limit, 100);
-        $indexes = $this->getIndexes(['Discussion']);
+        $indexes = $this->indexes('Discussion');
 
         $search = Search::cleanSearch($search);
 
@@ -604,7 +458,7 @@ class SphinxSearchModel extends \SearchModel {
             $sphinx->setFilter('CategoryID', (array) $search['cat']);
         }
         if (isset($search['discussionid'])) {
-            $indexes = $this->getIndexes(['Discussion', 'Comment']);
+            $indexes = $this->indexes(['Discussion', 'Comment']);
             $sphinx->setFilter('DiscussionID', (array) $search['discussionid']);
         }
         if (isset($search['tags'])) {
@@ -634,7 +488,7 @@ class SphinxSearchModel extends \SearchModel {
     public function groupAutoComplete($search, $limit = 10) {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, $limit, 100);
-        $indexes = $this->getIndexes(['Group']);
+        $indexes = $this->indexes('Group');
 
         $search = Search::cleanSearch($search);
 
@@ -651,7 +505,7 @@ class SphinxSearchModel extends \SearchModel {
     protected function doSearch($sphinx, $query, $indexes) {
         $this->EventArguments['SphinxClient'] = $sphinx;
         $this->fireEvent('BeforeSphinxSearch');
-        trace($query, 'query');
+        trace($query, 'Query');
         trace($indexes, 'indexes');
 
         $search = $sphinx->query($query, implode(' ', $indexes));
@@ -727,46 +581,26 @@ class SphinxSearchModel extends \SearchModel {
         return $result;
     }
 
-    /**
-     * @deprecated
-     */
     public function indexes($type = null) {
+        $indexes = $this->types;
+
         if (!empty($type)) {
-            $indexes = $this->getIndexes((array)$type);
-        } else {
-            $indexes = $this->getIndexes(null);
+            $indexes = array_intersect($this->types, (array) $type);
         }
 
+
+        $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
+        foreach ($indexes as &$name) {
+            $name = $prefix . $name;
+        }
+        unset($name);
+
+        if ($this->useDeltas) {
+            foreach ($indexes as $name) {
+                $indexes[] = $name . '_Delta';
+            }
+        }
         return $indexes;
-    }
-
-    /**
-     * Get the real names of indexes that Sphinx actually uses from a list of logical names.
-     *
-     * @param string[]|null $indexes The list of logical indexes or **null** for all indexes.
-     * @return string[] Returns a list of real indexes.
-     */
-    private function getIndexes(?array $indexes): array {
-        if ($indexes === null) {
-            $indexes = [];
-            foreach ($this->searchTypes as $type) {
-                $indexes = array_merge($indexes, $type->getIndexes());
-            }
-            $indexes = array_unique($indexes);
-        }
-
-        $result = [];
-
-        $px = str_replace(['-'], '_', c('Database.Name')) . '_';
-        foreach ($indexes as $index) {
-            $name = $px.$index;
-            $result[] = $name;
-            if ($this->useDeltas) {
-                $result[] = $name.'_Delta';
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -1085,15 +919,6 @@ class SphinxSearchModel extends \SearchModel {
 
 //      return array($search, array_unique($terms));
         return [trim($finalquery), array_unique($terms)];
-    }
-
-    /**
-     * Get the defined search types.
-     *
-     * @return SearchType[] Returns an array of defined search types.
-     */
-    public function getSearchTypes(): array {
-        return $this->searchTypes;
     }
 
 }
