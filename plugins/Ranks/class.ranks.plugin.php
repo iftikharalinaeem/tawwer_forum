@@ -191,22 +191,14 @@ class RanksPlugin extends Gdn_Plugin {
      public function checkForLinks($sender, $formValues, $fieldName) {
          $content = $formValues[$fieldName] ?? "";
          $format = $formValues["Format"] ?? "";
-         $body = $this->formatService->renderPlainText($content, $format);
+         $body = $this->formatService->renderHTML($content, $format);
 
-         // Allow links to upload hosts, so we can avoid flagging attachments.
-         $uploadHosts = [];
-         foreach (array_values(Gdn_Upload::urls()) as $uploadPath) {
-            $uploadHosts[] = preg_quote(parse_url($uploadPath, PHP_URL_HOST), "`");
+         $dom = new DOMDocument();
+         $dom->loadHTML($body);
+         $anchors = $dom->getElementsByTagName("a");
+         if ($anchors->count() > 0) {
+            $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
          }
-         $uploadHosts = array_unique($uploadHosts);
-
-         $linkPattern = "https?://?";
-         if (!empty($uploadHosts)) {
-             $linkPattern .= "(?!/|".implode("|", $uploadHosts).")";
-         }
-         if (preg_match("`{$linkPattern}`i", $body)) {
-                $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
-          }
      }
 
      /**
