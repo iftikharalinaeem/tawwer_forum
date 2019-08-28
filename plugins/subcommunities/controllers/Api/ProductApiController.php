@@ -1,6 +1,9 @@
 <?php
+namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
+use AbstractApiController;
+use productModel;
 use Vanilla\FeatureFlagHelper;
 
 class ProductApiController extends AbstractApiController {
@@ -14,6 +17,9 @@ class ProductApiController extends AbstractApiController {
     /** @var productModel */
     private $productModel;
 
+    /** @var boolean */
+    private $productFeatureEnabled;
+
     /**
      * productApiController constructor.
      *
@@ -21,10 +27,12 @@ class ProductApiController extends AbstractApiController {
      */
     public function __construct(productModel $productModel) {
         $this->productModel = $productModel;
-        FeatureFlagHelper::ensureFeature(productModel::FEATURE_FLAG);
+        $this->productFeatureEnabled = false;
+
     }
 
     /**
+     * Simplified product schema.
      *
      * @param string $type
      * @return Schema
@@ -39,10 +47,12 @@ class ProductApiController extends AbstractApiController {
                 "dateUpdated?"
             ])->add($this->fullSchema()), "Product");
         }
+
         return $this->schema($this->productSchema, $type);
     }
 
     /**
+     * Full product schema.
      *
      * @return Schema
      */
@@ -63,22 +73,28 @@ class ProductApiController extends AbstractApiController {
     }
 
     /**
+     * Get an ID-only schema for products
+     *
      * @param string $type
      * @return Schema
      */
     private function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema =  Schema::parse([
+            $this->idParamSchema = Schema::parse([
                 "id:i" => "The article ID."
             ]);
         }
+
         return $this->schema($this->idParamSchema, $type);
     }
 
     /**
+     * Get all products.
+     *
      * @return array|mixed
      */
-    public function index() {
+    public function index(): array {
+        $this->getProductFeatureStatus();
         $this->permission("'Garden.SignIn.Allow'");
         $out = $this->schema([
             ":a" => $this->fullSchema(),
@@ -92,10 +108,13 @@ class ProductApiController extends AbstractApiController {
     }
 
     /**
+     * Get a product by it's ID.
+     *
      * @param int $id
      * @return array
      */
     public function get(int $id): array {
+        $this->getProductFeatureStatus();
         $this->permission("Garden.SignIn.Allow");
         $this->idParamSchema()->setDescription("Get an product id.");
 
@@ -110,10 +129,13 @@ class ProductApiController extends AbstractApiController {
     }
 
     /**
+     * Create a new product.
+     *
      * @param array $body
      * @return array|mixed
      */
-    public function post(array $body) {
+    public function post(array $body): array {
+        $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
@@ -126,8 +148,8 @@ class ProductApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $productID = $this->productModel->insert($body);
-        $product = $this->productModel->selectSingle(["productID" => $productID]);
 
+        $product = $this->productModel->selectSingle(["productID" => $productID]);
         $out = $this->productSchema("out");
         $product = $out->validate($product);
 
@@ -135,12 +157,14 @@ class ProductApiController extends AbstractApiController {
     }
 
     /**
+     * Update an existing product.
+     *
      * @param int $id
      * @param array $body
      * @return array
      */
-
     public function patch(int $id, array $body = []): array {
+        $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
@@ -164,9 +188,12 @@ class ProductApiController extends AbstractApiController {
     }
 
     /**
+     * Delete a specified product.
+     *
      * @param int $id
      */
     public function delete(int $id) {
+        $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
         $product = $this->productModel->selectSingle(["productID" => $id]);
@@ -176,4 +203,35 @@ class ProductApiController extends AbstractApiController {
         }
     }
 
+    /**
+     * Enable/Disable the Product Feature.
+     * 
+     * @return array
+     */
+    public function put_enableProductFeature() {
+        $this->permission("Garden.Moderation.Manage");
+
+        $config = "Feature." . productModel::FEATURE_FLAG . ".Enabled";
+
+        if (!FeatureFlagHelper::featureEnabled(productModel::FEATURE_FLAG)) {
+            saveToConfig($config, true);
+            $this->productFeatureEnabled = true;
+        } else {
+            saveToConfig($config, false);
+            $this->productFeatureEnabled = false;
+        }
+
+        $enabled["Status"] = ($this->productFeatureEnabled) ? productModel::ENABLED : productModel::DISABLED;
+
+        return $enabled;
+    }
+
+    /**
+     * Check if the product feature is enabled.
+     */
+    private function getProductFeatureStatus() {
+        if (!$this->productFeatureEnabled) {
+            FeatureFlagHelper::ensureFeature(productModel::FEATURE_FLAG);
+        }
+    }
 }
