@@ -20,22 +20,9 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $Results = false; // whether or not to show results in the form.
 
-    /**
-     * @var array A mapping of type values to label codes.
-     */
     public $Types = [];
 
     public $value = null;
-
-    /**
-     * @var \Vanilla\Sphinx\SphinxSearchModel
-     */
-    private $searchModel;
-
-    /**
-     * @var bool Whether or not to include the types filter on the output.
-     */
-    public $IncludeTypes = false;
 
     public function __construct($sender = '', $applicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/AdvancedSearch';
@@ -51,13 +38,12 @@ class AdvancedSearchModule extends Gdn_Module {
             '1 year' => plural(1, '%s year', '%s years')
         ];
 
-        if (class_exists(\Vanilla\Sphinx\SphinxSearchModel::class)) {
-            $this->searchModel = Gdn::getContainer()->get(\Vanilla\Sphinx\SphinxSearchModel::class);
-
-            foreach ($this->searchModel->getSearchTypes() as $type) {
-                $this->Types[$type->getApiValue()] = $type->getLabelCode();
+        // Set the initial types.
+        foreach (AdvancedSearchPlugin::$Types as $table => $types) {
+            foreach ($types as $type => $label) {
+                $value = $table.'_'.$type;
+                $this->Types[$value] = $label;
             }
-            $this->IncludeTypes = true;
         }
     }
 
@@ -84,7 +70,7 @@ class AdvancedSearchModule extends Gdn_Module {
             $form->formValues($get);
         } else {
             if ($this->value !== null && !isset($get['search'])) {
-                $form->setFormValue('search', $this->value);
+                $form->setFormValue('search', $value);
             }
         }
 
@@ -98,14 +84,17 @@ class AdvancedSearchModule extends Gdn_Module {
             }
         }
 
-        if ($this->IncludeTypes) {
-            // See whether or not to check all of the  types.
-            $types = $this->searchModel->fixOldSearchTypes($form->formValues());
-            if (empty($types)) {
-                // If nothing is checked then we count this as everything checked.
-                $form->setFormValue('types', array_keys($this->Types));
-            } else {
-                $form->setFormValue('types', $types);
+        // See whether or not to check all of the  types.
+        $onechecked = false;
+        foreach ($this->Types as $name => $label) {
+            if ($form->getFormValue($name)) {
+                $onechecked = true;
+                break;
+            }
+        }
+        if (!$onechecked) {
+            foreach ($this->Types as $name => $label) {
+                $form->setFormValue($name, true);
             }
         }
 
