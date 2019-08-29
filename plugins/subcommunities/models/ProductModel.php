@@ -3,6 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
+namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Database\Operation;
 

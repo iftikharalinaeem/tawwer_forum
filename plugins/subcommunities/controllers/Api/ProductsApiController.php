@@ -8,7 +8,7 @@ namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
 use AbstractApiController;
-use ProductModel;
+use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
 
 /**

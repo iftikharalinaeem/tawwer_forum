@@ -6,7 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
-use ProductModel;
+use Vanilla\Subcommunities\Models\ProductModel;
 
 /**
  * Test the /api/v2/product endpoint.
