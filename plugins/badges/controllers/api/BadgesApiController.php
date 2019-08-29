@@ -148,7 +148,7 @@ class BadgesApiController extends AbstractApiController {
                 'enabled:b' => 'Tells whether the badge is enabled or not.',
                 'canDelete:b' => 'Tells whether the badge can be deleted or not. (Only custom badges can be deleted right now)',
                 'countUsers:i' => 'The number of users that have earned the badge.',
-                'class:s|n' => 'The class of the badge.',
+                'class:s|n?' => 'The class of the badge.',
                 'classLevel:i|n' => 'The class level.',
                 'insertUserID:i' => 'The user that created the badge.',
                 'insertUser?' => $this->getUserFragmentSchema(),
