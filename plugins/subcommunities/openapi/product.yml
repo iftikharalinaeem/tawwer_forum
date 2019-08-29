@@ -37,7 +37,7 @@ paths:
                     description: Success
             tags:
                 - Products
-            summary: Create a new product.
+            summary: Add a new product.
     /products/{id}:
         get:
             parameters:
@@ -56,7 +56,7 @@ paths:
                     description: Success
             tags:
                 - Products
-            summary: Get a product by it's ID.
+            summary: Get a single product.
         patch:
             parameters:
                 - description: The ID of the product.
@@ -85,7 +85,7 @@ paths:
                     description: Success
             tags:
                 - Products
-            summary: Update an existing product.
+            summary: Update a product.
         delete:
             parameters:
                 - description: The ID of the product.
@@ -105,7 +105,7 @@ paths:
                     description: Success
             tags:
                 - Products
-            summary: Delete an existing product.
+            summary: Delete a product.
 components:
     schemas:
         Product:
