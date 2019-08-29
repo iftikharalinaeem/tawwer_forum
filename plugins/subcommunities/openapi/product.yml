@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+paths:
+    /products:
+        get:
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Product'
+                                type: array
+                    description: Success
+            tags:
+                - Products
+            summary: Get a list of products.
+        post:
+            parameters:
+                - description: The name of the product.
+                  in: path
+                  name: name
+                  required: true
+                  schema:
+                      type: string
+                - description: The description of the product.
+                  in: path
+                  name: body
+                  schema:
+                      type: string
+            responses:
+                '201':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+            tags:
+                - Products
+            summary: Add a new product.
+    /products/{id}:
+        get:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+            tags:
+                - Products
+            summary: Get a single product.
+        patch:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                     type: integer
+                - description: The name of the product.
+                  in: path
+                  name: name
+                  required: true
+                  schema:
+                      type: string
+                - description: The description of the product.
+                  in: path
+                  name: body
+                  schema:
+                      type: string
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+            tags:
+                - Products
+            summary: Update a product.
+        delete:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Product'
+                                type: object
+                    description: Success
+            tags:
+                - Products
+            summary: Delete a product.
+components:
+    schemas:
+        Product:
+            properties:
+                productID:
+                    description: Unique product ID.
+                    type: integer
+                name:
+                    description: Name of the product.
+                    nullable: true
+                    type: string
+                body:
+                    description: Description of the product.
+                    nullable: true
+                    type: string
+                dateInserted:
+                    description: When the product was created.
+                    format: date-time
+                    type: string
+                dateUpated:
+                    description: When the product was updated.
+                    format: date-time
+                    type: string
+            required:
+                - productID
+                - name
+                - dateInserted
+            type: object
