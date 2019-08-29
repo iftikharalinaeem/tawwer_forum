@@ -37,11 +37,9 @@ class ProductsTest extends AbstractAPIv2Test {
         $response = $result->getBody();
         $this->assertEquals(false, c( 'Feature.' . productModel::FEATURE_FLAG . '.Enabled'));
         $this->assertEquals(productModel::DISABLED, $response['status']);
-
     }
 
     public function testGetProduct() {
-       
         $record = $this->getRecord();
 
         $result = $this->api()->post(
@@ -79,14 +77,11 @@ class ProductsTest extends AbstractAPIv2Test {
      * Test PATCH /product
      */
     public function testPatchProduct() {
-       
         $record = $this->getRecord();
-
         $result = $this->api()->post(
             'products',
             $record
         );
-        
         $body = $result->getBody();
 
         $updatedRecord = [
@@ -113,9 +108,7 @@ class ProductsTest extends AbstractAPIv2Test {
      * @expectedExceptionMessage No rows matched the provided criteria.
      */
     public function testDeleteProduct() {
-       
         $record = $this->getRecord();
-
         $result = $this->api()->post(
             'products',
             $record
