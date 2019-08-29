@@ -25,7 +25,7 @@
                 <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), "/subcommunities/$id/edit", 'js-modal btn btn-icon',  ['aria-label' => t('Edit'), 'title' => t('Edit')]),
+                    echo anchor(dashboardSymbol('edit'), "/subcommunities/$id/edit", 'js-modal js-full-height-modal btn btn-icon',  ['aria-label' => t('Edit'), 'title' => t('Edit')]),
                         anchor(dashboardSymbol('delete'), "/subcommunities/$id/delete", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => sprintf(t('Are you sure you want to delete this %s?'), t('site'))]);
                     ?>
                     </div>
