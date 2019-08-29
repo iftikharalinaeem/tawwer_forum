@@ -27,10 +27,10 @@ class ProductsTest extends AbstractAPIv2Test {
     /**
      * Test Put setProductFeatureFlag.
      */
-    public function testPutSetProductFeatureFlag() {
+    public function testPutProductFeatureFlag() {
         // ensure that we can disable the product feature.
         $result = $this->api()->put(
-            'products/setProductFeatureFlag'
+            'products/product-feature-flag'
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -55,13 +55,13 @@ class ProductsTest extends AbstractAPIv2Test {
 
         $this->assertEquals($record['name'], $body['name']);
         $this->assertEquals($record['body'], $body['body']);
-
     }
+
     /**
      * Test POST /products
      */
     public function testPostProduct() {
-       
+
         $record = $this->getRecord();
 
         $result = $this->api()->post(

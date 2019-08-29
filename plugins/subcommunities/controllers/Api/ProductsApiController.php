@@ -29,7 +29,7 @@ class ProductsApiController extends AbstractApiController {
     private $productFeatureEnabled;
 
     /**
-     * productApiController constructor.
+     * ProductApiController constructor.
      *
      * @param ProductModel $productModel
      */
@@ -208,10 +208,10 @@ class ProductsApiController extends AbstractApiController {
 
     /**
      * Enable/Disable the Product Feature.
-     * 
+     *
      * @return array
      */
-    public function put_setProductFeatureFlag(): array {
+    public function put_productFeatureFlag(): array {
         $this->permission("Garden.Moderation.Manage");
 
         $config = "Feature." . ProductModel::FEATURE_FLAG . ".Enabled";
