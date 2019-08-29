@@ -15,5 +15,4 @@ class productModel extends \Vanilla\Models\PipelineModel {
             ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
     }
-
 }

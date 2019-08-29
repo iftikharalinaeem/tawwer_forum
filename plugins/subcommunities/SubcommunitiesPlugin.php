@@ -59,7 +59,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->primaryKey('productID')
             ->column('name', 'varchar(255)')
             ->column('body', 'varchar(255)', true)
-            ->column("dateInserted", "datetime", )
+            ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime", true )
             ->set();
     }

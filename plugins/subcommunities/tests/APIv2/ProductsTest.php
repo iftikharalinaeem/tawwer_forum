@@ -24,9 +24,13 @@ class ProductsTest extends AbstractAPIv2Test {
         $config->set('Feature.'. productModel::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
+    /**
+     * Test Put setProductFeatureFlag.
+     */
     public function testPutSetProductFeatureFlag() {
+        // ensure that we can disable the product feature.
         $result = $this->api()->put(
-            'product/setProductFeatureFlag'
+            'products/setProductFeatureFlag'
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -41,12 +45,12 @@ class ProductsTest extends AbstractAPIv2Test {
         $record = $this->getRecord();
 
         $result = $this->api()->post(
-            'product',
+            'products',
             $record
         );
 
         $body = $result->getBody();
-        $this->api()->get('product/'.$body['productID']);
+        $this->api()->get('products/'.$body['productID']);
 
         $this->assertEquals($record['name'], $body['name']);
         $this->assertEquals($record['body'], $body['body']);
@@ -60,7 +64,7 @@ class ProductsTest extends AbstractAPIv2Test {
         $record = $this->getRecord();
 
         $result = $this->api()->post(
-            'product',
+            'products',
             $record
         );
 
@@ -79,7 +83,7 @@ class ProductsTest extends AbstractAPIv2Test {
         $record = $this->getRecord();
 
         $result = $this->api()->post(
-            'product', 
+            'products',
             $record
         );
         
@@ -91,7 +95,7 @@ class ProductsTest extends AbstractAPIv2Test {
         ];
 
         $result = $this->api()->patch(
-            'product/'.$body['productID'],
+            'products/'.$body['productID'],
             $updatedRecord
         );
 
@@ -113,16 +117,16 @@ class ProductsTest extends AbstractAPIv2Test {
         $record = $this->getRecord();
 
         $result = $this->api()->post(
-            'product',
+            'products',
             $record
         );
         $body = $result->getBody();
 
         $result = $this->api()->delete(
-            'product/'.$body['productID']
+            'products/'.$body['productID']
         );
         $this->assertEquals(204, $result->getStatusCode());
-        $this->api()->get('product/'.$body['productID']);
+        $this->api()->get('products/'.$body['productID']);
     }
 
     /**
@@ -135,7 +139,6 @@ class ProductsTest extends AbstractAPIv2Test {
             'name' => uniqid('Product'),
             'body' => 'Test product',
         ];
-
         return $record;
     }
 }
