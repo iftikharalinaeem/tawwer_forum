@@ -2,7 +2,7 @@
 
 use Vanilla\Database\Operation;
 
-class productModel extends \Vanilla\Models\PipelineModel {
+class ProductModel extends \Vanilla\Models\PipelineModel {
 
     const FEATURE_FLAG = 'SubcommunityProducts';
     const ENABLED = 'Enabled';

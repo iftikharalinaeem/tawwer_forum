@@ -51,7 +51,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('Attributes', 'text', true)
             ->column('Sort', 'smallint', '1000')
             ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
-            ->column('productID', 'smallint', true)
+            ->column('ProductID', 'smallint', true)
             ->set();
 
         Gdn::structure()

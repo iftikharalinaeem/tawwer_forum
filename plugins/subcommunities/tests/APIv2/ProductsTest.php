@@ -6,7 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
-use productModel;
+use ProductModel;
 
 /**
  * Test the /api/v2/product endpoint.
@@ -21,7 +21,7 @@ class ProductsTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
-        $config->set('Feature.'. productModel::FEATURE_FLAG.'.Enabled', true, true, false);
+        $config->set('Feature.'. ProductModel::FEATURE_FLAG.'.Enabled', true, true, false);
     }
 
     /**
@@ -35,8 +35,8 @@ class ProductsTest extends AbstractAPIv2Test {
 
         $this->assertEquals(200, $result->getStatusCode());
         $response = $result->getBody();
-        $this->assertEquals(false, c( 'Feature.' . productModel::FEATURE_FLAG . '.Enabled'));
-        $this->assertEquals(productModel::DISABLED, $response['status']);
+        $this->assertEquals(false, c( 'Feature.' . ProductModel::FEATURE_FLAG . '.Enabled'));
+        $this->assertEquals(ProductModel::DISABLED, $response['status']);
     }
 
     public function testGetProduct() {

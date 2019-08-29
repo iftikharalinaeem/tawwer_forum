@@ -3,7 +3,7 @@ namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
 use AbstractApiController;
-use productModel;
+use ProductModel;
 use Vanilla\FeatureFlagHelper;
 
 class ProductsApiController extends AbstractApiController {
@@ -14,7 +14,7 @@ class ProductsApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
-    /** @var productModel */
+    /** @var ProductModel */
     private $productModel;
 
     /** @var boolean */
@@ -23,9 +23,9 @@ class ProductsApiController extends AbstractApiController {
     /**
      * productApiController constructor.
      *
-     * @param productModel $productModel
+     * @param ProductModel $productModel
      */
-    public function __construct(productModel $productModel) {
+    public function __construct(ProductModel $productModel) {
         $this->productModel = $productModel;
         $this->productFeatureEnabled = false;
     }
@@ -206,9 +206,9 @@ class ProductsApiController extends AbstractApiController {
     public function put_setProductFeatureFlag(): array {
         $this->permission("Garden.Moderation.Manage");
 
-        $config = "Feature." . productModel::FEATURE_FLAG . ".Enabled";
+        $config = "Feature." . ProductModel::FEATURE_FLAG . ".Enabled";
 
-        if (!FeatureFlagHelper::featureEnabled(productModel::FEATURE_FLAG)) {
+        if (!FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
             saveToConfig($config, true);
             $this->productFeatureEnabled = true;
         } else {
@@ -216,7 +216,7 @@ class ProductsApiController extends AbstractApiController {
             $this->productFeatureEnabled = false;
         }
 
-        $enabled["status"] = ($this->productFeatureEnabled) ? productModel::ENABLED : productModel::DISABLED;
+        $enabled["status"] = ($this->productFeatureEnabled) ? ProductModel::ENABLED : ProductModel::DISABLED;
         return $enabled;
     }
 
@@ -225,7 +225,7 @@ class ProductsApiController extends AbstractApiController {
      */
     private function getProductFeatureStatus() {
         if (!$this->productFeatureEnabled) {
-            FeatureFlagHelper::ensureFeature(productModel::FEATURE_FLAG);
+            FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         }
     }
 }
