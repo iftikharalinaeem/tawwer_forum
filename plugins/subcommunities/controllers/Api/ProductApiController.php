@@ -64,7 +64,7 @@ class ProductApiController extends AbstractApiController {
             ],
             "body:s" => [
                 "allowNull" => true,
-                "description" => "description of the product",
+                "description" => "Description of the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
             "dateUpdated:dt?" => "When the product was updated.",
@@ -96,7 +96,7 @@ class ProductApiController extends AbstractApiController {
         $this->getProductFeatureStatus();
         $this->permission("'Garden.SignIn.Allow'");
         $out = $this->schema([
-            ":a" => $this->fullSchema(),
+            ":a" => $this->productSchema(),
         ], "out");
 
         $products = $this->productModel->get();
