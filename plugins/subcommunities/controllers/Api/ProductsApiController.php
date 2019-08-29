@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
@@ -6,6 +11,9 @@ use AbstractApiController;
 use ProductModel;
 use Vanilla\FeatureFlagHelper;
 
+/**
+ * API controller for managing the products resource.
+ */
 class ProductsApiController extends AbstractApiController {
 
     /** @var Schema */

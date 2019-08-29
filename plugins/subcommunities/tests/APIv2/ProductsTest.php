@@ -52,8 +52,8 @@ class ProductsTest extends AbstractAPIv2Test {
 
         $this->assertEquals($record['name'], $body['name']);
         $this->assertEquals($record['body'], $body['body']);
-    }
 
+    }
     /**
      * Test POST /product
      */
