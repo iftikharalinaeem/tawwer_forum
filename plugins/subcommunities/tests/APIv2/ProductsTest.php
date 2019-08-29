@@ -39,6 +39,9 @@ class ProductsTest extends AbstractAPIv2Test {
         $this->assertEquals(ProductModel::DISABLED, $response['status']);
     }
 
+    /**
+     * Test GET /products
+     */
     public function testGetProduct() {
         $record = $this->getRecord();
 
@@ -55,7 +58,7 @@ class ProductsTest extends AbstractAPIv2Test {
 
     }
     /**
-     * Test POST /product
+     * Test POST /products
      */
     public function testPostProduct() {
        
@@ -74,7 +77,7 @@ class ProductsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test PATCH /product
+     * Test PATCH /products
      */
     public function testPatchProduct() {
         $record = $this->getRecord();
@@ -102,7 +105,7 @@ class ProductsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test Delete /product
+     * Test Delete /products
      *
      * @expectedException \Exception
      * @expectedExceptionMessage No rows matched the provided criteria.
