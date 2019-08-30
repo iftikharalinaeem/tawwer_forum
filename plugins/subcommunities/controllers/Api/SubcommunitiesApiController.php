@@ -38,6 +38,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
+     * Simple Subcommunity Schema.
      *
      * @param string $type
      * @return Schema
@@ -48,7 +49,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "subcommunityID",
                 "name",
                 "folder",
-                "categoryID",
+                "categoryID?",
                 "locale",
                 "productID?",
                 "product?" => $this->productFragmentSchema(),
@@ -57,6 +58,7 @@ class SubcommunitiesApiController extends AbstractApiController {
         return $this->schema($this->subcommunitySchema, $type);
     }
     /**
+     * Full Subcommunity Schema.
      *
      * @return Schema
      */
@@ -70,7 +72,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "description" => "Category ID associated with the subcommunity",
             ],
             "locale:s?" => "Locale associated with the subcommunity",
-            "dateInserted:dt?" => "",
+            "dateInserted:dt" => "",
             "insertUserID:s?" => "",
             "dateUpdated:dt?" => [
                 "allowNull" => true,
