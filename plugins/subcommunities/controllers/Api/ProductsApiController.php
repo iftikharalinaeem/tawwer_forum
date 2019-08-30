@@ -105,7 +105,9 @@ class ProductsApiController extends AbstractApiController {
             ":a" => $this->productSchema(),
         ], "out");
 
-        $products = $this->productModel->get();
+        $where = [];
+        $options = ['orderFields' => 'name', 'orderDirection' => 'asc'];
+        $products = $this->productModel->get($where,$options);
 
         $products = $out->validate($products);
 
@@ -208,23 +210,45 @@ class ProductsApiController extends AbstractApiController {
 
     /**
      * Enable/Disable the Product Feature.
-     * 
+     *
+     * @param array $body
      * @return array
      */
-    public function put_setProductFeatureFlag(): array {
+    public function put_productFeatureFlag(array $body = []): array {
         $this->permission("Garden.Moderation.Manage");
+
+        $in = $this->schema(
+            Schema::parse([
+                "enabled:b",
+            ]),
+            "in"
+        );
+        $out = $this->schema(
+            Schema::parse([
+                "enabled:b",
+            ]),
+            "out"
+        );
+
+        $body = $in->validate($body);
 
         $config = "Feature." . ProductModel::FEATURE_FLAG . ".Enabled";
 
-        if (!FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
-            saveToConfig($config, true);
-            $this->productFeatureEnabled = true;
-        } else {
-            saveToConfig($config, false);
-            $this->productFeatureEnabled = false;
+        $saved = false;
+        if ($body["enabled"] && array_key_exists("enabled", $body)) {
+            $saved = saveToConfig($config, true);
+        } elseif (!$body["enabled"] && array_key_exists("enabled", $body)) {
+            $saved = saveToConfig($config, false);
         }
 
-        $enabled["status"] = ($this->productFeatureEnabled) ? ProductModel::ENABLED : ProductModel::DISABLED;
+        // saveToConfig returns true on success and null if no changes needed.
+        if ($saved || is_null($saved)) {
+            $this->productFeatureEnabled  = c($config);
+        }
+
+        $enabled["enabled"] = $this->productFeatureEnabled;
+        $enabled = $out->validate($enabled);
+
         return $enabled;
     }
 

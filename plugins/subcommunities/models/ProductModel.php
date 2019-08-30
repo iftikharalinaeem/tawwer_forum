@@ -13,8 +13,6 @@ use Vanilla\Database\Operation;
 class ProductModel extends \Vanilla\Models\PipelineModel {
 
     const FEATURE_FLAG = 'SubcommunityProducts';
-    const ENABLED = 'Enabled';
-    const DISABLED = 'Disabled';
 
     /**
      * ProductModel constructor.
