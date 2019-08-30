@@ -7,7 +7,6 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { LoadStatus } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { t } from "@library/utility/appUtils";
@@ -15,7 +14,9 @@ import { ProductManager } from "@subcommunities/products/ProductManager";
 import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
 
-interface IProps {}
+interface IProps {
+    initialValue?: number | null;
+}
 
 /**
  * Render out a form group with selection UI for this input.
@@ -34,7 +35,21 @@ export function ProductSelectorFormGroup(props: IProps) {
             });
     }, [productsById]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [value, setValue] = useState<IComboBoxOption | undefined>(undefined);
+
+    const [value, setValue] = useState<number | string | undefined | null>(props.initialValue);
+    const currentComboBoxValue = useMemo(() => {
+        if (value == null) {
+            return null;
+        }
+        const selectedProduct = productsById[value];
+        if (!selectedProduct || !selectedProduct.data) {
+            return null;
+        }
+        return {
+            label: selectedProduct.data.name,
+            value,
+        };
+    }, [value, productsById]);
 
     return (
         <DashboardFormGroup
@@ -51,12 +66,12 @@ export function ProductSelectorFormGroup(props: IProps) {
             }
         >
             {modalOpen && <ProductManager onClose={() => setModalOpen(false)} asModal />}
-            <input type="hidden" value={value ? value.value : ""} />
+            <input name="ProductID" type="hidden" value={value != null ? value : ""} />
             <DashboardSelect
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS}
                 options={options}
-                value={value}
-                onChange={value => setValue(value)}
+                value={currentComboBoxValue}
+                onChange={value => setValue(value.value)}
             />
         </DashboardFormGroup>
     );
