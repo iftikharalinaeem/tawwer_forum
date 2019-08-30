@@ -15,7 +15,7 @@ import { IDeviceProps } from "@library/layout/DeviceContext";
 import { optionsKnob as options } from "@storybook/addon-knobs";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 
-const story = storiesOf("KnowledgeBase", module);
+const story = storiesOf("Knowledge Base", module);
 
 // Add Knobs
 

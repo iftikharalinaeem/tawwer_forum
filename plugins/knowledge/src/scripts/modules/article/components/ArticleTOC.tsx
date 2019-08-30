@@ -10,6 +10,7 @@ import Heading from "@library/layout/Heading";
 import classNames from "classnames";
 import { IOutlineItem } from "@knowledge/@types/api/article";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { articleTOCClasses } from "@knowledge/modules/article/components/articleTOCStyles";
 
 interface IProps {
     items: IOutlineItem[];
@@ -25,7 +26,7 @@ export default class ArticleTOC extends React.Component<IProps> {
         if (this.props.items.length < ArticleTOC.MINIMUM_CHILD_COUNT) {
             return null;
         }
-
+        const classes = articleTOCClasses();
         const classesPanelList = panelListClasses();
         const contents = this.props.items
             .filter(item => item.level === 2)
@@ -34,17 +35,12 @@ export default class ArticleTOC extends React.Component<IProps> {
                 const isActive = window.location.hash === href;
                 return (
                     <li
-                        className={classNames("panelList-item", classesPanelList.item, "tableOfContents-item", {
+                        className={classNames("panelList-item", classesPanelList.item, classes.item, {
                             isActive,
                         })}
                         key={item.ref}
                     >
-                        <a
-                            href={href}
-                            onClick={this.forceHashChange}
-                            className="tableOfContents-link"
-                            title={item.text}
-                        >
+                        <a href={href} onClick={this.forceHashChange} className={classes.link} title={item.text}>
                             {item.text}
                         </a>
                     </li>
@@ -57,9 +53,7 @@ export default class ArticleTOC extends React.Component<IProps> {
                     title={t("On This Page")}
                     className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
                 />
-                <ul className={classNames("panelList-items", "tableOfContents-items", classesPanelList.items)}>
-                    {contents}
-                </ul>
+                <ul className={classNames("panelList-items", classesPanelList.items)}>{contents}</ul>
             </nav>
         );
     }
