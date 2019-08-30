@@ -30,13 +30,14 @@ class ProductsTest extends AbstractAPIv2Test {
     public function testPutSetProductFeatureFlag() {
         // ensure that we can disable the product feature.
         $result = $this->api()->put(
-            'products/setProductFeatureFlag'
+            'products/product-feature-flag',
+            ["enabled" => false]
         );
 
         $this->assertEquals(200, $result->getStatusCode());
         $response = $result->getBody();
         $this->assertEquals(false, c( 'Feature.' . ProductModel::FEATURE_FLAG . '.Enabled'));
-        $this->assertEquals(ProductModel::DISABLED, $response['status']);
+        $this->assertEquals(false, $response['enabled']);
     }
 
     /**
