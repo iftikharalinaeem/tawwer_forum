@@ -52,7 +52,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "categoryID?",
                 "locale",
                 "productID?",
-                "product?" => $this->productFragmentSchema(),
+                "product?" => $this->productModel->productFragmentSchema(),
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -77,7 +77,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             "sort:i?",
             "isDefault:i?",
             "productID:i?",
-            "product?" => $this->productFragmentSchema(),
+            "product?" => $this->productModel->productFragmentSchema(),
         ]);
     }
 
@@ -107,9 +107,7 @@ class SubcommunitiesApiController extends AbstractApiController {
         $in = $this->schema([
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
-        $out = $this->schema([
-            ":a" => $this->subcommunitySchema(),
-        ], "out");
+        $out = $this->schema([":a" => $this->subcommunitySchema(), "out"]);
 
         $query = $in->validate($query);
         $results = $this->subcommunityModel::all();
@@ -118,8 +116,9 @@ class SubcommunitiesApiController extends AbstractApiController {
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
         }
+        $results = ApiUtils::convertOutputKeys($results);
+        $subcommunities = $out->validate($results, true);
 
-        $subcommunities = $out->validate($results);
         return $subcommunities;
     }
 
@@ -149,18 +148,5 @@ class SubcommunitiesApiController extends AbstractApiController {
         $result = $out->validate($results);
 
         return $result;
-    }
-
-    /**
-     * Simplified product schema.
-     *
-     * @param string $type
-     * @return Schema
-     */
-    public function productFragmentSchema(string $type = ""): Schema {
-        if ($this->productSchema === null) {
-            $this->productSchema = $this->schema($this->productModel->productFragmentSchema, $type);
-        }
-        return $this->schema($this->productSchema, $type);
     }
 }

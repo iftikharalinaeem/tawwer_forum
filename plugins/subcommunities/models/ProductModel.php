@@ -8,6 +8,7 @@ namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Garden\Schema\Schema;
 
 /**
  * A model for managing products.
@@ -18,8 +19,8 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
     const ENABLED = 'Enabled';
     const DISABLED = 'Disabled';
 
-    /** @var array */
-    public $productFragmentSchema;
+    /** @var Schema */
+    public $productSchema;
 
     /**
      * ProductModel constructor.
@@ -30,7 +31,6 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
             ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
-        $this->productFragmentSchema = $this->setProductFragmentSchema();
     }
 
     /**
@@ -69,15 +69,19 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Fragmented product schema.
+     * Simplified product schema.
      *
-     * @return array
+     * @param string $type
+     * @return Schema
      */
-    private function setProductFragmentSchema() {
-        return [
-            "productID",
-            "name",
-            "body?",
-        ];
+    public function productFragmentSchema(string $type = ""): Schema {
+        if ($this->productSchema === null) {
+            $this->productSchema = Schema::parse([
+                "productID",
+                "name",
+                "body?",
+            ], $type);
+        }
+        return $this->productSchema;
     }
 }
