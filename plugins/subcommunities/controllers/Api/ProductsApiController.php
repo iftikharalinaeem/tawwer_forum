@@ -224,7 +224,7 @@ class ProductsApiController extends AbstractApiController {
             $this->productFeatureEnabled = false;
         }
 
-        $enabled["status"] = ($this->productFeatureEnabled) ? ProductModel::ENABLED : ProductModel::DISABLED;
+        $enabled["enabled"] = ($this->productFeatureEnabled) ? ProductModel::ENABLED : ProductModel::DISABLED;
         return $enabled;
     }
 
