@@ -50,7 +50,8 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "Folder",
                 "CategoryID",
                 "Locale",
-                "productID?"
+                "productID?",
+                "product?" => $this->productFragmentSchema(),
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -97,6 +98,8 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
+     * Get an ID-only schema for subcommunities.
+     *
      * @param string $type
      * @return Schema
      */
@@ -110,6 +113,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a list of Subcommunities.
      *
      * @param String $query
      * @return array
@@ -120,11 +124,12 @@ class SubcommunitiesApiController extends AbstractApiController {
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
         $out = $this->schema([
-            ":a" => $this->fullSchema(),
+            ":a" => $this->subcommunitySchema(),
         ], "out");
 
         $query = $in->validate($query);
-        $results = $this->subcommunityModel->get()->resultArray();
+        $results = $this->subcommunityModel::all();
+        $results = array_values($results);
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
@@ -135,23 +140,23 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a Subcommunity by it's ID.
      *
      * @param int $id
      * @param array $query
      * @return array
      */
-
     public function get(int $id, array $query): array {
         $this->permission("Garden.SignIn.Allow");
+        $this->idParamSchema()->setDescription("Get a Subcommunity ID");
+
         $in = $this->schema([
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
-        $this->idParamSchema()->setDescription("Get a Subcommunity ID");
-        $id = $id ?? null;
-
-        $results = $this->subcommunityModel->getID($id);
-
         $query = $in->validate($query);
+
+        $id = $id ?? null;
+        $results = $this->subcommunityModel->getID($id);
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
@@ -171,7 +176,7 @@ class SubcommunitiesApiController extends AbstractApiController {
      */
     public function productFragmentSchema(string $type = ""): Schema {
         if ($this->productSchema === null) {
-            $this->productSchema = $this->schema(Schema::parse($this->productModel->productFragmentSchema));
+            $this->productSchema = $this->schema($this->productModel->productFragmentSchema, $type);
         }
         return $this->schema($this->productSchema, $type);
     }
