@@ -107,7 +107,7 @@ class ProductsApiController extends AbstractApiController {
 
         $where = [];
         $options = ['orderFields' => 'name', 'orderDirection' => 'asc'];
-        $products = $this->productModel->get($where,$options);
+        $products = $this->productModel->get($where, $options);
 
         $products = $out->validate($products);
 
