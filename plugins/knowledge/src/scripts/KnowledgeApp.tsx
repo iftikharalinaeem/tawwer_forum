@@ -4,72 +4,84 @@
  * @license Proprietary
  */
 
+import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
-import ErrorPage from "@knowledge/pages/ErrorPage";
-import KnowledgeRoutes from "@knowledge/routes/KnowledgeRoutes";
-import { SearchRoute } from "@knowledge/routes/pageRoutes";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import SearchContext from "@library/contexts/SearchContext";
-import { DeviceProvider } from "@library/layout/DeviceContext";
-import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
-import SiteNavProvider from "@library/navigation/SiteNavContext";
-import getStore from "@library/redux/getStore";
-import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
-import PagesContext from "@library/routing/PagesContext";
-import { ThemeProvider } from "@library/theming/ThemeProvider";
-import { formatUrl, getMeta } from "@library/utility/appUtils";
-import React, { useMemo, useEffect } from "react";
-import { Provider } from "react-redux";
-import { Router, Route } from "react-router-dom";
-import { LiveAnnouncer } from "react-aria-live";
-import { hot } from "react-hot-loader";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
-import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
-import { createBrowserHistory } from "history";
-import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
+import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import ErrorPage from "@knowledge/pages/ErrorPage";
+import { SearchRoute } from "@knowledge/routes/pageRoutes";
+import RouteActions from "@knowledge/routes/RouteActions";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { LoadStatus } from "@library/@types/api/core";
+import SearchContext from "@library/contexts/SearchContext";
+import Loader from "@library/loaders/Loader";
+import SiteNavProvider from "@library/navigation/SiteNavContext";
+import { Router } from "@library/Router";
+import PagesContext from "@library/routing/PagesContext";
+import React, { useCallback, useEffect } from "react";
+import { hot } from "react-hot-loader";
+import { useDispatch, useSelector } from "react-redux";
 
 /*
  * Top level application component for knowledge.
  * This is made to mounted with ReactDOM.
  */
 function KnowledgeApp() {
-    const store = useMemo(() => getStore<IKnowledgeAppStoreState>(), []);
-    const history = useMemo(() => createBrowserHistory({ basename: formatUrl("") }), []);
+    const { kbLoadable, routeState, clearError, requestKnowledgeBases } = useConnect();
+
+    useEffect(() => {
+        if (kbLoadable.status === LoadStatus.PENDING) {
+            requestKnowledgeBases();
+        }
+    });
+
+    if (routeState.error) {
+        return <ErrorPage error={routeState.error} />;
+    }
+
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
+        return <Loader />;
+    }
+
+    if (kbLoadable.status === LoadStatus.SUCCESS && kbLoadable.data && Object.values(kbLoadable.data).length === 0) {
+        return <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />;
+    }
 
     return (
-        <Provider store={store}>
-            <LiveAnnouncer>
-                <ThemeProvider errorComponent={<ErrorPage />} themeKey={getMeta("ui.themeKey", "keystone")}>
-                    <PagesContext.Provider
-                        value={{
-                            pages: {
-                                search: SearchRoute,
-                            },
-                        }}
-                    >
-                        <ScrollOffsetProvider scrollWatchingEnabled={false}>
-                            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
-                                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                                    <NavHistoryContextProvider>
-                                        <DeviceProvider>
-                                            <Router history={history}>
-                                                <LinkContextProvider linkContext={formatUrl("/kb", true)}>
-                                                    <FontSizeCalculatorProvider>
-                                                        <Route component={KnowledgeRoutes} />
-                                                    </FontSizeCalculatorProvider>
-                                                </LinkContextProvider>
-                                            </Router>
-                                        </DeviceProvider>
-                                    </NavHistoryContextProvider>
-                                </SearchContext.Provider>
-                            </SiteNavProvider>
-                        </ScrollOffsetProvider>
-                    </PagesContext.Provider>
-                </ThemeProvider>
-            </LiveAnnouncer>
-        </Provider>
+        <PagesContext.Provider
+            value={{
+                pages: {
+                    search: SearchRoute,
+                },
+            }}
+        >
+            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                    <NavHistoryContextProvider>
+                        <Router sectionRoot="/kb" onRouteChange={clearError} />
+                    </NavHistoryContextProvider>
+                </SearchContext.Provider>
+            </SiteNavProvider>
+        </PagesContext.Provider>
     );
+}
+
+function useConnect() {
+    const kbLoadable = useSelector(
+        (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.knowledgeBasesByID,
+    );
+    const routeState = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.route);
+    const dispatch = useDispatch();
+    const clearError = useCallback(() => dispatch(RouteActions.resetAC), [dispatch]);
+    const kbActions = useKnowledgeBaseActions();
+
+    return {
+        kbLoadable,
+        routeState,
+        clearError,
+        requestKnowledgeBases: kbActions.getAll,
+    };
 }
 
 export default hot(module)(KnowledgeApp);

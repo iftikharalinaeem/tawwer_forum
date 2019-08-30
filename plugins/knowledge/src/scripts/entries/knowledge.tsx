@@ -9,8 +9,6 @@ import "../../scss/knowledge-styles.scss";
 
 // Vendors
 import React from "react";
-import ReactDOM from "react-dom";
-import { forceRenderStyles } from "typestyle";
 import { AppContainer } from "react-hot-loader";
 
 // Our own libraries
@@ -28,20 +26,27 @@ import { deploymentKeyMiddleware } from "@knowledge/server/deploymentKeyMiddlewa
 import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
 import { serverReducer } from "@knowledge/server/serverReducer";
+import { Router } from "@library/Router";
+import { getPageRoutes } from "@knowledge/routes/pageRoutes";
+import { AppContext } from "@library/AppContext";
+import { mountReact } from "@vanilla/react-utils";
+import ErrorPage from "@knowledge/pages/ErrorPage";
 
 debug(getMeta("context.debug"));
 
-const deploymentKeyInterceptor = apiv2.interceptors.response.use(deploymentKeyMiddleware);
+apiv2.interceptors.response.use(deploymentKeyMiddleware);
+Router.addRoutes(getPageRoutes());
 
 const render = () => {
-    const app = document.querySelector("#app");
-    ReactDOM.render(
+    const app = document.querySelector("#app") as HTMLElement;
+    mountReact(
         <AppContainer>
-            <KnowledgeApp />
+            <AppContext errorComponent={<ErrorPage />}>
+                <KnowledgeApp />
+            </AppContext>
         </AppContainer>,
         app,
     );
-    forceRenderStyles();
 };
 
 onReady(() => {
