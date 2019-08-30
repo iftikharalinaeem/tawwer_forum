@@ -1,0 +1,112 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ProductActions } from "@subcommunities/products/ProductActions";
+import { IProduct } from "@subcommunities/products/productTypes";
+import { produce } from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+
+type ProductLoadableGroup = { [id: number]: ILoadable<IProduct> };
+
+// Type for products that are currently being submitted.
+export type TempProduct = Pick<IProduct, "name" | "body"> & { transactionID: string };
+type TempProductLoadableGroup = { [tempID: string]: ILoadable<TempProduct> };
+
+export interface IProductsState {
+    enabled: boolean;
+    enableStatus: LoadStatus;
+    allProductLoadable: ILoadable<{}>;
+    productsById: ProductLoadableGroup;
+    submittingProducts: TempProductLoadableGroup;
+}
+
+const INITIAL_PRODUCTS_STATE: IProductsState = {
+    enabled: false,
+    enableStatus: LoadStatus.PENDING,
+    allProductLoadable: {
+        status: LoadStatus.PENDING,
+    },
+    productsById: {},
+    submittingProducts: {},
+};
+
+export const productsReducer = produce(
+    reducerWithInitialState(INITIAL_PRODUCTS_STATE)
+        .case(ProductActions.getAllACs.started, state => {
+            state.allProductLoadable.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(ProductActions.getAllACs.done, (state, payload) => {
+            state.allProductLoadable.status = LoadStatus.SUCCESS;
+            const products: ProductLoadableGroup = {};
+            payload.result.forEach(product => {
+                products[product.productID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: product,
+                };
+            });
+            state.productsById = products;
+            return state;
+        })
+        .case(ProductActions.getAllACs.failed, (state, payload) => {
+            state.allProductLoadable.status = LoadStatus.ERROR;
+            state.allProductLoadable.error = payload.error;
+            return state;
+        })
+        .case(ProductActions.postACs.started, (state, payload) => {
+            state.submittingProducts[payload.transactionID] = {
+                status: LoadStatus.PENDING,
+                data: payload,
+            };
+            return state;
+        })
+        .case(ProductActions.postACs.done, (state, payload) => {
+            delete state.submittingProducts[payload.params.transactionID];
+            state.productsById[payload.result.productID] = {
+                status: LoadStatus.SUCCESS,
+                data: payload.result,
+            };
+            return state;
+        })
+        .case(ProductActions.patchACs.started, (state, payload) => {
+            const existingProduct = state.productsById[payload.productID];
+            state.productsById[payload.productID] = {
+                status: LoadStatus.LOADING,
+                data: {
+                    ...existingProduct.data!,
+                    ...payload,
+                },
+            };
+            return state;
+        })
+        .case(ProductActions.patchACs.done, (state, payload) => {
+            state.productsById[payload.params.productID] = {
+                status: LoadStatus.SUCCESS,
+                data: payload.result,
+            };
+            return state;
+        })
+        .case(ProductActions.deleteACs.started, (state, payload) => {
+            const existingProduct = state.productsById[payload.productID];
+            if (existingProduct.data) {
+                existingProduct.data.tempDeleted = true;
+            }
+            return state;
+        })
+        .case(ProductActions.deleteACs.done, (state, payload) => {
+            delete state.productsById[payload.params.productID];
+            return state;
+        })
+        .case(ProductActions.putFeatureFlagACs.started, (state, payload) => {
+            state.enableStatus = LoadStatus.LOADING;
+            return state;
+        })
+        .case(ProductActions.putFeatureFlagACs.done, (state, payload) => {
+            state.enableStatus = LoadStatus.SUCCESS;
+            state.enabled = payload.result.status === "Enabled";
+            return state;
+        }),
+);
