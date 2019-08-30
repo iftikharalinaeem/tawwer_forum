@@ -45,11 +45,11 @@ class SubcommunitiesApiController extends AbstractApiController {
     public function subcommunitySchema(string $type = ""): Schema {
         if ($this->subcommunitySchema === null) {
             $this->subcommunitySchema = $this->schema(Schema::parse([
-                "SubcommunityID",
-                "Name",
-                "Folder",
-                "CategoryID",
-                "Locale",
+                "subcommunityID",
+                "name",
+                "folder",
+                "categoryID",
+                "locale",
                 "productID?",
                 "product?" => $this->productFragmentSchema(),
             ]));
@@ -62,30 +62,30 @@ class SubcommunitiesApiController extends AbstractApiController {
      */
     private function fullSchema(): Schema {
         return Schema::parse([
-            "SubcommunityID:i" => "Unique Subcommunity ID.",
-            "Name:s?" =>  "Name of the Subcommunity.",
-            "Folder:s?" => "Subcomunity folder",
-            "CategoryID:i?" => [
+            "subcommunityID:i" => "Unique Subcommunity ID.",
+            "name:s?" =>  "Name of the Subcommunity.",
+            "folder:s?" => "Subcomunity folder",
+            "categoryID:i?" => [
                 "allowNull" => true,
                 "description" => "Category ID associated with the subcommunity",
             ],
-            "Locale:s?" => "Locale associated with the subcommunity",
-            "DateInserted:dt?" => "",
-            "InsertUserID:s?" => "",
-            "DateUpdated:dt?" => [
+            "locale:s?" => "Locale associated with the subcommunity",
+            "dateInserted:dt?" => "",
+            "insertUserID:s?" => "",
+            "dateUpdated:dt?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "UpdateUserID:i?" => [
+            "updateUserID:i?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "Attributes:s?" => [
+            "attributes:s?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
-            "Sort:i?" => "",
-            "IsDefault:i?" => [
+            "sort:i?" => "",
+            "isDefault:i?" => [
                 "allowNull" => true,
                 "description" => "",
             ],
@@ -162,7 +162,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             $this->productModel->expandProduct($results);
         }
 
-        $out = $this->fullSchema();
+        $out = $this->subcommunitySchema();
         $result = $out->validate($results);
 
         return $result;
