@@ -38,7 +38,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
-     * Simple Subcommunity Schema.
+     * Simple subcommunity Schema.
      *
      * @param string $type
      * @return Schema
@@ -58,43 +58,25 @@ class SubcommunitiesApiController extends AbstractApiController {
         return $this->schema($this->subcommunitySchema, $type);
     }
     /**
-     * Full Subcommunity Schema.
+     * Full subcommunity Schema.
      *
      * @return Schema
      */
     private function fullSchema(): Schema {
         return Schema::parse([
-            "subcommunityID:i" => "Unique Subcommunity ID.",
-            "name:s?" =>  "Name of the Subcommunity.",
-            "folder:s?" => "Subcomunity folder",
-            "categoryID:i?" => [
-                "allowNull" => true,
-                "description" => "Category ID associated with the subcommunity",
-            ],
-            "locale:s?" => "Locale associated with the subcommunity",
-            "dateInserted:dt" => "",
-            "insertUserID:s?" => "",
-            "dateUpdated:dt?" => [
-                "allowNull" => true,
-                "description" => "",
-            ],
-            "updateUserID:i?" => [
-                "allowNull" => true,
-                "description" => "",
-            ],
-            "attributes:s?" => [
-                "allowNull" => true,
-                "description" => "",
-            ],
-            "sort:i?" => "",
-            "isDefault:i?" => [
-                "allowNull" => true,
-                "description" => "",
-            ],
-            "productID:i?" => [
-                "allowNull" => true,
-                "description" => "",
-            ],
+            "subcommunityID:i",
+            "name:s",
+            "folder:s" => "Subcomunity folder",
+            "categoryID:i",
+            "locale:s" ,
+            "dateInserted:dt",
+            "insertUserID:s",
+            "dateUpdated:dt?",
+            "updateUserID:i?",
+            "attributes:s?",
+            "sort:i?",
+            "isDefault:i?",
+            "productID:i?",
             "product?" => $this->productFragmentSchema(),
         ]);
     }
@@ -115,7 +97,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a list of Subcommunities.
+     * Get a list of subcommunities.
      *
      * @param String $query
      * @return array
@@ -142,7 +124,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a Subcommunity by it's ID.
+     * Get a subcommunity by it's ID.
      *
      * @param int $id
      * @param array $query
@@ -156,8 +138,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
         $query = $in->validate($query);
-
-        $id = $id ?? null;
+        
         $results = $this->subcommunityModel->getID($id);
 
         if ($this->isExpandField('product', $query['expand'])) {
