@@ -5,10 +5,9 @@
  */
 namespace Vanilla\Subcommunities\Models;
 
-use Garden\Schema\ValidationException;
+
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
-use Garden\Schema\Schema;
 
 /**
  * A model for managing products.
@@ -19,9 +18,7 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
     const ENABLED = 'Enabled';
     const DISABLED = 'Disabled';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     public $productFragmentSchema;
 
     /**
@@ -46,7 +43,6 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
             // Nothing to do here.
             return;
         }
-
         reset($rows);
         $single = is_string(key($rows));
 
@@ -72,11 +68,16 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
         }
     }
 
+    /**
+     * Fragmented product schema.
+     *
+     * @return array
+     */
     private function setProductFragmentSchema() {
-        $this->productFragmentSchema = [
+        return [
             "productID",
             "name",
-            "body",
+            "body?",
         ];
     }
 }
