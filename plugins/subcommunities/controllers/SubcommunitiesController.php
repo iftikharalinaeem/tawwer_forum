@@ -80,6 +80,7 @@ class SubcommunitiesController extends DashboardController {
         $form = [
             'Name' => ['Description' => 'Enter a friendly name for the site.'],
             'Folder' => ['Description' => 'Enter a url-friendly folder name for the site.'],
+            'ProductID' => ['Control' => 'react', 'Component' => 'product-selector-form-group'],
             'CategoryID' => ['LabelCode' => 'Category', 'Control' => 'DropDown', 'Items' => $this->data('Categories'), 'Options' => ['IncludeNull' => true]],
             'Locale' => ['Control' => 'DropDown', 'Items' => $this->data('Locales'), 'Options' => ['IncludeNull' => true]],
         ];

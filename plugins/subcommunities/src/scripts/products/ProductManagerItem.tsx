@@ -42,7 +42,6 @@ export function ProductManagerItem(props: IProps) {
         props.productLoadable && props.productLoadable.data && "transactionID" in props.productLoadable.data
             ? props.productLoadable.data
             : null;
-    const loadStatus = props.productLoadable ? props.productLoadable.status : null;
     const initialProductName = actualProduct ? actualProduct.name : "";
 
     /// Locale State
@@ -50,7 +49,7 @@ export function ProductManagerItem(props: IProps) {
     const [isEditMode, setIsEditMode] = useState(!!props.isEditMode);
     const [inputValue, setInputValue] = useState(initialProductName);
 
-    /// F
+    ///
     /// Focus Handling
     ///
     const rootRef = useRef<HTMLLIElement>(null);
@@ -59,13 +58,12 @@ export function ProductManagerItem(props: IProps) {
     // Focus the input when it opens.
     useLayoutEffect(() => {
         inputRef.current && inputRef.current.focus();
-    }, [isEditMode]);
+    }, [isEditMode, inputRef]);
 
     // Dismiss the edit mode if we lose focus.
     useFocusWatcher(rootRef, newFocus => {
         if (!newFocus) {
             console.log(document.activeElement);
-            console.log("Clear edit mode");
             setIsEditMode(false);
         }
     });
@@ -76,13 +74,12 @@ export function ProductManagerItem(props: IProps) {
         if (!actualProduct && !isEditMode && props.onDismiss) {
             props.onDismiss();
         }
-    });
+    }, [actualProduct, isEditMode, props.onDismiss]);
 
     ///
     /// Event Handling
     ///
     const onEditClick = () => {
-        console.log("setting edit mode");
         setIsEditMode(true);
     };
 
