@@ -26,7 +26,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 export class HomePage extends React.Component<IProps> {
     public render() {
-        const splashVars = splashVariables();
+        const splashVars = splashVariables({});
         const title = t(splashVars.title.text);
         const { loadStatus, knowledgeBases } = this.props;
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {

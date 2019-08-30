@@ -13,7 +13,7 @@ import * as icons from "@knowledge/icons/common";
 import { StoryTile } from "@library/storybook/StoryTile";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 
-const story = storiesOf("KnowledgeBase", module);
+const story = storiesOf("Knowledge Base", module);
 
 story.add("Icons", () => {
     return (
