@@ -22,7 +22,7 @@ interface IProps {
  * Render out a form group with selection UI for this input.
  * Renders a hidden input for compatibity with Gdn_Form.
  */
-export function ProductSelectorFormGroup(props: IProps) {
+export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     const { allProductLoadable, productsById } = useProducts();
     const options = useMemo(() => {
         return Object.values(productsById)
@@ -70,9 +70,9 @@ export function ProductSelectorFormGroup(props: IProps) {
             <DashboardSelect
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS}
                 options={options}
-                value={currentComboBoxValue}
+                value={currentComboBoxValue!}
                 onChange={value => setValue(value.value)}
             />
         </DashboardFormGroup>
     );
-}
+};
