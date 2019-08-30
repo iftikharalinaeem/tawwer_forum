@@ -1,4 +1,8 @@
 <?php
+
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Subcommunities\Models\ProductModel;
+
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2014 Vanilla Forums Inc.
@@ -80,9 +84,14 @@ class SubcommunitiesController extends DashboardController {
         $form = [
             'Name' => ['Description' => 'Enter a friendly name for the site.'],
             'Folder' => ['Description' => 'Enter a url-friendly folder name for the site.'],
+            'ProductID' => ['Control' => 'react', 'Component' => 'product-selector-form-group'],
             'CategoryID' => ['LabelCode' => 'Category', 'Control' => 'DropDown', 'Items' => $this->data('Categories'), 'Options' => ['IncludeNull' => true]],
             'Locale' => ['Control' => 'DropDown', 'Items' => $this->data('Locales'), 'Options' => ['IncludeNull' => true]],
         ];
+
+        if (!FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+            unset($form['ProductID']);
+        }
 
         $this->EventArguments['Form'] =& $form;
         $this->EventArguments['Site'] =& $this->site;

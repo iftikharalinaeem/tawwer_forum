@@ -29,7 +29,7 @@ class ProductsApiController extends AbstractApiController {
     private $productFeatureEnabled;
 
     /**
-     * productApiController constructor.
+     * ProductApiController constructor.
      *
      * @param ProductModel $productModel
      */
