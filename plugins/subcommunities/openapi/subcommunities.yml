@@ -28,11 +28,11 @@ paths:
                     description: Success
             tags:
                 - Subcommunities
-            summary: Get a list of products.
+            summary: Get a list of subcommunities.
     /subcommunities/{id}:
         get:
             parameters:
-                - description: The ID of the product.
+                - description: The ID of the subcommunity.
                   in: path
                   name: id
                   required: true
