@@ -46,13 +46,15 @@ class SubcommunitiesApiController extends AbstractApiController {
     public function subcommunitySchema(string $type = ""): Schema {
         if ($this->subcommunitySchema === null) {
             $this->subcommunitySchema = $this->schema(Schema::parse([
-                "subcommunityID",
-                "name",
-                "folder",
-                "categoryID?",
-                "locale",
-                "productID?",
+                "subcommunityID:i",
+                "name:s",
+                "folder:s",
+                "categoryID:s",
+                "locale:s",
+                "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
+                "localeNames:o?",
+                "subcommunityUrl:s"
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -78,6 +80,8 @@ class SubcommunitiesApiController extends AbstractApiController {
             "isDefault:i?",
             "productID:i?",
             "product?" => $this->productModel->productFragmentSchema(),
+            "localeNames:o?",
+            "subcommunityUrl:i"
         ]);
     }
 
@@ -105,17 +109,29 @@ class SubcommunitiesApiController extends AbstractApiController {
     public function index(array $query): array {
         $this->permission();
         $in = $this->schema([
-            "expand?" => ApiUtils::getExpandDefinition(["product","category"])
+            "expand?" => ApiUtils::getExpandDefinition(["product","category","locale"])
         ]);
         $out = $this->schema([":a" => $this->subcommunitySchema(), "out"]);
 
         $query = $in->validate($query);
         $results = $this->subcommunityModel::all();
+
         $results = array_values($results);
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
         }
+
+        if ($this->isExpandField('locale', $query['expand'])) {
+            $locales = array_column($results, 'Locale', 'Locale');
+            $this->expandLocales($results, $locales);
+        }
+        // Build subcommunity url.
+        foreach ($results as &$result) {
+            $url = url($result["Folder"], true);
+            $result["subcommunityUrl"] = $url;
+        }
+
         $results = ApiUtils::convertOutputKeys($results);
         $subcommunities = $out->validate($results, true);
 
@@ -138,15 +154,48 @@ class SubcommunitiesApiController extends AbstractApiController {
         ]);
         $query = $in->validate($query);
         
-        $results = $this->subcommunityModel->getID($id);
+        $result = $this->subcommunityModel->getID($id);
 
         if ($this->isExpandField('product', $query['expand'])) {
-            $this->productModel->expandProduct($results);
+            $this->productModel->expandProduct($result);
         }
+        
+        // Build subcommunity url.
+        $url = url($result["Folder"], true);
+        $result["subcommunityUrl"] = $url;
 
         $out = $this->subcommunitySchema();
-        $result = $out->validate($results);
+        $result = $out->validate($result);
 
         return $result;
+    }
+
+    /**
+     * Expand the locale names.
+     *
+     * @param array $rows
+     * @param array $locales
+     */
+    public function expandLocales(array &$rows, array $locales) {
+        if (count($rows) === 0) {
+            return;
+        }
+        reset($rows);
+        $single = is_string(key($rows));
+
+        $populate = function(array &$row, array $locales) {
+            foreach ($locales as $locale) {
+                $locales[$locale] = \Locale::getDisplayLanguage($row["Locale"], $locale);
+            }
+            setValue('localeNames', $row, $locales);
+        };
+
+        if ($single) {
+            $populate($rows, $locales);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row, $locales);
+            }
+        }
     }
 }
