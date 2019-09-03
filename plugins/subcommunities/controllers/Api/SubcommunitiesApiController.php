@@ -99,11 +99,11 @@ class SubcommunitiesApiController extends AbstractApiController {
     /**
      * Get a list of subcommunities.
      *
-     * @param String $query
+     * @param array $query
      * @return array
      */
     public function index(array $query): array {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission();
         $in = $this->schema([
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
