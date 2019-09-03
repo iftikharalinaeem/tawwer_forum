@@ -1,19 +1,42 @@
 <?php
+
+use Vanilla\ApiUtils;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Models\UserFragmentSchema;
+
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  */
 class ReportModel extends Gdn_Model {
 
     /**
-     * \Vanilla\EmbeddedContent\EmbedService $embedService
+     * @var EmbedService $embedService
      */
-    var $embedService;
+    private $embedService;
 
-    public function __construct($name = '', \Vanilla\EmbeddedContent\EmbedService $embedService ) {
+    /** @var FormatService */
+    private $formatService;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /**
+     * DI.
+     *
+     * @param EmbedService $embedService
+     * @param FormatService $formatService
+     * @param UserModel $userModel
+     */
+    public function __construct(EmbedService $embedService, FormatService $formatService, UserModel $userModel) {
         parent::__construct('Comment');
-
         $this->embedService = $embedService;
+        $this->formatService = $formatService;
+        $this->userModel = $userModel;
     }
+
 
     /**
      * Get our special Reported Posts CategoryID.
@@ -127,7 +150,7 @@ class ReportModel extends Gdn_Model {
                 $data['Body'] = \Gdn::formatService()->filter($data['Body'], $data['Format']);
             }
 
-            $discussionBody = $this->encodeBody($reportedRecord, $data) ?? '';
+            $discussionBody = $this->encodeBody($reportedRecord) ?? '';
 
             // Build discussion record
             $discussion = [
@@ -182,16 +205,47 @@ class ReportModel extends Gdn_Model {
      * Encode the record to render and save.
      *
      * @param array $record The record that needs to be processed.
-     * @param array $data Optionally data that needs to be added to the record.
+     *
      * @return string Json encoded data for the be rendered in the view and saved.
      */
-    public function encodeBody(array $record, array $data = []): string {
-        $quote = $this->embedService->createEmbedForUrl($record['Url']);
+    public function encodeBody(array $record): string {
+        $recordType = "unknown";
+        $recordID = -1;
+        if (isset($record['DiscussionID'])) {
+            $recordType = "discussion";
+            $recordID = $record["DiscussionID"];
+        } elseif (isset($record["CommentID"])) {
+            $recordType = "comment";
+            $recordID = $record["CommentID"];
+        } elseif (isset($record["ActivityID"])) {
+            $recordType = "activity";
+            $recordID = $record["ActivityID"];
+        }
+
+        $bodyRaw = $record["Body"] ?? "";
+        $bodyFormat = $record["Format"] ?? HtmlFormat::FORMAT_KEY;
+        $userID = $record['UserID'] ?? $record['ActivityUserID'];
+        $userRecord = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $userRecord = UserFragmentSchema::normalizeUserFragment($userRecord);
+
+        $embed = new QuoteEmbed([
+            "embedType" => QuoteEmbed::TYPE,
+            "recordType" => $recordType,
+            "recordID" => $recordID,
+            "body" => $this->formatService->renderQuote($bodyRaw, $bodyFormat),
+            "format" => $bodyFormat,
+            "bodyRaw" => $bodyRaw,
+            "userID" => $userID,
+            "insertUser" => $userRecord,
+            "url" => $record['Url'],
+            "dateInserted" =>  $record["DateInserted"],
+        ]);
+
         $jsonOperations = [
             [
                 "insert" => [
                     "embed-external" => [
-                        "data" => $quote,
+                        "data" => $embed,
                         ],
                     ],
                 ],
@@ -199,5 +253,4 @@ class ReportModel extends Gdn_Model {
 
         return json_encode($jsonOperations);
     }
-
 }
