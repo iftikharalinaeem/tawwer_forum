@@ -45,7 +45,7 @@ export function ProductChooser(props: IProps) {
     const classes = chooserClasses();
     return (
         <div>
-            {props.onBack && localeInfo.count > 0 && (
+            {props.onBack && localeInfo.count > 1 && (
                 <>
                     <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
                         <span className={classes.rowBack}>

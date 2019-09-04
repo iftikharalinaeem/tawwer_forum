@@ -52,7 +52,7 @@ export function useLocaleInfo() {
         );
         const result = {
             count: uniqueLocales.length,
-            defaultLocale: getMeta("ui.localeKey", null),
+            defaultLocale: getMeta("ui.localeKey", getMeta("ui.locale", null)),
         };
         return result;
     }, [subcommunitiesByID]);
