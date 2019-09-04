@@ -29,10 +29,8 @@ type DeleteRequest = { productID: number };
 type DeleteResponse = undefined;
 type PatchRequest = Partial<PostRequest> & GetRequest;
 type PatchResponse = IProduct;
-type PutFeatureRequest = {};
-type PutFeatureResponse = {
-    status: "Enabled" | "Disabled";
-};
+type PutFeatureRequest = { enabled: boolean };
+type PutFeatureResponse = { enabled: boolean };
 
 export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
     public static readonly getAllACs = actionCreator.async<GetAllRequest, GetAllResponse, IApiError>("GET_ALL");
@@ -91,7 +89,7 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
 
     public toggleFeatureEnabled = (request: PutFeatureRequest) => {
         const apiThunk = bindThunkAction(ProductActions.putFeatureFlagACs, async () => {
-            const response = await this.api.put(`/products/product-feature-flag`);
+            const response = await apiv2.put(`/products/product-feature-flag`, request);
             return response.data;
         })(request);
         this.dispatch(apiThunk);

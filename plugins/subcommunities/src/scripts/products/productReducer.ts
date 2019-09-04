@@ -106,7 +106,7 @@ export const productsReducer = produce(
         })
         .case(ProductActions.putFeatureFlagACs.done, (state, payload) => {
             state.enableStatus = LoadStatus.SUCCESS;
-            state.enabled = payload.result.status === "Enabled";
+            state.enabled = payload.result.enabled;
             return state;
         }),
 );
