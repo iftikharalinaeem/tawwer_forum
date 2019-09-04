@@ -15,7 +15,7 @@ import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
 
 interface IProps {
-    initialValue?: number | null;
+    initialValue?: number | null | boolean; // Gdn_Form can give us some nasty values.
 }
 
 /**
@@ -36,7 +36,9 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     }, [productsById]);
     const [modalOpen, setModalOpen] = useState(false);
 
-    const [value, setValue] = useState<number | string | undefined | null>(props.initialValue);
+    const [value, setValue] = useState<number | string | undefined | null>(
+        typeof props.initialValue === "boolean" ? null : props.initialValue,
+    );
     const currentComboBoxValue = useMemo(() => {
         if (value == null) {
             return null;
@@ -53,7 +55,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
 
     return (
         <DashboardFormGroup
-            label={t("Product Name")}
+            label={t("Product")}
             description={
                 <Translate
                     source="Assosciate a product with this Subcommunity. <0>Use the management UI</0> to replace add, edit, or delete products."
@@ -71,7 +73,9 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS}
                 options={options}
                 value={currentComboBoxValue!}
-                onChange={value => setValue(value.value)}
+                onChange={value => {
+                    setValue(value ? value.value : null);
+                }}
             />
         </DashboardFormGroup>
     );

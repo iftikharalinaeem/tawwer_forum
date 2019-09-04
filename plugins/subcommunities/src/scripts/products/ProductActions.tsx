@@ -3,14 +3,15 @@
  * @license Proprietary
  */
 
-import { IApiError } from "@library/@types/api/core";
-import apiv2 from "@library/apiv2";
+import { IApiError, LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IProduct } from "@subcommunities/products/productTypes";
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { actionCreatorFactory } from "typescript-fsa";
+import apiv2 from "@library/apiv2";
+import { IMultiSiteStoreState } from "@subcommunities/state/model";
 
 const actionCreator = actionCreatorFactory("@@product");
 
@@ -33,7 +34,7 @@ type PutFeatureResponse = {
     status: "Enabled" | "Disabled";
 };
 
-export class ProductActions extends ReduxActions {
+export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
     public static readonly getAllACs = actionCreator.async<GetAllRequest, GetAllResponse, IApiError>("GET_ALL");
     public static readonly getACs = actionCreator.async<GetRequest, GetResponse, IApiError>("GET");
     public static readonly postACs = actionCreator.async<
@@ -47,9 +48,13 @@ export class ProductActions extends ReduxActions {
         "PUT_FEATURE",
     );
 
-    public getAll = () => {
+    public getAll = (force: boolean = false) => {
+        if (!force && this.getState().multisite.products.allProductLoadable.status !== LoadStatus.PENDING) {
+            // Only make the request if we haven't started it yet.
+            return;
+        }
         const apiThunk = bindThunkAction(ProductActions.getAllACs, async () => {
-            const response = await apiv2.get("/products");
+            const response = await this.api.get("/products");
             return response.data;
         })();
         this.dispatch(apiThunk);
@@ -57,7 +62,7 @@ export class ProductActions extends ReduxActions {
 
     public postProduct = (request: PostRequest) => {
         const apiThunk = bindThunkAction(ProductActions.postACs, async () => {
-            const response = await apiv2.post("/products", request);
+            const response = await this.api.post("/products", request);
             return response.data;
         })({
             ...request,
@@ -69,7 +74,7 @@ export class ProductActions extends ReduxActions {
     public patchProduct = (request: PatchRequest) => {
         const apiThunk = bindThunkAction(ProductActions.patchACs, async () => {
             const { productID, ...rest } = request;
-            const response = await apiv2.patch(`/products/${productID}`, rest);
+            const response = await this.api.patch(`/products/${productID}`, rest);
             return response.data;
         })(request);
         this.dispatch(apiThunk);
@@ -78,7 +83,7 @@ export class ProductActions extends ReduxActions {
     public deleteProduct = (request: DeleteRequest) => {
         const apiThunk = bindThunkAction(ProductActions.deleteACs, async () => {
             const { productID } = request;
-            const response = await apiv2.delete(`/products/${productID}`);
+            const response = await this.api.delete(`/products/${productID}`);
             return response.data;
         })(request);
         this.dispatch(apiThunk);
@@ -86,7 +91,7 @@ export class ProductActions extends ReduxActions {
 
     public toggleFeatureEnabled = (request: PutFeatureRequest) => {
         const apiThunk = bindThunkAction(ProductActions.putFeatureFlagACs, async () => {
-            const response = await apiv2.put(`/products/product-feature-flag`);
+            const response = await this.api.put(`/products/product-feature-flag`);
             return response.data;
         })(request);
         this.dispatch(apiThunk);
