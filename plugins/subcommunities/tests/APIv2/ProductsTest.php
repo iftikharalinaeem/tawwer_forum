@@ -21,22 +21,23 @@ class ProductsTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
-        $config->set('Feature.'. ProductModel::FEATURE_FLAG.'.Enabled', true, true, false);
+        $config->set('Feature.'. ProductModel::FEATURE_FLAG.'.Enabled', false, true, false);
     }
 
     /**
      * Test Put setProductFeatureFlag.
      */
     public function testPutProductFeatureFlag() {
-        // ensure that we can disable the product feature.
+        // ensure that we can enable the product feature.
         $result = $this->api()->put(
-            'products/product-feature-flag'
+            'products/product-feature-flag',
+            ["enabled" => true]
         );
 
         $this->assertEquals(200, $result->getStatusCode());
         $response = $result->getBody();
-        $this->assertEquals(false, c( 'Feature.' . ProductModel::FEATURE_FLAG . '.Enabled'));
-        $this->assertEquals(ProductModel::DISABLED, $response['status']);
+        $this->assertEquals(true, c( 'Feature.' . ProductModel::FEATURE_FLAG . '.Enabled'));
+        $this->assertEquals(true, $response['enabled']);
     }
 
     /**

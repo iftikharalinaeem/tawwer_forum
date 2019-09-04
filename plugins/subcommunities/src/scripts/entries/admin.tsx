@@ -20,8 +20,8 @@ onReady(() => {
     const store = getStore();
     store.dispatch(
         ProductActions.putFeatureFlagACs.done({
-            params: {},
-            result: { status: getMeta("featureFlags.SubcommunityProducts.Enabled", false) ? "Enabled" : "Disabled" },
+            params: { enabled: false },
+            result: { enabled: !!getMeta("featureFlags.SubcommunityProducts.Enabled", false) },
         }),
     );
 });

@@ -32,7 +32,7 @@ export function ProductIntegrationFormGroup(props: IProps) {
                 inProgress={enableStatus === LoadStatus.LOADING}
                 checked={enabled}
                 onChange={() => {
-                    void toggleFeatureEnabled(!enabled);
+                    void toggleFeatureEnabled({ enabled: !enabled });
                 }}
             />
         </DashboardFormGroup>
