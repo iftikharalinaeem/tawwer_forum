@@ -55,6 +55,7 @@ class SubcommunitiesController extends DashboardController {
                 $this->form->saveImage($field, ['Prefix' => 'subcommunities/']);
             }
             $value = $this->form->getFormValue($field);
+            $value = $value === "" ? null : $value; // Normalize empty strings
 
             if (strpos($field, 'Config.') === 0) {
                 setvalr($field, $result, $value);
