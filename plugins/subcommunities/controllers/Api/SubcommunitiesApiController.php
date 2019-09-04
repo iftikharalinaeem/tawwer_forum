@@ -54,7 +54,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
                 "localeNames:o?",
-                "subcommunityUrl:s"
+                "url:s"
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -81,7 +81,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             "productID:i?",
             "product?" => $this->productModel->productFragmentSchema(),
             "localeNames:o?",
-            "subcommunityUrl:i"
+            "url:s"
         ]);
     }
 
@@ -103,11 +103,11 @@ class SubcommunitiesApiController extends AbstractApiController {
     /**
      * Get a list of subcommunities.
      *
-     * @param array $query
+     * @param String $query
      * @return array
      */
     public function index(array $query): array {
-        $this->permission();
+        $this->permission("Garden.SignIn.Allow");
         $in = $this->schema([
             "expand?" => ApiUtils::getExpandDefinition(["product","category","locale"])
         ]);
@@ -118,6 +118,10 @@ class SubcommunitiesApiController extends AbstractApiController {
 
         $results = array_values($results);
 
+        foreach ($results as &$result) {
+            $this->subcommunityModel::calculateRow($result);
+        }
+
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
         }
@@ -125,11 +129,6 @@ class SubcommunitiesApiController extends AbstractApiController {
         if ($this->isExpandField('locale', $query['expand'])) {
             $locales = array_column($results, 'Locale', 'Locale');
             $this->expandLocales($results, $locales);
-        }
-        // Build subcommunity url.
-        foreach ($results as &$result) {
-            $url = url($result["Folder"], true);
-            $result["subcommunityUrl"] = $url;
         }
 
         $results = ApiUtils::convertOutputKeys($results);
