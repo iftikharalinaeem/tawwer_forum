@@ -20,7 +20,7 @@ onReady(() => {
     const store = getStore();
     store.dispatch(
         ProductActions.putFeatureFlagACs.done({
-            params: {},
+            params: { enabled: false },
             result: { enabled: !!getMeta("featureFlags.SubcommunityProducts.Enabled", false) },
         }),
     );
