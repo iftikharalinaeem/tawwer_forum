@@ -15,7 +15,7 @@ import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { useLocaleInfo } from "@subcommunities/products/productSelectors";
-import { useCurrentSubcommunity } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { useCurrentSubcommunity, useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
@@ -28,8 +28,9 @@ export function SubcommunityChooserDropdown() {
     const [activeSection, setActiveSection] = useState<SectionName>("locale");
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const localeInfo = useLocaleInfo();
 
-    if (!subcommunity) {
+    if (!subcommunity || !localeInfo) {
         return null;
     }
 
@@ -61,13 +62,17 @@ export function SubcommunityChooserDropdown() {
                             setIsOpen(false);
                         }}
                     >
-                        <Button
-                            baseClass={activeSection === "locale" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
-                            onClick={() => setActiveSection("locale")}
-                        >
-                            Locales
-                        </Button>
-                        <hr className={classes.headingDivider} />
+                        {localeInfo.count > 1 && (
+                            <>
+                                <Button
+                                    baseClass={activeSection === "locale" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
+                                    onClick={() => setActiveSection("locale")}
+                                >
+                                    Locales
+                                </Button>
+                                <hr className={classes.headingDivider} />
+                            </>
+                        )}
                         <Button
                             baseClass={activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
                             onClick={() => setActiveSection("product")}
@@ -93,7 +98,7 @@ export function SubcommunityChooser(props: {
 }) {
     const { activeSection, setActiveSection } = props;
     const subcommunity = useCurrentSubcommunity();
-    const context = useCommunityFilterContext();
+    const locales = useAvailableLocales();
     const [selectedLocale, setSelectedLocale] = useState<string | null>(subcommunity ? subcommunity.locale : null);
     useEffect(() => {
         if (subcommunity) {
@@ -105,21 +110,12 @@ export function SubcommunityChooser(props: {
     const localeInfo = useLocaleInfo();
 
     if (localeInfo && localeInfo.count <= 1 && localeInfo.defaultLocale) {
-        return (
-            <ProductChooser
-                forLocale={localeInfo.defaultLocale}
-                hideNoProductCommunities={context.hideNoProductCommunities}
-                communityID={communityID}
-                linkSuffix={context.linkSuffix}
-            />
-        );
+        return <ProductChooser forLocale={localeInfo.defaultLocale} communityID={communityID} />;
     }
 
     if (activeSection === "product" && selectedLocale) {
         return (
             <ProductChooser
-                linkSuffix={context.linkSuffix}
-                hideNoProductCommunities={context.hideNoProductCommunities}
                 forLocale={selectedLocale}
                 communityID={communityID}
                 onBack={() => {

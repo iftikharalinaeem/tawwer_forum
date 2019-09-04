@@ -9,7 +9,7 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
 import { assetUrl } from "@library/utility/appUtils";
-import { useProductsForLocale } from "@subcommunities/products/productSelectors";
+import { useProductsForLocale, useLocaleInfo } from "@subcommunities/products/productSelectors";
 import React, { useRef, useLayoutEffect } from "react";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
@@ -31,28 +31,31 @@ export function ProductChooser(props: IProps) {
     const options = useCommunityFilterContext();
     const productsForLocale = useProductsForLocale(props.forLocale);
     const backButtonRef = useRef<HTMLButtonElement>(null);
+    const localeInfo = useLocaleInfo();
 
     // Focus the button when the page opens.
     useLayoutEffect(() => {
         backButtonRef.current && backButtonRef.current.focus();
     }, []);
 
-    if (!productsForLocale) {
+    if (!productsForLocale || !localeInfo) {
         return <Loader small padding={10} />;
     }
 
     const classes = chooserClasses();
     return (
         <div>
-            {props.onBack && (
-                <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
-                    <span className={classes.rowBack}>
-                        <LeftChevronCompactIcon className={classes.rowArrow} />
-                        <LocaleDisplayer localeContent={props.forLocale} />
-                    </span>
-                </DropDownItemButton>
+            {props.onBack && localeInfo.count > 0 && (
+                <>
+                    <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
+                        <span className={classes.rowBack}>
+                            <LeftChevronCompactIcon className={classes.rowArrow} />
+                            <LocaleDisplayer localeContent={props.forLocale} />
+                        </span>
+                    </DropDownItemButton>
+                    <DropDownItemSeparator />
+                </>
             )}
-            <DropDownItemSeparator />
             {productsForLocale.map(productGroup => {
                 const { product, community } = productGroup;
                 return (
