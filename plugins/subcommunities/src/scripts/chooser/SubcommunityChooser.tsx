@@ -14,12 +14,16 @@ import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
-import { useLocaleInfo } from "@subcommunities/products/productSelectors";
-import { useCurrentSubcommunity, useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
+import {
+    useCurrentSubcommunity,
+    useAvailableLocales,
+    useLocaleInfo,
+} from "@subcommunities/subcommunities/subcommunitySelectors";
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { button } from "@storybook/addon-knobs";
 
 type SectionName = "locale" | "product";
 
@@ -38,6 +42,11 @@ export function SubcommunityChooserDropdown() {
     const classesTitleBar = titleBarClasses();
     const classesTitleBarNav = titleBarNavClasses();
 
+    let toggleName = subcommunity.name;
+    if (localeInfo.count > 1) {
+        toggleName += ` (${subcommunity.locale}) `;
+    }
+
     return (
         <DropDown
             isVisible={isOpen}
@@ -50,7 +59,7 @@ export function SubcommunityChooserDropdown() {
             renderLeft={true}
             buttonContents={
                 <span className={classNames(classes.toggle, classesTitleBarNav.linkContent)}>
-                    {subcommunity.name + ` (${subcommunity.locale}) `}
+                    {toggleName}
                     <DownTriangleIcon className={classes.toggleArrow} />
                 </span>
             }
@@ -74,6 +83,7 @@ export function SubcommunityChooserDropdown() {
                             </>
                         )}
                         <Button
+                            disabled={activeSection === "locale"}
                             baseClass={activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
                             onClick={() => setActiveSection("product")}
                         >
@@ -100,14 +110,15 @@ export function SubcommunityChooser(props: {
     const subcommunity = useCurrentSubcommunity();
     const locales = useAvailableLocales();
     const [selectedLocale, setSelectedLocale] = useState<string | null>(subcommunity ? subcommunity.locale : null);
+    const localeInfo = useLocaleInfo();
     useEffect(() => {
-        if (subcommunity) {
-            setSelectedLocale(subcommunity.locale);
+        if (localeInfo && localeInfo.defaultLocale) {
+            setSelectedLocale(localeInfo.defaultLocale);
+            props.setActiveSection("product");
         }
     }, [subcommunity]);
 
     const [communityID, setCommunityID] = useState<number | null>(null);
-    const localeInfo = useLocaleInfo();
 
     if (localeInfo && localeInfo.count <= 1 && localeInfo.defaultLocale) {
         return <ProductChooser forLocale={localeInfo.defaultLocale} communityID={communityID} />;

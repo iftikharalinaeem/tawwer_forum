@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useMemo, useDebugValue } from "react";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { ISubcommunity, ILocale } from "@subcommunities/subcommunities/subcommunityTypes";
-import { formatUrl, assetUrl } from "@library/utility/appUtils";
+import { formatUrl, assetUrl, getMeta } from "@library/utility/appUtils";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 
 export function useSubcommunitiesState() {
@@ -114,6 +114,22 @@ export function useAvailableLocales() {
         return availableLocales;
     }, [subcommunitiesByID, hideNoProductCommunities]);
 
+    useDebugValue(result);
+    return result;
+}
+
+export function useLocaleInfo() {
+    const locales = useAvailableLocales();
+    const result = useMemo(() => {
+        if (!locales) {
+            return null;
+        }
+        const result = {
+            count: Object.values(locales).length,
+            defaultLocale: getMeta("ui.localeKey", getMeta("ui.locale", null)),
+        };
+        return result;
+    }, [locales]);
     useDebugValue(result);
     return result;
 }

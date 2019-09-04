@@ -40,26 +40,6 @@ export function useProducts() {
     return result;
 }
 
-export function useLocaleInfo() {
-    const { subcommunitiesByID } = useSubcommunities();
-    const result = useMemo(() => {
-        if (!subcommunitiesByID.data) {
-            return null;
-        }
-
-        const uniqueLocales = Array.from(
-            new Set(Object.values(subcommunitiesByID.data).map(community => community.locale)),
-        );
-        const result = {
-            count: uniqueLocales.length,
-            defaultLocale: getMeta("ui.localeKey", getMeta("ui.locale", null)),
-        };
-        return result;
-    }, [subcommunitiesByID]);
-    useDebugValue(result);
-    return result;
-}
-
 export function useProductsByLocale() {
     const { productsById } = useProducts();
     const { subcommunitiesByID } = useSubcommunities();

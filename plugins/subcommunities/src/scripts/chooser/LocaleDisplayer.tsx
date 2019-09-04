@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 import React from "react";
-import { useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { useAvailableLocales, useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
 import { getMeta, t } from "@library/utility/appUtils";
 
 interface IProps {
@@ -18,12 +18,12 @@ interface IProps {
  */
 export function LocaleDisplayer(props: IProps) {
     const locales = useAvailableLocales();
-    if (!locales) {
+    const localeInfo = useLocaleInfo();
+    if (!locales || !localeInfo) {
         return null;
     }
 
-    const currentSiteLocale = getMeta("ui.localeKey");
-    let fullLocaleName = locales[props.localeContent].translatedNames[props.displayLocale || currentSiteLocale];
+    let fullLocaleName = locales[props.localeContent].translatedNames[localeInfo.defaultLocale];
 
     if (!fullLocaleName) {
         fullLocaleName = t(props.localeContent);

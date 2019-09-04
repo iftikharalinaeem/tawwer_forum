@@ -9,12 +9,13 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
 import { assetUrl } from "@library/utility/appUtils";
-import { useProductsForLocale, useLocaleInfo } from "@subcommunities/products/productSelectors";
+import { useProductsForLocale } from "@subcommunities/products/productSelectors";
 import React, { useRef, useLayoutEffect } from "react";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
+import { useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
 
 interface IProps {
     forLocale: string;
