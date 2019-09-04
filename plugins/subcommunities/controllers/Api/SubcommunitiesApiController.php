@@ -103,11 +103,11 @@ class SubcommunitiesApiController extends AbstractApiController {
     /**
      * Get a list of subcommunities.
      *
-     * @param String $query
+     * @param array $query
      * @return array
      */
     public function index(array $query): array {
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission();
         $in = $this->schema([
             "expand?" => ApiUtils::getExpandDefinition(["product","category","locale"])
         ]);
@@ -154,14 +154,11 @@ class SubcommunitiesApiController extends AbstractApiController {
         $query = $in->validate($query);
         
         $result = $this->subcommunityModel->getID($id);
+        $this->subcommunityModel::calculateRow($result);
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($result);
         }
-        
-        // Build subcommunity url.
-        $url = url($result["Folder"], true);
-        $result["subcommunityUrl"] = $url;
 
         $out = $this->subcommunitySchema();
         $result = $out->validate($result);
