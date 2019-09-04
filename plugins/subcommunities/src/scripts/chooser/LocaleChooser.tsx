@@ -5,9 +5,11 @@
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { RightChevronIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
-import { useProductsByLocale } from "@subcommunities/products/productSelectors";
-import React from "react";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
+import { useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
+import React from "react";
+import { getMeta } from "@library/utility/appUtils";
+import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
 
 interface IProps {
     value: string | null;
@@ -15,21 +17,21 @@ interface IProps {
 }
 
 export function LocaleChooser(props: IProps) {
-    const productsByLocale = useProductsByLocale();
+    const locales = useAvailableLocales();
 
-    if (productsByLocale === null) {
-        return <Loader />;
+    if (locales === null) {
+        return <Loader small padding={10} />;
     }
 
     const classes = chooserClasses();
 
     return (
         <div>
-            {Object.entries(productsByLocale).map(([localeKey, products]) => {
+            {Object.values(locales).map(locale => {
                 return (
-                    <DropDownItemButton key={localeKey} onClick={() => props.onChange(localeKey)}>
+                    <DropDownItemButton key={locale.key} onClick={() => props.onChange(locale.key)}>
                         <span className={classes.row}>
-                            {localeKey}
+                            <LocaleDisplayer localeContent={locale.key} />
                             <RightChevronIcon className={classes.rowArrow} />
                         </span>
                     </DropDownItemButton>

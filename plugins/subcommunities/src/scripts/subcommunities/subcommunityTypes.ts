@@ -11,9 +11,20 @@ export interface ISubcommunity extends IApiDateInfo {
     name: string;
     folder: string;
     categoryID: string | null;
-    locale: string;
     sort: number;
     isDefault: boolean;
     productID: number | null;
     product?: IProduct;
+    locale: string;
+    localeNames: {
+        [localeKey: string]: string;
+    };
+}
+
+export interface ILocale {
+    key: string;
+    translatedNames: {
+        // Translated names of the locale.
+        [localeKey: string]: string;
+    };
 }

@@ -3,23 +3,23 @@
  * @license Proprietary
  */
 
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { DownTriangleIcon } from "@library/icons/common";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
+import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { useLocaleInfo } from "@subcommunities/products/productSelectors";
-import React, { useState, useEffect, useReducer, useRef } from "react";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { useCurrentSubcommunity } from "@subcommunities/subcommunities/subcommunitySelectors";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { DownTriangleIcon } from "@library/icons/common";
-import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
-import { t } from "@library/utility/appUtils";
-import Button from "@library/forms/Button";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import Frame from "@library/layout/frame/Frame";
-import { MinimalFrameHeader } from "@library/layout/frame/MinimalFrameHeader";
-import Loader from "@library/loaders/Loader";
+import React, { useEffect, useRef, useState } from "react";
+import classNames from "classnames";
+import titleBarNavClasses from "@library/headers/titleBarNavStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 
 type SectionName = "locale" | "product";
 
@@ -27,22 +27,28 @@ export function SubcommunityChooserDropdown() {
     const subcommunity = useCurrentSubcommunity();
     const [activeSection, setActiveSection] = useState<SectionName>("locale");
     const buttonRef = useRef<HTMLButtonElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     if (!subcommunity) {
-        return <Loader />;
+        return null;
     }
 
     const classes = chooserClasses();
+    const classesTitleBar = titleBarClasses();
+    const classesTitleBarNav = titleBarNavClasses();
 
     return (
         <DropDown
+            isVisible={isOpen}
+            onVisibilityChange={setIsOpen}
             buttonRef={buttonRef}
             isSmall
             flyoutType={FlyoutType.FRAME}
             buttonBaseClass={ButtonTypes.TEXT}
+            toggleButtonClassName={classNames(classesTitleBarNav.link, classesTitleBar.topElement)}
             renderLeft={true}
             buttonContents={
-                <span className={classes.toggle}>
+                <span className={classNames(classes.toggle, classesTitleBarNav.linkContent)}>
                     {subcommunity.name + ` (${subcommunity.locale}) `}
                     <DownTriangleIcon className={classes.toggleArrow} />
                 </span>
@@ -50,10 +56,9 @@ export function SubcommunityChooserDropdown() {
         >
             <Frame
                 header={
-                    <MinimalFrameHeader
+                    <FrameHeaderMinimal
                         onClose={() => {
-                            document.body.focus();
-                            buttonRef.current && buttonRef.current.focus();
+                            setIsOpen(false);
                         }}
                     >
                         <Button
@@ -69,7 +74,7 @@ export function SubcommunityChooserDropdown() {
                         >
                             Products
                         </Button>
-                    </MinimalFrameHeader>
+                    </FrameHeaderMinimal>
                 }
                 body={
                     <FrameBody selfPadded className={classes.body}>

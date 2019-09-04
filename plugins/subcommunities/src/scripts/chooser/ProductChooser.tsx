@@ -13,6 +13,7 @@ import { useProductsForLocale } from "@subcommunities/products/productSelectors"
 import React, { useRef, useLayoutEffect } from "react";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
 
 interface IProps {
     forLocale: string;
@@ -31,7 +32,7 @@ export function ProductChooser(props: IProps) {
     }, []);
 
     if (!productsForLocale) {
-        return <Loader />;
+        return <Loader small padding={10} />;
     }
 
     const classes = chooserClasses();
@@ -41,7 +42,7 @@ export function ProductChooser(props: IProps) {
                 <DropDownItemButton buttonRef={buttonRef} onClick={props.onBack}>
                     <span className={classes.rowBack}>
                         <LeftChevronCompactIcon className={classes.rowArrow} />
-                        {props.forLocale}
+                        <LocaleDisplayer localeContent={props.forLocale} />
                     </span>
                 </DropDownItemButton>
             )}

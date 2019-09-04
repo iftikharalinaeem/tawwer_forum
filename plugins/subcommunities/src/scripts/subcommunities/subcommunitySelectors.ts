@@ -8,9 +8,9 @@ import { IMultiSiteStoreState } from "@subcommunities/state/model";
 import { useSelector } from "react-redux";
 import { useEffect, useMemo, useDebugValue } from "react";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { ISubcommunity } from "@subcommunities/subcommunities/subcommunityTypes";
-import { getMeta, formatUrl, assetUrl } from "@library/utility/appUtils";
-import { logWarning } from "@vanilla/utils";
+import { ISubcommunity, ILocale } from "@subcommunities/subcommunities/subcommunityTypes";
+import { formatUrl, assetUrl } from "@library/utility/appUtils";
+import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 
 export function useSubcommunitiesState() {
     return useSelector((state: IMultiSiteStoreState) => {
@@ -82,6 +82,37 @@ export function useCurrentSubcommunity() {
             }
         }
     }
+
+    useDebugValue(result);
+    return result;
+}
+
+export function useAvailableLocales() {
+    const { subcommunitiesByID } = useSubcommunities();
+    const { hideNoProductCommunities } = useCommunityFilterContext();
+
+    const result = useMemo(() => {
+        const availableLocales: { [key: string]: ILocale } = {};
+        if (!subcommunitiesByID.data) {
+            return null;
+        }
+
+        for (const community of Object.values(subcommunitiesByID.data)) {
+            if (availableLocales[community.locale]) {
+                continue;
+            }
+
+            if (hideNoProductCommunities && community.productID == null) {
+                continue;
+            }
+
+            availableLocales[community.locale] = {
+                key: community.locale,
+                translatedNames: community.localeNames,
+            };
+        }
+        return availableLocales;
+    }, [subcommunitiesByID, hideNoProductCommunities]);
 
     useDebugValue(result);
     return result;

@@ -3,37 +3,44 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { unit, margins, paddings, colorOut } from "@library/styles/styleHelpers";
-import { percent, px } from "csx";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { frameVariables } from "@library/layout/frame/frameStyles";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
 
 export const chooserVariables = useThemeCache(() => {
     const vars = variableFactory("chooser");
+    const titleBarVars = titleBarVariables();
 
     const arrow = vars("arrow", {
         size: 12,
         margin: 6,
     });
 
-    return { arrow };
+    const toggle = vars("colors", {
+        lineHeight: titleBarVars.button.size,
+        color: titleBarVars.colors.fg,
+    });
+
+    return { arrow, toggle };
 });
 
 export const chooserClasses = useThemeCache(() => {
     const style = styleFactory("chooser");
     const vars = chooserVariables();
-    const titleBarVars = titleBarVariables();
     const dropdownVars = dropDownVariables();
     const globalVars = globalVariables();
 
     const toggle = style("toggle", {
         display: "inline-flex",
         alignItems: "center",
-        lineHeight: unit(titleBarVars.button.size),
+        lineHeight: unit(vars.toggle.lineHeight),
+        color: colorOut(vars.toggle.color),
+        fontWeight: globalVars.fonts.weights.normal,
         ...margins({ horizontal: unit(6) }),
     });
 
