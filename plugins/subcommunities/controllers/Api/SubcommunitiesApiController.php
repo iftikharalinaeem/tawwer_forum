@@ -54,7 +54,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
                 "localeNames:o?",
-                "subcommunityUrl:s"
+                "url:s"
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -81,7 +81,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             "productID:i?",
             "product?" => $this->productModel->productFragmentSchema(),
             "localeNames:o?",
-            "subcommunityUrl:i"
+            "url:s"
         ]);
     }
 
@@ -118,6 +118,10 @@ class SubcommunitiesApiController extends AbstractApiController {
 
         $results = array_values($results);
 
+        foreach ($results as &$result) {
+            $this->subcommunityModel::calculateRow($result);
+        }
+
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
         }
@@ -125,11 +129,6 @@ class SubcommunitiesApiController extends AbstractApiController {
         if ($this->isExpandField('locale', $query['expand'])) {
             $locales = array_column($results, 'Locale', 'Locale');
             $this->expandLocales($results, $locales);
-        }
-        // Build subcommunity url.
-        foreach ($results as &$result) {
-            $url = url($result["Folder"], true);
-            $result["subcommunityUrl"] = $url;
         }
 
         $results = ApiUtils::convertOutputKeys($results);
@@ -155,14 +154,11 @@ class SubcommunitiesApiController extends AbstractApiController {
         $query = $in->validate($query);
         
         $result = $this->subcommunityModel->getID($id);
+        $this->subcommunityModel::calculateRow($result);
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($result);
         }
-        
-        // Build subcommunity url.
-        $url = url($result["Folder"], true);
-        $result["subcommunityUrl"] = $url;
 
         $out = $this->subcommunitySchema();
         $result = $out->validate($result);
