@@ -60,8 +60,12 @@ export const chooserClasses = useThemeCache(() => {
     });
 
     const rowArrow = style("rowArrow", {
-        height: unit(vars.arrow.size),
-        width: unit(vars.arrow.size),
+        $nest: {
+            "&&": {
+                height: unit(vars.arrow.size),
+                width: unit(vars.arrow.size),
+            },
+        },
     });
 
     const rowIndented = style("rowIndented", {

@@ -14,21 +14,27 @@ import React, { useRef, useLayoutEffect } from "react";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
+import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 
 interface IProps {
     forLocale: string;
     communityID: number | null;
     onBack?: () => void;
-    linkSuffix?: string;
-    hideNoProductCommunities?: boolean;
 }
 
+/**
+ * Choose a product or a subcommunity.
+ * Behaviour of this component varies significantly based on the `CommunityFilterContext`.
+ * That can enable a product requirement.
+ */
 export function ProductChooser(props: IProps) {
+    const options = useCommunityFilterContext();
     const productsForLocale = useProductsForLocale(props.forLocale);
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const backButtonRef = useRef<HTMLButtonElement>(null);
 
+    // Focus the button when the page opens.
     useLayoutEffect(() => {
-        buttonRef.current && buttonRef.current.focus();
+        backButtonRef.current && backButtonRef.current.focus();
     }, []);
 
     if (!productsForLocale) {
@@ -39,7 +45,7 @@ export function ProductChooser(props: IProps) {
     return (
         <div>
             {props.onBack && (
-                <DropDownItemButton buttonRef={buttonRef} onClick={props.onBack}>
+                <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
                     <span className={classes.rowBack}>
                         <LeftChevronCompactIcon className={classes.rowArrow} />
                         <LocaleDisplayer localeContent={props.forLocale} />
@@ -52,7 +58,7 @@ export function ProductChooser(props: IProps) {
                 return (
                     <DropDownItemLink
                         key={`product${product ? product.productID : ""}-sub${community.subcommunityID}`}
-                        to={window.location.origin + assetUrl("/" + community.folder) + props.linkSuffix}
+                        to={window.location.origin + assetUrl("/" + community.folder) + options.linkSuffix}
                     >
                         <span className={classes.rowIndented}>{community.name}</span>
                     </DropDownItemLink>

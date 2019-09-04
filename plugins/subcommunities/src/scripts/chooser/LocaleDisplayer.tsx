@@ -11,6 +11,11 @@ interface IProps {
     displayLocale?: string; // The language to use for the display.
 }
 
+/**
+ * Component for displaying a locale translated into a different locale.
+ *
+ * Currently this relies on the subcommuntiies endpoint to provide all translations for active locale.s
+ */
 export function LocaleDisplayer(props: IProps) {
     const locales = useAvailableLocales();
     if (!locales) {

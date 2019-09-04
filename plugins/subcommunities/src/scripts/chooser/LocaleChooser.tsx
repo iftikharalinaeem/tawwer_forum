@@ -8,7 +8,6 @@ import Loader from "@library/loaders/Loader";
 import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
 import { useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
 import React from "react";
-import { getMeta } from "@library/utility/appUtils";
 import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
 
 interface IProps {
@@ -16,6 +15,9 @@ interface IProps {
     onChange: (value: string) => void;
 }
 
+/**
+ * Component for choosing a locale.
+ */
 export function LocaleChooser(props: IProps) {
     const locales = useAvailableLocales();
 

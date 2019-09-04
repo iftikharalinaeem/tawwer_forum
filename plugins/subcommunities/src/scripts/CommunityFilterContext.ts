@@ -6,11 +6,14 @@
 import React, { useContext } from "react";
 
 interface IProps {
-    hideNoProductCommunities?: boolean;
-    linkSuffix?: string; // Some suffix to put on the URL path when switching communities.
+    hideNoProductCommunities: boolean; // Enabling this will filter any community not attached to a product.
+    linkSuffix: string; // Some suffix to put on the URL path when switching communities.
 }
 
-export const CommunityFilterContext = React.createContext<IProps>({});
+export const CommunityFilterContext = React.createContext<IProps>({
+    hideNoProductCommunities: false,
+    linkSuffix: "",
+});
 export function useCommunityFilterContext() {
     return useContext(CommunityFilterContext);
 }
