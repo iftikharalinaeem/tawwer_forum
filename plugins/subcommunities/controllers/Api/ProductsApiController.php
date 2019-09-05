@@ -125,7 +125,6 @@ class ProductsApiController extends AbstractApiController {
      *
      * @param int $id
      * @return array
-     * @throws NotFoundException If the product could not be located.
      */
     public function get(int $id): array {
         $this->getProductFeatureStatus();
@@ -135,11 +134,7 @@ class ProductsApiController extends AbstractApiController {
         $id = $id ?? null;
         $where = ["productID" => $id];
 
-        try {
-            $product = $this->productModel->selectSingle($where);
-        } catch (NoResultsException $ex) {
-            throw new NotFoundException('Product');
-        }
+        $product = $this->productByID($where);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -181,7 +176,6 @@ class ProductsApiController extends AbstractApiController {
      * @param int $id
      * @param array $body
      * @return array
-     * @throws NotFoundException If the product could not be located.
      */
     public function patch(int $id, array $body = []): array {
         $this->getProductFeatureStatus();
@@ -198,15 +192,13 @@ class ProductsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $where = ["productID" => $id];
+        $product = $this->productByID($where);
 
-        $this->productModel->update($body, $where);
-
-        try {
-            $product = $this->productModel->selectSingle($where);
-        } catch (NoResultsException $ex) {
-            throw new NotFoundException('Product');
+        if ($product["name"] !== $body["name"] || $product['body'] !== $body["body"]) {
+            $this->productModel->update($body, $where);
         }
 
+        $product = $this->productByID($where);
         $product = $out->validate($product);
 
         return $product;
@@ -216,7 +208,6 @@ class ProductsApiController extends AbstractApiController {
      * Delete a specified product.
      *
      * @param int $id
-     * @throws NotFoundException If the article revision could not be located.
      */
     public function delete(int $id) {
         $this->getProductFeatureStatus();
@@ -224,11 +215,7 @@ class ProductsApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Delete a product id.");
         $where = ["productID" => $id];
 
-        try {
-            $product = $this->productModel->selectSingle($where);
-        } catch (NoResultsException $ex) {
-            throw new NotFoundException('Product');
-        }
+        $product = $this->productByID($where);
 
         if (is_array($product) && array_key_exists('productID', $product)) {
             $this->productModel->delete(["productID" => $product["productID"]]);
@@ -286,5 +273,22 @@ class ProductsApiController extends AbstractApiController {
         if (!$this->productFeatureEnabled) {
             FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         }
+    }
+
+    /**
+     * Get a product by it's ID.
+     *
+     * @param array $where
+     * @return array
+     * @throws NotFoundException If the product could not be located.
+     */
+    protected function productByID(array $where): array {
+        try {
+            $product = $this->productModel->selectSingle($where);
+        } catch (NoResultsException $ex) {
+            throw new NotFoundException('Product');
+        }
+
+        return $product;
     }
 }
