@@ -89,6 +89,8 @@ class ReportModel extends Gdn_Model {
         }
 
         // Get reported content
+        $recordType = $data['RecordType'];
+        $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
         if (!$reportedRecord) {
             $this->Validation->addValidationResult('RecordID', 'ErrorRecordNotFound');
@@ -150,7 +152,7 @@ class ReportModel extends Gdn_Model {
                 $data['Body'] = \Gdn::formatService()->filter($data['Body'], $data['Format']);
             }
 
-            $discussionBody = $this->encodeBody($reportedRecord) ?? '';
+            $discussionBody = $this->encodeBody($reportedRecord, $recordType, $recordID) ?? '';
 
             // Build discussion record
             $discussion = [
@@ -205,23 +207,12 @@ class ReportModel extends Gdn_Model {
      * Encode the record to render and save.
      *
      * @param array $record The record that needs to be processed.
+     * @param string $recordType The type of the record.
+     * @param int $recordID The ID of the record.
      *
      * @return string Json encoded data for the be rendered in the view and saved.
      */
-    public function encodeBody(array $record): string {
-        $recordType = "unknown";
-        $recordID = -1;
-        if (isset($record['DiscussionID'])) {
-            $recordType = "discussion";
-            $recordID = $record["DiscussionID"];
-        } elseif (isset($record["CommentID"])) {
-            $recordType = "comment";
-            $recordID = $record["CommentID"];
-        } elseif (isset($record["ActivityID"])) {
-            $recordType = "activity";
-            $recordID = $record["ActivityID"];
-        }
-
+    public function encodeBody(array $record, string $recordType, int $recordID): string {
         $bodyRaw = $record["Body"] ?? "";
         $bodyFormat = $record["Format"] ?? HtmlFormat::FORMAT_KEY;
         $userID = $record['UserID'] ?? $record['ActivityUserID'];

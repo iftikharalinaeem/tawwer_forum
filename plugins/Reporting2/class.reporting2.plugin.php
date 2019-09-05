@@ -188,7 +188,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         } else {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
-            $quoteHtml = $this->renderQuote($row);
+            $quoteHtml = $this->renderQuote($row, $recordType, $iD);
             $sender->setData('quote', $quoteHtml);
         }
 
@@ -236,11 +236,14 @@ class Reporting2Plugin extends Gdn_Plugin {
      * Render the Quote html for the view.
      *
      * @param array $record The Record to create a quote from.
+     * @param string $recordType The type of the record.
+     * @param int $recordID The ID of the record.
+     *
      * @return string $quoteHtml The html markup to generate a quote.
      */
-    private function renderQuote(array $record): string {
+    private function renderQuote(array $record, string $recordType, int $recordID): string {
         $reportModel = $this->reportModel;
-        $encodeData =  $reportModel->encodeBody($record);
+        $encodeData =  $reportModel->encodeBody($record, $recordType, $recordID);
         $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
         return $quoteHtml;
     }
