@@ -19,7 +19,7 @@ paths:
             responses:
                 '201':
                       content:
-                          'application/json':
+                        'application/json':
                           schema:
                           $ref: '#/components/schemas/Product'
                       description: Success
