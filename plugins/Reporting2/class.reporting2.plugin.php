@@ -6,20 +6,18 @@
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
 
-    /**
-     * @var \\Vanilla\EmbeddedContent\EmbedService $embedService
-     */
-    private $embedService;
+    /** @var ReportModel */
+    private $reportModel;
 
     /**
      * Reporting2Plugin constructor.
      *
-     * @param \Vanilla\EmbeddedContent\EmbedService $embedService
+     * @param ReportModel $reportModel
      */
-    public function __construct(\Vanilla\EmbeddedContent\EmbedService $embedService) {
+    public function __construct(ReportModel $reportModel) {
         parent::__construct();
 
-        $this->embedService = $embedService;
+        $this->reportModel = $reportModel;
     }
 
     public function setup() {
@@ -157,7 +155,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         $sender->permission('Reactions.Flag.Add');
 
         $sender->Form = new Gdn_Form();
-        $reportModel = new ReportModel('', $this->embedService);
+        $reportModel = $this->reportModel;
         $sender->Form->setModel($reportModel);
 
         $sender->Form->setFormValue('RecordID', $iD);
@@ -190,7 +188,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         } else {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
-            $quoteHtml = $this->renderQuote($row);
+            $quoteHtml = $this->renderQuote($row, $recordType, $iD);
             $sender->setData('quote', $quoteHtml);
         }
 
@@ -238,11 +236,14 @@ class Reporting2Plugin extends Gdn_Plugin {
      * Render the Quote html for the view.
      *
      * @param array $record The Record to create a quote from.
+     * @param string $recordType The type of the record.
+     * @param int $recordID The ID of the record.
+     *
      * @return string $quoteHtml The html markup to generate a quote.
      */
-    private function renderQuote(array $record): string {
-        $reportModel = new ReportModel('', $this->embedService);
-        $encodeData =  $reportModel->encodeBody($record);
+    private function renderQuote(array $record, string $recordType, int $recordID): string {
+        $reportModel = $this->reportModel;
+        $encodeData =  $reportModel->encodeBody($record, $recordType, $recordID);
         $quoteHtml =\Gdn::formatService()->renderHTML($encodeData, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
         return $quoteHtml;
     }
