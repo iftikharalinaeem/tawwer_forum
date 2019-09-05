@@ -10,6 +10,8 @@ use Garden\Schema\Schema;
 use AbstractApiController;
 use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Exception\Database\NoResultsException;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * API controller for managing the products resource.
@@ -100,7 +102,7 @@ class ProductsApiController extends AbstractApiController {
     /**
      * Get all products.
      *
-     * @return array|mixed
+     * @return array
      */
     public function index(): array {
         $this->getProductFeatureStatus();
@@ -123,6 +125,7 @@ class ProductsApiController extends AbstractApiController {
      *
      * @param int $id
      * @return array
+     * @throws NotFoundException If the product could not be located.
      */
     public function get(int $id): array {
         $this->getProductFeatureStatus();
@@ -131,7 +134,12 @@ class ProductsApiController extends AbstractApiController {
 
         $id = $id ?? null;
         $where = ["productID" => $id];
-        $product = $this->productModel->selectSingle($where);
+
+        try {
+            $product = $this->productModel->selectSingle($where);
+        } catch (NoResultsException $ex) {
+            throw new NotFoundException('Product');
+        }
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -143,7 +151,7 @@ class ProductsApiController extends AbstractApiController {
      * Create a new product.
      *
      * @param array $body
-     * @return array|mixed
+     * @return array
      */
     public function post(array $body): array {
         $this->getProductFeatureStatus();
@@ -173,6 +181,7 @@ class ProductsApiController extends AbstractApiController {
      * @param int $id
      * @param array $body
      * @return array
+     * @throws NotFoundException If the product could not be located.
      */
     public function patch(int $id, array $body = []): array {
         $this->getProductFeatureStatus();
@@ -189,8 +198,15 @@ class ProductsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $where = ["productID" => $id];
+
         $this->productModel->update($body, $where);
-        $product = $this->productModel->selectSingle($where);
+
+        try {
+            $product = $this->productModel->selectSingle($where);
+        } catch (NoResultsException $ex) {
+            throw new NotFoundException('Product');
+        }
+
         $product = $out->validate($product);
 
         return $product;
@@ -200,13 +216,19 @@ class ProductsApiController extends AbstractApiController {
      * Delete a specified product.
      *
      * @param int $id
+     * @throws NotFoundException If the article revision could not be located.
      */
     public function delete(int $id) {
         $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
         $where = ["productID" => $id];
-        $product = $this->productModel->selectSingle($where);
+
+        try {
+            $product = $this->productModel->selectSingle($where);
+        } catch (NoResultsException $ex) {
+            throw new NotFoundException('Product');
+        }
 
         if (is_array($product) && array_key_exists('productID', $product)) {
             $this->productModel->delete(["productID" => $product["productID"]]);
