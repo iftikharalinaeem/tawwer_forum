@@ -51,7 +51,9 @@ class ProductsApiController extends AbstractApiController {
                 "name",
                 "body",
                 "dateInserted",
-                "dateUpdated?"
+                "insertUserID",
+                "dateUpdated?",
+                "updateUserID?"
             ])->add($this->fullSchema()), "Product");
         }
         return $this->schema($this->productSchema, $type);
@@ -74,7 +76,9 @@ class ProductsApiController extends AbstractApiController {
                 "description" => "Description of the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
+            "insertUserID:i" => "Unique ID of the user who originally created the draft.",
             "dateUpdated:dt?" => "When the product was updated.",
+            "updateUserID:i?" =>  "Unique ID of the last user to update the draft.",
         ]);
     }
 
@@ -154,6 +158,7 @@ class ProductsApiController extends AbstractApiController {
         );
 
         $body = $in->validate($body);
+
         $productID = $this->productModel->insert($body);
         $product = $this->productModel->selectSingle(["productID" => $productID]);
         $out = $this->productSchema("out");
