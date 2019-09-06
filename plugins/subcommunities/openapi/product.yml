@@ -20,8 +20,8 @@ paths:
                 '201':
                       content:
                         'application/json':
-                          schema:
-                          $ref: '#/components/schemas/Product'
+                            schema:
+                                $ref: '#/components/schemas/Product'
                       description: Success
             tags:
                 - Products
@@ -88,8 +88,6 @@ paths:
                                 body:
                                     description: The description of the product.
                                     type: string
-                            required:
-                                - name
                             type: object
                 required: true
             summary: Update a product.
