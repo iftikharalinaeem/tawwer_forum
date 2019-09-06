@@ -187,8 +187,6 @@ class ProductsApiController extends AbstractApiController {
         $out = $this->productSchema("out");
         $body = $in->validate($body);
 
-        $product = $this->productByID($id);
-
         if (isset($body["name"]) || isset($body["body"])) {
             $where = ["productID" => $id];
             $this->productModel->update($body, $where);
