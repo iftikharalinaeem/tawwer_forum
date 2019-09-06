@@ -161,7 +161,6 @@ class ProductsApiController extends AbstractApiController {
         );
 
         $body = $in->validate($body);
-
         $productID = $this->productModel->insert($body);
         $product = $this->productModel->selectSingle(["productID" => $productID]);
         $out = $this->productSchema("out");
@@ -213,8 +212,8 @@ class ProductsApiController extends AbstractApiController {
         $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
-        $where = ["productID" => $id];
 
+        $where = ["productID" => $id];
         $product = $this->productByID($where);
 
         if (is_array($product) && array_key_exists('productID', $product)) {
