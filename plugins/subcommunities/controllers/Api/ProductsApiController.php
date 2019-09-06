@@ -78,9 +78,9 @@ class ProductsApiController extends AbstractApiController {
                 "description" => "Description of the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
-            "insertUserID:i" => "Unique ID of the user who originally created the draft.",
+            "insertUserID:i" => "Unique ID of the user who originally created the product.",
             "dateUpdated:dt?" => "When the product was updated.",
-            "updateUserID:i?" =>  "Unique ID of the last user to update the draft.",
+            "updateUserID:i?" =>  "Unique ID of the last user to update the product.",
         ]);
     }
 
