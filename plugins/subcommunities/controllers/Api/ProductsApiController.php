@@ -131,10 +131,7 @@ class ProductsApiController extends AbstractApiController {
         $this->permission("Garden.SignIn.Allow");
         $this->idParamSchema()->setDescription("Get an product id.");
 
-        $id = $id ?? null;
-        $where = ["productID" => $id];
-
-        $product = $this->productByID($where);
+        $product = $this->productByID($id);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -190,14 +187,12 @@ class ProductsApiController extends AbstractApiController {
         $out = $this->productSchema("out");
         $body = $in->validate($body);
 
+        $product = $this->productByID($id);
+
         $where = ["productID" => $id];
-        $product = $this->productByID($where);
+        $this->productModel->update($body, $where);
 
-        if ($product["name"] !== $body["name"] || $product['body'] !== $body["body"]) {
-            $this->productModel->update($body, $where);
-        }
-
-        $product = $this->productByID($where);
+        $product = $this->productByID($id);
         $product = $out->validate($product);
 
         return $product;
@@ -213,8 +208,7 @@ class ProductsApiController extends AbstractApiController {
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
 
-        $where = ["productID" => $id];
-        $product = $this->productByID($where);
+        $product = $this->productByID($id);
 
         if (is_array($product) && array_key_exists('productID', $product)) {
             $this->productModel->delete(["productID" => $product["productID"]]);
@@ -277,11 +271,12 @@ class ProductsApiController extends AbstractApiController {
     /**
      * Get a product by it's ID.
      *
-     * @param array $where
+     * @param int $id
      * @return array
      * @throws NotFoundException If the product could not be located.
      */
-    protected function productByID(array $where): array {
+    protected function productByID(int $id): array {
+        $where = ["productID" => $id];
         try {
             $product = $this->productModel->selectSingle($where);
         } catch (NoResultsException $ex) {
@@ -290,4 +285,5 @@ class ProductsApiController extends AbstractApiController {
 
         return $product;
     }
+
 }
