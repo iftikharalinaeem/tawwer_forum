@@ -8,8 +8,10 @@ namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
 use AbstractApiController;
+use Garden\Web\Exception\ClientException;
 use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
+use SubcommunityModel;
 
 /**
  * API controller for managing the products resource.
@@ -25,6 +27,9 @@ class ProductsApiController extends AbstractApiController {
     /** @var ProductModel */
     private $productModel;
 
+    /** @var SubcommunityModel */
+    private $subcommunityModel;
+
     /** @var boolean */
     private $productFeatureEnabled;
 
@@ -32,9 +37,11 @@ class ProductsApiController extends AbstractApiController {
      * ProductApiController constructor.
      *
      * @param ProductModel $productModel
+     * @param SubcommunityModel $subcommunityModel
      */
-    public function __construct(ProductModel $productModel) {
+    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel) {
         $this->productModel = $productModel;
+        $this->subcommunityModel = $subcommunityModel;
         $this->productFeatureEnabled = false;
     }
 
@@ -195,12 +202,21 @@ class ProductsApiController extends AbstractApiController {
      * Delete a specified product.
      *
      * @param int $id
+     * @throws ClientException Product is associated with a subcommunity.
      */
     public function delete(int $id) {
         $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
+
         $where = ["productID" => $id];
+        // Find out if the product is associated to a subcommunity
+        $hasSubcommunity = $this->subcommunityModel->getWhere(["ProductID" => $id])->resultArray();
+
+        if ($hasSubcommunity) {
+            throw new ClientException("Product is associated with a subcommunity", 401);
+        }
+
         $product = $this->productModel->selectSingle($where);
 
         if (is_array($product) && array_key_exists('productID', $product)) {
