@@ -83,7 +83,7 @@ class ReportModel extends Gdn_Model {
         $this->Validation->applyRule('RecordID', 'ValidateRequired');
         $this->Validation->applyRule('Body', 'ValidateRequired');
         $this->Validation->applyRule('Format', 'ValidateRequired');
-        
+
         if (!$this->Validation->validate($data, true)) {
             return false;
         }
@@ -215,7 +215,7 @@ class ReportModel extends Gdn_Model {
     public function encodeBody(array $record, string $recordType, int $recordID): string {
         $bodyRaw = $record["Body"] ?? "";
         $bodyFormat = $record["Format"] ?? HtmlFormat::FORMAT_KEY;
-        $userID = $record['UserID'] ?? $record['ActivityUserID'];
+        $userID = $record['InsertUserID'] ?? $record['ActivityUserID'];
         $userRecord = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         $userRecord = UserFragmentSchema::normalizeUserFragment($userRecord);
 
