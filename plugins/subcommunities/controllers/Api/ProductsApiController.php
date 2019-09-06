@@ -182,7 +182,7 @@ class ProductsApiController extends AbstractApiController {
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
-                "name:s",
+                "name:s?",
                 "body:s?",
             ]),
             "in"
