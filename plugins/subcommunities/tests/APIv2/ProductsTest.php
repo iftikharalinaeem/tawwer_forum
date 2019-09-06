@@ -109,7 +109,7 @@ class ProductsTest extends AbstractAPIv2Test {
      * Test Delete /products
      *
      * @expectedException \Exception
-     * @expectedExceptionMessage No rows matched the provided criteria.
+     * @expectedExceptionMessage Product not found.
      */
     public function testDeleteProduct() {
         $record = $this->getRecord();
