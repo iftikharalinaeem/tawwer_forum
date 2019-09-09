@@ -60,7 +60,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('name', 'varchar(255)')
             ->column('body', 'varchar(255)', true)
             ->column("dateInserted", "datetime")
+            ->column("insertUserID", "int")
             ->column("dateUpdated", "datetime", true )
+            ->column("updateUserID", "int", true)
             ->set();
     }
 

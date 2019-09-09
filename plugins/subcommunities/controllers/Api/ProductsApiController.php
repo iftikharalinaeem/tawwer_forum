@@ -10,6 +10,8 @@ use Garden\Schema\Schema;
 use AbstractApiController;
 use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Exception\Database\NoResultsException;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * API controller for managing the products resource.
@@ -51,7 +53,9 @@ class ProductsApiController extends AbstractApiController {
                 "name",
                 "body",
                 "dateInserted",
-                "dateUpdated?"
+                "insertUserID",
+                "dateUpdated?",
+                "updateUserID?"
             ])->add($this->fullSchema()), "Product");
         }
         return $this->schema($this->productSchema, $type);
@@ -74,7 +78,9 @@ class ProductsApiController extends AbstractApiController {
                 "description" => "Description of the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
+            "insertUserID:i" => "Unique ID of the user who originally created the product.",
             "dateUpdated:dt?" => "When the product was updated.",
+            "updateUserID:i?" =>  "Unique ID of the last user to update the product.",
         ]);
     }
 
@@ -96,7 +102,7 @@ class ProductsApiController extends AbstractApiController {
     /**
      * Get all products.
      *
-     * @return array|mixed
+     * @return array
      */
     public function index(): array {
         $this->getProductFeatureStatus();
@@ -125,9 +131,7 @@ class ProductsApiController extends AbstractApiController {
         $this->permission("Garden.SignIn.Allow");
         $this->idParamSchema()->setDescription("Get an product id.");
 
-        $id = $id ?? null;
-        $where = ["productID" => $id];
-        $product = $this->productModel->selectSingle($where);
+        $product = $this->productByID($id);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -139,7 +143,7 @@ class ProductsApiController extends AbstractApiController {
      * Create a new product.
      *
      * @param array $body
-     * @return array|mixed
+     * @return array
      */
     public function post(array $body): array {
         $this->getProductFeatureStatus();
@@ -174,7 +178,7 @@ class ProductsApiController extends AbstractApiController {
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
-                "name:s",
+                "name:s?",
                 "body:s?",
             ]),
             "in"
@@ -183,9 +187,12 @@ class ProductsApiController extends AbstractApiController {
         $out = $this->productSchema("out");
         $body = $in->validate($body);
 
-        $where = ["productID" => $id];
-        $this->productModel->update($body, $where);
-        $product = $this->productModel->selectSingle($where);
+        if (isset($body["name"]) || isset($body["body"])) {
+            $where = ["productID" => $id];
+            $this->productModel->update($body, $where);
+        }
+
+        $product = $this->productByID($id);
         $product = $out->validate($product);
 
         return $product;
@@ -200,8 +207,8 @@ class ProductsApiController extends AbstractApiController {
         $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
-        $where = ["productID" => $id];
-        $product = $this->productModel->selectSingle($where);
+
+        $product = $this->productByID($id);
 
         if (is_array($product) && array_key_exists('productID', $product)) {
             $this->productModel->delete(["productID" => $product["productID"]]);
@@ -260,4 +267,23 @@ class ProductsApiController extends AbstractApiController {
             FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         }
     }
+
+    /**
+     * Get a product by it's ID.
+     *
+     * @param int $id
+     * @return array
+     * @throws NotFoundException If the product could not be located.
+     */
+    protected function productByID(int $id): array {
+        $where = ["productID" => $id];
+        try {
+            $product = $this->productModel->selectSingle($where);
+        } catch (NoResultsException $ex) {
+            throw new NotFoundException('Product');
+        }
+
+        return $product;
+    }
+
 }
