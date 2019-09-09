@@ -106,6 +106,33 @@ paths:
             tags:
                 - Products
             summary: Delete a product.
+    /products/product-feature-flag:
+        x-hidden: true
+        put:
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    description: Success
+            tags:
+                - Products
+            requestBody:
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    required: true
+            summary: Enable\Disable the product feature.
 components:
     schemas:
         Product:
