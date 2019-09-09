@@ -116,13 +116,23 @@ paths:
                             schema:
                                 properties:
                                     enabled:
-                                        description: Whether the product feature is enabled or not.
+                                        description: Enabled state of the product feature.
                                         type: boolean
                                 type: object
                     description: Success
             tags:
                 - Products
-            summary: Enable and disable the product feature.
+            requestBody:
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    required: true
+            summary: Enable\Disable the product feature.
 components:
     schemas:
         Product:
