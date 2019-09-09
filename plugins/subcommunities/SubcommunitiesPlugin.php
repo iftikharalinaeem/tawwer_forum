@@ -1,17 +1,26 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
+use Vanilla\Web\Page;
+use \Garden\Container\Reference;
+
 /**
  * Class SubcommunitiesPlugin
  */
 class SubcommunitiesPlugin extends Gdn_Plugin {
+
+    /// Constants
     const URL_TYPE_UNKNOWN = 0;
     const URL_TYPE_DISCUSSION = 1;
     const URL_TYPE_COMMENT = 2;
     const URL_TYPE_CATEGORY = 3;
+
     /// Properties ///
 
     /**
@@ -31,7 +40,22 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Methods ///
 
     /**
+     * Configure the container with multisite configuration.
+     *
+     * @param Container $dic
      */
+    public function container_init(Container $dic) {
+        $providerArgs = ['provider' => new Reference(MultisiteReduxPreloader::class)];
+        $dic
+            ->rule(Page::class)
+            ->setInherit(true)
+            ->addCall('registerReduxActionProvider', $providerArgs)
+            ->rule(Gdn_Controller::class)
+            ->setInherit(true)
+            ->addCall('registerReduxActionProvider', $providerArgs)
+        ;
+    }
+
     public function setup() {
         $this->structure();
     }

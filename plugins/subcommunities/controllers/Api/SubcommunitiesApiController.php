@@ -32,6 +32,12 @@ class SubcommunitiesApiController extends AbstractApiController {
     /** @var ProductModel */
     private $productModel;
 
+    /**
+     * DI
+     *
+     * @param SubcommunityModel $subcommunityModel
+     * @param ProductModel $productModel
+     */
     public function __construct(SubcommunityModel $subcommunityModel, ProductModel $productModel) {
         $this->subcommunityModel = $subcommunityModel;
         $this->productModel = $productModel;
