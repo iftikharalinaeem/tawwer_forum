@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-
 use Vanilla\Subcommunities\Models\ProductModel;
 
 /**
@@ -32,7 +31,7 @@ class ProductsTest extends AbstractAPIv2Test {
         // ensure that we can enable the product feature.
         $result = $this->api()->put(
             'products/product-feature-flag',
-            ["enabled" => true]
+            ['enabled' => true]
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -63,7 +62,6 @@ class ProductsTest extends AbstractAPIv2Test {
      * Test POST /products
      */
     public function testPostProduct() {
-
         $record = $this->getRecord();
 
         $result = $this->api()->post(
@@ -142,7 +140,7 @@ class ProductsTest extends AbstractAPIv2Test {
         );
         $body = $result->getBody();
 
-        $this->createSubcommunity($body);
+        $this->createSubcommunity($body['productID']);
 
         $this->api()->delete(
             'products/'.$body['productID']
@@ -163,19 +161,19 @@ class ProductsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Create a Subcommunity.
+     * Create a Subcommunity with a product.
      *
-     * @param $body
+     * @param int $id
      */
-    protected function createSubcommunity($body): void {
+    protected function createSubcommunity($id): void {
         $subcommunityModel = self::container()->get(\SubcommunityModel::class);
 
         $record = [
-            "Name" => "Test_Subcommunity",
-            "Folder" => "Test_Subcommunity",
-            "Category" => 1,
-            "Locale" => "en",
-            "ProductID" => $body['productID']
+            'Name' => 'Test_Subcommunity',
+            'Folder' => 'Test_Subcommunity',
+            'Category' => 1,
+            'Locale' => 'en',
+            'ProductID' => $id
         ];
 
         $subcommunityModel->insert($record);
