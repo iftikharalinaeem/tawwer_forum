@@ -57,6 +57,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Product'
                     description: Success
+                '404':
+                    description: Not Found
             tags:
                 - Products
             summary: Get a single product.
