@@ -202,7 +202,7 @@ class ProductsApiController extends AbstractApiController {
      * Delete a specified product.
      *
      * @param int $id
-     * @throws ClientException Product is associated with a subcommunity.
+     * @throws ClientException If a product is associated with a subcommunity.
      */
     public function delete(int $id) {
         $this->getProductFeatureStatus();
