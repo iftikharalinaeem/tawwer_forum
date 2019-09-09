@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+
 use Vanilla\Subcommunities\Models\ProductModel;
 
 /**
@@ -127,6 +128,28 @@ class ProductsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test Delete /products with associated subcommunity.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     * @expectedExceptionCode 409
+     * @expectedExceptionMessage Product is associated with 1 subcommunities.
+     */
+    public function testDeleteProductWithSubcommunity() {
+        $record = $this->getRecord();
+        $result = $this->api()->post(
+            'products',
+            $record
+        );
+        $body = $result->getBody();
+
+        $this->createSubcommunity($body);
+
+        $this->api()->delete(
+            'products/'.$body['productID']
+        );
+    }
+
+    /**
      * Create a record.
      *
      * @return array
@@ -137,5 +160,24 @@ class ProductsTest extends AbstractAPIv2Test {
             'body' => 'Test product',
         ];
         return $record;
+    }
+
+    /**
+     * Create a Subcommunity.
+     *
+     * @param $body
+     */
+    protected function createSubcommunity($body): void {
+        $subcommunityModel = self::container()->get(\SubcommunityModel::class);
+
+        $record = [
+            "Name" => "Test_Subcommunity",
+            "Folder" => "Test_Subcommunity",
+            "Category" => 1,
+            "Locale" => "en",
+            "ProductID" => $body['productID']
+        ];
+
+        $subcommunityModel->insert($record);
     }
 }

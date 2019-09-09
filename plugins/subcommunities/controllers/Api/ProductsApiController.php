@@ -211,10 +211,16 @@ class ProductsApiController extends AbstractApiController {
 
         $where = ["productID" => $id];
         // Find out if the product is associated to a subcommunity
-        $hasSubcommunity = $this->subcommunityModel->getWhere(["ProductID" => $id])->resultArray();
+        $subcommunitiesAsscoiated = $this->subcommunityModel->getWhere(["ProductID" => $id])->resultArray();
 
-        if ($hasSubcommunity) {
-            throw new ClientException("Product is associated with a subcommunity", 401);
+        if ($subcommunitiesAsscoiated) {
+            $subcommunityCount = count($subcommunitiesAsscoiated);
+            $message = sprintf(t("Product is associated with %s subcommunities."), $subcommunityCount);
+            $subcommunityDetails = [];
+            $subcommunityDetails["Number of subcommunities associated"] = $subcommunityCount;
+            $subcommunityDetails["Subcommunity ID's"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
+
+            throw new ClientException($message, 409, $subcommunityDetails);
         }
 
         $product = $this->productModel->selectSingle($where);
