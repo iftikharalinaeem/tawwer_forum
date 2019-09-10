@@ -193,8 +193,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("sort", "int", true)
             ->column("score", "int", "0")
             ->column("views", "int", "0")
-            ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
+            ->column("insertUserID", "int")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
             ->column(
@@ -238,7 +238,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("outline", "text", true)
             ->column("plainText", "mediumtext", true)
             ->column("excerpt", "text", true)
-            ->column("locale", "varchar(10)", true)
+            ->column("locale", "varchar(10)", false, "unique.publishedRevision")
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
             ->set()
@@ -272,7 +272,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("urlCode", "varchar(191)", false, 'unique.urlCode')
             ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("bannerImage", "varchar(255)", ['Null' => false, 'Default' => ''])
-            ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => ''])
+            ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => c("Garden.Locale")])
             ->column(
                 "viewType",
                 Models\KnowledgeBaseModel::getAllTypes(),

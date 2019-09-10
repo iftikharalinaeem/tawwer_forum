@@ -290,6 +290,97 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function get_translations(int $id, array $body):array {
+
+        $this->idParamSchema()->setDescription("Get revisions from a specific article.");
+        $in = Schema::parse([
+            "status:s" =>[
+                "enum" => $this->articleModel::getAllStatuses()
+            ],
+            "limit:i" => [
+                "default" => self::REVISIONS_LIMIT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+            "page:i" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+        ]);
+
+        $out = $this->schema([":a" => Schema::parse([
+            "articleRevisionID:i",
+            "name:s",
+            "url:s",
+            "locale:s",
+            "translationsStatus:s",
+            ], "out")]);
+
+        $article = $this->articleByID($id, false);
+        // if article revision count = 1 skip all the logic
+        $articleRevisions = $this->articleRevisionModel->get(["articleID" => $id], ["orderFields" => "dateInserted", "orderDirection" => "desc"]);
+        $knowledgeBaseCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $article["knowledgeCategoryID"]]);
+        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseCategory["knowledgeBaseID"]]);
+        $knowledgeBaseLocale = $knowledgeBase["sourceLocale"];
+        $articleRevisionsLocales = array_unique(array_column($articleRevisions, "locale", "locale"));
+        $translationsExist = (count($articleRevisionsLocales) > 1) ? true : false;
+
+
+        $latestRevisions = [];
+        foreach ($articleRevisions as $articleRevision) {
+            if(in_array($articleRevision["locale"], $articleRevisionsLocales)) {
+                $latestRevisions[$articleRevision["locale"]] = $articleRevision;
+                unset($articleRevisionsLocales[$articleRevision["locale"]]);
+            }
+        }
+
+        if ($translationsExist) {
+            $sourceLocaleArticleRevision = $latestRevisions[$knowledgeBaseLocale];
+            $srDate = $sourceLocaleArticleRevision["dateInserted"]->getTimeStamp();
+
+            foreach ($latestRevisions as &$latestArticleRevision) {
+                $arDate  = $latestArticleRevision["dateInserted"]->getTimeStamp();
+                if ($arDate >= $srDate) {
+                    $latestArticleRevision["translationStatus"] = "up-to-date";
+                } elseif ($latestArticleRevision["dateInserted"] < $sourceLocaleArticleRevision["dateInserted"]) {
+                    $latestArticleRevision["translationStatus"] = "out-of-date";
+                }
+                $slug = \Gdn_Format::url("{$id}-{$latestArticleRevision["name"]}");
+                $latestArticleRevision["url"] = \Gdn::request()->url("/kb/articles/" . $slug, true);
+            }
+        } else {
+            $latestRevisions["translationStatus"] = "no";
+            $slug = \Gdn_Format::url("{$id}-{$latestRevisions["name"]}");
+            $latestRevisions["url"] = \Gdn::request()->url("/kb/articles/" . $slug, true);
+        }
+
+        $result = [];
+
+        foreach ($latestRevisions as $latestRevision) {
+            $result[] = [
+                "articleRevisionID" =>  $latestRevision["articleRevisionID"],
+                "name" => $latestRevision["name"],
+                "url" => $latestRevision["url"],
+                "locale" => $latestRevision["locale"],
+                "translationStatus" => $latestRevision["translationStatus"],
+            ];
+        }
+
+        $result = $out->validate($result);
+
+        return $result;
+    }
+
+
+
+    /**
      * Get a single article draft.
      *
      * @param int $draftID
@@ -462,6 +553,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /**
      * List article drafts.
      *
+     * @param array $query
      * @param array $query
      * @return mixed
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
