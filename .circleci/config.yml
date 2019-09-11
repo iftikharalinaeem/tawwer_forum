@@ -25,6 +25,8 @@ jobs:
                         cd ~/workspace/vanilla
                         cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
                         cp ~/workspace/repo/.circleci/sphinx/sphinxapi.php ./sphinxapi.php
+                        ls sphinx*
+                        diet
                         echo $'\nrequire_once("sphinxapi.php");' | sudo tee -a ./conf/bootstrap.before.php
             - run:
                     name: Prepare MySQL
@@ -35,11 +37,6 @@ jobs:
                         # Localhost redirects
                         echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
                         cat /etc/hosts
-            -   run:
-                    name: Library Tests
-                    command: |
-                        cd ~/workspace/vanilla
-                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
             -   run:
                     name: APIv2 Tests
                     command: |
