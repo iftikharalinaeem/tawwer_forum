@@ -199,7 +199,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function delete_drafts(int $draftID) {
         $this->permission("Garden.SignIn.Allow");
-
         $in = $this->schema([
             "draftID" => [
                 "description" => "Target article draft ID.",
@@ -318,9 +317,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]);
 
         $query = $in->validate($query);
+        $where = isset($query["status"]) ? ["articleID" => $id, "status" => $query["status"]] : ["articleID" => $id];
 
         try {
-            $article = $this->articleModel->selectSingle(["articleID" => $id, "status" => $query["status"]]);
+            $article = $this->articleModel->selectSingle($where);
         } catch (NoResultsException $ex) {
             $message = sprintf("Article %s not found.", $id);
             if (array_key_exists("status", $query) && isset($query["status"])) {
@@ -330,7 +330,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $articleRevisions = $this->articleRevisionModel->get(["articleID" => $id], ["orderFields" => "dateInserted", "orderDirection" => "desc"]);
-        $sourceLocale = $this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"]);
+        $sourceLocale = ($this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"])) ? $this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"]) : "en";
 
 
         $distinctArticleRevisionLocales = array_unique(array_column($articleRevisions, "locale", "locale"));

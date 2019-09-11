@@ -8,6 +8,8 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleReactionModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
@@ -132,7 +134,7 @@ class ArticlesTest extends AbstractResourceTest {
             'icon' => '',
             'bannerImage' => '',
             'sortArticles' => 'manual',
-            'sourceLocale' => '',
+            'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base'.$salt,
         ];
         $kb = $this->api()
@@ -535,5 +537,77 @@ class ArticlesTest extends AbstractResourceTest {
 
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
+    }
+
+    /**
+     * Test GET /articles/{ID}/translations
+     */
+    public function testGetArticleTranslations()  {
+        $record =$this->record();
+        $article = $this->testPost($record);
+        $articleID = $article["articleID"];
+        $locales = ["fr", "de", "es"];
+
+        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
+
+        foreach ($locales as $locale) {
+            $locale = ["locale" => $locale ];
+            $this->api()->patch("{$this->baseUrl}/{$articleID}", $locale);
+        }
+        
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
+        $revisions = $response->getBody();
+
+        foreach($revisions as $revision) {
+            $articleRevisionModel->update(["status" => "published"], ["articleRevisionID" => $revision["articleRevisionID"]]);
+        }
+
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
+        $articleTranslations = $response->getBody();
+        
+        $this->assertCount(4, $articleTranslations);
+        
+        foreach ($articleTranslations as $articleTranslation) {
+            $this->assertEquals("up-to-date", $articleTranslation["translationStatus"]);
+        }
+    }
+
+    /**
+     * Test article translations when there are no translations.
+     */
+    public function testGetArticleWithNoTranslations() {
+        $record =$this->record();
+        $article = $this->testPost($record);
+        $articleID = $article["articleID"];
+
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
+        $articleTranslation = $response->getBody();
+
+        $this->assertCount(1, $articleTranslation);
+        $this->assertEquals("no", $articleTranslation[0]["translationStatus"]);
+    }
+
+    /**
+     * Test article translations when there are no translations.
+     */
+    public function testGetArticleWithOutofDateTranslations() {
+        $record =$this->record();
+        $article = $this->testPost($record);
+        $articleID = $article["articleID"];
+
+        $this->api()->patch("{$this->baseUrl}/{$articleID}", ["locale" => "fr"]);
+        
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
+        $revision = $response->getBody();
+        
+        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
+        $articleRevisionModel->update(["status" => "published"], ["articleRevisionID" => $revision[0]["articleRevisionID"]]);
+        $articleRevisionModel->update(["dateInserted" => "2018-01-01T01:01:01+00:00"],  ["articleRevisionID" => $revision[1]["articleRevisionID"]]);
+
+        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
+        $articleTranslation = $response->getBody();
+
+        $this->assertEquals("out-of-date", $articleTranslation[1]["translationStatus"]);
+
     }
 }
