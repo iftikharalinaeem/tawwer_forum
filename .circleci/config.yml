@@ -26,7 +26,6 @@ jobs:
                         cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
                         cp ~/workspace/repo/.circleci/sphinx/sphinxapi.php ./sphinxapi.php
                         echo $'\nrequire_once("../sphinxapi.php");' | tee -a ./conf/bootstrap.before.php
-                        diet
             - run:
                     name: Prepare MySQL
                     command: ~/workspace/ci-scripts/prepare-mysql.sh
