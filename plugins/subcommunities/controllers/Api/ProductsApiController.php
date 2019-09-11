@@ -217,8 +217,8 @@ class ProductsApiController extends AbstractApiController {
             $subcommunityCount = count($subcommunitiesAsscoiated);
             $message = sprintf(t("Product is associated with %s subcommunities."), $subcommunityCount);
             $subcommunityDetails = [];
-            $subcommunityDetails["Number of subcommunities associated"] = $subcommunityCount;
-            $subcommunityDetails["Subcommunity ID's"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
+            $subcommunityDetails["subcommunityCount"] = $subcommunityCount;
+            $subcommunityDetails["subcommunityIDs"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
 
             throw new ClientException($message, 409, $subcommunityDetails);
         }
