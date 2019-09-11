@@ -24,7 +24,15 @@ jobs:
                     command: |
                         cd ~/workspace/vanilla
                         cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - core/prepare_php_tests
+            - run:
+                    name: Prepare MySQL
+                    command: ~/workspace/ci-scripts/prepare-mysql.sh
+            - run:
+                    name: Configuring Hosts
+                    command: |
+                        # Localhost redirects
+                        echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+                        cat /etc/hosts
             -   run:
                     name: Library Tests
                     command: |
