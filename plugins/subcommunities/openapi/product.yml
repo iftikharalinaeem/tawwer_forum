@@ -16,27 +16,30 @@ paths:
                 - Products
             summary: Get a list of products.
         post:
-            parameters:
-                - description: The name of the product.
-                  in: path
-                  name: name
-                  required: true
-                  schema:
-                      type: string
-                - description: The description of the product.
-                  in: path
-                  name: body
-                  schema:
-                      type: string
             responses:
                 '201':
-                    content:
+                      content:
                         'application/json':
                             schema:
                                 $ref: '#/components/schemas/Product'
-                    description: Success
+                      description: Success
             tags:
                 - Products
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                name:
+                                    description: The name of the product.
+                                    type: string
+                                body:
+                                    description: The description of the product.
+                                    type: string
+                            required:
+                                - name
+                            type: object
+                required: true
             summary: Add a new product.
     /products/{id}:
         get:
@@ -54,6 +57,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Product'
                     description: Success
+                '404':
+                    description: Not Found
             tags:
                 - Products
             summary: Get a single product.
@@ -65,17 +70,6 @@ paths:
                   required: true
                   schema:
                      type: integer
-                - description: The name of the product.
-                  in: path
-                  name: name
-                  required: true
-                  schema:
-                      type: string
-                - description: The description of the product.
-                  in: path
-                  name: body
-                  schema:
-                      type: string
             responses:
                 '200':
                     content:
@@ -85,6 +79,19 @@ paths:
                     description: Success
             tags:
                 - Products
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                name:
+                                    description: The name of the product.
+                                    type: string
+                                body:
+                                    description: The description of the product.
+                                    type: string
+                            type: object
+                required: true
             summary: Update a product.
         delete:
             parameters:
@@ -125,6 +132,33 @@ paths:
             tags:
                 - Products
             summary: Delete a product.
+    /products/product-feature-flag:
+        x-hidden: true
+        put:
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    description: Success
+            tags:
+                - Products
+            requestBody:
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    required: true
+            summary: Enable\Disable the product feature.
 components:
     schemas:
         Product:
