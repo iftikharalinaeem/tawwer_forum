@@ -18,7 +18,7 @@ jobs:
         executor: sphinx
         steps: &php_unit_test_steps
             -   attach_workspace:
-                        at: ~/workspace
+                    at: ~/workspace
             -   run:
                     name: Test setup
                     command: |
