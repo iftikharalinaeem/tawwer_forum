@@ -84,7 +84,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     }
 
     public static function sphinxReindex() {
-       $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
+       $sphinxHost = c('Plugins.Sphinx.Server', 'localhost');
        if ($sphinxHost === 'localhost') {
           exec('indexer --all --rotate', $dockerResponse);
        } else {
