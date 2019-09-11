@@ -84,16 +84,16 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     }
 
     public static function sphinxReindex() {
-       $sphinxHost = c('Plugins.Sphinx.Server', 'localhost');
-       if ($sphinxHost === 'localhost') {
+//       $sphinxHost = c('Plugins.Sphinx.Server', 'localhost');
+//       if ($sphinxHost === 'localhost') {
           exec('indexer --all --rotate', $dockerResponse);
-       } else {
-          // this is for localhost with sphinx on docker
-          exec('curl sphinx:9399', $dockerResponse);
-          if ('Sphinx reindexed.' !== end($dockerResponse)) {
-             die('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
-          }
-       }
+//       } else {
+//          // this is for localhost with sphinx on docker
+//          exec('curl sphinx:9399', $dockerResponse);
+//          if ('Sphinx reindexed.' !== end($dockerResponse)) {
+//             die('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
+//          }
+//       }
     }
 
     /**
