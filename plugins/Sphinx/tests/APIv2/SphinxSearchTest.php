@@ -8,7 +8,7 @@
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
-class SearchTest extends AbstractAPIv2Test {
+class SphinxSearchTest extends AbstractAPIv2Test {
 
     /** @var array */
     protected static $category;
