@@ -122,6 +122,9 @@ paths:
                                     status:
                                         description: Response status code.
                                         type: integer
+                                    errorType:
+                                        description: Error type.
+                                        type: string
                                     subcommunityCount:
                                         description: Number of subcommunities the product is associtated to.
                                         type: integer

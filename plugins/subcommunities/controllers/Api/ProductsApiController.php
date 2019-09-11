@@ -20,6 +20,8 @@ use Garden\Web\Exception\NotFoundException;
  */
 class ProductsApiController extends AbstractApiController {
 
+    const ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY = "ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY";
+
     /** @var Schema */
     private $productSchema;
 
@@ -222,12 +224,13 @@ class ProductsApiController extends AbstractApiController {
 
         if ($subcommunitiesAsscoiated) {
             $subcommunityCount = count($subcommunitiesAsscoiated);
-            $message = sprintf(t("Product is associated with %s subcommunities."), $subcommunityCount);
-            $subcommunityDetails = [];
-            $subcommunityDetails["subcommunityCount"] = $subcommunityCount;
-            $subcommunityDetails["subcommunityIDs"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
+            $message = sprintf(t("Product %s is associated with %s subcommunities."), $id, $subcommunityCount);
+            $details = [];
+            $details["errorType"] = self::ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY;
+            $details["subcommunityCount"] = $subcommunityCount;
+            $details["subcommunityIDs"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
 
-            throw new ClientException($message, 409, $subcommunityDetails);
+            throw new ClientException($message, 409, $details);
         }
         $product = $this->productByID($id);
 
