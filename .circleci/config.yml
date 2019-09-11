@@ -9,6 +9,27 @@ executors:
             - image: mysql:5.7.26
             - image: dzsysop/sphinx-vanilla
               environment: *db_env
+jobs:
+    php_sphinx_tests:
+        executor: sphinx
+        steps: &php_unit_test_steps
+            - *attach_workspace
+            -   run:
+                    name: Test setup
+                    command: |
+                        cd ~/workspace/vanilla
+                        cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+            - core/prepare_php_tests
+            -   run:
+                    name: Library Tests
+                    command: |
+                        cd ~/workspace/vanilla
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
+            -   run:
+                    name: APIv2 Tests
+                    command: |
+                        cd ~/workspace/vanilla
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
 workflows:
     version: 2
     commit:
@@ -17,6 +38,9 @@ workflows:
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
+            - jobs/php_sphinx_tests:
+                  requires:
+                      - php_setup
             - jobs/php_72_tests:
                   requires:
                       - php_setup
