@@ -24,6 +24,8 @@ jobs:
                     command: |
                         cd ~/workspace/vanilla
                         cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+                        cp ~/workspace/internal/.circleci/sphinx/sphinxapi.php ./conf/sphinxapi.php
+                        echo $'\nrequire_once("sphinxapi.php");' | sudo tee -a ./conf/bootstrap.before.php
             - run:
                     name: Prepare MySQL
                     command: ~/workspace/ci-scripts/prepare-mysql.sh
