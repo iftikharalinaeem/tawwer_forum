@@ -8,7 +8,11 @@ executors:
             - image: circleci/php:7.2.19-fpm-node
             - image: mysql:5.7.26
             - image: dzsysop/sphinx-vanilla
-              environment: *db_env
+              environment:
+                  MYSQL_USER: circleci
+                  MYSQL_PASSWORD: ''
+                  MYSQL_DATABASE: vanilla_test
+                  MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
     php_sphinx_tests:
         executor: sphinx
