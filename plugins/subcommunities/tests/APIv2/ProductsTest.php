@@ -130,7 +130,7 @@ class ProductsTest extends AbstractAPIv2Test {
      *
      * @expectedException \Garden\Web\Exception\ClientException
      * @expectedExceptionCode 409
-     * @expectedExceptionMessage Product is associated with 1 subcommunities.
+     * @expectedExceptionMessageRegExp  /Product \d is associated with \d subcommunities./
      */
     public function testDeleteProductWithSubcommunity() {
         $record = $this->getRecord();
