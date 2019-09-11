@@ -14,6 +14,25 @@ executors:
                   MYSQL_DATABASE: vanilla_test
                   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
+    php_sphinx_setup:
+        executor: sphinx
+        steps:
+            - run:
+                    name: Versions
+                    command: |
+                        php --version
+                        composer --version
+            - core/checkout
+            -   run: ~/workspace/ci-scripts/clone-vanilla.sh
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_composer
+            -   persist_to_workspace:
+                    root: ~/workspace
+                    paths:
+                        - repo
+                        - ci-scripts
+                        - vanilla
     php_sphinx_tests:
         executor: sphinx
         steps:
@@ -26,7 +45,7 @@ jobs:
                         cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
                         cp ~/workspace/repo/.circleci/sphinx/sphinxapi.php ./sphinxapi.php
                         echo $'\nrequire_once("../sphinxapi.php");' | tee -a ./conf/bootstrap.before.php
-                        docker
+                        indexer
             - run:
                     name: Prepare MySQL
                     command: ~/workspace/ci-scripts/prepare-mysql.sh
@@ -46,12 +65,12 @@ workflows:
     commit:
         jobs:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
-            - jobs/php_setup:
-                  name: php_setup
+            - php_sphinx_setup:
+                  name: php_sphinx_setup
 #            - jobs/php_72_lint
             - php_sphinx_tests:
                   requires:
-                      - php_setup
+                      - php_sphinx_setup
 #            - jobs/php_72_tests:
 #                  requires:
 #                      - php_setup
