@@ -110,6 +110,28 @@ paths:
                                     $ref: '#/components/schemas/Product'
                                 type: object
                     description: Success
+                '409':
+                    description: Product is associated with a subcommunity.
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    message:
+                                        description: Verbose description of the error.
+                                        type: string
+                                    status:
+                                        description: Response status code.
+                                        type: integer
+                                    errorType:
+                                        description: Error type.
+                                        type: string
+                                    subcommunityCount:
+                                        description: Number of subcommunities the product is associtated to.
+                                        type: integer
+                                    subcommunityIDs:
+                                        description: Id's of the associated subcommunities.
+                                        type: object
+                                type: object
             tags:
                 - Products
             summary: Delete a product.

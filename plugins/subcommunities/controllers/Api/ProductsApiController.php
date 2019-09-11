@@ -8,8 +8,10 @@ namespace Vanilla\Subcommunities\Controllers\Api;
 
 use Garden\Schema\Schema;
 use AbstractApiController;
+use Garden\Web\Exception\ClientException;
 use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
+use SubcommunityModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 
@@ -17,6 +19,8 @@ use Garden\Web\Exception\NotFoundException;
  * API controller for managing the products resource.
  */
 class ProductsApiController extends AbstractApiController {
+
+    const ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY = "ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY";
 
     /** @var Schema */
     private $productSchema;
@@ -27,6 +31,9 @@ class ProductsApiController extends AbstractApiController {
     /** @var ProductModel */
     private $productModel;
 
+    /** @var SubcommunityModel */
+    private $subcommunityModel;
+
     /** @var boolean */
     private $productFeatureEnabled;
 
@@ -34,9 +41,11 @@ class ProductsApiController extends AbstractApiController {
      * ProductApiController constructor.
      *
      * @param ProductModel $productModel
+     * @param SubcommunityModel $subcommunityModel
      */
-    public function __construct(ProductModel $productModel) {
+    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel) {
         $this->productModel = $productModel;
+        $this->subcommunityModel = $subcommunityModel;
         $this->productFeatureEnabled = false;
     }
 
@@ -202,12 +211,27 @@ class ProductsApiController extends AbstractApiController {
      * Delete a specified product.
      *
      * @param int $id
+     * @throws ClientException If a product is associated with a subcommunity.
      */
     public function delete(int $id) {
         $this->getProductFeatureStatus();
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
 
+
+        // Find out if the product is associated to a subcommunity
+        $subcommunitiesAsscoiated = $this->subcommunityModel->getWhere(["ProductID" => $id])->resultArray();
+
+        if ($subcommunitiesAsscoiated) {
+            $subcommunityCount = count($subcommunitiesAsscoiated);
+            $message = sprintf(t("Product %s is associated with %s subcommunities."), $id, $subcommunityCount);
+            $details = [];
+            $details["errorType"] = self::ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY;
+            $details["subcommunityCount"] = $subcommunityCount;
+            $details["subcommunityIDs"] = array_column($subcommunitiesAsscoiated, "SubcommunityID");
+
+            throw new ClientException($message, 409, $details);
+        }
         $product = $this->productByID($id);
 
         if (is_array($product) && array_key_exists('productID', $product)) {

@@ -31,7 +31,7 @@ class ProductsTest extends AbstractAPIv2Test {
         // ensure that we can enable the product feature.
         $result = $this->api()->put(
             'products/product-feature-flag',
-            ["enabled" => true]
+            ['enabled' => true]
         );
 
         $this->assertEquals(200, $result->getStatusCode());
@@ -62,7 +62,6 @@ class ProductsTest extends AbstractAPIv2Test {
      * Test POST /products
      */
     public function testPostProduct() {
-
         $record = $this->getRecord();
 
         $result = $this->api()->post(
@@ -127,6 +126,28 @@ class ProductsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test Delete /products with associated subcommunity.
+     *
+     * @expectedException \Garden\Web\Exception\ClientException
+     * @expectedExceptionCode 409
+     * @expectedExceptionMessageRegExp  /Product \d is associated with \d subcommunities./
+     */
+    public function testDeleteProductWithSubcommunity() {
+        $record = $this->getRecord();
+        $result = $this->api()->post(
+            'products',
+            $record
+        );
+        $body = $result->getBody();
+
+        $this->createSubcommunity($body['productID']);
+
+        $this->api()->delete(
+            'products/'.$body['productID']
+        );
+    }
+
+    /**
      * Create a record.
      *
      * @return array
@@ -137,5 +158,24 @@ class ProductsTest extends AbstractAPIv2Test {
             'body' => 'Test product',
         ];
         return $record;
+    }
+
+    /**
+     * Create a Subcommunity with a product.
+     *
+     * @param int $id
+     */
+    protected function createSubcommunity($id): void {
+        $subcommunityModel = self::container()->get(\SubcommunityModel::class);
+
+        $record = [
+            'Name' => 'Test_Subcommunity',
+            'Folder' => 'Test_Subcommunity',
+            'Category' => 1,
+            'Locale' => 'en',
+            'ProductID' => $id
+        ];
+
+        $subcommunityModel->insert($record);
     }
 }
