@@ -26,7 +26,11 @@ jobs:
             -   run: ~/workspace/ci-scripts/clone-vanilla.sh
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
-            - *run_composer
+            - run:
+                name: Install Composer Packages
+                command: |
+                    cd ~/workspace/vanilla
+                    VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
             -   persist_to_workspace:
                     root: ~/workspace
                     paths:
