@@ -290,29 +290,22 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get the translations for an article.
+     * 
      * @param int $id
-     * @param array $body
+     * @param array $query
      * @return array
+     *
+     * @throws ClientException If article is not found.
      */
-    public function get_translations(int $id, array $body):array {
+    public function get_translations(int $id, array $query):array {
+        $this->permission("knowledge.kb.view");
+        $this->idParamSchema()->setDescription("Get translations for an article");
 
-        $this->idParamSchema()->setDescription("Get revisions from a specific article.");
         $in = Schema::parse([
-            "status:s" =>[
+            "status:s?" =>[
                 "enum" => $this->articleModel::getAllStatuses()
-            ],
-            "limit:i" => [
-                "default" => self::REVISIONS_LIMIT,
-                "minimum" => 1,
-                "maximum" => 100,
-                "type" => "integer",
-            ],
-            "page:i" => [
-                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
-                "default" => 1,
-                "minimum" => 1,
-                "maximum" => 100,
-            ],
+            ]
         ]);
 
         $out = $this->schema([":a" => Schema::parse([
@@ -320,65 +313,54 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name:s",
             "url:s",
             "locale:s",
-            "translationsStatus:s",
-            ], "out")]);
+            "translationStatus:s",
+            ], "out")
+        ]);
 
-        $article = $this->articleByID($id, false);
-        // if article revision count = 1 skip all the logic
-        $articleRevisions = $this->articleRevisionModel->get(["articleID" => $id], ["orderFields" => "dateInserted", "orderDirection" => "desc"]);
-        $knowledgeBaseCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $article["knowledgeCategoryID"]]);
-        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseCategory["knowledgeBaseID"]]);
-        $knowledgeBaseLocale = $knowledgeBase["sourceLocale"];
-        $articleRevisionsLocales = array_unique(array_column($articleRevisions, "locale", "locale"));
-        $translationsExist = (count($articleRevisionsLocales) > 1) ? true : false;
+        $query = $in->validate($query);
 
-
-        $latestRevisions = [];
-        foreach ($articleRevisions as $articleRevision) {
-            if(in_array($articleRevision["locale"], $articleRevisionsLocales)) {
-                $latestRevisions[$articleRevision["locale"]] = $articleRevision;
-                unset($articleRevisionsLocales[$articleRevision["locale"]]);
+        try {
+            $article = $this->articleModel->selectSingle(["articleID" => $id, "status" => $query["status"]]);
+        } catch (NoResultsException $ex) {
+            $message = sprintf("Article %s not found.", $id);
+            if (array_key_exists("status", $query) && isset($query["status"])) {
+                $message = sprintf("Article %s with status of %s not found.", $id, $query["status"]);
             }
+            throw new ClientException($message, 404);
         }
+
+        $articleRevisions = $this->articleRevisionModel->get(["articleID" => $id], ["orderFields" => "dateInserted", "orderDirection" => "desc"]);
+        $sourceLocale = $this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"]);
+
+
+        $distinctArticleRevisionLocales = array_unique(array_column($articleRevisions, "locale", "locale"));
+        $translationsExist = (count($distinctArticleRevisionLocales) > 1) ? true : false;
+
+        $mostRecentRevisions = $this->getRecentArticleRevisionsByLocale($articleRevisions, $distinctArticleRevisionLocales);
 
         if ($translationsExist) {
-            $sourceLocaleArticleRevision = $latestRevisions[$knowledgeBaseLocale];
-            $srDate = $sourceLocaleArticleRevision["dateInserted"]->getTimeStamp();
+            $revisionFromSourceLocale = $mostRecentRevisions[$sourceLocale];
+            $revisionFromSourcelocaleDate = $revisionFromSourceLocale["dateInserted"]->getTimeStamp();
 
-            foreach ($latestRevisions as &$latestArticleRevision) {
-                $arDate  = $latestArticleRevision["dateInserted"]->getTimeStamp();
-                if ($arDate >= $srDate) {
-                    $latestArticleRevision["translationStatus"] = "up-to-date";
-                } elseif ($latestArticleRevision["dateInserted"] < $sourceLocaleArticleRevision["dateInserted"]) {
-                    $latestArticleRevision["translationStatus"] = "out-of-date";
+            foreach ($mostRecentRevisions as &$mostRecentRevision) {
+                $mostRecentRevisionDate = $mostRecentRevision["dateInserted"]->getTimeStamp();
+                if ($mostRecentRevisionDate >= $revisionFromSourcelocaleDate) {
+                    $mostRecentRevision["translationStatus"] = "up-to-date";
+                } elseif ($mostRecentRevision["dateInserted"] < $revisionFromSourceLocale["dateInserted"]) {
+                    $mostRecentRevision["translationStatus"] = "out-of-date";
                 }
-                $slug = \Gdn_Format::url("{$id}-{$latestArticleRevision["name"]}");
-                $latestArticleRevision["url"] = \Gdn::request()->url("/kb/articles/" . $slug, true);
             }
         } else {
-            $latestRevisions["translationStatus"] = "no";
-            $slug = \Gdn_Format::url("{$id}-{$latestRevisions["name"]}");
-            $latestRevisions["url"] = \Gdn::request()->url("/kb/articles/" . $slug, true);
+            foreach ($mostRecentRevisions as &$mostRecentRevision) {
+                $mostRecentRevision["translationStatus"] = "no";
+            }
         }
 
-        $result = [];
-
-        foreach ($latestRevisions as $latestRevision) {
-            $result[] = [
-                "articleRevisionID" =>  $latestRevision["articleRevisionID"],
-                "name" => $latestRevision["name"],
-                "url" => $latestRevision["url"],
-                "locale" => $latestRevision["locale"],
-                "translationStatus" => $latestRevision["translationStatus"],
-            ];
-        }
-
+        $result = $this->normalizeArticleTranslationData($id, $mostRecentRevisions);
         $result = $out->validate($result);
 
         return $result;
     }
-
-
 
     /**
      * Get a single article draft.
@@ -1259,5 +1241,65 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         return $articleID;
+    }
+
+    /**
+     * Get the source locale of KnowledgeBase.
+     *
+     * @param int $id knowledge category ID.
+     * @return string
+     * @throws ClientException if the any issue finding a category or knowledgebase.
+     */
+    protected function getKnowledgeBaseSourceLocale(int $id): string {
+        try {
+            $knowledgeBaseCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseCategory["knowledgeBaseID"]]);
+            $knowledgeBaseLocale = $knowledgeBase["sourceLocale"];
+            return $knowledgeBaseLocale;
+        } catch (NoResultsException $e) {
+            throw new ClientException("Article not associated to correct KnowledgeBase", 404);
+        }
+    }
+
+    /**
+     * Get the most recent article revisions by locale.
+     *
+     * @param array $articleRevisions
+     * @param array $articleRevisionsLocales
+     * @return array
+     */
+    protected function getRecentArticleRevisionsByLocale(array $articleRevisions, array $articleRevisionsLocales): array {
+        $latestRevisions = [];
+        foreach ($articleRevisions as $articleRevision) {
+            if (in_array($articleRevision["locale"], $articleRevisionsLocales)) {
+                $latestRevisions[$articleRevision["locale"]] = $articleRevision;
+                unset($articleRevisionsLocales[$articleRevision["locale"]]);
+            }
+        }
+        return $latestRevisions;
+    }
+
+    /**
+     * Prepare the article translation data for the api.
+     *
+     * @param int $id article id.
+     * @param array $revisions
+     * @return array
+     */
+    protected function normalizeArticleTranslationData(int $id, array $revisions): array {
+        $result = [];
+        foreach ($revisions as $revision) {
+            $slug = \Gdn_Format::url("{$id}-{$revision["name"]}");
+            $url = \Gdn::request()->url("/kb/articles/" . $slug, true);
+
+            $result[] = [
+                "articleRevisionID" =>  $revision["articleRevisionID"],
+                "name" => $revision["name"],
+                "url" => $url,
+                "locale" => $revision["locale"],
+                "translationStatus" => $revision["translationStatus"],
+            ];
+        }
+        return $result;
     }
 }
