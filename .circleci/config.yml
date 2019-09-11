@@ -43,7 +43,7 @@ workflows:
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
-            - jobs/php_sphinx_tests:
+            - php_sphinx_tests:
                   requires:
                       - php_setup
             - jobs/php_72_tests:
