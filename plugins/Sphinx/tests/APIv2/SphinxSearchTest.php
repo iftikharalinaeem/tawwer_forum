@@ -86,7 +86,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     public static function sphinxReindex() {
        exec('curl sphinx:9399', $dockerResponse);
        if ('Sphinx reindexed.' !== end($dockerResponse)) {
-          die('Can\'t reindex Sphinx indexes!');
+          die('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
        }
     }
 
