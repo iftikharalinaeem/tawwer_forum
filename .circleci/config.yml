@@ -2,6 +2,13 @@ version: 2.1
 orbs:
     core: vanilla/core@2.1
     jobs: vanilla/jobs@1.0
+executors:
+    sphinx:
+        docker:
+            - image: circleci/php:7.2.19-fpm-node
+            - image: mysql:5.7.26
+            - image: dzsysop/sphinx-vanilla
+              environment: *db_env
 workflows:
     version: 2
     commit:
