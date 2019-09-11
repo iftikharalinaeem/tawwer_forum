@@ -6,13 +6,13 @@ executors:
     sphinx:
         docker:
             - image: circleci/php:7.2.19-fpm-node
-            - image: mysql:5.7.26
-                environment:
-                    MYSQL_USER: circleci
-                    MYSQL_PASSWORD: ''
-                    MYSQL_DATABASE: vanilla_test
-                    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
             - image: dzsysop/sphinx-vanilla
+            - image: mysql:5.7.26
+              environment:
+                  MYSQL_USER: circleci
+                  MYSQL_PASSWORD: ''
+                  MYSQL_DATABASE: vanilla_test
+                  MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
     php_sphinx_tests:
         executor: sphinx
