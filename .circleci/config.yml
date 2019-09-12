@@ -49,6 +49,26 @@ jobs:
         steps:
             - attach_workspace:
                 at: ~/workspace
+            - run:
+                    name: Versions
+                    command: |
+                        php --version
+                        composer --version
+            - core/checkout
+            -   run: ~/workspace/ci-scripts/clone-vanilla.sh
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - run:
+                name: Install Composer Packages
+                command: |
+                    cd ~/workspace/vanilla
+                    VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+            -   persist_to_workspace:
+                    root: ~/workspace
+                    paths:
+                        - repo
+                        - ci-scripts
+                        - vanilla
             -   run:
                     name: Test setup
                     command: |
@@ -79,8 +99,7 @@ workflows:
                   name: php_sphinx_setup
 #            - jobs/php_72_lint
             - php_sphinx_tests:
-                  requires:
-                      - php_sphinx_setup
+                  name: php_sphinx_tests
 #            - jobs/php_72_tests:
 #                  requires:
 #                      - php_setup
