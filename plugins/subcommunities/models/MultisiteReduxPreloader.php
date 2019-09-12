@@ -8,6 +8,7 @@
 namespace Vanilla\Subcommunities\Models;
 
 use Garden\Web\Data;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Subcommunities\Controllers\Api\ProductsApiController;
 use Vanilla\Subcommunities\Controllers\Api\SubcommunitiesApiController;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -44,7 +45,11 @@ class MultisiteReduxPreloader implements ReduxActionProviderInterface {
      */
     public function createActions(): array {
         $allCommunities = $this->subcommunitiesApi->index(['expand' => 'all']);
-        $allProducts = $this->productsApi->index();
+
+        $allProducts = [];
+        if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+            $allProducts = $this->productsApi->index();
+        }
 
         return [
             new ReduxAction(self::GET_ALL_SUBCOMMUNITIES_ACTION, Data::box($allCommunities), []),
