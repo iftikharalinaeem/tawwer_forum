@@ -35,7 +35,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
        exec('curl 127.0.0.1:9399', $dockerResponse);
        //die(print_r($dockerResponse));
 
-
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$siteInfo['adminUserID'], false, false);
