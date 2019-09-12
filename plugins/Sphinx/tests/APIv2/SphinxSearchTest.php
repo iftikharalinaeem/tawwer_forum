@@ -91,7 +91,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 //          exec('indexer --all --rotate', $dockerResponse);
 //       } else {
 //          // this is for localhost with sphinx on docker
-         $continue = 3;
+         $continue = 2;
          while ($continue) {
             exec('curl 127.0.0.1:9399', $dockerResponse);
             if ('Sphinx reindexed.' !== end($dockerResponse)) {
