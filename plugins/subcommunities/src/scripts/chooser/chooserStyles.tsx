@@ -10,7 +10,6 @@ import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers"
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
 
 export const chooserVariables = useThemeCache(() => {
     const vars = variableFactory("chooser");
@@ -21,7 +20,7 @@ export const chooserVariables = useThemeCache(() => {
         margin: 6,
     });
 
-    const toggle = vars("colors", {
+    const toggle = vars("toggle", {
         lineHeight: titleBarVars.button.size,
         color: titleBarVars.colors.fg,
     });
