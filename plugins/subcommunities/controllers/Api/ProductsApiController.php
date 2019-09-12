@@ -9,8 +9,8 @@ namespace Vanilla\Subcommunities\Controllers\Api;
 use Garden\Schema\Schema;
 use AbstractApiController;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Subcommunities\Models\ProductModel;
 use SubcommunityModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
@@ -21,6 +21,7 @@ use Garden\Web\Exception\NotFoundException;
 class ProductsApiController extends AbstractApiController {
 
     const ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY = "ERR_PRODUCT_IS_ATTACHED_TO_A_SUBCOMMUNITY";
+    const FEATURE_FLAG_CONFIG_KEY = "Feature." . ProductModel::FEATURE_FLAG . ".Enabled";
 
     /** @var Schema */
     private $productSchema;
@@ -34,8 +35,8 @@ class ProductsApiController extends AbstractApiController {
     /** @var SubcommunityModel */
     private $subcommunityModel;
 
-    /** @var boolean */
-    private $productFeatureEnabled;
+    /** @var \Gdn_Configuration */
+    private $config;
 
     /**
      * ProductApiController constructor.
@@ -43,10 +44,10 @@ class ProductsApiController extends AbstractApiController {
      * @param ProductModel $productModel
      * @param SubcommunityModel $subcommunityModel
      */
-    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel) {
+    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel, \Gdn_Configuration $config) {
         $this->productModel = $productModel;
         $this->subcommunityModel = $subcommunityModel;
-        $this->productFeatureEnabled = false;
+        $this->config = $config;
     }
 
     /**
@@ -114,7 +115,7 @@ class ProductsApiController extends AbstractApiController {
      * @return array
      */
     public function index(): array {
-        $this->getProductFeatureStatus();
+        FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         $this->permission("'Garden.SignIn.Allow'");
         $out = $this->schema([
             ":a" => $this->productSchema(),
@@ -136,7 +137,7 @@ class ProductsApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id): array {
-        $this->getProductFeatureStatus();
+        FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         $this->permission("Garden.SignIn.Allow");
         $this->idParamSchema()->setDescription("Get an product id.");
 
@@ -155,7 +156,7 @@ class ProductsApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body): array {
-        $this->getProductFeatureStatus();
+        FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         $this->permission("Garden.Moderation.Manage");
 
         $in = $this->schema(
@@ -183,7 +184,7 @@ class ProductsApiController extends AbstractApiController {
      * @return array
      */
     public function patch(int $id, array $body = []): array {
-        $this->getProductFeatureStatus();
+        FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema(
             Schema::parse([
@@ -214,7 +215,7 @@ class ProductsApiController extends AbstractApiController {
      * @throws ClientException If a product is associated with a subcommunity.
      */
     public function delete(int $id) {
-        $this->getProductFeatureStatus();
+        FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
         $this->permission("Garden.Moderation.Manage");
         $this->idParamSchema()->setDescription("Delete a product id.");
 
@@ -263,33 +264,12 @@ class ProductsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $config = "Feature." . ProductModel::FEATURE_FLAG . ".Enabled";
-
-        $saved = false;
-        if ($body["enabled"] && array_key_exists("enabled", $body)) {
-            $saved = saveToConfig($config, true);
-        } elseif (!$body["enabled"] && array_key_exists("enabled", $body)) {
-            $saved = saveToConfig($config, false);
-        }
-
-        // saveToConfig returns true on success and null if no changes needed.
-        if ($saved || is_null($saved)) {
-            $this->productFeatureEnabled  = c($config);
-        }
-
-        $enabled["enabled"] = $this->productFeatureEnabled;
-        $enabled = $out->validate($enabled);
+        $this->config->saveToConfig(self::FEATURE_FLAG_CONFIG_KEY, $body['enabled']);
+        $enabled = $out->validate([
+            'enabled' => FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG),
+        ]);
 
         return $enabled;
-    }
-
-    /**
-     * Check if the product feature is enabled.
-     */
-    private function getProductFeatureStatus() {
-        if (!$this->productFeatureEnabled) {
-            FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
-        }
     }
 
     /**
