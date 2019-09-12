@@ -19,7 +19,7 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
  */
 class MultisiteReduxPreloader implements ReduxActionProviderInterface {
 
-    const GET_ALL_SUB_ACTION = "@@subcommunities/GET_ALL_DONE";
+    const GET_ALL_SUBCOMMUNITIES_ACTION = "@@subcommunities/GET_ALL_DONE";
     const GET_ALL_PRODUCTS_ACTION = "@@products/GET_ALL_DONE";
 
     /** @var SubcommunitiesApiController */
@@ -47,7 +47,7 @@ class MultisiteReduxPreloader implements ReduxActionProviderInterface {
         $allProducts = $this->productsApi->index();
 
         return [
-            new ReduxAction(self::GET_ALL_SUB_ACTION, Data::box($allCommunities), []),
+            new ReduxAction(self::GET_ALL_SUBCOMMUNITIES_ACTION, Data::box($allCommunities), []),
             new ReduxAction(self::GET_ALL_PRODUCTS_ACTION, Data::box($allProducts), []),
         ];
     }
