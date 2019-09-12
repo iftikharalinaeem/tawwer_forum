@@ -185,7 +185,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
             "Internal"
         );
 
-
         $this->database->structure()
             ->table("article")
             ->primaryKey("articleID")
@@ -193,8 +192,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("sort", "int", true)
             ->column("score", "int", "0")
             ->column("views", "int", "0")
-            ->column("dateInserted", "datetime")
             ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
             ->column(
