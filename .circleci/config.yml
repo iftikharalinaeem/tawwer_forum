@@ -7,6 +7,12 @@ executors:
         docker:
             - image: circleci/php:7.2.19-fpm-node
             - image: dzsysop/sphinx-vanilla
+              environment:
+                  MYSQL_HOST: 127.0.0.1
+                  MYSQL_USER: circleci
+                  MYSQL_PASSWORD: ''
+                  MYSQL_DATABASE: vanilla_test
+                  MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
             - image: mysql:5.7.26
               environment:
                   MYSQL_USER: circleci
@@ -68,8 +74,8 @@ workflows:
     commit:
         jobs:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
-            - php_sphinx_setup:
-                  name: php_sphinx_setup
+#            - php_sphinx_setup:
+#                  name: php_sphinx_setup
 #            - jobs/php_72_lint
             - php_sphinx_tests:
                   requires:
