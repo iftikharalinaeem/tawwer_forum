@@ -624,7 +624,7 @@ class SphinxSearchModel extends \SearchModel {
      */
     public function sphinxClient() {
         //if ($this->_sphinxClient === null) {
-            $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', '127.0.0.1'));
+            $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
             $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
             $this->_sphinxClient = new SphinxClient();
