@@ -95,8 +95,8 @@ workflows:
     commit:
         jobs:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
-            - php_sphinx_setup:
-                  name: php_sphinx_setup
+#            - php_sphinx_setup:
+#                  name: php_sphinx_setup
 #            - jobs/php_72_lint
             - php_sphinx_tests:
                   name: php_sphinx_tests
