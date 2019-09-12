@@ -101,6 +101,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
                sleep(3);
                $continue--;
             } else {
+               fwrite(STDERR, print_r($dockerResponse), TRUE);
                $continue = false;
             }
          }
