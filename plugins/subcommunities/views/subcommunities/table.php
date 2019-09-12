@@ -17,7 +17,7 @@
                 <td><?php echo htmlspecialchars($Row['Name']); ?></td>
                 <td>
                     <?php
-                    $url = Gdn::request()->urlDomain('//').Gdn::request()->assetRoot().'/'.htmlspecialchars($Row['Folder']);
+                    $url = Gdn::request()->urlDomain('//').Gdn::request()->getAssetRoot().'/'.htmlspecialchars($Row['Folder']);
                     echo anchor('/'.htmlspecialchars($Row['Folder']), $url);
                     ?>
                 </td>
