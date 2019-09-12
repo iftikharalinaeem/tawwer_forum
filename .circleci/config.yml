@@ -7,7 +7,6 @@ executors:
         docker:
             - image: circleci/php:7.2.19-fpm-node
             - image: dzsysop/sphinx-vanilla
-              name: sphinx
               environment:
                   MYSQL_HOST: 127.0.0.1
                   MYSQL_USER: circleci
