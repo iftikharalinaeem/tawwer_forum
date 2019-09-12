@@ -32,7 +32,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
-       //exec('curl sphinx:9399', $dockerResponse);
+       exec('curl sphinx:9399', $dockerResponse);
        // die(print_r($dockerResponse));
 
         /** @var \Gdn_Session $session */
@@ -91,10 +91,18 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 //          exec('indexer --all --rotate', $dockerResponse);
 //       } else {
 //          // this is for localhost with sphinx on docker
-          exec('curl 127.0.0.1:9399', $dockerResponse);
-          if ('Sphinx reindexed.' !== end($dockerResponse)) {
-             die('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
-          }
+         $continue = 3;
+         while ($continue) {
+            exec('curl 127.0.0.1:9399', $dockerResponse);
+            if ('Sphinx reindexed.' !== end($dockerResponse)) {
+               //die('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
+               sleep(3);
+               $continue--;
+            } else {
+               $continue = false;
+            }
+         }
+
 //       }
     }
 
