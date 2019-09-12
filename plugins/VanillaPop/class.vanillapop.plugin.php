@@ -30,14 +30,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /// Methods ///
 
     public static function addIDToEmail($email, $iD) {
-        if (!c('Plugins.VanillaPop.AugmentFrom', true)) {
-            return;
-        }
-
         // Encode the message ID in the from.
-        $fromParts = explode('@', $email, 2);
-        if (count($fromParts) == 2) {
-            $email = "{$fromParts[0]}+$iD@{$fromParts[1]}";
+        if (c('Plugins.VanillaPop.AugmentFrom', true)) {
+            $fromParts = explode('@', $email, 2);
+            if (count($fromParts) == 2) {
+                $email = "{$fromParts[0]}+$iD@{$fromParts[1]}";
+            }
         }
         return $email;
     }
