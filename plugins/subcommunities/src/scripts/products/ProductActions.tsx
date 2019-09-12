@@ -13,7 +13,7 @@ import { actionCreatorFactory } from "typescript-fsa";
 import apiv2 from "@library/apiv2";
 import { IMultiSiteStoreState } from "@subcommunities/state/model";
 
-const actionCreator = actionCreatorFactory("@@product");
+const actionCreator = actionCreatorFactory("@@products");
 
 interface ITransactionParams {
     transactionID: string;
