@@ -4,7 +4,7 @@
  */
 import React from "react";
 import { useAvailableLocales, useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
-import { getMeta, t } from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     localeContent: string; // The locale key to translate into a full name.

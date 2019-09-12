@@ -5,7 +5,7 @@
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { RightChevronIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
-import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
+import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
 import { useAvailableLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
 import React from "react";
 import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
@@ -25,7 +25,7 @@ export function LocaleChooser(props: IProps) {
         return <Loader small padding={10} />;
     }
 
-    const classes = chooserClasses();
+    const classes = subcommunityChooserClasses();
 
     return (
         <div>

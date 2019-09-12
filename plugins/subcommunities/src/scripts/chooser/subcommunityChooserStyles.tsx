@@ -11,8 +11,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
-export const chooserVariables = useThemeCache(() => {
-    const vars = variableFactory("chooser");
+export const subcommunityChooserVariables = useThemeCache(() => {
+    const vars = variableFactory("subcommunityChooser");
     const titleBarVars = titleBarVariables();
 
     const arrow = vars("arrow", {
@@ -28,9 +28,9 @@ export const chooserVariables = useThemeCache(() => {
     return { arrow, toggle };
 });
 
-export const chooserClasses = useThemeCache(() => {
-    const style = styleFactory("chooser");
-    const vars = chooserVariables();
+export const subcommunityChooserClasses = useThemeCache(() => {
+    const style = styleFactory("subcommunityChooser");
+    const vars = subcommunityChooserVariables();
     const dropdownVars = dropDownVariables();
     const globalVars = globalVariables();
 
@@ -38,9 +38,16 @@ export const chooserClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         lineHeight: unit(vars.toggle.lineHeight),
-        color: colorOut(vars.toggle.color),
         fontWeight: globalVars.fonts.weights.normal,
         ...margins({ horizontal: unit(6) }),
+    });
+
+    const toggleFullWidth = style("toggleFullWidth", {
+        width: percent(100),
+    });
+
+    const toggleWrapper = style("toggle", {
+        borderRadius: px(6),
     });
 
     const toggleArrow = style("toggleArrow", {
@@ -96,5 +103,16 @@ export const chooserClasses = useThemeCache(() => {
         background: colorOut(globalVars.border.color),
     });
 
-    return { toggle, toggleArrow, row, rowArrow, rowIndented, rowBack, body, headingDivider };
+    return {
+        toggle,
+        toggleFullWidth,
+        toggleArrow,
+        toggleWrapper,
+        row,
+        rowArrow,
+        rowIndented,
+        rowBack,
+        body,
+        headingDivider,
+    };
 });

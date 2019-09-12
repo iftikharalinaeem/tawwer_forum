@@ -3,17 +3,16 @@
  * @license Proprietary
  */
 
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { DownTriangleIcon } from "@library/icons/common";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
+import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
-import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import {
     useCurrentSubcommunity,
     useAvailableLocales,
@@ -23,11 +22,15 @@ import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { button } from "@storybook/addon-knobs";
 
 type SectionName = "locale" | "product";
 
-export function SubcommunityChooserDropdown() {
+interface IDropdownProps {
+    buttonType?: ButtonTypes;
+    fullWidth?: boolean;
+}
+
+export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const subcommunity = useCurrentSubcommunity();
     const [activeSection, setActiveSection] = useState<SectionName>("locale");
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -38,8 +41,7 @@ export function SubcommunityChooserDropdown() {
         return null;
     }
 
-    const classes = chooserClasses();
-    const classesTitleBar = titleBarClasses();
+    const classes = subcommunityChooserClasses();
     const classesTitleBarNav = titleBarNavClasses();
 
     let toggleName = subcommunity.name;
@@ -54,9 +56,13 @@ export function SubcommunityChooserDropdown() {
             buttonRef={buttonRef}
             isSmall
             flyoutType={FlyoutType.FRAME}
-            buttonBaseClass={ButtonTypes.TEXT}
-            toggleButtonClassName={classNames(classesTitleBarNav.link, classesTitleBar.topElement)}
-            renderLeft={true}
+            buttonBaseClass={props.buttonType || ButtonTypes.TEXT}
+            toggleButtonClassName={classNames(
+                classesTitleBarNav.link,
+                classes.toggleWrapper,
+                props.fullWidth && classes.toggleFullWidth,
+            )}
+            openDirection={DropDownOpenDirection.AUTO}
             buttonContents={
                 <span className={classNames(classes.toggle, classesTitleBarNav.linkContent)}>
                     {toggleName}
