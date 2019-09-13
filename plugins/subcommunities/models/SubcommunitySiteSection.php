@@ -2,18 +2,18 @@
 
 namespace Vanilla\Subcommunities\Models;
 
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
-use Vanilla\Subcommunities\Models\ProductModel;
-
 
 class SubcommunitySiteSection implements SiteSectionInterface {
 
+    /** @var ProductModel */
+    private $productModel;
+
+    /** @var int */
     private $siteSectionID;
 
+    /** @var string */
     private $siteSectionPath;
-
-    private $siteSectionGroup;
 
     /** @var string */
     private $siteSectionName;
@@ -21,16 +21,11 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var string */
     private $locale;
 
-    /** @var \SubcommunityModel */
-    private $subcommunityModel;
-
-    /** @var ProductModel */
-    private $productModel;
-
-    private $currentSubcommunity;
-
+    /** @var string */
     private $sectionGroup;
 
+    /** @var string */
+    private $siteSectionUrl;
 
     /**
      * DI.
@@ -40,11 +35,13 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      */
     public function __construct(array $subcommunity, ProductModel $productModel){
         $this->productModel = $productModel;
-
         $this->siteSectionName = $subcommunity["Name"];
-        $this->locale = $subcommunity['locale'];
-        $this->sectionGroup = $this->setSectionGroup($subcommunity["ProductID"]);
-
+        $this->locale = $subcommunity['Locale'];
+        $this->siteSectionPath = $subcommunity["Folder"];
+        $this->siteSectionUrl =$subcommunity["Url"];
+        $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
+        $this->siteSectionID = $product["productID"];
+        $this->sectionGroup = $product["productID"].'_'.$product["name"];
     }
 
     /**
@@ -72,22 +69,15 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      * @inheritdoc
      */
     public function getSectionID(): int {
-        return '';
+        return $this->siteSectionID;
     }
 
     /**
      * @inheritdoc
      */
     public function getSectionGroup(): string {
-
         return $this->sectionGroup;
     }
 
-    public function setSectionGroup(int $id): string {
-
-        $product = $this->productModel->get(["productID" => $id]);
-        $sectionGroup = $product["name"] ."". $product["ProductID"];
-        return $sectionGroup;
-    }
 
 }

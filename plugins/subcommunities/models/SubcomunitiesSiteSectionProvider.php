@@ -8,22 +8,24 @@
 
 namespace Vanilla\Subcommunities\Models;
 
-
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
-use Vanilla\Subcommunities\Models\ProductModel;
 
 
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
 
     /** @var SubcommunitySiteSection */
-    private $currnetSubcommunity;
+    private $currentSubcommunity;
     
     /** @var \SubcommunityModel */
     private $subcommunityModel;
 
+    /** @var $subcommunities */
+    private $subcommunities;
+
     /** @var ProductModel */
     private $productModel;
+
     /**
      * DI.
      *
@@ -33,22 +35,27 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel) {
         $this->subcommunityModel = $subcommunityModel;
         $this->productModel = $productModel;
-        $this->currnetSubcommunity = new SubcommunitySiteSection($this->subcommunityModel::getCurrent(), $this->productModel);
+        $this->currentSubcommunity = new SubcommunitySiteSection($this->subcommunityModel::getCurrent(), $productModel);
+        $this->subcommunities = $this->subcommunityModel::all();
     }
 
     /**
      * @inheritdoc
      */
     public function getAll(): array {
-        return [$this->currnetSubcommunity];
+        $allSiteSections =[];
+        foreach ($this->subcommunities as $subcommunity) {
+            $allSiteSections[] =  new SubcommunitySiteSection($subcommunity, $this->productModel);
+        }
+        return $allSiteSections;
     }
 
     /**
      * @inheritdoc
      */
     public function getByID(int $id): ?SiteSectionInterface {
-        if ($id === $this->currnetSubcommunity->getSectionID()) {
-            return $this->currnetSubcommunity;
+        if ($id === $this->currentSubcommunity->getSectionID()) {
+            return $this->currentSubcommunity;
         } else {
             return null;
         }
@@ -58,8 +65,8 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getByBasePath(string $basePath): ?SiteSectionInterface {
-        if ($basePath === $this->currnetSubcommunity->getBasePath()) {
-            return $this->currnetSubcommunity;
+        if ($basePath === $this->currentSubcommunity->getBasePath()) {
+            return $this->currentSubcommunity;
         } else {
             return null;
         }
@@ -69,8 +76,8 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getForLocale(string $localeKey): array {
-        if ($localeKey === $this->currnetSubcommunity->getContentLocale()) {
-            return [$this->currnetSubcommunity];
+        if ($localeKey === $this->currentSubcommunity->getContentLocale()) {
+            return [$this->currentSubcommunity];
         } else {
             return [];
         }
