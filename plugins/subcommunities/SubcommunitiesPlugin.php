@@ -9,6 +9,7 @@ use Garden\EventManager;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
 use Vanilla\Web\Page;
 use \Garden\Container\Reference;
+use Vanilla\Subcommunities\Models\ProductModel;
 
 /**
  * Class SubcommunitiesPlugin
@@ -53,7 +54,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->rule(Gdn_Controller::class)
             ->setInherit(true)
             ->addCall('registerReduxActionProvider', $providerArgs)
+            ->rule(Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(\Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider::class)
+            ->setShared(true)
         ;
+
     }
 
     public function setup() {
@@ -155,7 +160,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($site['Locale'] !== Gdn::locale()->current()) {
             Gdn::locale()->set($site['Locale']);
         }
-
         SubcommunityModel::setCurrent($site);
     }
 
@@ -236,7 +240,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-
         $categoryModel = new CategoryModel();
         $categories = $categoryModel
             ->setJoinUserCategory(true)
@@ -283,7 +286,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
-
+        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
         if (!SubcommunityModel::getCurrent()) {
             return;
         }
