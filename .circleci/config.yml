@@ -20,29 +20,6 @@ executors:
                   MYSQL_DATABASE: vanilla_test
                   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
-    php_sphinx_setup:
-        executor: sphinx
-        steps:
-            - run:
-                    name: Versions
-                    command: |
-                        php --version
-                        composer --version
-            - core/checkout
-            -   run: ~/workspace/ci-scripts/clone-vanilla.sh
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
-            - run:
-                name: Install Composer Packages
-                command: |
-                    cd ~/workspace/vanilla
-                    VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
-            -   persist_to_workspace:
-                    root: ~/workspace
-                    paths:
-                        - repo
-                        - ci-scripts
-                        - vanilla
     php_sphinx_tests:
         executor: sphinx
         steps:
@@ -88,7 +65,7 @@ jobs:
                     name: APIv2 Tests
                     command: |
                         cd ~/workspace/vanilla
-                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2" --filter SphinxSearchTest --verbose
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx"
 workflows:
     version: 2
     commit:
