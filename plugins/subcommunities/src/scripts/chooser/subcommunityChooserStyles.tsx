@@ -40,7 +40,6 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         alignItems: "center",
         lineHeight: unit(vars.toggle.lineHeight),
         fontWeight: globalVars.fonts.weights.normal,
-        ...margins({ horizontal: unit(6) }),
     });
 
     const toggleFullWidth = style("toggleFullWidth", {

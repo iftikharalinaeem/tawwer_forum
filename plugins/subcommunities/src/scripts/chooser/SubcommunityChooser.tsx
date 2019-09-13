@@ -3,30 +3,27 @@
  * @license Proprietary
  */
 
-import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/DropDown";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { DownTriangleIcon } from "@library/icons/common";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
-import {
-    useCurrentSubcommunity,
-    useAvailableLocales,
-    useLocaleInfo,
-} from "@subcommunities/subcommunities/subcommunitySelectors";
-import React, { useEffect, useRef, useState } from "react";
+import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
+import { useCurrentSubcommunity, useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
 import classNames from "classnames";
-import { useDevice, Devices } from "@library/layout/DeviceContext";
+import React, { useEffect, useRef, useState } from "react";
 
 type SectionName = "locale" | "product";
 
 interface IDropdownProps {
     buttonType?: ButtonTypes;
     fullWidth?: boolean;
+    buttonClass?: string;
 }
 
 export function SubcommunityChooserDropdown(props: IDropdownProps) {
@@ -57,7 +54,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
             isSmall
             flyoutType={FlyoutType.FRAME}
             buttonBaseClass={props.buttonType || ButtonTypes.STANDARD}
-            toggleButtonClassName={classNames(props.fullWidth && classes.toggleFullWidth)}
+            toggleButtonClassName={classNames(props.fullWidth && classes.toggleFullWidth, props.buttonClass)}
             openDirection={DropDownOpenDirection.AUTO}
             buttonContents={
                 <span className={classNames(classes.toggle)}>
