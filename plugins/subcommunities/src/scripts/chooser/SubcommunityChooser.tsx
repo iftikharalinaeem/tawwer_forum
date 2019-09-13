@@ -20,8 +20,6 @@ import {
 } from "@subcommunities/subcommunities/subcommunitySelectors";
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import titleBarNavClasses from "@library/headers/titleBarNavStyles";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
 
 type SectionName = "locale" | "product";
 
@@ -42,7 +40,6 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     }
 
     const classes = subcommunityChooserClasses();
-    const classesTitleBarNav = titleBarNavClasses();
 
     let toggleName = subcommunity.name;
     if (localeInfo.count > 1) {
@@ -57,14 +54,10 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
             isSmall
             flyoutType={FlyoutType.FRAME}
             buttonBaseClass={props.buttonType || ButtonTypes.TEXT}
-            toggleButtonClassName={classNames(
-                classesTitleBarNav.link,
-                classes.toggleWrapper,
-                props.fullWidth && classes.toggleFullWidth,
-            )}
+            toggleButtonClassName={classNames(props.fullWidth && classes.toggleFullWidth)}
             openDirection={DropDownOpenDirection.AUTO}
             buttonContents={
-                <span className={classNames(classes.toggle, classesTitleBarNav.linkContent)}>
+                <span className={classNames(classes.toggle)}>
                     {toggleName}
                     <DownTriangleIcon className={classes.toggleArrow} />
                 </span>
