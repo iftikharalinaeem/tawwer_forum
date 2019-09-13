@@ -10,6 +10,7 @@ import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers"
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
 
 export const subcommunityChooserVariables = useThemeCache(() => {
     const vars = variableFactory("subcommunityChooser");
@@ -46,12 +47,17 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         width: percent(100),
     });
 
-    const toggleWrapper = style("toggle", {
-        borderRadius: px(6),
+    const toggleArrow = style("toggleArrow", {
+        ...margins({ horizontal: unit(4) }),
     });
 
-    const toggleArrow = style("toggleArrow", {
-        marginLeft: unit(6),
+    const toggleArrowFullWidth = style("toggleArrowFullWidth", {
+        // absolute
+        position: "absolute",
+        right: unit(buttonGlobalVariables().padding.side),
+        top: 0,
+        bottom: 0,
+        ...margins({ vertical: "auto" }),
     });
 
     const rowMixin: NestedCSSProperties = {
@@ -107,7 +113,7 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         toggle,
         toggleFullWidth,
         toggleArrow,
-        toggleWrapper,
+        toggleArrowFullWidth,
         row,
         rowArrow,
         rowIndented,
