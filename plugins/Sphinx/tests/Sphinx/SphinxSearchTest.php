@@ -89,7 +89,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     }
 
     public static function sphinxReindex() {
-         $sphinxHost = c('Plugins.Sphinx.Server');
+         $sphinxHost = empty(c('Plugins.Sphinx.Server')) ? '127.0.0.1' : c('Plugins.Sphinx.Server');
          exec('curl '.$sphinxHost.':9399', $dockerResponse);
          self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
          sleep(1);
