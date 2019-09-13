@@ -310,7 +310,6 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     public function advancedSearch($search, $offset = 0, $limit = 10, $clean = true) {
-
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits($offset, $limit, self::$maxResults);
         $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
@@ -324,7 +323,6 @@ class SphinxSearchModel extends \SearchModel {
         $doSearch = $search['dosearch'];
         $filtered = false;
         $indexes = $this->indexes();
-
         $query = '';
         $terms = [];
 
@@ -340,10 +338,8 @@ class SphinxSearchModel extends \SearchModel {
            } else {
               $catFilterValues = (array) $search['cat'];
            }
-
-         //  die(var_dump($catFilterValues));
-            $sphinx->setFilter('CategoryID', $catFilterValues);
-            $filtered &= (count($catFilterValues) > 0);
+           $sphinx->setFilter('CategoryID', $catFilterValues);
+           $filtered &= (count($catFilterValues) > 0);
         }
 
         if (isset($search['timestamp-from'])) {
@@ -500,13 +496,7 @@ class SphinxSearchModel extends \SearchModel {
         trace($query, 'Query');
         trace($indexes, 'indexes');
 
-//if ($query === 'Third') {
-//   die(print_r($indexes));
-//}
         $search = $sphinx->query($query, implode(' ', $indexes));
-//       if ($query === 'Third') {
-//   die(print_r($search));
-//}
         if (!$search) {
             trace($sphinx->getLastError(), TRACE_ERROR);
             trace($sphinx->getLastWarning(), TRACE_WARNING);
@@ -519,14 +509,8 @@ class SphinxSearchModel extends \SearchModel {
                 trace($sphinx);
                 trace('Sphinx returned an error', TRACE_ERROR);
             }
-//      } else {
-//         trace($Search, 'search');
         }
-         if ('discussion_' !== substr($query,0,11 )) {
-//           print_r($indexes);
-//           print_r($query);
-//           die(print_r($search));
-         }
+
         $results = $this->getDocuments($search);
         $total = val('total', $search);
         $controller = Gdn::controller();
@@ -603,7 +587,6 @@ class SphinxSearchModel extends \SearchModel {
                 $indexes[] = $name . '_Delta';
             }
         }
-        //die(print_r($indexes));
         return $indexes;
     }
 
@@ -623,20 +606,19 @@ class SphinxSearchModel extends \SearchModel {
      * @return SphinxClient
      */
     public function sphinxClient() {
-        //if ($this->_sphinxClient === null) {
-            $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
-            $sphinxPort = c('Plugins.Sphinx.Port', 9312);
+         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
+         $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-            $this->_sphinxClient = new SphinxClient();
-            $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
+         $this->_sphinxClient = new SphinxClient();
+         $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
-            // Set some defaults.
-            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
-            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-            $this->_sphinxClient->setRankingMode(self::$rankingMode);
-            $this->_sphinxClient->setMaxQueryTime(5000);
-            $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
-        //}
+         // Set some defaults.
+         $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+         $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+         $this->_sphinxClient->setRankingMode(self::$rankingMode);
+         $this->_sphinxClient->setMaxQueryTime(5000);
+         $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
+
         return $this->_sphinxClient;
     }
 
