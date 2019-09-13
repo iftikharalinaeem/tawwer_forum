@@ -14,6 +14,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -63,7 +64,7 @@ abstract class KbPage extends ThemedPage {
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
-        ThemesApiController $themesApi = null, // Default needed for method extensions
+        ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
@@ -71,7 +72,7 @@ abstract class KbPage extends ThemedPage {
         DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
         AnalyticsClient $analyticsClient = null // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themesApi);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider);
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
