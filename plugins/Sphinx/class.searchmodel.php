@@ -576,7 +576,6 @@ class SphinxSearchModel extends \SearchModel {
 
 
         $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
-       //$prefix = str_replace(['-'], '_', 'vanilla_test') . '_';
         foreach ($indexes as &$name) {
             $name = $prefix . $name;
         }
