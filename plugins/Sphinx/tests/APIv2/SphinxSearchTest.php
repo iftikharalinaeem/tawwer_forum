@@ -109,26 +109,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 //       }
     }
 
-    /**
-     * Test search scoped to discussions.
-     */
-    public function testRecordTypesDiscussion() {
-        $params = [
-            //'query' => self::$discussion['name'],
-           //'query' => 'discussion',
-            'recordTypes' => 'discussion',
-        ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
-        $this->assertEquals(200, $response->getStatusCode());
 
-        $results = $response->getBody();
-
-        $this->assertTrue(count($results) === 1);
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
-        $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
-    }
 
     /**
      * Test search scoped to comments.
@@ -149,6 +130,27 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         }
         $this->assertRowsEqual(['recordType' => 'comment'], $results[0]);
     }
+
+   /**
+    * Test search scoped to discussions.
+    */
+   public function testRecordTypesDiscussion() {
+      $params = [
+         //'query' => self::$discussion['name'],
+         'query' => 'discussion',
+         'recordTypes' => 'discussion',
+      ];
+      $response = $this->api()->get('/search?'.http_build_query($params));
+      $this->assertEquals(200, $response->getStatusCode());
+
+      $results = $response->getBody();
+
+      $this->assertTrue(count($results) === 1);
+      foreach ($results as $result) {
+         self::$searchResultSchema->validate($result);
+      }
+      $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
+   }
 
     /**
      * Test search scoped to a discussion.
