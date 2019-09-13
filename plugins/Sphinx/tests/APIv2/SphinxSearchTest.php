@@ -115,7 +115,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     public function testRecordTypesDiscussion() {
         $params = [
             //'query' => self::$discussion['name'],
-           'query' => 'discussion',
+           //'query' => 'discussion',
             'recordTypes' => 'discussion',
         ];
         $response = $this->api()->get('/search?'.http_build_query($params));
