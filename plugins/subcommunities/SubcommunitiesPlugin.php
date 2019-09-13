@@ -58,7 +58,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->setClass(\Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider::class)
             ->setShared(true)
         ;
-
     }
 
     public function setup() {
@@ -285,7 +284,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function categoriesController_render_before($sender) {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
-        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
         if (!SubcommunityModel::getCurrent()) {
             return;
