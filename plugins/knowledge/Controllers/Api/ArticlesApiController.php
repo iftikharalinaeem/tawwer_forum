@@ -15,6 +15,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
@@ -98,6 +99,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var EventManager */
     private $eventManager;
 
+    /** @var SiteSectionProviderInterface */
+    private $SiteSectionProviderInterface;
     /**
      * ArticlesApiController constructor
      *
@@ -118,6 +121,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param DiscussionArticleModel $discussionArticleModel
      * @param PageRouteAliasModel $pageRouteAliasModel
      * @param EventManager $eventManager
+     * @param SiteSectionProviderInterface $SiteSectionProviderInterface
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -136,7 +140,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         BreadcrumbModel $breadcrumbModel,
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
-        EventManager $eventManager
+        EventManager $eventManager,
+        SiteSectionProviderInterface $SiteSectionProviderInterface
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -152,6 +157,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
         $this->eventManager = $eventManager;
+        $this->SiteSectionProviderInterface = $SiteSectionProviderInterface;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -165,20 +171,26 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id Article ID.
      * @param bool $includeRevision
      * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
+     * @param bool $includeTranslations Whether to include translated article revisions.
      *
      * @return array
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false): array {
+    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false, bool $includeTranslations = false): array {
         try {
             if ($includeRevision) {
-                $article = $this->articleModel->getIDWithRevision($id);
+                $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
+                $knowledgeCategoryID = ($includeTranslations) ? array_column($article, "knowledgeCategoryID") : $article["knowledgeCategoryID"];
+                if (empty($article)) {
+                    throw new NoResultsException("No rows matched the provided criteria.");
+                }
             } else {
                 $article = $this->articleModel->selectSingle(["articleID" => $id]);
+                $knowledgeCategoryID = $article['knowledgeCategoryID'];
             }
             if (!$includeDeleted) {
-                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $article['knowledgeCategoryID']]);
+                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
                 $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
             }
         } catch (NoResultsException $e) {
@@ -294,8 +306,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id
      * @param array $query
      * @return array
-     *
-     * @throws ClientException If article is not found.
+
      */
     public function get_translations(int $id, array $query):array {
         $this->permission("knowledge.kb.view");
@@ -312,51 +323,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name:s",
             "url:s",
             "locale:s",
-            "translationStatus:s",
+            "translationStatus:s" => [
+                "enum" =>["up-to-date", "out-of-date", "not-translated"]
+            ],
             ], "out")
         ]);
 
         $query = $in->validate($query);
-        $where = isset($query["status"]) ? ["articleID" => $id, "status" => $query["status"]] : ["articleID" => $id];
+        $article = $this->articleByID($id, true, false, true);
 
-        try {
-            $article = $this->articleModel->selectSingle($where);
-        } catch (NoResultsException $ex) {
-            $message = sprintf("Article %s not found.", $id);
-            if (array_key_exists("status", $query) && isset($query["status"])) {
-                $message = sprintf("Article %s with status of %s not found.", $id, $query["status"]);
-            }
-            throw new ClientException($message, 404);
-        }
+        $result =  $this->normalizeArticleTranslationData($id, $article);
 
-        $articleRevisions = $this->articleRevisionModel->get(["articleID" => $id], ["orderFields" => "dateInserted", "orderDirection" => "desc"]);
-        $sourceLocale = ($this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"])) ? $this->getKnowledgeBaseSourceLocale($article["knowledgeCategoryID"]) : "en";
-
-
-        $distinctArticleRevisionLocales = array_unique(array_column($articleRevisions, "locale", "locale"));
-        $translationsExist = (count($distinctArticleRevisionLocales) > 1) ? true : false;
-
-        $mostRecentRevisions = $this->getRecentArticleRevisionsByLocale($articleRevisions, $distinctArticleRevisionLocales);
-
-        if ($translationsExist) {
-            $revisionFromSourceLocale = $mostRecentRevisions[$sourceLocale];
-            $revisionFromSourcelocaleDate = $revisionFromSourceLocale["dateInserted"]->getTimeStamp();
-
-            foreach ($mostRecentRevisions as &$mostRecentRevision) {
-                $mostRecentRevisionDate = $mostRecentRevision["dateInserted"]->getTimeStamp();
-                if ($mostRecentRevisionDate >= $revisionFromSourcelocaleDate) {
-                    $mostRecentRevision["translationStatus"] = "up-to-date";
-                } elseif ($mostRecentRevision["dateInserted"] < $revisionFromSourceLocale["dateInserted"]) {
-                    $mostRecentRevision["translationStatus"] = "out-of-date";
-                }
-            }
-        } else {
-            foreach ($mostRecentRevisions as &$mostRecentRevision) {
-                $mostRecentRevision["translationStatus"] = "no";
-            }
-        }
-
-        $result = $this->normalizeArticleTranslationData($id, $mostRecentRevisions);
         $result = $out->validate($result);
 
         return $result;
@@ -1243,52 +1220,16 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Get the source locale of KnowledgeBase.
-     *
-     * @param int $id knowledge category ID.
-     * @return string
-     * @throws ClientException if the any issue finding a category or knowledgebase.
-     */
-    protected function getKnowledgeBaseSourceLocale(int $id): string {
-        try {
-            $knowledgeBaseCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
-            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseCategory["knowledgeBaseID"]]);
-            $knowledgeBaseLocale = $knowledgeBase["sourceLocale"];
-            return $knowledgeBaseLocale;
-        } catch (NoResultsException $e) {
-            throw new ClientException("Article not associated to correct KnowledgeBase", 404);
-        }
-    }
-
-    /**
-     * Get the most recent article revisions by locale.
-     *
-     * @param array $articleRevisions
-     * @param array $articleRevisionsLocales
-     * @return array
-     */
-    protected function getRecentArticleRevisionsByLocale(array $articleRevisions, array $articleRevisionsLocales): array {
-        $latestRevisions = [];
-        foreach ($articleRevisions as $articleRevision) {
-            if (in_array($articleRevision["locale"], $articleRevisionsLocales)) {
-                $latestRevisions[$articleRevision["locale"]] = $articleRevision;
-                unset($articleRevisionsLocales[$articleRevision["locale"]]);
-            }
-        }
-        return $latestRevisions;
-    }
-
-    /**
      * Prepare the article translation data for the api.
      *
-     * @param int $id article id.
+     * @param int $artcileID article id.
      * @param array $revisions
      * @return array
      */
-    protected function normalizeArticleTranslationData(int $id, array $revisions): array {
+    protected function normalizeArticleTranslationData(int $artcileID, array $revisions): array {
         $result = [];
         foreach ($revisions as $revision) {
-            $slug = \Gdn_Format::url("{$id}-{$revision["name"]}");
+            $slug = \Gdn_Format::url("{$artcileID}-{$revision["name"]}");
             $url = \Gdn::request()->url("/kb/articles/" . $slug, true);
 
             $result[] = [

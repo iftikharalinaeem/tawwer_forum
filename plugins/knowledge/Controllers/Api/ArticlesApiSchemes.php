@@ -453,6 +453,10 @@ trait ArticlesApiSchemes {
                 ]
             ]),
             "aliases:a?" => ['items' => ['type' => 'string']],
+            "translations:a" => [
+                "allowNull" => true,
+                "description" => "Translation status of revision. Ex: valid, out-dated,",
+            ],
         ]);
     }
 

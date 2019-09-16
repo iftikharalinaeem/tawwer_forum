@@ -403,4 +403,9 @@ MESSAGE
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
     }
+
+    public function getSiteSectionGroup() {
+
+        return "13_test";
+    }
 }

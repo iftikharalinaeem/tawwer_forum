@@ -106,6 +106,10 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 "allowNull" => true,
                 "type" => "string",
             ],
+            "translationStatus?" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
         ]));
         return $schema;
     }
@@ -143,15 +147,18 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * Get a single article row by its ID.
      *
      * @param int $articleID
+     * @param bool $includeTranslations
      * @return array
      * @throws NoResultsException If the article could not be found.
      */
-    public function getIDWithRevision(int $articleID): array {
-        $resultSet = $this->getWithRevision(["a.ArticleID" => $articleID], ["limit" => 1]);
+    public function getIDWithRevision(int $articleID, bool $includeTranslations = false): array {
+        $limit = (!$includeTranslations) ?  ["limit" => 1] : ["limit" => ArticleRevisionModel::DEFAULT_LIMIT];
+        $resultSet = $this->getWithRevision(["a.ArticleID" => $articleID], $limit);
         if (empty($resultSet)) {
             throw new NoResultsException("An article with that ID could not be found.");
         }
-        $row = reset($resultSet);
+
+        $row = (!$includeTranslations) ? reset($resultSet) : $resultSet;
         return $row;
     }
 
@@ -189,6 +196,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 ->select("ar.articleRevisionID")
                 ->select("ar.name")
                 ->select("ar.locale")
+                ->select("ar.translationStatus")
                 ->from($this->getTable() . " as a")
                 ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
                 ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left")

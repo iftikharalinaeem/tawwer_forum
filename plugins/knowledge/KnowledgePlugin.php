@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge;
 use Gdn_Router as Router;
 use Garden\Container\Reference;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -238,6 +239,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("plainText", "mediumtext", true)
             ->column("excerpt", "text", true)
             ->column("locale", "varchar(10)", false, "unique.publishedRevision")
+            ->column(
+                "translationStatus",
+                ArticleRevisionModel::getTranslationStatuses(),
+                ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE,
+                'index'
+            )
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
             ->set()

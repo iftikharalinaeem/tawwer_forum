@@ -25,7 +25,7 @@ class ArticlesTest extends AbstractResourceTest {
     /** @var int */
     private static $knowledgeCategoryID;
 
-        /** @var string The resource route. */
+    /** @var string The resource route. */
     protected $baseUrl = "/articles";
 
     /** @var array Fields to be checked with get/<id>/edit */
@@ -116,6 +116,7 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => "Example Article",
             "sort" => 1,
         ];
+
         return $record;
     }
 
@@ -125,20 +126,22 @@ class ArticlesTest extends AbstractResourceTest {
      * @return array Knowledge base
      */
     public function newKnowledgeBase(): array {
-        $salt = '-'.round(microtime(true) * 1000).rand(1, 1000);
+        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
         $record = [
             'name' => 'Test Knowledge Base',
-            'description' => 'Test Knowledge Base '.$salt,
+            'description' => 'Test Knowledge Base ' . $salt,
             'viewType' => 'guide',
             'icon' => '',
             'bannerImage' => '',
             'sortArticles' => 'manual',
             'sourceLocale' => 'en',
-            'urlCode' => 'test-knowledge-base'.$salt,
+            'urlCode' => 'test-knowledge-base' . $salt,
         ];
         $kb = $this->api()
             ->post('/knowledge-bases', $record)
-            ->getBody();
+            ->getBody()
+        ;
+
         return $kb;
     }
 
@@ -163,7 +166,8 @@ class ArticlesTest extends AbstractResourceTest {
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$article[$this->pk]}"
-        );
+        )
+        ;
     }
 
     /**
@@ -171,13 +175,14 @@ class ArticlesTest extends AbstractResourceTest {
      */
     public function testPostDeleted() {
         $kb = $this->newKnowledgeBase();
-        $record =$this->record();
+        $record = $this->record();
         $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
 
         $this->api()->patch(
             "/knowledge-bases/{$kb['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
+        )
+        ;
         $this->expectException(NotFoundException::class);
         $article = $this->testPost($record);
     }
@@ -192,8 +197,10 @@ class ArticlesTest extends AbstractResourceTest {
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$article[$this->pk]}/edit"
-        );
+        )
+        ;
     }
+
     /**
      * Test PATCH /resource/<id> with a a single field update.
      *
@@ -207,10 +214,11 @@ class ArticlesTest extends AbstractResourceTest {
             $this->defaultKB = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " KB #1",
                 "Description" => 'Test knowledge base description',
-                "urlCode" => slugify('test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000)),
+                "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-            ])->getBody();
+            ])->getBody()
+            ;
         }
 
         $row = $this->testGetEdit();
@@ -223,7 +231,8 @@ class ArticlesTest extends AbstractResourceTest {
                 'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
                 $field => $patchRow[$field]
             ]
-        );
+        )
+        ;
 
         $this->assertEquals(200, $r->getStatusCode());
 
@@ -241,10 +250,11 @@ class ArticlesTest extends AbstractResourceTest {
             $this->defaultKB = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " KB #1",
                 "Description" => 'Test knowledge base description',
-                "urlCode" => slugify('test-'.__FUNCTION__.'-'.round(microtime(true) * 1000).rand(1, 1000)),
+                "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-            ])->getBody();
+            ])->getBody()
+            ;
         }
 
         $row = $this->testGetEdit();
@@ -270,7 +280,8 @@ class ArticlesTest extends AbstractResourceTest {
                 'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
-        );
+        )
+        ;
 
         $this->assertEquals(200, $r->getStatusCode());
 
@@ -285,7 +296,8 @@ class ArticlesTest extends AbstractResourceTest {
                 'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
-        );
+        )
+        ;
     }
 
     /**
@@ -300,14 +312,16 @@ class ArticlesTest extends AbstractResourceTest {
         $patchResponse = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}/status",
             ["status" => $status]
-        );
+        )
+        ;
         $this->assertEquals(200, $patchResponse->getStatusCode());
         $patchResponseBody = $patchResponse->getBody();
         $this->assertEquals($status, $patchResponseBody["status"]);
 
         $getResponse = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}"
-        );
+        )
+        ;
         $getResponseBody = $getResponse->getBody();
         $this->assertEquals($status, $getResponseBody["status"]);
     }
@@ -322,7 +336,8 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "{$this->baseUrl}/{$article[$this->pk]}",
             ['name' => 'Patched test article']
-        );
+        )
+        ;
     }
 
     /**
@@ -335,7 +350,8 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->put(
             "{$this->baseUrl}/{$article[$this->pk]}/react",
             ['helpful' => 'yes']
-        );
+        )
+        ;
     }
 
     /**
@@ -347,7 +363,8 @@ class ArticlesTest extends AbstractResourceTest {
         $body = $this->api()->put(
             "{$this->baseUrl}/{$article[$this->pk]}/react",
             ['helpful' => 'yes']
-        )->getBody();
+        )->getBody()
+        ;
 
         $this->assertEquals($article['name'], $body['name']);
         $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
@@ -370,14 +387,16 @@ class ArticlesTest extends AbstractResourceTest {
                 'body' => 'Hello world!',
                 'format' => 'markdown'
             ]
-        )->getBody();
+        )->getBody()
+        ;
         $record = $this->record();
         $record['discussionID'] = $discussion['discussionID'];
         $article = $this->api()->post($this->baseUrl, $record)->getBody();
 
         $discussionUpdated = $this->api()->get(
-            '/discussions/'.$discussion['discussionID']
-        )->getBody();
+            '/discussions/' . $discussion['discussionID']
+        )->getBody()
+        ;
         $this->assertStringEndsWith($article['url'], $discussionUpdated['canonicalUrl']);
     }
 
@@ -391,7 +410,8 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "{$this->baseUrl}/{$article[$this->pk]}/status",
             ['status' => 'deleted']
-        );
+        )
+        ;
     }
 
     /**
@@ -401,14 +421,15 @@ class ArticlesTest extends AbstractResourceTest {
      */
     private function prepareDeletedKnowledgeBase() {
         $kb = $this->newKnowledgeBase();
-        $record =$this->record();
+        $record = $this->record();
         $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
         $article = $this->testPost($record);
 
         $this->api()->patch(
             "/knowledge-bases/{$kb['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
+        )
+        ;
 
         return $article;
     }
@@ -421,19 +442,22 @@ class ArticlesTest extends AbstractResourceTest {
         $knowledgeBase = $this->api()->post("knowledge-bases", [
             "name" => __FUNCTION__ . " KB #1",
             "description" => __FUNCTION__,
-            "urlCode" => 'kb-1'.round(microtime(true) * 1000).rand(1, 1000),
+            "urlCode" => 'kb-1' . round(microtime(true) * 1000) . rand(1, 1000),
             "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
             "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-        ])->getBody();
+        ])->getBody()
+        ;
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Primary",
             "parentID" => $knowledgeBase['rootCategoryID'],
-        ])->getBody();
+        ])->getBody()
+        ;
         $secondaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Secondary",
             "parentID" => $knowledgeBase['rootCategoryID'],
-        ])->getBody();
+        ])->getBody()
+        ;
 
         // Setup the test articles.
         for ($i = 1; $i <= 5; $i++) {
@@ -442,21 +466,24 @@ class ArticlesTest extends AbstractResourceTest {
                 "name" => "Primary Category Article",
                 "body" => $helloWorldBody,
                 "format" => "rich",
-            ])->getBody();
+            ])->getBody()
+            ;
 
             $this->api()->post($this->baseUrl, [
                 "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"],
                 "name" => "Secondary Category Article",
                 "body" => $helloWorldBody,
                 "format" => "rich",
-            ])->getBody();
+            ])->getBody()
+            ;
         }
 
         // Get the articles for the primary category.
         $articles = $this->api()->get(
             $this->baseUrl,
             ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
-        )->getBody();
+        )->getBody()
+        ;
 
         // Verify the result.
         $this->assertNotEmpty($articles);
@@ -473,13 +500,15 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "/knowledge-bases/{$knowledgeBase['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
+        )
+        ;
         $this->expectException(NotFoundException::class);
 
         $r = $this->api()->get(
             $this->baseUrl,
             ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
-        );
+        )
+        ;
     }
 
 
@@ -488,7 +517,7 @@ class ArticlesTest extends AbstractResourceTest {
      */
     public function testGetRevisions() {
         $kb = $this->newKnowledgeBase();
-        $record =$this->record();
+        $record = $this->record();
         $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
         $article = $this->testPost($record);
         $articleID = $article["articleID"];
@@ -530,9 +559,10 @@ class ArticlesTest extends AbstractResourceTest {
 
         //check if articles/{articleID}/revisions return 404 when knowledge base has status "deleted"
         $this->api()->patch(
-            '/knowledge-bases/'.$kb['knowledgeBaseID'],
+            '/knowledge-bases/' . $kb['knowledgeBaseID'],
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
+        )
+        ;
 
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
@@ -541,72 +571,36 @@ class ArticlesTest extends AbstractResourceTest {
     /**
      * Test GET /articles/{ID}/translations
      */
-    public function testGetArticleTranslations()  {
-        $record =$this->record();
+    public function testGetArticleTranslations() {
+        $record = $this->record();
         $article = $this->testPost($record);
         $articleID = $article["articleID"];
         $locales = ["fr", "de", "es"];
 
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
 
+        // Kludge for now since we can't create published revisions with the same articleID
         foreach ($locales as $locale) {
-            $locale = ["locale" => $locale ];
+            $locale = ["locale" => $locale];
             $this->api()->patch("{$this->baseUrl}/{$articleID}", $locale);
         }
-        
+
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
         $revisions = $response->getBody();
 
-        foreach($revisions as $revision) {
+        foreach ($revisions as $revision) {
             $articleRevisionModel->update(["status" => "published"], ["articleRevisionID" => $revision["articleRevisionID"]]);
         }
 
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
         $articleTranslations = $response->getBody();
-        
+
         $this->assertCount(4, $articleTranslations);
-        
+
+        //default translation is out-of-date.
         foreach ($articleTranslations as $articleTranslation) {
-            $this->assertEquals("up-to-date", $articleTranslation["translationStatus"]);
+            $this->assertEquals("out-to-date", $articleTranslation["locale"]);
         }
     }
 
-    /**
-     * Test article translations when there are no translations.
-     */
-    public function testGetArticleWithNoTranslations() {
-        $record =$this->record();
-        $article = $this->testPost($record);
-        $articleID = $article["articleID"];
-
-        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
-        $articleTranslation = $response->getBody();
-
-        $this->assertCount(1, $articleTranslation);
-        $this->assertEquals("no", $articleTranslation[0]["translationStatus"]);
-    }
-
-    /**
-     * Test article translations when there are no translations.
-     */
-    public function testGetArticleWithOutofDateTranslations() {
-        $record =$this->record();
-        $article = $this->testPost($record);
-        $articleID = $article["articleID"];
-
-        $this->api()->patch("{$this->baseUrl}/{$articleID}", ["locale" => "fr"]);
-        
-        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
-        $revision = $response->getBody();
-        
-        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
-        $articleRevisionModel->update(["status" => "published"], ["articleRevisionID" => $revision[0]["articleRevisionID"]]);
-        $articleRevisionModel->update(["dateInserted" => "2018-01-01T01:01:01+00:00"],  ["articleRevisionID" => $revision[1]["articleRevisionID"]]);
-
-        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
-        $articleTranslation = $response->getBody();
-
-        $this->assertEquals("out-of-date", $articleTranslation[1]["translationStatus"]);
-
-    }
 }
