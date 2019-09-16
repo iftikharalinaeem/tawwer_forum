@@ -316,6 +316,11 @@ class SphinxSearchModel extends \SearchModel {
 
         // Filter the search into proper terms.
         if ($clean) {
+            // This $searchDirty variable contains initial arguments passed to the function
+            // cleanSearch() is replacing some of them and ['cat'] value in particular
+            // when 'cat' is not valid categoryID it got replaced with bolean 'false' value
+            // and sphinx client setFilter() fails with some not proper handled exception when called.
+            $searchDirty = $search;
             $search = Search::cleanSearch($search, $clean === 'api');
         }
 
@@ -325,12 +330,6 @@ class SphinxSearchModel extends \SearchModel {
         $query = '';
         $terms = [];
 
-        // Skip search if no parameters were set
-//      if (!isset($Search['search']) && !isset($Search['timestamp-from']) && !isset($Search['title'])
-//         && !isset($Search['users']) && !isset($Search['discussionid'])) {
-//         $DoSearch = false;
-//      }
-
         if (isset($search['search'])) {
             list($query, $terms) = $this->splitTags($search['search']);
         }
@@ -338,8 +337,13 @@ class SphinxSearchModel extends \SearchModel {
 
         // Set the filters based on the search.
         if (isset($search['cat'])) {
-            $sphinx->setFilter('CategoryID', (array) $search['cat']);
-            $filtered &= (count($search['cat']) > 0);
+           if ($search['cat'] === false) {
+              $catFilterValues = [$searchDirty['cat']];
+           } else {
+              $catFilterValues = (array) $search['cat'];
+           }
+           $sphinx->setFilter('CategoryID', $catFilterValues);
+           $filtered &= (count($catFilterValues) > 0);
         }
 
         if (isset($search['timestamp-from'])) {
@@ -425,18 +429,6 @@ class SphinxSearchModel extends \SearchModel {
             }
             $results = $this->doSearch($sphinx, $query, $indexes);
             $results['SearchTerms'] = array_unique($terms);
-
-//         if ($Search['group']) {
-//            // This was a grouped search so join the sub-documents.
-//            $Subsearch = $Search;
-//            $Subsearch['group'] = false;
-//            $Subsearch['discussionid'] = array_column($Results['SearchResults'], 'DiscussionID');
-//            unset($Subsearch['cat']);
-//            $Sphinx->resetFilters();
-//            $Sphinx->resetGroupBy();
-//            $ChildResults = $this->advancedSearch($Subsearch, 0, 50, false);
-//            $Results['ChildResults'] = $ChildResults['SearchResults'];
-//         }
         } else {
             $results = ['SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms];
         }
@@ -521,8 +513,6 @@ class SphinxSearchModel extends \SearchModel {
                 trace($sphinx);
                 trace('Sphinx returned an error', TRACE_ERROR);
             }
-//      } else {
-//         trace($Search, 'search');
         }
 
         $results = $this->getDocuments($search);
@@ -619,23 +609,19 @@ class SphinxSearchModel extends \SearchModel {
      * @return SphinxClient
      */
     public function sphinxClient() {
-        if ($this->_sphinxClient === null) {
-            $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
-            $sphinxPort = c('Plugins.Sphinx.Port', 9312);
+         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
+         $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-            $this->_sphinxClient = new SphinxClient();
-            $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
+         $this->_sphinxClient = new SphinxClient();
+         $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
-            // Set some defaults.
-            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
-            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-//            $Sphinx->setRankingMode(SPH_RANK_SPH04);
-//            $Sphinx->setRankingMode(SPH_RANK_PROXIMITY_BM25);
-//            $Sphinx->setRankingMode(SPH_RANK_BM25);
-            $this->_sphinxClient->setRankingMode(self::$rankingMode);
-            $this->_sphinxClient->setMaxQueryTime(5000);
-            $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
-        }
+         // Set some defaults.
+         $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+         $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+         $this->_sphinxClient->setRankingMode(self::$rankingMode);
+         $this->_sphinxClient->setMaxQueryTime(5000);
+         $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
+
         return $this->_sphinxClient;
     }
 
@@ -648,86 +634,6 @@ class SphinxSearchModel extends \SearchModel {
 
         $results = $this->advancedSearch($search, $offset, $limit);
         return $results['SearchResults'];
-
-//      $search = Search::cleanSearch($search);
-//      trace($search, 'calc search');
-
-        /*
-          $Indexes = $this->Types;
-          $Prefix = c('Database.Name').'_';
-          foreach ($Indexes as &$Name) {
-          $Name = $Prefix.$Name;
-          }
-          unset($Name);
-
-          if ($this->UseDeltas) {
-          foreach ($Indexes as $Name) {
-          $Indexes[] = $Name.'_Delta';
-          }
-          }
-
-          $SphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
-          $SphinxPort = c('Plugins.Sphinx.Port', 9312);
-
-          // Get the raw results from sphinx.
-          $Sphinx = new sphinxClient();
-          $Sphinx->setServer($SphinxHost, $SphinxPort);
-          $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
-          //      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-          $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
-          $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
-          $Sphinx->setMaxQueryTime(5000);
-
-          // Allow the client to be overridden.
-          $this->EventArguments['SphinxClient'] = $Sphinx;
-          $this->fireEvent('BeforeSphinxSearch');
-
-          $Cats = DiscussionModel::categoryPermissions();
-          if ($CategoryID = Gdn::controller()->Request->get('CategoryID')) {
-          $Cats2 = CategoryModel::getSubtree($CategoryID);
-          Gdn::controller()->setData('Categories', $Cats2);
-          $Cats2 = array_column($Cats2, 'CategoryID');
-          if (is_array($Cats))
-          $Cats = array_intersect($Cats, $Cats2);
-          elseif ($Cats)
-          $Cats = $Cats2;
-          }
-          //      $Cats = CategoryModel::categoryWatch();
-          //      var_dump($Cats);
-          if ($Cats !== true)
-          $Sphinx->setFilter('CategoryID', (array)$Cats);
-          $terms = $Sphinx->query($terms, implode(' ', $Indexes));
-          if (!$terms) {
-          trace($Sphinx->getLastError(), TRACE_ERROR);
-          trace($Sphinx->getLastWarning(), TRACE_WARNING);
-          $Warning = $Sphinx->getLastWarning();
-          if (isset($Sphinx->error)) {
-          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Error: '.$Sphinx->error);
-          } elseif (getValue('warning', $Sphinx)) {
-          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Warning: '.$Sphinx->warning);
-          } else {
-          trace($Sphinx);
-          trace('Sphinx returned an error', TRACE_ERROR);
-          }
-          }
-
-          $Result = $this->getDocuments($terms);
-
-          $Total = getValue('total', $terms);
-          Gdn::controller()->setData('RecordCount', $Total);
-
-          if (!is_array($Result))
-          $Result = [];
-
-          foreach ($Result as $Key => $Value) {
-          if (isset($Value['Summary'])) {
-          $Value['Summary'] = condense(Gdn_Format::to($Value['Summary'], getValue('Format', $Value, 'Html')));
-          $Result[$Key] = $Value;
-          }
-          }
-
-          return $Result;
-         */
     }
 
     public function setSort($sphinx, $terms, $search) {
