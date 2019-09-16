@@ -73,7 +73,11 @@ export class HelpCenterHome extends React.Component<IProps> {
         return (
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-                <Splash action={splashAction} outerBackgroundImage={bannerImage} title={knowledgeBase.name} />
+                <Splash
+                    action={splashAction}
+                    styleOverwrite={{ outerBackgroundImage: bannerImage }}
+                    title={knowledgeBase.name}
+                />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
                         <TitleBar />
