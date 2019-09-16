@@ -23,6 +23,7 @@ import React, { useCallback, useEffect } from "react";
 import { hot } from "react-hot-loader";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
+import PageLoader from "@library/routing/PageLoader";
 
 /*
  * Top level application component for knowledge.
@@ -73,7 +74,9 @@ function KnowledgeApp() {
         >
             <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
                 <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                    <NavHistoryContextProvider>{content}</NavHistoryContextProvider>
+                    <NavHistoryContextProvider>
+                        <PageLoader status={kbLoadable.status}>{content}</PageLoader>
+                    </NavHistoryContextProvider>
                 </SearchContext.Provider>
             </SiteNavProvider>
         </PagesContext.Provider>
