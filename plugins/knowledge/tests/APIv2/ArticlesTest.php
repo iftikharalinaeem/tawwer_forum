@@ -116,7 +116,6 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => "Example Article",
             "sort" => 1,
         ];
-
         return $record;
     }
 
@@ -139,8 +138,7 @@ class ArticlesTest extends AbstractResourceTest {
         ];
         $kb = $this->api()
             ->post('/knowledge-bases', $record)
-            ->getBody()
-        ;
+            ->getBody();
 
         return $kb;
     }
@@ -166,8 +164,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$article[$this->pk]}"
-        )
-        ;
+        );
     }
 
     /**
@@ -181,8 +178,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "/knowledge-bases/{$kb['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        )
-        ;
+        );
         $this->expectException(NotFoundException::class);
         $article = $this->testPost($record);
     }
@@ -197,8 +193,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$article[$this->pk]}/edit"
-        )
-        ;
+        );
     }
 
     /**
@@ -217,8 +212,7 @@ class ArticlesTest extends AbstractResourceTest {
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-            ])->getBody()
-            ;
+            ])->getBody();
         }
 
         $row = $this->testGetEdit();
@@ -231,8 +225,7 @@ class ArticlesTest extends AbstractResourceTest {
                 'knowledgeCategoryID' => $patchRow['knowledgeCategoryID'],
                 $field => $patchRow[$field]
             ]
-        )
-        ;
+        );
 
         $this->assertEquals(200, $r->getStatusCode());
 
@@ -253,8 +246,7 @@ class ArticlesTest extends AbstractResourceTest {
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-            ])->getBody()
-            ;
+            ])->getBody();
         }
 
         $row = $this->testGetEdit();
@@ -280,8 +272,7 @@ class ArticlesTest extends AbstractResourceTest {
                 'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
-        )
-        ;
+        );
 
         $this->assertEquals(200, $r->getStatusCode());
 
@@ -296,8 +287,7 @@ class ArticlesTest extends AbstractResourceTest {
                 'previousRevisionID' => $publishedRevision['articleRevisionID'],
                 'body' => $patchRow['body']
             ]
-        )
-        ;
+        );
     }
 
     /**
@@ -312,16 +302,14 @@ class ArticlesTest extends AbstractResourceTest {
         $patchResponse = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}/status",
             ["status" => $status]
-        )
-        ;
+        );
         $this->assertEquals(200, $patchResponse->getStatusCode());
         $patchResponseBody = $patchResponse->getBody();
         $this->assertEquals($status, $patchResponseBody["status"]);
 
         $getResponse = $this->api()->get(
             "{$this->baseUrl}/{$row[$this->pk]}"
-        )
-        ;
+        );
         $getResponseBody = $getResponse->getBody();
         $this->assertEquals($status, $getResponseBody["status"]);
     }
@@ -336,8 +324,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "{$this->baseUrl}/{$article[$this->pk]}",
             ['name' => 'Patched test article']
-        )
-        ;
+        );
     }
 
     /**
@@ -350,8 +337,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->put(
             "{$this->baseUrl}/{$article[$this->pk]}/react",
             ['helpful' => 'yes']
-        )
-        ;
+        );
     }
 
     /**
@@ -363,8 +349,7 @@ class ArticlesTest extends AbstractResourceTest {
         $body = $this->api()->put(
             "{$this->baseUrl}/{$article[$this->pk]}/react",
             ['helpful' => 'yes']
-        )->getBody()
-        ;
+        )->getBody();
 
         $this->assertEquals($article['name'], $body['name']);
         $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
@@ -378,7 +363,6 @@ class ArticlesTest extends AbstractResourceTest {
      * to set discussion canonical link to the article created
      */
     public function testPostDiscussionCanonical() {
-
         $discussion = $this->api()->post(
             '/discussions',
             [
@@ -387,16 +371,14 @@ class ArticlesTest extends AbstractResourceTest {
                 'body' => 'Hello world!',
                 'format' => 'markdown'
             ]
-        )->getBody()
-        ;
+        )->getBody();
         $record = $this->record();
         $record['discussionID'] = $discussion['discussionID'];
         $article = $this->api()->post($this->baseUrl, $record)->getBody();
 
         $discussionUpdated = $this->api()->get(
             '/discussions/' . $discussion['discussionID']
-        )->getBody()
-        ;
+        )->getBody();
         $this->assertStringEndsWith($article['url'], $discussionUpdated['canonicalUrl']);
     }
 
@@ -428,8 +410,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "/knowledge-bases/{$kb['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        )
-        ;
+        );
 
         return $article;
     }
@@ -445,19 +426,16 @@ class ArticlesTest extends AbstractResourceTest {
             "urlCode" => 'kb-1' . round(microtime(true) * 1000) . rand(1, 1000),
             "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
             "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
-        ])->getBody()
-        ;
+        ])->getBody();
         // Setup the test categories.
         $primaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Primary",
             "parentID" => $knowledgeBase['rootCategoryID'],
-        ])->getBody()
-        ;
+        ])->getBody();
         $secondaryCategory = $this->api()->post("knowledge-categories", [
             "name" => __FUNCTION__ . " Secondary",
             "parentID" => $knowledgeBase['rootCategoryID'],
-        ])->getBody()
-        ;
+        ])->getBody();
 
         // Setup the test articles.
         for ($i = 1; $i <= 5; $i++) {
@@ -466,24 +444,21 @@ class ArticlesTest extends AbstractResourceTest {
                 "name" => "Primary Category Article",
                 "body" => $helloWorldBody,
                 "format" => "rich",
-            ])->getBody()
-            ;
+            ])->getBody();
 
             $this->api()->post($this->baseUrl, [
                 "knowledgeCategoryID" => $secondaryCategory["knowledgeCategoryID"],
                 "name" => "Secondary Category Article",
                 "body" => $helloWorldBody,
                 "format" => "rich",
-            ])->getBody()
-            ;
+            ])->getBody();
         }
 
         // Get the articles for the primary category.
         $articles = $this->api()->get(
             $this->baseUrl,
             ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
-        )->getBody()
-        ;
+        )->getBody();
 
         // Verify the result.
         $this->assertNotEmpty($articles);
@@ -500,15 +475,13 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "/knowledge-bases/{$knowledgeBase['knowledgeBaseID']}",
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        )
-        ;
+        );
         $this->expectException(NotFoundException::class);
 
         $r = $this->api()->get(
             $this->baseUrl,
             ["knowledgeCategoryID" => $primaryCategory["knowledgeCategoryID"]]
-        )
-        ;
+        );
     }
 
 
@@ -561,8 +534,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             '/knowledge-bases/' . $kb['knowledgeBaseID'],
             ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        )
-        ;
+        );
 
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
