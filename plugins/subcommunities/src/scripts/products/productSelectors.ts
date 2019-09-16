@@ -61,8 +61,8 @@ export function useProductsByLocale() {
                 community => community.locale === localeKey,
             );
             communitiesForLocale.forEach(community => {
-                const product = community.productID !== null ? productsById[community.productID] : undefined;
-                if (hideNoProductCommunities && !product) {
+                const productLoadable = community.productID !== null ? productsById[community.productID] : undefined;
+                if (hideNoProductCommunities && !productLoadable) {
                     return;
                 }
 
@@ -72,7 +72,7 @@ export function useProductsByLocale() {
                 }
 
                 communityGroupsByLocale[localeKey].push({
-                    product: product && product.data ? product.data : null,
+                    product: productLoadable ? productLoadable.product : null,
                     community,
                 });
             });

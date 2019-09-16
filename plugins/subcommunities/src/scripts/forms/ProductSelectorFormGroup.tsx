@@ -25,14 +25,12 @@ interface IProps {
 export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     const { allProductLoadable, productsById } = useProducts();
     const options = useMemo(() => {
-        return Object.values(productsById)
-            .filter(product => !!product.data)
-            .map(product => {
-                return {
-                    label: product.data!.name,
-                    value: product.data!.productID,
-                };
-            });
+        return Object.values(productsById).map(productLoadable => {
+            return {
+                label: productLoadable.product.name,
+                value: productLoadable.product.productID,
+            };
+        });
     }, [productsById]);
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -44,11 +42,11 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             return null;
         }
         const selectedProduct = productsById[value];
-        if (!selectedProduct || !selectedProduct.data) {
+        if (!selectedProduct) {
             return null;
         }
         return {
-            label: selectedProduct.data.name,
+            label: selectedProduct.product.name,
             value,
         };
     }, [value, productsById]);
