@@ -316,6 +316,10 @@ class SphinxSearchModel extends \SearchModel {
 
         // Filter the search into proper terms.
         if ($clean) {
+            // This $searchDirty variable contains initial arguments passed to the function
+            // cleanSearch() is replacing some of them and ['cat'] value in particular
+            // when 'cat' is not valid categoryID it got replaced with bolean 'false' value
+            // and sphinx client setFilter() fails with some not proper handled exception when called.
             $searchDirty = $search;
             $search = Search::cleanSearch($search, $clean === 'api');
         }
