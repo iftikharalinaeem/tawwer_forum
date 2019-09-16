@@ -15,7 +15,11 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
 
     /** @var SubcommunitySiteSection */
+    private $currentSiteSection;
+
     private $currentSubcommunity;
+
+    private $defaultSubcommunity;
     
     /** @var \SubcommunityModel */
     private $subcommunityModel;
@@ -26,6 +30,9 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     /** @var ProductModel */
     private $productModel;
 
+    private $allSiteSections;
+
+
     /**
      * DI.
      *
@@ -35,8 +42,16 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel) {
         $this->subcommunityModel = $subcommunityModel;
         $this->productModel = $productModel;
-        $this->currentSubcommunity = new SubcommunitySiteSection($this->subcommunityModel::getCurrent(), $productModel);
         $this->subcommunities = $this->subcommunityModel::all();
+        $this->allSiteSections = $this->getAll();
+        $this->defaultSubcommunity = $this->subcommunityModel::getDefaultSite();
+        $this->currentSubcommunity = $this->subcommunityModel::getCurrent();
+
+        //die(var_dump($subcommunity));// ?? ["ProductID" => 13];
+        if (!empty($this->currentSubcommunity)) {
+            $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity, $productModel);
+        }
+
     }
 
     /**
@@ -54,11 +69,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getByID(int $id): ?SiteSectionInterface {
-        if ($id === $this->currentSubcommunity->getSectionID()) {
-            return $this->currentSubcommunity;
-        } else {
-            return null;
-        }
+
     }
 
     /**
@@ -82,5 +93,11 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
             return [];
         }
     }
+
+    public function getBySectionGroup(string $sectionGroup): ?SiteSectionInterface {
+
+
+    }
+
 
 }

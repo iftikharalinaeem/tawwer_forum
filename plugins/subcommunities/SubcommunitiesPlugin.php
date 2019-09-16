@@ -9,7 +9,6 @@ use Garden\EventManager;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
 use Vanilla\Web\Page;
 use \Garden\Container\Reference;
-use Vanilla\Subcommunities\Models\ProductModel;
 
 /**
  * Class SubcommunitiesPlugin
@@ -39,7 +38,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $categories;
 
     /// Methods ///
-
     /**
      * Configure the container with multisite configuration.
      *
@@ -227,7 +225,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoriesModule_getData_handler($sender) {
         $site = SubcommunityModel::getCurrent();
-
         if (!$site) {
             return;
         }
@@ -408,6 +405,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 // Redirect to the canonicalURL
                 redirectTo(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $defaultSite), 301);
             }
+        } else {
+            $site = $defaultSite;
         }
 
         $this->savedDoHeadings = c('Vanilla.Categories.DoHeadings');
