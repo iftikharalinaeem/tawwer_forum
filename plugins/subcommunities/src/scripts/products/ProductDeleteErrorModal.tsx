@@ -53,7 +53,7 @@ export function ProductDeleteErrorModal(props: IProps) {
                         <SmartAlign className={classNames(classesFrameBody.contents, userContentClasses().root)}>
                             <p>
                                 <Translate
-                                    source="You can't delete the product <0 /> because it's assosciated with existing subcommunities."
+                                    source="You can't delete the product <0 /> because it's associated with existing subcommunities."
                                     c0={<strong>{props.product.name}</strong>}
                                 />
                             </p>
