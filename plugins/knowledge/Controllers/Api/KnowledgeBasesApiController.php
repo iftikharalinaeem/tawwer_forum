@@ -111,8 +111,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $in = $this->schema([
             "status" => [
                 "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
-            ]
+            ],
+            "sourceLocale?",
+            "siteSectionGroup?"
         ])->add($this->fullSchema())->setDescription("List knowledge bases.");
+
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $in->validate($query);
@@ -143,6 +146,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
+
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert([
             'name' => $body['name'],
             'knowledgeBaseID' => $knowledgeBaseID,
@@ -170,6 +174,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema(Schema::parse([
             'knowledgeBaseID',
             'name',
+            'siteSectionGroup',
             'description',
             'viewType',
             'icon',

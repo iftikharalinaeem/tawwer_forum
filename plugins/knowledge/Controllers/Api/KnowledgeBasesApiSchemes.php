@@ -8,6 +8,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * KnowledgeBasesApiController schemes
@@ -112,6 +113,11 @@ trait KnowledgeBasesApiSchemes {
                 'description' => "Knowledge base status.",
                 'enum' => KnowledgeBaseModel::getAllStatuses(),
             ],
+            "siteSectionGroup:s" => [
+                'description' => "Site section group. Ex: subcommunity product key",
+                'default' => DefaultSiteSection::DEFAULT_SECTION_GROUP
+            ],
+
         ]);
     }
 
@@ -129,7 +135,8 @@ trait KnowledgeBasesApiSchemes {
                     "description",
                     "icon?",
                     "bannerImage?",
-                    "sourceLocale?",
+                    "siteSectionGroup",
+                    "sourceLocale",
                     "viewType",
                     "sortArticles?",
                     "status?",

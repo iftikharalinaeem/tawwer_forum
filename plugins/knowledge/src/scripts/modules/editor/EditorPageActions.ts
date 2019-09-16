@@ -203,7 +203,12 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     }
 
     private getInitialRecordForEdit(): ILocationPickerRecord | null {
-        const { article, form } = this.getState().knowledge.editorPage;
+        const editorPage = this.getState().knowledge.editorPage;
+        if (!editorPage) {
+            // Possible in testing with a mock store.
+            return null;
+        }
+        const { article, form } = editorPage;
         const kbID = article.data ? article.data.knowledgeBaseID : null;
         if (kbID == null) {
             return null;

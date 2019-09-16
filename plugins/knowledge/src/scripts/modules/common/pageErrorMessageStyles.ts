@@ -1,16 +1,19 @@
-import { colorOut, debugHelper, flexHelper, ISpinnerProps, margins, unit } from "@library/styles/styleHelpers";
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+import { colorOut, margins, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
-import { percent, px, viewHeight } from "csx";
-import { style } from "typestyle";
+import { viewHeight } from "csx";
 
 export const pageErrorMessageClasses = () => {
-    const debug = debugHelper("");
     const style = styleFactory("pageErrorMessage");
     const globalVars = globalVariables();
 
     const root = style({
-        marginBottom: viewHeight(25),
+        justifyContent: "center",
     });
 
     const title = style("title", {
@@ -40,11 +43,13 @@ export const pageErrorMessageClasses = () => {
 
     const errorIcon = style("icon", {
         display: "block",
-        margin: "auto",
         color: colorOut(globalVars.mainColors.primary),
         height: unit(85),
         width: unit(85),
-        marginBottom: unit(12),
+        ...margins({
+            bottom: 12,
+            horizontal: "auto",
+        }),
     });
 
     return {
