@@ -839,7 +839,7 @@ paths:
                                             enum:
                                                 - up-to-date
                                                 - out-of-date
-                                                - no
+                                                - not-translated
                                             type: string
                                     required:
                                         - articleRevisionID

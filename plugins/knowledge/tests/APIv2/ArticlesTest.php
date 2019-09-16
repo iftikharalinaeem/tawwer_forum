@@ -139,7 +139,6 @@ class ArticlesTest extends AbstractResourceTest {
         $kb = $this->api()
             ->post('/knowledge-bases', $record)
             ->getBody();
-
         return $kb;
     }
 
@@ -392,8 +391,7 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch(
             "{$this->baseUrl}/{$article[$this->pk]}/status",
             ['status' => 'deleted']
-        )
-        ;
+        );
     }
 
     /**
