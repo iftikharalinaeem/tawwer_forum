@@ -10,9 +10,10 @@ import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers"
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
 
-export const chooserVariables = useThemeCache(() => {
-    const vars = variableFactory("chooser");
+export const subcommunityChooserVariables = useThemeCache(() => {
+    const vars = variableFactory("subcommunityChooser");
     const titleBarVars = titleBarVariables();
 
     const arrow = vars("arrow", {
@@ -28,9 +29,9 @@ export const chooserVariables = useThemeCache(() => {
     return { arrow, toggle };
 });
 
-export const chooserClasses = useThemeCache(() => {
-    const style = styleFactory("chooser");
-    const vars = chooserVariables();
+export const subcommunityChooserClasses = useThemeCache(() => {
+    const style = styleFactory("subcommunityChooser");
+    const vars = subcommunityChooserVariables();
     const dropdownVars = dropDownVariables();
     const globalVars = globalVariables();
 
@@ -38,13 +39,24 @@ export const chooserClasses = useThemeCache(() => {
         display: "inline-flex",
         alignItems: "center",
         lineHeight: unit(vars.toggle.lineHeight),
-        color: colorOut(vars.toggle.color),
         fontWeight: globalVars.fonts.weights.normal,
-        ...margins({ horizontal: unit(6) }),
+    });
+
+    const toggleFullWidth = style("toggleFullWidth", {
+        width: percent(100),
     });
 
     const toggleArrow = style("toggleArrow", {
-        marginLeft: unit(6),
+        ...margins({ horizontal: unit(4) }),
+    });
+
+    const toggleArrowFullWidth = style("toggleArrowFullWidth", {
+        // absolute
+        position: "absolute",
+        right: unit(buttonGlobalVariables().padding.side),
+        top: 0,
+        bottom: 0,
+        ...margins({ vertical: "auto" }),
     });
 
     const rowMixin: NestedCSSProperties = {
@@ -96,5 +108,16 @@ export const chooserClasses = useThemeCache(() => {
         background: colorOut(globalVars.border.color),
     });
 
-    return { toggle, toggleArrow, row, rowArrow, rowIndented, rowBack, body, headingDivider };
+    return {
+        toggle,
+        toggleFullWidth,
+        toggleArrow,
+        toggleArrowFullWidth,
+        row,
+        rowArrow,
+        rowIndented,
+        rowBack,
+        body,
+        headingDivider,
+    };
 });

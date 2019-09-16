@@ -3,7 +3,6 @@
  * @license Proprietary
  */
 
-import DropDownItem from "@library/flyouts/items/DropDownItem";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { LeftChevronCompactIcon } from "@library/icons/common";
@@ -11,7 +10,7 @@ import Loader from "@library/loaders/Loader";
 import { assetUrl } from "@library/utility/appUtils";
 import { useProductsForLocale } from "@subcommunities/products/productSelectors";
 import React, { useRef, useLayoutEffect } from "react";
-import { chooserClasses } from "@subcommunities/chooser/chooserStyles";
+import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
@@ -43,7 +42,7 @@ export function ProductChooser(props: IProps) {
         return <Loader small padding={10} />;
     }
 
-    const classes = chooserClasses();
+    const classes = subcommunityChooserClasses();
     return (
         <div>
             {props.onBack && localeInfo.count > 1 && (

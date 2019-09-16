@@ -398,7 +398,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::request()->path($path);
             $webroot = self::$originalWebRoot;
 
-            Gdn::request()->assetRoot($webroot);
+            Gdn::request()->setAssetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);

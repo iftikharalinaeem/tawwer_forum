@@ -9,23 +9,35 @@ import { CommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { SubcommunityChooserDropdown } from "@subcommunities/chooser/SubcommunityChooser";
 import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { getMeta } from "@library/utility/appUtils";
 
-TitleBar.registerBeforeMeBox(() => (
-    <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
-        <SubcommunityChooserDropdown />
-    </CommunityFilterContext.Provider>
-));
+const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
 
-TitleBarNav.addNavItem(() => {
-    const device = useDevice();
+if (isProductIntgrationEnabled) {
+    TitleBar.registerBeforeMeBox(() => {
+        const device = useDevice();
+        if (device === Devices.MOBILE || device === Devices.XS) {
+            return null;
+        }
+        return (
+            <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
+                <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+            </CommunityFilterContext.Provider>
+        );
+    });
 
-    if (device !== Devices.MOBILE && device !== Devices.XS) {
-        return null;
-    }
+    TitleBarNav.addNavItem(() => {
+        const device = useDevice();
 
-    return (
-        <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
-            <SubcommunityChooserDropdown />
-        </CommunityFilterContext.Provider>
-    );
-});
+        if (device !== Devices.MOBILE && device !== Devices.XS) {
+            return null;
+        }
+
+        return (
+            <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
+                <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+            </CommunityFilterContext.Provider>
+        );
+    });
+}
