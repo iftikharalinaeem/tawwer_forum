@@ -6,12 +6,13 @@
 import { IApiError, LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { IProduct } from "@subcommunities/products/productTypes";
+import { IProduct, IProductDeleteError } from "@subcommunities/products/productTypes";
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { actionCreatorFactory } from "typescript-fsa";
 import apiv2 from "@library/apiv2";
 import { IMultiSiteStoreState } from "@subcommunities/state/model";
+import { AxiosResponse } from "axios";
 
 const actionCreator = actionCreatorFactory("@@products");
 
@@ -41,10 +42,16 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
         IApiError
     >("POST");
     public static readonly patchACs = actionCreator.async<PatchRequest, PatchResponse, IApiError>("PATCH");
-    public static readonly deleteACs = actionCreator.async<DeleteRequest, DeleteResponse, IApiError>("DELETE");
+    public static readonly deleteACs = actionCreator.async<
+        DeleteRequest,
+        DeleteResponse,
+        { response: AxiosResponse<IProductDeleteError> }
+    >("DELETE");
     public static readonly putFeatureFlagACs = actionCreator.async<PutFeatureRequest, PutFeatureResponse, IApiError>(
         "PUT_FEATURE",
     );
+
+    public static readonly clearDeleteError = actionCreator<{ productID: number }>("CLEAR_DELETE_ERRORS");
 
     public getAll = (force: boolean = false) => {
         if (!force && this.getState().multisite.products.allProductLoadable.status !== LoadStatus.PENDING) {
@@ -55,7 +62,7 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
             const response = await this.api.get("/products");
             return response.data;
         })();
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
     };
 
     public postProduct = (request: PostRequest) => {
@@ -66,7 +73,7 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
             ...request,
             transactionID: uniqueIDFromPrefix("postProduct"),
         });
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
     };
 
     public patchProduct = (request: PatchRequest) => {
@@ -75,7 +82,7 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
             const response = await this.api.patch(`/products/${productID}`, rest);
             return response.data;
         })(request);
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
     };
 
     public deleteProduct = (request: DeleteRequest) => {
@@ -84,15 +91,22 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
             const response = await this.api.delete(`/products/${productID}`);
             return response.data;
         })(request);
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
+    };
+
+    public clearDeleteError = (productID: number) => {
+        return this.dispatch(ProductActions.clearDeleteError({ productID }));
     };
 
     public toggleFeatureEnabled = (request: PutFeatureRequest) => {
         const apiThunk = bindThunkAction(ProductActions.putFeatureFlagACs, async () => {
             const response = await apiv2.put(`/products/product-feature-flag`, request);
+            if (request.enabled) {
+                await this.getAll(true); // Fetch products after enabling.
+            }
             return response.data;
         })(request);
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
     };
 }
 

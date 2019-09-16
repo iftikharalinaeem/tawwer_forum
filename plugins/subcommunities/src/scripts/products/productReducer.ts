@@ -5,11 +5,19 @@
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ProductActions } from "@subcommunities/products/ProductActions";
-import { IProduct } from "@subcommunities/products/productTypes";
+import { IProduct, IProductDeleteError } from "@subcommunities/products/productTypes";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 
-type ProductLoadableGroup = { [id: number]: ILoadable<IProduct> };
+export interface ILoadedProduct {
+    product: IProduct;
+    patchProduct: ILoadable<IProduct>;
+    deleteProduct: ILoadable<{}, IProductDeleteError>;
+}
+
+type ProductLoadableGroup = {
+    [id: number]: ILoadedProduct;
+};
 
 // Type for products that are currently being submitted.
 export type TempProduct = Pick<IProduct, "name" | "body"> & { transactionID: string };
@@ -44,8 +52,9 @@ export const productsReducer = produce(
             const products: ProductLoadableGroup = {};
             payload.result.forEach(product => {
                 products[product.productID] = {
-                    status: LoadStatus.SUCCESS,
-                    data: product,
+                    product,
+                    patchProduct: { status: LoadStatus.PENDING },
+                    deleteProduct: { status: LoadStatus.PENDING },
                 };
             });
             state.productsById = products;
@@ -66,38 +75,46 @@ export const productsReducer = produce(
         .case(ProductActions.postACs.done, (state, payload) => {
             delete state.submittingProducts[payload.params.transactionID];
             state.productsById[payload.result.productID] = {
-                status: LoadStatus.SUCCESS,
-                data: payload.result,
+                product: payload.result,
+                patchProduct: { status: LoadStatus.PENDING },
+                deleteProduct: { status: LoadStatus.PENDING },
             };
             return state;
         })
         .case(ProductActions.patchACs.started, (state, payload) => {
             const existingProduct = state.productsById[payload.productID];
-            state.productsById[payload.productID] = {
+            existingProduct.patchProduct = {
                 status: LoadStatus.LOADING,
-                data: {
-                    ...existingProduct.data!,
-                    ...payload,
-                },
             };
             return state;
         })
         .case(ProductActions.patchACs.done, (state, payload) => {
-            state.productsById[payload.params.productID] = {
+            const existingProduct = state.productsById[payload.params.productID];
+            existingProduct.product = payload.result;
+            existingProduct.patchProduct = {
                 status: LoadStatus.SUCCESS,
-                data: payload.result,
             };
             return state;
         })
         .case(ProductActions.deleteACs.started, (state, payload) => {
             const existingProduct = state.productsById[payload.productID];
-            if (existingProduct.data) {
-                existingProduct.data.tempDeleted = true;
-            }
+            existingProduct;
+            existingProduct.deleteProduct.status = LoadStatus.LOADING;
             return state;
         })
         .case(ProductActions.deleteACs.done, (state, payload) => {
             delete state.productsById[payload.params.productID];
+            return state;
+        })
+        .case(ProductActions.deleteACs.failed, (state, payload) => {
+            const existingProduct = state.productsById[payload.params.productID];
+            existingProduct.deleteProduct.status = LoadStatus.ERROR;
+            existingProduct.deleteProduct.error = payload.error.response.data;
+            return state;
+        })
+        .case(ProductActions.clearDeleteError, (state, payload) => {
+            const existingProduct = state.productsById[payload.productID];
+            existingProduct.deleteProduct = { status: LoadStatus.PENDING };
             return state;
         })
         .case(ProductActions.putFeatureFlagACs.started, (state, payload) => {
