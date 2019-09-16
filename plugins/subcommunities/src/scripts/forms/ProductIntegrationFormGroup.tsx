@@ -31,8 +31,13 @@ export function ProductIntegrationFormGroup(props: IProps) {
             <DashboardToggle
                 inProgress={enableStatus === LoadStatus.LOADING}
                 checked={enabled}
-                onChange={() => {
-                    void toggleFeatureEnabled({ enabled: !enabled });
+                onChange={async () => {
+                    await toggleFeatureEnabled({ enabled: !enabled });
+
+                    // Refresh the page.
+                    // This is necessary because the table is currently rendered server side.
+                    // As a result the only way to re-render this table is to do refresh the page.
+                    window.location.href = window.location.href;
                 }}
             />
         </DashboardFormGroup>

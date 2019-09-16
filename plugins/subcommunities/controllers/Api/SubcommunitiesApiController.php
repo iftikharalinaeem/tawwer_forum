@@ -115,7 +115,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     public function index(array $query): array {
         $this->permission();
         $in = $this->schema([
-            "expand?" => ApiUtils::getExpandDefinition(["product","category","locale"])
+            "expand?" => ApiUtils::getExpandDefinition(["product", "category", "locale"])
         ]);
         $out = $this->schema([":a" => $this->subcommunitySchema(), "out"]);
 

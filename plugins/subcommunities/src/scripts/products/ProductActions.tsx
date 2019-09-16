@@ -92,7 +92,7 @@ export class ProductActions extends ReduxActions<IMultiSiteStoreState> {
             const response = await apiv2.put(`/products/product-feature-flag`, request);
             return response.data;
         })(request);
-        this.dispatch(apiThunk);
+        return this.dispatch(apiThunk);
     };
 }
 
