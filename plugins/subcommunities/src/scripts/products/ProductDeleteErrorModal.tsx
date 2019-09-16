@@ -49,8 +49,8 @@ export function ProductDeleteErrorModal(props: IProps) {
             <Frame
                 header={<FrameHeader titleID={titleID} closeFrame={props.onClose} title={t("Delete Product")} />}
                 body={
-                    <FrameBody>
-                        <SmartAlign className={classNames(classesFrameBody.contents, userContentClasses().root)}>
+                    <FrameBody className={userContentClasses().root}>
+                        <div className={classNames(classesFrameBody.contents, userContentClasses().root)}>
                             <p>
                                 <Translate
                                     source="You can't delete the product <0 /> because it's associated with existing subcommunities."
@@ -64,7 +64,7 @@ export function ProductDeleteErrorModal(props: IProps) {
                                     c0={content => <SmartLink to="/subcommunities">{content}</SmartLink>}
                                 />
                             </p>
-                        </SmartAlign>
+                        </div>
                     </FrameBody>
                 }
                 footer={
