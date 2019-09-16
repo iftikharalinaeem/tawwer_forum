@@ -1084,7 +1084,8 @@ class SalesforcePlugin extends Gdn_Plugin {
         }
 
         //special case for "DateOfBirth"
-        if(isset($formFields["DateFields"])) {
+        // Only send "DateFields" to salesforce if "SalesForceID" is set
+        if(isset($formFields["DateFields"]) && !empty(c('ProfileExtender.Fields.DateOfBirth.SalesForceID'))) {
             $dateOfBirth = $this->validateDateOfBirth($formFields["DateOfBirth_Day"], $formFields["DateOfBirth_Month"], $formFields["DateOfBirth_Year"]);
             if($dateOfBirth) {
                 $contactData["Birthdate"] = $dateOfBirth;
