@@ -181,7 +181,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         try {
             if ($includeRevision) {
                 $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
-                $knowledgeCategoryID = ($includeTranslations) ? array_column($article, "knowledgeCategoryID") : $article["knowledgeCategoryID"];
+                $knowledgeCategoryID = ($includeTranslations) ? array_unique(array_column($article, "knowledgeCategoryID")) : $article["knowledgeCategoryID"];
                 if (empty($article)) {
                     throw new NoResultsException("No rows matched the provided criteria.");
                 }
