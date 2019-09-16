@@ -22,6 +22,7 @@ import PagesContext from "@library/routing/PagesContext";
 import React, { useCallback, useEffect } from "react";
 import { hot } from "react-hot-loader";
 import { useDispatch, useSelector } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
 
 /*
  * Top level application component for knowledge.
@@ -36,16 +37,30 @@ function KnowledgeApp() {
         }
     });
 
+    let content = <Router sectionRoot="/kb" onRouteChange={clearError} />;
+
     if (routeState.error) {
-        return <ErrorPage error={routeState.error} />;
+        content = (
+            <BrowserRouter>
+                <ErrorPage error={routeState.error} />
+            </BrowserRouter>
+        );
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
-        return <Loader />;
+        content = (
+            <BrowserRouter>
+                <Loader />
+            </BrowserRouter>
+        );
     }
 
     if (kbLoadable.status === LoadStatus.SUCCESS && kbLoadable.data && Object.values(kbLoadable.data).length === 0) {
-        return <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />;
+        content = (
+            <BrowserRouter>
+                <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />
+            </BrowserRouter>
+        );
     }
 
     return (
@@ -58,9 +73,7 @@ function KnowledgeApp() {
         >
             <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
                 <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                    <NavHistoryContextProvider>
-                        <Router sectionRoot="/kb" onRouteChange={clearError} />
-                    </NavHistoryContextProvider>
+                    <NavHistoryContextProvider>{content}</NavHistoryContextProvider>
                 </SearchContext.Provider>
             </SiteNavProvider>
         </PagesContext.Provider>
