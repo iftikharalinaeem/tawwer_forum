@@ -569,7 +569,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         //default translation is out-of-date.
         foreach ($articleTranslations as $articleTranslation) {
-            $this->assertEquals("out-to-date", $articleTranslation["locale"]);
+            $this->assertEquals("out-of-date", $articleTranslation["translationStatus"]);
         }
     }
 
