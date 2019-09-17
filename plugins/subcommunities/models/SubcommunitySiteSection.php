@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 namespace Vanilla\Subcommunities\Models;
 
@@ -40,7 +44,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->siteSectionPath = $subcommunity["Folder"];
         $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
-        $this->siteSectionID = $product["productID"];
+        $this->siteSectionID = $subcommunity["SubcommunityID"];
         $this->sectionGroup = $product["productID"].'_'.$product["name"];
     }
 
