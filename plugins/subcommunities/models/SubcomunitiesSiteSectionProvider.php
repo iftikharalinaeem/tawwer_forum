@@ -8,6 +8,7 @@ namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Site\DefaultSiteSection;
 
 
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
@@ -31,13 +32,17 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     /** @var SiteSectionInterface[] */
     private $allSiteSections;
 
+    /** @var DefaultSiteSection */
+    private $defaultSiteSection;
+
     /**
      * SubcomunitiesSiteSectionProvider constructor.
      *
      * @param \SubcommunityModel $subcommunityModel
      * @param ProductModel $productModel
      */
-    public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel) {
+    public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel, DefaultSiteSection $defaultSiteSection) {
+        $this->defaultSiteSection = $defaultSiteSection;
         $this->subcommunityModel = $subcommunityModel;
         $this->productModel = $productModel;
         $this->subcommunities = $this->subcommunityModel::all();
@@ -55,7 +60,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getAll(): array {
-        $allSiteSections =[];
+        $allSiteSections =[$this->defaultSiteSection];
         foreach ($this->subcommunities as $subcommunity) {
             $allSiteSections[] =  new SubcommunitySiteSection($subcommunity, $this->productModel);
         }
@@ -88,7 +93,6 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getForLocale(string $localeKey): array {
-
         $siteSections =[];
         $subCommunities = $this->subcommunityModel->getWhere(['locale' => $localeKey]);
         foreach ($subCommunities as $subCommunity) {
