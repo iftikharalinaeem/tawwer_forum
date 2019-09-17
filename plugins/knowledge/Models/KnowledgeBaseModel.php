@@ -294,7 +294,7 @@ MESSAGE
     }
 
     /**
-     * Get all loacles supported by knowledge base (based on siteSectionGroup supported).
+     * Get all locales supported by knowledge base (based on siteSectionGroup supported).
      *
      * @param string $siteSectionGroup Knowledge base site section group.
      * @return array
