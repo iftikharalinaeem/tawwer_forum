@@ -56,7 +56,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->siteSectionPath = $subcommunity["Folder"].'/';
         $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
-        $this->siteSectionID = SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
+        $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
         $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.($product["productID"] ?? self::SUBCOMMUNITY_NO_PRODUCT);
     }
 
