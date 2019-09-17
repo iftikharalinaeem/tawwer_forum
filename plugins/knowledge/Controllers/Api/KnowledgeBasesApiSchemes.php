@@ -93,6 +93,7 @@ trait KnowledgeBasesApiSchemes {
             "sourceLocale" => [
                 "description" => "sourceLocale of knowledge base.",
                 "type" => "string",
+                "default" => "en"
             ],
             "viewType" => [
                 "allowNull" => true,
