@@ -10,6 +10,8 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
+use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
@@ -39,14 +41,18 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var SiteSectionProviderInterface */
+    private $siteSectionProvider;
+
     /**
      * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, SiteSectionProviderInterface $siteSectionProvider) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
+        $this->siteSectionProvider = $siteSectionProvider;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -285,6 +291,22 @@ MESSAGE
         }
 
         return self::SORT_CONFIGS[$sortArticles];
+    }
+
+    /**
+     * Get all locales supported by knowledge base (based on siteSectionGroup supported).
+     *
+     * @param string $siteSectionGroup Knowledge base site section group.
+     * @return array
+     */
+    public function getLocales(string $siteSectionGroup): array {
+        $locales = [];
+        foreach ($this->siteSectionProvider->getAll() as $siteSection) {
+            if ($siteSection->getSectionGroup() === $siteSectionGroup) {
+                $locales[] = ['locale' => $siteSection->getContentLocale(), 'slug' => $siteSection->getBasePath()];
+            }
+        }
+        return $locales;
     }
 
     /**

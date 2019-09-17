@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * Test the /api/v2/knowledge-bases endpoint.
@@ -32,6 +33,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         'sortArticles',
         'sourceLocale',
         'urlCode',
+        'siteSectionGroup'
     ];
 
     /**
@@ -68,8 +70,9 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             'icon' => '',
             'bannerImage' => '',
             'sortArticles' => 'manual',
-            'sourceLocale' => '',
+            'sourceLocale' => 'en',
             'urlCode' => self::getUniqueUrlCode(),
+            'siteSectionGroup' => DefaultSiteSection::DEFAULT_SECTION_GROUP
         ];
         return $record;
     }
