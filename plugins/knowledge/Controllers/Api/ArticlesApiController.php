@@ -1233,13 +1233,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ];
             foreach ($article as $translation) {
                 if ($translation['locale'] === $locale['locale']) {
-                    $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
 
-                    if ($locale["slug"] == "/") {
-                        $url = \Gdn::request()->url( "/kb/articles/" . $slug, true);
-                    } else {
-                        $url = \Gdn::request()->url($locale['slug'] . "/kb/articles/" . $slug, true);
-                    }
+                    $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
+                    $url = \Gdn::request()->url($locale['slug'] . "kb/articles/" . $slug, true);
 
                     $current = [
                         "articleRevisionID" => $translation["articleRevisionID"],
