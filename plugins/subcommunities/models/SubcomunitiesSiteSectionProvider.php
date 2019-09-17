@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: chris
- * Date: 2019-09-12
- * Time: 13:46
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
  */
 
 namespace Vanilla\Subcommunities\Models;
@@ -30,14 +28,14 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     /** @var ProductModel */
     private $productModel;
 
+    /** @var SiteSectionInterface[] */
     private $allSiteSections;
 
-
     /**
-     * DI.
+     * SubcomunitiesSiteSectionProvider constructor.
      *
-     * @param  \SubcommunityModel $subcommunityModel
-     * @param  ProductModel $productModel
+     * @param \SubcommunityModel $subcommunityModel
+     * @param ProductModel $productModel
      */
     public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel) {
         $this->subcommunityModel = $subcommunityModel;
@@ -47,7 +45,6 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         $this->defaultSubcommunity = $this->subcommunityModel::getDefaultSite();
         $this->currentSubcommunity = $this->subcommunityModel::getCurrent();
 
-        //die(var_dump($subcommunity));// ?? ["ProductID" => 13];
         if (!empty($this->currentSubcommunity)) {
             $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity, $productModel);
         }
@@ -69,15 +66,19 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getByID(int $id): ?SiteSectionInterface {
-
+        if ($subCommunity = $this->subcommunityModel->getID($id)) {
+            return new SubcommunitySiteSection($subCommunity, $this->productModel);
+        } else {
+            return null;
+        }
     }
 
     /**
      * @inheritdoc
      */
     public function getByBasePath(string $basePath): ?SiteSectionInterface {
-        if ($basePath === $this->currentSubcommunity->getBasePath()) {
-            return $this->currentSubcommunity;
+        if ($subCommunity = $this->subcommunityModel->getSite($basePath)) {
+            return new SubcommunitySiteSection($subCommunity, $this->productModel);
         } else {
             return null;
         }
@@ -87,17 +88,12 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      * @inheritdoc
      */
     public function getForLocale(string $localeKey): array {
-        if ($localeKey === $this->currentSubcommunity->getContentLocale()) {
-            return [$this->currentSubcommunity];
-        } else {
-            return [];
+
+        $siteSections =[];
+        $subCommunities = $this->subcommunityModel->getWhere(['locale' => $localeKey]);
+        foreach ($subCommunities as $subCommunity) {
+            $siteSections[] =  new SubcommunitySiteSection($subCommunity, $this->productModel);
         }
+        return $siteSections;
     }
-
-    public function getBySectionGroup(string $sectionGroup): ?SiteSectionInterface {
-
-
-    }
-
-
 }
