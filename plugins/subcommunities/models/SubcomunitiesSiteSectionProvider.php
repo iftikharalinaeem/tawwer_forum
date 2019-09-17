@@ -40,6 +40,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      *
      * @param \SubcommunityModel $subcommunityModel
      * @param ProductModel $productModel
+     * @param DefaultSiteSection $defaultSiteSection
      */
     public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel, DefaultSiteSection $defaultSiteSection) {
         $this->defaultSiteSection = $defaultSiteSection;
@@ -53,7 +54,6 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         if (!empty($this->currentSubcommunity)) {
             $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity, $productModel);
         }
-
     }
 
     /**
@@ -99,5 +99,12 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
             $siteSections[] =  new SubcommunitySiteSection($subCommunity, $this->productModel);
         }
         return $siteSections;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentSiteSection(): SiteSectionInterface {
+        return $this->currentSiteSection ?? $this->defaultSiteSection;
     }
 }
