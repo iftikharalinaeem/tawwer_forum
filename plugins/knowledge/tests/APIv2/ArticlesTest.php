@@ -551,7 +551,8 @@ class ArticlesTest extends AbstractResourceTest {
         $articleTranslations = $response->getBody();
 
         $this->assertCount(1, $articleTranslations);
-        $this->assertEquals("out-of-date", $articleTranslations["translationStatus"]);
+        $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
+        $this->assertEquals("en", $articleTranslations[0]["locale"]);
     }
 
 }
