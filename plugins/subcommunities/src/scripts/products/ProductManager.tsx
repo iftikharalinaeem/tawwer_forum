@@ -17,8 +17,9 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { useProductActions } from "@subcommunities/products/ProductActions";
 import { ProductManagerAddItem } from "@subcommunities/products/ProductManagerAddItem";
 import { ProductManagerItem } from "@subcommunities/products/ProductManagerItem";
-import { useProducts } from "@subcommunities/products/productSelectors";
+import { useProducts, useProductsState } from "@subcommunities/products/productSelectors";
 import React, { useState } from "react";
+import { ProductDeleteErrorModal } from "@subcommunities/products/ProductDeleteErrorModal";
 
 interface IProps {
     onClose: () => void;
@@ -43,9 +44,11 @@ export function ProductManager(props: IProps) {
             bodyContent = <Loader loaderStyleClass={loaders.smallLoader} minimumTime={0} padding={18} />;
             break;
         case LoadStatus.SUCCESS:
-            const productItems = Object.values(productsById).map(product => {
-                if (product.data && !product.data.tempDeleted) {
-                    return <ProductManagerItem key={product.data.productID} productLoadable={product} />;
+            const productItems = Object.values(productsById).map(productLoadable => {
+                if (productLoadable.product) {
+                    return (
+                        <ProductManagerItem key={productLoadable.product.productID} productLoadable={productLoadable} />
+                    );
                 }
             });
             const tempItems = Object.values(submittingProducts).map(product => {
