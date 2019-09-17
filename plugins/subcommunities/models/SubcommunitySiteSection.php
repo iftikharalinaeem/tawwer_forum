@@ -9,8 +9,14 @@ namespace Vanilla\Subcommunities\Models;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 
 class SubcommunitySiteSection implements SiteSectionInterface {
-    /** @const string Site section group prefix for current provider */
-    const GROUP_PREFIX = 'subcommunities-group-';
+    /** @const string Site section prefix */
+    const SUBCOMMUNITY_SECTION_PREFIX = 'subcommunities-section-';
+
+    /** @const string Site section group prefix */
+    const SUBCOMMUNITY_GROUP_PREFIX = 'subcommunities-group-';
+
+    /** @const string Site section group prefix */
+    const SUBCOMMUNITY_NO_PRODUCT = 'no-product';
 
     /** @var ProductModel */
     private $productModel;
@@ -50,8 +56,8 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->siteSectionPath = $subcommunity["Folder"].'/';
         $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
-        $this->siteSectionID = $subcommunity["SubcommunityID"];
-        $this->sectionGroup = self::GROUP_PREFIX.$product["productID"];
+        $this->siteSectionID = SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
+        $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.($product["productID"] ?? self::SUBCOMMUNITY_NO_PRODUCT);
     }
 
     /**
