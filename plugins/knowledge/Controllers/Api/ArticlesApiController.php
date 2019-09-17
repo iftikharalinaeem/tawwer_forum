@@ -1220,8 +1220,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     protected function getArticleTranslationData(array $article): array {
         $result = [];
-        $kbCategory = reset($this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $article[0]["knowledgeCategoryID"]]));
-        $kb = reset($this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]));
+        $firstRevision = reset($article);
+        $kbCategory = $this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $firstRevision["knowledgeCategoryID"]]);
+        $kbCategory = reset($kbCategory);
+        $kb = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]);
+        $kb = reset($kb);
         $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
 
         foreach ($allLocales as $locale) {

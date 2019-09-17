@@ -540,37 +540,18 @@ class ArticlesTest extends AbstractResourceTest {
 
     /**
      * Test GET /articles/{ID}/translations
+     * 
      */
     public function testGetArticleTranslations() {
         $record = $this->record();
         $article = $this->testPost($record);
         $articleID = $article["articleID"];
-        $locales = ["fr", "de", "es"];
-
-        $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
-
-        // Kludge for now since we can't create published revisions with the same articleID
-        foreach ($locales as $locale) {
-            $locale = ["locale" => $locale];
-            $this->api()->patch("{$this->baseUrl}/{$articleID}", $locale);
-        }
-
-        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
-        $revisions = $response->getBody();
-
-        foreach ($revisions as $revision) {
-            $articleRevisionModel->update(["status" => "published"], ["articleRevisionID" => $revision["articleRevisionID"]]);
-        }
 
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
         $articleTranslations = $response->getBody();
 
-        $this->assertCount(4, $articleTranslations);
-
-        //default translation is out-of-date.
-        foreach ($articleTranslations as $articleTranslation) {
-            $this->assertEquals("out-of-date", $articleTranslation["translationStatus"]);
-        }
+        $this->assertCount(1, $articleTranslations);
+        $this->assertEquals("out-of-date", $articleTranslations["translationStatus"]);
     }
 
 }
