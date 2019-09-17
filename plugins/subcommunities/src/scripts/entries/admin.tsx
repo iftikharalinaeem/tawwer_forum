@@ -7,11 +7,17 @@ import React from "react";
 import { addComponent } from "@library/utility/componentRegistry";
 import { ProductIntegrationFormGroup } from "@subcommunities/forms/ProductIntegrationFormGroup";
 import { ProductSelectorFormGroup } from "@subcommunities/forms/ProductSelectorFormGroup";
+import { getMeta } from "@library/utility/appUtils";
+
+const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
 
 addComponent("product-integration-form-group", ProductIntegrationFormGroup);
-addComponent("product-selector-form-group", props => (
-    <ProductSelectorFormGroup {...props} formFieldName="ProductID" valueType="productID" />
-));
-addComponent("site-section-group-selector-form-group", props => (
-    <ProductSelectorFormGroup {...props} formFieldName="siteSectionGroup" valueType="sectionGroup" />
-));
+
+if (isProductIntgrationEnabled) {
+    addComponent("product-selector-form-group", props => (
+        <ProductSelectorFormGroup {...props} formFieldName="ProductID" valueType="productID" />
+    ));
+    addComponent("site-section-group-selector-form-group", props => (
+        <ProductSelectorFormGroup {...props} formFieldName="siteSectionGroup" valueType="sectionGroup" />
+    ));
+}
