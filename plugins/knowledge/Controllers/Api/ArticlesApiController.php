@@ -37,6 +37,7 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -320,8 +321,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $out = $this->schema([":a" => Schema::parse([
             "articleRevisionID:i",
-            "name:s",
-            "url:s",
+            "name:s?",
+            "url:s?",
             "locale:s",
             "translationStatus:s" => [
                 "enum" =>["up-to-date", "out-of-date", "not-translated"]
@@ -332,8 +333,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
         $article = $this->articleByID($id, true, false, true);
 
-        $result =  $this->normalizeArticleTranslationData($id, $article);
-
+        $result =  $this->getArticleTranslationData($article);
         $result = $out->validate($result);
 
         return $result;
@@ -1220,25 +1220,41 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Prepare the article translation data for the api.
+     * Get the article translation data for the api.
      *
-     * @param int $artcileID article id.
-     * @param array $revisions
+     * @param array $article
      * @return array
      */
-    protected function normalizeArticleTranslationData(int $artcileID, array $revisions): array {
+    protected function getArticleTranslationData(array $article): array {
         $result = [];
-        foreach ($revisions as $revision) {
-            $slug = \Gdn_Format::url("{$artcileID}-{$revision["name"]}");
-            $url = \Gdn::request()->url("/kb/articles/" . $slug, true);
+        $kbCategory = reset($this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $article[0]["knowledgeCategoryID"]]));
+        $kb = reset($this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]));
+        $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
 
-            $result[] = [
-                "articleRevisionID" =>  $revision["articleRevisionID"],
-                "name" => $revision["name"],
-                "url" => $url,
-                "locale" => $revision["locale"],
-                "translationStatus" => $revision["translationStatus"],
+        foreach ($allLocales as $locale) {
+            $current = [
+                "articleRevisionID" => -1,
+                "name" => '',
+                "url" => '',
+                "locale" => $locale["locale"],
+                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
             ];
+            foreach ($article as $translation) {
+                if ($translation['locale'] === $locale['locale']) {
+                    $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
+                    $url = \Gdn::request()->url($locale['slug'] . "/kb/articles/" . $slug, true);
+
+                    $current = [
+                        "articleRevisionID" => $translation["articleRevisionID"],
+                        "name" => $translation["name"],
+                        "url" => $url,
+                        "locale" => $translation["locale"],
+                        "translationStatus" => $translation["translationStatus"],
+                    ];
+                    break;
+                }
+            }
+            $result[] = $current;
         }
         return $result;
     }
