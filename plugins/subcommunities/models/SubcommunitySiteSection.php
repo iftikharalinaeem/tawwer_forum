@@ -40,23 +40,19 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
-    /** @var string */
-    private $siteSectionUrl;
-
     /**
      * DI.
      *
      * @param array $subcommunity
      * @param ProductModel $productModel
      */
-    public function __construct(array $subcommunity, ProductModel $productModel){
+    public function __construct(array $subcommunity, ProductModel $productModel) {
         $this->productModel = $productModel;
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
         $this->siteSectionPath = $subcommunity["Folder"].'/';
-        $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
-        $this->siteSectionID = SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
+        $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
         $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.($product["productID"] ?? self::SUBCOMMUNITY_NO_PRODUCT);
     }
 
