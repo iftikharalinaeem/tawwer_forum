@@ -38,7 +38,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $categories;
 
     /// Methods ///
-
     /**
      * Configure the container with multisite configuration.
      *
@@ -53,6 +52,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->rule(Gdn_Controller::class)
             ->setInherit(true)
             ->addCall('registerReduxActionProvider', $providerArgs)
+            ->rule(Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
+            ->setClass(\Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider::class)
+            ->setShared(true)
         ;
     }
 
@@ -155,7 +157,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($site['Locale'] !== Gdn::locale()->current()) {
             Gdn::locale()->set($site['Locale']);
         }
-
         SubcommunityModel::setCurrent($site);
     }
 
@@ -224,7 +225,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoriesModule_getData_handler($sender) {
         $site = SubcommunityModel::getCurrent();
-
         if (!$site) {
             return;
         }
@@ -235,7 +235,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $sender->root = $categoryID;
             return;
         }
-
 
         $categoryModel = new CategoryModel();
         $categories = $categoryModel
@@ -283,7 +282,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
-
         if (!SubcommunityModel::getCurrent()) {
             return;
         }
@@ -407,6 +405,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 // Redirect to the canonicalURL
                 redirectTo(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $defaultSite), 301);
             }
+        } else {
+            $site = $defaultSite;
         }
 
         $this->savedDoHeadings = c('Vanilla.Categories.DoHeadings');
