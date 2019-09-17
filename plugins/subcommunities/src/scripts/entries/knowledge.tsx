@@ -12,32 +12,33 @@ import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getMeta } from "@library/utility/appUtils";
 
-const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
+const providerArgs = {
+    hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
+    linkSuffix: "/kb",
+};
 
-if (isProductIntgrationEnabled) {
-    TitleBar.registerBeforeMeBox(() => {
-        const device = useDevice();
-        if (device === Devices.MOBILE || device === Devices.XS) {
-            return null;
-        }
-        return (
-            <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
-                <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
-            </CommunityFilterContext.Provider>
-        );
-    });
+TitleBar.registerBeforeMeBox(() => {
+    const device = useDevice();
+    if (device === Devices.MOBILE || device === Devices.XS) {
+        return null;
+    }
+    return (
+        <CommunityFilterContext.Provider value={providerArgs}>
+            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+        </CommunityFilterContext.Provider>
+    );
+});
 
-    TitleBarNav.addNavItem(() => {
-        const device = useDevice();
+TitleBarNav.addNavItem(() => {
+    const device = useDevice();
 
-        if (device !== Devices.MOBILE && device !== Devices.XS) {
-            return null;
-        }
+    if (device !== Devices.MOBILE && device !== Devices.XS) {
+        return null;
+    }
 
-        return (
-            <CommunityFilterContext.Provider value={{ hideNoProductCommunities: true, linkSuffix: "/kb" }}>
-                <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
-            </CommunityFilterContext.Provider>
-        );
-    });
-}
+    return (
+        <CommunityFilterContext.Provider value={providerArgs}>
+            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+        </CommunityFilterContext.Provider>
+    );
+});
