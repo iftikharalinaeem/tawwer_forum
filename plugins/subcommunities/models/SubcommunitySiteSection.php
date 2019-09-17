@@ -16,7 +16,11 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var int */
     private $siteSectionID;
 
-    /** @var string */
+    /**
+     * @var string
+     *
+     * The site section path should always end with a '/'
+     */
     private $siteSectionPath;
 
     /** @var string */
@@ -41,7 +45,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->productModel = $productModel;
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
-        $this->siteSectionPath = $subcommunity["Folder"];
+        $this->siteSectionPath = $subcommunity["Folder"].'/';
         $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
         $this->siteSectionID = $subcommunity["SubcommunityID"];
