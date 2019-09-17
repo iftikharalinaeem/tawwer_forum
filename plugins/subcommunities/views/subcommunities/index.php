@@ -23,6 +23,6 @@
 
 <div id="sites-wrap">
     <?php
-    require $this->fetchViewLocation('table');
+    echo $this->fetchView('table');
     ?>
 </div>

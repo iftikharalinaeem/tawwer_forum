@@ -56,9 +56,9 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
         reset($rows);
         $single = is_string(key($rows));
 
-        $populate = function(array &$row) {
+        $populate = function (array &$row) {
             if (array_key_exists('ProductID', $row) && !is_null($row['ProductID'])) {
-                try{
+                try {
                     $product = $this->selectSingle(["productID" => $row['ProductID']]);
                     if ($product) {
                         setValue('product', $row, $product);

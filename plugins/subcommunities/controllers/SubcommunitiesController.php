@@ -28,8 +28,23 @@ class SubcommunitiesController extends DashboardController {
      */
     protected $site;
 
+    /** @var ProductModel */
+    private $productModel;
+
+
+
 
     /// Methods ///
+
+    /**
+     * DI.
+     *
+     * @param ProductModel $productModel
+     */
+    public function __construct(ProductModel $productModel) {
+        parent::__construct();
+        $this->productModel = $productModel;
+    }
 
     public function add() {
         $this->title(sprintf(t('Add %s'), t('Site')));
@@ -183,6 +198,11 @@ class SubcommunitiesController extends DashboardController {
         $this->site = $this->siteModel->getID($siteID);
     }
 
+    /**
+     * Serve the /subcommunities page.
+     *
+     * @param string $page The page number.
+     */
     public function index($page = '') {
         switch ($this->Request->requestMethod()) {
             case 'GET':
@@ -216,13 +236,24 @@ class SubcommunitiesController extends DashboardController {
             if (count($sites) > $limit) {
                 $sites = array_slice($sites, 0, $pageSize);
             }
-
-            $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->getWhere($where, 'Sort,Folder', 'asc', $limit, $offset)->resultArray());
+            $sites = $this->siteModel->getWhere($where, 'Sort,Folder', 'asc', $limit, $offset)->resultArray();
             $this->setData('RecordCount', $this->siteModel->getCount($where));
         }
+
+        // Check if the product integration is enabled.
+        if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+            $this->productModel->expandProduct($sites);
+            $this->setData('useProducts', true);
+        } else {
+            $this->setData('useProducts', false);
+        }
+
+        $this->setData('Sites', $sites);
+
+        // Temporary until the dashboardSymbol from https://github.com/vanilla/vanilla/pull/9282 is merged.
+        $this->setData('functionContainer', new FunctionContainer());
 
         $this->setData('_Limit', $pageSize);
         $this->addJsFile('jquery.tablednd.js');
@@ -289,5 +320,12 @@ class SubcommunitiesController extends DashboardController {
         }
 
         $this->render();
+    }
+}
+
+class FunctionContainer {
+    public function dashboardSymbol(...$args) {
+        $result = dashboardSymbol(...$args);
+        return new \Twig\Markup($result, 'utf-8');
     }
 }
