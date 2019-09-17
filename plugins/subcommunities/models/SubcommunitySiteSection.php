@@ -9,6 +9,7 @@ namespace Vanilla\Subcommunities\Models;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 
 class SubcommunitySiteSection implements SiteSectionInterface {
+    const GROUP_PREFIX = 'subcommunitySSG-';
 
     /** @var ProductModel */
     private $productModel;
@@ -45,7 +46,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->siteSectionUrl =$subcommunity["Url"];
         $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
         $this->siteSectionID = $subcommunity["SubcommunityID"];
-        $this->sectionGroup = $product["productID"].'_'.$product["name"];
+        $this->sectionGroup = self::GROUP_PREFIX.$product["productID"];
     }
 
     /**
