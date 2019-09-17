@@ -120,6 +120,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
+        if ($query['siteSectionGroup'] === 'all') {
+            unset($query['siteSectionGroup']);
+        }
+
         $rows = $this->knowledgeBaseModel->get($query);
         $rows = array_map(function ($row) {
             return $this->normalizeOutput($row);
