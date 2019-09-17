@@ -1,12 +1,12 @@
 <h1>{{ t('Add/Edit Knowledge Base') }}</h1>
-{{ form.open(formOptions)|raw }}
-{{ form.errors()|raw }}
+{{ form.open() }}
+{{ form.errors() }}
 <ul>
-    {{ form.simple(formData)|raw }}
+    {{ form.simple(formData) }}
 </ul>
 <div class="js-modal-footer form-footer">
     <div class="buttons">
-        {{ form.button('Save')|raw }}
+        {{ form.button('Save') }}
     </div>
 </div>
-{{ form.close()|raw }}
+{{ form.close()}}
