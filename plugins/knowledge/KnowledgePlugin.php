@@ -301,5 +301,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 'index'
             )
             ->set();
+
+        // Update knowledge baese when missing sourceLocale
+        /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
+        $kbModel = \Gdn::getContainer()->get(KnowledgeBaseModel::class);
+        $kbNoLocales = $kbModel->get(['sourceLocale' => '']);
+        if (!empty($kbNoLocales)) {
+            $kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
+        }
     }
 }
