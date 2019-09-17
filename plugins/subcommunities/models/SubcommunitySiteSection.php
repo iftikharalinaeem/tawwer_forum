@@ -9,7 +9,8 @@ namespace Vanilla\Subcommunities\Models;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 
 class SubcommunitySiteSection implements SiteSectionInterface {
-    const GROUP_PREFIX = 'subcommunitySSG-';
+    /** @const string Site section group prefix for current provider */
+    const GROUP_PREFIX = 'subcommunities-group-';
 
     /** @var ProductModel */
     private $productModel;
