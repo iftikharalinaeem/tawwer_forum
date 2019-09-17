@@ -488,7 +488,7 @@ class WhispersPlugin extends Gdn_Plugin {
                // Link to the last comment.
                $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
 
-               $Sender->redirecTo(url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE), false);
+               $Sender->setRedirectTo(url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE), false);
             } else {
                // Link to the discussion.
                $Hash = $MessageID ? "Comment_w$MessageID" : 'Item_1';
