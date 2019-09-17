@@ -15,7 +15,6 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
@@ -37,7 +36,6 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
-use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -100,8 +98,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var EventManager */
     private $eventManager;
 
-    /** @var SiteSectionProviderInterface */
-    private $SiteSectionProviderInterface;
     /**
      * ArticlesApiController constructor
      *
@@ -122,7 +118,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param DiscussionArticleModel $discussionArticleModel
      * @param PageRouteAliasModel $pageRouteAliasModel
      * @param EventManager $eventManager
-     * @param SiteSectionProviderInterface $SiteSectionProviderInterface
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -141,8 +136,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         BreadcrumbModel $breadcrumbModel,
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
-        EventManager $eventManager,
-        SiteSectionProviderInterface $SiteSectionProviderInterface
+        EventManager $eventManager
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -158,12 +152,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
         $this->eventManager = $eventManager;
-        $this->SiteSectionProviderInterface = $SiteSectionProviderInterface;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
         $this->setFormatterService($formatService);
-        $this->setSessionInterface($sessionInterface);
     }
 
     /**
