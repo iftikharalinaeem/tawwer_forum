@@ -156,6 +156,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
         $this->setFormatterService($formatService);
+        $this->setSessionInterface($sessionInterface);
     }
 
     /**
