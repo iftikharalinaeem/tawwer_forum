@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
-import { ILoadable } from "@library/@types/api/core";
-import { IProduct } from "@subcommunities/products/productTypes";
-import { TempProduct } from "@subcommunities/products/productReducer";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IProduct, IProductDeleteError } from "@subcommunities/products/productTypes";
+import { TempProduct, ILoadedProduct } from "@subcommunities/products/productReducer";
 import { useProductActions } from "@subcommunities/products/ProductActions";
 import { productManagerClasses } from "@subcommunities/products/productManagerStyles";
 import { useFocusWatcher } from "@vanilla/react-utils";
@@ -15,9 +15,11 @@ import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { PlusCircleIcon, EditIcon, DeleteIcon } from "@library/icons/common";
+import { ProductDeleteErrorModal } from "@subcommunities/products/ProductDeleteErrorModal";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
 interface IProps {
-    productLoadable?: ILoadable<IProduct | TempProduct>;
+    productLoadable?: ILoadedProduct | ILoadable<TempProduct>;
     afterSubmit?: () => void;
     afterDelete?: () => void;
     onDismiss?: () => void;
@@ -34,18 +36,18 @@ export function ProductManagerItem(props: IProps) {
     ///
     /// Data unwrapping
     ///
-    const actualProduct: IProduct | null =
-        props.productLoadable && props.productLoadable.data && "productID" in props.productLoadable.data
-            ? props.productLoadable.data
-            : null;
+    const loadedProduct: ILoadedProduct | null =
+        props.productLoadable && "product" in props.productLoadable ? props.productLoadable : null;
+    const actualProduct: IProduct | null = loadedProduct ? loadedProduct.product : null;
+    props.productLoadable && "product" in props.productLoadable ? props.productLoadable.product : null;
     const tempProduct: TempProduct | null =
-        props.productLoadable && props.productLoadable.data && "transactionID" in props.productLoadable.data
+        props.productLoadable && "data" in props.productLoadable && props.productLoadable.data
             ? props.productLoadable.data
             : null;
     const initialProductName = actualProduct ? actualProduct.name : "";
 
     /// Locale State
-    const { postProduct, patchProduct, deleteProduct } = useProductActions();
+    const { postProduct, patchProduct, deleteProduct, clearDeleteError } = useProductActions();
     const [isEditMode, setIsEditMode] = useState(!!props.isEditMode);
     const [inputValue, setInputValue] = useState(initialProductName);
 
@@ -54,6 +56,7 @@ export function ProductManagerItem(props: IProps) {
     ///
     const rootRef = useRef<HTMLLIElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const deleteIconRef = useRef<HTMLButtonElement>(null);
 
     // Focus the input when it opens.
     useLayoutEffect(() => {
@@ -111,39 +114,57 @@ export function ProductManagerItem(props: IProps) {
     ///
     const classes = productManagerClasses();
     return (
-        <li className={classes.row} ref={rootRef}>
-            <form onSubmit={onSubmit} className={classes.item}>
-                {isEditMode ? (
-                    <TextInput
-                        placeholder={t("Product Name")}
-                        className={classes.input}
-                        value={inputValue}
-                        inputRef={inputRef}
-                        onChange={event => {
-                            event.preventDefault();
-                            setInputValue(event.target.value);
-                        }}
-                    />
-                ) : (
-                    <span className={classes.itemName}>
-                        {actualProduct ? actualProduct.name : tempProduct ? tempProduct.name : null}
-                    </span>
-                )}
-                <div className={classes.itemActions}>
+        <>
+            {loadedProduct && loadedProduct.deleteProduct.error && (
+                <ProductDeleteErrorModal
+                    elementToFocusOnExit={deleteIconRef.current}
+                    onClose={() => clearDeleteError(loadedProduct.product.productID)}
+                    product={loadedProduct.product}
+                    errorData={loadedProduct.deleteProduct.error}
+                />
+            )}
+            <li className={classes.row} ref={rootRef}>
+                <form onSubmit={onSubmit} className={classes.item}>
                     {isEditMode ? (
-                        <Button baseClass={ButtonTypes.ICON} submit>
-                            <PlusCircleIcon />
-                        </Button>
+                        <TextInput
+                            placeholder={t("Product Name")}
+                            className={classes.input}
+                            value={inputValue}
+                            inputRef={inputRef}
+                            onChange={event => {
+                                event.preventDefault();
+                                setInputValue(event.target.value);
+                            }}
+                        />
                     ) : (
-                        <Button baseClass={ButtonTypes.ICON} onClick={onEditClick}>
-                            <EditIcon />
-                        </Button>
+                        <span className={classes.itemName}>
+                            {actualProduct ? actualProduct.name : tempProduct ? tempProduct.name : null}
+                        </span>
                     )}
-                    <Button baseClass={ButtonTypes.ICON} onClick={onDelete}>
-                        <DeleteIcon />
-                    </Button>
-                </div>
-            </form>
-        </li>
+                    <div className={classes.itemActions}>
+                        {isEditMode ? (
+                            <Button baseClass={ButtonTypes.ICON} submit>
+                                <PlusCircleIcon />
+                            </Button>
+                        ) : (
+                            <Button baseClass={ButtonTypes.ICON} onClick={onEditClick}>
+                                {loadedProduct && loadedProduct.patchProduct.status === LoadStatus.LOADING ? (
+                                    <ButtonLoader buttonType={ButtonTypes.ICON} />
+                                ) : (
+                                    <EditIcon />
+                                )}
+                            </Button>
+                        )}
+                        <Button baseClass={ButtonTypes.ICON} onClick={onDelete} buttonRef={deleteIconRef}>
+                            {loadedProduct && loadedProduct.deleteProduct.status === LoadStatus.LOADING ? (
+                                <ButtonLoader buttonType={ButtonTypes.ICON} />
+                            ) : (
+                                <DeleteIcon />
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </li>
+        </>
     );
 }
