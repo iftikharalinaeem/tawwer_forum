@@ -5,5 +5,18 @@
 
 import { addComponent } from "@library/utility/componentRegistry";
 import { SubcommunityChooserDropdown } from "@subcommunities/chooser/SubcommunityChooser";
+import { getMeta } from "@library/utility/appUtils";
+import { CommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 
-addComponent("subcommunity-chooser", SubcommunityChooserDropdown);
+const providerArgs = {
+    hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
+    linkSuffix: "",
+};
+
+const ChooserWithProvider = () => (
+    <CommunityFilterContext.Provider value={providerArgs}>
+        <SubcommunityChooserDropdown />
+    </CommunityFilterContext.Provider>
+);
+
+addComponent("subcommunity-chooser", ChooserWithProvider);

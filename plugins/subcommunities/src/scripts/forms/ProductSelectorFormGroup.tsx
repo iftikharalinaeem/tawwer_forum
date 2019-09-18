@@ -13,9 +13,13 @@ import { t } from "@library/utility/appUtils";
 import { ProductManager } from "@subcommunities/products/ProductManager";
 import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
+import { makeSiteSectionGroup } from "@subcommunities/products/productTypes";
+import { ILoadedProduct } from "@subcommunities/products/productReducer";
 
 interface IProps {
-    initialValue?: number | null | boolean; // Gdn_Form can give us some nasty values.
+    initialValue: number | null | boolean; // Gdn_Form can give us some nasty values.
+    formFieldName: string;
+    valueType: "sectionGroup" | "productID";
 }
 
 /**
@@ -26,25 +30,37 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     const { allProductLoadable, productsById } = useProducts();
     const options = useMemo(() => {
         return Object.values(productsById).map(productLoadable => {
+            const { productID } = productLoadable.product;
             return {
                 label: productLoadable.product.name,
-                value: productLoadable.product.productID,
+                value: props.valueType === "sectionGroup" ? makeSiteSectionGroup({ productID }) : productID,
             };
         });
     }, [productsById]);
     const [modalOpen, setModalOpen] = useState(false);
 
-    const [value, setValue] = useState<number | string | undefined | null>(
+    const [value, setValue] = useState<number | string | null>(
         typeof props.initialValue === "boolean" ? null : props.initialValue,
     );
     const currentComboBoxValue = useMemo(() => {
         if (value == null) {
             return null;
         }
-        const selectedProduct = productsById[value];
+
+        let selectedProduct: ILoadedProduct | undefined;
+        for (const [productID, product] of Object.entries(productsById)) {
+            if (props.valueType === "sectionGroup" && value === makeSiteSectionGroup({ productID })) {
+                selectedProduct = product;
+                break;
+            } else if (props.valueType === "productID" && value.toString() === productID.toString()) {
+                selectedProduct = product;
+                break;
+            }
+        }
         if (!selectedProduct) {
             return null;
         }
+
         return {
             label: selectedProduct.product.name,
             value,
@@ -66,7 +82,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             }
         >
             {modalOpen && <ProductManager onClose={() => setModalOpen(false)} asModal />}
-            <input name="ProductID" type="hidden" value={value != null ? value : ""} />
+            <input name={props.formFieldName} type="hidden" value={value != null ? value : ""} />
             <DashboardSelect
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS}
                 options={options}
