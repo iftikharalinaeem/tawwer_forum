@@ -158,7 +158,7 @@ class KnowledgeSettingsController extends SettingsController {
     private function knowledgeBasesIndex(string $status) {
         $this->permission('Garden.Settings.Manage');
 
-        $knowledgeBases = $this->apiController->index(["status" => $status]);
+        $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all']);
         $this->setData('knowledgeBases', $knowledgeBases);
         $this->setData("status", $status);
         $this->addIndexNavigation($status);
@@ -246,12 +246,13 @@ class KnowledgeSettingsController extends SettingsController {
                     '</li>'
                 ]
             ],
+            'siteSectionGroup' => [
+                'Control' => 'react',
+                'Component' => 'site-section-group-selector-form-group',
+            ],
         ];
 
-        $this->setData([
-            'formData' => $formData,
-            'form' => $this->Form
-        ]);
+        $this->setData('formData', $formData);
         $this->render('addedit');
     }
 

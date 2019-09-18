@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge\Controllers\Pages;
 
 use Garden\Web\Data;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
@@ -53,6 +54,14 @@ abstract class KbPage extends ThemedPage {
     /** @var DeploymentCacheBuster */
     public $deploymentCacheBuster;
 
+    /** @var array */
+    protected $knowledgeBases;
+
+    /** @var SiteSectionProviderInterface */
+    protected $siteSectionProvider;
+
+
+
     /**
      * @inheritdoc
      */
@@ -70,7 +79,8 @@ abstract class KbPage extends ThemedPage {
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
         DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
-        AnalyticsClient $analyticsClient = null // Default needed for method extensions
+        AnalyticsClient $analyticsClient = null, // Default needed for method extensions
+        SiteSectionProviderInterface $siteSectionProvider = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider);
         $this->usersApi = $usersApi;
@@ -79,6 +89,7 @@ abstract class KbPage extends ThemedPage {
         $this->categoriesApi = $categoriesApi;
         $this->deploymentCacheBuster = $deploymentCacheBuster;
         $this->analyticsClient = $analyticsClient;
+        $this->siteSectionProvider = $siteSectionProvider;
 
         // Shared initialization.
         $this->initSharedData();
@@ -94,9 +105,6 @@ abstract class KbPage extends ThemedPage {
         parent::initAssets();
     }
 
-    /** @var array */
-    protected $knowledgeBases;
-
     /**
      * Add global redux actions that apply to any /kb page.
      */
@@ -104,11 +112,13 @@ abstract class KbPage extends ThemedPage {
         $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
-        $this->knowledgeBases = $this->kbApi->index();
+        $currentSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup()];
+        $this->knowledgeBases = $this->kbApi->index($kbArgs);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ALL_KBS,
             Data::box($this->knowledgeBases),
-            []
+            $kbArgs
         ));
 
         $this->addReduxAction(new ReduxAction(
