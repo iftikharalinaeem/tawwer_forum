@@ -227,13 +227,15 @@ class ReportModel extends Gdn_Model {
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => $recordType,
             "recordID" => $recordID,
-            "body" => $this->formatService->renderQuote($bodyRaw, $bodyFormat),
+            "body" => $this->formatService->renderHTML($bodyRaw, $bodyFormat),
             "format" => $bodyFormat,
             "bodyRaw" => $bodyRaw,
             "userID" => $userID,
             "insertUser" => $userRecord,
             "url" => $record['Url'],
             "dateInserted" =>  $record["DateInserted"],
+            "renderFullContent" => true,
+            "expandByDefault" => true,
         ]);
 
         $jsonOperations = [
