@@ -14,6 +14,8 @@ use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;
@@ -267,6 +269,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->table("knowledgeBase")
             ->primaryKey("knowledgeBaseID")
             ->column("name", "varchar(255)")
+            ->column("siteSectionGroup", "varchar(64)", DefaultSiteSection::DEFAULT_SECTION_GROUP)
             ->column("description", "text")
             // Size of this cannot be larger than 191 UT8-mb4 to be an index.
             ->column("urlCode", "varchar(191)", false, 'unique.urlCode')
@@ -298,5 +301,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 'index'
             )
             ->set();
+
+        // Update knowledge baese when missing sourceLocale
+        /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
+        $kbModel = \Gdn::getContainer()->get(KnowledgeBaseModel::class);
+        $kbNoLocales = $kbModel->get(['sourceLocale' => '']);
+        if (!empty($kbNoLocales)) {
+            $kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
+        }
     }
 }
