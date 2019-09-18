@@ -18,9 +18,6 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @const string Site section group prefix */
     const SUBCOMMUNITY_NO_PRODUCT = 'no-product';
 
-    /** @var ProductModel */
-    private $productModel;
-
     /** @var int */
     private $siteSectionID;
 
@@ -43,17 +40,18 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /**
      * DI.
      *
-     * @param array $subcommunity
+     * @param array $subcommunity Subcommunity model record
      * @param ProductModel $productModel
      */
-    public function __construct(array $subcommunity, ProductModel $productModel) {
-        $this->productModel = $productModel;
+    public function __construct(array $subcommunity) {
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
         $this->siteSectionPath = $subcommunity["Folder"].'/';
-        $product = $this->productModel->selectSingle(["productID" => $subcommunity["ProductID"]]);
+        if (empty($siteGroup = $subcommunity["ProductID"])) {
+            $siteGroup = self::SUBCOMMUNITY_NO_PRODUCT;
+        }
         $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
-        $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.($product["productID"] ?? self::SUBCOMMUNITY_NO_PRODUCT);
+        $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.$siteGroup;
     }
 
     /**
