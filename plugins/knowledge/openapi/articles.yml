@@ -795,6 +795,63 @@ paths:
             tags:
                 - Articles
             summary: Get an article by its alias.
+    "/articles/{ID}/translations":
+        get:
+            parameters:
+                - description: Article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: The status of an article
+                  in: query
+                  name: status
+                  schema:
+                      items:
+                        enum:
+                            - published
+                            - deleted
+                            - undeleted
+                        type: string
+                      type: array
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        articleRevisionID:
+                                            description: Unique article revision ID.
+                                            type: integer
+                                        name:
+                                            description: The name of the article.
+                                            type: string
+                                        url:
+                                            description: The url of the article.
+                                            type: string
+                                        locale:
+                                            description: Locale the article was written in..
+                                            type: string
+                                        translationStatus:
+                                            description: The translation status of the article.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            type: string
+                                    required:
+                                        - articleRevisionID
+                                        - name
+                                        - url
+                                        - locale
+                                        - translationStatus
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
 components:
     requestBodies:
         ArticlePost:

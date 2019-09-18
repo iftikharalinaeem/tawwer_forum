@@ -12,6 +12,11 @@ use Gdn_Session;
  * A model for managing article revisions.
  */
 class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
+    const STATUS_TRANSLATION_UP_TO_DATE = "up-to-date";
+    const STATUS_TRANSLATION_OUT_TO_DATE = "out-of-date";
+    const STATUS_TRANSLATION_NOT_TRANSLATED = "not-translated";
+
+    const DEFAULT_LIMIT = 100;
 
     private $session;
 
@@ -73,5 +78,14 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
         $result = $sqlDriver->getWhere($this->getTable(), ["articleID" => $articleID])->resultArray();
 
         return current($result)["revisionsCount"];
+    }
+
+
+    public static function getTranslationStatuses(): array {
+        return [
+            self::STATUS_TRANSLATION_NOT_TRANSLATED,
+            self::STATUS_TRANSLATION_OUT_TO_DATE,
+            self::STATUS_TRANSLATION_UP_TO_DATE
+        ];
     }
 }

@@ -165,20 +165,26 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id Article ID.
      * @param bool $includeRevision
      * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
+     * @param bool $includeTranslations Whether to include translated article revisions.
      *
      * @return array
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false): array {
+    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false, bool $includeTranslations = false): array {
         try {
             if ($includeRevision) {
-                $article = $this->articleModel->getIDWithRevision($id);
+                $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
+                $knowledgeCategoryID = ($includeTranslations) ? array_unique(array_column($article, "knowledgeCategoryID")) : $article["knowledgeCategoryID"];
+                if (empty($article)) {
+                    throw new NoResultsException("No rows matched the provided criteria.");
+                }
             } else {
                 $article = $this->articleModel->selectSingle(["articleID" => $id]);
+                $knowledgeCategoryID = $article['knowledgeCategoryID'];
             }
             if (!$includeDeleted) {
-                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $article['knowledgeCategoryID']]);
+                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
                 $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
             }
         } catch (NoResultsException $e) {
@@ -199,7 +205,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function delete_drafts(int $draftID) {
         $this->permission("Garden.SignIn.Allow");
-
         $in = $this->schema([
             "draftID" => [
                 "description" => "Target article draft ID.",
@@ -286,6 +291,44 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
+        return $result;
+    }
+
+    /**
+     * Get the translations for an article.
+     * 
+     * @param int $id
+     * @param array $query
+     * @return array
+
+     */
+    public function get_translations(int $id, array $query):array {
+        $this->permission("knowledge.kb.view");
+        $this->idParamSchema()->setDescription("Get translations for an article");
+
+        $in = Schema::parse([
+            "status:s?" =>[
+                "enum" => $this->articleModel::getAllStatuses()
+            ]
+        ]);
+
+        $out = $this->schema([":a" => Schema::parse([
+            "articleRevisionID:i",
+            "name:s?",
+            "url:s?",
+            "locale:s",
+            "translationStatus:s" => [
+                "enum" =>["up-to-date", "out-of-date", "not-translated"]
+            ],
+            ], "out")
+        ]);
+
+        $query = $in->validate($query);
+        $article = $this->articleByID($id, true, false, true);
+
+        $result =  $this->getArticleTranslationData($article);
+        $result = $out->validate($result);
+
         return $result;
     }
 
@@ -1167,5 +1210,49 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         return $articleID;
+    }
+
+    /**
+     * Get the article translation data for the api.
+     *
+     * @param array $article
+     * @return array
+     */
+    protected function getArticleTranslationData(array $article): array {
+        $result = [];
+        $firstRevision = reset($article);
+        $kbCategory = $this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $firstRevision["knowledgeCategoryID"]]);
+        $kbCategory = reset($kbCategory);
+        $kb = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]);
+        $kb = reset($kb);
+        $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
+
+        foreach ($allLocales as $locale) {
+            $current = [
+                "articleRevisionID" => -1,
+                "name" => '',
+                "url" => '',
+                "locale" => $locale["locale"],
+                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
+            ];
+            foreach ($article as $translation) {
+                if ($translation['locale'] === $locale['locale']) {
+
+                    $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
+                    $url = \Gdn::request()->url($locale['slug'] . "kb/articles/" . $slug, true);
+
+                    $current = [
+                        "articleRevisionID" => $translation["articleRevisionID"],
+                        "name" => $translation["name"],
+                        "url" => $url,
+                        "locale" => $translation["locale"],
+                        "translationStatus" => $translation["translationStatus"],
+                    ];
+                    break;
+                }
+            }
+            $result[] = $current;
+        }
+        return $result;
     }
 }
