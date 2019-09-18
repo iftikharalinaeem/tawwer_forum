@@ -207,6 +207,10 @@ class KnowledgeSettingsController extends SettingsController {
                     "data-validation-filter" => "slug",
                 ],
             ],
+            'siteSectionGroup' => [
+                'Control' => 'react',
+                'Component' => 'site-section-group-selector-form-group',
+            ],
             'description' => [
                 'LabelCode' => 'Description',
                 'Control' => 'textbox',
@@ -245,10 +249,6 @@ class KnowledgeSettingsController extends SettingsController {
                     '<li class="form-group js-sortArticlesGroup">',
                     '</li>'
                 ]
-            ],
-            'siteSectionGroup' => [
-                'Control' => 'react',
-                'Component' => 'site-section-group-selector-form-group',
             ],
         ];
 
