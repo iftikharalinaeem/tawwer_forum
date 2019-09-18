@@ -45,6 +45,9 @@ jobs:
                         - ci-scripts
                         - vanilla
             -   run:
+                    name: Clone Internal repo
+                    command: ~/workspace/repo/.circleci/clone-internal.sh
+            -   run:
                     name: Test setup
                     command: |
                         cd ~/workspace/vanilla
