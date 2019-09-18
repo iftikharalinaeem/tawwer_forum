@@ -217,8 +217,13 @@ class ReportModel extends Gdn_Model {
         $userID = $record['InsertUserID'] ?? $record['ActivityUserID'];
         $userRecord = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         $userRecord = UserFragmentSchema::normalizeUserFragment($userRecord);
+        $name = $record['Name'] ?? null;
+        if ($recordType === 'comment') {
+            $name = sprintf(t('Re: %s'), $name);
+        }
 
         $embed = new QuoteEmbed([
+            "name" => $name,
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => $recordType,
             "recordID" => $recordID,
