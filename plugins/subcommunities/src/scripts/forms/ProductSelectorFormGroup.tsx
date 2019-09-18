@@ -52,7 +52,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             if (props.valueType === "sectionGroup" && value === makeSiteSectionGroup({ productID })) {
                 selectedProduct = product;
                 break;
-            } else if (props.valueType === "productID" && value === productID) {
+            } else if (props.valueType === "productID" && value.toString() === productID.toString()) {
                 selectedProduct = product;
                 break;
             }
