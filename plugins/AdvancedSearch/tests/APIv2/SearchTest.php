@@ -201,6 +201,27 @@ class SearchTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test searching with the insert user expanded.
+     */
+    public function testExpandInsertUser() {
+        $params = [
+            'name' => self::$discussion['name'],
+            'expand' => true,
+        ];
+        $response = $this->api()->get('/search?'.http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertTrue(count($results) > 0);
+
+        $sch = new \Vanilla\Models\UserFragmentSchema();
+        foreach ($results as $result) {
+            $sch->validate($result['insertUser']);
+        }
+    }
+
+    /**
      * Test search by user names.
      */
     public function testInsertUserNames() {

@@ -35,17 +35,27 @@ class SearchApiController extends AbstractApiController {
     /** @var SearchModel */
     private $searchModel;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * SearchApiController constructor.
      *
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param SearchModel $searchModel
+     * @param UserModel $userModel
      */
-    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, SearchModel $searchModel) {
+    public function __construct(
+        CommentModel $commentModel,
+        DiscussionModel $discussionModel,
+        SearchModel $searchModel,
+        UserModel $userModel
+    ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -72,6 +82,7 @@ class SearchApiController extends AbstractApiController {
                 'body:s' => 'The content of the record.',
                 'score:i' => 'Score of the record.',
                 'insertUserID:i' => 'The user that created the record.',
+                'insertUser?' => $this->getUserFragmentSchema(),
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
@@ -200,6 +211,7 @@ class SearchApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => self::LIMIT_MAXIMUM,
                 ],
+                'expand?' => ApiUtils::getExpandDefinition(['insertUser']),
             ], ['SearchIndex', 'in'])
             ->addValidator('', $validator)
             ->setDescription('Search for records matching specific criteria.');
@@ -227,6 +239,15 @@ class SearchApiController extends AbstractApiController {
         }
 
         $data = $this->preNormalizeOutputs($data);
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $data,
+            $this->resolveExpandFields($query, ['insertUser' => 'UserID']),
+            ['expand' => $query['expand']]
+        );
+
+
         $data = array_map([$this, 'normalizeOutput'], $data);
 
         $result = $out->validate($data);
@@ -349,6 +370,10 @@ class SearchApiController extends AbstractApiController {
             $schemaRecord['discussionID'] = $searchRecord['DiscussionID'];
             $schemaRecord['commentID'] = $schemaRecord['recordID'];
             $schemaRecord['type'] = $schemaRecord['type'] ?? 'comment';
+        }
+
+        if (isset($searchRecord['User'])) {
+            $schemaRecord['insertUser'] = $searchRecord['User'];
         }
 
         $result = $this->getEventManager()->fireFilter('searchApiController_normalizeOutput', $schemaRecord, $this, $searchRecord, []);
