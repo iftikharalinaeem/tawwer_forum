@@ -3,6 +3,7 @@
  * @license Proprietary
  */
 
+import React from "react";
 import { addComponent } from "@library/utility/componentRegistry";
 import { SubcommunityChooserDropdown } from "@subcommunities/chooser/SubcommunityChooser";
 import { getMeta } from "@library/utility/appUtils";
@@ -13,9 +14,9 @@ const providerArgs = {
     linkSuffix: "",
 };
 
-const ChooserWithProvider = () => (
+const ChooserWithProvider = props => (
     <CommunityFilterContext.Provider value={providerArgs}>
-        <SubcommunityChooserDropdown />
+        <SubcommunityChooserDropdown {...props} />
     </CommunityFilterContext.Provider>
 );
 

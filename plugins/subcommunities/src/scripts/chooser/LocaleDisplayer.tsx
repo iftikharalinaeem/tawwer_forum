@@ -23,7 +23,7 @@ export function LocaleDisplayer(props: IProps) {
         return null;
     }
 
-    let fullLocaleName = locales[props.localeContent].translatedNames[localeInfo.defaultLocale];
+    let fullLocaleName = locales[props.localeContent].translatedNames[props.displayLocale || localeInfo.defaultLocale];
 
     if (!fullLocaleName) {
         fullLocaleName = t(props.localeContent);

@@ -33,7 +33,7 @@ export function LocaleChooser(props: IProps) {
                 return (
                     <DropDownItemButton key={locale.key} onClick={() => props.onChange(locale.key)}>
                         <span className={classes.row}>
-                            <LocaleDisplayer localeContent={locale.key} />
+                            <LocaleDisplayer localeContent={locale.key} displayLocale={locale.key} />
                             <RightChevronIcon className={classes.rowArrow} />
                         </span>
                     </DropDownItemButton>
