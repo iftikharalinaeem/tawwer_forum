@@ -8,14 +8,22 @@
 use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\AdvancedSearch\Models\BasicSearchRecordType;
+use Garden\Container\Container;
 
 /**
  * Class AdvancedSearchPlugin
  */
 class AdvancedSearchPlugin extends Gdn_Plugin {
+    const RECORD_TYPE_DISCUSSION = 'discussion';
+    const RECORD_TYPE_COMMENT = 'comment';
     /// Properties ///
 
-    public static $Types;
+    /**
+     * @var array
+     * @deprecated
+     */
+    public static $Types = [];
 
     /**
      * @var AddonManager
@@ -45,34 +53,48 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         $this->addonManager = $addonManager;
         $this->container = $container;
-
-        self::$Types = [
-            'discussion' => ['d' => 'discussions'],
-            'comment' => ['c' => 'comments']
-        ];
-
-        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
-            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['question'] = 'questions';
-                self::$Types['comment']['answer'] = 'answers';
-            }
-
-            if ($this->addonManager->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['poll'] = 'polls';
-            }
-
-            if ($this->addonManager->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['page']['p'] = 'docs';
-            }
-
-            $group = $this->addonManager->lookupAddon('Groups');
-            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['group']['group'] = 'groups';
-            }
-        }
-
         $this->fireEvent('Init');
     }
+
+    public function container_init(Container $dic) {
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypesProviderInterface::class)
+            ->setClass(\Vanilla\AdvancedSearch\Models\SubcomunitiesSiteSectionProvider::class)
+            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['d' => 'discussions'])])
+            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_COMMENT, ['c' => 'comments'])])
+            ->setShared(true)
+        ;
+
+        //self::$Types = [
+        //'discussion' => ['d' => 'discussions'],
+        //'comment' => ['c' => 'comments']
+        //];
+//        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON))
+//        {
+//            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON))
+//            {
+//                self::$Types['discussion']['question'] = 'questions';
+//                self::$Types['comment']['answer'] = 'answers';
+//            }
+//
+//            if ($this->addonManager->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
+//                self::$Types['discussion']['poll'] = 'polls';
+//            }
+//
+//            if ($this->addonManager->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
+//                self::$Types['page']['p'] = 'docs';
+//            }
+//
+//            $group = $this->addonManager->lookupAddon('Groups');
+//            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups',
+//                    \Vanilla\Addon::TYPE_ADDON)) {
+//                self::$Types['group']['group'] = 'groups';
+//            }
+//        }
+    }
+
+
+
 
     /**
      * Get the SearchModel.

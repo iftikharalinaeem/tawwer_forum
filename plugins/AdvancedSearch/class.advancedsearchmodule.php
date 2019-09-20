@@ -20,7 +20,7 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $Results = false; // whether or not to show results in the form.
 
-    public $Types = [];
+    //public $Types = [];
 
     public $value = null;
 
@@ -39,12 +39,12 @@ class AdvancedSearchModule extends Gdn_Module {
         ];
 
         // Set the initial types.
-        foreach (AdvancedSearchPlugin::$Types as $table => $types) {
-            foreach ($types as $type => $label) {
-                $value = $table.'_'.$type;
-                $this->Types[$value] = $label;
-            }
-        }
+//        foreach (AdvancedSearchPlugin::$Types as $table => $types) {
+//            foreach ($types as $type => $label) {
+//                $value = $table.'_'.$type;
+//                $this->Types[$value] = $label;
+//            }
+//        }
     }
 
     public static function addAssets() {
@@ -86,6 +86,7 @@ class AdvancedSearchModule extends Gdn_Module {
 
         // See whether or not to check all of the  types.
         $onechecked = false;
+        //die(var_dump(__LINE__));
         foreach ($this->Types as $name => $label) {
             if ($form->getFormValue($name)) {
                 $onechecked = true;
