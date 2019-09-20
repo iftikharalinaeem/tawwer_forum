@@ -384,7 +384,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         // Redirect
         const editLocation = {
             ...history.location,
-            pathname: EditorRoute.url({ articleID: article.articleID }),
+            pathname: getRelativeUrl(EditorRoute.url({ articleID: article.articleID })),
             search: "",
         };
 
