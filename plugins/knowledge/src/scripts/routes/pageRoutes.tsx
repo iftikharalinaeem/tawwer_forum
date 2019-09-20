@@ -16,6 +16,7 @@ import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { formatUrl } from "@library/utility/appUtils";
 
 interface IEditorURLData {
     articleID?: number;
@@ -36,7 +37,7 @@ function makeEditorUrl(data?: IEditorURLData) {
     const addRoot = "/kb/articles/add";
 
     if (!data) {
-        return addRoot;
+        return formatUrl(addRoot, true);
     }
 
     if (data.articleID === undefined) {
@@ -59,7 +60,7 @@ function makeEditorUrl(data?: IEditorURLData) {
         baseUrl += `?${query}`;
     }
 
-    return baseUrl;
+    return formatUrl(baseUrl, true);
 }
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
@@ -76,9 +77,12 @@ export const EditorRoute = new RouteHandler(loadEditor, editorPaths, makeEditorU
  */
 export function makeRevisionsUrl(articleOrRevison: IArticleFragment | IArticle | IRevisionFragment | IRevision) {
     if ("articleRevisionID" in articleOrRevison) {
-        return `/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`;
+        return formatUrl(
+            `/kb/articles/${articleOrRevison.articleID}/revisions/${articleOrRevison.articleRevisionID}`,
+            true,
+        );
     } else {
-        return `/kb/articles/${articleOrRevison.articleID}/revisions`;
+        return formatUrl(`/kb/articles/${articleOrRevison.articleID}/revisions`, true);
     }
 }
 export const RevisionsRoute = new RouteHandler(
@@ -114,32 +118,32 @@ export const CategoryPagedRoute = new RouteHandler(
 export const SearchRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
     "/kb/search",
-    (data?: undefined) => "/kb/search",
+    (data?: undefined) => formatUrl("/kb/search", true),
 );
 
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
-    (data?: undefined) => "/kb/drafts",
+    (data?: undefined) => formatUrl("/kb/drafts", true),
     ModalLoader,
 );
 
 export const HomeRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/HomePage"),
     "/kb",
-    (data?: undefined) => "/kb",
+    (data?: undefined) => formatUrl("/kb", true),
 );
 
 export const KnowledgeBasePage = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
     "/kb/:urlCode([\\w\\d-]+)",
-    (data: { urlCode: string }) => `/kb/${data.urlCode}`,
+    (data: { urlCode: string }) => formatUrl(`/kb/${data.urlCode}`, true),
 );
 
 export const OrganizeCategoriesRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/organize-categories" */ "@knowledge/pages/OrganizeCategoriesPage"),
     "/kb/:id/organize-categories",
-    (data: { kbID: number }) => `/kb/${data.kbID}/organize-categories`,
+    (data: { kbID: number }) => formatUrl(`/kb/${data.kbID}/organize-categories`, true),
     ModalLoader,
 );
 
