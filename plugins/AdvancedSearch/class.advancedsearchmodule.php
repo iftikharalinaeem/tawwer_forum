@@ -4,6 +4,9 @@
  * @license Proprietary
  */
 
+use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use \Vanilla\Contracts\Search\SearchRecordTypeInterface;
+
 /**
  * Class AdvancedSearchModule
  */
@@ -20,7 +23,10 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $Results = false; // whether or not to show results in the form.
 
-    //public $Types = [];
+    /**
+     * @var SearchRecordTypeInterface[] $Types
+     */
+    public $Types = [];
 
     public $value = null;
 
@@ -38,13 +44,11 @@ class AdvancedSearchModule extends Gdn_Module {
             '1 year' => plural(1, '%s year', '%s years')
         ];
 
-        // Set the initial types.
-//        foreach (AdvancedSearchPlugin::$Types as $table => $types) {
-//            foreach ($types as $type => $label) {
-//                $value = $table.'_'.$type;
-//                $this->Types[$value] = $label;
-//            }
-//        }
+        //if (class_exists(\Vanilla\Sphinx\SphinxSearchModel::class)) {
+        /** @var SearchRecordTypeProviderInterface $recordTypesProvider */
+        if ($recordTypesProvider = Gdn::getContainer()->get('SearchRecordTypesProvider')) {
+            $this->Types = $recordTypesProvider->getAll();
+        }
     }
 
     public static function addAssets() {
@@ -87,15 +91,16 @@ class AdvancedSearchModule extends Gdn_Module {
         // See whether or not to check all of the  types.
         $onechecked = false;
         //die(var_dump(__LINE__));
-        foreach ($this->Types as $name => $label) {
-            if ($form->getFormValue($name)) {
+        /** @var SearchRecordTypeInterface $recordType */
+        foreach ($this->Types as $recordType) {
+            if ($form->getFormValue($recordType->getCheckBoxId())) {
                 $onechecked = true;
                 break;
             }
         }
         if (!$onechecked) {
-            foreach ($this->Types as $name => $label) {
-                $form->setFormValue($name, true);
+            foreach ($this->Types as $recordType) {
+                $form->setFormValue($recordType->getCheckBoxId(), true);
             }
         }
 

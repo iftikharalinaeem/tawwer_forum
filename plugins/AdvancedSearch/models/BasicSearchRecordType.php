@@ -23,6 +23,10 @@ class BasicSearchRecordType implements SearchRecordTypeInterface {
         return $this->key;
     }
 
+    public function getCheckBoxId(): string {
+        return $this->structure['checkboxId'] ?? '';
+    }
+
     public function getFeatures(): array {
         return $this->structure;
     }

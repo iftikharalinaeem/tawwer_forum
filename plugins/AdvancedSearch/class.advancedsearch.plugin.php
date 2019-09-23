@@ -23,7 +23,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * @var array
      * @deprecated
      */
-    public static $Types = [];
+    //public static $Types = [];
 
     /**
      * @var AddonManager
@@ -59,10 +59,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     public function container_init(Container $dic) {
         $dic
             ->rule(Vanilla\Contracts\Search\SearchRecordTypesProviderInterface::class)
-            ->setClass(\Vanilla\AdvancedSearch\Models\SubcomunitiesSiteSectionProvider::class)
-            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['d' => 'discussions'])])
-            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_COMMENT, ['c' => 'comments'])])
+            ->setClass(\Vanilla\AdvancedSearch\Models\SearchRecordTypeProvider::class)
+            //->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['d' => 'discussions'])])
+            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['checkboxId' => self::RECORD_TYPE_DISCUSSION.'_d'])])
+            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_COMMENT, ['checkboxId' => self::RECORD_TYPE_COMMENT.'_c'])])
             ->setShared(true)
+            ->addAlias('SearchRecordTypesProvider')
         ;
 
         //self::$Types = [
