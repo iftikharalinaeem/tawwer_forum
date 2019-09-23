@@ -67,8 +67,8 @@
             <?php
             echo $Form->label('What to search', '', ['class' => 'Heading']);
             echo '<div class="Inline">';
-            foreach ($this->Types as $name => $label) {
-                 echo ' '.$Form->checkBox($name, $label, ['nohidden' => true]).' ';
+            foreach ($this->Types as $recordType) {
+                 echo ' '.$Form->checkBox($recordType->getCheckBoxId(), $recordType->getCheckBoxLabel(), ['nohidden' => true]).' ';
             }
             echo '</div>';
             ?>

@@ -9,14 +9,14 @@ use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\AdvancedSearch\Models\BasicSearchRecordType;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeComment;
 use Garden\Container\Container;
 
 /**
  * Class AdvancedSearchPlugin
  */
 class AdvancedSearchPlugin extends Gdn_Plugin {
-    const RECORD_TYPE_DISCUSSION = 'discussion';
-    const RECORD_TYPE_COMMENT = 'comment';
     /// Properties ///
 
     /**
@@ -60,17 +60,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $dic
             ->rule(Vanilla\Contracts\Search\SearchRecordTypesProviderInterface::class)
             ->setClass(\Vanilla\AdvancedSearch\Models\SearchRecordTypeProvider::class)
-            //->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['d' => 'discussions'])])
-            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_DISCUSSION, ['checkboxId' => self::RECORD_TYPE_DISCUSSION.'_d'])])
-            ->addCall('setType', [new BasicSearchRecordType(self::RECORD_TYPE_COMMENT, ['checkboxId' => self::RECORD_TYPE_COMMENT.'_c'])])
+            ->addCall('setType', [new SearchRecordTypeDiscussion()])
+            ->addCall('setType', [new SearchRecordTypeComment()])
             ->setShared(true)
             ->addAlias('SearchRecordTypesProvider')
         ;
 
-        //self::$Types = [
-        //'discussion' => ['d' => 'discussions'],
-        //'comment' => ['c' => 'comments']
-        //];
 //        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON))
 //        {
 //            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON))

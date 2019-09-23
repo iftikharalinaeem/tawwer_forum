@@ -90,7 +90,6 @@ class AdvancedSearchModule extends Gdn_Module {
 
         // See whether or not to check all of the  types.
         $onechecked = false;
-        //die(var_dump(__LINE__));
         /** @var SearchRecordTypeInterface $recordType */
         foreach ($this->Types as $recordType) {
             if ($form->getFormValue($recordType->getCheckBoxId())) {

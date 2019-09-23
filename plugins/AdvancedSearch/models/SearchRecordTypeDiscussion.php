@@ -9,28 +9,26 @@ namespace Vanilla\AdvancedSearch\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 
-class BasicSearchRecordType implements SearchRecordTypeInterface {
-    protected $key = '';
+class SearchRecordTypeDiscussion extends BasicSearchRecordType {
+    const TYPE = 'discussion';
 
-    protected $structure = [];
+    const CHECKBOX_ID = 'd';
+
+    const CHECKBOX_LABEL = 'discussions';
+
+    public function __construct() {
+        $this->key = self::TYPE;
+    }
 
     public function getKey(): string {
         return $this->key;
     }
 
     public function getCheckBoxId(): string {
-        return $this->structure['checkboxId'] ?? '';
+        return self::TYPE.'_'.self::CHECKBOX_ID;
     }
 
     public function getCheckBoxLabel(): string {
-        return $this->structure['checkboxLabel'] ?? '';
-    }
-
-    public function getFeatures(): array {
-        return $this->structure;
-    }
-
-    public function getModel() {
-        return '';
+        return self::CHECKBOX_LABEL;
     }
 }
