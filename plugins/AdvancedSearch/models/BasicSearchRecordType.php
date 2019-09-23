@@ -23,7 +23,7 @@ class BasicSearchRecordType implements SearchRecordTypeInterface {
         return $this->key;
     }
 
-    public function getStructure(): array {
+    public function getFeatures(): array {
         return $this->structure;
     }
 
