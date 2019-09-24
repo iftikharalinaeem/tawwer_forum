@@ -24,29 +24,16 @@ jobs:
         steps:
             - attach_workspace:
                 at: ~/workspace
-            - run:
-                    name: Versions
-                    command: |
-                        php --version
-                        composer --version
             - core/checkout
             -   run: ~/workspace/ci-scripts/clone-vanilla.sh
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
+            -   run:
+                    name: Clone Internal repo
+                    command: ~/workspace/repo/.circleci/clone-repo.sh internal
             - run:
                 name: Install Composer Packages
                 command: |
                     cd ~/workspace/vanilla
                     VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
-            -   persist_to_workspace:
-                    root: ~/workspace
-                    paths:
-                        - repo
-                        - ci-scripts
-                        - vanilla
-            -   run:
-                    name: Clone Internal repo
-                    command: ~/workspace/repo/.circleci/clone-repo.sh internal
             -   run:
                     name: Test setup
                     command: |
@@ -67,7 +54,7 @@ jobs:
                     name: APIv2 Tests
                     command: |
                         cd ~/workspace/vanilla
-                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx"
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx" --testdox-text
 workflows:
     version: 2
     commit:
