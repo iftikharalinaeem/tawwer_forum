@@ -59,16 +59,10 @@ workflows:
     version: 2
     commit:
         jobs:
-            # PHP 7.2 jobs are only nightly until we move upwards on infra.
-
-            # Sphinx tests temporary disabled until Circleci security issue will be resolved
-            # At the moment we can't checkout private repos
-            #- php_sphinx_tests:
-            #      name: php_sphinx_tests
-            - php_sphinx_tests
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
+            - php_sphinx_tests
             - jobs/php_72_tests:
                   requires:
                       - php_setup
@@ -102,6 +96,7 @@ workflows:
                   name: php_setup
             - jobs/php_72_lint
             - jobs/php_73_lint
+            - php_sphinx_tests
             - jobs/php_72_tests:
                   requires:
                       - php_setup
