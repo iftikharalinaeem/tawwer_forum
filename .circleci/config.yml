@@ -46,7 +46,7 @@ jobs:
                         - vanilla
             -   run:
                     name: Clone Internal repo
-                    command: ~/workspace/repo/.circleci/clone-internal.sh
+                    command: ~/workspace/repo/.circleci/clone-repo.sh internal
             -   run:
                     name: Test setup
                     command: |
