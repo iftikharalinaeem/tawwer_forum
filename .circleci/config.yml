@@ -78,6 +78,7 @@ workflows:
             # At the moment we can't checkout private repos
             #- php_sphinx_tests:
             #      name: php_sphinx_tests
+            - php_sphinx_tests
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
