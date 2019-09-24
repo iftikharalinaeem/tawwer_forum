@@ -4,11 +4,14 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
+use Vanilla\Polls\Models\SearchRecordTypePoll;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+
 /**
  * Class PollsPlugin
  */
 class PollsPlugin extends Gdn_Plugin {
-
     /**
      * Run once on enable.
      */
@@ -21,6 +24,19 @@ class PollsPlugin extends Gdn_Plugin {
      */
     public function structure() {
         include dirname(__FILE__).'/structure.php';
+    }
+
+    /**
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        /*
+         * Register additional advanced search sphinx record type Poll
+         */
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypePoll()])
+        ;
     }
 
     /**
