@@ -24,29 +24,16 @@ jobs:
         steps:
             - attach_workspace:
                 at: ~/workspace
-            - run:
-                    name: Versions
-                    command: |
-                        php --version
-                        composer --version
             - core/checkout
             -   run: ~/workspace/ci-scripts/clone-vanilla.sh
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
+            -   run:
+                    name: Clone Internal repo
+                    command: ~/workspace/repo/.circleci/clone-repo.sh internal
             - run:
                 name: Install Composer Packages
                 command: |
                     cd ~/workspace/vanilla
                     VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
-            -   persist_to_workspace:
-                    root: ~/workspace
-                    paths:
-                        - repo
-                        - ci-scripts
-                        - vanilla
-            -   run:
-                    name: Clone Internal repo
-                    command: ~/workspace/repo/.circleci/clone-internal.sh
             -   run:
                     name: Test setup
                     command: |
@@ -67,20 +54,15 @@ jobs:
                     name: APIv2 Tests
                     command: |
                         cd ~/workspace/vanilla
-                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx"
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx" --testdox
 workflows:
     version: 2
     commit:
         jobs:
-            # PHP 7.2 jobs are only nightly until we move upwards on infra.
-
-            # Sphinx tests temporary disabled until Circleci security issue will be resolved
-            # At the moment we can't checkout private repos
-            #- php_sphinx_tests:
-            #      name: php_sphinx_tests
             - jobs/php_setup:
                   name: php_setup
             - jobs/php_72_lint
+            - php_sphinx_tests
             - jobs/php_72_tests:
                   requires:
                       - php_setup
@@ -114,6 +96,7 @@ workflows:
                   name: php_setup
             - jobs/php_72_lint
             - jobs/php_73_lint
+            - php_sphinx_tests
             - jobs/php_72_tests:
                   requires:
                       - php_setup
