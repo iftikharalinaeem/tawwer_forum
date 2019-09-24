@@ -54,7 +54,7 @@ jobs:
                     name: APIv2 Tests
                     command: |
                         cd ~/workspace/vanilla
-                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx" --testdox-text
+                        ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx" --testdox
 workflows:
     version: 2
     commit:
