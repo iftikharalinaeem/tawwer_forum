@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
 
 

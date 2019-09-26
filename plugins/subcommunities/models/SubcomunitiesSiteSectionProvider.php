@@ -52,7 +52,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         $this->currentSubcommunity = $this->subcommunityModel::getCurrent();
 
         if (!empty($this->currentSubcommunity)) {
-            $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity, $productModel);
+            $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity);
         }
     }
 
@@ -62,7 +62,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     public function getAll(): array {
         $allSiteSections =[$this->defaultSiteSection];
         foreach ($this->subcommunities as $subcommunity) {
-            $allSiteSections[] =  new SubcommunitySiteSection($subcommunity, $this->productModel);
+            $allSiteSections[] =  new SubcommunitySiteSection($subcommunity);
         }
         return $allSiteSections;
     }
@@ -72,7 +72,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      */
     public function getByID(int $id): ?SiteSectionInterface {
         if ($subCommunity = $this->subcommunityModel->getID($id)) {
-            return new SubcommunitySiteSection($subCommunity, $this->productModel);
+            return new SubcommunitySiteSection($subCommunity);
         } else {
             return null;
         }
@@ -83,7 +83,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
      */
     public function getByBasePath(string $basePath): ?SiteSectionInterface {
         if ($subCommunity = $this->subcommunityModel->getSite($basePath)) {
-            return new SubcommunitySiteSection($subCommunity, $this->productModel);
+            return new SubcommunitySiteSection($subCommunity);
         } else {
             return null;
         }
@@ -96,7 +96,7 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         $siteSections =[];
         $subCommunities = $this->subcommunityModel->getWhere(['locale' => $localeKey]);
         foreach ($subCommunities as $subCommunity) {
-            $siteSections[] =  new SubcommunitySiteSection($subCommunity, $this->productModel);
+            $siteSections[] =  new SubcommunitySiteSection($subCommunity);
         }
         return $siteSections;
     }
