@@ -305,7 +305,7 @@ class RanksPlugin extends Gdn_Plugin {
     private function getUserRank(array $user) {
         $result = null;
 
-        $rankID = $user['rankID'] ?? null;
+        $rankID = $user['rankID'] ?? $user['RankID'] ?? null;
         if ($rankID) {
             $rank = $this->rankModel->getID($rankID, DATASET_TYPE_ARRAY);
             if ($rank) {
@@ -691,22 +691,26 @@ class RanksPlugin extends Gdn_Plugin {
             if (isset($rank['CssClass'])) {
                 $cssClass = val('_CssClass', $args['User']);
                 $cssClass .= ' '.$rank['CssClass'];
-                setValue('_CssClass', $args['User'], trim($cssClass));
+                $args['User']['_CssClass'] = trim($cssClass);
             }
 
-            if (valr('Abilities.Signatures', $rank) == 'no') {
-                setValue('HideSignature', $args['User'], true);
+            if (($rank['Abilities']['Signatures'] ?? false) == 'no') {
+                $args['User']['HideSignature'] = true;
             }
 
-            if (valr('Abilities.Titles', $rank) == 'no') {
-                setValue('Title', $args['User'], '');
+            if (($rank['Abilities']['Titles'] ?? false) == 'no') {
+                // Strip away a title if it exists.
+                $args['User']['Title'] = '';
+            } elseif (!$args['User']['Title']) {
+                // Apply the rank title if it isn't set.
+                $args['User']['Title'] = $rank['Label'] ?? '';
             }
 
-            if (valr('Abilities.Locations', $rank) == 'no') {
-                setValue('Location', $args['User'], '');
+            if (($rank['Abilities']['Locations'] ?? false) == 'no') {
+                $args['User']['Location'] = '';
             }
 
-            $v = valr('Abilities.Verified', $rank, null);
+            $v = $rank['Abilities']['Verified'] ?? null;
             if (!is_null($v)) {
                 $verified = ['yes' => 1, 'no'  => 0];
                 $verified = val($v, $verified, null);
