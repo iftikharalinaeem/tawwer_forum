@@ -2,6 +2,7 @@
 
 use Vanilla\ApiUtils;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
@@ -23,18 +24,28 @@ class ReportModel extends Gdn_Model {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
     /**
      * DI.
      *
      * @param EmbedService $embedService
      * @param FormatService $formatService
      * @param UserModel $userModel
+     * @param CategoryModel $categoryModel
      */
-    public function __construct(EmbedService $embedService, FormatService $formatService, UserModel $userModel) {
+    public function __construct(
+        EmbedService $embedService,
+        FormatService $formatService,
+        UserModel $userModel,
+        CategoryModel $categoryModel
+) {
         parent::__construct('Comment');
         $this->embedService = $embedService;
         $this->formatService = $formatService;
         $this->userModel = $userModel;
+        $this->categoryModel = $categoryModel;
     }
 
 
@@ -110,7 +121,6 @@ class ReportModel extends Gdn_Model {
 
         // Can't find one, must create
         if (!$discussion) {
-
             // Get category for report discussions
             $category = self::getReportCategory();
             if (!$category) {
@@ -120,6 +130,9 @@ class ReportModel extends Gdn_Model {
             // Grab the context discussion for the reported record
             if (strcasecmp($data['RecordType'], 'Comment') == 0) {
                 $contextDiscussion = (array)$discussionModel->getID(val('DiscussionID', $reportedRecord));
+
+                // Comments get their title adjusted.
+                $contextDiscussion['Name'] = sprintf(t('Re: %s'), $contextDiscussion['Name']);
             } else {
                 $contextDiscussion = $reportedRecord;
             }
@@ -138,7 +151,8 @@ class ReportModel extends Gdn_Model {
             );
 
             // Build report name
-            $reportName = sprintf(t('[Reported] %s', "%s"),
+            $reportName = sprintf(
+                t('[Reported] %s', "%s"),
                 $contextDiscussion['Name'],
                 $reportedRecord['InsertName'], // Author Name
                 $contextDiscussion['Category']
@@ -222,6 +236,18 @@ class ReportModel extends Gdn_Model {
             $name = sprintf(t('Re: %s'), $name);
         }
 
+        $categoryID = $record['CategoryID'] ?? $record['Discussion']['CategoryID'] ?? null;
+        $category = $categoryID !== null ? CategoryModel::categories($categoryID) : null;
+        $category = $category !== null ? [
+            'categoryID' => $categoryID,
+            'name' => (array) $category['Name'],
+            'url' => CategoryModel::categoryUrl($category),
+        ] : null;
+
+        $discussionLink = $recordType === 'discussion'
+            ? $record['Url']
+            : $record['Discussion']['Url'] ?? null;
+
         $embed = new QuoteEmbed([
             "name" => $name,
             "embedType" => QuoteEmbed::TYPE,
@@ -233,9 +259,10 @@ class ReportModel extends Gdn_Model {
             "userID" => $userID,
             "insertUser" => $userRecord,
             "url" => $record['Url'],
+            "discussionLink" => $discussionLink,
             "dateInserted" =>  $record["DateInserted"],
-            "renderFullContent" => true,
-            "expandByDefault" => true,
+            "displayOptions" => QuoteEmbedDisplayOptions::full(),
+            'category' => $category,
         ]);
 
         $jsonOperations = [
@@ -243,10 +270,10 @@ class ReportModel extends Gdn_Model {
                 "insert" => [
                     "embed-external" => [
                         "data" => $embed,
-                        ],
                     ],
                 ],
-            ];
+            ],
+        ];
 
         return json_encode($jsonOperations);
     }
