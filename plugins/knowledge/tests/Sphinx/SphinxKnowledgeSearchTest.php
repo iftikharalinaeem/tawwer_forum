@@ -48,7 +48,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
      * Call sphinx server port to trigger reindexing
      */
     public static function sphinxReindex() {
-         $sphinxHost = empty(c('Plugins.Sphinx.Server')) ? 'sphinx' : c('Plugins.Sphinx.Server');
+         $sphinxHost = c('Plugins.Sphinx.Server');
          exec('curl '.$sphinxHost.':9399', $dockerResponse);
          self::$dockerResponse = $dockerResponse;
          self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
