@@ -107,7 +107,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     */
    public function testRecordTypesDiscussion() {
       if (!self::$sphinxReindexed)
-         $this->fail('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
+         $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
 
       $params = [
          'query' => self::$discussion['name'],
