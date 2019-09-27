@@ -29,6 +29,9 @@ class SphinxSearchTest extends AbstractAPIv2Test {
    /** @var bool */
    protected static $sphinxReindexed;
 
+   /** @var array */
+   protected static $dockerResponse;
+
     protected static $addons = ['vanilla', 'sphinx', 'advancedsearch'];
 
     /**
@@ -93,6 +96,7 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     public static function sphinxReindex() {
          $sphinxHost = c('Plugins.Sphinx.Server');
          exec('curl '.$sphinxHost.':9399', $dockerResponse);
+         self::$dockerResponse = $dockerResponse;
          self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
          sleep(1);
     }
