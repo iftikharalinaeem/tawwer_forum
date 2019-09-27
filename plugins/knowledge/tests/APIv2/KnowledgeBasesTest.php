@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Site\DefaultSiteSection;
@@ -306,7 +305,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             $this->baseUrl,
             ['siteSectionGroup' => $query]
         );
-
         $results = $results->getBody();
         $this->assertCount($expected, $results);
     }
