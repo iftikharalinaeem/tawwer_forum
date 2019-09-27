@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Site\DefaultSiteSection;
@@ -281,4 +282,62 @@ class KnowledgeBasesTest extends AbstractResourceTest {
 
         $this->assertEquals($knowledgeBase["rootCategoryID"], $article["knowledgeCategoryID"]);
     }
+
+    /**
+     * Test /knowledge-base with site-section filters.
+     *
+     * @param $query
+     * @param $expected
+     *
+     * @dataProvider filteringSiteSectionProvider
+     */
+    public function testFilteringBySiteSection($query, $expected) {
+        $knowledgeBases = $this->getKnowledgeBases();
+
+        foreach ($knowledgeBases as $knowledgeBase) {
+            $this->api()->patch(
+                $this->baseUrl.'/'.$knowledgeBase['knowledgeBaseID'],
+                ['siteSectionGroup' => 'subcommunities-group-1']);
+        }
+
+        $results = $this->api()->get(
+            $this->baseUrl,
+            ['siteSectionGroup' => $query]
+        );
+
+        $results = $results->getBody();
+        $this->assertCount($expected, $results);
+    }
+
+    /**
+     * Data provider for filteringBySiteSections test.
+     *
+     * @return array
+     */
+    public function filteringSiteSectionProvider() {
+        return [
+            ['subcommunities-group-1', 3],
+            ['subcommunities-group-2', 0],
+            ['all', 9],
+            [null, 0],
+        ];
+    }
+
+    /**
+     * Create multiple knowledge-bases for tests.
+     *
+     * @return array
+     */
+    protected function getKnowledgeBases(): array {
+        $knowledgeBases = [];
+        for ($i = 0; $i <= 2; $i++) {
+            $result = $this->api()->post(
+                $this->baseUrl,
+                $this->record(uniqid("testKB"))
+            );
+            $knowledgeBases[] = $result->getBody();
+        }
+        return $knowledgeBases;
+    }
+
 }
