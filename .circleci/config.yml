@@ -61,7 +61,7 @@ jobs:
                         echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
                         cat /etc/hosts
             -   run:
-                    name: APIv2 Tests
+                    name: APIv2 Sphinx Tests
                     command: |
                         cd ~/workspace/vanilla
                         ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx"
