@@ -8,62 +8,26 @@
 namespace Vanilla\Groups\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeTrait;
 
 class SearchRecordTypeGroup implements SearchRecordTypeInterface {
+    use SearchRecordTypeTrait;
+
     const PROVIDER_GROUP = 'sphinx';
 
     const TYPE = 'group';
 
-    const CHECKBOX_ID = 'group';
+    const API_TYPE_KEY = 'group';
+
+    const SUB_KEY = 'group';
 
     const CHECKBOX_LABEL = 'groups';
 
-    /**
-     * SearchRecordTypeAnswer constructor.
-     */
-    public function __construct() {
-        $this->key = self::TYPE;
-    }
+    const SPHINX_DTYPE = 400;
 
-    /**
-     * @inheritdoc
-     */
-    public function getKey(): string {
-        return $this->key;
-    }
+    const SPHINX_INDEX = 'Group';
 
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxId(): string {
-        return self::TYPE.'_'.self::CHECKBOX_ID;
-    }
+    const GUID_OFFSET = 4;
 
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxLabel(): string {
-        return self::CHECKBOX_LABEL;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFeatures(): array {
-        return $this->structure;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getModel() {
-        return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getProviderGroup(): string {
-        return self::PROVIDER_GROUP;
-    }
+    const GUID_MULTIPLIER = 10;
 }
