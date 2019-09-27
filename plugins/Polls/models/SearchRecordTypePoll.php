@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -8,62 +8,37 @@
 namespace Vanilla\Polls\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeTrait;
 
 class SearchRecordTypePoll implements SearchRecordTypeInterface {
+    use SearchRecordTypeTrait;
+
     const PROVIDER_GROUP = 'sphinx';
 
     const TYPE = 'discussion';
 
-    const CHECKBOX_ID = 'poll';
+    const API_TYPE_KEY = 'poll';
+
+    const SUB_KEY = 'poll';
 
     const CHECKBOX_LABEL = 'polls';
 
-    /**
-     * SearchRecordTypePoll constructor.
-     */
-    public function __construct() {
-        $this->key = self::TYPE;
-    }
+    const SPHINX_DTYPE = 2;
+
+    const SPHINX_INDEX = 'Discussion';
+
+    const GUID_OFFSET = 1;
+
+    const GUID_MULTIPLIER = 10;
 
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return $this->key;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxId(): string {
-        return self::TYPE.'_'.self::CHECKBOX_ID;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCheckBoxLabel(): string {
-        return self::CHECKBOX_LABEL;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFeatures(): array {
-        return $this->structure;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getModel() {
-        return '';
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getProviderGroup(): string {
-        return self::PROVIDER_GROUP;
+    public function getDocuments(array $IDs, \SearchModel $searchModel): array {
+        $result = $searchModel->getDiscussions($IDs);
+        foreach ($result as &$record) {
+            $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
+        }
+        return $result;
     }
 }

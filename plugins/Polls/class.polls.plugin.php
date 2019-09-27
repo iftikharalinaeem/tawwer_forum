@@ -34,7 +34,7 @@ class PollsPlugin extends Gdn_Plugin {
          * Register additional advanced search sphinx record type Poll
          */
         $dic
-            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->rule(SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypePoll()])
         ;
     }
