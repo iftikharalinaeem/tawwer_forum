@@ -25,7 +25,10 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
         self::createSubcommunities();
     }
 
-    public function getProvider() {
+    /**
+     * Set the site section provider.
+     */
+    public function setProvider() {
         $this->provider = static::container()->get(SubcomunitiesSiteSectionProvider::class);
     }
 
@@ -33,7 +36,7 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Test for getAll.
      */
     public function testGetAll() {
-        $this->getProvider();
+        $this->setProvider();
         $all = $this->provider->getAll();
         $this->assertCount(6, $all);
     }
@@ -42,16 +45,17 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Test for getByID.
      */
     public function testGetByID() {
-        $this->getProvider();
+        $this->setProvider();
         $subcomunnitySiteSection = $this->provider->getByID(1);
         $this->assertEquals("es", $subcomunnitySiteSection->getContentLocale());
+        $this->assertEquals("subcommunities-section-1", $subcomunnitySiteSection->getSectionID());
     }
 
     /**
      * Test for getByBasePath.
      */
     public function testGetByBasePath() {
-        $this->getProvider();
+        $this->setProvider();
         $subcomunnitySiteSection = $this->provider->getByBasePath("ru");
         $this->assertEquals("ru", $subcomunnitySiteSection->getContentLocale());
     }
@@ -60,7 +64,7 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Test for getForLocale.
      */
     public function testGetForLocale() {
-        $this->getProvider();
+        $this->setProvider();
         $subcomunnitySiteSections = $this->provider->getForLocale("en");
         $this->assertCount(2, $subcomunnitySiteSections);
     }
@@ -69,11 +73,14 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Test for getCurrentSiteSection.
      */
     public function testGetCurrentSiteSection() {
-        $this->getProvider();
+        $this->setProvider();
         $subcomunnitySiteSections = $this->provider->getCurrentSiteSection();
         $this->assertEquals("es", $subcomunnitySiteSections->getContentLocale() );
     }
-    
+
+    /**
+     * Create subcommunities for Tests.
+     */
     private static function createSubcommunities() {
        $subcommunityModel = static::container()->get(\SubcommunityModel::class);
        $rows = [
