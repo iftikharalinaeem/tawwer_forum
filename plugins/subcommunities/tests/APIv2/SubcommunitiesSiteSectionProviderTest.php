@@ -48,7 +48,6 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
         $this->setProvider();
         $subcomunnitySiteSection = $this->provider->getByID(1);
         $this->assertEquals("es", $subcomunnitySiteSection->getContentLocale());
-        $this->assertEquals("subcommunities-section-1", $subcomunnitySiteSection->getSectionID());
     }
 
     /**
