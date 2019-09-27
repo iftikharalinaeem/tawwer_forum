@@ -7,8 +7,8 @@
 
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use CommentsApiController;
-use CategoryModel;
+use \CommentsApiController;
+use \CategoryModel;
 
 class SphinxSearchCommentsExtentionTest extends AbstractAPIv2Test {
 
