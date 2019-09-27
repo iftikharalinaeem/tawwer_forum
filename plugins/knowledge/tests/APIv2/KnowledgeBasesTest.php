@@ -292,7 +292,9 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      * @dataProvider filteringSiteSectionProvider
      */
     public function testFilteringBySiteSection($query, $expected) {
-        $knowledgeBases = $this->getKnowledgeBases();
+        /** @var KnowledgeBaseModel */
+        $knowledgeModel = self::container()->get(KnowledgeBaseModel::class);
+        $knowledgeBases = $knowledgeModel->get();
 
         foreach ($knowledgeBases as $knowledgeBase) {
             $this->api()->patch(
@@ -316,28 +318,10 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      */
     public function filteringSiteSectionProvider() {
         return [
-            ['subcommunities-group-1', 3],
+            ['subcommunities-group-1', 7],
             ['subcommunities-group-2', 0],
-            ['all', 9],
+            ['all', 7],
             [null, 0],
         ];
     }
-
-    /**
-     * Create multiple knowledge-bases for tests.
-     *
-     * @return array
-     */
-    protected function getKnowledgeBases(): array {
-        $knowledgeBases = [];
-        for ($i = 0; $i <= 2; $i++) {
-            $result = $this->api()->post(
-                $this->baseUrl,
-                $this->record(uniqid("testKB"))
-            );
-            $knowledgeBases[] = $result->getBody();
-        }
-        return $knowledgeBases;
-    }
-
 }
