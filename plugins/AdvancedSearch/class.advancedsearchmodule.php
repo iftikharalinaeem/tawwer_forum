@@ -44,9 +44,8 @@ class AdvancedSearchModule extends Gdn_Module {
             '1 year' => plural(1, '%s year', '%s years')
         ];
 
-        //if (class_exists(\Vanilla\Sphinx\SphinxSearchModel::class)) {
         /** @var SearchRecordTypeProviderInterface $recordTypesProvider */
-        if ($recordTypesProvider = Gdn::getContainer()->get('SearchRecordTypesProvider')) {
+        if ($recordTypesProvider = Gdn::getContainer()->get('SearchRecordTypeProvider')) {
             $this->Types = $recordTypesProvider->getAll();
         }
     }

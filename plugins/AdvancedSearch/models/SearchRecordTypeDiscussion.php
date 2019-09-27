@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -8,27 +8,42 @@
 namespace Vanilla\AdvancedSearch\Models;
 
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeTrait;
+use SphinxSearchModel;
 
-class SearchRecordTypeDiscussion extends BasicSearchRecordType {
+/**
+ * Class SearchRecordTypeDiscussion
+ * @package Vanilla\AdvancedSearch\Models
+ */
+class SearchRecordTypeDiscussion implements SearchRecordTypeInterface {
+    use SearchRecordTypeTrait;
+
+    const PROVIDER_GROUP = 'advanced';
+
     const TYPE = 'discussion';
 
-    const CHECKBOX_ID = 'd';
+    const API_TYPE_KEY = 'discussion';
+
+    const SUB_KEY = 'd';
 
     const CHECKBOX_LABEL = 'discussions';
 
-    public function __construct() {
-        $this->key = self::TYPE;
-    }
+    const SPHINX_DTYPE = 0;
 
-    public function getKey(): string {
-        return $this->key;
-    }
+    const SPHINX_INDEX = 'Discussion';
 
-    public function getCheckBoxId(): string {
-        return self::TYPE.'_'.self::CHECKBOX_ID;
-    }
+    const GUID_OFFSET = 1;
 
-    public function getCheckBoxLabel(): string {
-        return self::CHECKBOX_LABEL;
+    const GUID_MULTIPLIER = 10;
+
+    /**
+     * @inheritdoc
+     */
+    public function getDocuments(array $IDs, \SearchModel $searchModel): array {
+        $result = $searchModel->getDiscussions($IDs);
+        foreach ($result as &$record) {
+            $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
+        }
+        return $result;
     }
 }
