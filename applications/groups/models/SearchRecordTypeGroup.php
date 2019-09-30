@@ -30,4 +30,15 @@ class SearchRecordTypeGroup implements SearchRecordTypeInterface {
     const GUID_OFFSET = 4;
 
     const GUID_MULTIPLIER = 10;
+
+    /**
+     * @inheritdoc
+     */
+    public function getDocuments(array $IDs, \SearchModel $searchModel): array {
+        $result = $searchModel->getGroups($IDs);
+        foreach ($result as &$record) {
+            $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
+        }
+        return $result;
+    }
 }
