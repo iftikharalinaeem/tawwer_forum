@@ -75,11 +75,11 @@ class SearchApiController extends AbstractApiController {
             $this->searchResultSchema = $this->schema([
                 'recordID:i' => 'The identifier of the record.',
                 'recordType:s' => [
-                    'enum' => ['discussion', 'comment', 'article'],
+                    'enum' => ['discussion', 'comment'],
                     'description' => 'The main type of record.',
                 ],
                 'type:s' => [
-                    'enum' => ['discussion', 'comment', 'poll', 'article'],
+                    'enum' => ['discussion', 'comment'],
                     'description' => 'Sub-type of the discussion.',
                 ],
                 'discussionID:i?' => 'The id of the discussion.',
@@ -223,6 +223,7 @@ class SearchApiController extends AbstractApiController {
             ->addValidator('', $validator)
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
+
         $query = $in->validate($query);
         if (isset($query['dateInserted'])) {
             $query['dateFilters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
@@ -296,12 +297,17 @@ class SearchApiController extends AbstractApiController {
             $query['types'] = $this->fullSchema()->getField('properties.type.enum');
         }
 
-        $types = $query['recordTypes'];
-        foreach ($types as $type) {
+        $queryRecordTypes = $query['recordTypes'];
+        $queryTypes = $query['types'] ?? [];
+        foreach ($queryRecordTypes as $queryRecordType) {
             /** @var SearchRecordTypeInterface $recordType */
             foreach ($recordTypes as $recordType) {
-                if ($type === $recordType->getApiTypeKey()) {
-                    $result['types'][] = $recordType;
+                if ($queryRecordType === $recordType->getKey()) {
+                    if (empty($queryTypes)) {
+                        $result['types'][] = $recordType;
+                    } elseif (in_array($recordType->getApiTypeKey(), $queryTypes)) {
+                        $result['types'][] = $recordType;
+                    }
                 }
             }
         }
