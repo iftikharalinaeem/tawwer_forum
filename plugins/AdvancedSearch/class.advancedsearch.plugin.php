@@ -377,23 +377,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $Row['DateHtml'] = Gdn_Format::date($Row['DateInserted'], 'html');
             $Row['Notes'] = $calc($Row, $SearchTerms);
 
-            $Type = strtolower(val('Type', $Row));
-            if (isset($Row['CommentID'])) {
-                if ($Type == 'question') {
-                    $Type = 'answer';
-                } else {
-                    $Type = 'comment';
-                }
-            } elseif (isset($Row['PageID'])) {
-                $Type = 'doc';
-            } else {
-                if (!$Type) {
-                    $Type = 'discussion';
-                } elseif ($Type == 'page' && isset($Row['DiscussionID'])) {
-                    $Type = 'link';
-                }
-            }
-            $Row['Type'] = $Type;
+            $Row['Type'] = $Row['Type'] ?? SearchRecordTypeDiscussion::API_TYPE_KEY;
 
             // Add breadcrumbs for discussions.
             if ($UseCategories && isset($Row['CategoryID'])) {

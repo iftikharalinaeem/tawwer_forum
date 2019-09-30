@@ -26,7 +26,7 @@ class Search {
      * @param bool $api Whether the data comes from the UI or the API.
      * @return array
      */
-    public static function cleanSearch($search, $api = false) {
+    public static function cleanSearch($search = [], $api = false) {
         $search = array_change_key_case($search);
         $search = array_map(function ($v) {
             return is_string($v) ? trim($v) : $v;
@@ -35,6 +35,8 @@ class Search {
             return $v !== '';
         });
         $doSearch = false;
+
+        $enableAllTypes = (count($search) === 1 && isset($search['search']));
 
         /// Author ///
         if (isset($search['author'])) {
@@ -193,17 +195,20 @@ class Search {
         }
 
         if (!$api) {
-            /// Types ///
-            $types = [];
-            /** @var SearchRecordTypeInterface $recordType */
-            foreach (self::types() as $recordType) {
-                $key = $recordType->getCheckBoxId();
-                if ($search[$key] ?? false) {
-                    $types[] = $recordType;
+            // Types //
+            if ($enableAllTypes) {
+                $search['types'] = self::types();
+            } else {
+                $types = [];
+                /** @var SearchRecordTypeInterface $recordType */
+                foreach (self::types() as $recordType) {
+                    $key = $recordType->getCheckBoxId();
+                    if ($search[$key] ?? false) {
+                        $types[] = $recordType;
+                    }
                 }
+                $search['types'] = $types;
             }
-            $search['types'] = $types;
-
         }
 
 
