@@ -45,9 +45,9 @@ class AdvancedSearchModule extends Gdn_Module {
         ];
 
         /** @var SearchRecordTypeProviderInterface $recordTypesProvider */
-        if ($recordTypesProvider = Gdn::getContainer()->get('SearchRecordTypeProvider')) {
-            $this->Types = $recordTypesProvider->getAll();
-        }
+        $recordTypesProvider = Gdn::getContainer()->get(SearchRecordTypeProviderInterface::class);
+        $this->Types = $recordTypesProvider->getAll();
+
     }
 
     public static function addAssets() {
