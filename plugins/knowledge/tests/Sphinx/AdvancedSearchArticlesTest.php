@@ -35,6 +35,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
     /** @var bool */
     protected static $sphinxReindexed;
 
+    /** @var array */
+    protected static $dockerResponse;
+
     protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'advancedsearch'];
 
     /**
@@ -121,7 +124,8 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
     public static function sphinxReindex() {
         $sphinxHost = c('Plugins.Sphinx.Server');
         exec('curl '.$sphinxHost.':9399', $dockerResponse);
-        self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
+        self::$dockerResponse = $dockerResponse;
+        self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
         sleep(1);
     }
 
@@ -131,7 +135,7 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      */
     public function testRecordTypesDiscussion() {
         if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end($dockerResponse));
+            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
 
         $params = [
             'query' => self::$discussion['name'],
