@@ -296,17 +296,11 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $knowledgeBases = $knowledgeModel->get();
 
         for ($i = 0; $i <= 2; $i++) {
-            if ($i !== 2) {
-                $this->api()->patch(
-                    $this->baseUrl.'/'.$knowledgeBases[$i]['knowledgeBaseID'],
-                    ['siteSectionGroup' => 'subcommunities-group-1']
-                );
-            } else {
-                $this->api()->patch(
-                    $this->baseUrl . '/' . $knowledgeBases[$i]['knowledgeBaseID'],
-                    ['siteSectionGroup' => 'subcommunities-group-2']
-                );
-            }
+            $siteSectionGroup = ($i !== 2) ? 'subcommunities-group-1' : 'subcommunities-group-2';
+            $this->api()->patch(
+                $this->baseUrl.'/'.$knowledgeBases[$i]['knowledgeBaseID'],
+                ['siteSectionGroup' => $siteSectionGroup]
+            );
         }
 
         $results = $this->api()->get(
