@@ -7,6 +7,7 @@
 use Garden\Container\Container;
 use Vanilla\Polls\Models\SearchRecordTypePoll;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Garden\Schema\Schema;
 
 /**
  * Class PollsPlugin
@@ -231,6 +232,17 @@ class PollsPlugin extends Gdn_Plugin {
         if (strcasecmp(val('Type', $discussion), 'Poll') == 0) {
             echo tag($discussion, 'Type', 'Poll');
         }
+    }
+
+    /**
+     * Add QnA fields to the search schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'poll';
+        $schema->setField('properties.type.enum', $types);
     }
 
     /**
