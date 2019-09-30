@@ -23,10 +23,11 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $Results = false; // whether or not to show results in the form.
 
+    public $Types = [];
     /**
      * @var SearchRecordTypeInterface[] $Types
      */
-    public $Types = [];
+    public $recordTypes = [];
 
     public $value = null;
 
@@ -46,7 +47,10 @@ class AdvancedSearchModule extends Gdn_Module {
 
         /** @var SearchRecordTypeProviderInterface $recordTypesProvider */
         $recordTypesProvider = Gdn::getContainer()->get(SearchRecordTypeProviderInterface::class);
-        $this->Types = $recordTypesProvider->getAll();
+        $this->recordTypes = $recordTypesProvider->getAll();
+        foreach ($this->recordTypes as $recordType) {
+            $this->Types[$recordType->getCheckBoxId()] = $recordType->getCheckBoxLabel();
+        }
 
     }
 
@@ -90,14 +94,14 @@ class AdvancedSearchModule extends Gdn_Module {
         // See whether or not to check all of the  types.
         $onechecked = false;
         /** @var SearchRecordTypeInterface $recordType */
-        foreach ($this->Types as $recordType) {
+        foreach ($this->recordTypes as $recordType) {
             if ($form->getFormValue($recordType->getCheckBoxId())) {
                 $onechecked = true;
                 break;
             }
         }
         if (!$onechecked) {
-            foreach ($this->Types as $recordType) {
+            foreach ($this->recordTypes as $recordType) {
                 $form->setFormValue($recordType->getCheckBoxId(), true);
             }
         }
