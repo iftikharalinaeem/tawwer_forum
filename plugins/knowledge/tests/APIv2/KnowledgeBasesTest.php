@@ -295,10 +295,18 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $knowledgeModel = self::container()->get(KnowledgeBaseModel::class);
         $knowledgeBases = $knowledgeModel->get();
 
-        foreach ($knowledgeBases as $knowledgeBase) {
-            $this->api()->patch(
-                $this->baseUrl.'/'.$knowledgeBase['knowledgeBaseID'],
-                ['siteSectionGroup' => 'subcommunities-group-1']);
+        for ($i = 0; $i <= 2; $i++) {
+            if ($i !== 2) {
+                $this->api()->patch(
+                    $this->baseUrl.'/'.$knowledgeBases[$i]['knowledgeBaseID'],
+                    ['siteSectionGroup' => 'subcommunities-group-1']
+                );
+            } else {
+                $this->api()->patch(
+                    $this->baseUrl . '/' . $knowledgeBases[$i]['knowledgeBaseID'],
+                    ['siteSectionGroup' => 'subcommunities-group-2']
+                );
+            }
         }
 
         $results = $this->api()->get(
@@ -309,6 +317,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $this->assertCount($expected, $results);
     }
 
+
     /**
      * Data provider for filteringBySiteSections test.
      *
@@ -316,10 +325,11 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      */
     public function filteringSiteSectionProvider() {
         return [
-            ['subcommunities-group-1', 7],
-            ['subcommunities-group-2', 0],
+            ['subcommunities-group-1', 2],
+            ['subcommunities-group-2', 1],
+            ['subcommunities-group-3', 0],
             ['all', 7],
-            [null, 0],
+            [null, 4],
         ];
     }
 }
