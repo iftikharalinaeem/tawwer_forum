@@ -285,8 +285,8 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /**
      * Test /knowledge-base with site-section filters.
      *
-     * @param $query
-     * @param $expected
+     * @param string $query Query string for API call.
+     * @param int $expected Expected number of rows returned.
      *
      * @dataProvider filteringSiteSectionProvider
      */
