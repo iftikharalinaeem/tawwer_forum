@@ -281,4 +281,49 @@ class KnowledgeBasesTest extends AbstractResourceTest {
 
         $this->assertEquals($knowledgeBase["rootCategoryID"], $article["knowledgeCategoryID"]);
     }
+
+    /**
+     * Test /knowledge-base with site-section filters.
+     *
+     * @param string $query Query string for API call.
+     * @param int $expected Expected number of rows returned.
+     *
+     * @dataProvider filteringSiteSectionProvider
+     */
+    public function testFilteringBySiteSection($query, $expected) {
+        /** @var KnowledgeBaseModel */
+        $knowledgeModel = self::container()->get(KnowledgeBaseModel::class);
+        $knowledgeBases = $knowledgeModel->get();
+
+        for ($i = 0; $i <= 2; $i++) {
+            $siteSectionGroup = ($i !== 2) ? 'subcommunities-group-1' : 'subcommunities-group-2';
+            $this->api()->patch(
+                $this->baseUrl.'/'.$knowledgeBases[$i]['knowledgeBaseID'],
+                ['siteSectionGroup' => $siteSectionGroup]
+            );
+        }
+
+        $results = $this->api()->get(
+            $this->baseUrl,
+            ['siteSectionGroup' => $query]
+        );
+        $results = $results->getBody();
+        $this->assertCount($expected, $results);
+    }
+
+
+    /**
+     * Data provider for filteringBySiteSections test.
+     *
+     * @return array
+     */
+    public function filteringSiteSectionProvider() {
+        return [
+            ['subcommunities-group-1', 2],
+            ['subcommunities-group-2', 1],
+            ['subcommunities-group-3', 0],
+            ['all', 7],
+            [null, 4],
+        ];
+    }
 }
