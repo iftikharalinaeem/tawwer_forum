@@ -8,7 +8,6 @@
 use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
-use Vanilla\AdvancedSearch\Models\BasicSearchRecordType;
 use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
 use Vanilla\AdvancedSearch\Models\SearchRecordTypeComment;
 use Vanilla\AdvancedSearch\Models\SearchRecordTypeProvider;

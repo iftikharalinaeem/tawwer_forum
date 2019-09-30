@@ -37,6 +37,7 @@ class SearchRecordTypePoll implements SearchRecordTypeInterface {
     public function getDocuments(array $IDs, \SearchModel $searchModel): array {
         $result = $searchModel->getDiscussions($IDs);
         foreach ($result as &$record) {
+            $record['Type'] = self::SUB_KEY;
             $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
         }
         return $result;
