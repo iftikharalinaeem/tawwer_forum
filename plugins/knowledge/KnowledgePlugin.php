@@ -23,6 +23,7 @@ use Vanilla\Models\ThemeModel;
 use Vanilla\Knowledge\Models\KnowledgeVariablesProvider;
 use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Garden\Schema\Schema;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -176,7 +177,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
     public function searchResultSchema_init(Schema $schema) {
         $recordTypes = $schema->getField('properties.recordType.enum');
         $recordTypes[] = 'article';
-        $schema->setField('properties.type.enum', $recordTypes);
+        $schema->setField('properties.recordType.enum', $recordTypes);
         $types = $schema->getField('properties.type.enum');
         $types[] = 'article';
         $schema->setField('properties.type.enum', $types);
