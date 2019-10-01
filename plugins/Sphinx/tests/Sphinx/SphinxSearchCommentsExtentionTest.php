@@ -45,7 +45,7 @@ class SphinxSearchCommentsExtentionTest extends AbstractAPIv2Test {
    /** @var array */
    protected static $dockerResponse;
 
-   protected static $addons = ['vanilla', 'sphinx', 'advancedsearch'];
+   protected static $addons = ['vanilla', 'sphinx'];
 
     /**
      * {@inheritdoc}

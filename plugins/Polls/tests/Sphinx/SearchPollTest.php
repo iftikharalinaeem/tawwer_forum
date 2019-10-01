@@ -40,7 +40,7 @@ class SearchPollTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $dockerResponse;
 
-    protected static $addons = ['vanilla', 'sphinx', 'polls', 'advancedsearch'];
+    protected static $addons = ['vanilla', 'sphinx', 'polls'];
 
     /**
      * {@inheritdoc}
