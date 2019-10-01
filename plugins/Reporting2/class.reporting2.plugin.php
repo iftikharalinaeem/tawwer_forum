@@ -188,6 +188,12 @@ class Reporting2Plugin extends Gdn_Plugin {
         } else {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
+
+            if ($recordType === "discussion") {
+                $discussionModel = new DiscussionModel();
+                $row = $discussionModel->fixRow($row);
+            }
+
             $quoteHtml = $this->renderQuote($row, $recordType, $iD);
             $sender->setData('quote', $quoteHtml);
         }

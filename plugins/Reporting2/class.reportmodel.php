@@ -27,6 +27,9 @@ class ReportModel extends Gdn_Model {
     /** @var CategoryModel */
     private $categoryModel;
 
+    /** @var DiscussionModel */
+    private $discussionModel;
+
     /**
      * DI.
      *
@@ -34,18 +37,21 @@ class ReportModel extends Gdn_Model {
      * @param FormatService $formatService
      * @param UserModel $userModel
      * @param CategoryModel $categoryModel
+     * @param DiscussionModel $discussionModel
      */
     public function __construct(
         EmbedService $embedService,
         FormatService $formatService,
         UserModel $userModel,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        DiscussionModel $discussionModel
 ) {
         parent::__construct('Comment');
         $this->embedService = $embedService;
         $this->formatService = $formatService;
         $this->userModel = $userModel;
         $this->categoryModel = $categoryModel;
+        $this->discussionModel = $discussionModel;
     }
 
 
@@ -102,6 +108,11 @@ class ReportModel extends Gdn_Model {
         $recordType = $data['RecordType'];
         $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
+        
+        if ($recordType === "discussion") {
+            $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
+        }
+
         if (!$reportedRecord) {
             $this->Validation->addValidationResult('RecordID', 'ErrorRecordNotFound');
         }
