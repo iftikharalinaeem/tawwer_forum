@@ -41,7 +41,7 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $dockerResponse;
 
-    protected static $addons = ['vanilla', 'knowledge'];
+    protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
 
     /**
      * {@inheritdoc}

@@ -33,7 +33,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
    /** @var bool */
     protected static $sphinxReindexed;
 
-    protected static $addons = ['vanilla', 'knowledge'];
+    protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
 
     /**
      * {@inheritdoc}
