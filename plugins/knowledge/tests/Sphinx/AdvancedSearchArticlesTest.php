@@ -41,7 +41,7 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $dockerResponse;
 
-    protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'advancedsearch'];
+    protected static $addons = ['vanilla', 'knowledge'];
 
     /**
      * {@inheritdoc}
@@ -118,7 +118,7 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
         self::SphinxReindex();
 
         /** @var SearchApiController $searchAPIController */
-        $searchAPIController = static::container()->get('SearchApiController');
+        $searchAPIController = static::container()->get(SearchApiController::class);
         self::$searchResultSchema = $searchAPIController->fullSchema();
 
         $session->end();
