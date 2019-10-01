@@ -11,6 +11,8 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 
 /**
  * Class SearchApiController
@@ -38,6 +40,9 @@ class SearchApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var SearchRecordTypeProviderInterface */
+    private $searchRecordTypeProvider;
+
     /**
      * SearchApiController constructor.
      *
@@ -50,12 +55,14 @@ class SearchApiController extends AbstractApiController {
         CommentModel $commentModel,
         DiscussionModel $discussionModel,
         SearchModel $searchModel,
-        UserModel $userModel
+        UserModel $userModel,
+        SearchRecordTypeProviderInterface $searchRecordTypeProvider
     ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
         $this->userModel = $userModel;
+        $this->searchRecordTypeProvider =$searchRecordTypeProvider;
     }
 
     /**
@@ -276,7 +283,8 @@ class SearchApiController extends AbstractApiController {
             'tags' => 'tags',
             'tagOperator' => 'tags-op',
         ];
-        $recordTypeMap = Search::types();
+        $recordTypes = $this->searchRecordTypeProvider->getAll();
+
 
         $result = [
             'types' => [],
@@ -289,25 +297,17 @@ class SearchApiController extends AbstractApiController {
             $query['types'] = $this->fullSchema()->getField('properties.type.enum');
         }
 
-        $types = $query['recordTypes'];
-        $subTypes = $query['types'];
-        foreach ($types as $type) {
-            if (isset($recordTypeMap[$type])) {
-                foreach ($subTypes as $subType) {
-                    if ($subType === 'discussion') {
-                        $subType = 'd';
-                    } else if ($subType === 'comment') {
-                        $subType = 'c';
-                    // Until we rework sphinx. See TODO LINK PR.
-                    } else if ($type === 'comment' && $subType === 'question') {
-                        $subType = 'answer';
+        $queryRecordTypes = $query['recordTypes'];
+        $queryTypes = $query['types'] ?? [];
+        foreach ($queryRecordTypes as $queryRecordType) {
+            /** @var SearchRecordTypeInterface $recordType */
+            foreach ($recordTypes as $recordType) {
+                if ($queryRecordType === $recordType->getKey()) {
+                    if (empty($queryTypes)) {
+                        $result['types'][] = $recordType;
+                    } elseif (in_array($recordType->getApiTypeKey(), $queryTypes)) {
+                        $result['types'][] = $recordType;
                     }
-                    if (isset($recordTypeMap[$type][$subType])) {
-                        $result['types'][$type][] = $subType;
-                    }
-                }
-                if (empty($result['types'][$type])) {
-                    $result['types'][$type] = array_keys($recordTypeMap[$type]);
                 }
             }
         }
@@ -345,7 +345,7 @@ class SearchApiController extends AbstractApiController {
             'type' => null,
             'categoryID' => $searchRecord['CategoryID'],
             'name' => $searchRecord['Title'],
-            'body' => Gdn_Format::to($searchRecord['Summary'], $searchRecord['Format']),
+            'body' => Gdn::formatService()->renderHTML($searchRecord['Summary'], $searchRecord['Format']),
             'score' => $searchRecord['Score'] ?? 0,
             'insertUserID' => $searchRecord['UserID'],
             'dateInserted' => $searchRecord['DateInserted'],

@@ -9,6 +9,8 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 
 class Search {
     /// Properties ///
@@ -24,7 +26,7 @@ class Search {
      * @param bool $api Whether the data comes from the UI or the API.
      * @return array
      */
-    public static function cleanSearch($search, $api = false) {
+    public static function cleanSearch($search = [], $api = false) {
         $search = array_change_key_case($search);
         $search = array_map(function ($v) {
             return is_string($v) ? trim($v) : $v;
@@ -33,6 +35,8 @@ class Search {
             return $v !== '';
         });
         $doSearch = false;
+
+        $enableAllTypes = (count($search) === 1 && isset($search['search']));
 
         /// Author ///
         if (isset($search['author'])) {
@@ -54,10 +58,10 @@ class Search {
 
         /// Category ///
         $categoryFilter = [];
-        $archived = getValue('archived', $search, 0);
-        $followedCats = getValue('followedcats', $search, 0);
-        $categoryID = getValue('cat', $search);
-        if (strcasecmp($categoryID, 'all') === 0) {
+        $archived = $search['archived'] ?? 0;
+        $followedCats = $search['followedcats'] ?? 0;
+        $categoryID = $search['cat'] ?? null;
+        if ('all' === $categoryID) {
             $categoryID = null;
         }
 
@@ -191,37 +195,19 @@ class Search {
         }
 
         if (!$api) {
-            /// Types ///
-            $types = [];
-            $typecount = 0;
-            $selectedcount = 0;
-
-            foreach (self::types() as $table => $type) {
-                $allselected = true;
-
-                foreach ($type as $name => $label) {
-                    $typecount++;
-                    $key = $table.'_'.$name;
-
-                    if (getValue($key, $search)) {
-                        $selectedcount++;
-                        $types[$table][] = $name;
-                    } else {
-                        $allselected = false;
-                    }
-                    unset($search[$key]);
-                }
-                // If all of the types are selected then don't filter.
-                if ($allselected) {
-                    unset($type[$table]);
-                }
-            }
-
-            // At least one type has to be selected to filter.
-            if ($selectedcount > 0 && $selectedcount < $typecount) {
-                $search['types'] = $types;
+            // Types //
+            if ($enableAllTypes) {
+                $search['types'] = self::types();
             } else {
-                unset($search['types']);
+                $types = [];
+                /** @var SearchRecordTypeInterface $recordType */
+                foreach (self::types() as $recordType) {
+                    $key = $recordType->getCheckBoxId();
+                    if ($search[$key] ?? false) {
+                        $types[] = $recordType;
+                    }
+                }
+                $search['types'] = $types;
             }
         }
 
@@ -354,29 +340,9 @@ EOT;
      */
     public static function types() {
         if (!isset(self::$types)) {
-            $types = [
-                'discussion' => ['d' => 'discussions'],
-                'comment' => ['c' => 'comments']
-            ];
-
-            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
-                $types['discussion']['question'] = 'questions';
-                $types['comment']['answer'] = 'answers';
-            }
-
-            if (Gdn::addonManager()->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
-                $types['discussion']['poll'] = 'polls';
-            }
-
-            if (Gdn::addonManager()->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
-                $types['page']['p'] = 'docs';
-            }
-
-            if (Gdn::addonManager()->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
-                $types['group']['group'] = 'group';
-            }
-
-            self::$types = $types;
+            /** @var SearchRecordTypeProviderInterface $recordTypeProvider */
+            $recordTypeProvider = Gdn::getContainer()->get(\Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class);
+            self::$types = $recordTypeProvider->getAll();
         }
 
         return self::$types;

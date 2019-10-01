@@ -7,6 +7,7 @@
 use Garden\Container\Container;
 use Garden\Schema\Schema;
 use Interop\Container\ContainerInterface;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
 
 /**
  * Sphinx Plugin
@@ -15,6 +16,7 @@ use Interop\Container\ContainerInterface;
  * @package internal
  */
 class SphinxPlugin extends Gdn_Plugin {
+   const PROVIDER_GROUP = 'sphinx';
 
     /** The highest value for "limit" in the default, generic schema. */
     const MAX_SCHEMA_LIMIT = 100;
@@ -63,6 +65,8 @@ class SphinxPlugin extends Gdn_Plugin {
         $dic->rule(\SearchModel::class)
             ->setShared(true)
             ->setClass(\SphinxSearchModel::class)
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->addCall('addProviderGroup', [self::PROVIDER_GROUP])
         ;
     }
 
@@ -182,16 +186,17 @@ class SphinxPlugin extends Gdn_Plugin {
             ->merge($this->searchSchema())
             ->setDescription('Search discussions.');
         $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
-
         $query = $sender->filterValues($query);
         $query = $in->validate($query);
+
         list($offset, $limit) = offsetLimit(
             "p{$query['page']}",
             $query['limit']
         );
         $params = [
             'group' => false,
-            'discussion_d' => 1
+            'discussion_d' => 1,
+            'types' => [new SearchRecordTypeDiscussion()]
         ];
 
         if (array_key_exists('categoryID', $query)) {
@@ -210,7 +215,6 @@ class SphinxPlugin extends Gdn_Plugin {
             $offset,
             $query['expand']
         );
-
         foreach ($result as &$row) {
             $row = $sender->normalizeOutput($row);
         }

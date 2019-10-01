@@ -18,7 +18,7 @@ abstract class AbstractPollsSubResource extends AbstractAPIv2Test {
      * {@inheritdoc}
      */
     public static function setupBeforeClass() {
-        self::$addons = ['vanilla', 'polls'];
+        self::$addons = ['vanilla', 'polls', 'advancedsearch'];
 
         parent::setupBeforeClass();
 

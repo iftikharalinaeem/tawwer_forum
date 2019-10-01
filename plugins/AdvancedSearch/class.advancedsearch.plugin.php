@@ -8,6 +8,12 @@
 use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeComment;
+use Vanilla\AdvancedSearch\Models\SearchRecordTypeProvider;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Garden\Container\Container;
 
 /**
  * Class AdvancedSearchPlugin
@@ -15,7 +21,11 @@ use Vanilla\AddonManager;
 class AdvancedSearchPlugin extends Gdn_Plugin {
     /// Properties ///
 
-    public static $Types;
+    /**
+     * @var array
+     * @deprecated
+     */
+    //public static $Types = [];
 
     /**
      * @var AddonManager
@@ -45,33 +55,20 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         $this->addonManager = $addonManager;
         $this->container = $container;
-
-        self::$Types = [
-            'discussion' => ['d' => 'discussions'],
-            'comment' => ['c' => 'comments']
-        ];
-
-        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
-            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['question'] = 'questions';
-                self::$Types['comment']['answer'] = 'answers';
-            }
-
-            if ($this->addonManager->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['discussion']['poll'] = 'polls';
-            }
-
-            if ($this->addonManager->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['page']['p'] = 'docs';
-            }
-
-            $group = $this->addonManager->lookupAddon('Groups');
-            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
-                self::$Types['group']['group'] = 'groups';
-            }
-        }
-
         $this->fireEvent('Init');
+    }
+
+    public function container_init(Container $dic) {
+        $dic
+            ->rule(SearchRecordTypeProviderInterface::class)
+            ->setClass(SearchRecordTypeProvider::class)
+            ->addCall('setType', [new SearchRecordTypeDiscussion()])
+            ->addCall('setType', [new SearchRecordTypeComment()])
+            ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
+            ->addAlias('SearchRecordTypeProvider')
+            ->setShared(true)
+
+        ;
     }
 
     /**
@@ -270,15 +267,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $results = $searchModel->advancedSearch($sender->Request->get(), $offset, $limit);
             $sender->setData($results);
             $searchTerms = $results['SearchTerms'];
-
-
             // Grab the discussion if we are searching it.
             if (isset($results['CalculatedSearch']['discussionid'])) {
                 $discussionModel = new DiscussionModel();
                 $discussion = $discussionModel->getID($results['CalculatedSearch']['discussionid']);
                 if ($discussion) {
                     $cat = CategoryModel::categories(getValue('CategoryID', $discussion));
-//               if (getValue('PermsDiscussionView', $Cat))
                     $sender->setData('Discussion', $discussion);
                 }
             }
@@ -383,23 +377,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $Row['DateHtml'] = Gdn_Format::date($Row['DateInserted'], 'html');
             $Row['Notes'] = $calc($Row, $SearchTerms);
 
-            $Type = strtolower(val('Type', $Row));
-            if (isset($Row['CommentID'])) {
-                if ($Type == 'question') {
-                    $Type = 'answer';
-                } else {
-                    $Type = 'comment';
-                }
-            } elseif (isset($Row['PageID'])) {
-                $Type = 'doc';
-            } else {
-                if (!$Type) {
-                    $Type = 'discussion';
-                } elseif ($Type == 'page' && isset($Row['DiscussionID'])) {
-                    $Type = 'link';
-                }
-            }
-            $Row['Type'] = $Type;
+            $Row['Type'] = $Row['Type'] ?? SearchRecordTypeDiscussion::API_TYPE_KEY;
 
             // Add breadcrumbs for discussions.
             if ($UseCategories && isset($Row['CategoryID'])) {
@@ -435,6 +413,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     static function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
         $isAPI = $clean === 'api';
         $search = Search::cleanSearch($search, $isAPI);
+
         $pdo = Gdn::database()->connection();
 
         $csearch = true;
@@ -492,11 +471,21 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         /// Type ///
-        if (isset($search['types'])) {
-            $dsearch = isset($search['types']['discussion']);
-            $csearch = isset($search['types']['comment']);
-        }
+        if (!empty($search['types'])) {
+            $disableComments = true;
+            $disableDiscussions = true;
+            /** @var SearchRecordTypeInterface $recordType */
+            foreach ($search['types'] as $recordType) {
+                if ($recordType instanceof SearchRecordTypeDiscussion) {
+                    $disableDiscussions = false;
+                } elseif ($recordType instanceof SearchRecordTypeComment) {
+                    $disableComments = false;
+                }
+            }
 
+            $dsearch = !$disableDiscussions;
+            $csearch = !$disableComments;
+        }
         /// Date ///
         if (!$isAPI) {
             if (isset($search['date-from'])) {
@@ -581,7 +570,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         Gdn::sql()->reset();
 
         $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
-        trace([$Sql], 'SearchSQL');
+
         $Result = Gdn::database()->query($Sql)->resultArray();
 
         foreach ($Result as &$row) {

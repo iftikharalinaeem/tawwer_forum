@@ -6,6 +6,8 @@
 
 use \Garden\Schema\Schema;
 use \Vanilla\Web\Controller;
+use Garden\Container\Container;
+use Vanilla\Groups\Models\SearchRecordTypeGroup;
 
 /**
  * Class GroupsHooks
@@ -56,6 +58,19 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function structure() {
         include(dirname(__FILE__).'/structure.php');
+    }
+
+    /**
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        /*
+         * Register additional advanced search sphinx record type Poll
+         */
+        $dic
+            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeGroup()])
+        ;
     }
 
     /**
