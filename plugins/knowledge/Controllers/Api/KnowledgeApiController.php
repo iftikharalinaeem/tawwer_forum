@@ -493,7 +493,6 @@ class KnowledgeApiController extends AbstractApiController {
      *
      * @param array $iDs
      * @param int $dtype
-     * @param array $expand
      * @return array
      */
     public function getArticlesAsDiscussions(array $iDs, int $dtype): array {

@@ -12,6 +12,9 @@ use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use \Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
+/**
+ * Class AdvancedSearchArticlesTest
+ */
 class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
 
     /** @var array */
@@ -121,6 +124,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
         $session->end();
     }
 
+    /**
+     * Method to call aphinx reindex command and check if response is successful
+     */
     public static function sphinxReindex() {
         $sphinxHost = c('Plugins.Sphinx.Server');
         exec('curl '.$sphinxHost.':9399', $dockerResponse);
@@ -129,13 +135,13 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
         sleep(1);
     }
 
-
     /**
      * Test search scoped to discussions.
      */
     public function testRecordTypesDiscussion() {
-        if (!self::$sphinxReindexed)
+        if (!self::$sphinxReindexed) {
             $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$discussion['name'],
@@ -157,8 +163,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search scoped to comments.
      */
     public function testRecordTypesComment() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$comment['rawBody'],
@@ -180,8 +187,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search scoped to comments.
      */
     public function testRecordTypesArticle() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$article['name'],
@@ -204,8 +212,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search scoped to a discussion.
      */
     public function testExistingDiscussionID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$comment['rawBody'],
@@ -227,8 +236,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search scoped to a discussion.
      */
     public function testExistingArticleDiscussionID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'discussionID' => self::$article['articleID'],
@@ -250,8 +260,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search scoped to a category.
      */
     public function testExistingCategoryID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$discussion['name'],
@@ -276,8 +287,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search article by user names.
      */
     public function testInsertUserNames() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$discussion['name'],
@@ -300,8 +312,9 @@ class AdvancedSearchArticlesTest extends AbstractAPIv2Test {
      * Test search article by wrong user IDs
      */
     public function testArticleWrongInsertUserIDs() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
 
         $params = [
             'query' => self::$article['name'],

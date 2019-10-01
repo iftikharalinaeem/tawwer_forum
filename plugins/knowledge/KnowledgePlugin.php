@@ -169,6 +169,20 @@ class KnowledgePlugin extends \Gdn_Plugin {
     }
 
     /**
+     * Add articles to search result schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $recordTypes = $schema->getField('properties.recordType.enum');
+        $recordTypes[] = 'article';
+        $schema->setField('properties.type.enum', $recordTypes);
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'article';
+        $schema->setField('properties.type.enum', $types);
+    }
+
+    /**
      * Add knowledge base sitemap-index to robots.txt
      *
      * @param Robots $robots

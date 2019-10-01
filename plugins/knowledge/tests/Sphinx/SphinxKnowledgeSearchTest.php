@@ -10,6 +10,9 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\ServerException;
 
+/**
+ * Class SphinxKnowledgeSearchTest
+ */
 class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
@@ -28,9 +31,9 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
     protected static $searchResultSchema;
 
    /** @var bool */
-   protected static $sphinxReindexed;
+    protected static $sphinxReindexed;
 
-   protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
+    protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
 
     /**
      * {@inheritdoc}
@@ -109,7 +112,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
 
         $results = $response->getBody();
 
-        $this->assertEquals(2,count($results));
+        $this->assertEquals(2, count($results));
     }
 
 

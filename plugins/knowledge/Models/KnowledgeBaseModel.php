@@ -48,6 +48,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
+     * @param SiteSectionProviderInterface $siteSectionProvider
      */
     public function __construct(Gdn_Session $session, SiteSectionProviderInterface $siteSectionProvider) {
         parent::__construct("knowledgeBase");

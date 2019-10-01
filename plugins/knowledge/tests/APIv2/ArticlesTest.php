@@ -540,7 +540,6 @@ class ArticlesTest extends AbstractResourceTest {
 
     /**
      * Test GET /articles/{ID}/translations
-     * 
      */
     public function testGetArticleTranslations() {
         $record = $this->record();
@@ -554,5 +553,4 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
     }
-
 }

@@ -80,7 +80,9 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
         return current($result)["revisionsCount"];
     }
 
-
+    /**
+     * @return array
+     */
     public static function getTranslationStatuses(): array {
         return [
             self::STATUS_TRANSLATION_NOT_TRANSLATED,
