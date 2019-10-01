@@ -108,7 +108,11 @@ class ReportModel extends Gdn_Model {
         $recordType = $data['RecordType'];
         $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
-        $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
+        
+        if ($recordType === "discussion") {
+            $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
+        }
+
         if (!$reportedRecord) {
             $this->Validation->addValidationResult('RecordID', 'ErrorRecordNotFound');
         }
