@@ -489,6 +489,40 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
+     * Get records from article model for advanced search plugin
+     *
+     * @param array $iDs
+     * @param int $dtype
+     * @return array
+     */
+    public function getArticlesAsDiscussions(array $iDs, int $dtype): array {
+        $articles = $this->articleModel->getWithRevision([
+            'ar.articleRevisionID' => $iDs,
+        ]);
+
+        $typeData = self::RECORD_TYPES[$dtype];
+
+        foreach ($articles as &$articleWithRevision) {
+            $articleWithRevision["PrimaryID"] = $articleWithRevision[$typeData['recordID']];
+            $articleWithRevision["CategoryID"] = 0;
+            $articleWithRevision["RecordType"] = $typeData['recordType'];
+            $articleWithRevision["Format"] = $articleWithRevision['format'];
+
+            $articleWithRevision["Summary"] = $articleWithRevision["body"];//$articleWithRevision["excerpt"];
+            $articleWithRevision["Url"] = $this->articleModel->url($articleWithRevision);
+            $articleWithRevision["Title"] = $articleWithRevision['name'];
+            $articleWithRevision["UserID"] = $articleWithRevision['insertUserID'];
+            $articleWithRevision["DateInserted"] = $articleWithRevision['dateInserted']->format('Y-m-d H:i:s');
+            $articleWithRevision["Type"] = $typeData['recordType'];
+
+            $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($articleWithRevision['knowledgeCategoryID']));
+            $articleWithRevision['Breadcrumbs'] = $this->breadcrumbModel->crumbsAsArray($crumbs);
+        }
+
+        return $articles;
+    }
+
+    /**
      * Normalize some forum records.
      *
      * @param array $records

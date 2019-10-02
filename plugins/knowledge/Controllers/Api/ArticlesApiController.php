@@ -175,7 +175,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         try {
             if ($includeRevision) {
                 $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
-                $knowledgeCategoryID = ($includeTranslations) ? array_unique(array_column($article, "knowledgeCategoryID")) : $article["knowledgeCategoryID"];
+                if ($includeTranslations) {
+                    $knowledgeCategoryID = array_unique(array_column($article, "knowledgeCategoryID"));
+                } else {
+                    $knowledgeCategoryID = $article["knowledgeCategoryID"];
+                }
                 if (empty($article)) {
                     throw new NoResultsException("No rows matched the provided criteria.");
                 }
@@ -296,11 +300,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /**
      * Get the translations for an article.
-     * 
+     *
      * @param int $id
      * @param array $query
      * @return array
-
      */
     public function get_translations(int $id, array $query):array {
         $this->permission("knowledge.kb.view");
@@ -1237,7 +1240,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ];
             foreach ($article as $translation) {
                 if ($translation['locale'] === $locale['locale']) {
-
                     $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
                     $url = \Gdn::request()->url($locale['slug'] . "kb/articles/" . $slug, true);
 

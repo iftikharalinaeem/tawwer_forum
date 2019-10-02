@@ -10,6 +10,9 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\ServerException;
 
+/**
+ * Class SphinxKnowledgeSearchTest
+ */
 class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
@@ -28,27 +31,15 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
     protected static $searchResultSchema;
 
    /** @var bool */
-   protected static $sphinxReindexed;
+    protected static $sphinxReindexed;
 
-   protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function setupBeforeClass() {
-        //self::$addons = ["vanilla", "knowledge"];
-        parent::setupBeforeClass();
-        $config = static::container()->get(\Gdn_Configuration::class);
-        // For dev environment you should replace 127.0.0.1 with your sphinx docker container network host name. Ex: sphinx
-        // This is temporary solution
-        $config->set('Plugins.Sphinx.Server', '127.0.0.1', true, true);
-    }
+    protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
 
     /**
      * Call sphinx server port to trigger reindexing
      */
     public static function sphinxReindex() {
-         $sphinxHost = empty(c('Plugins.Sphinx.Server')) ? 'sphinx' : c('Plugins.Sphinx.Server');
+         $sphinxHost = c('Plugins.Sphinx.Server');
          exec('curl '.$sphinxHost.':9399', $dockerResponse);
          self::$dockerResponse = $dockerResponse;
          self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
@@ -109,7 +100,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
 
         $results = $response->getBody();
 
-        $this->assertEquals(2,count($results));
+        $this->assertEquals(2, count($results));
     }
 
 
