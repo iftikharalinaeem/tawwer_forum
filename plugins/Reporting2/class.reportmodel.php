@@ -108,7 +108,7 @@ class ReportModel extends Gdn_Model {
         $recordType = $data['RecordType'];
         $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
-        
+
         if ($recordType === "discussion") {
             $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
         }
@@ -209,15 +209,20 @@ class ReportModel extends Gdn_Model {
 
         if ($discussionID) {
             // Now that we have the discussion add the report.
-            $newcommenT = [
+            $newComment = [
                 'DiscussionID' => $discussionID,
                 'Body' => $data['Body'],
                 'Format' => $data['Format'],
                 'Attributes' => ['Type' => 'Report']
             ];
             $commentModel = new CommentModel();
-            $commentID = $commentModel->save($newcommenT);
+            $commentID = $commentModel->save($newComment);
             $this->Validation->addValidationResult($commentModel->validationResults());
+
+            // Send notifications
+            $commentModel->save2($commentID, true);
+            $this->Validation->addValidationResult($commentModel->validationResults());
+
             SpamModel::$Disabled = $spamCheckDisabled;
             return $commentID;
         }
