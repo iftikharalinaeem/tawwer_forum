@@ -782,7 +782,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         // Join record in question with note.
         $notes = [];
         $notes[] = $note;
-        joinRecords($notes, 'Record', false, true);
+        joinRecords($notes, 'Record', false, false);
 
         $sender->setData('Notes', $notes);
         $sender->render('viewnote', '', 'plugins/Warnings2');
