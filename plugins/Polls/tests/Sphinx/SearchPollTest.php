@@ -48,6 +48,7 @@ class SearchPollTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
+        saveToConfig('Plugins.Sphinx.UseDeltas', true);
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$siteInfo['adminUserID'], false, false);
