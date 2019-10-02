@@ -36,18 +36,6 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
     protected static $addons = ['vanilla', 'knowledge', 'sphinx'];
 
     /**
-     * {@inheritdoc}
-     */
-    public static function setupBeforeClass() {
-        //self::$addons = ["vanilla", "knowledge"];
-        parent::setupBeforeClass();
-        $config = static::container()->get(\Gdn_Configuration::class);
-        // For dev environment you should replace 127.0.0.1 with your sphinx docker container network host name. Ex: sphinx
-        // This is temporary solution
-        $config->set('Plugins.Sphinx.Server', '127.0.0.1', true, true);
-    }
-
-    /**
      * Call sphinx server port to trigger reindexing
      */
     public static function sphinxReindex() {
