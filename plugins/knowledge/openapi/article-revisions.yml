@@ -23,25 +23,23 @@ paths:
       summary: Get an article revision.
   '/article-revisions/re-render':
     patch:
-      parameters:
-      - description: The article ID.
-        in: path
-        name: id
-        schema:
-          type: integer
-      - description: The desired number of revisions to process.
-        in: path
-        name: limit
-        schema:
-            type: integer
-            default: 1000
-            minimum: 1
-            maximum: 1000
-      - description: The number revisions to exclude.
-        in: path
-        name: offset
-        schema:
-            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                articleID:
+                 description: The article ID.
+                 type: integer
+                limit:
+                  description: The desired maximum number of revisions to process.
+                  type: integer
+                  default: 1000
+                  minimum: 1
+                  maximum: 1000
+                offset:
+                  description: The number revisions to exclude.
+                  type: integer
       responses:
         '200':
           content:
@@ -50,7 +48,7 @@ paths:
                 $ref: '#/components/schemas/ReRender'
           description: Success
       tags:
-      - Article revisions re-render.
+      - Article Revisions
       summary: Re-render content in the article revisions table.
 components:
   schemas:
