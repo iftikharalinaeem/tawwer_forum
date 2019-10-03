@@ -196,17 +196,18 @@ class Search {
 
         if (!$api) {
             // Types //
-            if ($enableAllTypes) {
+
+            $types = [];
+            /** @var SearchRecordTypeInterface $recordType */
+            foreach (self::types() as $recordType) {
+                $key = $recordType->getCheckBoxId();
+                if ($search[$key] ?? false) {
+                    $types[] = $recordType;
+                }
+            }
+            if (empty($types)) {
                 $search['types'] = self::types();
             } else {
-                $types = [];
-                /** @var SearchRecordTypeInterface $recordType */
-                foreach (self::types() as $recordType) {
-                    $key = $recordType->getCheckBoxId();
-                    if ($search[$key] ?? false) {
-                        $types[] = $recordType;
-                    }
-                }
                 $search['types'] = $types;
             }
         }
