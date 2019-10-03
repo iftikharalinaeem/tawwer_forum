@@ -679,8 +679,22 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $name = $row["name"] ?? null;
+
+        $kbCategory = $this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
+        $kbCategory = reset($kbCategory);
+        $kb = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]);
+        $kb = reset($kb);
+        $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
+
+        $siteSectionSlug = null;
+        foreach ($allLocales as $locale) {
+            if ($locale["locale"] === $row["locale"]) {
+                $siteSectionSlug = $locale["slug"];
+            }
+        }
+
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
+        $row["url"] = \Gdn::request()->url("{$siteSectionSlug}kb/articles/{$slug}", true);
 
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
@@ -1011,6 +1025,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body);
+
+        $this->verifyLocales($body);
+
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
@@ -1256,5 +1273,27 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $result[] = $current;
         }
         return $result;
+    }
+
+    /**
+     * Verify Knowledge-Base supports a locale.
+     *
+     * @param array $body
+     * @throws ClientException
+     */
+    protected function verifyLocales(array $body): void {
+        $locale = (array_key_exists("locale", $body) ? $body["locale"] : "en");
+        $kbCategory = $this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $body["knowledgeCategoryID"]]);
+        $kbCategory = reset($kbCategory);
+        $kb = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]);
+        $kb = reset($kb);
+        $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
+        $allLocales = array_column($allLocales, "locale");
+
+        $supportedLocale = in_array($locale, $allLocales);
+
+        if (!$supportedLocale) {
+            throw new ClientException("Locale {$locale} not support in this KnowledgBase");
+        }
     }
 }
