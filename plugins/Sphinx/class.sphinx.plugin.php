@@ -7,7 +7,11 @@
 use Garden\Container\Container;
 use Garden\Schema\Schema;
 use Interop\Container\ContainerInterface;
-use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Sphinx\Models\SearchRecordTypeProvider;
+use Vanilla\Sphinx\Models\SearchRecordTypeDiscussion;
+use Vanilla\Sphinx\Models\SearchRecordTypeComment;
+
 
 /**
  * Sphinx Plugin
@@ -62,11 +66,17 @@ class SphinxPlugin extends Gdn_Plugin {
      * @param Container $dic The container to initialize.
      */
     public function container_init(Container $dic) {
-        $dic->rule(\SearchModel::class)
+        $dic->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
+           ->setClass(SearchRecordTypeProvider::class) //this is kludge
+           ->addCall('setType', [new SearchRecordTypeDiscussion()])
+           ->addCall('setType', [new SearchRecordTypeComment()])
+           ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
+           ->addCall('addProviderGroup', [self::PROVIDER_GROUP])
+           ->addAlias('SearchRecordTypeProvider')
+           ->rule(\SearchModel::class)
             ->setShared(true)
             ->setClass(\SphinxSearchModel::class)
-            ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
-            ->addCall('addProviderGroup', [self::PROVIDER_GROUP])
+
         ;
     }
 
