@@ -576,10 +576,9 @@ class ArticlesTest extends AbstractResourceTest {
         $response = $this->api()->post($this->baseUrl, $record);
     }
 
-
-     /**
+    /**
       * Create subcommunities for Tests.
-      */
+     */
     private static function createSubcommunities() {
         $subcommunityModel = static::container()->get(\SubcommunityModel::class);
         

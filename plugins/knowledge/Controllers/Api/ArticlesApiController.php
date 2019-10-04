@@ -1011,6 +1011,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ClientException If locale is not supported.
      */
     public function post(array $body): array {
         $this->permission("knowledge.articles.add");
@@ -1283,6 +1284,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get a knowledge-base by a category ID.
+     *
      * @param int $id
      * @return array
      */
@@ -1293,5 +1296,4 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase = reset($knowledgeBase);
         return $knowledgeBase;
     }
-
 }
