@@ -358,8 +358,6 @@ class SphinxSearchModel extends \SearchModel {
     public function autoComplete($search, $limit = 10) {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, $limit, 100);
-        $indexes = $this->indexes(['Discussion']);
-
         $search = Search::cleanSearch($search);
 
         $str = $search['search'];
@@ -380,18 +378,23 @@ class SphinxSearchModel extends \SearchModel {
                 $sphinx->setFilter('Tags', array_column($search['tags'], 'TagID'));
             }
         }
+       $dtypes = [];
+       $indexes = [];
         if (empty($search['types'])) {
-              $indexes = [];
-              $dtypes = [];
-
               /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
               foreach ($this->searchRecordTypeProvider->getAll() as $recordType) {
                  $indexes[] = $recordType->getIndexName();
                  $dtypes[] = $recordType->getDType();
               }
-              $sphinx->setFilter('dtype', $dtypes);
-              $indexes = $this->indexes($indexes);
+        } else {
+           /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
+           foreach ($search['types'] as $recordType) {
+              $indexes[] = $recordType->getIndexName();
+              $dtypes[] = $recordType->getDType();
+           }
         }
+       $sphinx->setFilter('dtype', $dtypes);
+       $indexes = $this->indexes($indexes);
 
         $this->setSort($sphinx, $terms, $search);
         $results = $this->doSearch($sphinx, $query, $indexes);
