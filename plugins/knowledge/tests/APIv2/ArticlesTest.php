@@ -15,7 +15,6 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Subcommunities\Models\ProductModel;
 
-
 /**
  * Test the /api/v2/articles endpoint.
  */
@@ -567,7 +566,8 @@ class ArticlesTest extends AbstractResourceTest {
      */
     public function testPostArticleInNotSupportedLocale() {
         $kb = $this->newKnowledgeBase();
-        $kb = $this->api()->patch('/knowledge-bases/' . $kb["knowledgeBaseID"],
+        $kb = $this->api()->patch(
+            '/knowledge-bases/' . $kb["knowledgeBaseID"],
             ['siteSectionGroup' => 'subcommunities-group-1']
         );
         $kb = $kb->getBody();
