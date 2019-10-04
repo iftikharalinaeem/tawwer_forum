@@ -13,6 +13,8 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Subcommunities\Models\ProductModel;
+
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -50,7 +52,7 @@ class ArticlesTest extends AbstractResourceTest {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass() {
-        self::$addons = ["vanilla", "knowledge"];
+        self::$addons = ["vanilla", "knowledge", "subcommunities"];
         parent::setupBeforeClass();
 
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
@@ -68,6 +70,9 @@ class ArticlesTest extends AbstractResourceTest {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
+
+        self::createSubcommunities();
+        
     }
 
     /**
@@ -552,5 +557,69 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertCount(1, $articleTranslations);
         $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
+    }
+
+    /**
+     * Test posting article in a locale that isn't supported.
+     *
+     * @expectedException Garden\Web\Exception\ClientException
+     * @expectedExceptionMessage Locale xx not support in this Knowledge-Base
+     */
+    public function testPostArticleInNotSupportedLocale() {
+        $kb = $this->newKnowledgeBase();
+        $kb = $this->api()->patch('/knowledge-bases/' . $kb["knowledgeBaseID"],
+            ['siteSectionGroup' => 'subcommunities-group-1']
+        );
+        $kb = $kb->getBody();
+        $record = $this->record();
+        $record["locale"] = "xx";
+        $response = $this->api()->post($this->baseUrl, $record);
+    }
+
+
+     /**
+      * Create subcommunities for Tests.
+      */
+    private static function createSubcommunities() {
+        $subcommunityModel = static::container()->get(\SubcommunityModel::class);
+        
+        $productModel = static::container()->get(ProductModel::class);
+        $productID = $productModel->insert($record = [
+            'name' => uniqid('Product'),
+            'body' => 'Test product',
+        ]);
+       
+        $rows = [
+            [
+                "locale" => "es",
+                "folder" => "es"
+            ],
+            [
+                "locale" => "ru",
+                "folder" => "ru"
+            ],
+            [
+                "locale" => "fr",
+                "folder" => "fr"
+            ]
+        ];
+
+        $subCommunities = [];
+        foreach ($rows as $row) {
+            $subCommunities[] = [
+                "Name" => uniqid("test-subcommunity"),
+                "Folder" => $row["folder"],
+                "CategoryID" => 1,
+                "Locale" => $row["locale"],
+                "Sort" => 1,
+                "ProductID" => $productID
+            ];
+        }
+        foreach ($subCommunities as $subCommunity) {
+            $subcommunityModel->insert($subCommunity);
+        }
+
+        $currentSubcommunity = $subcommunityModel->getID(1, DATASET_TYPE_ARRAY);
+        $subcommunityModel::setCurrent($currentSubcommunity);
     }
 }
