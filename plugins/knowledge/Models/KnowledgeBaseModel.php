@@ -22,6 +22,8 @@ use Garden\Schema\Validation;
 class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const TYPE_GUIDE = 'guide';
     const TYPE_HELP = 'help';
+    const SPHINX_ARTICLES_COUNTER_ID = 5;
+    const SPHINX_ARTICLES_DELETED_COUNTER_ID = 6;
 
     const STATUS_PUBLISHED = 'published';
     const STATUS_DELETED = 'deleted';
@@ -353,6 +355,28 @@ MESSAGE
         }
 
         return parent::update($set, $where);
+    }
+
+    /**
+     * Reset both sphinx indexes: KnowledgeArticle and KnowledgeArticleDeleted to 0.
+     * This will trigger complete reindex for these two indexes when run next Sphinx reindex.
+     *
+     * @return bool
+     */
+    public function resetSphinxCounters() {
+        /** @var \Gdn_MySQLDriver $sql */
+        $sql = $this->sql();
+        $query = $sql->getUpdate(
+            $sql->mapAliases('SphinxCounter'),
+            ['MaxID' => 1],
+            [
+                'CounterID in ('.implode(',', [
+                    self::SPHINX_ARTICLES_COUNTER_ID,
+                    self::SPHINX_ARTICLES_DELETED_COUNTER_ID
+                ]).')',
+            ]
+        );
+        $sql->query($query, 'update');
     }
 
     /**
