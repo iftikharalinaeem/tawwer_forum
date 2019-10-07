@@ -703,7 +703,7 @@ class RanksPlugin extends Gdn_Plugin {
                 setValue('Title', $args['User'], '');
             } elseif (!getValue('Title', $args['User'])) {
                 // Apply the rank title if it isn't set.
-                setValue('Title', $args['User'], $rank['Label']);
+                setValue('Title', $args['User'], $rank['Label'] ?? '');
             }
 
             if (($rank['Abilities']['Locations'] ?? false) == 'no') {
