@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -70,7 +69,6 @@ class ArticlesTest extends AbstractResourceTest {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
-
     }
 
     /**
