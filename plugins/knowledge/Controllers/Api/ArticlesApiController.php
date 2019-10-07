@@ -690,8 +690,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
         }
 
+
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $row["url"] = \Gdn::request()->url("{$siteSectionSlug}kb/articles/{$slug}", true);
+        $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
+        $row["url"] = \Gdn::request()->url($path, true);
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];

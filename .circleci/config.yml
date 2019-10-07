@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    core: vanilla/core@dev:test-kb
+    core: vanilla/core@2.2
     jobs: vanilla/jobs@1.1
 jobs:
     php_sphinx_tests:
@@ -27,20 +27,20 @@ workflows:
                   requires:
                       - php_setup
             # JS and browsers
-#            - jobs/frontend_setup:
-#                  name: frontend_setup
-#            - jobs/frontend_lint:
-#                  requires:
-#                      - frontend_setup
-#            - jobs/frontend_typechecker:
-#                  requires:
-#                      - frontend_setup
-#            - jobs/frontend_build:
-#                  requires:
-#                      - frontend_setup
-#            - jobs/frontend_test:
-#                  requires:
-#                      - frontend_setup
+            - jobs/frontend_setup:
+                  name: frontend_setup
+            - jobs/frontend_lint:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_typechecker:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_build:
+                  requires:
+                      - frontend_setup
+            - jobs/frontend_test:
+                  requires:
+                      - frontend_setup
     nightly:
         triggers:
             - schedule:

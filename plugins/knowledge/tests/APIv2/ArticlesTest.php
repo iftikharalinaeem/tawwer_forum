@@ -6,14 +6,15 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Web\Exception\ClientException;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Test the /api/v2/articles endpoint.
