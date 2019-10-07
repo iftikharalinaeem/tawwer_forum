@@ -313,7 +313,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
         if (isset($body['status']) && ($body['status'] !== $prevState['status'])) {
             // If status changed we need to reset Sphinx counters and reindex
             $this->knowledgeBaseModel->resetSphinxCounters();
-
         }
 
         $row = $this->knowledgeBaseByID($id);
