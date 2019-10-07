@@ -1,5 +1,5 @@
 # Internal Addons
 
-[![Build Status](https://travis-ci.com/vanilla/internal.svg?token=PHGJrbbWR9hs8JnRpyG3&branch=master)](https://travis-ci.com/vanilla/internal)
+[![CircleCI](https://circleci.com/gh/vanilla/internal/tree/master.svg?style=svg)]
 
 This repository hosts most of Vanilla's private addons used on our cloud platform.
