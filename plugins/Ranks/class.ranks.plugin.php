@@ -702,8 +702,16 @@ class RanksPlugin extends Gdn_Plugin {
                 // Strip away a title if it exists.
                 setValue('Title', $args['User'], '');
             } elseif (!getValue('Title', $args['User'])) {
-                // Apply the rank title if it isn't set.
-                setValue('Title', $args['User'], $rank['Label'] ?? '');
+                $rankLabel = $rank['Label'] ?? '';
+                $isRankLabelHtml = $rankLabel !== strip_tags($rankLabel);
+
+                if ($isRankLabelHtml) {
+                    // HTML rank titles go into a special field because they need special handling (bypass sanitization).
+                    setValue('HtmlTitle', $args['User'], $rank['Label'] ?? '');
+                } else {
+                    // Apply the rank title if it isn't set.
+                    setValue('Title', $args['User'], $rank['Label'] ?? '');
+                }
             }
 
             if (($rank['Abilities']['Locations'] ?? false) == 'no') {
