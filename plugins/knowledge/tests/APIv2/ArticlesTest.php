@@ -6,14 +6,14 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
-use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
-use Garden\Web\Exception\ClientException;
-use Vanilla\Subcommunities\Models\ProductModel;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -69,7 +69,7 @@ class ArticlesTest extends AbstractResourceTest {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
-        
+
     }
 
     /**
@@ -557,20 +557,47 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test posting article in a locale that is supported.
+     *
+     */
+    public function testPostArticleInSupportedLocale() {
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
+        $kb = $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'subcommunities-group-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "ru";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+
+        $this->assertEquals(201, $response->getStatusCode());
+    }
+
+    /**
      * Test posting article in a locale that isn't supported.
      *
      * @expectedException Garden\Web\Exception\ClientException
-     * @expectedExceptionMessage Locale xx not support in this Knowledge-Base
+     * @expectedExceptionMessage Locale xx not supported in this Knowledge-Base
+     *
      */
     public function testPostArticleInNotSupportedLocale() {
-        $kb = $this->newKnowledgeBase();
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
         $kb = $this->api()->patch(
-            '/knowledge-bases/' . $kb["knowledgeBaseID"],
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'subcommunities-group-1']
         );
-        $kb = $kb->getBody();
+
         $record = $this->record();
         $record["locale"] = "xx";
+
         $response = $this->api()->post($this->baseUrl, $record);
     }
 }

@@ -1032,7 +1032,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $allLocales[] = $sourceLocale;
             $supportedLocale = in_array($locale, $allLocales);
             if (!$supportedLocale) {
-                throw new ClientException("Locale {$locale} not support in this Knowledge-Base");
+                throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
             }
         } else {
             $body["locale"] = $sourceLocale;
