@@ -691,23 +691,23 @@ class RanksPlugin extends Gdn_Plugin {
             if (isset($rank['CssClass'])) {
                 $cssClass = val('_CssClass', $args['User']);
                 $cssClass .= ' '.$rank['CssClass'];
-                $args['User']['_CssClass'] = trim($cssClass);
+                setValue('_CssClass', $args['User'], trim($cssClass));
             }
 
             if (($rank['Abilities']['Signatures'] ?? false) == 'no') {
-                $args['User']['HideSignature'] = true;
+                setValue('HideSignature', $args['User'], true);
             }
 
             if (($rank['Abilities']['Titles'] ?? false) == 'no') {
                 // Strip away a title if it exists.
-                $args['User']['Title'] = '';
-            } elseif (!$args['User']['Title']) {
+                setValue('Title', $args['User'], '');
+            } elseif (!getValue('Title', $args['User'])) {
                 // Apply the rank title if it isn't set.
-                $args['User']['Title'] = $rank['Label'] ?? '';
+                setValue('Title', $args['User'], $rank['Label'] ?? '');
             }
 
             if (($rank['Abilities']['Locations'] ?? false) == 'no') {
-                $args['User']['Location'] = '';
+                setValue('Location', $args['User'], '');
             }
 
             $v = $rank['Abilities']['Verified'] ?? null;
