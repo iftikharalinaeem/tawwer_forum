@@ -50,7 +50,7 @@ class ArticlesTest extends AbstractResourceTest {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass() {
-        self::$addons = ["vanilla", "knowledge"];
+        self::$addons = ["vanilla", "sphinx", "knowledge"];
         parent::setupBeforeClass();
 
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
