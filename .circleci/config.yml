@@ -71,9 +71,7 @@ workflows:
             - jobs/php_72_lint
             - jobs/php_73_lint
             - php_sphinx_tests
-            - jobs/php_72_tests:
-                  requires:
-                      - php_setup
+            - php_knowledge_api_tests
             - jobs/php_73_tests:
                   requires:
                       - php_setup
