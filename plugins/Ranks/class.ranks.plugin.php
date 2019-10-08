@@ -177,30 +177,40 @@ class RanksPlugin extends Gdn_Plugin {
         $sender->addModule($messageModule);
     }
 
-     /**
-      * Helper to check for links in posts.
-      *
-      * If a user cannot post links, this will check if a link has been included
-      * in the main body of their post, and if one has, the message cannot be
-      * posted, and the user is notified.
-      *
-      * @param mixed $sender The given model.
-      * @param array $formValues The form post values.
-      * @param string $fieldName The field name in the form to check for links.
-      */
-     public function checkForLinks($sender, $formValues, $fieldName) {
-         $content = $formValues[$fieldName] ?? "";
-         $format = $formValues["Format"] ?? "";
-         $body = $this->formatService->renderHTML($content, $format);
+    /**
+     * Helper to check for links in posts.
+     *
+     * If a user cannot post links, this will check if a link has been included
+     * in the main body of their post, and if one has, the message cannot be
+     * posted, and the user is notified.
+     *
+     * @param mixed $sender The given model.
+     * @param array $formValues The form post values.
+     * @param string $fieldName The field name in the form to check for links.
+     */
+    public function checkForLinks($sender, $formValues, $fieldName) {
+        $content = $formValues[$fieldName] ?? "";
+        $format = $formValues["Format"] ?? "";
+        $body = $this->formatService->renderHTML($content, $format);
 
-         // Do not allow any anchors. This could include links to attachments in some formats, like rich.
-         $dom = new DOMDocument();
-         $dom->loadHTML($body);
-         $anchors = $dom->getElementsByTagName("a");
-         if ($anchors->count() > 0) {
-            $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
-         }
-     }
+        // Do not allow any anchors. This could include links to attachments in some formats, like rich.
+        $dom = new DOMDocument();
+        $dom->loadHTML($body);
+        $anchors = $dom->getElementsByTagName("a");
+        $currentDomain = parse_url(Gdn::request()->domain(), PHP_URL_HOST);
+
+        // Allow links to the current domain or uploads.
+        if ($anchors instanceof Traversable) {
+            /** @var DOMElement $anchor */
+            foreach ($anchors as $anchor) {
+                $linkUrl = $anchor->getAttribute("href");
+                $linkDomain = parse_url($linkUrl, PHP_URL_HOST);
+                if ($linkDomain !== $currentDomain && !Gdn_Upload::isUploadUri($linkUrl)) {
+                    $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
+                }
+            }
+        }
+    }
 
      /**
       * Prior to saving a comment, check whether the user can post links.
