@@ -682,6 +682,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
         $bodyRendered = $row["bodyRendered"] ?? null;
+
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
         // Placeholder data.
