@@ -677,19 +677,16 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
-
         $name = $row["name"] ?? null;
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
         $bodyRendered = $row["bodyRendered"] ?? null;
-
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
         $row["slug"] = $slug;
-
         return $row;
     }
 
