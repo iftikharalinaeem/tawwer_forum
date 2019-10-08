@@ -14,7 +14,11 @@ jobs:
             - core/composer_install
             - core/prepare_php_tests
             - core/prepare_sphinx
-            - core/run_sphinx_test_suite
+            - run:
+                name: APIv2 Tests
+                command: |
+                    cd ~/workspace/vanilla
+                    ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Sphinx"
     php_knowledge_api_tests:
         executor: core/sphinx
         steps:
