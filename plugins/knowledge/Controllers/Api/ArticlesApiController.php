@@ -1013,7 +1013,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
 
         if (array_key_exists("locale", $body) && isset($body["locale"])) {
-            if ($body["locale"] !== $sourceLocale){
+            if ($body["locale"] !== $sourceLocale) {
                 throw new ClientException("Articles must be created in {$sourceLocale} locale.");
             }
         }
