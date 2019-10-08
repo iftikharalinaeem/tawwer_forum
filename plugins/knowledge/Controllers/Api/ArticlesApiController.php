@@ -679,21 +679,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $name = $row["name"] ?? null;
-
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
-        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
-        $siteSectionSlug = null;
-
-        foreach ($allLocales as $locale) {
-            if ($locale["locale"] === $row["locale"]) {
-                $siteSectionSlug = $locale["slug"];
-            }
-        }
-
-
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
-        $row["url"] = \Gdn::request()->url($path, true);
+        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -1027,17 +1014,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($body["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
 
-        if (array_key_exists("locale", $body)) {
-            $locale = (isset($body["locale"])) ? $body["locale"] : $sourceLocale;
-            $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
-            $allLocales = array_column($allLocales, "locale");
-            $allLocales[] = $sourceLocale;
-            $supportedLocale = in_array($locale, $allLocales);
-            if (!$supportedLocale) {
-                throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
+        if (array_key_exists("locale", $body) && isset($body["locale"])) {
+            if ($body["locale"] !== $sourceLocale){
+                throw new ClientException("Articles must be created in {$sourceLocale} locale.");
             }
-        } else {
-            $body["locale"] = $sourceLocale;
         }
 
         $articleID = $this->save($body);
