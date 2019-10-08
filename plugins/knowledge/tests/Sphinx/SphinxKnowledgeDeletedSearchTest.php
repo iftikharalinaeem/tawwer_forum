@@ -41,8 +41,7 @@ class SphinxKnowledgeDeletedSearchTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass()
-    {
+    public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
         /** @var KnowledgeSettingsController  */
