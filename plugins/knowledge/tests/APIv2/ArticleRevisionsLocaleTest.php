@@ -115,31 +115,27 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
     /**
      * Test  articles/revisions resource can be filtered by locales.
      * @depends testPrepareData
+     * @dataProvider provideLocaleCounts
      */
-    public function testGetRevisionsByLocale() {
+    public function testGetRevisionsByLocale(string $locale, int $count) {
+
 
         $revisions = $this->api()
-            ->get("articles/" . self::$articleID . "/revisions?locale=en")
+            ->get("articles/" . self::$articleID . "/revisions?locale=".$locale)
             ->getBody();
 
-        $this->assertEquals(1, count($revisions));
+        $this->assertEquals($count, count($revisions));
+    }
 
-        $revisions = $this->api()
-            ->get("articles/" . self::$articleID . "/revisions?locale=fr")
-            ->getBody();
-
-        $this->assertEquals(1, count($revisions));
-
-        $revisions = $this->api()
-            ->get("articles/" . self::$articleID . "/revisions?locale=ru")
-            ->getBody();
-
-        $this->assertEquals(1, count($revisions));
-
-        $revisions = $this->api()
-            ->get("articles/" . self::$articleID . "/revisions?locale=es")
-            ->getBody();
-
-        $this->assertEquals(0, count($revisions));
+    /**
+     * @return array Data with expected correct Count values
+     */
+    public function provideLocaleCounts(): array {
+        return [
+            'Test locale EN' => ['en', 1],
+            'Test locale FR' => ['fr', 1],
+            'Test locale RU' => ['ru', 1],
+            'Test locale ES' => ['es', 0],
+        ];
     }
 }
