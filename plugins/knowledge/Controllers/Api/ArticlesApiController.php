@@ -678,8 +678,21 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             throw new ServerException("No ID in article row.");
         }
         $name = $row["name"] ?? null;
+
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
+        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
+        $siteSectionSlug = null;
+
+        foreach ($allLocales as $locale) {
+            if ($locale["locale"] === $row["locale"]) {
+                $siteSectionSlug = $locale["slug"];
+            }
+        }
+
+
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
+        $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
+        $row["url"] = \Gdn::request()->url($path, true);
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -711,8 +724,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body, true);
         $this->save($body, $id);
 
-        $row = $this->articleByID($id, true);
-        $this->eventManager->fire("afterArticleUpdate", $row);
+        $records = $this->articleByID($id, true, false, true);
+
+        $firstRecord = reset($records);
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
+        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
+        $locale = (array_key_exists("locale", $body) ? $body["locale"] : $sourceLocale);
+        foreach ($records as $record) {
+            if ($record["locale"] === $locale) {
+                $row = $record;
+            }
+        }
+
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
 
@@ -1075,6 +1098,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $article = array_diff_key($fields, $revisionFields);
         $revision = array_intersect_key($fields, $revisionFields);
 
+        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
+        $locale = (array_key_exists("locale", $fields) ? $fields["locale"] : $sourceLocale);
+
         if ($articleID !== null) {
             // this means we patch existing Article
 
@@ -1085,6 +1111,21 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 }
             } else {
                 $prevState = $this->articleModel->getID($articleID);
+            }
+
+            $knowledgeCategory = $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
+            $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategory["knowledgeCategoryID"]);
+
+            if (isset($fields["locale"]) && array_key_exists("locale", $fields)) {
+                // If the locale is passed check if it is supported.
+                $locale = (isset($fields["locale"])) ? $fields["locale"] : $knowledgeBase["sourceLocale"];
+                $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
+                $allLocales = array_column($allLocales, "locale");
+                $allLocales[] = $knowledgeBase["sourceLocale"];
+                $supportedLocale = in_array($locale, $allLocales);
+                if (!$supportedLocale) {
+                    throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
+                }
             }
 
             //check if knowledge category exists and knowledge base is "published"
@@ -1178,10 +1219,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         if (!empty($revision)) {
             // Grab the current revision, if available, to load as initial defaults.
-            $currentRevision = array_intersect_key($this->articleModel->getIDWithRevision($articleID), $revisionFields);
+            $articles = $this->articleModel->getIDWithRevision($articleID, true);
+            $currentRevision =[];
+
+            foreach ($articles as $article) {
+                if ($article["locale"] === $locale) {
+                    $currentRevision = array_intersect_key($article, $revisionFields);
+                }
+            }
+
             $revision = array_merge($currentRevision, $revision);
             $revision["articleID"] = $articleID;
-            $revision["locale"] = $fields["locale"] ?? $this->getLocale()->current();
+            $revision["locale"] = $locale;
 
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
             $revision["name"] = $revision["name"] ?? "";
@@ -1198,8 +1247,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
 
-            $articleRevisionID = $this->articleRevisionModel->insert($revision);
-            $this->articleRevisionModel->publish($articleRevisionID);
+
+            if (!$currentRevision) {
+                $revision["status"] = "published";
+                $this->articleRevisionModel->insert($revision);
+            } else {
+                $articleRevisionID = $this->articleRevisionModel->insert($revision);
+                $this->articleRevisionModel->publish($articleRevisionID);
+            }
 
             $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
             $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);

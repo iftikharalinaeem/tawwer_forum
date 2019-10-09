@@ -594,4 +594,72 @@ class ArticlesTest extends AbstractResourceTest {
 
         $this->api()->post($this->baseUrl, $record);
     }
+
+    /**
+     * Test posting article in a locale that is supported.
+     */
+    public function testPatchArticleInSupportedLocale() {
+
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "en";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        $record = [
+            "body" => "Translated article body",
+            "format" => "markdown",
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
+            "locale" => "ru",
+            "name" => "Translated Example Article",
+            "sort" => 1,
+        ];
+
+        $response = $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * Test posting article in a locale that is supported.
+     *
+     * @expectedException Garden\Web\Exception\ClientException
+     * @expectedExceptionMessage Locale xx not supported in this Knowledge-Base
+     */
+    public function testPatchArticleInNotSupportedLocale() {
+
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "en";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        $record = [
+            "body" => "Translated article body",
+            "format" => "markdown",
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
+            "locale" => "xx",
+            "name" => "Translated Example Article",
+            "sort" => 1,
+        ];
+        $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+    }
 }
