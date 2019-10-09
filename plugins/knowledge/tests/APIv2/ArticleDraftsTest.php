@@ -157,7 +157,7 @@ class ArticleDraftsTest extends AbstractResourceTest {
             'icon' => '',
             'bannerImage' => '',
             'sortArticles' => 'manual',
-            'sourceLocale' => '',
+            'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base'.$salt,
         ];
         $kb = $this->api()

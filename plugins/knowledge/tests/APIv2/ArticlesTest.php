@@ -8,10 +8,11 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
-use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Garden\Web\Exception\ClientException;
 
 /**
@@ -552,5 +553,45 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertCount(1, $articleTranslations);
         $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
+    }
+
+    /**
+     * Test posting article in a locale that is supported.
+     *
+     */
+    public function testPostArticleInSupportedLocale() {
+        /** @var KnowledgeBaseModel $knowledgeBaseModel */
+        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
+        $kb = $knowledgeBaseModel->get(["knowledgeBaseID" => self::$knowledgeBaseID]);
+        $kb = reset($kb);
+
+        $record = $this->record();
+        $record["locale"] = "en";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals($kb["sourceLocale"], $article["locale"]);
+    }
+
+    /**
+     * Test posting article in a locale that isn't supported.
+     *
+     * @expectedException Garden\Web\Exception\ClientException
+     * @expectedExceptionMessage Articles must be created in en locale.
+     *
+     */
+    public function testPostArticleInNotSupportedLocale() {
+        /** @var KnowledgeBaseModel $knowledgeBaseModel */
+        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
+        $kb = $knowledgeBaseModel->get(["knowledgeBaseID" => self::$knowledgeBaseID]);
+        $kb = reset($kb);
+        $this->assertEquals("en", $kb["sourceLocale"]);
+
+        $record = $this->record();
+        $record["locale"] = "ru";
+
+        $this->api()->post($this->baseUrl, $record);
     }
 }

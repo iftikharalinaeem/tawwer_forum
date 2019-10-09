@@ -677,11 +677,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
-
         $name = $row["name"] ?? null;
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $row["url"] = \Gdn::request()->url("/kb/articles/{$slug}", true);
-
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -689,7 +687,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row["seoName"] = null;
         $row["seoDescription"] = null;
         $row["slug"] = $slug;
-
         return $row;
     }
 
@@ -1001,6 +998,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
+     * @throws ClientException If locale is not supported.
      */
     public function post(array $body): array {
         $this->permission("knowledge.articles.add");
@@ -1009,8 +1007,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
             ->setDescription("Create a new article.");
         $out = $this->articleSchema("out");
-
         $body = $in->validate($body);
+
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($body["knowledgeCategoryID"]);
+        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
+
+        if (array_key_exists("locale", $body) && isset($body["locale"])) {
+            if ($body["locale"] !== $sourceLocale) {
+                throw new ClientException("Articles must be created in {$sourceLocale} locale.");
+            }
+        }
+
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
@@ -1224,11 +1231,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     protected function getArticleTranslationData(array $article): array {
         $result = [];
         $firstRevision = reset($article);
-        $kbCategory = $this->knowledgeCategoryModel->get(["knowledgeCategoryID" => $firstRevision["knowledgeCategoryID"]]);
-        $kbCategory = reset($kbCategory);
-        $kb = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $kbCategory["knowledgeBaseID"]]);
-        $kb = reset($kb);
-        $allLocales = $this->knowledgeBaseModel->getLocales($kb["siteSectionGroup"]);
+
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRevision["knowledgeCategoryID"]);
+        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
 
         foreach ($allLocales as $locale) {
             $current = [
@@ -1256,5 +1261,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $result[] = $current;
         }
         return $result;
+    }
+
+    /**
+     * Get a knowledge-base by a category ID.
+     *
+     * @param int $id
+     * @return array
+     */
+    protected function getKnowledgeBaseFromCategoryID(int $id) {
+        $knowledgeBaseCategoryFragement = $this->knowledgeCategoryModel->selectSingleFragment($id);
+        $knowledgeBaseID = $knowledgeBaseCategoryFragement->getKnowledgeBaseID();
+        $knowledgeBase = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+        $knowledgeBase = reset($knowledgeBase);
+        return $knowledgeBase;
     }
 }
