@@ -96,8 +96,8 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
             ]
         );
 
-        $this->assertTrue(true)
-;    }
+        $this->assertTrue(true);
+    }
 
     /**
      * Test article/revisions resource .
