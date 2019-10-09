@@ -114,6 +114,10 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
 
     /**
      * Test  articles/revisions resource can be filtered by locales.
+     *
+     * @param string $locale
+     * @param int $count
+     *
      * @depends testPrepareData
      * @dataProvider provideLocaleCounts
      */
