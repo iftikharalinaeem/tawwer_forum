@@ -19,7 +19,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 class KnowledgeNavigationTest extends AbstractAPIv2Test {
 
     /** @var array */
-    protected static $addons = ["vanilla", "knowledge"];
+    protected static $addons = ["vanilla", "sphinx", "knowledge"];
 
     /** @var array */
     private $articles;

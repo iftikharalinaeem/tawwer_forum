@@ -419,7 +419,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     protected function getNormalizedData(array $searchResults): array {
         $results = [];
-        $this->results['matches'] = $searchResults['matches'];
+        $this->results['matches'] = $searchResults['matches'] ?? [];
 
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];

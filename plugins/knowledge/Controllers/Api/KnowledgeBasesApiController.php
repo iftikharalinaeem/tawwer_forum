@@ -309,6 +309,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 ['knowledgeCategoryID' => $prevState['rootCategoryID']]
             );
         }
+        // Check if KB status changed: deleted vs published
+        if (isset($body['status']) && ($body['status'] !== $prevState['status'])) {
+            // If status changed we need to reset Sphinx counters and reindex
+            $this->knowledgeBaseModel->resetSphinxCounters();
+        }
 
         $row = $this->knowledgeBaseByID($id);
         $row = $this->normalizeOutput($row);
