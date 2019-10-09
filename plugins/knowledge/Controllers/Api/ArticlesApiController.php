@@ -594,9 +594,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "minimum" => 1,
                 "maximum" => 100,
             ],
+            "locale:s?" => [
+                "description" => "Filter revisions by locale.",
+            ],
         ]);
         $query = $in->validate($query);
         $offset = ($query['page'] - 1) * $query['limit'];
+
 
         $out = $this->schema([
             ":a" => Schema::parse([
@@ -611,9 +615,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out");
 
         $article = $this->articleByID($id);
+        $where = ["articleID" => $article["articleID"]];
+
+        if (!empty($query['locale'])) {
+            $where['locale'] = $query['locale'];
+        }
 
         $revisions = $this->articleRevisionModel->get(
-            ["articleID" => $article["articleID"]],
+            $where,
             [
                 "orderFields" => "dateInserted",
                 "orderDirection" => "desc",

@@ -586,13 +586,18 @@ paths:
     "/articles/{id}/revisions":
         get:
             parameters:
-                - description:
-                      <p>The article ID.</p>
+                - description: The article ID.
                   in: path
                   name: id
                   required: true
                   schema:
                       type: integer
+                - description: Locale to filter revisions by.
+                  in: path
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
                 - description:
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
                   in: query
