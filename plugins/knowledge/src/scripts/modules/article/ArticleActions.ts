@@ -17,6 +17,8 @@ import {
     IGetArticleFromDiscussionResponse,
     IGetArticleRequestBody,
     IGetArticleResponseBody,
+    IGetArticleLocalesRequestBody,
+    IGetArticleLocalesResponseBody,
     IPatchArticleDraftRequest,
     IPatchArticleDraftResponse,
     IPatchArticleRequestBody,
@@ -77,6 +79,10 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public static readonly GET_ARTICLE_REQUEST = "@@article/GET_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     public static readonly GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_ERROR";
+
+    public static readonly GET_ARTICLE_LOCALES_REQUEST = "@@article/GET_ARTICLE_LOCALES_REQUEST";
+    public static readonly GET_ARTICLE_LOCALES_RESPONSE = "@@article/GET_ARTICLE_LOCALES_RESPONSE";
+    public static readonly GET_ARTICLE_LOCALES_ERROR = "@@article/GET_ARTICLE_LOCALES_ERROR";
 
     public static readonly GET_ARTICLES_REQUEST = "@@article/GET_ARTICLES_REQUEST";
     public static readonly GET_ARTICLES_RESPONSE = "@@article/GET_ARTICLES_RESPONSE";
@@ -146,6 +152,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.patchArticleACs>
         | ActionsUnion<typeof ArticleActions.getArticleACs>
+        | ActionsUnion<typeof ArticleActions.getArticleLocalesACs>
         | ActionsUnion<typeof ArticleActions.getDraftACs>
         | ActionsUnion<typeof ArticleActions.getDraftsACs>
         | ActionsUnion<typeof ArticleActions.postDraftACs>
@@ -176,6 +183,18 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IGetArticleResponseBody,
         {} as IGetArticleRequestBody,
+    );
+
+    /**
+     * Static action creators for the get article  translations endpoint.
+     */
+    private static readonly getArticleLocalesACs = ReduxActions.generateApiActionCreators(
+        ArticleActions.GET_ARTICLE_LOCALES_REQUEST,
+        ArticleActions.GET_ARTICLE_LOCALES_RESPONSE,
+        ArticleActions.GET_ARTICLE_LOCALES_ERROR,
+
+        {} as IGetArticleLocalesResponseBody,
+        {} as IGetArticleLocalesRequestBody,
     );
 
     /**
@@ -236,7 +255,9 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public getFromDiscussion(request: IGetArticleFromDiscussionRequest) {
         const apiThunk = bindThunkAction(ArticleActions.getFromDiscussionACs, async () => {
             const params = { ...request };
-            const response = await this.api.get("/articles/from-discussion", { params });
+            const response = await this.api.get("/articles/from-discussion", {
+                params,
+            });
             return response.data;
         })(request);
         return this.dispatch(apiThunk);
@@ -419,9 +440,13 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         force: boolean = false,
     ): Promise<IApiResponse<IGetArticleResponseBody> | undefined> => {
         const { articleID, ...rest } = options;
+
         const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
         if (existingArticle && !force) {
-            const articleResponse: IApiResponse<IGetArticleResponseBody> = { data: existingArticle, status: 200 };
+            const articleResponse: IApiResponse<IGetArticleResponseBody> = {
+                data: existingArticle,
+                status: 200,
+            };
             this.dispatch(ArticleActions.getArticleACs.response(articleResponse, options));
             return Promise.resolve(articleResponse);
         }
@@ -432,6 +457,25 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             ArticleActions.getArticleACs,
             rest,
             { articleID },
+        );
+    };
+
+    /**
+     * Get an article Locales by its ID from the API.
+     */
+    public fetchLocales = (
+        options: IGetArticleLocalesRequestBody,
+        force: boolean = false,
+    ): Promise<IApiResponse<IGetArticleLocalesResponseBody> | undefined> => {
+        const { articleID, ...rest } = options;
+        const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
+
+        return this.dispatchApi<IGetArticleLocalesResponseBody>(
+            "get",
+            `/articles/1/translations`,
+            ArticleActions.getArticleLocalesACs,
+            { articleID },
+            options,
         );
     };
 
@@ -448,7 +492,10 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         const { revisionID, ...rest } = options;
         const existingRevision = ArticleModel.selectRevision(this.getState(), revisionID);
         if (existingRevision) {
-            const revResponse: IApiResponse<IGetRevisionResponseBody> = { data: existingRevision, status: 200 };
+            const revResponse: IApiResponse<IGetRevisionResponseBody> = {
+                data: existingRevision,
+                status: 200,
+            };
             this.dispatch(ArticleActions.getRevisionACs.response(revResponse, options));
             return Promise.resolve(revResponse);
         } else {

@@ -16,7 +16,7 @@ import classNames from "classnames";
 export interface IOtherLangaugesProps {
     id?: string;
     selected: any;
-    children: ILanguageProps[];
+    data: ILanguageProps[];
 }
 
 /**
@@ -30,7 +30,8 @@ export default class OtherLangauges extends React.Component<IOtherLangaugesProps
 
     public render() {
         const classesPanelList = panelListClasses();
-        const showPicker = this.props.children && this.props.children.length > 1;
+        const showPicker = this.props.data && this.props.data.length > 1;
+
         if (showPicker) {
             return (
                 <PanelWidget>
@@ -46,9 +47,8 @@ export default class OtherLangauges extends React.Component<IOtherLangaugesProps
                             className="otherLanguages-select"
                             renderLeft={true}
                             selected={this.props.selected}
-                        >
-                            {this.props.children}
-                        </LanguagesDropDown>
+                            data={this.props.data}
+                        />
                     </div>
                 </PanelWidget>
             );

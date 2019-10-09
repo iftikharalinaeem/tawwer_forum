@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocales } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -29,6 +29,9 @@ export interface IArticleState {
     };
     draftsByID: {
         [key: number]: IResponseArticleDraft;
+    };
+    localesByID: {
+        [key: number]: IArticleLocales;
     };
 }
 
@@ -103,6 +106,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         revisionsByID: {},
         revisionFragmentsByID: {},
         draftsByID: {},
+        localesByID: {},
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -157,6 +161,13 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     break;
                 case CategoryActions.PATCH_CATEGORY_RESPONSE:
                     return ArticleModel.INITIAL_STATE;
+
+                case ArticleActions.GET_ARTICLE_LOCALES_RESPONSE:
+                    const localeData = action.payload.data;
+                    localeData.forEach(d => {
+                        nextState.localesByID[d.articleRevisionID] = d;
+                    });
+                    break;
             }
         });
     };

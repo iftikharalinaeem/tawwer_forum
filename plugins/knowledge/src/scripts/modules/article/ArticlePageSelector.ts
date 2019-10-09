@@ -72,4 +72,21 @@ export default class ArticlePageSelector {
             return (navItemsByFullID[sortData.prevID] as IKbNavigationItem<KbRecordType.ARTICLE>) || null;
         },
     );
+
+    /**
+     * Select the previous article from our navigation data if possible.
+     */
+    public static selectLocales = createSelector(
+        [
+            (state: IKnowledgeAppStoreState) => state.knowledge.articlePage,
+            (state: IKnowledgeAppStoreState) => state.knowledge.articles.localesByID,
+        ],
+        (pageState, localesByID) => {
+            const { articleID, articleLoadable } = pageState;
+            return {
+                ...articleLoadable,
+                data: articleID !== null ? localesByID[articleID] : null,
+            };
+        },
+    );
 }

@@ -57,6 +57,8 @@ export default class ArticlePageActions extends ReduxActions {
                 article = articleResponse.data;
             }
 
+            const localResponseData = await this.articleActions.fetchLocales({ articleID });
+            const localResponse = localResponseData.data;
             const kbID = article.knowledgeBaseID;
             await this.navigationActions.getNavigationFlat(kbID);
             return article;

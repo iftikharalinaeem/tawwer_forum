@@ -94,6 +94,15 @@ export const articlePageReducer = produce(
                     case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
                         nextState.restoreStatus = LoadStatus.SUCCESS;
                         break;
+                    case ArticleActions.GET_ARTICLE_LOCALES_REQUEST:
+                        nextState.articleLoadable.status = LoadStatus.LOADING;
+                        break;
+                    case ArticleActions.GET_ARTICLE_LOCALES_RESPONSE:
+                        nextState.articleLoadable.status = LoadStatus.SUCCESS;
+                        break;
+                    case ArticleActions.GET_ARTICLE_LOCALES_ERROR:
+                        nextState.articleLoadable.status = LoadStatus.ERROR;
+                        break;
                 }
             }
 

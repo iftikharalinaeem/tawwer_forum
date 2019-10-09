@@ -28,6 +28,7 @@ import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
+import { stat } from "fs";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -71,6 +72,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     nextNavArticle={this.props.nextNavArticle}
                     currentNavCategory={this.props.currentNavCategory}
                     messages={this.renderMessages()}
+                    articlelocales={this.props.articlelocales}
                 />
             </DocumentTitle>
         );
@@ -150,7 +152,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (id === null) {
             return;
         }
-
         void articlePageActions.init(id);
     }
 }
@@ -177,6 +178,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
                 : null,
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
+        articlelocales: state.knowledge.articles.localesByID,
     };
 }
 
