@@ -14,7 +14,6 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
-use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use UserModel;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
@@ -683,10 +682,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
         $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
         $siteSectionSlug = $this->getSitSectionSlug($row["locale"], $allLocales);
-
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
         $row["url"] = \Gdn::request()->url($path, true);
+
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -724,6 +723,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
         $locale = (array_key_exists("locale", $body) ? $body["locale"] : $sourceLocale);
+        $row =[];
         foreach ($records as $record) {
             if ($record["locale"] === $locale) {
                 $row = $record;
@@ -1225,8 +1225,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["locale"] = $locale;
 
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
-            $revision["name"] = $revision["name"] ?? "";
-            $revision["body"] = $revision["body"] ?? "";
+            $revision["name"] = $revision["name"] ?? "place-holder";
+            $revision["body"] = $revision["body"] ?? "place-holder";
             $revision["format"] = $revision["format"] ?? strtolower(\Gdn_Format::defaultFormat());
 
             // Temporary hack to avoid a Rich format error if we have no body.

@@ -60,6 +60,7 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => __CLASS__,
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
+            "sourceLocale" => "en",
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
@@ -82,7 +83,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $row["body"] = md5($row["body"]);
         $row["format"] = $row["body"] === "markdown" ? "text" : "markdown";
-        $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
+      //  $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
         $row["name"] = md5($row["name"]);
         $row["sort"]++;
 
@@ -211,7 +212,8 @@ class ArticlesTest extends AbstractResourceTest {
                 "Description" => 'Test knowledge base description',
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
-                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
+                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
+                "sourceLocale" => "en",
             ])->getBody();
         }
 
@@ -245,7 +247,7 @@ class ArticlesTest extends AbstractResourceTest {
                 "Description" => 'Test knowledge base description',
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
-                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
+                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
             ])->getBody();
         }
 
@@ -662,4 +664,5 @@ class ArticlesTest extends AbstractResourceTest {
         ];
         $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
     }
+
 }
