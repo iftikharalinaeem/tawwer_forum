@@ -20,11 +20,3 @@ export interface ISubcommunity extends IApiDateInfo {
         [localeKey: string]: string;
     };
 }
-
-export interface ILocale {
-    key: string;
-    translatedNames: {
-        // Translated names of the locale.
-        [localeKey: string]: string;
-    };
-}

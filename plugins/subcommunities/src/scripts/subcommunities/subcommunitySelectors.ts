@@ -8,9 +8,10 @@ import { IMultiSiteStoreState } from "@subcommunities/state/model";
 import { useSelector } from "react-redux";
 import { useEffect, useMemo, useDebugValue } from "react";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { ISubcommunity, ILocale } from "@subcommunities/subcommunities/subcommunityTypes";
-import { formatUrl, assetUrl, getMeta } from "@library/utility/appUtils";
+import { ISubcommunity } from "@subcommunities/subcommunities/subcommunityTypes";
+import { formatUrl, assetUrl } from "@library/utility/appUtils";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
+import { useLocaleInfo, ILocale } from "@vanilla/i18n";
 
 export function useSubcommunitiesState() {
     return useSelector((state: IMultiSiteStoreState) => {
@@ -87,18 +88,25 @@ export function useCurrentSubcommunity() {
     return result;
 }
 
-export function useAvailableLocales() {
+export function useAvailableSubcommunityLocales(): ILocale[] | null {
     const { subcommunitiesByID } = useSubcommunities();
     const { hideNoProductCommunities } = useCommunityFilterContext();
+    const { locales } = useLocaleInfo();
 
     const result = useMemo(() => {
-        const availableLocales: { [key: string]: ILocale } = {};
+        const availableLocales: ILocale[] = [];
         if (!subcommunitiesByID.data) {
             return null;
         }
 
         for (const community of Object.values(subcommunitiesByID.data)) {
-            if (availableLocales[community.locale]) {
+            const matchingFullLocale = locales.find(locale => community.locale === locale.regionalKey);
+
+            if (!matchingFullLocale) {
+                continue;
+            }
+
+            if (availableLocales.find(locale => locale.regionalKey === community.locale)) {
                 continue;
             }
 
@@ -106,30 +114,13 @@ export function useAvailableLocales() {
                 continue;
             }
 
-            availableLocales[community.locale] = {
-                key: community.locale,
-                translatedNames: community.localeNames,
-            };
+            if (matchingFullLocale) {
+                availableLocales.push(matchingFullLocale);
+            }
         }
         return availableLocales;
-    }, [subcommunitiesByID, hideNoProductCommunities]);
+    }, [subcommunitiesByID, hideNoProductCommunities, locales]);
 
-    useDebugValue(result);
-    return result;
-}
-
-export function useLocaleInfo() {
-    const locales = useAvailableLocales();
-    const result = useMemo(() => {
-        if (!locales) {
-            return null;
-        }
-        const result = {
-            count: Object.values(locales).length,
-            defaultLocale: getMeta("ui.localeKey", getMeta("ui.locale", null)),
-        };
-        return result;
-    }, [locales]);
     useDebugValue(result);
     return result;
 }

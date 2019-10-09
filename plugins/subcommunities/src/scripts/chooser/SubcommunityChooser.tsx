@@ -14,9 +14,13 @@ import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
 import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
-import { useCurrentSubcommunity, useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
+import {
+    useCurrentSubcommunity,
+    useAvailableSubcommunityLocales,
+} from "@subcommunities/subcommunities/subcommunitySelectors";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
+import { useLocaleInfo } from "@vanilla/i18n";
 
 type SectionName = "locale" | "product";
 
@@ -31,18 +35,20 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const [activeSection, setActiveSection] = useState<SectionName>("locale");
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const localeInfo = useLocaleInfo();
+    const availableLocales = useAvailableSubcommunityLocales();
     const device = useDevice();
     const showHeader = device === Devices.MOBILE || device === Devices.XS;
 
-    if (!subcommunity || !localeInfo) {
+    if (!subcommunity || !availableLocales) {
         return null;
     }
+
+    const hasMultipleLocales = Object.values(availableLocales).length > 1;
 
     const classes = subcommunityChooserClasses();
 
     let toggleName = subcommunity.name;
-    if (localeInfo.count > 1) {
+    if (hasMultipleLocales) {
         toggleName += ` (${subcommunity.locale}) `;
     }
 
@@ -73,7 +79,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
                                 setIsOpen(false);
                             }}
                         >
-                            {localeInfo.count > 1 && (
+                            {hasMultipleLocales && (
                                 <>
                                     <Button
                                         baseClass={
@@ -114,18 +120,19 @@ export function SubcommunityChooser(props: {
     const { activeSection, setActiveSection } = props;
     const subcommunity = useCurrentSubcommunity();
     const [selectedLocale, setSelectedLocale] = useState<string | null>(subcommunity ? subcommunity.locale : null);
-    const localeInfo = useLocaleInfo();
+    const availableLocales = useAvailableSubcommunityLocales();
+    const { currentLocale } = useLocaleInfo();
     useEffect(() => {
-        if (localeInfo && localeInfo.defaultLocale) {
-            setSelectedLocale(localeInfo.defaultLocale);
+        if (currentLocale) {
+            setSelectedLocale(currentLocale);
             props.setActiveSection("product");
         }
     }, [subcommunity]);
 
     const [communityID] = useState<number | null>(null);
 
-    if (localeInfo && localeInfo.count <= 1 && localeInfo.defaultLocale) {
-        return <ProductChooser forLocale={localeInfo.defaultLocale} communityID={communityID} />;
+    if (availableLocales && Object.values(availableLocales).length <= 1 && currentLocale) {
+        return <ProductChooser forLocale={currentLocale} communityID={communityID} />;
     }
 
     if (activeSection === "product" && selectedLocale) {

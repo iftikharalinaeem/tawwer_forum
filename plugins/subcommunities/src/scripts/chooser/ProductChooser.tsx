@@ -12,9 +12,9 @@ import { useProductsForLocale } from "@subcommunities/products/productSelectors"
 import React, { useRef, useLayoutEffect } from "react";
 import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import { LocaleDisplayer } from "@subcommunities/chooser/LocaleDisplayer";
+import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
-import { useLocaleInfo } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { useAvailableSubcommunityLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
 
 interface IProps {
     forLocale: string;
@@ -31,21 +31,21 @@ export function ProductChooser(props: IProps) {
     const options = useCommunityFilterContext();
     const productsForLocale = useProductsForLocale(props.forLocale);
     const backButtonRef = useRef<HTMLButtonElement>(null);
-    const localeInfo = useLocaleInfo();
+    const availableLocales = useAvailableSubcommunityLocales();
 
     // Focus the button when the page opens.
     useLayoutEffect(() => {
         backButtonRef.current && backButtonRef.current.focus();
     }, []);
 
-    if (!productsForLocale || !localeInfo) {
+    if (!productsForLocale || !availableLocales) {
         return <Loader small padding={10} />;
     }
 
     const classes = subcommunityChooserClasses();
     return (
         <div>
-            {props.onBack && localeInfo.count > 1 && (
+            {props.onBack && Object.values(availableLocales).length > 1 && (
                 <>
                     <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
                         <span className={classes.rowBack}>
