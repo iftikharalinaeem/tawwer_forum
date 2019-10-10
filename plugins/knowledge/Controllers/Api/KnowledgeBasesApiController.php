@@ -114,7 +114,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ],
             "sourceLocale?",
             "siteSectionGroup?"
-        ])->add($this->fullSchema())->setDescription("List knowledge bases.");
+        ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
 
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
