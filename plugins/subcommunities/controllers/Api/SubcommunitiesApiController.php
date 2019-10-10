@@ -16,7 +16,7 @@ use Vanilla\ApiUtils;
  * API controller for managing the subcommunities resource.
  */
 class SubcommunitiesApiController extends AbstractApiController {
-   
+
     /** @var Schema */
     private $subcommunitySchema;
 
@@ -25,7 +25,7 @@ class SubcommunitiesApiController extends AbstractApiController {
 
     /** @var Schema */
     private $idParamSchema;
-   
+
     /** @var SubcommunityModel */
     private $subcommunityModel;
 
@@ -55,7 +55,7 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "subcommunityID:i",
                 "name:s",
                 "folder:s",
-                "categoryID:s",
+                "categoryID:s?",
                 "locale:s",
                 "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
@@ -151,7 +151,7 @@ class SubcommunitiesApiController extends AbstractApiController {
             "expand?" => ApiUtils::getExpandDefinition(["product","category"])
         ]);
         $query = $in->validate($query);
-        
+
         $result = $this->subcommunityModel->getID($id);
         $this->subcommunityModel::calculateRow($result);
 
