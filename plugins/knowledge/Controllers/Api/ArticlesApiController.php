@@ -715,10 +715,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body, true);
+
+        if (array_key_exists("locale", $body)) {
+            $body = $this->validateFirstArticleRevision($id, $body);
+        }
+
         $this->save($body, $id);
-
         $records = $this->articleByID($id, true, false, true);
-
         $firstRecord = reset($records);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
@@ -1111,7 +1114,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategory["knowledgeCategoryID"]);
 
             // If the locale is passed check if it is supported.
-            $locale =  $fields["locale"] ?? $knowledgeBase["sourceLocale"];
+            $locale =  $locale ?? $knowledgeBase["sourceLocale"];
             $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
             $allLocales = array_column($allLocales, "locale");
             $allLocales[] = $knowledgeBase["sourceLocale"];
@@ -1225,8 +1228,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["locale"] = $locale;
 
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
-            $revision["name"] = $revision["name"] ?? "place-holder";
-            $revision["body"] = $revision["body"] ?? "place-holder";
+            $revision["name"] = $revision["name"] ?? "";
+            $revision["body"] = $revision["body"] ?? "";
             $revision["format"] = $revision["format"] ?? strtolower(\Gdn_Format::defaultFormat());
 
             // Temporary hack to avoid a Rich format error if we have no body.
@@ -1340,5 +1343,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
         }
         return $siteSectionSlug;
+    }
+
+    /**
+     * Check if the required fields are there for the first revision in a different locale.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    private function validateFirstArticleRevision(int $id, array $body) {
+        $revisions = $this->articleRevisionModel->get(["articleID" => $id]);
+        $revisionForLocale = array_column($revisions, "locale");
+        if (!in_array($body["locale"], $revisionForLocale)) {
+            $firstRevisionSchema = $this->firstArticleRevisionPatchSchema("in")
+                ->setDescription("Update an existing article.");
+            $body = $firstRevisionSchema->validate($body);
+        }
+        return $body;
     }
 }
