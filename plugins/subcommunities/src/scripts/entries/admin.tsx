@@ -11,13 +11,17 @@ import { getMeta } from "@library/utility/appUtils";
 
 const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
 
-addComponent("product-integration-form-group", ProductIntegrationFormGroup);
+addComponent("product-integration-form-group", ProductIntegrationFormGroup, { overwrite: true });
 
 if (isProductIntgrationEnabled) {
-    addComponent("product-selector-form-group", props => (
-        <ProductSelectorFormGroup {...props} formFieldName="ProductID" valueType="productID" />
-    ));
-    addComponent("site-section-group-selector-form-group", props => (
-        <ProductSelectorFormGroup {...props} formFieldName="siteSectionGroup" valueType="sectionGroup" />
-    ));
+    addComponent(
+        "product-selector-form-group",
+        props => <ProductSelectorFormGroup {...props} formFieldName="ProductID" valueType="productID" />,
+        { overwrite: true },
+    );
+    addComponent(
+        "site-section-group-selector-form-group",
+        props => <ProductSelectorFormGroup {...props} formFieldName="siteSectionGroup" valueType="sectionGroup" />,
+        { overwrite: true },
+    );
 }
