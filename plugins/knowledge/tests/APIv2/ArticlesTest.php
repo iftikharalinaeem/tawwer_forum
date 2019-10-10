@@ -631,9 +631,12 @@ class ArticlesTest extends AbstractResourceTest {
         $response = $this->api()->get($this->baseUrl."/".$article["articleID"]."/revisions");
         $revisions =  $response->getBody();
         $locales = array_column($revisions, "locale");
+        $status = array_column($revisions, "status");
 
         $this->assertEquals(2, count($revisions));
         $this->assertEquals(["en","ru"], $locales);
+        $this->assertEquals(["published","published"], $status);
+
     }
 
     /**
