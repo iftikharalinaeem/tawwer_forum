@@ -639,10 +639,11 @@ class ArticlesTest extends AbstractResourceTest {
     /**
      * Test posting article in a locale that is supported.
      *
-     * @expectedException Garden\Web\Exception\ClientException
-     * @expectedExceptionMessage Locale xx not supported in this Knowledge-Base
      */
     public function testPatchArticleInNotSupportedLocale() {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage("Locale xx not supported in this Knowledge-Base");
+
         $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
             ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);

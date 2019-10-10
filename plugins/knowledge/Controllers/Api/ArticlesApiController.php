@@ -1205,13 +1205,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
 
         if (!empty($revision)) {
-            // Grab the current revision, if available, to load as initial defaults.
+            // Grab the current published revisions from each locale, if available, to load as initial defaults.
             $articles = $this->articleModel->getIDWithRevision($articleID, true);
 
             $currentRevision =[];
             foreach ($articles as $article) {
+                // find the unique published revision in the give locale.
                 if ($article["locale"] === $locale) {
                     $currentRevision = array_intersect_key($article, $revisionFields);
+                    break;
                 }
             }
 
