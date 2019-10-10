@@ -323,7 +323,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             ['subcommunities-group-2', 1],
             ['subcommunities-group-3', 0],
             ['all', 7],
-            [null, 4],
+            [null, 7],
         ];
     }
 }

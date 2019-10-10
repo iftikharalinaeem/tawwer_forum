@@ -120,7 +120,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        if ($query['siteSectionGroup'] === 'all') {
+        if (array_key_exists("siteSectionGroup", $query) && $query['siteSectionGroup'] === 'all') {
             unset($query['siteSectionGroup']);
         }
 
