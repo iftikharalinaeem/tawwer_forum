@@ -81,7 +81,7 @@ if ($St->tableExists('Category')) {
     $St->table('Category')
         ->column('AllowGroups', 'tinyint', '0')
         ->set();
-
+    $St->table('Category');
     if (!$AllowGroupsExists) {
         // Create a category for groups.
         $Model = new CategoryModel();
