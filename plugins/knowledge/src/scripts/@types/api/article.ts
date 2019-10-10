@@ -113,7 +113,7 @@ export interface IGetArticleResponseBody extends IArticle {}
 export interface IGetArticleLocalesRequestBody {
     articleID: number;
 }
-export interface IGetArticleLocalesResponseBody extends IArticleLocales {}
+export type IGetArticleLocalesResponseBody = IArticleLocales[];
 
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {

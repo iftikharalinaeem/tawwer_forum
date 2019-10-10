@@ -74,6 +74,18 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         return stateSlice.revisionFragmentsByID[revisionID] || null;
     }
 
+    /******/
+    /**
+     * Select a revision revision fragment out of the stored fragments.
+     *
+     * @param state A full state instance.
+     * @param localeID The ID of the revision to select.
+     */
+    public static selectLocaleFragment(state: IKnowledgeAppStoreState, localeID: number): IArticleLocales | null {
+        const stateSlice = this.stateSlice(state);
+        return stateSlice.localesByID[localeID] || null;
+    }
+
     /**
      * Select an article draft out of the stored drafts.
      *
@@ -134,6 +146,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                 }
                 case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                     const revisions = action.payload.data;
+                    // console.log("-->", nextState);
                     revisions.forEach(rev => {
                         nextState.revisionFragmentsByID[rev.articleRevisionID] = rev;
                     });
@@ -164,6 +177,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
                 case ArticleActions.GET_ARTICLE_LOCALES_RESPONSE:
                     const localeData = action.payload.data;
+                    //  console.log("~~>>", nextState);
                     localeData.forEach(d => {
                         nextState.localesByID[d.articleRevisionID] = d;
                     });

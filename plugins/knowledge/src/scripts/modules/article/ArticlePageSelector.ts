@@ -83,6 +83,7 @@ export default class ArticlePageSelector {
         ],
         (pageState, localesByID) => {
             const { articleID, articleLoadable } = pageState;
+            console.log("==>", pageState);
             return {
                 ...articleLoadable,
                 data: articleID !== null ? localesByID[articleID] : null,
