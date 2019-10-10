@@ -1383,12 +1383,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /**
      * Check if an locale is supported by a knowledge-base.
      *
-     * @param $locale
+     * @param string $locale
      * @param array $knowledgeBase
      * @return string
      * @throws ClientException If locale is not supported.
      */
-    private function checkKbSupportsLocale($locale, array $knowledgeBase): string {
+    private function checkKbSupportsLocale(string $locale, array $knowledgeBase): string {
         $locale = $locale ?? $knowledgeBase["sourceLocale"];
         $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
         $allLocales = array_column($allLocales, "locale");
