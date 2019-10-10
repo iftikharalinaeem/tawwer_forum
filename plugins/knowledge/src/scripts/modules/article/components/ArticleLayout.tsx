@@ -130,7 +130,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                 <OtherLanguages
                                     //id={}
                                     //={}
-                                    data={values(this.props.articlelocales)}
+                                    data={values(articlelocales)}
                                 />
                             </PanelWidget>
                         </>

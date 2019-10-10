@@ -58,7 +58,7 @@ export default class ArticlePageActions extends ReduxActions {
             }
 
             const localResponseData = await this.articleActions.fetchLocales({ articleID });
-            const localResponse = localResponseData.data;
+            const localResponse = localResponseData.data || null;
             /* if (!localResponseData) {
                 return localResponseData.data;
             }*/
