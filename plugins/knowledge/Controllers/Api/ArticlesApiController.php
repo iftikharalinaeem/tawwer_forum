@@ -734,7 +734,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $firstRecord = reset($records);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-        $locale = (array_key_exists("locale", $body) ? $body["locale"] : $sourceLocale);
+        $locale = (array_key_exists("locale", $body)) ? $body["locale"] : $sourceLocale;
         $row =[];
         foreach ($records as $record) {
             if ($record["locale"] === $locale) {
