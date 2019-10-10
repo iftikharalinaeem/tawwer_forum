@@ -6,10 +6,12 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Test the /api/v2/articles/{id}/revisions endpoint.
@@ -47,12 +49,21 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
+
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
     }
 
     /**
      * Creates an article and revisions for testing.
      */
     public function testPrepareData() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
         $bodyText = json_encode([["insert" => uniqid("Rich Article")]]);
 
         $row = [
