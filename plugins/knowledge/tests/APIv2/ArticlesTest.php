@@ -636,7 +636,6 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertEquals(2, count($revisions));
         $this->assertEquals(["en","ru"], $locales);
         $this->assertEquals(["published","published"], $status);
-
     }
 
     /**
