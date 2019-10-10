@@ -55,6 +55,8 @@ trait ArticlesApiSchemes {
     /** @var Schema */
     private $articleAliasesSchema;
 
+    /** @var Schema */
+    private $firstArticleRevisionPatchSchema;
     /**
      * Get a schema representing a discussion in an easy-to-consume format for creating an article.
      *
@@ -166,6 +168,36 @@ trait ArticlesApiSchemes {
         }
 
         return $this->schema($this->articlePatchSchema, $type);
+    }
+
+    /**
+     * Get an article schema with minimal editable fields.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function firstArticleRevisionPatchSchema(string $type = ""): Schema {
+        if ($this->firstArticleRevisionPatchSchema === null) {
+            $this->firstArticleRevisionPatchSchema = $this->schema(
+                Schema::parse([
+                    "knowledgeCategoryID",
+                    "format",
+                    "body",
+                    "name",
+                    "locale",
+                    "sort?",
+                    "discussionID?",
+                    "previousRevisionID?",
+                    "draftID?" => [
+                        "type" => "integer",
+                        "description" => "Unique ID of a draft to remove upon updating an article.",
+                            ]
+                        ])->add($this->fullSchema()),
+                "firstArticleRevisionPatch"
+            );
+        }
+
+        return $this->schema($this->firstArticleRevisionPatchSchema, $type);
     }
 
 

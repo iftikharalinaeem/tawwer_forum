@@ -60,6 +60,7 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => __CLASS__,
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
+            "sourceLocale" => "en",
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
@@ -82,7 +83,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $row["body"] = md5($row["body"]);
         $row["format"] = $row["body"] === "markdown" ? "text" : "markdown";
-        $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
+      //  $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
         $row["name"] = md5($row["name"]);
         $row["sort"]++;
 
@@ -211,7 +212,8 @@ class ArticlesTest extends AbstractResourceTest {
                 "Description" => 'Test knowledge base description',
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
-                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
+                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
+                "sourceLocale" => "en",
             ])->getBody();
         }
 
@@ -245,7 +247,7 @@ class ArticlesTest extends AbstractResourceTest {
                 "Description" => 'Test knowledge base description',
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
-                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL
+                "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
             ])->getBody();
         }
 
@@ -594,4 +596,80 @@ class ArticlesTest extends AbstractResourceTest {
 
         $this->api()->post($this->baseUrl, $record);
     }
+
+    /**
+     * Test posting article in a locale that is supported.
+     */
+    public function testPatchArticleInSupportedLocale() {
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "en";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        $record = [
+            "body" => "Translated article body",
+            "format" => "markdown",
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
+            "locale" => "ru",
+            "name" => "Translated Example Article",
+            "sort" => 1,
+        ];
+
+        $response = $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->api()->get($this->baseUrl."/".$article["articleID"]."/revisions");
+        $revisions =  $response->getBody();
+        $locales = array_column($revisions, "locale");
+        $status = array_column($revisions, "status");
+
+        $this->assertEquals(2, count($revisions));
+        $this->assertEquals(["en","ru"], $locales);
+        $this->assertEquals(["published","published"], $status);
+    }
+
+    /**
+     * Test posting article in a locale that is supported.
+     *
+     */
+    public function testPatchArticleInNotSupportedLocale() {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage("Locale xx not supported in this Knowledge-Base");
+
+        $siteSectionProvider = new MockSiteSectionProvider();
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "en";
+
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        $record = [
+            "body" => "Translated article body",
+            "format" => "markdown",
+            "knowledgeCategoryID" => self::$knowledgeCategoryID,
+            "locale" => "xx",
+            "name" => "Translated Example Article",
+            "sort" => 1,
+        ];
+        $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+    }
+
 }
