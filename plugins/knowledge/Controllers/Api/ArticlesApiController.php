@@ -1113,7 +1113,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategory["knowledgeCategoryID"]);
 
             // If the locale is passed check if it is supported.
-            $locale = $this->checkKbSupportsLocale($locale, $knowledgeBase);
+            $locale = $locale ?? $knowledgeBase["sourceLocale"];
+            $this->checkKbSupportsLocale($locale, $knowledgeBase);
 
             //check if knowledge category exists and knowledge base is "published"
             $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
@@ -1385,11 +1386,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param string $locale
      * @param array $knowledgeBase
-     * @return string
      * @throws ClientException If locale is not supported.
      */
-    private function checkKbSupportsLocale(string $locale, array $knowledgeBase): string {
-        $locale = $locale ?? $knowledgeBase["sourceLocale"];
+    private function checkKbSupportsLocale(string $locale, array $knowledgeBase) {
         $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
         $allLocales = array_column($allLocales, "locale");
         $allLocales[] = $knowledgeBase["sourceLocale"];
@@ -1397,6 +1396,5 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if (!$supportedLocale) {
             throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
         }
-        return $locale;
     }
 }

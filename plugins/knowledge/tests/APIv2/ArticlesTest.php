@@ -633,7 +633,7 @@ class ArticlesTest extends AbstractResourceTest {
         $locales = array_column($revisions, "locale");
 
         $this->assertEquals(2, count($revisions));
-        $this->assertArraySubset(["ru", "en"], $locales);
+        $this->assertEquals(["en","ru"], $locales);
     }
 
     /**
