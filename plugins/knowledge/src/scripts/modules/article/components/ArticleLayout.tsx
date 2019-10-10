@@ -20,7 +20,7 @@ import NextPrevious from "@library/navigation/NextPrevious";
 import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
-import { IArticle, IArticleLocales } from "@knowledge/@types/api/article";
+import { IArticle, IArticleLocale } from "@knowledge/@types/api/article";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
@@ -147,7 +147,9 @@ interface IProps extends IDeviceProps {
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
-    articlelocales: IArticleLocales;
+    articlelocales: {
+        [key: string]: IArticleLocale;
+    };
 }
 
 export default withDevice(ArticleLayout);

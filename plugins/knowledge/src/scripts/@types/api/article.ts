@@ -80,7 +80,7 @@ export interface IArticleFragment {
     excerpt?: string; // Excerpt of the article's content.
 }
 
-export interface IArticleLocales {
+export interface IArticleLocale {
     articleRevisionID: number;
     locale: string;
     name: string;
