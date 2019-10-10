@@ -438,6 +438,8 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
+     * Get the locale that is currently set.
+     * 
      * @return string
      */
     private function getCurrentLocale(): string {
