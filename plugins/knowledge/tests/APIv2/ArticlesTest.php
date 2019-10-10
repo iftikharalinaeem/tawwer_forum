@@ -601,7 +601,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test posting article in a locale that is supported.
      */
     public function testPatchArticleInSupportedLocale() {
-
         $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
             ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
@@ -627,8 +626,14 @@ class ArticlesTest extends AbstractResourceTest {
         ];
 
         $response = $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
-
         $this->assertEquals(200, $response->getStatusCode());
+
+        $response = $this->api()->get($this->baseUrl."/".$article["articleID"]."/revisions");
+        $revisions =  $response->getBody();
+        $locales = array_column($revisions, "locale");
+
+        $this->assertEquals(2, count($revisions));
+        $this->assertArraySubset(["ru", "en"], $locales);
     }
 
     /**
@@ -638,7 +643,6 @@ class ArticlesTest extends AbstractResourceTest {
      * @expectedExceptionMessage Locale xx not supported in this Knowledge-Base
      */
     public function testPatchArticleInNotSupportedLocale() {
-
         $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
             ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);

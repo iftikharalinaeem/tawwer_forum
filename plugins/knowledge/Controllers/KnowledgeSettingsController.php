@@ -193,6 +193,9 @@ class KnowledgeSettingsController extends SettingsController {
             }
         }
 
+        $localModel = new LocaleModel();
+        $availableLocales =  $localModel->enabledLocalePacks();
+
         // Set the form elements on the add/edit form.
         $formData = [
             'name' => [
@@ -249,6 +252,14 @@ class KnowledgeSettingsController extends SettingsController {
                     '<li class="form-group js-sortArticlesGroup">',
                     '</li>'
                 ]
+            ],
+            'sourceLocale' => [
+                "Description" => "The source locale of the knowledge base" ,
+                'LabelCode' => 'Source Locale',
+                'Control' => 'dropdown',
+                'Items' => [
+
+                ],
             ],
         ];
 

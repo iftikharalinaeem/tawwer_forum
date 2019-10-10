@@ -730,17 +730,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $this->save($body, $id);
-        $records = $this->articleByID($id, true, false, true);
-        $firstRecord = reset($records);
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
-        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-        $locale = (array_key_exists("locale", $body)) ? $body["locale"] : $sourceLocale;
-        $row =[];
-        foreach ($records as $record) {
-            if ($record["locale"] === $locale) {
-                $row = $record;
-            }
-        }
+        $row = $this->retrieveRow($id, $body);
 
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
@@ -1123,14 +1113,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategory["knowledgeCategoryID"]);
 
             // If the locale is passed check if it is supported.
-            $locale =  $locale ?? $knowledgeBase["sourceLocale"];
-            $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
-            $allLocales = array_column($allLocales, "locale");
-            $allLocales[] = $knowledgeBase["sourceLocale"];
-            $supportedLocale = in_array($locale, $allLocales);
-            if (!$supportedLocale) {
-                throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
-            }
+            $locale = $this->checkKbSupportsLocale($locale, $knowledgeBase);
 
             //check if knowledge category exists and knowledge base is "published"
             $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
@@ -1370,5 +1353,48 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $firstRevisionSchema->validate($body);
         }
         return $body;
+    }
+
+    /**
+     * Get an article row by it's id and locale.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    private function retrieveRow(int $id, array $body): array {
+        $records = $this->articleByID($id, true, false, true);
+        $firstRecord = reset($records);
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
+        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
+        $locale = (array_key_exists("locale", $body)) ? $body["locale"] : $sourceLocale;
+        $row = [];
+        foreach ($records as $record) {
+            if ($record["locale"] === $locale) {
+                $row = $record;
+            }
+        }
+
+        return $row;
+    }
+
+    /**
+     * Check if an locale is supported by a knowledge-base.
+     *
+     * @param $locale
+     * @param array $knowledgeBase
+     * @return string
+     * @throws ClientException If locale is not supported.
+     */
+    private function checkKbSupportsLocale($locale, array $knowledgeBase): string {
+        $locale = $locale ?? $knowledgeBase["sourceLocale"];
+        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
+        $allLocales = array_column($allLocales, "locale");
+        $allLocales[] = $knowledgeBase["sourceLocale"];
+        $supportedLocale = in_array($locale, $allLocales);
+        if (!$supportedLocale) {
+            throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
+        }
+        return $locale;
     }
 }
