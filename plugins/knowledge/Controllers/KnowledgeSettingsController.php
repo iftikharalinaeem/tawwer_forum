@@ -192,6 +192,7 @@ class KnowledgeSettingsController extends SettingsController {
                 $this->Form->setValidationResults($validation->results());
             }
         }
+        
         // Set the form elements on the add/edit form.
         $formData = [
             'name' => [
