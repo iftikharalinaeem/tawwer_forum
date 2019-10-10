@@ -3,6 +3,7 @@
     "version": "3.0.0",
     "private": true,
     "dependencies": {
+        "@vanilla/i18n": "*",
         "@vanilla/utils": "*",
         "@vanilla/library": "*",
         "@vanilla/dom-utils": "*",

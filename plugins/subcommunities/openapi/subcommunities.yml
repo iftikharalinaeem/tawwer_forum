@@ -14,7 +14,6 @@ paths:
                       enum:
                       - all
                       - product
-                      - locale
                       type: string
                     type: array
                   style: form
@@ -84,9 +83,6 @@ components:
                     type: string
                 product:
                     $ref: '#/components/schemas/ProductFragment'
-                localNames:
-                    description: Unabbreivated subcommunity locale display languages.
-                    type: object
                 subcommunityUrl:
                     description: The subcommunity url.
                     type: string

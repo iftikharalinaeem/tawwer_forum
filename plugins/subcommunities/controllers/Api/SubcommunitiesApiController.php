@@ -59,7 +59,6 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "locale:s",
                 "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
-                "localeNames:o?",
                 "url:s"
             ]));
         }
@@ -86,7 +85,6 @@ class SubcommunitiesApiController extends AbstractApiController {
             "isDefault:i?",
             "productID:i?",
             "product?" => $this->productModel->productFragmentSchema(),
-            "localeNames:o?",
             "url:s"
         ]);
     }
@@ -115,7 +113,7 @@ class SubcommunitiesApiController extends AbstractApiController {
     public function index(array $query): array {
         $this->permission();
         $in = $this->schema([
-            "expand?" => ApiUtils::getExpandDefinition(["product", "category", "locale"])
+            "expand?" => ApiUtils::getExpandDefinition(["product", "category"])
         ]);
         $out = $this->schema([":a" => $this->subcommunitySchema(), "out"]);
 
@@ -130,11 +128,6 @@ class SubcommunitiesApiController extends AbstractApiController {
 
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($results);
-        }
-
-        if ($this->isExpandField('locale', $query['expand'])) {
-            $locales = array_column($results, 'Locale', 'Locale');
-            $this->expandLocales($results, $locales);
         }
 
         $results = ApiUtils::convertOutputKeys($results);
@@ -170,34 +163,5 @@ class SubcommunitiesApiController extends AbstractApiController {
         $result = $out->validate($result);
 
         return $result;
-    }
-
-    /**
-     * Expand the locale names.
-     *
-     * @param array $rows
-     * @param array $locales
-     */
-    public function expandLocales(array &$rows, array $locales) {
-        if (count($rows) === 0) {
-            return;
-        }
-        reset($rows);
-        $single = is_string(key($rows));
-
-        $populate = function(array &$row, array $locales) {
-            foreach ($locales as $locale) {
-                $locales[$locale] = \Locale::getDisplayLanguage($row["Locale"], $locale);
-            }
-            setValue('localeNames', $row, $locales);
-        };
-
-        if ($single) {
-            $populate($rows, $locales);
-        } else {
-            foreach ($rows as &$row) {
-                $populate($row, $locales);
-            }
-        }
     }
 }
