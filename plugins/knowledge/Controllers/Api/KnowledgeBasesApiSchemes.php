@@ -21,6 +21,9 @@ trait KnowledgeBasesApiSchemes {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var Schema */
+    private $getKnowledgeBaseSchema;
+
     /**
      * Get a schema representing all available fields for a knowledge base.
      *
@@ -165,4 +168,28 @@ trait KnowledgeBasesApiSchemes {
         }
         return $this->schema($this->idParamSchema, $type);
     }
+
+    /**
+     * Get partial schema for GET request on /Knowledge-bases.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function getKnowledgeBaseSchema(string $type = "in"): Schema {
+        if ($this->getKnowledgeBaseSchema === null) {
+            $this->getKnowledgeBaseSchema = $this->schema(
+                Schema::parse([
+                    "status" => [
+                    "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
+                    ],
+                    "sourceLocale?",
+                    "siteSectionGroup?"
+                ]),
+                $type
+            );
+        }
+        return $this->schema($this->getKnowledgeBaseSchema, $type);
+    }
+
+
 }

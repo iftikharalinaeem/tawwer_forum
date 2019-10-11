@@ -114,13 +114,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ],
             "sourceLocale?",
             "siteSectionGroup?"
-        ])->add($this->fullSchema())->setDescription("List knowledge bases.");
+        ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
 
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $in->validate($query);
 
-        if ($query['siteSectionGroup'] === 'all') {
+        if (array_key_exists("siteSectionGroup", $query) && $query['siteSectionGroup'] === 'all') {
             unset($query['siteSectionGroup']);
         }
 
