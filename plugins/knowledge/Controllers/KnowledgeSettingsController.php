@@ -183,7 +183,7 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function knowledgeBasesAddEdit($knowledgeBaseID = null) {
         $this->permission('Garden.Settings.Manage');
-        $local = $this->getCurrentLocale();
+        $currentLocale = $this->getCurrentLocale();
         $options = $this->getSourceLocaleOptions();
 
         if ($knowledgeBaseID) {
@@ -262,7 +262,7 @@ class KnowledgeSettingsController extends SettingsController {
                 'LabelCode' => 'Locales',
                 'Control' => 'DropDown',
                 'Items' => $options,
-                'Options' => [ "Default" => $local]
+                'Options' => [ "Default" => $currentLocale]
             ],
         ];
 
@@ -335,7 +335,7 @@ class KnowledgeSettingsController extends SettingsController {
         }
 
         if (!isset($values["sourceLocale"])) {
-            $values["sortLocale"] = $this->getCurrentLocale();
+            $values["sourceLocale"] = $this->getCurrentLocale();
         }
 
         if ($knowledgeBaseID) {
@@ -431,8 +431,8 @@ class KnowledgeSettingsController extends SettingsController {
         $options = [];
         $availableLocales = $this->localApiController->index();
         $localeNames = array_column($availableLocales, 'displayNames', 'localeKey');
-        foreach ($localeNames as $localKey => $displayName) {
-            $options[$localKey] = $displayName[$localKey];
+        foreach ($localeNames as $localKey => $displayNames) {
+            $options[$localKey] = $displayNames[$localKey];
         }
         return $options;
     }
@@ -444,8 +444,8 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function getCurrentLocale(): string {
         $currentLocale = $this->localApiController->getLocale();
-        $local = $currentLocale->Locale;
+        $locale = $currentLocale->Locale;
 
-        return $local;
+        return $locale;
     }
 }
