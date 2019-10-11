@@ -127,12 +127,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @return array Navigation items, arranged hierarchically.
      */
     public function flat(array $query = []): array {
-        if (array_key_exists("knowledgeCategoryID", $query)) {
-            $rows = $this->categoryNavigation($query["knowledgeCategoryID"], true, $query["recordType"]);
-        } else {
-            $rows = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"]);
-        }
-        return $rows;
+        return $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"], $query);
     }
 
     /**
@@ -142,40 +137,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @return array Navigation items, arranged hierarchically.
      */
-    public function tree(array $query): array {
-        if (array_key_exists("knowledgeCategoryID", $query)) {
-            $tree = $this->categoryNavigation($query["knowledgeCategoryID"], false, $query["recordType"]);
-        } else {
-            $tree = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"]);
-        }
-        return $tree;
-    }
-
-    /**
-     * Get navigation items for a particular category.
-     *
-     * @param integer $knowledgeCategoryID
-     * @param boolean $flat
-     * @param string $recordType
-     */
-    private function categoryNavigation(int $knowledgeCategoryID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
-        $categories = $this->knowledgeCategoryModel->get(["parentID" => $knowledgeCategoryID]);
-
-        if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
-            $articles = $this->articleModel->getExtended(
-                [
-                    'a.knowledgeCategoryID' => $knowledgeCategoryID,
-                    'a.status' => ArticleModel::STATUS_PUBLISHED
-                ],
-                ["limit" => false],
-                ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
-            );
-        } else {
-            $articles = [];
-        }
-
-        $result = $this->getNavigation($categories, $articles, $flat, $knowledgeCategoryID);
-        return $result;
+    public function tree(array $query = []): array {
+        return $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"], $query);
     }
 
     /**
@@ -184,8 +147,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param integer $knowledgeBaseID
      * @param boolean $flat
      * @param string $recordType
+     * @param array $query Extra query prameters passed if any
      */
-    private function knowledgeBaseNavigation(int $knowledgeBaseID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
+    private function knowledgeBaseNavigation(int $knowledgeBaseID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL, array $query = []) {
         try {
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
@@ -203,11 +167,14 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
+                $where = [
+                    'a.knowledgeCategoryID' => $catIds,
+                    'a.status' => ArticleModel::STATUS_PUBLISHED
+                ];
+                $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+                //die(print_r($where));
                 $articles = $this->articleModel->getExtended(
-                    [
-                        'a.knowledgeCategoryID' => $catIds,
-                        'a.status' => ArticleModel::STATUS_PUBLISHED
-                    ],
+                    $where,
                     [
                         "limit" => false,
                         "orderFields" => 'sort',
@@ -346,6 +313,10 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     self::FILTER_RECORD_TYPE_CATEGORY,
                     self::FILTER_RECORD_TYPE_ALL
                 ],
+                "type" => "string",
+            ],
+            "locale?" => [
+                "description" => "Locale to represent content in.",
                 "type" => "string",
             ],
         ];
