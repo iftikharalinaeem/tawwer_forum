@@ -24,6 +24,8 @@ class SearchRecordTypeDiscussion implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'advanced';
 
+    const INFRASTRUCTURE_TEMPLATE = 'standard';
+
     const TYPE = 'discussion';
 
     const API_TYPE_KEY = 'discussion';
