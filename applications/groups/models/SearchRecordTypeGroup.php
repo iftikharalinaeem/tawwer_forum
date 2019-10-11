@@ -15,6 +15,8 @@ class SearchRecordTypeGroup implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'sphinx';
 
+    const INFRASTRUCTURE_TEMPLATE = 'groups';
+
     const TYPE = 'group';
 
     const API_TYPE_KEY = 'group';

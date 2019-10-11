@@ -19,6 +19,8 @@ class SearchRecordTypeComment implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'advanced';
 
+    const INFRASTRUCTURE_TEMPLATE = 'standard';
+
     const TYPE = 'comment';
 
     const API_TYPE_KEY = 'comment';
