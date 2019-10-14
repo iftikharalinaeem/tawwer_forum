@@ -5,7 +5,10 @@
 
 import { onReady, onContent } from "@library/utility/appUtils";
 import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { ManageKnowledgeBasesPage } from "@knowledge/knowledge-settings/ManageKnowledgeBasesPage";
+import { addComponent } from "@library/utility/componentRegistry";
 
+addComponent("knowledge-bases-table", ManageKnowledgeBasesPage);
 onReady(handleKBViewTypeChange);
 onContent(handleKBViewTypeChange);
 

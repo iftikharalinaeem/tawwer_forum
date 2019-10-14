@@ -21,7 +21,7 @@ export default class KnowledgeBaseActions extends ReduxActions {
 
     public getAll = () => {
         const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
-            const response = await this.api.get("/knowledge-bases");
+            const response = await this.api.get("/knowledge-bases?expand=all");
             return response.data;
         })();
         return this.dispatch(thunk);

@@ -7,10 +7,12 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { KnowledgeReducer, IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
-import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import KnowledgeBaseActions, { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { createSelector } from "reselect";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
@@ -132,3 +134,16 @@ export interface IKnowledgeBase {
 }
 
 type ReducerType = KnowledgeReducer<IKnowledgeBasesState>;
+
+export function useKnowledgeBases() {
+    const { knowledgeBasesByID } = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
+    const { getAll } = useKnowledgeBaseActions();
+
+    useEffect(() => {
+        if (knowledgeBasesByID.status === LoadStatus.PENDING) {
+            getAll();
+        }
+    }, [knowledgeBasesByID, getAll]);
+
+    return knowledgeBasesByID;
+}
