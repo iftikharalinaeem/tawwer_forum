@@ -36,6 +36,7 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -699,10 +700,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $name = $row["name"] ?? null;
 
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
-        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? "vanilla";
+        $allLocales = $this->knowledgeBaseModel->getLocales($siteSectionGroup);
 
-        //$locale = $row["locale"] ?? "";
-        $siteSectionSlug = $this->getSitSectionSlug($row["locale"], $allLocales);
+        $locale = $row["locale"] ?? "";
+        $siteSectionSlug = $this->getSitSectionSlug($locale, $allLocales);
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
         $row["url"] = \Gdn::request()->url($path, true);
@@ -1383,7 +1385,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $firstRecord = reset($records);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-        $locale = (array_key_exists("locale", $body)) ? $body["locale"] : $sourceLocale;
+        $locale = (array_key_exists("locale", $body) && !empty($body["locale"])) ? $body["locale"] : $sourceLocale;
         $row = [];
         foreach ($records as $record) {
             if ($record["locale"] === $locale) {
