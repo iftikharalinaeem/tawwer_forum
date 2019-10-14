@@ -66,7 +66,7 @@ class ArticlesTest extends AbstractResourceTest {
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
             "sourceLocale" => "en",
-            "siteSectionGroup" => "mockSiteSectionGroup-1"
+            "siteSectionGroup" => "mockSiteSectionGroup-1",
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
@@ -143,6 +143,7 @@ class ArticlesTest extends AbstractResourceTest {
             'sortArticles' => 'manual',
             'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base' . $salt,
+            "siteSectionGroup" => "mockSiteSectionGroup-1",
         ];
         $kb = $this->api()
             ->post('/knowledge-bases', $record)
@@ -564,13 +565,13 @@ class ArticlesTest extends AbstractResourceTest {
      */
     public function testGetArticleTranslations() {
         $record = $this->record();
-        $article = $this->testPost($record);
+        $article = $this->api()->post($this->baseUrl, $record);
         $articleID = $article["articleID"];
 
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
         $articleTranslations = $response->getBody();
 
-        $this->assertCount(1, $articleTranslations);
+        $this->assertCount(4, $articleTranslations);
         $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
     }
@@ -703,11 +704,11 @@ class ArticlesTest extends AbstractResourceTest {
         $this->createMultipleArticles();
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "fr"]);
         $articles = $response->getBody();
-        $this->assertEquals(5, count($articles));
+        $this->assertEquals(6, count($articles));
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
-        $this->assertEquals(5, count($articles));
+        $this->assertEquals(21, count($articles));
     }
 
     /**
@@ -731,7 +732,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "ru"]);
         $article = $response->getBody();
-        $this->assertEquals(1, count($article));
+        $this->assertEquals(2, count($article));
         $this->assertEquals("ru", $article[0]["locale"]);
     }
 

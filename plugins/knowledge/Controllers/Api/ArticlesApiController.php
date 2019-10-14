@@ -14,6 +14,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
+use phpDocumentor\Reflection\Types\Mixed_;
 use UserModel;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
@@ -36,7 +37,6 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
-use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -439,12 +439,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $includeExcerpts = $this->isExpandField("excerpt", $query["expand"]);
 
-        $locale = (array_key_exists("locale", $query) && isset($query["locale"])) ? $query["locale"] : "en";
         $options = [
             "includeBody" => $includeExcerpts,
             "limit" => $limit,
             "offset" => $offset,
-            "locale" => $locale
         ];
 
         $knowledgeCategory = $this->knowledgeCategoryByID($query["knowledgeCategoryID"]);
@@ -700,7 +698,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $name = $row["name"] ?? null;
 
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
-        $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? "vanilla";
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
         $allLocales = $this->knowledgeBaseModel->getLocales($siteSectionGroup);
 
         $locale = $row["locale"] ?? "";
@@ -1341,9 +1339,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param string $articleLocale
      * @param array $allLocales
-     * @return string
+     * @return string|null
      */
-    protected function getSitSectionSlug(string $articleLocale, array $allLocales): string {
+    protected function getSitSectionSlug(string $articleLocale, array $allLocales) {
         $siteSectionSlug = null;
 
         foreach ($allLocales as $locale) {
