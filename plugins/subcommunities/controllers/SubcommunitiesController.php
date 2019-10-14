@@ -1,14 +1,16 @@
 <?php
-
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Subcommunities\Models\ProductModel;
-
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Subcommunities\Models\ProductModel;
+
+/**
+ * Controller for routing the /subcommunities
+ */
 class SubcommunitiesController extends DashboardController {
 
     /// Properties ///
@@ -30,9 +32,6 @@ class SubcommunitiesController extends DashboardController {
 
     /** @var ProductModel */
     private $productModel;
-
-
-
 
     /// Methods ///
 

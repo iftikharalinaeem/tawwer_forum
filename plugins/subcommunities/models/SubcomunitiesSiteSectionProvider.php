@@ -10,14 +10,18 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
 
-
+/**
+ * Site section provider for subcommunities.
+ */
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
 
     /** @var SubcommunitySiteSection */
     private $currentSiteSection;
 
+    /** @var array */
     private $currentSubcommunity;
 
+    /** @var array */
     private $defaultSubcommunity;
     
     /** @var \SubcommunityModel */
@@ -87,6 +91,36 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getForSectionGroup(string $sectionGroupKey): array {
+        // Try to extract a productID.
+        $id = str_replace(
+            SubcommunitySiteSection::SUBCOMMUNITY_GROUP_PREFIX,
+            '',
+            $sectionGroupKey
+        );
+
+        $siteSections = [];
+        $productID = null;
+        if ($testID = filter_var($id, FILTER_VALIDATE_INT)) {
+            $productID = $testID;
+        }
+
+        // Fetch subcommunities.
+        $subcommunities = $this->subcommunityModel->getWhere(['productID' => $productID]);
+        foreach ($subcommunities as $subcommunity) {
+            $siteSections[] = new SubcommunitySiteSection($subcommunity);
+        }
+
+        if (empty($siteSections)) {
+            $siteSections = [$this->defaultSiteSection];
+        }
+
+        return $siteSections;
     }
 
     /**

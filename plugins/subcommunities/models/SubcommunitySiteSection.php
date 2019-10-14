@@ -7,8 +7,13 @@
 namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Site\SiteSectionSchema;
 
+/**
+ * Site section implementation for Subcommunities.
+ */
 class SubcommunitySiteSection implements SiteSectionInterface {
+
     /** @const string Site section prefix */
     const SUBCOMMUNITY_SECTION_PREFIX = 'subcommunities-section-';
 
@@ -41,17 +46,20 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      * DI.
      *
      * @param array $subcommunity Subcommunity model record
-     * @param ProductModel $productModel
      */
     public function __construct(array $subcommunity) {
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
         $this->siteSectionPath = $subcommunity["Folder"].'/';
-        if (empty($siteGroup = $subcommunity["ProductID"])) {
-            $siteGroup = self::SUBCOMMUNITY_NO_PRODUCT;
-        }
+        $this->sectionGroup = ProductModel::makeSiteSectionGroupKey($subcommunity['ProductID'] ?? null);
         $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
-        $this->sectionGroup = self::SUBCOMMUNITY_GROUP_PREFIX.$siteGroup;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
+        return SiteSectionSchema::toArray($this);
     }
 
     /**
@@ -78,7 +86,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /**
      * @inheritdoc
      */
-    public function getSectionID(): int {
+    public function getSectionID(): string {
         return $this->siteSectionID;
     }
 
@@ -88,6 +96,4 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     public function getSectionGroup(): string {
         return $this->sectionGroup;
     }
-
-
 }

@@ -3,8 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-namespace Vanilla\Subcommunities\Models;
 
+namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
@@ -41,6 +41,21 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
+    }
+
+    /**
+     * Make a site section group key from a site section ID.
+     *
+     * @param int|null $productID
+     * @return string
+     */
+    public static function makeSiteSectionGroupKey(?int $productID): string {
+        if ($productID === null) {
+            $siteGroup = SubcommunitySiteSection::SUBCOMMUNITY_NO_PRODUCT;
+        } else {
+            $siteGroup = $productID;
+        }
+        return SubcommunitySiteSection::SUBCOMMUNITY_GROUP_PREFIX . $siteGroup;
     }
 
     /**
