@@ -21,7 +21,7 @@ export default class KnowledgeBaseActions extends ReduxActions {
         "GET_ALL",
     );
 
-    public getAll = (status: KnowledgeBaseStatus) => {
+    public getAll = (status: KnowledgeBaseStatus = KnowledgeBaseStatus.PUBLISHED) => {
         const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
             const response = await this.api.get(`/knowledge-bases?expand=all&status=${status}`);
             return response.data;
