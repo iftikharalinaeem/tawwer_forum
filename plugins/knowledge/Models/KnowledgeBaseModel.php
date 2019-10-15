@@ -454,7 +454,7 @@ MESSAGE
     /**
      * Get all the supported locales of a Knowledge-base by ID.
      *
-     * @param $id Knowledge-base ID.
+     * @param $id $knowledgeBaseID
      * @return array
      */
     public function getSupportedLocaledByID(int $id) {

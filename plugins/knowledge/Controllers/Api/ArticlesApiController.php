@@ -1105,7 +1105,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $in = $this->schema([
             "invalidateTranslations:b"
-        ],"in")->setDescription("Invalidate translations for a particular article.");
+        ], "in")->setDescription("Invalidate translations for a particular article.");
 
         $out = $this->schema([":a" => Schema::parse([
             "articleID:i",
