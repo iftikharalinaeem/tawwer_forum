@@ -1340,7 +1340,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param array $allLocales
      * @return string
      */
-    protected function getSitSectionSlug(string $articleLocale, array $allLocales) {
+    protected function getSitSectionSlug(string $articleLocale, array $allLocales): string {
         $siteSectionSlug = "";
 
         foreach ($allLocales as $locale) {
