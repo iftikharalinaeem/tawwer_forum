@@ -69,10 +69,10 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function addIndexNavigation(string $currentStatus = null) {
         if ($currentStatus === null || $currentStatus === KnowledgeBaseModel::STATUS_PUBLISHED) {
-            $title = self::t("Deleted Knoweldge Bases");
+            $title = self::t("Deleted Knowledge Bases");
             $url = "knowledge-settings/knowledge-bases?status=" . KnowledgeBaseModel::STATUS_DELETED;
         } else {
-            $title = self::t("Knoweldge Bases");
+            $title = self::t("Knowledge Bases");
             $url = "knowledge-settings/knowledge-bases";
         }
 
@@ -161,6 +161,12 @@ class KnowledgeSettingsController extends SettingsController {
      * @param string $status
      */
     private function knowledgeBasesIndex(string $status) {
+        if ($status === KnowledgeBaseModel::STATUS_DELETED) {
+            $this->title(t('Deleted Knowledge Bases'));
+        } else {
+            $this->title(t("Knowledge Bases"));
+        }
+
         $this->permission('Garden.Settings.Manage');
 
         $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all']);

@@ -109,6 +109,19 @@ export enum KnowledgeBaseSortMode {
     DATE_INSERTED_DESC = "dateInsertedDesc",
 }
 
+interface ISiteSection {
+    basePath: string;
+    contentLocale: string;
+    sectionGroup: string;
+    sectionID: string;
+    name: string;
+}
+
+export enum KnowledgeBaseStatus {
+    DELETED = "deleted",
+    PUBLISHED = "published",
+}
+
 /**
  * Interface representing a knowledge base resource.
  */
@@ -126,22 +139,24 @@ export interface IKnowledgeBase {
     urlCode: string;
     url: string;
     icon: string;
+    status: KnowledgeBaseStatus;
     bannerImage: string;
     sourceLocale: string;
     viewType: KbViewType;
     rootCategoryID: number;
     defaultArticleID: number | null;
+    siteSections: ISiteSection[];
 }
 
 type ReducerType = KnowledgeReducer<IKnowledgeBasesState>;
 
-export function useKnowledgeBases() {
+export function useKnowledgeBases(status: KnowledgeBaseStatus) {
     const { knowledgeBasesByID } = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
     const { getAll } = useKnowledgeBaseActions();
 
     useEffect(() => {
         if (knowledgeBasesByID.status === LoadStatus.PENDING) {
-            getAll();
+            getAll(status);
         }
     }, [knowledgeBasesByID, getAll]);
 

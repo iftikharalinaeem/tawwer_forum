@@ -138,7 +138,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             unset($query['siteSectionGroup']);
         }
 
-        $rows = $this->knowledgeBaseModel->get([]);
+        $rows = $this->knowledgeBaseModel->get($query);
 
         $rows = array_map(function ($row) use ($expandSiteSections) {
             if ($expandSiteSections) {
