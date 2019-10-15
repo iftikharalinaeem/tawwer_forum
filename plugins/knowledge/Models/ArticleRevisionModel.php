@@ -91,4 +91,19 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
             self::STATUS_TRANSLATION_UP_TO_DATE
         ];
     }
+
+    /**
+     * @param int $articleID
+     */
+    public function invalidateTranslations(int $articleID) {
+            $this->update(
+                [
+                    "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
+                ],
+                [
+                    "articleID" => $articleID,
+                ]
+            );
+        }
+
 }

@@ -161,7 +161,8 @@ trait ArticlesApiSchemes {
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
-                    ]
+                    ],
+                    "invalidateTranslations:b?"
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );
@@ -263,6 +264,7 @@ trait ArticlesApiSchemes {
                 "aliases?",
                 "status",
                 "locale",
+                "translationStatus"
             ])->add($this->fullSchema()), "Article");
         }
         return $this->schema($this->articleSchema, $type);
@@ -423,6 +425,7 @@ trait ArticlesApiSchemes {
                 "outline",
                 "bodyRendered",
                 "locale",
+                "translationStatus",
             ])->add($this->fullRevisionSchema()));
     }
 
