@@ -126,7 +126,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                     </PanelWidget>
                                 )}
                             <PanelWidget>
-                                <OtherLanguages data={Object.values(articlelocales)} />
+                                <OtherLanguages articleLocaleData={Object.values(articlelocales)} />
                             </PanelWidget>
                         </>
                     }

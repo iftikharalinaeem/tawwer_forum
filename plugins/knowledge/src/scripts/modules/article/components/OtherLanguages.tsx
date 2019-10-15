@@ -20,7 +20,7 @@ import { IArticleLocale } from "@knowledge/@types/api/article";
 export interface IOtherLangaugesProps {
     id?: string;
     selected?: any;
-    data: IArticleLocale[];
+    articleLocaleData: IArticleLocale[];
     localeInfo?: ILocale[];
     currentLocale?: string;
     languageSelect?: boolean;
@@ -37,7 +37,7 @@ export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
     }*/
 
     const classesPanelList = panelListClasses();
-    const showPicker = props.data && props.data.length > 1;
+    const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
     const { locales, currentLocale } = useLocaleInfo();
     if (showPicker) {
         return (
@@ -54,7 +54,7 @@ export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
                         className="otherLanguages-select"
                         renderLeft={true}
                         selected={props.selected}
-                        data={props.data}
+                        data={props.articleLocaleData}
                         localeInfo={locales}
                         currentLocale={currentLocale}
                         languageSelect={true}
