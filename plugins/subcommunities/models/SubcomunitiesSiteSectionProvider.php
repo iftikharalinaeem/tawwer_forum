@@ -10,14 +10,18 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
 
-
+/**
+ * Site section provider for subcommunities.
+ */
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
 
     /** @var SubcommunitySiteSection */
     private $currentSiteSection;
 
+    /** @var array */
     private $currentSubcommunity;
 
+    /** @var array */
     private $defaultSubcommunity;
     
     /** @var \SubcommunityModel */
@@ -87,6 +91,25 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
         } else {
             return null;
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getForSectionGroup(string $sectionGroupKey): array {
+        $siteSections = [];
+
+        foreach ($this->allSiteSections as $siteSection) {
+            if ($siteSection->getSectionGroup() === $sectionGroupKey) {
+                $siteSections[] = $siteSection;
+            }
+        }
+
+        if (empty($siteSections)) {
+            $siteSections = [$this->defaultSiteSection];
+        }
+
+        return $siteSections;
     }
 
     /**
