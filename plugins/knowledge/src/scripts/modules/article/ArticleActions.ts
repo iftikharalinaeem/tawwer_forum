@@ -470,4 +470,21 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             );
         }
     };
+
+    /**
+     * Check that an article has a translation in a particular locale.
+     */
+    public async checkArticleHasTranslation(articleID: number, inLocale: string) {
+        // Temp implementation until neena's changed are merged in.
+        const availableLanguages = await this.api.get(`/articles/${articleID}/translations`);
+        let hasTranslation = true;
+
+        for (const translation of availableLanguages.data) {
+            if (translation.locale === inLocale && translation.translationStatus === "not-translated") {
+                hasTranslation = false;
+            }
+        }
+
+        return hasTranslation;
+    }
 }

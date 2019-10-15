@@ -203,7 +203,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
 
         const currentLocale = getCurrentLocale();
-        const localeExists = await this.checkArticleHasTranslation(articleID, currentLocale);
+        const localeExists = await this.articleActions.checkArticleHasTranslation(articleID, currentLocale);
 
         if (localeExists) {
             if (queryParams.articleRevisionID) {
@@ -235,23 +235,6 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (article) {
             this.setFallbackLocale(article.data.locale);
         }
-    }
-
-    /**
-     * Check that an article has a translation in a particular locale.
-     */
-    public async checkArticleHasTranslation(articleID: number, inLocale: string) {
-        // Temp implementation until neena's changed are merged in.
-        const availableLanguages = await this.api.get(`/articles/${articleID}/translations`);
-        let hasTranslation = true;
-
-        for (const translation of availableLanguages.data) {
-            if (translation.locale === inLocale && translation.translationStatus === "not-translated") {
-                hasTranslation = false;
-            }
-        }
-
-        return hasTranslation;
     }
 
     private getInitialRecordForEdit(): ILocationPickerRecord | null {
