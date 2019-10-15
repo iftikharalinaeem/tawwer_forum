@@ -1093,6 +1093,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         return $result;
     }
 
+    /**
+     * Invalidate article translations.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
     public function put_invalidateTranslations(int $id, array $body): array {
         $this->permission("knowledge.articles.add");
 

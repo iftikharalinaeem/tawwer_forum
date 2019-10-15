@@ -822,6 +822,7 @@ class ArticlesTest extends AbstractResourceTest {
 
     /**
      * Create an article with a revision.
+     * 
      * @param array $locales
      * @return int
      */
