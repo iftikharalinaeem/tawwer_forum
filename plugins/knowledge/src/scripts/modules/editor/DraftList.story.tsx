@@ -10,8 +10,8 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { MemoryRouter } from "react-router";
 import DraftsList from "@knowledge/modules/editor/components/DraftsList";
-import { StoryExampleDropDownDraft } from "@library/embeddedContent/StoryExampleDropDownDraft";
 import { DraftPreview } from "@knowledge/modules/drafts/components/DraftPreview";
+import { StoryExampleDropDownDraft } from "@knowledge/modules/drafts/components/StoryExampleDropDownDraft";
 
 const story = storiesOf("Drafts", module);
 
