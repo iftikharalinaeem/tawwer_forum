@@ -6,7 +6,7 @@
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { AlertIcon, DeleteIcon, EditIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -17,6 +17,7 @@ import React from "react";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
+    forStatus: KnowledgeBaseStatus;
 }
 export function KnowledgeBaseTableRow(props: IProps) {
     const kb = props.knowledgeBase;
@@ -65,16 +66,27 @@ export function KnowledgeBaseTableRow(props: IProps) {
                     >
                         <EditIcon />
                     </LinkAsButton>
-                    <LinkAsButton
-                        to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/delete`}
-                        className="js-modal-confirm btn-icon"
-                        data-body={t(
-                            "Are you sure you want to delete this knowledge base? It can restored later from the Deleted Knowledge Bases page.",
-                        )}
-                        baseClass={ButtonTypes.ICON_COMPACT}
-                    >
-                        <DeleteIcon />
-                    </LinkAsButton>
+                    {props.forStatus === KnowledgeBaseStatus.DELETED ? (
+                        <LinkAsButton
+                            to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/publish`}
+                            className="js-modal-confirm btn-icon"
+                            data-body={t("Are you sure you want to restore this knowledge base?")}
+                            baseClass={ButtonTypes.DASHBOARD_LINK}
+                        >
+                            {t("Restore")}
+                        </LinkAsButton>
+                    ) : (
+                        <LinkAsButton
+                            to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/delete`}
+                            className="js-modal-confirm btn-icon"
+                            data-body={t(
+                                "Are you sure you want to delete this knowledge base? It can restored later from the Deleted Knowledge Bases page.",
+                            )}
+                            baseClass={ButtonTypes.ICON_COMPACT}
+                        >
+                            <DeleteIcon />
+                        </LinkAsButton>
+                    )}
                 </DashboardTableOptions>
             </td>
         </tr>

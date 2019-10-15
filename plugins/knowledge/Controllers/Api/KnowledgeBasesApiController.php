@@ -14,14 +14,14 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\Site\SiteSectionSchema;
 
 /**
  * Endpoint for the knowledge base resource.
  */
 class KnowledgeBasesApiController extends AbstractApiController {
     use KnowledgeBasesApiSchemes;
+
+    const GET_ALL_DONE_ACTION = "@@knowledgeBases/GET_ALL_DONE";
 
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;

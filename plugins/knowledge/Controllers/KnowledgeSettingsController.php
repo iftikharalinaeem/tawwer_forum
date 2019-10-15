@@ -13,6 +13,8 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Garden\Schema\Validation;
+use Garden\Web\Data;
+use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
  * Controller for serving the /knowledge-settings pages.
@@ -169,7 +171,13 @@ class KnowledgeSettingsController extends SettingsController {
 
         $this->permission('Garden.Settings.Manage');
 
-        $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all']);
+        $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all', "expand" => "all"]);
+        $this->addReduxAction(new ReduxAction(
+            KnowledgeBasesApiController::GET_ALL_DONE_ACTION,
+            Data::box($knowledgeBases),
+            ["status" => $status]
+        ));
+
         $this->setData('knowledgeBases', $knowledgeBases);
         $this->setData("status", $status);
         $this->addIndexNavigation($status);

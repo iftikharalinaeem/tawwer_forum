@@ -10,29 +10,34 @@ import { KnowledgeBaseTableRow } from "@knowledge/knowledge-settings/KnowledgeBa
 import Loader from "@library/loaders/Loader";
 import qs from "qs";
 import React from "react";
+import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyKnowledgeBasesResults";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
     const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
-    const kbs = useKnowledgeBases(initialForm.status || KnowledgeBaseStatus.PUBLISHED);
+    const status = initialForm.status || KnowledgeBaseStatus.PUBLISHED;
+    const kbs = useKnowledgeBases(status);
 
     if (!kbs.data) {
         return <Loader />;
     }
 
     return (
-        <DashboardTable
-            head={
-                <tr>
-                    <HeadItem>Knowledge Base</HeadItem>
-                    <HeadItem>Locations</HeadItem>
-                    <HeadItem size={TableColumnSize.XS}>Source Locale</HeadItem>
-                    <HeadItem size={TableColumnSize.XS}>Options</HeadItem>
-                </tr>
-            }
-            body={Object.values(kbs.data).map(kb => (
-                <KnowledgeBaseTableRow key={kb.knowledgeBaseID} knowledgeBase={kb} />
-            ))}
-        />
+        <>
+            <DashboardTable
+                head={
+                    <tr>
+                        <HeadItem>Knowledge Base</HeadItem>
+                        <HeadItem>Locations</HeadItem>
+                        <HeadItem size={TableColumnSize.XS}>Source Locale</HeadItem>
+                        <HeadItem size={TableColumnSize.XS}>Options</HeadItem>
+                    </tr>
+                }
+                body={Object.values(kbs.data).map(kb => (
+                    <KnowledgeBaseTableRow key={kb.knowledgeBaseID} knowledgeBase={kb} forStatus={status} />
+                ))}
+            />
+            {Object.entries(kbs.data).length === 0 && <EmptyKnowledgeBasesResults forStatus={status} />}
+        </>
     );
 }
