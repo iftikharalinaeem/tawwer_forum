@@ -17,6 +17,7 @@ use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Utility\InstanceValidatorSchema;
 
@@ -488,9 +489,10 @@ trait ArticlesApiSchemes {
                 ]
             ]),
             "aliases:a?" => ['items' => ['type' => 'string']],
-            "translations:a" => [
-                "allowNull" => true,
-                "description" => "Translation status of revision. Ex: valid, out-dated,",
+            "translationStatus:a" => [
+                "allowNull" => false,
+                "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
+                "enum" => ArticleRevisionModel::getTranslationStatuses()
             ],
         ]);
     }
@@ -539,6 +541,11 @@ trait ArticlesApiSchemes {
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
             ]),
+            "translationStatus:a" => [
+                "allowNull" => false,
+                "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
+                "enum" => ArticleRevisionModel::getTranslationStatuses()
+            ],
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
             "insertUser?" => $this->getUserFragmentSchema(),

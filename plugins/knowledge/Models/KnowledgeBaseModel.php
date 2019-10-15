@@ -450,4 +450,18 @@ MESSAGE
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
     }
+
+    /**
+     * Get all the supported locales of a Knowledge-base by ID.
+     *
+     * @param $id
+     * @return array
+     */
+    public function getSupportedLocaledByID($id) {
+        $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $id]);
+        $supportedLocales = $this->getLocales($knowledgeBase["siteSectionGroup"]);
+        $locales = array_column($supportedLocales, "locale");
+        return $locales;
+    }
+
 }

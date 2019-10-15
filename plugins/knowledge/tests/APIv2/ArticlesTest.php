@@ -664,7 +664,8 @@ class ArticlesTest extends AbstractResourceTest {
         $status = array_column($revisions, "status");
 
         $this->assertEquals(2, count($revisions));
-        $this->assertEquals(["en","ru"], $locales);
+        $this->assertContains("en", $locales);
+        $this->assertContains("ru", $locales);
         $this->assertEquals(["published","published"], $status);
     }
 
