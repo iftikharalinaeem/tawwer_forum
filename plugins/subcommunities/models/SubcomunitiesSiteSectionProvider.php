@@ -94,26 +94,15 @@ class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getForSectionGroup(string $sectionGroupKey): array {
-        // Try to extract a productID.
-        $id = str_replace(
-            SubcommunitySiteSection::SUBCOMMUNITY_GROUP_PREFIX,
-            '',
-            $sectionGroupKey
-        );
-
         $siteSections = [];
-        $productID = null;
-        if ($testID = filter_var($id, FILTER_VALIDATE_INT)) {
-            $productID = $testID;
-        }
 
-        // Fetch subcommunities.
-        $subcommunities = $this->subcommunityModel->getWhere(['productID' => $productID]);
-        foreach ($subcommunities as $subcommunity) {
-            $siteSections[] = new SubcommunitySiteSection($subcommunity);
+        foreach ($this->allSiteSections as $siteSection) {
+            if ($siteSection->getSectionGroup() === $sectionGroupKey) {
+                $siteSections[] = $siteSection;
+            }
         }
 
         if (empty($siteSections)) {
