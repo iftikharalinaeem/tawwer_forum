@@ -774,7 +774,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         // A discussion with a low score counts as sunk.
         $discussion =& $args['Discussion'];
-        if ((int)val('Score', $discussion) <= -5) {
+        if ((int)val('Score', $discussion) <= c('Reactions.BuryValue', -5)) {
             $controller = Gdn::controller();
             if ($controller instanceof Gdn_Controller) {
                 $controller->setData('Score', val('Score', $discussion));
