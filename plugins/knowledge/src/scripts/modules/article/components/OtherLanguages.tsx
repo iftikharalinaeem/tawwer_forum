@@ -14,14 +14,13 @@ import { useLocaleInfo, ILocale } from "@vanilla/i18n";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import { CodeNode } from "source-list-map";
 
 export interface IOtherLangaugesProps {
     id?: string;
     selected: any;
     data: ILanguageProps[];
-    useLocaleInfo?: {
-        [key: string]: ILocale[];
-    };
+    localeInfo?: ILocale[];
     currentLocale?: string;
     languageSelect?: boolean;
 }
@@ -39,6 +38,7 @@ export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
     const classesPanelList = panelListClasses();
     const showPicker = props.data && props.data.length > 1;
     const { locales, currentLocale } = useLocaleInfo();
+
     if (showPicker) {
         return (
             <PanelWidget>
@@ -55,7 +55,7 @@ export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
                         renderLeft={true}
                         selected={props.selected}
                         data={props.data}
-                        useLocaleInfo={locales}
+                        localeInfo={locales}
                         currentLocale={currentLocale}
                         languageSelect={true}
                     />
