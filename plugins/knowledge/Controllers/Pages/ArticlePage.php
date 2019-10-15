@@ -11,6 +11,8 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
@@ -64,6 +66,25 @@ class ArticlePage extends KbPage {
             throw new NotFoundException('Article');
         }
 
-        return $this->articlesApi->get($id, ["expand" => "all"]);
+        $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $currentLocale = $currentSiteSection->getContentLocale();
+        $availableTranslations = $this->articlesApi->get_translations($id, []);
+
+        $hasTranslation = true;
+        foreach ($availableTranslations as $translation) {
+            if ($translation['locale'] === $currentLocale
+                && $translation['translationStatus'] === ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED
+            ) {
+                $hasTranslation = false;
+                break;
+            }
+        }
+
+        $query = ["expand" => "all"];
+        if ($hasTranslation) {
+            $query['locale'] = $currentLocale;
+        }
+
+        return $this->articlesApi->get($id, $query);
     }
 }
