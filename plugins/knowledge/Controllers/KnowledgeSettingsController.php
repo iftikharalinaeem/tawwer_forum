@@ -458,7 +458,7 @@ class KnowledgeSettingsController extends SettingsController {
     /**
      * Get the default locale to use for /knowledge-base add/edit.
      *
-     * @param $knowledgeBaseID
+     * @param int $knowledgeBaseID
      * @return string
      */
     private function getDefaultLocale(int $knowledgeBaseID): string {
