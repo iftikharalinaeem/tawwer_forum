@@ -577,7 +577,7 @@ class ArticlesTest extends AbstractResourceTest {
         );
 
         $record = $this->record();
-        $article = $this->api()->post($this->baseUrl, $record);
+        $article = $this->testPost($record);
         $articleID = $article["articleID"];
 
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
