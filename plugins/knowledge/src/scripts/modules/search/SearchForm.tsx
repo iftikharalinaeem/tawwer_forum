@@ -90,9 +90,7 @@ class SearchForm extends React.Component<IProps, IState> {
                                 )}
                             </>
                         }
-                        middleBottom={
-                            {this.renderSearchResults()}
-                        }
+                        middleBottom={this.renderSearchResults()}
                         rightTop={
                             !isMobile && (
                                 <PanelWidget>
@@ -177,11 +175,11 @@ class SearchForm extends React.Component<IProps, IState> {
                         void this.props.searchActions.search(prev);
                     };
                 }
-
-                const uniqueKey = hashString(this.props.form.query + JSON.stringify(this.props.pages));
                 return (
                     <>
-                        <AnalyticsData uniqueKey={uniqueKey} />
+                        <AnalyticsData
+                            uniqueKey={hashString(this.props.form.query + JSON.stringify(this.props.pages))}
+                        />
                         <ResultList results={this.props.results.data!.map(this.mapResult)} />
                         <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                     </>

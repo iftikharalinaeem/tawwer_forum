@@ -73,17 +73,13 @@ export class RevisionsLayout extends React.Component<IProps> {
                         topPadding={this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS}
                         breadcrumbs={
                             this.props.device !== Devices.MOBILE &&
-                            this.props.device !== Devices.XS && <Breadcrumbs children={crumbs} forceDisplay={false} />
+                            this.props.device !== Devices.XS && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
                         }
                         leftTop={isDesktop && <></>}
                         middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}
                         middleBottom={<PanelWidget>{bodyContent}</PanelWidget>}
                         rightTop={!isMobile && this.props.draftList}
-                        rightBottom={
-                            !isMobile && (
-                                {this.props.revisionList}
-                            )
-                        }
+                        rightBottom={!isMobile && this.props.revisionList}
                     />
                 </Container>
             </>
