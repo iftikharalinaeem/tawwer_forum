@@ -8,21 +8,15 @@ import * as React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
 import Heading from "@library/layout/Heading";
 import { t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import LanguagesDropDown, { ILanguageProps } from "@library/layout/LanguagesDropDown";
-import { useLocaleInfo, ILocale } from "@vanilla/i18n";
+import LanguagesDropDown from "@library/layout/LanguagesDropDown";
+import { useLocaleInfo } from "@vanilla/i18n";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
-import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
-import { CodeNode } from "source-list-map";
 import { IArticleLocale } from "@knowledge/@types/api/article";
+import { useUniqueID } from "@library/utility/idUtils";
 
 export interface IOtherLangaugesProps {
-    id?: string;
-    selected?: any;
     articleLocaleData: IArticleLocale[];
-    localeInfo?: ILocale[];
-    currentLocale?: string;
     languageSelect?: boolean;
 }
 
@@ -30,39 +24,32 @@ export interface IOtherLangaugesProps {
  * Implements "other languages" DropDown for articles.
  */
 
-export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
-    /*  private id = uniqueIDFromPrefix("articleOtherLanguages");
-    private get titleID() {
-        return this.id + "-title";
-    }*/
+export default function OtherLangauges(props: IOtherLangaugesProps) {
+    const id = useUniqueID("articleOtherLanguages");
+    const { currentLocale } = useLocaleInfo();
 
     const classesPanelList = panelListClasses();
     const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
-    const { locales, currentLocale } = useLocaleInfo();
-    if (showPicker) {
-        return (
-            <PanelWidget>
-                <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                    <Heading
-                        // id={titleID}
-                        title={t("Other Languages")}
-                        className={classNames("panelList-title", classesPanelList.title)}
-                    />
-                    <LanguagesDropDown
-                        titleID={props.id}
-                        widthOfParent={true}
-                        className="otherLanguages-select"
-                        renderLeft={true}
-                        selected={props.selected}
-                        data={props.articleLocaleData}
-                        localeInfo={locales}
-                        currentLocale={currentLocale}
-                        languageSelect={true}
-                    />
-                </div>
-            </PanelWidget>
-        );
-    } else {
+    if (!showPicker || !currentLocale) {
         return null;
     }
+
+    return (
+        <PanelWidget>
+            <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+                <Heading
+                    title={t("Other Languages")}
+                    className={classNames("panelList-title", classesPanelList.title)}
+                />
+                <LanguagesDropDown
+                    titleID={id}
+                    widthOfParent={true}
+                    className="otherLanguages-select"
+                    renderLeft={true}
+                    data={props.articleLocaleData}
+                    currentLocale={currentLocale}
+                />
+            </div>
+        </PanelWidget>
+    );
 }
