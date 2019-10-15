@@ -454,10 +454,10 @@ MESSAGE
     /**
      * Get all the supported locales of a Knowledge-base by ID.
      *
-     * @param $id $knowledgeBaseID
+     * @param int $id
      * @return array
      */
-    public function getSupportedLocaledByID(int $id) {
+    public function getSupportedLocaledByID(int $id): array {
         $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $id]);
         $supportedLocales = $this->getLocales($knowledgeBase["siteSectionGroup"]);
         $locales = array_column($supportedLocales, "locale");
