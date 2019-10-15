@@ -44,7 +44,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
     public render(): React.ReactNode {
         const { article } = this.props;
         const articleID = this.articleID;
-
         if (!articleID) {
             return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
@@ -178,7 +177,6 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
                 : null,
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
-        //articlelocales: ArticlePageSelector.selectLocales(state),
         articlelocales: state.knowledge.articles.localesByID,
     };
 }

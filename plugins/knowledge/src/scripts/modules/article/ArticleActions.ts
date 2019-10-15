@@ -472,7 +472,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
         return this.dispatchApi<IGetArticleLocalesResponseBody>(
             "get",
-            `/articles/1/translations`,
+            `/articles/${options.articleID}/translations`,
             ArticleActions.getArticleLocalesACs,
             { articleID },
             options,
