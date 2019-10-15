@@ -489,7 +489,7 @@ trait ArticlesApiSchemes {
                 ]
             ]),
             "aliases:a?" => ['items' => ['type' => 'string']],
-            "translationStatus:a" => [
+            "translationStatus:s" => [
                 "allowNull" => false,
                 "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
                 "enum" => ArticleRevisionModel::getTranslationStatuses()
@@ -541,7 +541,7 @@ trait ArticlesApiSchemes {
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
             ]),
-            "translationStatus:a" => [
+            "translationStatus:s" => [
                 "allowNull" => false,
                 "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
                 "enum" => ArticleRevisionModel::getTranslationStatuses()

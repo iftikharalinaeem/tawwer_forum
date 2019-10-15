@@ -617,6 +617,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "status",
                 "name",
                 "locale",
+                "translationStatus",
                 "insertUser",
                 "dateInserted",
             ])->add($this->fullRevisionSchema()),
@@ -1287,7 +1288,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
             $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
-            
+
             if (!$currentRevision) {
                 $revision["status"] = "published";
                 $this->articleRevisionModel->insert($revision);

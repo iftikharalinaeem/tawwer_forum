@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
@@ -584,7 +585,7 @@ class ArticlesTest extends AbstractResourceTest {
         $articleTranslations = $response->getBody();
 
         $this->assertCount(4, $articleTranslations);
-        $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
+        $this->assertEquals("up-to-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
     }
 
@@ -736,17 +737,58 @@ class ArticlesTest extends AbstractResourceTest {
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
         );
 
-        $record = $this->record();
-        $record["locale"] = "en";
-        $response = $this->api()->post($this->baseUrl, $record);
-        $article = $response->getBody();
-        $record["locale"] = "ru";
-        $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+        $this->createArticleWithRevisions(["ru"]);
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "ru"]);
         $article = $response->getBody();
         $this->assertEquals(2, count($article));
         $this->assertEquals("ru", $article[0]["locale"]);
+    }
+
+    /**
+     * Test translations-statuses are set correctly from POST & PATCH /articles.
+     */
+    public function testTranslationsStatuses() {
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $articleID = $this->createArticleWithRevisions(["es","ru"]);
+        $response = $this->api()->get($this->baseUrl."/".$articleID."/revisions");
+        $revisions = $response->getBody();
+        $translationsStatuses = array_column($revisions, "translationStatus");
+        $translationsStatuses = array_unique($translationsStatuses);
+        
+        $this->assertEquals(3, count($revisions));
+        $this->assertEquals(1, count($translationsStatuses));
+        $this->assertEquals("up-to-date", $translationsStatuses[0]);
+    }
+
+    /**
+     * Test PUT /articles/{ID}/invalidateTranslations.
+     */
+    public function testInvalidatingTranslations() {
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $articleID = $this->createArticleWithRevisions(["es","ru"]);
+        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidateTranslations", ["invalidateTranslations" => true]);
+
+        $revisions = $response->getBody();
+        $translationStatuses = array_column($revisions, "translationStatus", "locale");
+        
+        $this->assertEquals("up-to-date", $translationStatuses["en"]);
+        $this->assertEquals("out-of-date", $translationStatuses["es"]);
+        $this->assertEquals("out-of-date", $translationStatuses["ru"]);
     }
 
     /**
@@ -776,5 +818,24 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row["articleID"]}",
             $record
         );
+    }
+
+    /**
+     * Create an article with a revision.
+     * @param array $locales
+     * @return int
+     */
+    private function createArticleWithRevisions(array $locales = ["fr"]): int {
+        $record = $this->record();
+        $record["locale"] = "en";
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+
+        foreach ($locales as $locale) {
+            $record["locale"] = $locale;
+            $this->api()->patch($this->baseUrl . "/" . $article["articleID"], $record);
+        }
+
+        return  $article["articleID"];
     }
 }
