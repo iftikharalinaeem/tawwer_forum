@@ -318,7 +318,8 @@ trait ArticlesApiSchemes {
                 "insertUser?",
                 "updateUser?",
                 "status",
-                "locale"
+                "locale",
+                "translationStatus"
             ])->add($this->fullSchema()), "ArticleSimple");
         }
         return $this->schema($this->articleSimpleSchema, $type);
