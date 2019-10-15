@@ -93,7 +93,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     middleTop={
                         <PanelWidget>
                             <PageTitle
-                                className="searchBar-heading pageSmallTitle"
+                                className="searchBar-heading"
                                 title={category.name}
                                 actions={
                                     <LinkAsButton

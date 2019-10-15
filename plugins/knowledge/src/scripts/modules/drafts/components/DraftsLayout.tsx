@@ -27,7 +27,7 @@ class DraftsLayout extends React.Component<IProps> {
     public render() {
         const { device } = this.props;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const isMobile = Devices.MOBILE === device;
+        const isMobile = Devices.MOBILE === device || Devices.XS === device;
 
         return (
             <React.Fragment>
@@ -37,14 +37,8 @@ class DraftsLayout extends React.Component<IProps> {
                         device={this.props.device}
                         className="hasLargePadding"
                         leftTop={isFullWidth && <PanelEmptyColumn />}
-                        middleTop={
-                            !isMobile && <PageTitle smallPageTitle={true} includeBackLink={false} title={t("Drafts")} />
-                        }
-                        middleBottom={
-                            <PanelWidgetVerticalPadding>
-                                <DraftList data={this.props.data} />
-                            </PanelWidgetVerticalPadding>
-                        }
+                        middleTop={!isMobile && <PageTitle includeBackLink={false} title={t("Drafts")} />}
+                        middleBottom={<DraftList data={this.props.data} />}
                         rightTop={isFullWidth && <PanelEmptyColumn />}
                     />
                 </Container>

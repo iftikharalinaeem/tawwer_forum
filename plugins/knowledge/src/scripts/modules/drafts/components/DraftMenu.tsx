@@ -16,6 +16,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import classNames from "classnames";
+import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftPreviewStyles";
 
 interface IProps extends IInjectableDraftsPageProps {
     actions: ArticleActions;
@@ -42,6 +43,7 @@ export class DraftMenu extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const classes = draftPreviewClasses();
         return (
             <React.Fragment>
                 <DropDown
@@ -49,11 +51,11 @@ export class DraftMenu extends React.Component<IProps, IState> {
                     buttonClassName={ButtonTypes.CUSTOM}
                     renderLeft={true}
                     buttonRef={this.toggleButtonRef}
-                    toggleButtonClassName="draftPreview-actionsToggle"
-                    className={classNames("draftPreview-actions", this.props.className)}
+                    toggleButtonClassName={classes.toggle}
+                    className={classNames(classes.actions, this.props.className)}
                     flyoutType={FlyoutType.LIST}
                 >
-                    <DropDownItemLink name={t("Edit")} to={this.props.url} className="draftPreview-option" />
+                    <DropDownItemLink name={t("Edit")} to={this.props.url} className={classes.option} />
                     <DropDownItemButton
                         name={t("Delete")}
                         onClick={this.openDeleteDialogue}
