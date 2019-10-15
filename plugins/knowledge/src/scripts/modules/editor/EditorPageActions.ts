@@ -23,17 +23,14 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getRelativeUrl } from "@library/utility/appUtils";
+import { EditorQueueItem } from "@rich-editor/editor/context";
+import { getCurrentLocale } from "@vanilla/i18n";
 import { History } from "history";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
-import { EditorQueueItem } from "@rich-editor/editor/context";
-import { EditorPage } from "@knowledge/modules/editor/EditorPage";
-import { getRelativeUrl } from "@library/utility/appUtils";
-import { article } from "@knowledge/navigation/navigationManagerIcons";
-import { getCurrentLocale } from "@vanilla/i18n";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -234,9 +231,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * Load a fallback article content if an article isn't translated.
      */
     public async loadArticleTranslationFallback(history: History, articleID: number) {
-        const response = await this.fetchArticleForEdit(history, articleID);
-        if (response) {
-            this.setFallbackLocale(response.data.locale);
+        const article = await this.fetchArticleForEdit(history, articleID);
+        if (article) {
+            this.setFallbackLocale(article.data.locale);
         }
     }
 
@@ -287,8 +284,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         return article.data || null;
     }
 
-    public static setFallbackLocaleAC = createAction<string | null>("SET_FALLBACK_LOCALE");
+    public static setFallbackLocaleAC = createAction<string>("SET_FALLBACK_LOCALE");
     public setFallbackLocale = this.bindDispatch(EditorPageActions.setFallbackLocaleAC);
+
+    public static clearFallbackLocaleNoticeAC = createAction("CLEAR_FALLBACK_LOCALE_NOTICE");
+    public clearFallbackLocaleNotice = this.bindDispatch(EditorPageActions.clearFallbackLocaleNoticeAC);
 
     public static queueEditorOpsAC = createAction<EditorQueueItem[]>("QUEUE_EDITOR_OP");
     public queueEditorOps = this.bindDispatch(EditorPageActions.queueEditorOpsAC);
@@ -353,9 +353,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
-        const { form, article, draft, isDirty, notifyConversion } = state.knowledge.editorPage;
+        const { form, article, draft, isDirty, notifyConversion, fallbackLocale } = state.knowledge.editorPage;
 
-        if (!isDirty || notifyConversion) {
+        if (!isDirty || notifyConversion || fallbackLocale.notify) {
             return;
         }
 
@@ -413,19 +413,22 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+            const isUsingFallbackLocale = editorState.fallbackLocale.locale !== null;
             const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
             const { body, name, knowledgeCategoryID, sort } = request;
 
             // We only want to submit the body if it is not the default value.
-            const shouldSubmitBody = prevBody !== body;
+            const shouldSubmitBody = prevBody !== body || isUsingFallbackLocale;
+            const shouldSubmitName = prevName !== name || isUsingFallbackLocale;
+            const shouldSubmitCategory = prevCategoryID !== knowledgeCategoryID || isUsingFallbackLocale;
 
             const patchRequest: IPatchArticleRequestBody = {
                 locale: currentLocale,
                 articleID: editorState.article.data.articleID,
                 body: shouldSubmitBody ? body : undefined,
                 format: shouldSubmitBody ? Format.RICH : undefined, // forced to always be rich on insert
-                name: prevName !== name ? name : undefined,
-                knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
+                name: shouldSubmitName ? name : undefined,
+                knowledgeCategoryID: shouldSubmitCategory ? knowledgeCategoryID : undefined,
                 sort,
             };
 
@@ -493,25 +496,29 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
 
         if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
-            const newFormValue: Partial<IEditorPageForm> = {
-                name: editArticleResponse.data.name,
-                knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
-            };
-
-            const { body, format } = editArticleResponse.data;
-            // Check if we have another format loaded. If we do we need to use the queue.
-            if (format.toLowerCase() === "rich") {
-                newFormValue.body = JSON.parse(body);
-            } else {
-                newFormValue.body = [];
-                const renderedBody = articleResponse.data.body;
-                this.queueEditorOps([renderedBody]);
-            }
-
-            this.updateForm(newFormValue, true);
+            this.loadInitialFormBody(articleResponse.data, editArticleResponse.data);
         }
 
         return editArticleResponse;
+    }
+
+    private loadInitialFormBody(article: IGetArticleResponseBody, editArticle: IGetArticleResponseBody) {
+        const newFormValue: Partial<IEditorPageForm> = {
+            name: editArticle.name,
+            knowledgeCategoryID: editArticle.knowledgeCategoryID,
+        };
+
+        const { body, format } = editArticle;
+        // Check if we have another format loaded. If we do we need to use the queue.
+        if (format.toLowerCase() === "rich") {
+            newFormValue.body = JSON.parse(body);
+        } else {
+            newFormValue.body = [];
+            const renderedBody = article.body;
+            this.queueEditorOps([renderedBody]);
+        }
+
+        this.updateForm(newFormValue, true);
     }
 
     /**
@@ -567,7 +574,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
             return;
         }
 
-        const pathname = getRelativeUrl(fullArticleResponse.data.url); //const { pathname } = new URL(article.url)
+        this.redirectToArticleUrl(history, fullArticleResponse.data.url);
+    }
+
+    private redirectToArticleUrl(history: History, url: string) {
+        const pathname = getRelativeUrl(url);
 
         // Redirect to the new url.
         history.replace({

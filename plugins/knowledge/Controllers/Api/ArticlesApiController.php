@@ -769,7 +769,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function patch_drafts(int $draftID, array $body): array {
         $this->permission("knowledge.articles.add");
 
-
         $this->schema(["draftID" => "Target article draft ID."], "in");
         $in = $this->schema($this->draftPostSchema(), "in")
             ->setDescription("Update an article draft.");

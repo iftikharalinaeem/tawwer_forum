@@ -104,7 +104,6 @@ export interface IGetArticleResponseBody extends IArticle {}
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {
     articleID: number;
-    locale: string;
     status: PublishStatus;
 }
 export interface IPatchArticleStatusResponseBody extends IArticle {}

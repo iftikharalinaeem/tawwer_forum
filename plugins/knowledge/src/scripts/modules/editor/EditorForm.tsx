@@ -40,6 +40,8 @@ import { EDITOR_SCROLL_CONTAINER_CLASS } from "@rich-editor/quill/ClipboardModul
 import { useMeasure } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import Translate from "@library/content/Translate";
+import { LocaleDisplayer } from "@vanilla/i18n";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -52,19 +54,6 @@ export function EditorForm(props: IProps) {
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
     const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
-    const { clearConversionNotice } = props.actions;
-    const message = t(
-        "This text has been converted from another format. As a result you may lose some of your formatting. Do you wish to continue?",
-    );
-    const conversionNotice = props.notifyConversion && (
-        <Message
-            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
-            onCancel={props.history.goBack}
-            onConfirm={clearConversionNotice}
-            contents={message}
-            stringContents={message}
-        />
-    );
 
     const updateDraft = useDraftThrottling(props.actions.syncDraft);
 
@@ -125,15 +114,44 @@ export function EditorForm(props: IProps) {
         [props.actions.publish, props.history],
     );
 
+    const { clearConversionNotice } = props.actions;
+    const message = t(
+        "This text has been converted from another format. As a result you may lose some of your formatting. Do you wish to continue?",
+    );
+    const conversionNotice = props.notifyConversion && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            onCancel={props.history.goBack}
+            onConfirm={clearConversionNotice}
+            contents={message}
+            stringContents={message}
+        />
+    );
+
+    const translationNotice = props.fallbackLocale.notify && props.fallbackLocale.locale && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            contents={
+                <Translate
+                    source="This is the first time translating this article into this language. The original article content in <0 /> has been loaded."
+                    c0={
+                        <LocaleDisplayer
+                            displayLocale={props.fallbackLocale.locale}
+                            localeContent={props.fallbackLocale.locale}
+                        />
+                    }
+                />
+            }
+            onConfirm={props.actions.clearFallbackLocaleNotice}
+            stringContents={t("This is the first time translating content into this language")}
+        />
+    );
+
     const contentRef = useRef<HTMLDivElement>(null);
     const embedBarRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const contentSize = useMeasure(contentRef);
     const transition = useFormScrollTransition(formRef, embedBarRef);
-    // const embedMenu = useRef<HTMLDivElement>(null);
-
-    const [embedMenuStyles, setEmbedMenuStyles] = useState();
-    const [embedMenuVisibility, setEmbedMenuVisibility] = useState();
 
     return (
         <TouchScrollable>
@@ -252,6 +270,7 @@ export function EditorForm(props: IProps) {
                     </div>
 
                     {conversionNotice}
+                    {translationNotice}
                     <div
                         className={classNames(
                             "richEditor",
@@ -389,6 +408,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         editorOperationsQueue,
         notifyConversion,
         formErrors,
+        fallbackLocale,
     } = EditorPageModel.getStateSlice(state);
 
     return {
@@ -401,6 +421,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         draft: EditorPageModel.selectDraft(state),
         editorOperationsQueue,
         notifyConversion,
+        fallbackLocale,
         formErrors,
     };
 }
