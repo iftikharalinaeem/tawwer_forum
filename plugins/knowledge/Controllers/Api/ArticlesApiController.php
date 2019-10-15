@@ -321,6 +321,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name:s?",
             "url:s?",
             "locale:s",
+            "sourceLocale:s",
             "translationStatus:s" => [
                 "enum" =>["up-to-date", "out-of-date", "not-translated"]
             ],
@@ -1297,6 +1298,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "name" => '',
                 "url" => '',
                 "locale" => $locale["locale"],
+                "sourceLocale" => $knowledgeBase["sourceLocale"],
                 "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
             ];
             foreach ($article as $translation) {
@@ -1309,6 +1311,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                         "name" => $translation["name"],
                         "url" => $url,
                         "locale" => $translation["locale"],
+                        "sourceLocale" => $knowledgeBase["sourceLocale"],
                         "translationStatus" => $translation["translationStatus"],
                     ];
                     break;

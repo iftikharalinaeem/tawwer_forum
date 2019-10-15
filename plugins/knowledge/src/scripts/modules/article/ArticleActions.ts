@@ -42,6 +42,8 @@ import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/Redu
 import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { all } from "bluebird";
+import qs from "qs";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -427,9 +429,11 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             return Promise.resolve(articleResponse);
         }
 
+        const params = qs.stringify({ expand: all, ...rest });
+
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
-            `/articles/${options.articleID}?expand=all`,
+            `/articles/${options.articleID}?${params}`,
             ArticleActions.getArticleACs,
             rest,
             { articleID },

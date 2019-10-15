@@ -13,6 +13,7 @@ import { DeltaOperation } from "quill/core";
 
 interface IArticleRequiredData {
     knowledgeCategoryID: number | null; //The category the article belongs in.
+    locale: string;
 }
 
 interface IInsertUpdate {
@@ -36,7 +37,6 @@ interface IArticleDefaultedData {
     body: string; // Content of the article. Defaults to an empty string.
     name: string; // Name of the article. Defaults to an empty string.
     format: string; // Format of the content. Defaults to the site's configured default format.
-    locale: string; // Defaults to the current locale.
 }
 
 export interface IOutlineItem {
@@ -91,19 +91,20 @@ export interface IPostArticleResponseBody extends IArticle {}
 // PATCH /articles/:id
 export interface IPatchArticleRequestBody extends Partial<IPostArticleRequestBody> {
     articleID: number;
-    draftID?: number;
 }
 export interface IPatchArticleResponseBody extends IArticle {}
 
 // GET /articles/:id
 export interface IGetArticleRequestBody {
     articleID: number;
+    locale?: string;
 }
 export interface IGetArticleResponseBody extends IArticle {}
 
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {
     articleID: number;
+    locale: string;
     status: PublishStatus;
 }
 export interface IPatchArticleStatusResponseBody extends IArticle {}
