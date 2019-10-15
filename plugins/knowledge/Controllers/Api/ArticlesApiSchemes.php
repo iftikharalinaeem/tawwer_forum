@@ -318,6 +318,7 @@ trait ArticlesApiSchemes {
                 "insertUser?",
                 "updateUser?",
                 "status",
+                "locale"
             ])->add($this->fullSchema()), "ArticleSimple");
         }
         return $this->schema($this->articleSimpleSchema, $type);
@@ -554,7 +555,10 @@ trait ArticlesApiSchemes {
      */
     public function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema = Schema::parse(["id:i" => "The article ID."]);
+            $this->idParamSchema = Schema::parse([
+                "id:i" => "The article ID.",
+                "locale:s?" => "Locale of the article"
+            ]);
         }
         return $this->schema($this->idParamSchema, $type);
     }
