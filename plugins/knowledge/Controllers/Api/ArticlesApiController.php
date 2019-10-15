@@ -705,7 +705,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $siteSectionSlug = $this->getSitSectionSlug($locale, $allLocales);
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
-        $row["url"] = \Gdn::request()->url($path, true);
+        $request = \Gdn::request();
+
+        // Make sure the site section doesn't get added back again.
+        // We can't use `Gdn_Request::url()` for this reason.
+        $row["url"] = $request->getScheme() . '://' . $request->getHost() . $request->getAssetRoot() . '/' . $path;
 
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
@@ -1109,7 +1113,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         $locale = $fields["locale"] ?? null;
-        
+
         if ($articleID !== null) {
             // this means we patch existing Article
             if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
