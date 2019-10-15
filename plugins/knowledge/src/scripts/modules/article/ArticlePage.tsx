@@ -13,7 +13,7 @@ import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayo
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { CategoryRoute } from "@knowledge/routes/pageRoutes";
+import { CategoryRoute, EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -28,6 +28,9 @@ import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
+import Message from "@library/messages/Message";
+import { t } from "@vanilla/i18n";
+import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -106,19 +109,20 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     private renderMessages(): React.ReactNode {
-        const { article } = this.props;
-        let messages: React.ReactNode;
-
-        if (article.data && article.data.status === PublishStatus.DELETED) {
-            messages = (
-                <Permission permission="articles.add">
+        const { article, notifyTranslationFallback } = this.props;
+        let messages = (
+            <Permission permission="articles.add">
+                {notifyTranslationFallback && article.data && (
+                    <ArticleUntranslatedMessage articleID={article.data.articleID} />
+                )}
+                {article.data && article.data.status === PublishStatus.DELETED && (
                     <ArticleDeletedMessage
                         onRestoreClick={this.handleRestoreClick}
                         isLoading={this.props.restoreStatus === LoadStatus.LOADING}
                     />
-                </Permission>
-            );
-        }
+                )}
+            </Permission>
+        );
 
         return messages;
     }
@@ -166,6 +170,10 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { restoreStatus } = state.knowledge.articlePage;
     const article = ArticlePageSelector.selectArticle(state);
+    const notifyTranslationFallback =
+        article &&
+        article.data &&
+        state.knowledge.articles.articlesIDsWithTranslationFallback.includes(article.data.articleID);
     const categoryID = article.data ? article.data.knowledgeCategoryID : null;
 
     return {
@@ -177,6 +185,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
                 : null,
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
+        notifyTranslationFallback,
     };
 }
 

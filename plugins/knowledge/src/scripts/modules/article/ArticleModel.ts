@@ -30,6 +30,7 @@ export interface IArticleState {
     draftsByID: {
         [key: number]: IResponseArticleDraft;
     };
+    articlesIDsWithTranslationFallback: number[];
 }
 
 type ReducerType = KnowledgeReducer<IArticleState>;
@@ -103,6 +104,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         revisionsByID: {},
         revisionFragmentsByID: {},
         draftsByID: {},
+        articlesIDsWithTranslationFallback: [],
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -163,6 +165,16 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public reducer = produce(
         reducerWithInitialState<IArticleState>(ArticleModel.INITIAL_STATE)
+            .case(ArticleActions.articleUsesTranslationFallbackAC, (nextState, payload) => {
+                if (payload.usesFallback && !nextState.articlesIDsWithTranslationFallback.includes(payload.articleID)) {
+                    nextState.articlesIDsWithTranslationFallback.push(payload.articleID);
+                } else if (!payload.usesFallback) {
+                    nextState.articlesIDsWithTranslationFallback = nextState.articlesIDsWithTranslationFallback.filter(
+                        id => id !== payload.articleID,
+                    );
+                }
+                return nextState;
+            })
             .case(ArticleActions.putReactACs.done, (nextState, payload) => {
                 const { articleID } = payload.params;
                 const { reactions } = payload.result;

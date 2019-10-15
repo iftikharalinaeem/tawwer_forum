@@ -73,6 +73,11 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         return this.dispatch(apiThunk);
     };
 
+    public static articleUsesTranslationFallbackAC = createAction<{ articleID: number; usesFallback: boolean }>(
+        "ARTICLE_USES_TRANSLATION_FALLBACK",
+    );
+    public articleUsesTranslationFallback = this.bindDispatch(ArticleActions.articleUsesTranslationFallbackAC);
+
     // FSA actions.
 
     // Old style actions
@@ -417,7 +422,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     /**
      * Get an article by its ID from the API.
      */
-    public fetchByID = (
+    public fetchByID = async (
         options: IGetArticleRequestBody,
         force: boolean = false,
     ): Promise<IApiResponse<IGetArticleResponseBody> | undefined> => {
@@ -429,7 +434,19 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             return Promise.resolve(articleResponse);
         }
 
+        if (!rest.locale) {
+            rest.locale = getCurrentLocale();
+        }
+        const hasLocale = await this.checkArticleHasTranslation(articleID, rest.locale);
+        if (!hasLocale) {
+            delete rest.locale;
+            this.articleUsesTranslationFallback({ articleID, usesFallback: true });
+        } else {
+            this.articleUsesTranslationFallback({ articleID, usesFallback: false });
+        }
+
         const params = qs.stringify({ expand: all, ...rest });
+        console.log("request with params", params);
 
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",

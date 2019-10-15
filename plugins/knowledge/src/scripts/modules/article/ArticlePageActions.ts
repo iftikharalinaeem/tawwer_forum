@@ -9,6 +9,10 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { getCurrentLocale } from "@vanilla/i18n";
+import actionCreatorFactory from "typescript-fsa";
+
+const createAction = actionCreatorFactory("@@articlePage");
 
 /**
  * Actions for the article page.
@@ -49,7 +53,9 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             this.dispatch(ArticlePageActions.createInitAction(articleID, true));
         } else {
             this.dispatch(ArticlePageActions.createInitAction(articleID));
-            const articleResponse = await this.articleActions.fetchByID({ articleID });
+            const articleResponse = await this.articleActions.fetchByID({
+                articleID,
+            });
             if (!articleResponse) {
                 return;
             }
