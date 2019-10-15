@@ -78,12 +78,10 @@ export class RevisionsLayout extends React.Component<IProps> {
                         leftTop={isDesktop && <></>}
                         middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}
                         middleBottom={<PanelWidget>{bodyContent}</PanelWidget>}
-                        rightTop={
-                            !isMobile && <PanelWidgetVerticalPadding>{this.props.draftList}</PanelWidgetVerticalPadding>
-                        }
+                        rightTop={!isMobile && this.props.draftList}
                         rightBottom={
                             !isMobile && (
-                                <PanelWidgetVerticalPadding>{this.props.revisionList}</PanelWidgetVerticalPadding>
+                                {this.props.revisionList}
                             )
                         }
                     />

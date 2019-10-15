@@ -91,7 +91,7 @@ class SearchForm extends React.Component<IProps, IState> {
                             </>
                         }
                         middleBottom={
-                            <PanelWidgetVerticalPadding>{this.renderSearchResults()}</PanelWidgetVerticalPadding>
+                            {this.renderSearchResults()}
                         }
                         rightTop={
                             !isMobile && (
