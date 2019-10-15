@@ -1039,7 +1039,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body["locale"] = $sourceLocale;
         }
 
-        $body["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
         $articleID = $this->save($body);
         $row = $this->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
@@ -1082,6 +1081,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         return $result;
     }
 
+//    public function put_invalidateTranslations(int $id, array $body): array {
+//        $this->permission("knowledge.articles.add");
+//
+//        $in = $this->schema($this->draftPostSchema(), "in")
+//            ->setDescription("Create a new article draft.");
+//        $out = $this->schema($this->fullDraftSchema(), "out");
+//
+//    }
+
     /**
      * Separate article and revision fields from request input and save to the proper resources.
      *
@@ -1092,13 +1100,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NoResultsException If the article could not be found.
      */
     private function save(array $fields, int $articleID = null): int {
-        $revisionFields = [
-            "body" => true,
-            "format" => true,
-            "locale" => true,
-            "name" => true,
-            "translationStatus" => true
-        ];
+        $revisionFields = ["body" => true, "format" => true, "locale" => true, "name" => true];
 
         $article = array_diff_key($fields, $revisionFields);
         $revision = array_intersect_key($fields, $revisionFields);
@@ -1218,7 +1220,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $currentRevision =[];
             foreach ($articles as $article) {
-                // find the unique published revision in the given locale.
+                // find the unique published revision in the give locale.
                 if ($article["locale"] === $locale) {
                     $currentRevision = array_intersect_key($article, $revisionFields);
                     break;
@@ -1244,13 +1246,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
             $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
-            $invalidateTranslations = (array_key_exists("invalidateTranslations", $fields) && $fields["invalidateTranslations"]);
+
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
-                $this->updateRevisionTranslationStatus($articleID, $invalidateTranslations, $revision);
+                $this->articleRevisionModel->insert($revision);
             } else {
-                $articleRevisionID =  $this->updateRevisionTranslationStatus($articleID, $invalidateTranslations, $revision);
+                $articleRevisionID = $this->articleRevisionModel->insert($revision);
                 $this->articleRevisionModel->publish($articleRevisionID);
             }
 
@@ -1405,37 +1407,4 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
         }
     }
-
-    /**
-     * @param int $articleID
-     * @param bool $invalidateTranslations
-     * @param array $revision
-     * @param array $knowledgeBase
-     *
-     * @return int
-     */
-    private function updateRevisionTranslationStatus(int $articleID, bool $invalidateTranslations, array $revision) {
-
-        if ($invalidateTranslations) {
-            $this->articleRevisionModel->invalidateTranslations($articleID);
-        } elseif ($revision["locale"] !== "en") {
-            $this->articleRevisionModel->update(
-                [
-                    "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE
-                ],
-                [
-                    "articleID" => $articleID,
-                    "locale" => "en",
-                    "status" => ArticleModel::STATUS_PUBLISHED,
-                ]
-            );
-        } else {
-            $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
-        }
-
-        $articleRevisionID = $this->articleRevisionModel->insert($revision);
-        return $articleRevisionID;
-    }
-
-
 }
