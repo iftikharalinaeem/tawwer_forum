@@ -7,17 +7,21 @@ import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import { useKnowledgeBases, IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { useKnowledgeBases, IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { DeleteIcon, EditIcon } from "@library/icons/common";
+import { DeleteIcon, EditIcon, AlertIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@vanilla/i18n";
 import React from "react";
+import qs from "qs";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { getMeta } from "@library/utility/appUtils";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
-    const kbs = useKnowledgeBases();
+    const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
+    const kbs = useKnowledgeBases(initialForm.status || KnowledgeBaseStatus.PUBLISHED);
 
     if (!kbs.data) {
         return <Loader />;
@@ -45,15 +49,42 @@ interface IProps {
 }
 function KnowledgeBaseRow(props: IProps) {
     const kb = props.knowledgeBase;
+
+    const siteSectionLocales = kb.siteSections.map(siteSection => siteSection.contentLocale);
+    const hasConflictingSourceLocale = !siteSectionLocales.includes(kb.sourceLocale);
+
     return (
-        <tr key={kb.knowledgeBaseID}>
+        <tr>
             <td>
                 <DashboardMediaItem title={kb.name} info={kb.description} imgSrc={kb.icon} />
             </td>
             <td>
-                <a href={kb.url}>/{kb.urlCode}</a>
+                {kb.siteSections.map(section => {
+                    const sectionBase = section.basePath.replace("/", "");
+                    const fullUrlCode = `${sectionBase ? "/" + sectionBase : ""}/kb/${kb.urlCode.replace("/", "")}`;
+                    return (
+                        <React.Fragment key={section.sectionID}>
+                            <a href={getMeta("context.host") + fullUrlCode}>{fullUrlCode}</a>
+                            <br />
+                        </React.Fragment>
+                    );
+                })}
             </td>
-            <td>{kb.sourceLocale}</td>
+            <td>
+                {hasConflictingSourceLocale ? (
+                    <ToolTip
+                        label={
+                            "The source locale of this knowledge base may not be accesssible due to a multisite configuration issue."
+                        }
+                    >
+                        <span>
+                            <AlertIcon title={null} />
+                        </span>
+                    </ToolTip>
+                ) : (
+                    kb.sourceLocale
+                )}
+            </td>
             <td>
                 <DashboardTableOptions>
                     <LinkAsButton
