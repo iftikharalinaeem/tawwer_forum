@@ -10,7 +10,7 @@ import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { AlertIcon, DeleteIcon, EditIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n";
 import React from "react";
@@ -49,9 +49,9 @@ export function KnowledgeBaseTableRow(props: IProps) {
                             "The source locale of this knowledge base may not be accesssible due to a multisite configuration issue."
                         }
                     >
-                        <span>
-                            <AlertIcon title={null} />
-                        </span>
+                        <ToolTipIcon>
+                            <AlertIcon compact />
+                        </ToolTipIcon>
                     </ToolTip>
                 ) : (
                     kb.sourceLocale
