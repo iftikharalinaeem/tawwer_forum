@@ -456,10 +456,12 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
+     * Get the default locale to use for /knowledge-base add/edit.
+     *
      * @param $knowledgeBaseID
      * @return string
      */
-    private function getDefaultLocale($knowledgeBaseID): string {
+    private function getDefaultLocale(int $knowledgeBaseID): string {
         if ($knowledgeBaseID) {
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
             $defaultLocale = $knowledgeBase["sourceLocale"];
