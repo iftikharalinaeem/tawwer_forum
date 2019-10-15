@@ -15,11 +15,12 @@ import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import { CodeNode } from "source-list-map";
+import { IArticleLocale } from "@knowledge/@types/api/article";
 
 export interface IOtherLangaugesProps {
     id?: string;
     selected: any;
-    data: ILanguageProps[];
+    data: IArticleLocale[];
     localeInfo?: ILocale[];
     currentLocale?: string;
     languageSelect?: boolean;

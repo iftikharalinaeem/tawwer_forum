@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocales } from "@knowledge/@types/api/article";
+import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocale } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -31,7 +31,7 @@ export interface IArticleState {
         [key: number]: IResponseArticleDraft;
     };
     localesByID: {
-        [key: number]: IArticleLocales;
+        [key: number]: IArticleLocale;
     };
 }
 
@@ -80,7 +80,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
      * @param state A full state instance.
      * @param localeID The ID of the revision to select.
      */
-    public static selectLocaleFragment(state: IKnowledgeAppStoreState, localeID: number): IArticleLocales | null {
+    public static selectLocaleFragment(state: IKnowledgeAppStoreState, localeID: number): IArticleLocale | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.localesByID[localeID] || null;
     }

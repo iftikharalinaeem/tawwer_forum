@@ -86,6 +86,7 @@ export interface IArticleLocale {
     name: string;
     translationStatus: string;
     url: string;
+    lang: string;
 }
 
 // Request/Response interfaces
@@ -113,7 +114,7 @@ export interface IGetArticleResponseBody extends IArticle {}
 export interface IGetArticleLocalesRequestBody {
     articleID: number;
 }
-export type IGetArticleLocalesResponseBody = IArticleLocales[];
+export type IGetArticleLocalesResponseBody = IArticleLocale[];
 
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {

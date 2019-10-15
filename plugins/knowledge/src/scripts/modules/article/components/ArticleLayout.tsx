@@ -6,7 +6,6 @@
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
-import values from "lodash/values";
 import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
@@ -127,7 +126,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                     </PanelWidget>
                                 )}
                             <PanelWidget>
-                                <OtherLanguages data={values(articlelocales)} />
+                                <OtherLanguages data={Object.values(articlelocales)} />
                             </PanelWidget>
                         </>
                     }
