@@ -765,8 +765,8 @@ class ArticlesTest extends AbstractResourceTest {
     /**
      * Create a revision in a locale.
      *
-     * @param array $row.
-     * @param string $locale.
+     * @param array $row
+     * @param string $locale
      */
     private function createFirstRevisionInLocale(array $row, string $locale) {
         $record = $this->record();
