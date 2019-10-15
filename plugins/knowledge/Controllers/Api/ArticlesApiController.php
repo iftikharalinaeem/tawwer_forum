@@ -700,7 +700,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
         $allLocales = $this->knowledgeBaseModel->getLocales($siteSectionGroup);
 
-        $locale = $row["locale"] ?? "";
+        $locale = $row["locale"] ?? $knowledgeBase["sourceLocale"];
         $siteSectionSlug = $this->getSitSectionSlug($locale, $allLocales);
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
@@ -1338,10 +1338,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param string $articleLocale
      * @param array $allLocales
-     * @return string|null
+     * @return string
      */
     protected function getSitSectionSlug(string $articleLocale, array $allLocales) {
-        $siteSectionSlug = null;
+        $siteSectionSlug = "";
 
         foreach ($allLocales as $locale) {
             if ($locale["locale"] === $articleLocale) {
