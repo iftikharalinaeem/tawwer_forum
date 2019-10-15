@@ -162,7 +162,6 @@ trait ArticlesApiSchemes {
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
                     ],
-                    "invalidateTranslations:b?"
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );

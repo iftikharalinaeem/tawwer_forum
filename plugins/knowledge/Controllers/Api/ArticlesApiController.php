@@ -1092,14 +1092,38 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         return $result;
     }
 
-//    public function put_invalidateTranslations(int $id, array $body): array {
-//        $this->permission("knowledge.articles.add");
-//
-//        $in = $this->schema($this->draftPostSchema(), "in")
-//            ->setDescription("Create a new article draft.");
-//        $out = $this->schema($this->fullDraftSchema(), "out");
-//
-//    }
+    public function put_invalidateTranslations(int $id, array $body): array {
+        $this->permission("knowledge.articles.add");
+
+        $in = $this->schema([
+            "invalidateTranslations:b"
+        ],"in")->setDescription("Invalidate translations for a particular article.");
+
+        $out = $this->schema($this->articleSchema(), "out");
+        $body = $in->validate($body);
+
+        $articles = $this->articleModel->getIDWithRevision($id, true);
+
+        $firstArticle = reset($articles);
+        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
+
+        foreach ($articles as $article) {
+            if ($article["locale"] === $knowledgeBase["sourceLocale"]) {
+                unset($articles[$article]);
+            }
+        }
+        $articleRevisionIDs = array_column($articles, "articleRevisionID");
+        foreach ($articleRevisionIDs as $articleRevisionID) {
+            $this->articleRevisionModel->update(
+                ["translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE],
+                ["articleRevisionID" => $articleRevisionID]
+            );
+        }
+
+        $articles = $this->articleModel->getIDWithRevision($id, true);
+
+        return $articles;
+    }
 
     /**
      * Separate article and revision fields from request input and save to the proper resources.
