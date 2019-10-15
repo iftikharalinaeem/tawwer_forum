@@ -43,6 +43,7 @@ import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -480,11 +481,15 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     };
 
     public fetchRevisionsForArticle = (options: IGetArticleRevisionsRequestBody) => {
+        const locale = getCurrentLocale();
         return this.dispatchApi<IGetArticleRevisionsResponseBody>(
             "get",
             `/articles/${options.articleID}/revisions`,
             ArticleActions.getArticleRevisionsACs,
-            options,
+            {
+                locale,
+                ...options,
+            },
         );
     };
 

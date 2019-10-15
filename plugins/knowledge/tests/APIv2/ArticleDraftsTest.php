@@ -98,7 +98,7 @@ class ArticleDraftsTest extends AbstractResourceTest {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass() {
-        self::$addons = ["vanilla", "knowledge"];
+        self::$addons = ["vanilla", "sphinx", "knowledge"];
         parent::setupBeforeClass();
     }
 
@@ -157,7 +157,7 @@ class ArticleDraftsTest extends AbstractResourceTest {
             'icon' => '',
             'bannerImage' => '',
             'sortArticles' => 'manual',
-            'sourceLocale' => '',
+            'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base'.$salt,
         ];
         $kb = $this->api()

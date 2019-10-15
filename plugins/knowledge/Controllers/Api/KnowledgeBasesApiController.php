@@ -114,13 +114,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
             ],
             "sourceLocale?",
             "siteSectionGroup?"
-        ])->add($this->fullSchema())->setDescription("List knowledge bases.");
+        ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
 
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $in->validate($query);
 
-        if ($query['siteSectionGroup'] === 'all') {
+        if (array_key_exists("siteSectionGroup", $query) && $query['siteSectionGroup'] === 'all') {
             unset($query['siteSectionGroup']);
         }
 
@@ -308,6 +308,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 ['name' => $body['name']],
                 ['knowledgeCategoryID' => $prevState['rootCategoryID']]
             );
+        }
+        // Check if KB status changed: deleted vs published
+        if (isset($body['status']) && ($body['status'] !== $prevState['status'])) {
+            // If status changed we need to reset Sphinx counters and reindex
+            $this->knowledgeBaseModel->resetSphinxCounters();
         }
 
         $row = $this->knowledgeBaseByID($id);

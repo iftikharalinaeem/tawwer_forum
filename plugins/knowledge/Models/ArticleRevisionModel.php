@@ -51,11 +51,12 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
     public function publish(int $articleRevisionID) {
         $row = $this->selectSingle(["articleRevisionID" => $articleRevisionID]);
         $articleID = $row["articleID"];
+        $locale = $row["locale"];
 
         // Remove the "published" flag from the currently-published revision.
         $this->update(
             ["status" => null],
-            ["articleID" => $articleID, "status" => "published"]
+            ["articleID" => $articleID, "status" => "published", "locale" => $locale]
         );
         // Publish this revision.
         $this->update(

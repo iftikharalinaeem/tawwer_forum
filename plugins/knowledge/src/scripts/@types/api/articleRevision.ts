@@ -52,6 +52,7 @@ export interface IGetArticleRevisionsRequestBody {
     articleID: number;
     page?: number;
     limit?: number;
+    locale?: string;
 }
 
 export type IGetArticleRevisionsResponseBody = IRevisionFragment[];

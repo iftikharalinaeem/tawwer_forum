@@ -38,6 +38,7 @@ export class DraftsPage extends React.Component<IProps> {
     public render() {
         return (
             <Modal
+                scrollable={true}
                 titleID={this.titleID}
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={this.navigateToBacklink}
