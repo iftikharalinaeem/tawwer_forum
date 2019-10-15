@@ -1389,7 +1389,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $row = $record;
             }
         }
-        if(!$row) {
+        if (!$row) {
             throw new ClientException("Article not found", 404);
         }
         return $row;

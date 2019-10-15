@@ -66,7 +66,6 @@ class ArticlesTest extends AbstractResourceTest {
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
             "sourceLocale" => "en",
-            "siteSectionGroup" => "mockSiteSectionGroup-1",
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
@@ -235,6 +234,10 @@ class ArticlesTest extends AbstractResourceTest {
         // Patching an article's locale won't work unless there is an existing revision for that locale.
         $locale = null;
         if ($field === "locale") {
+            $this->api()->patch(
+                '/knowledge-bases/' . self::$knowledgeCategoryID,
+                ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+            );
             $locale = "fr";
             $this->createFirstRevisionInLocale($row, $locale);
         }
@@ -384,6 +387,10 @@ class ArticlesTest extends AbstractResourceTest {
      * to set discussion canonical link to the article created
      */
     public function testPostDiscussionCanonical() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'vanilla']
+        );
         $discussion = $this->api()->post(
             '/discussions',
             [
@@ -564,6 +571,11 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles/{ID}/translations
      */
     public function testGetArticleTranslations() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
         $record = $this->record();
         $article = $this->api()->post($this->baseUrl, $record);
         $articleID = $article["articleID"];
@@ -756,11 +768,12 @@ class ArticlesTest extends AbstractResourceTest {
      * @param array $row.
      * @param string $locale.
      */
-    private function createFirstRevisionInLocale(array $row, string $locale){
+    private function createFirstRevisionInLocale(array $row, string $locale) {
         $record = $this->record();
         $record["locale"] = $locale;
         $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}", $record
+            "{$this->baseUrl}/{$row["articleID"]}",
+            $record
         );
     }
 }
