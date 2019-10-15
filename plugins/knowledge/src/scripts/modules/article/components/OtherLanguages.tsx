@@ -19,7 +19,7 @@ import { IArticleLocale } from "@knowledge/@types/api/article";
 
 export interface IOtherLangaugesProps {
     id?: string;
-    selected: any;
+    selected?: any;
     data: IArticleLocale[];
     localeInfo?: ILocale[];
     currentLocale?: string;
@@ -39,7 +39,6 @@ export default function OtherLangauges(this: any, props: IOtherLangaugesProps) {
     const classesPanelList = panelListClasses();
     const showPicker = props.data && props.data.length > 1;
     const { locales, currentLocale } = useLocaleInfo();
-
     if (showPicker) {
         return (
             <PanelWidget>
