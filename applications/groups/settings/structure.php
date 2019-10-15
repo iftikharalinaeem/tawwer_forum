@@ -78,10 +78,10 @@ $St->table('GroupApplicant')
 if ($St->tableExists('Category')) {
     $St->table('Category');
     $AllowGroupsExists = $St->columnExists('AllowGroups');
+    $canDeleteExists = $St->columnExists('CanDelete');
     $St->table('Category')
         ->column('AllowGroups', 'tinyint', '0')
         ->set();
-    $St->table('Category');
     if (!$AllowGroupsExists) {
         // Create a category for groups.
         $Model = new CategoryModel();
@@ -89,7 +89,7 @@ if ($St->tableExists('Category')) {
         if ($Row) {
             $Model->setField($Row['CategoryID'], 'AllowGroups', 1);
             // Backwards compat for a new column.
-            if ($St->columnExists('CanDelete')) {
+            if ($canDeleteExists) {
                 $Model->setField($Row['CategoryID'], 'CanDelete', 0);
             }
         } else {
@@ -129,7 +129,7 @@ if ($St->tableExists('Category')) {
             $Row['Permissions'] = $permissions;
 
             // Backwards compat for a new column.
-            if ($St->columnExists('CanDelete')) {
+            if ($canDeleteExists) {
                 $Row['CanDelete'] = 0;
             }
 
