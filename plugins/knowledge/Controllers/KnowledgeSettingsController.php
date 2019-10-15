@@ -40,6 +40,9 @@ class KnowledgeSettingsController extends SettingsController {
 
     /** @var LocalesApiController */
     private $localApiController;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
     /**
      * Constructor for DI.
      *
@@ -48,19 +51,22 @@ class KnowledgeSettingsController extends SettingsController {
      * @param Gdn_Request $request
      * @param KnowledgeBaseKludgedVars $kludgedVars
      * @param LocalesApiController $localApiController
+     * @param  KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
         MediaApiController $mediaApiController,
         Gdn_Request $request,
         KnowledgeBaseKludgedVars $kludgedVars,
-        LocalesApiController $localApiController
+        LocalesApiController $localApiController,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->apiController = $apiController;
         $this->mediaApiController = $mediaApiController;
         $this->request = $request;
         $this->kludgedVars = $kludgedVars;
         $this->localApiController = $localApiController;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
     }
@@ -198,7 +204,7 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function knowledgeBasesAddEdit($knowledgeBaseID = null) {
         $this->permission('Garden.Settings.Manage');
-        $currentLocale = $this->getCurrentLocale();
+        $defaultLocale = $this->getDefaultLocale($knowledgeBaseID);
         $options = $this->getSourceLocaleOptions();
 
         if ($knowledgeBaseID) {
@@ -277,7 +283,7 @@ class KnowledgeSettingsController extends SettingsController {
                 'LabelCode' => 'Locales',
                 'Control' => 'DropDown',
                 'Items' => $options,
-                'Options' => [ "Default" => $currentLocale]
+                'Options' => [ "Default" => $defaultLocale]
             ],
         ];
 
@@ -462,5 +468,22 @@ class KnowledgeSettingsController extends SettingsController {
         $locale = $currentLocale->Locale;
 
         return $locale;
+    }
+
+    /**
+     * Get the default locale to use for /knowledge-base add/edit.
+     *
+     * @param int $knowledgeBaseID
+     * @return string
+     */
+    private function getDefaultLocale(int $knowledgeBaseID = null): string {
+        if ($knowledgeBaseID) {
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            $defaultLocale = $knowledgeBase["sourceLocale"];
+        } else {
+            $defaultLocale = $this->getCurrentLocale();
+        }
+
+        return $defaultLocale;
     }
 }

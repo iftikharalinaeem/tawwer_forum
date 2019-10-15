@@ -93,6 +93,11 @@ export const editorHeaderClasses = useThemeCache(() => {
         marginRight: "auto",
     });
 
+    const backSpacer = style("backSpacer", {
+        position: "relative",
+        visibility: "hidden",
+    });
+
     return {
         items,
         centreColumn,
@@ -103,5 +108,6 @@ export const editorHeaderClasses = useThemeCache(() => {
         split,
         backLink,
         itemMarginLeft,
+        backSpacer,
     };
 });

@@ -23,6 +23,12 @@ paths:
                   schema:
                       minimum: 1
                       type: integer
+                -  description: Locale the articles are written in.
+                   in: query
+                   name: locale
+                   required: false
+                   schema:
+                       type: string
                 - in: query
                   name: limit
                   required: true
@@ -482,6 +488,12 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - description: Locale the article is written in.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
             responses:
                 "200":
                     content:
@@ -525,6 +537,12 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - description: Locale the article is written in.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
             responses:
                 "200":
                     content:
@@ -558,8 +576,7 @@ paths:
                                         type: integer
                                     locale:
                                         description: Locale the article was written in.
-                                        minLength: 1
-                                        nullable: true
+                                        minLength: 2
                                         type: string
                                     name:
                                         description: Title of the article.
@@ -959,8 +976,7 @@ components:
                     type: integer
                 locale:
                     description: Locale the article was written in.
-                    minLength: 1
-                    nullable: true
+                    minLength: 2
                     type: string
                 name:
                     description: Title of the article.
@@ -1202,6 +1218,10 @@ components:
                         - published
                     minLength: 1
                     nullable: true
+                    type: string
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 2
                     type: string
                 updateUser:
                     $ref: "#/components/schemas/UserFragment"
