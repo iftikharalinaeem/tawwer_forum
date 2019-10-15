@@ -14,6 +14,7 @@ use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Garden\Schema\Validation;
 use Garden\Web\Data;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
@@ -173,7 +174,7 @@ class KnowledgeSettingsController extends SettingsController {
 
         $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all', "expand" => "all"]);
         $this->addReduxAction(new ReduxAction(
-            KnowledgeBasesApiController::GET_ALL_DONE_ACTION,
+            ActionConstants::GET_ALL_KBS,
             Data::box($knowledgeBases),
             ["status" => $status]
         ));

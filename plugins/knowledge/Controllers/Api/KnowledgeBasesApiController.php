@@ -21,8 +21,6 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 class KnowledgeBasesApiController extends AbstractApiController {
     use KnowledgeBasesApiSchemes;
 
-    const GET_ALL_DONE_ACTION = "@@knowledgeBases/GET_ALL_DONE";
-
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
