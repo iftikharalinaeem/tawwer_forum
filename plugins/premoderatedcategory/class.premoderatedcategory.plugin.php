@@ -71,19 +71,25 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
+        $discussion = $args['DiscussionData'];
+        $categoryID = $discussion->categoryID;
+
+        $this->setModeration($categoryID, $discussion);
+    }
+
+
+    public function setModeration($categoryID, $record) {
         $categoryList = c('PreModeratedCategory.IDs');
         if (!$categoryList) {
             return;
         }
 
         $categories = explode(',', $categoryList);
-        if (!in_array(val('CategoryID', $args['DiscussionData']), $categories)) {
-            return;
+        if (in_array($categoryID, $categories)) {
+            $args['IsValid'] = false;
+            $args['InvalidReturnType'] = UNAPPROVED;
+
+            LogModel::insert('Pending', 'Discussion', $record);
         }
-
-        $args['IsValid'] = false;
-        $args['InvalidReturnType'] = UNAPPROVED;
-
-        LogModel::insert('Pending', 'Discussion', $args['DiscussionData']);
     }
 }
