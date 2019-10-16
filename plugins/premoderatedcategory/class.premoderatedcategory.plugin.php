@@ -8,6 +8,14 @@
  * Class PreModeratedCategoryPlugin
  */
 class PreModeratedCategoryPlugin extends Gdn_Plugin {
+
+    private $discussionModel;
+
+    public function __construct(DiscussionModel $discussionModel) {
+        parent::__construct();
+        $this->discussionModel = $discussionModel;
+    }
+
     /**
      * Add a link to the dashboard menu.
      *
@@ -38,13 +46,15 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
         ]);
 
+        //TODO: add checkboxes for comments and discussions so the client can choose
+        // discussions should be enabled by default
+
         $sender->Form->setModel($configurationModel, [
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
         ]);
 
         // If we are not seeing the form for the first time
         if ($sender->Form->authenticatedPostBack() !== false) {
-
             $selectedCategories = $sender->Form->getFormValue('PreModeratedCategory.IDs', []);
             if ($selectedCategories === false) {
                 $selectedCategories = [];
@@ -72,24 +82,59 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      */
     public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
         $discussion = $args['DiscussionData'];
-        $categoryID = $discussion->categoryID;
+        $categoryID = (int)$discussion['CategoryID'];
+        $moderateRecord = $this->setModeration($categoryID);
 
-        $this->setModeration($categoryID, $discussion);
-    }
-
-
-    public function setModeration($categoryID, $record) {
-        $categoryList = c('PreModeratedCategory.IDs');
-        if (!$categoryList) {
-            return;
-        }
-
-        $categories = explode(',', $categoryList);
-        if (in_array($categoryID, $categories)) {
+        if ($moderateRecord) {
             $args['IsValid'] = false;
             $args['InvalidReturnType'] = UNAPPROVED;
 
-            LogModel::insert('Pending', 'Discussion', $record);
+            LogModel::insert('Pending', 'Discussion', $discussion);
         }
+    }
+
+    /**
+     * Send comment to moderation queue
+     *
+     * @param CommentModel $sender
+     * @param array $args
+     */
+    public function commentModel_afterValidateComment_handler($sender, $args) {
+        $comment = $args['CommentData'];
+        $discussionID = $comment['DiscussionID'];
+        $discussion = $this->discussionModel->getID($discussionID);
+        $categoryID = $discussion->CategoryID;
+        $moderateRecord = $this->setModeration($categoryID);
+
+        if ($moderateRecord) {
+            $args['IsValid'] = false;
+            $args['InvalidReturnType'] = UNAPPROVED;
+
+            LogModel::insert('Pending', 'Discussion', $discussion);
+        }
+    }
+
+    /**
+     * Get PreModeratedCategory.IDs config
+     * @return array
+     */
+    private function getPreModeratedCategoryIDs(): array {
+        $categoryList = c('PreModeratedCategory.IDs');
+        if (!$categoryList) {
+            return [];
+        }
+
+        return explode(',', $categoryList);
+    }
+
+    /**
+     * Pre moderation criteria
+     *
+     * @param int $categoryID
+     * @return bool
+     */
+    public function setModeration($categoryID) {
+        $categories = $this->getPreModeratedCategoryIDs();
+        return in_array($categoryID, $categories);
     }
 }
