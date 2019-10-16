@@ -17,6 +17,7 @@ use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Utility\InstanceValidatorSchema;
 
@@ -161,7 +162,7 @@ trait ArticlesApiSchemes {
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
-                    ]
+                    ],
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );
@@ -262,6 +263,7 @@ trait ArticlesApiSchemes {
                 "aliases?",
                 "status",
                 "locale",
+                "translationStatus"
             ])->add($this->fullSchema()), "Article");
         }
         return $this->schema($this->articleSchema, $type);
@@ -315,7 +317,8 @@ trait ArticlesApiSchemes {
                 "insertUser?",
                 "updateUser?",
                 "status",
-                "locale"
+                "locale",
+                "translationStatus"
             ])->add($this->fullSchema()), "ArticleSimple");
         }
         return $this->schema($this->articleSimpleSchema, $type);
@@ -423,6 +426,7 @@ trait ArticlesApiSchemes {
                 "outline",
                 "bodyRendered",
                 "locale",
+                "translationStatus",
             ])->add($this->fullRevisionSchema()));
     }
 
@@ -485,9 +489,10 @@ trait ArticlesApiSchemes {
                 ]
             ]),
             "aliases:a?" => ['items' => ['type' => 'string']],
-            "translations:a" => [
-                "allowNull" => true,
-                "description" => "Translation status of revision. Ex: valid, out-dated,",
+            "translationStatus:s" => [
+                "allowNull" => false,
+                "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
+                "enum" => ArticleRevisionModel::getTranslationStatuses()
             ],
         ]);
     }
@@ -536,6 +541,11 @@ trait ArticlesApiSchemes {
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
             ]),
+            "translationStatus:s" => [
+                "allowNull" => false,
+                "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
+                "enum" => ArticleRevisionModel::getTranslationStatuses()
+            ],
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
             "insertUser?" => $this->getUserFragmentSchema(),

@@ -618,6 +618,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "status",
                 "name",
                 "locale",
+                "translationStatus",
                 "insertUser",
                 "dateInserted",
             ])->add($this->fullRevisionSchema()),
@@ -1093,6 +1094,39 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Invalidate article translations.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function put_invalidateTranslations(int $id, array $body): array {
+        $this->permission("knowledge.articles.add");
+
+        $in = $this->schema([
+            "invalidateTranslations:b"
+        ], "in")->setDescription("Invalidate translations for a particular article.");
+
+        $out = $this->schema([":a" => Schema::parse([
+            "articleID:i",
+            "articleRevisionID:i",
+            "locale:s",
+            "translationStatus:s" => [
+                "enum" => ArticleRevisionModel::getTranslationStatuses()
+            ],
+        ], "out")
+        ]);
+
+        if ($body["invalidateTranslations"]) {
+            $this->updateInvalidateArticleTranslations($id);
+        }
+        $articles = $this->articleModel->getIDWithRevision($id, true);
+        $results = $out->validate($articles);
+
+        return $results;
+    }
+
+    /**
      * Separate article and revision fields from request input and save to the proper resources.
      *
      * @param array $fields
@@ -1247,7 +1281,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $revision["plainText"] = $this->formatterService->renderPlainText($revision['body'], $revision['format']);
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
-
+            $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
@@ -1412,5 +1446,29 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if (!$supportedLocale) {
             throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
         }
+    }
+
+    /**
+     * Update translation status to out-of-date.
+     *
+     * @param int $id
+     */
+    private function updateInvalidateArticleTranslations(int $id) {
+        $articles = $this->articleModel->getIDWithRevision($id, true);
+        $firstArticle = reset($articles);
+        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
+        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByKnowledgeBase($knowledgeBase);
+        $locales = array_diff($supportedLocales, [$knowledgeBase["sourceLocale"]]);
+
+        $this->articleRevisionModel->update(
+            [
+                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
+            ],
+            [
+                "articleID" => $id,
+                "locale" => $locales,
+                "status" => ArticleModel::STATUS_PUBLISHED,
+            ]
+        );
     }
 }
