@@ -20,6 +20,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
  */
 class KnowledgeBasesApiController extends AbstractApiController {
     use KnowledgeBasesApiSchemes;
+    use KnowledgeNavigationApiSchemes;
 
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
@@ -230,14 +231,14 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function get_navigationTree(int $id, array $query = []): array {
         $this->permission("knowledge.kb.view");
         $this->idParamSchema();
-        $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
+        $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
         $query = $in->validate($query);
 
         //check if kb exists and status is not deleted
         $kb = $this->knowledgeBaseByID($id, false);
         $query['knowledgeBaseID'] = $id;
-        $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->schemaWithChildren()], "out");
+        $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
         $rows = $this->knowledgeNavigationApi->tree($query);
         $result = $out->validate($rows);
         return $result ?? [];
@@ -253,16 +254,14 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function get_navigationFlat(int $id, array $query = []): array {
         $this->permission("knowledge.kb.view");
         $this->idParamSchema();
-        $in = $this->knowledgeNavigationApi->schema($this->knowledgeNavigationApi->defaultSchema(), "in")
+        $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
         $query = $in->validate($query);
-
         //check if kb exists and status is not deleted
-        $kb = $this->knowledgeBaseByID($id, false);
+        $kb = $this->knowledgeBaseByID($id, false, true);
 
         $query['knowledgeBaseID'] = $id;
-        $out = $this->knowledgeNavigationApi->schema([":a" => $this->knowledgeNavigationApi->categoryNavigationFragment()], "out");
-
+        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
         $rows = $this->knowledgeNavigationApi->flat($query);
         $result = $out->validate($rows);
 
@@ -427,11 +426,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param int $knowledgeBaseID
      * @param bool $includeDeleted Include "deleted" knowledgebase. Default: true (include all)
+     * @param bool $checkOnly Check only call. If TRUE there is no need to return extra data
      *
      * @return array
      * @throws NotFoundException If the knowledge base could not be found.
      */
-    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true): array {
+    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true, bool $checkOnly = false): array {
         try {
             if ($includeDeleted) {
                 $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
@@ -447,7 +447,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
 
-        if ($result['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+        if (!$checkOnly && $result['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
             $result['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($knowledgeBaseID);
         } else {
             $result['defaultArticleID'] = null;
