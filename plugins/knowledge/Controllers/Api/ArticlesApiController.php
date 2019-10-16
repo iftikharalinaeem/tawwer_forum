@@ -1458,15 +1458,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByKnowledgeBase($knowledgeBase);
         $locales = array_diff($supportedLocales, [$knowledgeBase["sourceLocale"]]);
 
-            $this->articleRevisionModel->update(
-                [
-                    "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
-                ],
-                [
-                    "articleID" => $id,
-                    "locale" => $locales,
-                    "status" => ArticleModel::STATUS_PUBLISHED,
-                ]
-            );
+        $this->articleRevisionModel->update(
+            [
+                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
+            ],
+            [
+                "articleID" => $id,
+                "locale" => $locales,
+                "status" => ArticleModel::STATUS_PUBLISHED,
+            ]
+        );
     }
 }
