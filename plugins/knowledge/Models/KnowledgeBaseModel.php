@@ -457,7 +457,7 @@ MESSAGE
      * @param array $knowledgeBase
      * @return array
      */
-    public function getSupportedLocalesByID(array $knowledgeBase): array {
+    public function getSupportedLocalesByKnowledgeBase(array $knowledgeBase): array {
         $supportedLocales = $this->getLocales($knowledgeBase["siteSectionGroup"]);
         $locales = array_column($supportedLocales, "locale");
         return $locales;

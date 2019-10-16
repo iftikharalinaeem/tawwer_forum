@@ -1455,7 +1455,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $firstArticle = reset($articles);
         $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
-        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByID($knowledgeBase);
+        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByKnowledgeBase($knowledgeBase);
         $locales = array_diff($supportedLocales, [$knowledgeBase["sourceLocale"]]);
 
             $this->articleRevisionModel->update(
