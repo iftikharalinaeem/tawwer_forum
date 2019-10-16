@@ -5,10 +5,13 @@
 
 import { onContent, onReady, t } from "@library/utility/appUtils";
 import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { ManageKnowledgeBasesPage } from "@knowledge/knowledge-settings/ManageKnowledgeBasesPage";
+import { addComponent } from "@library/utility/componentRegistry";
 import { mountModal } from "@library/modal/Modal";
 import React from "react";
 import { ConfirmLocaleChange } from "@knowledge/entries/ConfirmLocaleChange";
 
+addComponent("knowledge-bases-table", ManageKnowledgeBasesPage);
 onReady(handleKBViewTypeChange);
 onContent(() => {
     handleKBViewTypeChange();
