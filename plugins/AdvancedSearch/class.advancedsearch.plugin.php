@@ -379,22 +379,24 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
             $Row['Type'] = $Row['Type'] ?? SearchRecordTypeDiscussion::API_TYPE_KEY;
 
-            // Add breadcrumbs for discussions.
-            if ($UseCategories && isset($Row['CategoryID'])) {
-                $CategoryID = $Row['CategoryID'];
-                if (isset($Breadcrumbs[$CategoryID])) {
-                    $Row['Breadcrumbs'] = $Breadcrumbs[$CategoryID];
-                } else {
-                    $Categories = CategoryModel::getAncestors($CategoryID);
-                    $R = [];
-                    foreach ($Categories as $Cat) {
-                        $R[] = [
-                            'Name' => $Cat['Name'],
-                            'Url' => categoryUrl($Cat)
-                        ];
+            if (!($Row['Type'] !== SearchRecordTypeDiscussion::API_TYPE_KEY && is_array($Row['Breadcrumbs']))) {
+                // Add breadcrumbs for discussions.
+                if ($UseCategories && isset($Row['CategoryID'])) {
+                    $CategoryID = $Row['CategoryID'];
+                    if (isset($Breadcrumbs[$CategoryID])) {
+                        $Row['Breadcrumbs'] = $Breadcrumbs[$CategoryID];
+                    } else {
+                        $Categories = CategoryModel::getAncestors($CategoryID);
+                        $R = [];
+                        foreach ($Categories as $Cat) {
+                            $R[] = [
+                                'Name' => $Cat['Name'],
+                                'Url' => categoryUrl($Cat)
+                            ];
+                        }
+                        $Row['Breadcrumbs'] = $R;
+                        $Breadcrumbs[$CategoryID] = $R;
                     }
-                    $Row['Breadcrumbs'] = $R;
-                    $Breadcrumbs[$CategoryID] = $R;
                 }
             }
         }
