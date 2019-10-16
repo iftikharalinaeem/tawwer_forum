@@ -48,6 +48,10 @@ export interface IEditorPageState {
     submit: ILoadable<{}>;
     isDirty: boolean;
     notifyConversion: boolean;
+    fallbackLocale: {
+        notify: boolean;
+        locale: string | null;
+    };
 }
 
 type ReducerType = KnowledgeReducer<IEditorPageState>;
@@ -144,6 +148,10 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         },
         isDirty: false,
         notifyConversion: false,
+        fallbackLocale: {
+            notify: false,
+            locale: null,
+        },
     };
     public initialState = EditorPageModel.INITIAL_STATE;
 
@@ -160,6 +168,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceArticle,
                 this.reduceEditorQueue,
                 this.reduceErrors,
+                this.reduceTranslation,
             )(nextState, action);
         });
     };
@@ -210,6 +219,17 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
 
         return nextState;
     };
+
+    private reduceTranslation = reducerWithoutInitialState<IEditorPageState>()
+        .case(EditorPageActions.setFallbackLocaleAC, (nextState, payload) => {
+            nextState.fallbackLocale.notify = true;
+            nextState.fallbackLocale.locale = payload;
+            return nextState;
+        })
+        .case(EditorPageActions.clearFallbackLocaleNoticeAC, nextState => {
+            nextState.fallbackLocale.notify = false;
+            return nextState;
+        });
 
     private reduceEditorQueue = reducerWithoutInitialState<IEditorPageState>()
         .case(EditorPageActions.queueEditorOpsAC, (nextState, payload) => {

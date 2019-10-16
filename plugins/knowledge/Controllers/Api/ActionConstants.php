@@ -15,6 +15,8 @@ abstract class ActionConstants {
     const GET_ALL_KBS = "@@knowledgeBases/GET_ALL_DONE";
     const GET_NAVIGATION_FLAT = "@@navigation/GET_NAVIGATION_FLAT_DONE";
 
+    const ARTICLE_TRANSLATION_FALLBACK = "@@article/ARTICLE_USES_TRANSLATION_FALLBACK";
+
     // Article page
     const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     const GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_ERROR";
