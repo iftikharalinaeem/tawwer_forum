@@ -1118,23 +1118,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]);
 
         if ($body["invalidateTranslations"]) {
-            $articles = $this->updateInvalidateArticleTranslations($id);
+            $this->updateInvalidateArticleTranslations($id);
         }
         $articles = $this->articleModel->getIDWithRevision($id, true);
-
-        $results = [];
-
-        foreach ($articles as $article) {
-            $row = [
-                "articleID" => $article["articleID"],
-                "articleRevisionID" => $article["articleRevisionID"],
-                "locale" => $article["locale"],
-                "translationStatus" => $article["translationStatus"],
-            ];
-            $results[] = $row;
-        }
-
-        $results = $out->validate($results);
+        $results = $out->validate($articles);
 
         return $results;
     }
@@ -1468,19 +1455,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $firstArticle = reset($articles);
         $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
-        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocaledByID($knowledgeBase["knowledgeBaseID"]);
+        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByID($knowledgeBase);
         $locales = array_diff($supportedLocales, [$knowledgeBase["sourceLocale"]]);
 
-        foreach ($locales as $locale) {
             $this->articleRevisionModel->update(
                 [
                     "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
                 ],
                 [
                     "articleID" => $id,
-                    "locale" => $locale,
+                    "locale" => $locales,
+                    "status" => ArticleModel::STATUS_PUBLISHED,
                 ]
             );
-        }
     }
 }
