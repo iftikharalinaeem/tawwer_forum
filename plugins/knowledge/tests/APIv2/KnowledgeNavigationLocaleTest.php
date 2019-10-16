@@ -225,7 +225,6 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
         $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
             ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
-
     }
    /**
      * Setup routine for the test. Called before test execution.
