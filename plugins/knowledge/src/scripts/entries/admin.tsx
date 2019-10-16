@@ -6,12 +6,8 @@
 import { onContent, onReady, t } from "@library/utility/appUtils";
 import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { mountModal } from "@library/modal/Modal";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import React, { useState } from "react";
-import Paragraph from "@library/layout/Paragraph";
-import Translate from "@library/content/Translate";
-import ModalSizes from "@library/modal/ModalSizes";
-import { ITranslationGrid } from "@library/content/translationGrid/TranslationGrid";
+import React from "react";
+import { ConfirmLocaleChange } from "@knowledge/entries/ConfirmLocaleChange";
 
 onReady(handleKBViewTypeChange);
 onContent(() => {
@@ -47,42 +43,6 @@ function updateSortArticles() {
         default:
             sortGroup.classList.remove(hiddenClass);
     }
-}
-
-function ConfirmLocaleChange(props: { oldValue: string; target: HTMLSelectElement }) {
-    const { oldValue, target } = props;
-    const [showModal, setShowModal] = useState(true);
-
-    return showModal ? (
-        <ModalConfirm
-            title={t("Are you sure?")}
-            onCancel={() => {
-                target.value = oldValue;
-            }}
-            onConfirm={() => {
-                setShowModal(false);
-            }}
-            elementToFocusOnExit={target}
-            size={ModalSizes.SMALL}
-        >
-            <Paragraph>
-                <Translate
-                    source="Changing your source locale can lead to articles disappearing and is not recommended. Are you sure you want to change the source locale? <0>More information</0>."
-                    c0={content => {
-                        return (
-                            <a
-                                href="https://success.vanillaforums.com/kb/articles/118"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {content}
-                            </a>
-                        );
-                    }}
-                />
-            </Paragraph>
-        </ModalConfirm>
-    ) : null;
 }
 
 function handleKBSourceLocaleChange() {
