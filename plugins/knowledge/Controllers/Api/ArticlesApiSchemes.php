@@ -180,7 +180,6 @@ trait ArticlesApiSchemes {
         if ($this->firstArticleRevisionPatchSchema === null) {
             $this->firstArticleRevisionPatchSchema = $this->schema(
                 Schema::parse([
-                    "knowledgeCategoryID",
                     "format",
                     "body",
                     "name",

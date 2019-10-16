@@ -11,9 +11,9 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use Vanilla\Exception\Database\NoResultsException;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -31,21 +31,27 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var SiteSectionProviderInterface */
+    private $siteSectionProvider;
+
     /**
      * KnowledgeBaseApiController constructor.
      *
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param KnowledgeNavigationApiController $knowledgeNavigationApi
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
+     * @param SiteSectionProviderInterface $siteSectionProvider
      */
     public function __construct(
         KnowledgeBaseModel $knowledgeBaseModel,
         KnowledgeNavigationApiController $knowledgeNavigationApi,
-        KnowledgeCategoryModel $knowledgeCategoryModel
+        KnowledgeCategoryModel $knowledgeCategoryModel,
+        SiteSectionProviderInterface $siteSectionProvider
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->siteSectionProvider = $siteSectionProvider;
     }
 
     /**
@@ -114,24 +120,44 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
             ],
             "sourceLocale?",
-            "siteSectionGroup?"
+            "siteSectionGroup?",
+            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections"]),
         ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
 
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $in->validate($query);
 
+        // Get the expand params and then remove from the query.
+        $expandSiteSections = $this->isExpandField('siteSections', $query['expand']);
+        unset($query["expand"]);
+
+
         if (array_key_exists("siteSectionGroup", $query) && $query['siteSectionGroup'] === 'all') {
             unset($query['siteSectionGroup']);
         }
 
         $rows = $this->knowledgeBaseModel->get($query);
-        $rows = array_map(function ($row) {
+
+        $rows = array_map(function ($row) use ($expandSiteSections) {
+            if ($expandSiteSections) {
+                $this->expandSiteSections($row);
+            }
             return $this->normalizeOutput($row);
         }, $rows);
         $result = $out->validate($rows);
 
         return $result;
+    }
+
+    /**
+     * Expand the site sections on a knowledge base record.
+     *
+     * @param array $row
+     */
+    private function expandSiteSections(array &$row) {
+        $siteSections = $this->siteSectionProvider->getForSectionGroup($row['siteSectionGroup']);
+        $row['siteSections'] = $siteSections;
     }
 
     /**
