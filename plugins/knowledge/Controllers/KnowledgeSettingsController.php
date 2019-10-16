@@ -220,6 +220,14 @@ class KnowledgeSettingsController extends SettingsController {
                 $this->Form->setValidationResults($validation->results());
             }
         }
+
+        $sourceLocaleOptions = [ "Default" => $defaultLocale];
+
+        // If we've got a KB ID, we've already got a locale set for this KB
+        if ($knowledgeBaseID) {
+            $sourceLocaleOptions["data-sourceLocale-kb"] = $defaultLocale;
+        }
+
         // Set the form elements on the add/edit form.
         $formData = [
             'name' => [
@@ -283,7 +291,7 @@ class KnowledgeSettingsController extends SettingsController {
                 'LabelCode' => 'Locales',
                 'Control' => 'DropDown',
                 'Items' => $options,
-                'Options' => [ "Default" => $defaultLocale]
+                'Options' => $sourceLocaleOptions
             ],
         ];
 
