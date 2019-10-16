@@ -242,67 +242,41 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
 
     /**
      * Test GET navigation-flat with locale = sourceLocale
+     *
+     * @dataProvider validCounts
      */
-    public function testNavigationFlatSourceLocale() {
+    public function testNavigationFlat(string $locale, int $count, $onlyTranslated) {
 
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=' . $this->knowledgeBase['sourceLocale']);
+        $query = (is_null($onlyTranslated)) ? '' : '&only-translated='.($onlyTranslated ? 'true' : 'false');
+        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=' . $locale.$query);
         $status = $response->getStatus();
         $this->assertEquals('200 OK', $status);
 
         $navigation = $response->getBody();
 
-        $this->assertEquals(14, count($navigation));
+        $this->assertEquals($count, count($navigation));
     }
 
     /**
-     * Test GET navigation-flat with locale = unknown
+     * @return array Data with expected correct Count values
      */
-    public function testNavigationFlatUnknownLocale() {
-
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=ua');
-        $status = $response->getStatus();
-        $this->assertEquals('200 OK', $status);
-
-        $navigation = $response->getBody();
-        $this->assertEquals(14, count($navigation));
-    }
-
-    /**
-     * Test GET navigation-flat with locale = unknown with only-translated
-     */
-    public function testNavigationFlatOnlyTranslatedUnknownLocale() {
-
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=ua&only-translated=true');
-        $status = $response->getStatus();
-        $this->assertEquals('200 OK', $status);
-
-        $navigation = $response->getBody();
-        $this->assertEquals(9, count($navigation));
-    }
-
-    /**
-     * Test GET navigation-flat with locale = unknown
-     */
-    public function testNavigationFlatNotSourceLocale() {
-
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=fr');
-        $status = $response->getStatus();
-        $this->assertEquals('200 OK', $status);
-
-        $navigation = $response->getBody();
-        $this->assertEquals(14, count($navigation));
-    }
-
-    /**
-     * Test GET navigation-flat with locale = unknown with only-translated
-     */
-    public function testNavigationFlatOnlyTranslatedNotSourceLocale() {
-
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=fr&only-translated=true');
-        $status = $response->getStatus();
-        $this->assertEquals('200 OK', $status);
-
-        $navigation = $response->getBody();
-        $this->assertEquals(11, count($navigation));
+    public function validCounts(): array {
+        return [
+            'Source locale (en)' => [
+                'en', 14, null
+            ],
+            'Unknown locale (ua)' => [
+                'ua', 14, null
+            ],
+            'Unknown locale (ua) only-translated (true)' => [
+                'ua', 9, true
+            ],
+            'Translated locale (fr)' => [
+                'fr', 14, null
+            ],
+            'Translated locale (fr)  only-translated (true)' => [
+                'fr', 11, true
+            ],
+        ];
     }
 }
