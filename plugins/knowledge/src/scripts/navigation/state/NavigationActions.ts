@@ -9,6 +9,7 @@ import { IApiError, LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 const createAction = actionCreatorFactory("@@navigation");
 
@@ -36,7 +37,8 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
         }
 
         const apiThunk = bindThunkAction(NavigationActions.getNavigationFlatACs, async () => {
-            const response = await this.api.get(`/knowledge-bases/${knowledgeBaseID}/navigation-flat`);
+            const locale = getCurrentLocale();
+            const response = await this.api.get(`/knowledge-bases/${knowledgeBaseID}/navigation-flat?locale=${locale}`);
             return response.data;
         })({ knowledgeBaseID });
 

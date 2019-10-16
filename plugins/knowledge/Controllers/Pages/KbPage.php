@@ -146,8 +146,14 @@ abstract class KbPage extends ThemedPage {
      * @param int $knowledgeBaseID
      */
     protected function preloadNavigation(int $knowledgeBaseID) {
-        $options = ['knowledgeBaseID' => $knowledgeBaseID, "recordType" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL];
-        $navigation = $this->navApi->flat($options);
+        $options = [
+            "knowledgeBaseID" => $knowledgeBaseID,
+            "recordType" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL,
+            "locale" => $this->siteSectionProvider->getCurrentSiteSection()->getContentLocale(),
+        ];
+
+
+        $navigation = $this->kbApi->get_navigationFlat($knowledgeBaseID, $options);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_NAVIGATION_FLAT,
             Data::box($navigation),
