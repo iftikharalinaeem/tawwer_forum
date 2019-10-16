@@ -16,7 +16,7 @@ paths:
         required: false
         schema:
             type: string
-      - description: If transalted revisions does not exist don not return related article.
+      - description: If set, do not include any resources that are not translated into the requested locale.
         in: query
         name: only-translated
         required: false

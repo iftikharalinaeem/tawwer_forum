@@ -9,7 +9,7 @@ import { ManageKnowledgeBasesPage } from "@knowledge/knowledge-settings/ManageKn
 import { addComponent } from "@library/utility/componentRegistry";
 import { mountModal } from "@library/modal/Modal";
 import React from "react";
-import { ConfirmLocaleChange } from "@knowledge/entries/ConfirmLocaleChange";
+import { ConfirmLocaleChange } from "@knowledge/knowledge-settings/ConfirmLocaleChange";
 
 addComponent("knowledge-bases-table", ManageKnowledgeBasesPage);
 onReady(handleKBViewTypeChange);
