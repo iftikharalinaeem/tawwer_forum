@@ -35,6 +35,11 @@ class KnowledgeSettingsController extends SettingsController {
     /** @var KnowledgeBaseKludgedVars */
     private $kludgedVars;
 
+    /** @var LocalesApiController */
+    private $localApiController;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
     /**
      * Constructor for DI.
      *
@@ -42,17 +47,23 @@ class KnowledgeSettingsController extends SettingsController {
      * @param MediaApiController $mediaApiController
      * @param Gdn_Request $request
      * @param KnowledgeBaseKludgedVars $kludgedVars
+     * @param LocalesApiController $localApiController
+     * @param  KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
         MediaApiController $mediaApiController,
         Gdn_Request $request,
-        KnowledgeBaseKludgedVars $kludgedVars
+        KnowledgeBaseKludgedVars $kludgedVars,
+        LocalesApiController $localApiController,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->apiController = $apiController;
         $this->mediaApiController = $mediaApiController;
         $this->request = $request;
         $this->kludgedVars = $kludgedVars;
+        $this->localApiController = $localApiController;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
     }
@@ -178,6 +189,8 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function knowledgeBasesAddEdit($knowledgeBaseID = null) {
         $this->permission('Garden.Settings.Manage');
+        $defaultLocale = $this->getDefaultLocale($knowledgeBaseID);
+        $options = $this->getSourceLocaleOptions();
 
         if ($knowledgeBaseID) {
             $record = $this->apiController->get($knowledgeBaseID);
@@ -192,7 +205,6 @@ class KnowledgeSettingsController extends SettingsController {
                 $this->Form->setValidationResults($validation->results());
             }
         }
-
         // Set the form elements on the add/edit form.
         $formData = [
             'name' => [
@@ -249,6 +261,14 @@ class KnowledgeSettingsController extends SettingsController {
                     '<li class="form-group js-sortArticlesGroup">',
                     '</li>'
                 ]
+            ],
+            'sourceLocale' => [
+                "Type" => "String",
+                "Description" => "Source locale for the Knowledge-Base",
+                'LabelCode' => 'Locales',
+                'Control' => 'DropDown',
+                'Items' => $options,
+                'Options' => [ "Default" => $defaultLocale]
             ],
         ];
 
@@ -318,6 +338,10 @@ class KnowledgeSettingsController extends SettingsController {
         } elseif ($values["sortArticles"] === KnowledgeBaseModel::ORDER_MANUAL) {
             // If it isn't a guide, it can't be sorted manually.
             $values["sortArticles"] = KnowledgeBaseModel::ORDER_DATE_DESC;
+        }
+
+        if (!isset($values["sourceLocale"])) {
+            $values["sourceLocale"] = $this->getCurrentLocale();
         }
 
         if ($knowledgeBaseID) {
@@ -402,5 +426,49 @@ class KnowledgeSettingsController extends SettingsController {
         }
 
         return $image['url'];
+    }
+
+    /**
+     * Get the source locale options.
+     *
+     * @return array
+     */
+    private function getSourceLocaleOptions(): array {
+        $options = [];
+        $availableLocales = $this->localApiController->index();
+        $localeNames = array_column($availableLocales, 'displayNames', 'localeKey');
+        foreach ($localeNames as $localKey => $displayNames) {
+            $options[$localKey] = $displayNames[$localKey];
+        }
+        return $options;
+    }
+
+    /**
+     * Get the locale that is currently set.
+     *
+     * @return string
+     */
+    private function getCurrentLocale(): string {
+        $currentLocale = $this->localApiController->getLocale();
+        $locale = $currentLocale->Locale;
+
+        return $locale;
+    }
+
+    /**
+     * Get the default locale to use for /knowledge-base add/edit.
+     *
+     * @param int $knowledgeBaseID
+     * @return string
+     */
+    private function getDefaultLocale(int $knowledgeBaseID = null): string {
+        if ($knowledgeBaseID) {
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+            $defaultLocale = $knowledgeBase["sourceLocale"];
+        } else {
+            $defaultLocale = $this->getCurrentLocale();
+        }
+
+        return $defaultLocale;
     }
 }

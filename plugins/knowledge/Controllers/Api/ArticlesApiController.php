@@ -256,6 +256,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Handle GET requests to the root of the endpoint.
      *
      * @param int $id
+     * @param array $query
      * @return array
      * @throws Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
@@ -265,13 +266,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ServerException If there was an error normalizing the output.
      */
-    public function get(int $id) {
+    public function get(int $id, array $query) {
         $this->permission("knowledge.kb.view");
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
         $out = $this->articleSchema("out");
+        $article = $this->retrieveRow($id, $query);
 
-        $article = $this->articleByID($id, true);
         $this->userModel->expandUsers(
             $article,
             ["insertUserID", "updateUserID"]
@@ -367,13 +368,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article for editing.
      *
      * @param int $id
+     * @param array $query
      * @return array
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws NotFoundException If the article could not be found.
      * @throws ValidationException If the output fails to validate against the schema.
      */
-    public function get_edit(int $id): array {
+    public function get_edit(int $id, array $query): array {
         $this->permission("knowledge.articles.add");
 
         $this->idParamSchema()->setDescription("Get an article for editing.");
@@ -386,8 +388,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "format",
             "locale",
         ])->add($this->fullSchema()), "out");
-
-        $article = $this->articleByID($id, true);
+        $article = $this->retrieveRow($id, $query);
         $body = $article['body'];
         $article = $this->normalizeOutput($article);
         $article['body'] = $body;
@@ -426,6 +427,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "minimum" => 1,
                 "maximum" => 100,
             ],
+            "locale:s?" => [
+                "description" => "Filter revisions by locale.",
+            ],
         ], "in")->setDescription("List published articles in a given knowledge category.");
         $out = $this->schema([":a" => $this->articleSimpleSchema()], "out");
 
@@ -462,8 +466,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $options["orderFields"] = $sortRule[0];
         $options["orderDirection"] = $sortRule[1];
 
+        $locale = $query["locale"] ?? $knowledgeBase["sourceLocale"];
         $rows = $this->articleModel->getWithRevision(
-            ["a.knowledgeCategoryID" => $query["knowledgeCategoryID"]],
+            [
+                "a.knowledgeCategoryID" => $query["knowledgeCategoryID"],
+                "ar.locale" => $locale,
+            ],
             $options
         );
 
@@ -689,8 +697,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $name = $row["name"] ?? null;
 
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
-        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
-        $siteSectionSlug = $this->getSitSectionSlug($row["locale"], $allLocales);
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
+        $allLocales = $this->knowledgeBaseModel->getLocales($siteSectionGroup);
+
+        $locale = $row["locale"] ?? $knowledgeBase["sourceLocale"];
+        $siteSectionSlug = $this->getSitSectionSlug($locale, $allLocales);
         $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
         $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
         $row["url"] = \Gdn::request()->url($path, true);
@@ -1330,7 +1341,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return string
      */
     protected function getSitSectionSlug(string $articleLocale, array $allLocales): string {
-        $siteSectionSlug = null;
+        $siteSectionSlug = "";
 
         foreach ($allLocales as $locale) {
             if ($locale["locale"] === $articleLocale) {
@@ -1364,20 +1375,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id
      * @param array $body
      * @return array
+     * @throws ClientException When no record is found.
      */
     private function retrieveRow(int $id, array $body): array {
         $records = $this->articleByID($id, true, false, true);
         $firstRecord = reset($records);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-        $locale = (array_key_exists("locale", $body)) ? $body["locale"] : $sourceLocale;
+        $locale = (!empty($body["locale"])) ? $body["locale"] : $sourceLocale;
         $row = [];
         foreach ($records as $record) {
             if ($record["locale"] === $locale) {
                 $row = $record;
             }
         }
-
+        if (!$row) {
+            throw new ClientException("Article not found", 404);
+        }
         return $row;
     }
 

@@ -20,6 +20,8 @@ class SearchRecordTypeArticle implements SearchRecordTypeInterface {
 
     const PROVIDER_GROUP = 'sphinx';
 
+    const INFRASTRUCTURE_TEMPLATE = 'knowledgearticle';
+
     const TYPE = 'article';
 
     const API_TYPE_KEY = 'article';

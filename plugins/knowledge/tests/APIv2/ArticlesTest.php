@@ -29,6 +29,9 @@ class ArticlesTest extends AbstractResourceTest {
     /** @var string The resource route. */
     protected $baseUrl = "/articles";
 
+    /** @var SiteSectionProviderInterface*/
+    private static $siteSectionProvider;
+
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
         "body",
@@ -53,6 +56,8 @@ class ArticlesTest extends AbstractResourceTest {
     public static function setupBeforeClass() {
         self::$addons = ["vanilla", "sphinx", "knowledge"];
         parent::setupBeforeClass();
+
+        self::$siteSectionProvider =  new MockSiteSectionProvider();
 
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
         $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
@@ -83,7 +88,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $row["body"] = md5($row["body"]);
         $row["format"] = $row["body"] === "markdown" ? "text" : "markdown";
-      //  $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
+        $row["locale"] = $row["locale"] === "en" ? "fr" : "en";
         $row["name"] = md5($row["name"]);
         $row["sort"]++;
 
@@ -137,6 +142,7 @@ class ArticlesTest extends AbstractResourceTest {
             'sortArticles' => 'manual',
             'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base' . $salt,
+            "siteSectionGroup" => "mockSiteSectionGroup-1",
         ];
         $kb = $this->api()
             ->post('/knowledge-bases', $record)
@@ -206,6 +212,8 @@ class ArticlesTest extends AbstractResourceTest {
      * @dataProvider providePatchFields
      */
     public function testPatchSparse($field) {
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
         if (empty($this->defaultKB)) {
             $this->defaultKB = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " KB #1",
@@ -214,12 +222,25 @@ class ArticlesTest extends AbstractResourceTest {
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
                 "sourceLocale" => "en",
+                "format" => "markdown",
+                "siteSectionGroup" => "mockSiteSectionGroup-1",
             ])->getBody();
         }
 
         $row = $this->testGetEdit();
 
         $patchRow = $this->modifyRow($row);
+
+        // Patching an article's locale won't work unless there is an existing revision for that locale.
+        $locale = null;
+        if ($field === "locale") {
+            $this->api()->patch(
+                '/knowledge-bases/' . self::$knowledgeCategoryID,
+                ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+            );
+            $locale = "fr";
+            $this->createFirstRevisionInLocale($row, $locale);
+        }
 
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}",
@@ -231,7 +252,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $this->assertEquals(200, $r->getStatusCode());
 
-        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit", ["locale" => $locale]);
         $this->assertSame($patchRow[$field], $newRow[$field]);
     }
 
@@ -248,6 +269,7 @@ class ArticlesTest extends AbstractResourceTest {
                 "urlCode" => slugify('test-' . __FUNCTION__ . '-' . round(microtime(true) * 1000) . rand(1, 1000)),
                 "viewType" => KnowledgeBaseModel::TYPE_GUIDE,
                 "sortArticles" => KnowledgeBaseModel::ORDER_MANUAL,
+                'siteSectionGroup' => 'mockSiteSectionGroup-1'
             ])->getBody();
         }
 
@@ -365,6 +387,10 @@ class ArticlesTest extends AbstractResourceTest {
      * to set discussion canonical link to the article created
      */
     public function testPostDiscussionCanonical() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'vanilla']
+        );
         $discussion = $this->api()->post(
             '/discussions',
             [
@@ -545,6 +571,11 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles/{ID}/translations
      */
     public function testGetArticleTranslations() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
         $record = $this->record();
         $article = $this->testPost($record);
         $articleID = $article["articleID"];
@@ -552,7 +583,7 @@ class ArticlesTest extends AbstractResourceTest {
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
         $articleTranslations = $response->getBody();
 
-        $this->assertCount(1, $articleTranslations);
+        $this->assertCount(4, $articleTranslations);
         $this->assertEquals("out-of-date", $articleTranslations[0]["translationStatus"]);
         $this->assertEquals("en", $articleTranslations[0]["locale"]);
     }
@@ -601,9 +632,8 @@ class ArticlesTest extends AbstractResourceTest {
      * Test posting article in a locale that is supported.
      */
     public function testPatchArticleInSupportedLocale() {
-        $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
-            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
 
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
@@ -646,9 +676,8 @@ class ArticlesTest extends AbstractResourceTest {
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage("Locale xx not supported in this Knowledge-Base");
 
-        $siteSectionProvider = new MockSiteSectionProvider();
         self::container()
-            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
 
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
@@ -672,4 +701,79 @@ class ArticlesTest extends AbstractResourceTest {
         $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
     }
 
+    /**
+     * Test GET /articles when filtering with locale
+     */
+    public function testGetArticlesFilterByLocale() {
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $this->createMultipleArticles();
+        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "fr"]);
+        $articles = $response->getBody();
+        $this->assertEquals(6, count($articles));
+
+        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
+        $articles = $response->getBody();
+        $this->assertEquals(21, count($articles));
+    }
+
+    /**
+     * Test GET /articles when filtering with locale
+     */
+    public function testGetArticleIDFilterByLocale() {
+        self::container()
+            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
+
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+        );
+
+        $record = $this->record();
+        $record["locale"] = "en";
+        $response = $this->api()->post($this->baseUrl, $record);
+        $article = $response->getBody();
+        $record["locale"] = "ru";
+        $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
+
+        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "ru"]);
+        $article = $response->getBody();
+        $this->assertEquals(2, count($article));
+        $this->assertEquals("ru", $article[0]["locale"]);
+    }
+
+    /**
+     * Create multiple articles with some a revision in a different locale.
+     */
+    private function createMultipleArticles() {
+        for ($i = 1; $i <= 5; $i++) {
+            $record = $this->record();
+            $record["locale"] = "en";
+            $response = $this->api()->post($this->baseUrl, $record);
+            $article = $response->getBody();
+            $record["locale"] = "fr";
+            $this->api()->patch($this->baseUrl . "/" . $article["articleID"], $record);
+        }
+    }
+
+    /**
+     * Create a revision in a locale.
+     *
+     * @param array $row
+     * @param string $locale
+     */
+    private function createFirstRevisionInLocale(array $row, string $locale) {
+        $record = $this->record();
+        $record["locale"] = $locale;
+        $this->api()->patch(
+            "{$this->baseUrl}/{$row["articleID"]}",
+            $record
+        );
+    }
 }
