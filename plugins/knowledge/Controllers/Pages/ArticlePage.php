@@ -39,7 +39,7 @@ class ArticlePage extends KbPage {
         $article = $this->getArticleForPath($path);
         $this
             ->setSeoTitle($article['name'] ?? "")
-            ->setSeoDescription($article['articleRevision']['excerpt'] ?? "")
+            ->setSeoDescription($article['excerpt'] ?? "")
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
@@ -83,6 +83,16 @@ class ArticlePage extends KbPage {
         $query = ["expand" => "all"];
         if ($hasTranslation) {
             $query['locale'] = $currentLocale;
+        } else {
+            $this->addReduxAction(new ReduxAction(
+                ActionConstants::ARTICLE_TRANSLATION_FALLBACK,
+                Data::box([
+                    'articleID' => $id,
+                    'usesFallback' => true,
+                ]),
+                [],
+                true
+            ));
         }
 
         return $this->articlesApi->get($id, $query);
