@@ -23,6 +23,7 @@ import { IArticle, IArticleLocale } from "@knowledge/@types/api/article";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
+import { typographyClasses } from "@library/styles/typographyStyles";
 
 /**
  * Implements the article's layout
@@ -64,7 +65,7 @@ export class ArticleLayout extends React.Component<IProps> {
                     breadcrumbs={
                         this.props.device !== Devices.MOBILE &&
                         this.props.device !== Devices.XS &&
-                        article.breadcrumbs && <Breadcrumbs children={article.breadcrumbs} forceDisplay={false} />
+                        article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
                     }
                     leftBottom={
                         <PanelWidget>
@@ -75,6 +76,7 @@ export class ArticleLayout extends React.Component<IProps> {
                         <PanelWidget>
                             <PageTitle
                                 title={article.name}
+                                headingClassName={typographyClasses().largeTitle}
                                 actions={
                                     <ArticleMenu
                                         article={article}

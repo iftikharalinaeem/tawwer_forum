@@ -28,7 +28,7 @@ import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
-import { stat } from "fs";
+import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -107,19 +107,20 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     private renderMessages(): React.ReactNode {
-        const { article } = this.props;
-        let messages: React.ReactNode;
-
-        if (article.data && article.data.status === PublishStatus.DELETED) {
-            messages = (
-                <Permission permission="articles.add">
+        const { article, notifyTranslationFallback } = this.props;
+        let messages = (
+            <Permission permission="articles.add">
+                {notifyTranslationFallback && article.data && (
+                    <ArticleUntranslatedMessage articleID={article.data.articleID} />
+                )}
+                {article.data && article.data.status === PublishStatus.DELETED && (
                     <ArticleDeletedMessage
                         onRestoreClick={this.handleRestoreClick}
                         isLoading={this.props.restoreStatus === LoadStatus.LOADING}
                     />
-                </Permission>
-            );
-        }
+                )}
+            </Permission>
+        );
 
         return messages;
     }
@@ -166,6 +167,10 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { restoreStatus } = state.knowledge.articlePage;
     const article = ArticlePageSelector.selectArticle(state);
+    const notifyTranslationFallback =
+        article &&
+        article.data &&
+        state.knowledge.articles.articlesIDsWithTranslationFallback.includes(article.data.articleID);
     const categoryID = article.data ? article.data.knowledgeCategoryID : null;
 
     return {
@@ -178,6 +183,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
         articlelocales: state.knowledge.articles.localesByID,
+        notifyTranslationFallback,
     };
 }
 

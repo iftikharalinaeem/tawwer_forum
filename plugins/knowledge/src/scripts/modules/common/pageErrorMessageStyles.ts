@@ -17,7 +17,7 @@ export const pageErrorMessageClasses = () => {
     });
 
     const title = style("title", {
-        fontSize: unit(globalVars.fonts.size.smallTitle),
+        fontSize: unit(globalVars.fonts.size.title),
         lineHeight: globalVars.lineHeights.condensed,
         fontWeight: globalVars.fonts.weights.semiBold,
         textAlign: "center",

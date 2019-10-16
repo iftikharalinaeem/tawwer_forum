@@ -12,6 +12,7 @@ import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLa
 import { modalClasses } from "@library/modal/modalStyles";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
+import FlexSpacer from "@library/layout/FlexSpacer";
 
 interface IProps {
     className?: string;
@@ -43,12 +44,27 @@ export default class DraftHeader extends React.Component<IProps> {
                                 </PanelWidgetHorizontalPadding>
                             </li>
                             {this.props.mobileDropDownTitle && (
-                                <li className={classNames(classesEditorHeader.centreColumn, classesEditorHeader.item)}>
-                                    <MobileDropDown
-                                        title={this.props.mobileDropDownTitle!}
-                                        buttonClass="editorHeader-mobileDropDown"
-                                    />
-                                </li>
+                                <>
+                                    <li
+                                        className={classNames(
+                                            classesEditorHeader.centreColumn,
+                                            classesEditorHeader.item,
+                                        )}
+                                    >
+                                        <MobileDropDown
+                                            title={this.props.mobileDropDownTitle!}
+                                            buttonClass="editorHeader-mobileDropDown"
+                                        />
+                                    </li>
+                                    {/*For centering the title*/}
+                                    <li aria-hidden={true} className={classNames(classesEditorHeader.backSpacer)}>
+                                        <BackLink
+                                            title={t("Back")}
+                                            className="draftPage-backLink"
+                                            visibleLabel={true}
+                                        />
+                                    </li>
+                                </>
                             )}
                         </ul>
                     </PanelArea>
