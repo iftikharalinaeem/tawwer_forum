@@ -669,6 +669,15 @@ paths:
                                             minLength: 1
                                             nullable: true
                                             type: string
+                                        translationStatus:
+                                            description: The translation status of the article revision.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            minLength: 1
+                                            nullable: false
+                                            type: string
                                     required:
                                         - articleRevisionID
                                         - articleID
@@ -817,7 +826,7 @@ paths:
             tags:
                 - Articles
             summary: Get an article by its alias.
-    "/articles/{ID}/translations":
+    "/articles/{id}/translations":
         get:
             parameters:
                 - description: Article ID.
@@ -867,6 +876,54 @@ paths:
                                         - articleRevisionID
                                         - name
                                         - url
+                                        - locale
+                                        - translationStatus
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+    "articles/{id}/invalidateTranslations":
+        put:
+            parameters:
+                -   description: Article ID.
+                    in: path
+                    name: id
+                    required: true
+                    schema:
+                        type: integer
+                -   description: The status of an article
+                    in: body
+                    name: invalidateTranslations
+                    required: true
+                    schema:
+                        type: boolean
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        articleID:
+                                            description: article ID.
+                                            type: integer
+                                        articleRevisionID:
+                                            description: Unique article revision ID.
+                                            type: integer
+                                        locale:
+                                            description: Locale the article was written in..
+                                            type: string
+                                        translationStatus:
+                                            description: The translation status of the article.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            type: string
+                                    required:
+                                        - articleID
+                                        - articleRevisionID
                                         - locale
                                         - translationStatus
                                     type: object
@@ -1033,6 +1090,15 @@ components:
                         - published
                     minLength: 1
                     nullable: true
+                    type: string
+                translationStatus:
+                    description: The translation status of the article revision.
+                    enum:
+                        - up-to-date
+                        - out-of-date
+                        - not-translated
+                    minLength: 1
+                    nullable: false
                     type: string
                 updateUser:
                     $ref: "#/components/schemas/UserFragment"
@@ -1222,6 +1288,15 @@ components:
                 locale:
                     description: Locale the article was written in.
                     minLength: 2
+                    type: string
+                translationStatus:
+                    description: The translation status of the article revision.
+                    enum:
+                        - up-to-date
+                        - out-of-date
+                        - not-translated
+                    minLength: 1
+                    nullable: false
                     type: string
                 updateUser:
                     $ref: "#/components/schemas/UserFragment"
