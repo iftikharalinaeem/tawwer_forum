@@ -8,11 +8,16 @@ import ReduxActions from "@library/redux/ReduxActions";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { getCurrentLocale } from "@vanilla/i18n";
+import actionCreatorFactory from "typescript-fsa";
+
+const createAction = actionCreatorFactory("@@articlePage");
 
 /**
  * Actions for the article page.
  */
-export default class ArticlePageActions extends ReduxActions {
+export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static readonly INIT = "@@articlePage/INIT";
     public static readonly RESET = "@@articlePage/RESET";
 
@@ -43,23 +48,23 @@ export default class ArticlePageActions extends ReduxActions {
     public reset = this.bindDispatch(ArticlePageActions.createResetAction);
 
     public init = async (articleID: number) => {
-        this.dispatch(async (a, getState) => {
-            let article = ArticleModel.selectArticle(getState(), articleID);
-            if (article) {
-                this.dispatch(ArticlePageActions.createInitAction(articleID, true));
-            } else {
-                this.dispatch(ArticlePageActions.createInitAction(articleID));
-                const articleResponse = await this.articleActions.fetchByID({ articleID });
-                if (!articleResponse) {
-                    return;
-                }
-
-                article = articleResponse.data;
+        let article = ArticleModel.selectArticle(this.getState(), articleID);
+        if (article) {
+            this.dispatch(ArticlePageActions.createInitAction(articleID, true));
+        } else {
+            this.dispatch(ArticlePageActions.createInitAction(articleID));
+            const articleResponse = await this.articleActions.fetchByID({
+                articleID,
+            });
+            if (!articleResponse) {
+                return;
             }
 
-            const kbID = article.knowledgeBaseID;
-            await this.navigationActions.getNavigationFlat(kbID);
-            return article;
-        });
+            article = articleResponse.data;
+        }
+
+        const kbID = article.knowledgeBaseID;
+        await this.navigationActions.getNavigationFlat(kbID);
+        return article;
     };
 }

@@ -23,16 +23,14 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getRelativeUrl } from "@library/utility/appUtils";
+import { EditorQueueItem } from "@rich-editor/editor/context";
+import { getCurrentLocale } from "@vanilla/i18n";
 import { History } from "history";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
-import { EditorQueueItem } from "@rich-editor/editor/context";
-import { EditorPage } from "@knowledge/modules/editor/EditorPage";
-import { getRelativeUrl } from "@library/utility/appUtils";
-import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -186,19 +184,56 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         return draftLoaded;
     }
 
+    /**
+     * Initialize records for the edit page of an article.
+     *
+     * @param history The history object.
+     * @param articleID The article ID to initialize from.
+     *
+     * Possible initial configurations.
+     *
+     * - ArticleID w/ locale revision                  -> Valid
+     * - ArticleID w/ LocaleRevision + revisionID      -> Valid
+     * - ArticleID w/ locale revision + draftID        -> Valid
+     * - ArticleID w/out locale revision               -> Valid
+     * - ArticleID w/out LocaleRevision + revisionID   -> Invalid
+     * - ArticleID w/out locale revision + draftID     -> Invalid
+     */
     public async initializeEditPage(history: History, articleID: number) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
 
-        if (queryParams.articleRevisionID) {
-            const revisionID = parseInt(queryParams.articleRevisionID, 10);
-            await this.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
+        const currentLocale = getCurrentLocale();
+        const localeExists = await this.articleActions.checkArticleHasTranslation(articleID, currentLocale);
+
+        if (localeExists) {
+            if (queryParams.articleRevisionID) {
+                const revisionID = parseInt(queryParams.articleRevisionID, 10);
+                await this.fetchArticleAndRevisionForEdit(history, articleID, currentLocale, revisionID);
+            } else {
+                await this.fetchArticleForEdit(history, articleID, currentLocale);
+            }
         } else {
-            await this.fetchArticleForEdit(history, articleID);
+            await this.loadArticleTranslationFallback(history, articleID);
         }
 
+        // We may have had a 404 on the article. This could be because the article doesn't exist in this locale.
+
         const initialRecord = this.getInitialRecordForEdit();
+
+        // Get our current locale & source locale to compare.
+
         if (initialRecord) {
             await this.locationActions.initLocationPickerFromRecord(initialRecord, this.getCurrentArticle());
+        }
+    }
+
+    /**
+     * Load a fallback article content if an article isn't translated.
+     */
+    public async loadArticleTranslationFallback(history: History, articleID: number) {
+        const article = await this.fetchArticleForEdit(history, articleID);
+        if (article) {
+            this.setFallbackLocale(article.data.locale);
         }
     }
 
@@ -231,6 +266,12 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
 
         return article.data || null;
     }
+
+    public static setFallbackLocaleAC = createAction<string>("SET_FALLBACK_LOCALE");
+    public setFallbackLocale = this.bindDispatch(EditorPageActions.setFallbackLocaleAC);
+
+    public static clearFallbackLocaleNoticeAC = createAction("CLEAR_FALLBACK_LOCALE_NOTICE");
+    public clearFallbackLocaleNotice = this.bindDispatch(EditorPageActions.clearFallbackLocaleNoticeAC);
 
     public static queueEditorOpsAC = createAction<EditorQueueItem[]>("QUEUE_EDITOR_OP");
     public queueEditorOps = this.bindDispatch(EditorPageActions.queueEditorOpsAC);
@@ -295,9 +336,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
-        const { form, article, draft, isDirty, notifyConversion } = state.knowledge.editorPage;
+        const { form, article, draft, isDirty, notifyConversion, fallbackLocale } = state.knowledge.editorPage;
 
-        if (!isDirty || notifyConversion) {
+        if (!isDirty || notifyConversion || fallbackLocale.notify) {
             return;
         }
 
@@ -341,29 +382,36 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public publish = async (history: History) => {
         const editorState = this.getState().knowledge.editorPage;
+        const currentLocale = getCurrentLocale();
+
         // We don't have an article so go create one.
         const isBodyEmpty = isEqual(editorState.form.body, [{ insert: "\n" }]) || isEqual(editorState.form.body, []);
         const draft = editorState.draft;
         const request: IPostArticleRequestBody = {
             ...editorState.form,
+            locale: currentLocale,
             body: isBodyEmpty ? "" : JSON.stringify(editorState.form.body),
             draftID: draft.data ? draft.data.draftID : undefined,
             format: Format.RICH,
         };
 
         if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+            const isUsingFallbackLocale = editorState.fallbackLocale.locale !== null;
             const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
             const { body, name, knowledgeCategoryID, sort } = request;
 
             // We only want to submit the body if it is not the default value.
-            const shouldSubmitBody = prevBody !== body;
+            const shouldSubmitBody = prevBody !== body || isUsingFallbackLocale;
+            const shouldSubmitName = prevName !== name || isUsingFallbackLocale;
+            const shouldSubmitCategory = prevCategoryID !== knowledgeCategoryID || isUsingFallbackLocale;
 
             const patchRequest: IPatchArticleRequestBody = {
+                locale: currentLocale,
                 articleID: editorState.article.data.articleID,
                 body: shouldSubmitBody ? body : undefined,
                 format: shouldSubmitBody ? Format.RICH : undefined, // forced to always be rich on insert
-                name: prevName !== name ? name : undefined,
-                knowledgeCategoryID: prevCategoryID !== knowledgeCategoryID ? knowledgeCategoryID : undefined,
+                name: shouldSubmitName ? name : undefined,
+                knowledgeCategoryID: shouldSubmitCategory ? knowledgeCategoryID : undefined,
                 sort,
             };
 
@@ -374,7 +422,10 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID });
+        const fullArticleResponse = await this.articleActions.fetchByID({
+            articleID: response.data.articleID,
+            locale: currentLocale,
+        });
         if (!fullArticleResponse) {
             return;
         }
@@ -402,11 +453,16 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * @param articleID - The ID of the article to fetch.
      * @param forRevision - Whether or not we're fetching with a revision.
      */
-    private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
+    private async fetchArticleForEdit(
+        history: History,
+        articleID: number,
+        locale?: string,
+        forRevision: boolean = false,
+    ) {
         // We don't have an article, but we have ID for one. Go get it.
         const [editArticleResponse, articleResponse, draftLoaded] = await Promise.all([
-            this.getEditableArticleByID(articleID),
-            this.articleActions.fetchByID({ articleID }),
+            this.getEditableArticleByID(articleID, locale),
+            this.articleActions.fetchByID({ articleID, locale }),
             forRevision ? Promise.resolve(false) : this.initializeDraftFromUrl(history),
         ]);
 
@@ -423,25 +479,29 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
 
         if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
-            const newFormValue: Partial<IEditorPageForm> = {
-                name: editArticleResponse.data.name,
-                knowledgeCategoryID: editArticleResponse.data.knowledgeCategoryID,
-            };
-
-            const { body, format } = editArticleResponse.data;
-            // Check if we have another format loaded. If we do we need to use the queue.
-            if (format.toLowerCase() === "rich") {
-                newFormValue.body = JSON.parse(body);
-            } else {
-                newFormValue.body = [];
-                const renderedBody = articleResponse.data.body;
-                this.queueEditorOps([renderedBody]);
-            }
-
-            this.updateForm(newFormValue, true);
+            this.loadInitialFormBody(articleResponse.data, editArticleResponse.data);
         }
 
         return editArticleResponse;
+    }
+
+    private loadInitialFormBody(article: IGetArticleResponseBody, editArticle: IGetArticleResponseBody) {
+        const newFormValue: Partial<IEditorPageForm> = {
+            name: editArticle.name,
+            knowledgeCategoryID: editArticle.knowledgeCategoryID,
+        };
+
+        const { body, format } = editArticle;
+        // Check if we have another format loaded. If we do we need to use the queue.
+        if (format.toLowerCase() === "rich") {
+            newFormValue.body = JSON.parse(body);
+        } else {
+            newFormValue.body = [];
+            const renderedBody = article.body;
+            this.queueEditorOps([renderedBody]);
+        }
+
+        this.updateForm(newFormValue, true);
     }
 
     /**
@@ -450,9 +510,15 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * Useful for restoring a revision.
      *
      * @param articleID - The ID of the article to fetch.
+     * @param locale - The locale to fetch the article for.
      * @param revision - Start from a particular revision.
      */
-    private async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
+    private async fetchArticleAndRevisionForEdit(
+        history: History,
+        articleID: number,
+        locale: string,
+        revisionID: number,
+    ) {
         const draftLoaded = await this.initializeDraftFromUrl(history);
         if (draftLoaded) {
             return;
@@ -460,7 +526,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
 
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
         const [article, revision] = await Promise.all([
-            this.fetchArticleForEdit(history, articleID, true),
+            this.fetchArticleForEdit(history, articleID, locale, true),
             this.articleActions.fetchRevisionByID({ revisionID }),
         ]);
 
@@ -477,20 +543,25 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
 
     /**
      * Submit the editor's form data to the API.
-     *
-     * @param body - The body of the submit request.
      */
     private async updateArticle(article: IPatchArticleRequestBody, history: History) {
         const response = await this.articleActions.patchArticle(article);
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID({ articleID: response.data.articleID }, true);
+        const fullArticleResponse = await this.articleActions.fetchByID(
+            { articleID: response.data.articleID, locale: getCurrentLocale() },
+            true,
+        );
         if (!fullArticleResponse) {
             return;
         }
 
-        const pathname = getRelativeUrl(fullArticleResponse.data.url); //const { pathname } = new URL(article.url)
+        this.redirectToArticleUrl(history, fullArticleResponse.data.url);
+    }
+
+    private redirectToArticleUrl(history: History, url: string) {
+        const pathname = getRelativeUrl(url);
 
         // Redirect to the new url.
         history.replace({
@@ -505,12 +576,13 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      *
      * @param articleID
      */
-    private getEditableArticleByID(articleID: number) {
+    private getEditableArticleByID(articleID: number, locale?: string) {
+        const params = qs.stringify({ locale });
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
-            `/articles/${articleID}/edit`,
+            `/articles/${articleID}/edit?${params}`,
             EditorPageActions.getArticleACs,
-            {},
+            { articleID, locale },
         );
     }
 }
