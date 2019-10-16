@@ -10,6 +10,18 @@ paths:
         required: true
         schema:
           type: integer
+      - description: Locale the navigation should be returned in.
+        in: query
+        name: locale
+        required: false
+        schema:
+            type: string
+      - description: If transalted revisions does not exist don not return related article.
+        in: query
+        name: only-translated
+        required: false
+        schema:
+            type: boolean
       responses:
         '200':
           content:

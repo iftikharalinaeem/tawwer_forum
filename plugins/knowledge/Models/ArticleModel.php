@@ -260,7 +260,13 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
-        $selectColumns = $options["columns"] ?? 'a.*, ar.name, c.knowledgeBaseID';
+        if (($options['only-translated'] ?? false)
+        || empty($options['arl.locale'])) {
+            $selectColumns = ['a.*, ar.name, c.knowledgeBaseID'];
+        } else {
+            $selectColumns = ['a.*', ['arl.name, ar.name', 'COALESCE', 'name'], 'c.knowledgeBaseID'];
+        }
+
         $orderFields = $options["orderFields"] ?? "";
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
@@ -272,18 +278,30 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         }
 
         $sql = $this->sql()
-            ->from('article a')
-            ->select($selectColumns)
-            ->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID')
+            ->from('article a');
+        foreach ($selectColumns as $selectColumn) {
+            if (is_array($selectColumn)) {
+                $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);
+            } else {
+                $sql->select($selectColumn);
+            }
+        }
+        $sql->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID')
             ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
+        if (!empty($options['arl.locale'])) {
+            $sql->leftJoin(
+                'articleRevision arl',
+                'arl.status = "'.self::STATUS_PUBLISHED.'" 
+                    AND ar.articleID = arl.articleID 
+                    AND arl.locale = "'.$options['arl.locale'].'" '
+            );
+        }
         foreach ($pseudoFields as $field => $val) {
             $sql->select('"' . $val . '" as ' . $field);
         }
         $sql->where($where);
-
         $result = $sql->get('', $orderFields, $orderDirection, $limit, $page)
             ->resultArray();
-
         return $result;
     }
 

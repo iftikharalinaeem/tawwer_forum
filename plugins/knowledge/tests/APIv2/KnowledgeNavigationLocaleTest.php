@@ -265,13 +265,13 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
         $this->assertEquals('200 OK', $status);
 
         $navigation = $response->getBody();
-        $this->assertEquals(9, count($navigation));
+        $this->assertEquals(14, count($navigation));
     }
 
     /**
-     * Test GET navigation-flat with locale = unknown with edit mode
+     * Test GET navigation-flat with locale = unknown with only-translated
      */
-    public function testNavigationFlatUnknownEditModeLocale() {
+    public function testNavigationFlatOnlyTranslatedUnknownLocale() {
 
         $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=ua&only-translated=true');
         $status = $response->getStatus();
@@ -279,5 +279,31 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
 
         $navigation = $response->getBody();
         $this->assertEquals(9, count($navigation));
+    }
+
+    /**
+     * Test GET navigation-flat with locale = unknown
+     */
+    public function testNavigationFlatNotSourceLocale() {
+
+        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=fr');
+        $status = $response->getStatus();
+        $this->assertEquals('200 OK', $status);
+
+        $navigation = $response->getBody();
+        $this->assertEquals(14, count($navigation));
+    }
+
+    /**
+     * Test GET navigation-flat with locale = unknown with only-translated
+     */
+    public function testNavigationFlatOnlyTranslatedNotSourceLocale() {
+
+        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=fr&only-translated=true');
+        $status = $response->getStatus();
+        $this->assertEquals('200 OK', $status);
+
+        $navigation = $response->getBody();
+        $this->assertEquals(11, count($navigation));
     }
 }
