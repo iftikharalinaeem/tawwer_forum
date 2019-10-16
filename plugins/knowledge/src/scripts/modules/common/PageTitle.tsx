@@ -16,7 +16,7 @@ export interface IPageTitle {
     meta?: React.ReactNode;
     className?: string;
     includeBackLink?: boolean;
-    smallPageTitle?: boolean;
+    headingClassName?: string;
 }
 
 /**
@@ -36,10 +36,7 @@ export default class PageTitle extends React.Component<IPageTitle> {
                     actions={this.props.actions}
                     title={this.props.title}
                     includeBackLink={this.props.includeBackLink}
-                    headingClassName={classNames({
-                        [classes.pageSmallTitle]: !!this.props.smallPageTitle,
-                        [classes.root]: !this.props.smallPageTitle,
-                    })}
+                    headingClassName={classNames(classes.root, this.props.headingClassName)}
                 />
                 {this.props.meta && (
                     <div className={classNames("pageMetas", "pageTitleContainer-metas", classesMetas.root)}>
