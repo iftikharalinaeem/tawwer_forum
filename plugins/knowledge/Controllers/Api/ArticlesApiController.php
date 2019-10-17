@@ -266,7 +266,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws NotFoundException If the article could not be found.
      * @throws ServerException If there was an error normalizing the output.
      */
-    public function get(int $id, array $query) {
+    public function get(int $id, array $query = []) {
         $this->permission("knowledge.kb.view");
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
