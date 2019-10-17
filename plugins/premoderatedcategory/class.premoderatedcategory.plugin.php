@@ -54,7 +54,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
         ]);
 
         // If we are not seeing the form for the first time
-        if ($sender->Form->authenticatedPostBack() !== false) {
+        if ($sender->Form->authenticatedPostBack()) {
             $selectedCategories = $sender->Form->getFormValue('PreModeratedCategory.IDs', []);
             if ($selectedCategories === false) {
                 $selectedCategories = [];
@@ -63,7 +63,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
             // Save as string
             $sender->Form->setFormValue('PreModeratedCategory.IDs', implode(',', $selectedCategories));
 
-            if ($sender->Form->save() !== false) {
+            if ($sender->Form->save()) {
                 $sender->informMessage(t('Your changes have been saved.'));
             }
 

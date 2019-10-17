@@ -11,14 +11,28 @@ $form = $this->Form;
 echo $form->open();
 echo $form->errors();
 ?>
-    <ul>
+<div class="form-group">
+    <ul class="label-wrap">
+        <li>
+            <?php echo $form->checkBox('PreModeratedCategory.Discussions', t('Discussions'), ['value' => '1']); ?>
+        </li>
+        <li>
+            <?php echo $form->checkBox('PreModeratedCategory.Comments', t('Comments'), ['value' => '1']); ?>
+        </li>
+    </ul>
+</div>
+<div class="form-group">
+    <ul class="label-wrap">
         <li><?php
             $categories = CategoryModel::instance()->getAll()->resultArray();
             $categories = Gdn_DataSet::index($categories, 'CategoryID');
             unset($categories[-1]);
 
-            echo $form->label(t('Pre-Moderated Category'), 'PreModeratedCategory.CategoryID');
+            echo '<h2>'.t('Pre-Moderated Categories').'</h2>';
+
+            //echo $form->label(t('Pre-Moderated Category'), 'PreModeratedCategory.CategoryID');
             echo $form->checkBoxList('PreModeratedCategory.IDs', $categories, null, ['ValueField' => 'CategoryID', 'TextField' => 'Name'])
             ?></li>
     </ul>
+</div>
 <?php echo $form->close('Save');
