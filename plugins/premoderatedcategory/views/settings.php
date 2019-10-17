@@ -29,8 +29,6 @@ echo $form->errors();
             unset($categories[-1]);
 
             echo '<h2>'.t('Pre-Moderated Categories').'</h2>';
-
-            //echo $form->label(t('Pre-Moderated Category'), 'PreModeratedCategory.CategoryID');
             echo $form->checkBoxList('PreModeratedCategory.IDs', $categories, null, ['ValueField' => 'CategoryID', 'TextField' => 'Name'])
             ?></li>
     </ul>
