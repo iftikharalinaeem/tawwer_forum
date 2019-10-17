@@ -14,10 +14,10 @@ echo $form->errors();
 <div class="form-group">
     <ul class="label-wrap">
         <li>
-            <?php echo $form->checkBox('PreModeratedCategory.Discussions', t('Discussions'), ['value' => '1']); ?>
+            <?php echo $form->checkBox('PreModeratedCategory.Discussions', t('Discussions')); ?>
         </li>
         <li>
-            <?php echo $form->checkBox('PreModeratedCategory.Comments', t('Comments'), ['value' => '1']); ?>
+            <?php echo $form->checkBox('PreModeratedCategory.Comments', t('Comments')); ?>
         </li>
     </ul>
 </div>

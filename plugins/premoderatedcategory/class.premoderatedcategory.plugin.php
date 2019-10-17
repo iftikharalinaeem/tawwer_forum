@@ -35,7 +35,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
-        $sender->title(sprintf(t('%s settings'), t('Pre-Moderated category')));
+        $sender->title(sprintf(t('%s Settings'), t('Pre-Moderated Category')));
         $sender->addSideMenu('settings/premoderatedcategory');
 
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
@@ -44,13 +44,14 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
+            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', '1'),
+            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', '0')
         ]);
-
-        //TODO: add checkboxes for comments and discussions so the client can choose
-        // discussions should be enabled by default
 
         $sender->Form->setModel($configurationModel, [
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
+            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', '1'),
+            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', '0')
         ]);
 
         // If we are not seeing the form for the first time
@@ -69,6 +70,8 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
 
             // Restore as array for display
             $sender->Form->setFormValue('PreModeratedCategory.IDs', $selectedCategories);
+            $sender->Form->setFormValue('PreModeratedCategory.Discussions', c('PreModeratedCategory.Discussions'));
+            $sender->Form->setFormValue('PreModeratedCategory.Comments', c('PreModeratedCategory.Comments'));
         }
 
         $sender->render($sender->fetchViewLocation('settings', '', 'plugins/PreModeratedCategory'));
