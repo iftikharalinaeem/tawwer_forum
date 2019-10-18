@@ -640,7 +640,7 @@ class KnowledgeApiController extends AbstractApiController {
             "body:s?" => "Keywords to search against article body.",
             "all:s?" => "Keywords to search against article name or body.",
             "locale:s?" => "The locale articles are published in",
-            "siteSectionGroup:s?" => "The product articles are associated to",
+            "siteSectionGroup:s?" => "The site-section-group articles are associated to",
             "global:b?" => "Global search flag. Default: false",
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
