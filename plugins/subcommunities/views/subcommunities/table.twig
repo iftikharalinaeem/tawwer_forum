@@ -27,7 +27,7 @@
                     <td class="options">
                         <div class="btn-group">
                             <a
-                                href="/subcommunities/{{ row.SubcommunityID }}/edit"
+                                href="{{ row.EditUrl }}"
                                 class="js-modal js-full-height-modal btn btn-icon"
                                 aria-label="{{ t('Edit') }}"
                                 title="{{ t('Edit') }}"
@@ -35,7 +35,7 @@
                                 {{ functionContainer.dashboardSymbol('edit') }}
                             </a>
                             <a
-                                href="/subcommunities/{{ row.SubcommunityID }}/delete"
+                                href="{{ row.DeleteUrl }}"
                                 class="js-modal-confirm btn btn-icon"
                                 aria-label="{{ t('Delete') }}"
                                 title="{{ t('Delete') }}"
