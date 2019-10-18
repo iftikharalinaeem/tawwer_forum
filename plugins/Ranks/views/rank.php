@@ -318,6 +318,7 @@ echo $this->Form->open(['enctype' => 'multipart/form-data']), $this->Form->error
             </div>
         </li>
     </ul>
+    <?php echo $this->Form->simple($this->data('_ExtendedControls')); ?>
 </section>
 <?php
 echo $this->Form->close('Save');

@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ClientException;
@@ -33,16 +34,20 @@ class RanksPlugin extends Gdn_Plugin {
     /** @var FormatService */
     private $formatService;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * RanksPlugin constructor.
      *
      * @param RankModel $rankModel
      * @param UserModel $userModel
      */
-    public function __construct(RankModel $rankModel, UserModel $userModel, FormatService $formatService) {
+    public function __construct(RankModel $rankModel, UserModel $userModel, FormatService $formatService, EventManager $eventManager) {
         $this->rankModel = $rankModel;
         $this->userModel = $userModel;
         $this->formatService = $formatService;
+        $this->eventManager = $eventManager;
         parent::__construct();
     }
 
@@ -459,6 +464,9 @@ class RanksPlugin extends Gdn_Plugin {
         $roles = RoleModel::roles();
         $roles = array_column($roles, 'Name', 'RoleID');
         $sender->setData('_Roles', $roles);
+
+        // Allow other plugins to add controls to the Rank form.
+        $sender->Data = $this->eventManager->fireFilter('ranksPlugin_extendedControls', $sender->Data);
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
