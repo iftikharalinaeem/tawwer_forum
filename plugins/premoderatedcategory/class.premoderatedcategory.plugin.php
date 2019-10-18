@@ -44,18 +44,18 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
-            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', '1'),
-            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', '0')
+            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', true),
+            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', false)
         ]);
 
         $sender->Form->setModel($configurationModel, [
             'PreModeratedCategory.IDs' => explode(',', c('PreModeratedCategory.IDs', '')),
-            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', '1'),
-            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', '0')
+            'PreModeratedCategory.Discussions' => c('PreModeratedCategory.Discussions', true),
+            'PreModeratedCategory.Comments' => c('PreModeratedCategory.Comments', false)
         ]);
 
         // If we are not seeing the form for the first time
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack() !== false) {
             $selectedCategories = $sender->Form->getFormValue('PreModeratedCategory.IDs', []);
             if ($selectedCategories === false) {
                 $selectedCategories = [];
@@ -64,7 +64,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
             // Save as string
             $sender->Form->setFormValue('PreModeratedCategory.IDs', implode(',', $selectedCategories));
 
-            if ($sender->Form->save()) {
+            if ($sender->Form->save() !== false) {
                 $sender->informMessage(t('Your changes have been saved.'));
             }
 
@@ -83,10 +83,10 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
+    public function discussionModel_afterValidateDiscussion_handler(\DiscussionModel $sender, array $args) {
         $discussion = $args['DiscussionData'];
         $categoryID = (int)$discussion['CategoryID'];
-        $moderateRecord = $this->setModeration($categoryID);
+        $moderateRecord = $this->isModeration($categoryID);
 
         if ($moderateRecord) {
             $args['IsValid'] = false;
@@ -102,12 +102,12 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      * @param CommentModel $sender
      * @param array $args
      */
-    public function commentModel_afterValidateComment_handler($sender, $args) {
+    public function commentModel_afterValidateComment_handler(\CommentModel $sender, array $args) {
         $comment = $args['CommentData'];
         $discussionID = $comment['DiscussionID'];
         $discussion = $this->discussionModel->getID($discussionID);
         $categoryID = $discussion->CategoryID;
-        $moderateRecord = $this->setModeration($categoryID);
+        $moderateRecord = $this->isModeration($categoryID);
 
         if ($moderateRecord) {
             $args['IsValid'] = false;
@@ -122,12 +122,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      * @return array
      */
     private function getPreModeratedCategoryIDs(): array {
-        $categoryList = c('PreModeratedCategory.IDs');
-        if (!$categoryList) {
-            return [];
-        }
-
-        return explode(',', $categoryList);
+        return explode(',', c('PreModeratedCategory.IDs'));
     }
 
     /**
@@ -136,7 +131,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
      * @param int $categoryID
      * @return bool
      */
-    public function setModeration($categoryID) {
+    public function isModeration(int $categoryID) {
         $categories = $this->getPreModeratedCategoryIDs();
         return in_array($categoryID, $categories);
     }
