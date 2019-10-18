@@ -249,6 +249,14 @@ class SubcommunitiesController extends DashboardController {
             $this->setData('useProducts', false);
         }
 
+        // Generate add & edit URLs
+        $request = Gdn::request();
+        foreach ($sites as &$site) {
+            $id = $site['SubcommunityID'];
+            $site['EditUrl'] = $request->url("/subcommunities/$id/edit");
+            $site['DeleteUrl'] = $request->url("/subcommunities/$id/delete");
+        }
+
         $this->setData('Sites', $sites);
 
         // Temporary until the dashboardSymbol from https://github.com/vanilla/vanilla/pull/9282 is merged.
