@@ -10,6 +10,18 @@ paths:
         required: true
         schema:
           type: integer
+      - description: Locale the navigation should be returned in.
+        in: query
+        name: locale
+        required: false
+        schema:
+            type: string
+      - description: If set, do not include any resources that are not translated into the requested locale.
+        in: query
+        name: only-translated
+        required: false
+        schema:
+            type: boolean
       responses:
         '200':
           content:

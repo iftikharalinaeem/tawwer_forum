@@ -96,6 +96,15 @@ components:
           minLength: 1
           nullable: true
           type: string
+        translationStatus:
+          description: The translation status of the article revision.
+          enum:
+          - up-to-date
+          - out-of-date
+          - not-translated
+          minLength: 1
+          nullable: false
+          type: string
       required:
       - articleRevisionID
       - articleID

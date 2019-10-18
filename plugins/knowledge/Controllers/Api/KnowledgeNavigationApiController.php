@@ -22,6 +22,7 @@ use Vanilla\Knowledge\Models\Navigation;
  * Endpoint for the virtual "knowledge navigation" resource.
  */
 class KnowledgeNavigationApiController extends AbstractApiController {
+    use KnowledgeNavigationApiSchemes;
 
     /** Filter value for limiting results to only knowledge categories. */
     const FILTER_RECORD_TYPE_CATEGORY = "knowledgeCategory";
@@ -41,12 +42,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
-    /** @var Schema */
-    private $categoryNavigationFragment;
-
-    /** @var Schema */
-    private $navigationTreeSchema;
-
     /**
      * KnowledgeNavigationApiController constructor.
      *
@@ -64,60 +59,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
     }
 
-    /**
-     * Get a schema with limited fields for representing a knowledge category row.
-     *
-     * @return Schema
-     */
-    public function categoryNavigationFragment(): Schema {
-        if ($this->categoryNavigationFragment === null) {
-            $schema = Schema::parse($this->getFragmentSchema());
-
-            $this->categoryNavigationFragment = $this->schema($schema, "CategoryNavigationFragment");
-        }
-        return $this->categoryNavigationFragment;
-    }
-
-    /**
-     * Get navigation fragment schema attributes array
-     *
-     * @return array
-     */
-    public function getFragmentSchema(): array {
-        return [
-            "name" => [
-                "allowNull" => true,
-                "description" => "Name of the item.",
-                "type" => "string",
-            ],
-            "url?" => [
-                "description" => "Full URL to the record.",
-                "type" => "string"
-            ],
-            "parentID?" => [
-                "description" => "Unique ID of the category this record belongs to.",
-                "type" => "integer",
-            ],
-            "recordID" => [
-                "description" => "Unique ID of the record represented by the navigation item.",
-                "type" => "integer"
-            ],
-            "sort" => [
-                "allowNull" => true,
-                "description" => "Sort weight.",
-                "type" => "integer",
-            ],
-            "knowledgeBaseID" => [
-                "type" => "integer",
-                "description" => "ID of the knowledge base the record belongs to.",
-            ],
-            "recordType" => [
-                "description" => "Type of record represented by the navigation item.",
-                "enum" => [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE],
-                "type" => "string",
-            ]
-        ];
-    }
 
     /**
      * Get a navigation-friendly record hierarchy of categories and articles in flat mode.
@@ -127,12 +68,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @return array Navigation items, arranged hierarchically.
      */
     public function flat(array $query = []): array {
-        if (array_key_exists("knowledgeCategoryID", $query)) {
-            $rows = $this->categoryNavigation($query["knowledgeCategoryID"], true, $query["recordType"]);
-        } else {
-            $rows = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"]);
-        }
-        return $rows;
+        return $this->knowledgeBaseNavigation($query["knowledgeBaseID"], true, $query["recordType"], $query);
     }
 
     /**
@@ -142,40 +78,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      *
      * @return array Navigation items, arranged hierarchically.
      */
-    public function tree(array $query): array {
-        if (array_key_exists("knowledgeCategoryID", $query)) {
-            $tree = $this->categoryNavigation($query["knowledgeCategoryID"], false, $query["recordType"]);
-        } else {
-            $tree = $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"]);
-        }
-        return $tree;
-    }
-
-    /**
-     * Get navigation items for a particular category.
-     *
-     * @param integer $knowledgeCategoryID
-     * @param boolean $flat
-     * @param string $recordType
-     */
-    private function categoryNavigation(int $knowledgeCategoryID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
-        $categories = $this->knowledgeCategoryModel->get(["parentID" => $knowledgeCategoryID]);
-
-        if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
-            $articles = $this->articleModel->getExtended(
-                [
-                    'a.knowledgeCategoryID' => $knowledgeCategoryID,
-                    'a.status' => ArticleModel::STATUS_PUBLISHED
-                ],
-                ["limit" => false],
-                ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
-            );
-        } else {
-            $articles = [];
-        }
-
-        $result = $this->getNavigation($categories, $articles, $flat, $knowledgeCategoryID);
-        return $result;
+    public function tree(array $query = []): array {
+        return $this->knowledgeBaseNavigation($query["knowledgeBaseID"], false, $query["recordType"], $query);
     }
 
     /**
@@ -184,8 +88,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param integer $knowledgeBaseID
      * @param boolean $flat
      * @param string $recordType
+     * @param array $query Extra query prameters passed if any
      */
-    private function knowledgeBaseNavigation(int $knowledgeBaseID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL) {
+    private function knowledgeBaseNavigation(int $knowledgeBaseID, bool $flat, string $recordType = self::FILTER_RECORD_TYPE_ALL, array $query = []) {
         try {
             $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {
@@ -203,16 +108,32 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
+                $where = [
+                    'a.knowledgeCategoryID' => $catIds,
+                    'a.status' => ArticleModel::STATUS_PUBLISHED
+                ];
+                $options = [
+                    "limit" => false,
+                    "orderFields" => 'sort',
+                    "orderDirection" => 'asc',
+                ];
+                if (isset($query['only-translated'])) {
+                    $options['only-translated'] = $query['only-translated'];
+                } else {
+                    $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
+                }
+
+                if ($options['only-translated']) {
+                    $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+                } else {
+                    $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+                    if (!empty($query['locale'])) {
+                        $options['arl.locale'] = $query['locale'];
+                    }
+                }
                 $articles = $this->articleModel->getExtended(
-                    [
-                        'a.knowledgeCategoryID' => $catIds,
-                        'a.status' => ArticleModel::STATUS_PUBLISHED
-                    ],
-                    [
-                        "limit" => false,
-                        "orderFields" => 'sort',
-                        "orderDirection" => 'asc'
-                    ],
+                    $where,
+                    $options,
                     ['recordType' => Navigation::RECORD_TYPE_ARTICLE]
                 );
             } else {
@@ -309,46 +230,6 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $tree[] = $l;
         }
         return $tree;
-    }
-
-    /**
-     * Get a category schema with an additional field for an array of children.
-     *
-     * @return Schema
-     */
-    public function schemaWithChildren() {
-        if ($this->navigationTreeSchema === null) {
-            $schema = Schema::parse($this->getFragmentSchema())
-                ->setID('navigationTreeSchema');
-            $schema->merge(Schema::parse([
-                'children:a?' =>  $schema
-            ]));
-            $this->navigationTreeSchema = $schema;
-        }
-        return $this->navigationTreeSchema;
-    }
-
-    /**
-     * Prepare default schema array for "in" schema
-     *
-     * @return array
-     */
-    public function defaultSchema() {
-        return [
-            "knowledgeCategoryID?" => [
-                "description" => "Unique ID of a knowledge category to get navigation for. Only direct children of this category will be included.",
-                "type" => "integer",
-            ],
-            "recordType?" => [
-                "default" => self::FILTER_RECORD_TYPE_ALL,
-                "description" => "The type of record to limit navigation results to.",
-                "enum" => [
-                    self::FILTER_RECORD_TYPE_CATEGORY,
-                    self::FILTER_RECORD_TYPE_ALL
-                ],
-                "type" => "string",
-            ],
-        ];
     }
 
     /**

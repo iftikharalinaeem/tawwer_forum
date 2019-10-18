@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Site\SiteSectionSchema;
 
 /**
  * KnowledgeBasesApiController schemes
@@ -121,7 +122,7 @@ trait KnowledgeBasesApiSchemes {
                 'description' => "Site section group. Ex: subcommunity product key",
                 'default' => DefaultSiteSection::DEFAULT_SECTION_GROUP
             ],
-
+            "siteSections:a?" => new SiteSectionSchema(),
         ]);
     }
 
@@ -190,6 +191,4 @@ trait KnowledgeBasesApiSchemes {
         }
         return $this->schema($this->getKnowledgeBaseSchema, $type);
     }
-
-
 }

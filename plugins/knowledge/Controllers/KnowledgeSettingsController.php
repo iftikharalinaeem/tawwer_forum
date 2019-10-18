@@ -13,6 +13,9 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Garden\Schema\Validation;
+use Garden\Web\Data;
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
+use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
  * Controller for serving the /knowledge-settings pages.
@@ -75,10 +78,10 @@ class KnowledgeSettingsController extends SettingsController {
      */
     private function addIndexNavigation(string $currentStatus = null) {
         if ($currentStatus === null || $currentStatus === KnowledgeBaseModel::STATUS_PUBLISHED) {
-            $title = self::t("Deleted Knoweldge Bases");
+            $title = self::t("Deleted Knowledge Bases");
             $url = "knowledge-settings/knowledge-bases?status=" . KnowledgeBaseModel::STATUS_DELETED;
         } else {
-            $title = self::t("Knoweldge Bases");
+            $title = self::t("Knowledge Bases");
             $url = "knowledge-settings/knowledge-bases";
         }
 
@@ -167,9 +170,21 @@ class KnowledgeSettingsController extends SettingsController {
      * @param string $status
      */
     private function knowledgeBasesIndex(string $status) {
+        if ($status === KnowledgeBaseModel::STATUS_DELETED) {
+            $this->title(t('Deleted Knowledge Bases'));
+        } else {
+            $this->title(t("Knowledge Bases"));
+        }
+
         $this->permission('Garden.Settings.Manage');
 
-        $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all']);
+        $knowledgeBases = $this->apiController->index(["status" => $status, 'siteSectionGroup' => 'all', "expand" => "all"]);
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ALL_KBS,
+            Data::box($knowledgeBases),
+            ["status" => $status]
+        ));
+
         $this->setData('knowledgeBases', $knowledgeBases);
         $this->setData("status", $status);
         $this->addIndexNavigation($status);

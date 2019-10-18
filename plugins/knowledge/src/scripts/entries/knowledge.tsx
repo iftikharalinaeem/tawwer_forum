@@ -14,18 +14,13 @@ import { AppContainer } from "react-hot-loader";
 // Our own libraries
 import apiv2 from "@library/apiv2";
 import { onReady } from "@library/utility/appUtils";
-import { registerReducer } from "@library/redux/reducerRegistry";
 import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
-import NotificationsModel from "@library/features/notifications/NotificationsModel";
-import ConversationsModel from "@library/features/conversations/ConversationsModel";
 import { initAllUserContent } from "@library/content";
 
 // Knowledge Modules
 import { deploymentKeyMiddleware } from "@knowledge/server/deploymentKeyMiddleware";
-import rootReducer from "@knowledge/state/reducer";
 import KnowledgeApp from "@knowledge/KnowledgeApp";
-import { serverReducer } from "@knowledge/server/serverReducer";
 import { Router } from "@library/Router";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { AppContext } from "@library/AppContext";
@@ -51,10 +46,6 @@ const render = () => {
 
 onReady(() => {
     initAllUserContent();
-    registerReducer("knowledge", rootReducer);
-    registerReducer("notifications", new NotificationsModel().reducer);
-    registerReducer("conversations", new ConversationsModel().reducer);
-    registerReducer("server", serverReducer);
     render();
 });
 
