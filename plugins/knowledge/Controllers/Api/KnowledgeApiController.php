@@ -209,6 +209,8 @@ class KnowledgeApiController extends AbstractApiController {
                 "dateUpdated?" => ["type" => "datetime"],
                 "knowledgeCategoryID?" => ["type" => "integer"],
                 "status?" => ["type" => "string"],
+                "locale?" => ["type" => "string"],
+                "siteSectionGroup?" => ["type" => "string"],
                 "recordType" => [
                     "enum" => ["article", "knowledgeCategory", "discussion", "comment"],
                     "type" => "string",
@@ -369,7 +371,12 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
         }
 
-
+        if (isset($this->query['locale'])) {
+            $this->sphinx->setFilterString('locale', $this->query['locale']);
+        }
+        if (isset($this->query['siteSectionGroup'])) {
+            $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
+        }
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
             $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
         }
@@ -632,6 +639,8 @@ class KnowledgeApiController extends AbstractApiController {
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
             "all:s?" => "Keywords to search against article name or body.",
+            "locale:s?" => "The locale articles are published in",
+            "siteSectionGroup:s?" => "The product articles are associated to",
             "global:b?" => "Global search flag. Default: false",
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
