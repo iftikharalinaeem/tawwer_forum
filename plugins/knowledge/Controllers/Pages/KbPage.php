@@ -131,6 +131,7 @@ abstract class KbPage extends ThemedPage {
      */
     protected function disableSiteSectionValidation(): KbPage {
         $this->siteSectionValidated = true;
+        return $this;
     }
 
     /**
