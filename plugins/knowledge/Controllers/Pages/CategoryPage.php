@@ -56,6 +56,7 @@ class CategoryPage extends KbPage {
                 'articles' => $articles
             ]))
             ->setCanonicalUrl($category['url'])
+            ->validateSiteSection($category['knowledgeBaseID'])
         ;
 
         // Preload redux actions for faster page loads.
