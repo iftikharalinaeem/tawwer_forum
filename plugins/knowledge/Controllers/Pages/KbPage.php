@@ -150,6 +150,9 @@ abstract class KbPage extends ThemedPage {
         }
 
         $kb = null;
+        // Re-using the KBs that were fetched in `initSharedData()`.
+        // This way we don't make another hit to the DB.
+        // If we ever start using caching in our KnowledgeBaseModel, we can switch this to use that directly.
         foreach ($this->knowledgeBases as $knowledgeBase) {
             if ($knowledgeBase['knowledgeBaseID'] === $kbID) {
                 $kb = $knowledgeBase;
@@ -157,6 +160,8 @@ abstract class KbPage extends ThemedPage {
             }
         }
 
+        // Because we aren't actually using the GET endpoint we have to simulate
+        // The 404 exception that would be thrown.
         if ($kb === null) {
             throw new NotFoundException("KnowledgeBase");
         }
