@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * A model for managing articles.
@@ -40,14 +41,18 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var KnowledgeBaseModel */
+    private $kbModel;
+
     /**
      * ArticleModel constructor.
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $kbModel) {
         parent::__construct("article");
         $this->session = $session;
+        $this->kbModel = $kbModel;
 
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -262,9 +267,14 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
         if (($options['only-translated'] ?? false)
         || empty($options['arl.locale'])) {
-            $selectColumns = ['a.*, ar.name, c.knowledgeBaseID'];
+            $selectColumns = ['a.*, ar.name, ar.locale, c.knowledgeBaseID'];
         } else {
-            $selectColumns = ['a.*', ['arl.name, ar.name', 'COALESCE', 'name'], 'c.knowledgeBaseID'];
+            $selectColumns = [
+                'a.*',
+                ['arl.name, ar.name', 'COALESCE', 'name'],
+                ['arl.locale, ar.locale', 'COALESCE', 'locale'],
+                'c.knowledgeBaseID'
+            ];
         }
 
         $orderFields = $options["orderFields"] ?? "";
@@ -364,7 +374,28 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
-        $result = \Gdn::request()->url("/kb/articles/" . $slug, $withDomain);
+        $siteSectionSlug = $this->kbModel->getSiteSectionSlug($article['knowledgeBaseID'], $article['locale']);
+        $result = \Gdn::request()->getSimpleUrl('/' . $siteSectionSlug . "kb/articles/" . $slug);
         return $result;
+    }
+
+    /**
+     * Generate a URL slug for an article row .
+     *
+     * @param array $article An array with just 2 filed required: name, articleID.
+     *
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function getSlug(array $article): string {
+        $name = $article["name"] ?? null;
+        $articleID = $article["articleID"] ?? null;
+
+        if (!$name || !$articleID) {
+            throw new \Exception('Invalid article row.');
+        }
+
+        $slug = \Gdn_Format::url("{$articleID}-{$name}");
+        return $slug;
     }
 }
