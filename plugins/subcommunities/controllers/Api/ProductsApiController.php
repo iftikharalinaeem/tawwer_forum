@@ -43,8 +43,13 @@ class ProductsApiController extends AbstractApiController {
      *
      * @param ProductModel $productModel
      * @param SubcommunityModel $subcommunityModel
+     * @param \Gdn_Configuration $config
      */
-    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel, \Gdn_Configuration $config) {
+    public function __construct(
+        ProductModel $productModel,
+        SubcommunityModel $subcommunityModel,
+        \Gdn_Configuration $config
+    ) {
         $this->productModel = $productModel;
         $this->subcommunityModel = $subcommunityModel;
         $this->config = $config;
@@ -62,6 +67,7 @@ class ProductsApiController extends AbstractApiController {
                 "productID",
                 "name",
                 "body",
+                "siteSectionGroupID?",
                 "dateInserted",
                 "insertUserID",
                 "dateUpdated?",
@@ -86,6 +92,10 @@ class ProductsApiController extends AbstractApiController {
             "body:s" => [
                 "allowNull" => true,
                 "description" => "Description of the product.",
+            ],
+            "siteSectionGroupID:s" => [
+                "allowNull" => true,
+                "description" => "The site section group associated to the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
             "insertUserID:i" => "Unique ID of the user who originally created the product.",
@@ -125,6 +135,10 @@ class ProductsApiController extends AbstractApiController {
         $options = ['orderFields' => 'name', 'orderDirection' => 'asc'];
         $products = $this->productModel->get($where, $options);
 
+        foreach ($products as &$product) {
+            $product["siteSectionGroupID"] = $this->productModel::makeSiteSectionGroupKey($product["productID"]);
+        }
+
         $products = $out->validate($products);
 
         return $products;
@@ -142,6 +156,7 @@ class ProductsApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $product = $this->productByID($id);
+        $product["siteSectionGroupID"] = $this->productModel::makeSiteSectionGroupKey($id);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
