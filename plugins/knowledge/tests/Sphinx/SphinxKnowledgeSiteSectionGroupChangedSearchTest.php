@@ -109,6 +109,8 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test search results
+     *
      * @param array $params Query parameters to pass to the search api
      * @param int $count Expected correct count value
      * @param string $url Expected string url shpuld starts with
@@ -169,7 +171,10 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
         }
         $this->assertTrue(true);
     }
+
     /**
+     * Test search results acter kb update
+     *
      * @param array $params Query parameters to pass to the search api
      * @param int $count Expected correct count value
      * @param string $url Expected string url shpuld starts with

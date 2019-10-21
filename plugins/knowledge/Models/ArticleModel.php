@@ -48,6 +48,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * ArticleModel constructor.
      *
      * @param Gdn_Session $session
+     * @param KnowledgeBaseModel $kbModel
      */
     public function __construct(Gdn_Session $session, KnowledgeBaseModel $kbModel) {
         parent::__construct("article");
