@@ -68,6 +68,9 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
         $this->assertTrue(true);
     }
 
+    /**
+     * @return array Data provider for testSearch
+     */
     public function beforeSiteSectionGroupUpdate() {
         return [
             'By name' => [['name' => 'apple'], 1, 'http://vanilla.test/en/kb/articles/'],
@@ -75,22 +78,40 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
             'By all (name or body)' => [['all' => 'apple'], 2, 'http://vanilla.test/en/kb/articles/'],
             'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, 'http://vanilla.test/en/kb/articles/'],
             'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, 'http://vanilla.test/en/kb/articles/'],
-            'By all knowledgeCategoryIDs' => [['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']], 3, 'http://vanilla.test/en/kb/articles/']
-        ];
-    }
-
-    public function afterSiteSectionGroupUpdate() {
-        return [
-            'By name' => [['name' => 'apple'], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By body' => [['body' => 'apple'], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By all (name or body)' => [['all' => 'apple'], 2, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By all knowledgeCategoryIDs' => [['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']], 3, 'http://vanilla.test/ssg2-en/kb/articles/']
+            'By all knowledgeCategoryIDs' => [
+                ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
+                3,
+                'http://vanilla.test/en/kb/articles/'
+            ]
         ];
     }
 
     /**
+     * @return array Data povider for testSearchUpdated
+     */
+    public function afterSiteSectionGroupUpdate() {
+        return [
+            'By name' => [
+                ['name' => 'apple'],
+                1,
+                'http://vanilla.test/ssg2-en/kb/articles/'
+            ],
+            'By body' => [['body' => 'apple'], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
+            'By all (name or body)' => [['all' => 'apple'], 2, 'http://vanilla.test/ssg2-en/kb/articles/'],
+            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
+            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
+            'By all knowledgeCategoryIDs' => [
+                ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
+                3,
+                'http://vanilla.test/ssg2-en/kb/articles/'
+            ]
+        ];
+    }
+
+    /**
+     * @param array $params Query parameters to pass to the search api
+     * @param int $count Expected correct count value
+     * @param string $url Expected string url shpuld starts with
      * @depends testData
      * @dataProvider beforeSiteSectionGroupUpdate
      */
@@ -149,6 +170,10 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
         $this->assertTrue(true);
     }
     /**
+     * @param array $params Query parameters to pass to the search api
+     * @param int $count Expected correct count value
+     * @param string $url Expected string url shpuld starts with
+     *
      * @depends testPatchKnowledgeBase
      * @dataProvider afterSiteSectionGroupUpdate
      */

@@ -704,7 +704,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
-        $row["slug"] = $this->articleModel->getSlug($row);;
+        $row["slug"] = $this->articleModel->getSlug($row);
         return $row;
     }
 
