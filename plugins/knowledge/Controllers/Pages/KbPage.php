@@ -164,7 +164,7 @@ abstract class KbPage extends ThemedPage {
         $kbSectionGroup = $knowledgeBase['siteSectionGroup'];
         $currentSectionGroup = $currentSiteSection->getSectionGroup();
 
-        if ($kbSectionGroup !== $currentSectionGroup) {;
+        if ($kbSectionGroup !== $currentSectionGroup) {
             throw new NotFoundException("KnowledgeBase");
         }
 
