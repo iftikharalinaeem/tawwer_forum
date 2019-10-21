@@ -16,6 +16,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -63,6 +64,9 @@ abstract class KbPage extends ThemedPage {
     /** @var SiteSectionProviderInterface */
     protected $siteSectionProvider;
 
+    /** @var KnowledgeBaseModel $kbModel */
+    protected $kbModel;
+
     /** @var bool */
     private $siteSectionValidated = false;
 
@@ -84,7 +88,8 @@ abstract class KbPage extends ThemedPage {
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
         DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
         AnalyticsClient $analyticsClient = null, // Default needed for method extensions
-        SiteSectionProviderInterface $siteSectionProvider = null // Default needed for method extensions,
+        SiteSectionProviderInterface $siteSectionProvider = null, // Default needed for method extensions
+        KnowledgeBaseModel $kbModel = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider);
         $this->usersApi = $usersApi;
@@ -94,6 +99,7 @@ abstract class KbPage extends ThemedPage {
         $this->deploymentCacheBuster = $deploymentCacheBuster;
         $this->analyticsClient = $analyticsClient;
         $this->siteSectionProvider = $siteSectionProvider;
+        $this->knowledgeBases = $kbModel;
 
         // Shared initialization.
         $this->initSharedData();
@@ -145,31 +151,13 @@ abstract class KbPage extends ThemedPage {
         $this->siteSectionValidated = true;
         $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
         if ($currentSiteSection instanceof DefaultSiteSection) {
-            // Anything knowledge base is allowed in the default site section to prevent broken URLs.
+            // Any knowledge base is allowed in the default site section to prevent broken URLs.
             return $this;
         }
 
-        $kb = null;
-        // Re-using the KBs that were fetched in `initSharedData()`.
-        // This way we don't make another hit to the DB.
-        // If we ever start using caching in our KnowledgeBaseModel, we can switch this to use that directly.
-        foreach ($this->knowledgeBases as $knowledgeBase) {
-            if ($knowledgeBase['knowledgeBaseID'] === $kbID) {
-                $kb = $knowledgeBase;
-                break;
-            }
-        }
-
-        // Because we aren't actually using the GET endpoint we have to simulate
-        // The 404 exception that would be thrown.
-        if ($kb === null) {
-            throw new NotFoundException("KnowledgeBase");
-        }
-
-        $kbSectionGroup = $knowledgeBase['siteSectionGroup'];
-        $currentSectionGroup = $currentSiteSection->getSectionGroup();
-
-        if ($kbSectionGroup !== $currentSectionGroup) {
+        $knowledgeBase = $this->kbModel->selectSingle(["knowledgeBaseID" => $kbID]);
+        if ($knowledgeBase["knowledgeBaseID"] === $currentSiteSection->getSectionGroup()) {
+            // The knowledge base doesn't exist in this site section group.
             throw new NotFoundException("KnowledgeBase");
         }
 
