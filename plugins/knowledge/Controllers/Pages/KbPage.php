@@ -135,9 +135,9 @@ abstract class KbPage extends ThemedPage {
     }
 
     /**
-     * Validate that a knowledge base has the correct site section for request.
+     * Validate that a knowledge base has a correct site section for request.
      *
-     * @param int $kbID
+     * @param int $kbID The knowledge base ID to validate the current site section against.
      *
      * @return $this
      */
@@ -161,17 +161,10 @@ abstract class KbPage extends ThemedPage {
             throw new NotFoundException("KnowledgeBase");
         }
 
-        $siteSections = $knowledgeBase['siteSections'] ?? [];
-        $currentSectionID = $currentSiteSection->getSectionID();
-        $found = false;
-        foreach ($siteSections as $siteSection) {
-            if ($siteSection->getSectionID() === $currentSectionID) {
-                $found = true;
-                break;
-            }
-        }
+        $kbSectionGroup = $knowledgeBase['siteSectionGroup'];
+        $currentSectionGroup = $currentSiteSection->getSectionGroup();
 
-        if (!$found) {
+        if ($kbSectionGroup !== $currentSectionGroup) {;
             throw new NotFoundException("KnowledgeBase");
         }
 
