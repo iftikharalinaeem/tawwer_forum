@@ -67,7 +67,7 @@ class ProductsApiController extends AbstractApiController {
                 "productID",
                 "name",
                 "body",
-                "siteSectionGroupID?",
+                "siteSectionGroup?",
                 "dateInserted",
                 "insertUserID",
                 "dateUpdated?",
@@ -93,7 +93,7 @@ class ProductsApiController extends AbstractApiController {
                 "allowNull" => true,
                 "description" => "Description of the product.",
             ],
-            "siteSectionGroupID:s" => [
+            "siteSectionGroup:s" => [
                 "allowNull" => true,
                 "description" => "The site section group associated to the product.",
             ],
@@ -136,7 +136,7 @@ class ProductsApiController extends AbstractApiController {
         $products = $this->productModel->get($where, $options);
 
         foreach ($products as &$product) {
-            $product["siteSectionGroupID"] = $this->productModel::makeSiteSectionGroupKey($product["productID"]);
+            $product["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($product["productID"]);
         }
 
         $products = $out->validate($products);
@@ -156,7 +156,7 @@ class ProductsApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $product = $this->productByID($id);
-        $product["siteSectionGroupID"] = $this->productModel::makeSiteSectionGroupKey($id);
+        $product["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($id);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
