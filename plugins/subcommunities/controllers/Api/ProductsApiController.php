@@ -313,12 +313,7 @@ class ProductsApiController extends AbstractApiController {
      * @return string
      */
     protected function getSiteSectionGroup($productID) {
-        $siteSectionGroup = "";
-        $subcommunity = $this->subcommunityModel->getWhere(["ProductID" => $productID])->resultArray();
-        if ($subcommunity) {
-            $siteSectionGroup = $this->productModel::makeSiteSectionGroupKey($productID);
-        }
-
+        $siteSectionGroup = $this->productModel::makeSiteSectionGroupKey($productID);
         return $siteSectionGroup;
     }
 }
