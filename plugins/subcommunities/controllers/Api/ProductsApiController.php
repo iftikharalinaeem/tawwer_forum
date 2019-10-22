@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use AbstractApiController;
 use Garden\Web\Exception\ClientException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Subcommunities\Models\ProductModel;
 use SubcommunityModel;
 use Vanilla\Exception\Database\NoResultsException;
@@ -93,7 +94,7 @@ class ProductsApiController extends AbstractApiController {
                 "allowNull" => true,
                 "description" => "Description of the product.",
             ],
-            "siteSectionGroup:s" => [
+            "siteSectionGroup:s?" => [
                 "allowNull" => true,
                 "description" => "The site section group associated to the product.",
             ],
@@ -136,7 +137,7 @@ class ProductsApiController extends AbstractApiController {
         $products = $this->productModel->get($where, $options);
 
         foreach ($products as &$product) {
-            $product["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($product["productID"]);
+            $product["siteSectionGroup"] = $this->getSiteSectionGroup($product["productID"]);
         }
 
         $products = $out->validate($products);
@@ -156,7 +157,7 @@ class ProductsApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $product = $this->productByID($id);
-        $product["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($id);
+        $product["siteSectionGroup"]= $this->getSiteSectionGroup($product["productID"]);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -305,4 +306,19 @@ class ProductsApiController extends AbstractApiController {
         return $product;
     }
 
+    /**
+     * Get the site-section-group the product is associated to.
+     *
+     * @param $productID
+     * @return string
+     */
+    protected function getSiteSectionGroup($productID) {
+        $siteSectionGroup = "";
+        $subcommunity = $this->subcommunityModel->getWhere(["ProductID" => $productID])->resultArray();
+        if ($subcommunity) {
+            $siteSectionGroup = $this->productModel::makeSiteSectionGroupKey($productID);
+        }
+
+        return $siteSectionGroup;
+    }
 }

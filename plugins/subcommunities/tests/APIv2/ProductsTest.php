@@ -6,7 +6,10 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Subcommunities\Models\ProductModel;
+use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
+use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
 
 /**
  * Test the /api/v2/product endpoint.
@@ -144,6 +147,28 @@ class ProductsTest extends AbstractAPIv2Test {
 
         $this->api()->delete(
             'products/'.$body['productID']
+        );
+    }
+
+    /**
+     * Test that a site-section-group is added if there is one.
+     */
+    public function testGetProductWithSiteSectionGroup() {
+        $record = $this->getRecord();
+        $result = $this->api()->post(
+            'products',
+            $record
+        );
+        $body = $result->getBody();
+
+        $this->createSubcommunity($body['productID']);
+
+        $product =$this->api()->get('products/'.$body['productID'])
+            ->getBody();
+
+        $this->assertEquals(
+            SubcommunitySiteSection::SUBCOMMUNITY_GROUP_PREFIX.$body['productID'],
+            $product['siteSectionGroup']
         );
     }
 
