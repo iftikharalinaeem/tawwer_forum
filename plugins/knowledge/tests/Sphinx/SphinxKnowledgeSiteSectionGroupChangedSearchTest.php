@@ -9,8 +9,6 @@ use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\ServerException;
-use VanillaTests\InternalClient;
-use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Class SphinxKnowledgeSearchTest
@@ -72,16 +70,17 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
      * @return array Data provider for testSearch
      */
     public function beforeSiteSectionGroupUpdate() {
+        $webRoot = 'http://vanilla.test/'.strtolower(__CLASS__);
         return [
-            'By name' => [['name' => 'apple'], 1, 'http://vanilla.test/en/kb/articles/'],
-            'By body' => [['body' => 'apple'], 1, 'http://vanilla.test/en/kb/articles/'],
-            'By all (name or body)' => [['all' => 'apple'], 2, 'http://vanilla.test/en/kb/articles/'],
-            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, 'http://vanilla.test/en/kb/articles/'],
-            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, 'http://vanilla.test/en/kb/articles/'],
+            'By name' => [['name' => 'apple'], 1, $webRoot.'/en/kb/articles/'],
+            'By body' => [['body' => 'apple'], 1, $webRoot.'/en/kb/articles/'],
+            'By all (name or body)' => [['all' => 'apple'], 2, $webRoot.'/en/kb/articles/'],
+            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, $webRoot.'/en/kb/articles/'],
+            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, $webRoot.'/en/kb/articles/'],
             'By all knowledgeCategoryIDs' => [
                 ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
                 3,
-                'http://vanilla.test/en/kb/articles/'
+                $webRoot.'/en/kb/articles/'
             ]
         ];
     }
@@ -90,20 +89,21 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
      * @return array Data povider for testSearchUpdated
      */
     public function afterSiteSectionGroupUpdate() {
+        $webRoot = 'http://vanilla.test/'.strtolower(__CLASS__);
         return [
             'By name' => [
                 ['name' => 'apple'],
                 1,
-                'http://vanilla.test/ssg2-en/kb/articles/'
+                $webRoot.'/ssg2-en/kb/articles/'
             ],
-            'By body' => [['body' => 'apple'], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By all (name or body)' => [['all' => 'apple'], 2, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
-            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, 'http://vanilla.test/ssg2-en/kb/articles/'],
+            'By body' => [['body' => 'apple'], 1, $webRoot.'/ssg2-en/kb/articles/'],
+            'By all (name or body)' => [['all' => 'apple'], 2, $webRoot.'/ssg2-en/kb/articles/'],
+            'By root knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['rootCategory']], 1, $webRoot.'/ssg2-en/kb/articles/'],
+            'By child knowledgeCategoryID' => [['knowledgeCategoryIDs' => ['childCategory']], 1, $webRoot.'/ssg2-en/kb/articles/'],
             'By all knowledgeCategoryIDs' => [
                 ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
                 3,
-                'http://vanilla.test/ssg2-en/kb/articles/'
+                $webRoot.'/ssg2-en/kb/articles/'
             ]
         ];
     }
