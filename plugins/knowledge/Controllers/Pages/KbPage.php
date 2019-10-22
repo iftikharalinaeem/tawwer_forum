@@ -99,7 +99,7 @@ abstract class KbPage extends ThemedPage {
         $this->deploymentCacheBuster = $deploymentCacheBuster;
         $this->analyticsClient = $analyticsClient;
         $this->siteSectionProvider = $siteSectionProvider;
-        $this->knowledgeBases = $kbModel;
+        $this->kbModel = $kbModel;
 
         // Shared initialization.
         $this->initSharedData();
@@ -122,7 +122,7 @@ abstract class KbPage extends ThemedPage {
     public function render(): Data {
         if ($this->siteMeta->getDebugModeEnabled() && !$this->siteSectionValidated) {
             throw new ServerException(
-                "Site Section must be valided.",
+                "Site Section must be validated.",
                 500,
                 ["description" => "User either `validateSiteSection()` or `disableSiteSectionValidation()`"]
             );
@@ -156,7 +156,7 @@ abstract class KbPage extends ThemedPage {
         }
 
         $knowledgeBase = $this->kbModel->selectSingle(["knowledgeBaseID" => $kbID]);
-        if ($knowledgeBase["knowledgeBaseID"] === $currentSiteSection->getSectionGroup()) {
+        if ($knowledgeBase["siteSectionGroup"] !== $currentSiteSection->getSectionGroup()) {
             // The knowledge base doesn't exist in this site section group.
             throw new NotFoundException("KnowledgeBase");
         }
@@ -186,17 +186,19 @@ abstract class KbPage extends ThemedPage {
             []
         ));
 
-        $this->addReduxAction(new ReduxAction(
-            \Vanilla\Analytics\ActionConstants::GET_CONFIG,
-            new Data($this->analyticsClient->config()),
-            []
-        ));
+        if ($this->analyticsClient !== null) {
+            $this->addReduxAction(new ReduxAction(
+                \Vanilla\Analytics\ActionConstants::GET_CONFIG,
+                new Data($this->analyticsClient->config()),
+                []
+            ));
 
-        $this->addReduxAction(new ReduxAction(
-            \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
-            new Data($this->analyticsClient->eventDefaults()),
-            []
-        ));
+            $this->addReduxAction(new ReduxAction(
+                \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
+                new Data($this->analyticsClient->eventDefaults()),
+                []
+            ));
+        }
     }
 
     /**
