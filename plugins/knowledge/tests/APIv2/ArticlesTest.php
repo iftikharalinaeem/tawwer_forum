@@ -58,8 +58,6 @@ class ArticlesTest extends AbstractResourceTest {
         self::$addons = ["vanilla", "sphinx", "knowledge"];
         parent::setupBeforeClass();
 
-        self::$siteSectionProvider =  new MockSiteSectionProvider();
-
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
         $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
         self::$knowledgeBaseID = $knowledgeBaseModel->insert([
@@ -213,8 +211,6 @@ class ArticlesTest extends AbstractResourceTest {
      * @dataProvider providePatchFields
      */
     public function testPatchSparse($field) {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
         if (empty($this->defaultKB)) {
             $this->defaultKB = $this->api()->post('knowledge-bases', [
                 "name" => __FUNCTION__ . " KB #1",
@@ -633,9 +629,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test posting article in a locale that is supported.
      */
     public function testPatchArticleInSupportedLocale() {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -678,9 +671,6 @@ class ArticlesTest extends AbstractResourceTest {
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage("Locale xx not supported in this Knowledge-Base");
 
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -707,9 +697,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles when filtering with locale
      */
     public function testGetArticlesFilterByLocale() {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -729,9 +716,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test GET /articles when filtering with locale
      */
     public function testGetArticleIDFilterByLocale() {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -749,9 +733,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test translations-statuses are set correctly from POST & PATCH /articles.
      */
     public function testTranslationsStatuses() {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -772,9 +753,6 @@ class ArticlesTest extends AbstractResourceTest {
      * Test PUT /articles/{ID}/invalidateTranslations.
      */
     public function testInvalidatingTranslations() {
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, self::$siteSectionProvider);
-
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
