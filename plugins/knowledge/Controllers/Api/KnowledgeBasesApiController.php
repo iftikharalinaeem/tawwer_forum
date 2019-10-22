@@ -335,8 +335,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
             );
         }
         // Check if KB status changed: deleted vs published
-        if (isset($body['status']) && ($body['status'] !== $prevState['status'])) {
-            // If status changed we need to reset Sphinx counters and reindex
+        if (isset($body['status']) && ($body['status'] !== $prevState['status'])
+            || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
+            // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
             $this->knowledgeBaseModel->resetSphinxCounters();
         }
 

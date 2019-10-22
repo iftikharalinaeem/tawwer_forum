@@ -696,17 +696,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
-        $name = $row["name"] ?? null;
-
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($row["knowledgeCategoryID"]);
-        $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
-        $allLocales = $this->knowledgeBaseModel->getLocales($siteSectionGroup);
-
-        $locale = $row["locale"] ?? $knowledgeBase["sourceLocale"];
-        $siteSectionSlug = $this->getSitSectionSlug($locale, $allLocales);
-        $slug = $articleID . ($name ? "-" . Gdn_Format::url($name) : "");
-        $path = (isset($siteSectionSlug)) ? "{$siteSectionSlug}kb/articles/{$slug}" : "/kb/articles/{$slug}";
-        $row["url"] = \Gdn::request()->url($path, true);
+        $row["url"] = $this->articleModel->url($row);
 
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
@@ -714,7 +704,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
-        $row["slug"] = $slug;
+        $row["slug"] = $this->articleModel->getSlug($row);
         return $row;
     }
 
