@@ -947,6 +947,28 @@ class GroupsHooks extends Gdn_Plugin {
         if (!isset($id)) {
             return;
         }
+        $this->overrideGroupPermissions($id);
+    }
+
+    /**
+     * Override group permissions to allow users to see category
+     *
+     * @param CommentsAPIController $controller
+     * @param int $id discussion id
+     */
+    public function commentsApiController_getFilters(CommentsApiController $controller, $id) {
+        if (!isset($id)) {
+            return;
+        }
+        $this->overrideGroupPermissions($id);
+    }
+
+    /**
+     * Overrides group permissions to view a category.
+     *
+     * @param $id
+     */
+    public function overrideGroupPermissions($id) {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!empty($discussion['GroupID'])) {
