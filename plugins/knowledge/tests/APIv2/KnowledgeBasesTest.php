@@ -24,6 +24,8 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = false;
 
+    protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
+
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
         'name',
@@ -50,7 +52,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass() {
-        self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
     }
 

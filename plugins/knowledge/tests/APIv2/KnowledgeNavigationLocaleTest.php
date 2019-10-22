@@ -243,6 +243,9 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
     /**
      * Test GET navigation-flat with locale = sourceLocale
      *
+     * @param string $locale
+     * @param int $count
+     * @param bool $onlyTranslated
      * @dataProvider validCounts
      */
     public function testNavigationFlat(string $locale, int $count, $onlyTranslated) {
