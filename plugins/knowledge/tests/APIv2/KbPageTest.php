@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\Knowledge\Controllers\Pages;
+namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
