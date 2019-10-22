@@ -947,13 +947,7 @@ class GroupsHooks extends Gdn_Plugin {
         if (!isset($id)) {
             return;
         }
-        $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!empty($discussion['GroupID'])) {
-            $groupModel = new GroupModel();
-            $group = $groupModel->getID($discussion['GroupID']);
-            $groupModel->overridePermissions($group);
-        }
+        $this->overrideGroupPermissions($id);
     }
 
     /**
@@ -966,6 +960,15 @@ class GroupsHooks extends Gdn_Plugin {
         if (!isset($id)) {
             return;
         }
+        $this->overrideGroupPermissions($id);
+    }
+
+    /**
+     * Overrides group permissions to view a category.
+     *
+     * @param $id
+     */
+    public function overrideGroupPermissions($id) {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!empty($discussion['GroupID'])) {
@@ -974,6 +977,7 @@ class GroupsHooks extends Gdn_Plugin {
             $groupModel->overridePermissions($group);
         }
     }
+
     /**
      * Add group fields to search schema.
      *
