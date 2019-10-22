@@ -11,6 +11,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
@@ -155,10 +156,16 @@ abstract class KbPage extends ThemedPage {
             return $this;
         }
 
-        $knowledgeBase = $this->kbModel->selectSingle(["knowledgeBaseID" => $kbID]);
+        try {
+            $knowledgeBase = $this->kbModel->selectSingle(["knowledgeBaseID" => $kbID]);
+        } catch (NoResultsException $e) {
+            // Rethrow as a more generic exception.
+            throw new NotFoundException();
+        }
+
         if ($knowledgeBase["siteSectionGroup"] !== $currentSiteSection->getSectionGroup()) {
             // The knowledge base doesn't exist in this site section group.
-            throw new NotFoundException("KnowledgeBase");
+            throw new NotFoundException();
         }
 
         return $this;
