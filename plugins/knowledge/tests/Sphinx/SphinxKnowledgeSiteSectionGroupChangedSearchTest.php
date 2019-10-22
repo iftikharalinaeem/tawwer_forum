@@ -81,7 +81,14 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
                 ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
                 3,
                 $webRoot.'/en/kb/articles/'
-            ]
+            ],
+            'By siteSectionGroup-1' => [
+                ['all' => 'apple', 'siteSectionGroup' => "mockSiteSectionGroup-1"],
+                2,
+                $webRoot.'/en/kb/articles/'
+            ],
+            'By siteSectionGroup-2' => [['all' => 'apple', 'siteSectionGroup' => "mockSiteSectionGroup-2"], 0, ''],
+
         ];
     }
 
@@ -104,7 +111,13 @@ class SphinxKnowledgeSiteSectionGroupChangedSearchTest extends AbstractAPIv2Test
                 ['knowledgeCategoryIDs' => ['rootCategory', 'childCategory', 'child2Category', 'childCategory2']],
                 3,
                 $webRoot.'/ssg2-en/kb/articles/'
-            ]
+            ],
+            'By siteSectionGroup-1' => [['all' => 'apple', 'siteSectionGroup' => "mockSiteSectionGroup-1"], 0, ''],
+            'By siteSectionGroup-2' => [
+                ['all' => 'apple', 'siteSectionGroup' => "mockSiteSectionGroup-2"],
+                2,
+                $webRoot.'/ssg2-en/kb/articles/'
+            ],
         ];
     }
 
