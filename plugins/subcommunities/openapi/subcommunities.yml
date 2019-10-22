@@ -86,6 +86,12 @@ components:
                 subcommunityUrl:
                     description: The subcommunity url.
                     type: string
+                siteSectionGroup:
+                    description: The site-section-group associated to the subcommunity.
+                    type: string
+                siteSectionID:
+                    description: The site-section-id of the subcommunity.
+                    type: string  
             required:
                 - subcommunityID
                 - name
