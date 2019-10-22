@@ -788,33 +788,34 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('viewnote', '', 'plugins/Warnings2');
     }
 
+    public function profileController_multipleWarnings_create($sender, $userID, $recordType = false, $recordID = false) {
+        $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
+
+        $userIDs = explode(',', $userID);
+        if (count($userIDs) > 1) {
+            if ($sender->Form->authenticatedPostBack()) {
+                $userID = $sender->Form->getFormValue('UserID');    // a user has been chosen
+
+                // strip records that do not belong to the selected user
+                $recordID = $this->filterRecords($recordID, $recordType, $userID);
+                $this->profileController_warn_create($sender, $userID, $recordType, $recordID);
+            } else {
+                $this->chooseUser($sender, $userIDs);   // more than one userID has been passed and prompt the user to choose one
+            }
+        }
+    }
+
     /**
      *
      * @param ProfileController $sender
      * @param int $userID
      */
     public function profileController_warn_create($sender, $userID, $recordType = false, $recordID = false) {
-
-        //If the user has already been warned, let the mod know and move on.
-        if ($recordID && $recordType) {
-            $warningModule = new WarningModel();
-            $model = $warningModule->getModel($recordType);
-            if ($model) {
-                $record = $model->getID($recordID);
-
-                if (isset($record->Attributes['WarningID']) && $record->Attributes['WarningID']) {
-                    $sender->title(sprintf(t('Already Warned')));
-                    $sender->render('alreadywarned', '', 'plugins/Warnings2');
-                    return;
-                }
-            }
-        }
-
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
-            throw notFoundException();
+            throw notFoundException('User');
         }
         $sender->User = $user;
 
@@ -826,24 +827,19 @@ class Warnings2Plugin extends Gdn_Plugin {
         $form = new Gdn_Form();
         $sender->Form = $form;
 
-        if (!$userID) {
-            throw notFoundException('User');
-        }
-
         // Get the warning types.
         $warningTypes = Gdn::sql()->getWhere('WarningType', [], 'Points')->resultArray();
         $sender->setData('WarningTypes', $warningTypes);
 
         // Get the record.
         if ($recordType && $recordID) {
-            $row = getRecord($recordType, $recordID);
+            $row = count($recordID) > 1 ? getRecord($recordType, end($recordID)) : getRecord($recordType, $recordID);
             $sender->setData('RecordType', $recordType);
             $sender->setData('Record', $row);
 
             $form->addHidden('RecordBody', $row['Body']);
             $form->addHidden('RecordFormat', $row['Format']);
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
-
         }
 
         if ($form->authenticatedPostBack()) {
@@ -875,6 +871,19 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('', '');
     }
 
+    private function filterRecords($recordIDs, $recordType, $userID) {
+        $filteredRecordIDs = [];
+
+        foreach (explode(',', $recordIDs) as $recordID) {
+            $record = getRecord($recordType, $recordID);
+            if ($record['InsertUserID'] == $userID) {
+                $filteredRecordIDs[] = $recordID;
+            }
+        }
+
+        return $filteredRecordIDs;
+    }
+
     /**
      * Hide signatures for people in the pokey.
      *
@@ -897,6 +906,74 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
+    public function base_beforeCheckComments_handler($sender, $args) {
+        if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
+            return;
+        }
+
+        $actionMessage = &$sender->EventArguments['ActionMessage'];
+        $discussion = $sender->EventArguments['Discussion'];
+        $commentIDs = $this->getCommentIDs($discussion->DiscussionID);
+        $authorIDs = $this->getAuthorIDs($commentIDs, 'comment');
+
+        $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userid='.join($authorIDs, ',').'&recordtype=Comment&recordid='.join($commentIDs, ','), 'Warn Popup');
+    }
+
+    public function base_beforeCheckDiscussions($sender, $args) {
+        if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
+            return;
+        }
+
+        $actionMessage = &$sender->EventArguments['ActionMessage'];
+        $discussionIDs = Gdn::userModel()->getAttribute(Gdn::session()->UserID, 'CheckedDiscussions', []);
+        $authorIDs = $this->getAuthorIDs($discussionIDs, 'discussion');
+
+        $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userid='.join($authorIDs, ',').'&recordtype=Discussion&recordid='.join($discussionIDs, ','), 'Warn Popup');
+    }
+
+    private function chooseUser($sender, array $userIDs) {
+        $users = [];
+
+        foreach ($userIDs as $userID) {
+            $user = Gdn::userModel()->getID($userID);
+            if (!empty($user)) {
+                $users[] = $user;
+            }
+        }
+
+        $sender->setData('Users', $users);
+        $this->render('chooseuser');
+    }
+
+    private function getCommentIDs($discussionID):array {
+        $commentIDs = Gdn::userModel()->getAttribute(Gdn::session()->UserID, 'CheckedComments', []);
+        $commentIDs = $commentIDs[$discussionID];
+        return $commentIDs;
+    }
+
+    private function getAuthorIDs($recordIDs, $recordType):array {
+        $authorIDs = [];
+
+        switch ($recordType) {
+            case 'comment':
+                $recordModel = new CommentModel();
+                break;
+            case 'discussion':
+                $recordModel = new DiscussionModel();
+                break;
+
+        }
+
+        foreach ($recordIDs as $recordID) {
+            $row = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
+            $authorID = $row['InsertUserID'];
+            if (!in_array($authorID, $authorIDs)) {
+                $authorIDs[] = $authorID;
+            }
+        }
+
+        return $authorIDs;
+    }
 }
 
 /*

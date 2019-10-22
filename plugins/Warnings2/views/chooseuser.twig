@@ -1,0 +1,19 @@
+<h2>{{ t('Choose User') }}</h2>
+{{ form.open() }}
+{{ form.errors() }}
+
+<div class="P">
+    {{ t('Only one user can be warned at a time. Please choose the user you wish to warn bellow:') }}
+</div>
+
+<div class="P ChooseUsers form-group">
+    <ul class="radio-list">
+        {% for User in Users %}
+            <li>{{ form.radio('UserID', User.Name, {value: User.UserID}) }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="Buttons Buttons-Confirm">
+    {{ form.button('Save') }}
+</div>
+{{ form.close()}}
