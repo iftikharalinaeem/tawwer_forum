@@ -346,14 +346,14 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
         $anchor = (val('ShowInPopup', $terms)) ? anchor('Click here to read.', $link, $linkAttribute) : '';
         $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
-        echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag);
+        echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag, ['class' => 'managed-terms-message']);
 
         if (!val('ShowInPopup', $terms)) {
             $termsBody = t('Terms of service body text.', val('Body', $terms));
             $body = Gdn_Format::text($termsBody);
-            echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag);
+            echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag, ['class' => 'managed-terms-row']);
         }
-        echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
+        echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag, ['class' => 'managed-terms-checkbox-row']);
     }
 
 
