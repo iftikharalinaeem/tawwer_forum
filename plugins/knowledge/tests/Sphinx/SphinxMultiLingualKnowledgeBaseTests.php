@@ -10,6 +10,9 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
+/**
+ * Class for testing multi-lingual knowledge-bases.
+ */
 class SphinxMultiLingualKnowledgeBaseTests extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
@@ -97,7 +100,7 @@ class SphinxMultiLingualKnowledgeBaseTests extends AbstractAPIv2Test {
 
         $this->assertEquals(6, count($result));
     }
-    
+
     /**
      * Generate test knowledge-base with articles.
      */
@@ -129,21 +132,21 @@ class SphinxMultiLingualKnowledgeBaseTests extends AbstractAPIv2Test {
     /**
      * Create multiple articles with translations.
      *
-     * @param $rootCategory
+     * @param int $rootCategoryID
      */
-    protected function createTranslations($rootCategory) {
+    protected function createTranslations($rootCategoryID) {
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
 
         for ($i = 0; $i <= 4; $i++) {
             $article = $this->api()->post($this->kbArticlesUrl, [
-                "knowledgeCategoryID" => $rootCategory,
+                "knowledgeCategoryID" => $rootCategoryID,
                 "name" => "English_Article_" . $i,
                 "body" => $helloWorldBody,
                 "format" => "rich",
             ])->getBody();
 
             $this->api()->patch($this->kbArticlesUrl . '/' . $article['articleID'], [
-                "knowledgeCategoryID" => $rootCategory,
+                "knowledgeCategoryID" => $rootCategoryID,
                 "name" => "French_Article_" . $i,
                 "body" => json_encode([["insert" => "Bonjour monde"]]),
                 "format" => "rich",

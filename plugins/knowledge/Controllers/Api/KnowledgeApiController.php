@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -162,6 +163,9 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var SiteSectionProviderInterface */
+    private $siteSectionProvider;
+
     /**
      * DI.
      *
@@ -172,6 +176,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
+     * @param SiteSectionProviderInterface $siteSectionProvider
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -180,7 +185,8 @@ class KnowledgeApiController extends AbstractApiController {
         DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        SiteSectionProviderInterface $siteSectionProvider
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -189,6 +195,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->commentModel = $commentModel;
         $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->siteSectionProvider = $siteSectionProvider;
     }
 
     /**
@@ -238,7 +245,6 @@ class KnowledgeApiController extends AbstractApiController {
 
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
         $this->query = $in->validate($query);
-
         $searchResults = $this->sphinxSearch();
 
         $results = $this->getNormalizedData($searchResults);
@@ -373,6 +379,9 @@ class KnowledgeApiController extends AbstractApiController {
 
         if (isset($this->query['locale'])) {
             $this->sphinx->setFilterString('locale', $this->query['locale']);
+        } else {
+            $siteSection = $this->siteSectionProvider->getCurrentSiteSection();
+            $this->sphinx->setFilterString('locale', $siteSection->getContentLocale());
         }
         if (isset($this->query['siteSectionGroup'])) {
             $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
