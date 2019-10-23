@@ -471,12 +471,13 @@ MESSAGE
      * @return string
      */
     public function getSiteSectionSlug(int $knowledgeBaseID, string $locale): string {
-        $slug = '';
+        $slug = '/';
         $knowledgeBase = $this->selectSingle(['knowledgeBaseID' => $knowledgeBaseID]);
         $siteSections = $this->siteSectionProvider->getForSectionGroup($knowledgeBase['siteSectionGroup']);
         foreach ($siteSections as $siteSection) {
             if ($siteSection->getContentLocale() === $locale) {
-                $slug = $siteSection->getBasePath();
+                $slug .= $siteSection->getBasePath();
+                break;
             }
         }
         return $slug;
