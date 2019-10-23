@@ -6,9 +6,9 @@ echo $this->Form->open();
 echo $this->Form->errors();
 
 $post = $this->data('Record');
-if ($post) {
-    echo formatQuote($post);
-}
+//if ($post) {
+//    echo formatQuote($post);
+//}
 
 if (count($this->data('WarningTypes', [])) <= 1) {
     foreach ($this->data('WarningTypes', []) as $Row) {

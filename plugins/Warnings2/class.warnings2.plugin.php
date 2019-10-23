@@ -247,7 +247,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $quote = true;
                 if ($comment && $discussion) {
                     $context = formatQuote($comment);
-                    $location = warningContext($comment, $discussion);
+                    $location = '';//warningContext($comment, $discussion);
                 // Fallback. Use the warning's "RecordBody" field.
                 } else {
                     $context = formatQuote([
@@ -266,7 +266,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $quote = true;
                 if ($discussion) {
                     $context = formatQuote($discussion);
-                    $location = warningContext($discussion);
+                    $location = '';//warningContext($discussion);
                 // Fallback. Use the warning's "RecordBody" field.
                 } else {
                     $context = formatQuote([
@@ -284,7 +284,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
                 $quote = true;
                 $context = '';
-                $location = warningContext($activity);
+                $location = '';//warningContext($activity);
                 break;
 
             // profile/direct user warning
@@ -296,15 +296,16 @@ class Warnings2Plugin extends Gdn_Plugin {
         if ($quote) {
             $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
 
-            $content = sprintf(t('Re: %s'), "{$location}<br>{$context}");
-            $content .= wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
+            //$content = sprintf(t('Re: %s'), "{$location}<br>{$context}");
+            $content = wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
             $content .= "<br>";
             $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
 
+//            echo wrap($content, 'div', [
+//                'class' => 'WarningContext'
+//            ]);
 
-            echo wrap($content, 'div', [
-                'class' => 'WarningContext'
-            ]);
+            echo $content;
         }
     }
 
@@ -802,6 +803,8 @@ class Warnings2Plugin extends Gdn_Plugin {
             } else {
                 $this->chooseUser($sender, $userIDs);   // more than one userID has been passed and prompt the user to choose one
             }
+        } else {
+            $this->profileController_warn_create($sender, $userID, $recordType, $recordID);
         }
     }
 
@@ -835,11 +838,13 @@ class Warnings2Plugin extends Gdn_Plugin {
         if ($recordType && $recordID) {
             $row = count($recordID) > 1 ? getRecord($recordType, end($recordID)) : getRecord($recordType, $recordID);
             $sender->setData('RecordType', $recordType);
-            $sender->setData('Record', $row);
 
             $form->addHidden('RecordBody', $row['Body']);
+            $form->addHidden('RecordBody', 'olar');
             $form->addHidden('RecordFormat', $row['Format']);
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
+
+            $warningBody = $this->getWarningBody($recordID, $recordType, c('Garden.InputFormatter'));
         }
 
         if ($form->authenticatedPostBack()) {
@@ -863,6 +868,9 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->setValue('AttachRecord', true);
         }
 
+        $form->setValue('Body', $warningBody);
+        $form->setFormValue('Body', $warningBody);
+
         $sender->setData('Profile', $user);
         $sender->setData('Title', sprintf(t('Warn %s'), htmlspecialchars(val('Name', $user))));
 
@@ -882,6 +890,70 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         return $filteredRecordIDs;
+    }
+
+    private function getWarningBody($recordIDs, $recordType, $format):string {
+        $recordUrls = $this->getRecordsUrls($recordIDs, $recordType);
+
+        switch (strtolower($format)) {
+            case 'rich':
+                $body = $this->getRichWarningBody($recordUrls);
+                break;
+            default:
+                $body = t('You are being warned for the following posts:').PHP_EOL;
+                foreach ($recordUrls as $recordUrl) {
+                    $body .= $recordUrl.PHP_EOL;
+                }
+                break;
+        }
+
+        return $body;
+    }
+
+    private function getRecordsUrls($recordIDs, $recordType):array {
+        $recordUrls = [];
+
+        if (gettype($recordIDs) === 'string') {
+            $recordIDs = explode(',', $recordIDs);
+        }
+
+        if ($recordType == 'Comment') {
+            foreach ($recordIDs as $recordID) {
+                $url = url("/discussion/comment/{$recordID}#Comment_{$recordID}", true);
+                $recordUrls[] = $url;
+            }
+        } else {    // discussion
+            foreach ($recordIDs as $recordID) {
+                $discussionModel = new DiscussionModel();
+                $discussion = (array)$discussionModel->getID($recordID);
+                $discussionSlug = Gdn_Format::url($discussion['Name']);
+                $url = url("/discussion/{$recordID}/{$discussionSlug}", true);
+                $recordUrls[] = $url;
+            }
+        }
+
+        return $recordUrls;
+    }
+
+    private function getRichWarningBody($recordUrls):string {
+        $richBody = '[{"insert": "'.t('You are being warned for the following posts:').'"},';
+        $richBody .= '{"insert": "\n"},';
+        $length = count($recordUrls);
+        foreach ($recordUrls as $key => $recordUrl) {
+            $richBody .= <<<EOT
+{
+  "attributes": {
+    "link": "$recordUrl"
+  },
+  "insert": "$recordUrl"
+},
+EOT;
+
+            $richBody .= ($key === $length - 1) ? '{"insert": "\n"}' : '{"insert": "\n"},';
+        }
+        $richBody .= ']';
+
+        return $richBody;
     }
 
     /**
