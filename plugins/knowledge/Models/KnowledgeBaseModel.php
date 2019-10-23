@@ -476,7 +476,7 @@ MESSAGE
         $siteSections = $this->siteSectionProvider->getForSectionGroup($knowledgeBase['siteSectionGroup']);
         foreach ($siteSections as $siteSection) {
             if ($siteSection->getContentLocale() === $locale) {
-                $slug .= $siteSection->getBasePath();
+                $slug = $siteSection->getBasePath();
                 break;
             }
         }
