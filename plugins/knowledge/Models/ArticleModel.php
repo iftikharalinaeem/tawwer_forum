@@ -376,7 +376,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
         $siteSectionSlug = $this->kbModel->getSiteSectionSlug($article['knowledgeBaseID'], $article['locale']);
-        $result = \Gdn::request()->getSimpleUrl('/' . $siteSectionSlug . "kb/articles/" . $slug);
+        $result = \Gdn::request()->getSimpleUrl( $siteSectionSlug . "kb/articles/" . $slug);
         return $result;
     }
 
