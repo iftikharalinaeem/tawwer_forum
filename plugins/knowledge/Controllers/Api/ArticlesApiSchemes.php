@@ -563,7 +563,12 @@ trait ArticlesApiSchemes {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = Schema::parse([
                 "id:i" => "The article ID.",
-                "locale:s?" => "Locale of the article"
+                "locale:s?" => "Locale of the article",
+                "only-translated?" => [
+                    "description" => "If translated revisions does not exist don not return related article.",
+                    "type" => "boolean",
+                    "default" => false
+                ],
             ]);
         }
         return $this->schema($this->idParamSchema, $type);
