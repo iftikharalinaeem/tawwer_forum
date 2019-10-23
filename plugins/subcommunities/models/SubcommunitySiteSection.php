@@ -29,7 +29,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /**
      * @var string
      *
-     * The site section path should always end with a '/'
+     * The site section path should always start and end with a '/'
      */
     private $siteSectionPath;
 
@@ -50,7 +50,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     public function __construct(array $subcommunity) {
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
-        $this->siteSectionPath = $subcommunity["Folder"].'/';
+        $this->siteSectionPath = (empty($subcommunity["Folder"])) ? '/' : '/'.$subcommunity["Folder"].'/';
         $this->sectionGroup = ProductModel::makeSiteSectionGroupKey($subcommunity['ProductID'] ?? null);
         $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
     }
