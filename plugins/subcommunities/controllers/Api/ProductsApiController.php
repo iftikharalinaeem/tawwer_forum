@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use AbstractApiController;
 use Garden\Web\Exception\ClientException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Subcommunities\Models\ProductModel;
 use SubcommunityModel;
 use Vanilla\Exception\Database\NoResultsException;
@@ -43,8 +44,13 @@ class ProductsApiController extends AbstractApiController {
      *
      * @param ProductModel $productModel
      * @param SubcommunityModel $subcommunityModel
+     * @param \Gdn_Configuration $config
      */
-    public function __construct(ProductModel $productModel, SubcommunityModel $subcommunityModel, \Gdn_Configuration $config) {
+    public function __construct(
+        ProductModel $productModel,
+        SubcommunityModel $subcommunityModel,
+        \Gdn_Configuration $config
+    ) {
         $this->productModel = $productModel;
         $this->subcommunityModel = $subcommunityModel;
         $this->config = $config;
@@ -62,6 +68,7 @@ class ProductsApiController extends AbstractApiController {
                 "productID",
                 "name",
                 "body",
+                "siteSectionGroup?",
                 "dateInserted",
                 "insertUserID",
                 "dateUpdated?",
@@ -86,6 +93,10 @@ class ProductsApiController extends AbstractApiController {
             "body:s" => [
                 "allowNull" => true,
                 "description" => "Description of the product.",
+            ],
+            "siteSectionGroup:s?" => [
+                "allowNull" => true,
+                "description" => "The site section group associated to the product.",
             ],
             "dateInserted:dt" => "When the product was created.",
             "insertUserID:i" => "Unique ID of the user who originally created the product.",
@@ -125,6 +136,10 @@ class ProductsApiController extends AbstractApiController {
         $options = ['orderFields' => 'name', 'orderDirection' => 'asc'];
         $products = $this->productModel->get($where, $options);
 
+        foreach ($products as &$product) {
+            $product["siteSectionGroup"] = $this->getSiteSectionGroup($product["productID"]);
+        }
+
         $products = $out->validate($products);
 
         return $products;
@@ -142,6 +157,7 @@ class ProductsApiController extends AbstractApiController {
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $product = $this->productByID($id);
+        $product["siteSectionGroup"]= $this->getSiteSectionGroup($product["productID"]);
 
         $out = $this->productSchema("out");
         $result = $out->validate($product);
@@ -290,4 +306,14 @@ class ProductsApiController extends AbstractApiController {
         return $product;
     }
 
+    /**
+     * Get the site-section-group the product is associated to.
+     *
+     * @param $productID
+     * @return string
+     */
+    protected function getSiteSectionGroup($productID) {
+        $siteSectionGroup = $this->productModel::makeSiteSectionGroupKey($productID);
+        return $siteSectionGroup;
+    }
 }

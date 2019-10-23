@@ -177,6 +177,10 @@ components:
                     description: Description of the product.
                     nullable: true
                     type: string
+                siteSectionGroup:
+                    description: The site-section-group the product is associated to.
+                    nullable: true
+                    type: string
                 dateInserted:
                     description: When the product was created.
                     format: date-time
