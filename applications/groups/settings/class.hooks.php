@@ -33,9 +33,8 @@ class GroupsHooks extends Gdn_Plugin {
      * @param PermissionModel $permissionModel
      */
     public function permissionModel_defaultPermissions_handler(PermissionModel $permissionModel) {
-        $socialGroups = CategoryModel::categories('social-groups');
-        if ($socialGroups) {
-            $categoryID = val('CategoryID', $socialGroups);
+        $groupCategoryIDs = GroupModel::getGroupCategoryIDs();
+        foreach ($groupCategoryIDs as $categoryID) {
             // Disable view permissions for the new category by default.
             $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
             $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
