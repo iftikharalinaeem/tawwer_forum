@@ -477,6 +477,7 @@ MESSAGE
         foreach ($siteSections as $siteSection) {
             if ($siteSection->getContentLocale() === $locale) {
                 $slug = $siteSection->getBasePath();
+                break;
             }
         }
         return $slug;
