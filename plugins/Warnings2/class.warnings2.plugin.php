@@ -836,11 +836,17 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         // Get the record.
         if ($recordType && $recordID) {
+            if (gettype($recordID) === 'string') {
+                $recordID = explode(',', $recordID);
+            }
+
             $row = count($recordID) > 1 ? getRecord($recordType, end($recordID)) : getRecord($recordType, $recordID);
             $sender->setData('RecordType', $recordType);
+            $sender->setData('Record', $row);
+            $sender->setData('Record', $row);
 
             $form->addHidden('RecordBody', $row['Body']);
-            $form->addHidden('RecordBody', 'olar');
+            $form->addHidden('RecordBody', $row['Body']);
             $form->addHidden('RecordFormat', $row['Format']);
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
 
@@ -900,7 +906,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $body = $this->getRichWarningBody($recordUrls);
                 break;
             default:
-                $body = t('You are being warned for the following posts:').PHP_EOL;
+                $body = t('You are being warned for the following posts:').PHP_EOL; //todo: handle plural
                 foreach ($recordUrls as $recordUrl) {
                     $body .= $recordUrl.PHP_EOL;
                 }
@@ -912,10 +918,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     private function getRecordsUrls($recordIDs, $recordType):array {
         $recordUrls = [];
-
-        if (gettype($recordIDs) === 'string') {
-            $recordIDs = explode(',', $recordIDs);
-        }
 
         if ($recordType == 'Comment') {
             foreach ($recordIDs as $recordID) {
