@@ -217,15 +217,6 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function setupBeforeClass() {
-        parent::setupBeforeClass();
-        $siteSectionProvider = new MockSiteSectionProvider();
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
-    }
    /**
      * Setup routine for the test. Called before test execution.
      *

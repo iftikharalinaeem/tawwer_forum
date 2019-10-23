@@ -179,7 +179,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             if ($sortOrder === KnowledgeBaseModel::ORDER_MANUAL) {
                 usort($all, function ($prev, $next) {
                     if ($prev['sort'] === $next['sort']) {
-                        return 0;
+                        return $prev['name'] <=> $next['name'];
                     } else {
                         return ($prev['sort'] < $next['sort']) ? -1 : 1;
                     }
