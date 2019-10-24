@@ -53,6 +53,7 @@ class Reporting2Plugin extends Gdn_Plugin {
                 'HideAllDiscussions' => 1,
                 'DisplayAs' => 'Discussions',
                 'Type' => 'Reporting',
+                'CanDelete' => 0,
                 'AllowDiscussions' => 1,
                 'Sort' => 1000
             ];
@@ -94,6 +95,11 @@ class Reporting2Plugin extends Gdn_Plugin {
             // Set category permission & mark it custom
             Gdn::permissionModel()->saveAll($permissions, ['JunctionID' => $categoryID, 'JunctionTable' => 'Category']);
             $categoryModel->setField($categoryID, 'PermissionCategoryID', $categoryID);
+        }
+
+        $category = CategoryModel::categories('reported-posts');
+        if ($category && $category['CanDelete'] && $category['CanDelete'] === 1) {
+            $categoryModel->setField($category['CategoryID'], ['CanDelete' => 0]);
         }
 
         // Turn off Flagging & Reporting plugins (upgrade)
