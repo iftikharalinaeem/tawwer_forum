@@ -694,18 +694,25 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test GET /articles when filtering with locale
+     * Test GET /articles when filtering with locale without fallback articles.
      */
-    public function testGetArticlesFilterByLocale() {
+    public function testGetArticlesFilterByLocaleOnlyTranslated() {
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
         );
 
         $this->createMultipleArticles();
-        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "fr"]);
+        $response = $this->api()->get(
+            $this->baseUrl,
+            [
+                "knowledgeCategoryID" => self::$knowledgeCategoryID,
+                "locale" => "fr",
+                "only-translated" => true,
+            ]
+        );
         $articles = $response->getBody();
-        $this->assertEquals(21, count($articles));
+        $this->assertEquals(6, count($articles));
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
@@ -713,9 +720,9 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test GET /articles when filtering with locale
+     * Test GET /articles when filtering locale with fallback articles.
      */
-    public function testGetArticleFilterByLocale() {
+    public function testGetArticlesFilterByLocale() {
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
@@ -723,7 +730,13 @@ class ArticlesTest extends AbstractResourceTest {
 
         $this->createArticleWithRevisions(["ru"]);
 
-        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "ru"]);
+        $response = $this->api()->get(
+            $this->baseUrl,
+            [
+                "knowledgeCategoryID" => self::$knowledgeCategoryID,
+                "locale" => "ru"
+            ]
+        );
         $article = $response->getBody();
         $locales = array_count_values(array_column($article, "locale"));
 
@@ -733,9 +746,9 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * @depends testGetArticleFilterByLocale
+     * @depends testGetArticlesFilterByLocale
      *
-     * Test GET /articles when filtering with locale
+     * Test GET /articles when filtering with locale providing only translated articles.
      */
     public function testGetArticleFilterByLocaleOnlyTranslated() {
         $this->api()->patch(
@@ -755,11 +768,10 @@ class ArticlesTest extends AbstractResourceTest {
         $article = $response->getBody();
         $this->assertEquals(2, count($article));
     }
-
     /**
-     * Test Get /articles/{ID} filtered by locale.
+     * Test Get /articles/{ID} filtered by locale providing fallback article.
      */
-    public function testGetArticleFilterByIDAndLocale() {
+    public function testGetArticleFilterByIDAndLocaleFallback() {
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
             [
@@ -773,7 +785,35 @@ class ArticlesTest extends AbstractResourceTest {
             $this->baseUrl.'/'.$articleID,
             [
                 "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "es"
+                "locale" => "fr",
+                "only-translated" => false,
+            ]
+        );
+
+        $article = $response->getBody();
+        $this->assertEquals("en", $article["locale"]);
+        $this->assertEquals($articleID, $article["articleID"]);
+    }
+
+    /**
+     * Test Get /articles/{ID} filtered by locale providing translated article.
+     */
+    public function testGetArticleFilterByIDAndLocaleTranslated() {
+        $this->api()->patch(
+            '/knowledge-bases/' . self::$knowledgeCategoryID,
+            [
+                'siteSectionGroup' => 'mockSiteSectionGroup-1'
+            ]
+        );
+
+        $articleID = $this->createArticleWithRevisions(["es"]);
+
+        $response = $this->api()->get(
+            $this->baseUrl.'/'.$articleID,
+            [
+                "knowledgeCategoryID" => self::$knowledgeCategoryID,
+                "locale" => "es",
+                "only-translated" => true,
             ]
         );
 
@@ -783,9 +823,9 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test Get /articles/{ID} filtered by locale with translations only.
+     * Test Get /articles/{ID} filtered by locale with no translated article found.
      */
-    public function testGetArticleFilterByIDAndLocaleOnlyTranslated() {
+    public function testGetArticleFilterByIDAndLocaleNoTranslation() {
         $this->expectException(ClientException::class);
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,

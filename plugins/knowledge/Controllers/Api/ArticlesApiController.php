@@ -270,6 +270,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
+
+        $query["id"] = $id;
+        $query = $in->validate($query);
+
         $out = $this->articleSchema("out");
         $article = $this->retrieveRow($id, $query);
 
@@ -379,7 +383,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function get_edit(int $id, array $query): array {
         $this->permission("knowledge.articles.add");
 
-        $this->idParamSchema()->setDescription("Get an article for editing.");
+        $in = $this->idParamSchema()->setDescription("Get an article for editing.");
+
+        $query["id"] = $id;
+        $query = $in->validate($query);
+
         $out = $this->schema(Schema::parse([
             "articleID",
             "knowledgeCategoryID",
@@ -485,7 +493,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
         } else {
             $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale'])) {
+            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
                 $options['arl.locale'] = $query['locale'];
             }
         }
@@ -1434,7 +1442,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
         } else {
             $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale'])) {
+            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
                 $options['arl.locale'] = $query['locale'];
             }
         }
