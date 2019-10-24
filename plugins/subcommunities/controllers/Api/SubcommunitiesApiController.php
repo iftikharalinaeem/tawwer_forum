@@ -11,6 +11,7 @@ use AbstractApiController;
 use SubcommunityModel;
 use Vanilla\Subcommunities\Models\ProductModel;
 use Vanilla\ApiUtils;
+use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 
 /**
  * API controller for managing the subcommunities resource.
@@ -59,7 +60,9 @@ class SubcommunitiesApiController extends AbstractApiController {
                 "locale:s",
                 "productID:i?",
                 "product?" => $this->productModel->productFragmentSchema(),
-                "url:s"
+                "url:s",
+                "siteSectionGroup:s?",
+                "siteSectionID:s?",
             ]));
         }
         return $this->schema($this->subcommunitySchema, $type);
@@ -85,6 +88,8 @@ class SubcommunitiesApiController extends AbstractApiController {
             "isDefault:i?",
             "productID:i?",
             "product?" => $this->productModel->productFragmentSchema(),
+            "siteSectionGroup:s?",
+            "siteSectionID:s?",
             "url:s"
         ]);
     }
@@ -124,6 +129,8 @@ class SubcommunitiesApiController extends AbstractApiController {
 
         foreach ($results as &$result) {
             $this->subcommunityModel::calculateRow($result);
+            $result["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($result["ProductID"]);
+            $result["siteSectionID"] = SubcommunitySiteSection::SUBCOMMUNITY_SECTION_PREFIX . $result["SubcommunityID"];
         }
 
         if ($this->isExpandField('product', $query['expand'])) {
@@ -158,6 +165,8 @@ class SubcommunitiesApiController extends AbstractApiController {
         if ($this->isExpandField('product', $query['expand'])) {
             $this->productModel->expandProduct($result);
         }
+        $result["siteSectionGroup"] = $this->productModel::makeSiteSectionGroupKey($result["ProductID"]);
+        $result["siteSectionID"] = SubcommunitySiteSection::SUBCOMMUNITY_SECTION_PREFIX . $result["SubcommunityID"];
 
         $out = $this->subcommunitySchema();
         $result = $out->validate($result);
