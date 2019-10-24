@@ -906,7 +906,11 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $body = $this->getRichWarningBody($recordUrls);
                 break;
             default:
-                $body = t('You are being warned for the following posts:').PHP_EOL; //todo: handle plural
+                $body = plural(
+                    count($recordUrls),
+                    t('You are being warned for the following post:'),
+                    t('You are being warned for the following posts:')
+                ).PHP_EOL;
                 foreach ($recordUrls as $recordUrl) {
                     $body .= $recordUrl.PHP_EOL;
                 }
@@ -938,7 +942,11 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     private function getRichWarningBody($recordUrls):string {
-        $richBody = '[{"insert": "'.t('You are being warned for the following posts:').'"},';
+        $richBody = '[{"insert": "'.plural(
+            count($recordUrls),
+            t('You are being warned for the following post:'),
+            t('You are being warned for the following posts:')
+        ).'"},';
         $richBody .= '{"insert": "\n"},';
         $length = count($recordUrls);
         foreach ($recordUrls as $key => $recordUrl) {
