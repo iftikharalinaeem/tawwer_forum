@@ -743,12 +743,15 @@ class ArticlesTest extends AbstractResourceTest {
             ['siteSectionGroup' => 'mockSiteSectionGroup-1']
         );
 
-        $response = $this->api()->get($this->baseUrl,
+        $response = $this->api()->get(
+            $this->baseUrl,
             [
                 "knowledgeCategoryID" => self::$knowledgeCategoryID,
                 "locale" => "ru",
                 "only-translated" => true,
-            ]);
+            ]
+        );
+
         $article = $response->getBody();
         $this->assertEquals(2, count($article));
     }
@@ -759,7 +762,9 @@ class ArticlesTest extends AbstractResourceTest {
     public function testGetArticleFilterByIDAndLocale() {
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+            [
+                'siteSectionGroup' => 'mockSiteSectionGroup-1'
+            ]
         );
 
         $articleID = $this->createArticleWithRevisions(["es"]);
@@ -783,7 +788,9 @@ class ArticlesTest extends AbstractResourceTest {
         $this->expectException(ClientException::class);
         $this->api()->patch(
             '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
+            [
+                'siteSectionGroup' => 'mockSiteSectionGroup-1'
+            ]
         );
 
         $articleID = $this->createArticleWithRevisions(["es"]);
