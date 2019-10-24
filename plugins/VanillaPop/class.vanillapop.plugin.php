@@ -23,6 +23,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         'vanillaforums.com' => 'vanillaforums.email',
         'vanillacommunity.com' => 'vanillacommunity.email',
         'vanillacommunities.com' => 'vanillacommunities.email',
+        'vanillastaging.com' => 'vanillastaging.email',
         'vanillawip.com' => 'dev.vanillaforums.email'
     ];
 
