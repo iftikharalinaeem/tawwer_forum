@@ -838,6 +838,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         // Get the record.
         if ($recordType && $recordID) {
             $recordID = $this->normalizeRecordID($recordID);
+
+            //if the user has already been warned, let the mod know and move on.
+            if ($this->checkAlreadyWarned($sender, $recordID, $recordType)) {
+                return;
+            }
+
             $row = getRecord($recordType, end($recordID));
             $sender->setData('RecordType', $recordType);
             $sender->setData('Record', $row);
@@ -878,6 +884,22 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->View = 'Warn';
         $sender->ApplicationFolder = 'plugins/Warnings2';
         $sender->render('', '');
+    }
+
+    private function checkAlreadyWarned($sender, $recordIDs, $recordType) {
+        $warningModule = new WarningModel();
+        $model = $warningModule->getModel(strtolower($recordType));
+        if ($model) {
+            foreach ($recordIDs as $recordID) {
+                $record = $model->getID($recordID);
+                if (isset($record->Attributes['WarningID']) && $record->Attributes['WarningID']) {
+                    $sender->title(sprintf(t('Already Warned')));
+                    $sender->render('alreadywarned', '', 'plugins/Warnings2');
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private function normalizeRecordID($recordID):array {
