@@ -41,7 +41,7 @@ class SalesForceSSOPlugin extends Gdn_OAuth2 {
         $profile['Photo'] = valr('photos.thumbnail', $profile);
 
         // Roles are passed as custom_attributes which can be named anything by the client on Salesforce.
-        $profile['Roles'] = valr('custom_attributes.'.c('SalesForceSSO.CustomAttributeKey.Roles', 'Roles'), $profile);
+        $profile['Roles'] = valr('custom_attributes.'.c('SalesForceSSO.CustomAttributeKey.Roles', 'Roles'), $profile, null);
 
         // Log the results when troubleshooting.
         $this->log('getProfile API call', ['ProfileUrl' => $uri, 'Params' => $params, 'RawProfile' => $rawProfile, 'Profile' => $profile]);
