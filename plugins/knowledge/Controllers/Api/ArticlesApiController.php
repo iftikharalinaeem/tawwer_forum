@@ -271,7 +271,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
         $out = $this->articleSchema("out");
-
         $article = $this->retrieveRow($id, $query);
 
         $this->userModel->expandUsers(
