@@ -480,11 +480,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "ar.locale" => $locale,
         ];
 
-        if (isset($query['only-translated'])) {
-            $options['only-translated'] = $query['only-translated'];
-        } else {
-            $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
-        }
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
 
         if ($options['only-translated']) {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
@@ -1427,15 +1423,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      * @throws ClientException When no record is found.
      */
-    private function retrieveRow(int $id, array $query): array {
+    private function retrieveRow(int $id, array $query = []): array {
         $article = $this->articleModel->selectSingle(["articleID" => $id]);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($article["knowledgeCategoryID"]);
+        $options = [];
+        $where = [];
 
-        if (isset($query['only-translated'])) {
-            $options['only-translated'] = $query['only-translated'];
-        } else {
-            $options['only-translated'] = false;
-        }
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
 
         if ($options['only-translated']) {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
@@ -1446,28 +1440,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
         }
 
-
-        $where["a.knowledgeCategoryID"] = $article["knowledgeCategoryID"];
         $where["a.articleID"] = $id;
+        $where["kb.status"] = KnowledgeBaseModel::STATUS_PUBLISHED;
         $options["limit"] = ArticleRevisionModel::DEFAULT_LIMIT;
 
         $record = $this->articleModel->getWithRevision($where, $options);
+        $record = reset($record);
 
-//     $records = $this->articleModel->getIDWithRevision($id, true);
-////        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-////        $locale = (!empty($query["locale"])) ? $query["locale"] : $sourceLocale;
-////        $row = [];
-////        foreach ($records as $record) {
-////            if ($record["locale"] === $locale) {
-////                $row = $record;
-////            }
-////        }
-            if (!$record) {
-                throw new ClientException("Article not found", 404);
-            }
-
-            return $record[0];
+        if (!$record) {
+            throw new ClientException("Article not found", 404);
         }
+        return $record;
+    }
 
 
     /**

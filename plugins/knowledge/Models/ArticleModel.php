@@ -239,6 +239,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $sql->from($this->getTable() . " as a")
                 ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
                 ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
+            if (!empty($where["kb.status"])) {
+                $sql->leftJoin('knowledgeBase kb', "c.knowledgeBaseID = kb.knowledgeBaseID");
+            }
             if (!empty($options['arl.locale'])) {
                 $sql->leftJoin(
                     'articleRevision arl',
