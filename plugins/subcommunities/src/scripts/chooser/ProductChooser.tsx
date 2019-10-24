@@ -66,7 +66,9 @@ export function ProductChooser(props: IProps) {
                     >
                         <span className={classes.rowIndented}>
                             {community.name}
-                            {community.subcommunityID === props.activeSubcommunityID && <CheckIcon />}
+                            {community.subcommunityID === props.activeSubcommunityID && (
+                                <CheckIcon className={classes.check} />
+                            )}
                         </span>
                     </DropDownItemLink>
                 );
