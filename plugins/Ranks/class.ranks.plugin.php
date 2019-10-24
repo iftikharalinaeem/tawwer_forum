@@ -466,7 +466,9 @@ class RanksPlugin extends Gdn_Plugin {
         $sender->setData('_Roles', $roles);
 
         // Allow other plugins to add controls to the Rank form.
-        $sender->Data = $this->eventManager->fireFilter('ranksPlugin_extendedControls', $sender->Data);
+        $extendedControls = $sender->data('_ExtendedControls', []);
+        $extendedControls = $this->eventManager->fireFilter('ranksPlugin_extendControls', $extendedControls);
+        $sender->setData('_ExtendedControls', $extendedControls);
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
