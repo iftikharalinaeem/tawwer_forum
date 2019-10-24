@@ -797,14 +797,14 @@ class Warnings2Plugin extends Gdn_Plugin {
             if ($sender->Form->authenticatedPostBack()) {
                 $userID = $sender->Form->getFormValue('UserID');    // a user has been chosen
 
-                // strip records that do not belong to the selected user
+                // strip records that do not belong to the chosen user
                 $recordID = $this->filterRecords($recordID, $recordType, $userID);
-                $this->profileController_warn_create($sender, $userID, $recordType, $recordID);
+                $this->profileController_warn_create($sender, $userID, $recordType, $recordID, false);
             } else {
-                $this->chooseUser($sender, $userIDs);   // more than one userID has been passed and prompt the user to choose one
+                $this->chooseUser($sender, $userIDs);   // more than one userID has been passed, prompt the user to choose one
             }
         } else {
-            $this->profileController_warn_create($sender, $userID, $recordType, $recordID);
+            $this->profileController_warn_create($sender, $userID, $recordType, $recordID, false);
         }
     }
 
@@ -813,7 +813,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender
      * @param int $userID
      */
-    public function profileController_warn_create($sender, $userID, $recordType = false, $recordID = false) {
+    public function profileController_warn_create($sender, $userID, $recordType = false, $recordID = false, $validateForm = true) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -829,6 +829,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $form = new Gdn_Form();
         $sender->Form = $form;
+        $form->addHidden('UserID', $userID);
 
         // Get the warning types.
         $warningTypes = Gdn::sql()->getWhere('WarningType', [], 'Points')->resultArray();
@@ -836,16 +837,11 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         // Get the record.
         if ($recordType && $recordID) {
-            if (gettype($recordID) === 'string') {
-                $recordID = explode(',', $recordID);
-            }
-
-            $row = count($recordID) > 1 ? getRecord($recordType, end($recordID)) : getRecord($recordType, $recordID);
+            $recordID = $this->normalizeRecordID($recordID);
+            $row = getRecord($recordType, end($recordID));
             $sender->setData('RecordType', $recordType);
             $sender->setData('Record', $row);
-            $sender->setData('Record', $row);
 
-            $form->addHidden('RecordBody', $row['Body']);
             $form->addHidden('RecordBody', $row['Body']);
             $form->addHidden('RecordFormat', $row['Format']);
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
@@ -853,15 +849,14 @@ class Warnings2Plugin extends Gdn_Plugin {
             $warningBody = $this->getWarningBody($recordID, $recordType, c('Garden.InputFormatter'));
         }
 
-        if ($form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack() && $validateForm) {
             $model = new WarningModel();
             $form->setModel($model);
-
             $form->setFormValue('UserID', $userID);
 
             if ($form->getFormValue('AttachRecord')) {
                 $form->setFormValue('RecordType', $recordType);
-                $form->setFormValue('RecordID', $recordID);
+                $form->setFormValue('RecordID', end($recordID));
             }
 
             if ($form->save()) {
@@ -885,6 +880,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('', '');
     }
 
+    private function normalizeRecordID($recordID):array {
+        return gettype($recordID) === 'string' ? explode(',', $recordID) : $recordID;
+    }
+
     private function filterRecords($recordIDs, $recordType, $userID) {
         $filteredRecordIDs = [];
 
@@ -899,7 +898,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     private function getWarningBody($recordIDs, $recordType, $format):string {
-        $recordUrls = $this->getRecordsUrls($recordIDs, $recordType);
+        $recordUrls = $this->getRecordUrls($recordIDs, $recordType);
 
         switch (strtolower($format)) {
             case 'rich':
@@ -920,10 +919,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         return $body;
     }
 
-    private function getRecordsUrls($recordIDs, $recordType):array {
+    private function getRecordUrls($recordIDs, $recordType):array {
         $recordUrls = [];
 
-        if ($recordType == 'Comment') {
+        if (strtolower($recordType) == 'comment') {
             foreach ($recordIDs as $recordID) {
                 $url = url("/discussion/comment/{$recordID}#Comment_{$recordID}", true);
                 $recordUrls[] = $url;
@@ -988,7 +987,7 @@ EOT;
         $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
-    public function base_beforeCheckComments_handler($sender, $args) {
+    public function base_beforeCheckComments_handler($sender) {
         if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             return;
         }
@@ -1001,7 +1000,7 @@ EOT;
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userid='.join($authorIDs, ',').'&recordtype=Comment&recordid='.join($commentIDs, ','), 'Warn Popup');
     }
 
-    public function base_beforeCheckDiscussions($sender, $args) {
+    public function base_beforeCheckDiscussions($sender) {
         if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             return;
         }

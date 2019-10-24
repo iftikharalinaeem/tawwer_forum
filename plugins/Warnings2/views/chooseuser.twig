@@ -9,7 +9,7 @@
 <div class="P ChooseUsers form-group">
     <ul class="radio-list">
         {% for User in Users %}
-            <li>{{ form.radio('UserID', User.Name, {value: User.UserID}) }}</li>
+            <li>{{ form.radio('UserID', User.Name, {value: User.UserID, default: (loop.first) ? true : false }) }}</li>
         {% endfor %}
     </ul>
 </div>
