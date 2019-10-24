@@ -98,7 +98,7 @@ class Reporting2Plugin extends Gdn_Plugin {
         }
 
         $category = CategoryModel::categories('reported-posts');
-        if ($category['CanDelete'] === 1) {
+        if ($category && $category['CanDelete'] === 1) {
             $categoryModel->setField($category['CategoryID'], ['CanDelete' => 0]);
         }
 
