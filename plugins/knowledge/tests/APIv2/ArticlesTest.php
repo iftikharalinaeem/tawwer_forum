@@ -769,7 +769,8 @@ class ArticlesTest extends AbstractResourceTest {
 
         $articleID = $this->createArticleWithRevisions(["es"]);
 
-        $response = $this->api()->get($this->baseUrl.'/'.$articleID,
+        $response = $this->api()->get(
+            $this->baseUrl.'/'.$articleID,
             [
                 "knowledgeCategoryID" => self::$knowledgeCategoryID,
                 "locale" => "es"
@@ -795,7 +796,8 @@ class ArticlesTest extends AbstractResourceTest {
 
         $articleID = $this->createArticleWithRevisions(["es"]);
 
-        $response = $this->api()->get($this->baseUrl.'/'.$articleID,
+        $response = $this->api()->get(
+            $this->baseUrl.'/'.$articleID,
             [
                 "knowledgeCategoryID" => self::$knowledgeCategoryID,
                 "locale" => "fr",

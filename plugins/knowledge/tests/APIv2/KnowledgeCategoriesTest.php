@@ -125,7 +125,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             $this->assertEquals(409, $ex->getCode());
         }
 
-       $this->expectException(ServerException::class);
+        $this->expectException(ServerException::class);
         $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
     }
 
