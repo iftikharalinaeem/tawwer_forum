@@ -11,6 +11,7 @@ import {
     absolutePosition,
     colorOut,
     margins,
+    negative,
     paddings,
     placeholderStyles,
     pointerEvents,
@@ -147,8 +148,6 @@ export const editorFormClasses = useThemeCache(() => {
         zIndex: 3,
     });
 
-    const embedBar = style("embedBar", {});
-
     const embedBarMixin: NestedCSSProperties = {
         position: "absolute",
         transform: `translateX(-50%)`,
@@ -168,7 +167,7 @@ export const editorFormClasses = useThemeCache(() => {
         {
             top: percent(100),
             left: percent(50),
-            width: layoutVars.middleColumn.width + globalVars.gutter.half,
+            width: layoutVars.middleColumn.width + globalVars.gutter.half + globalVars.spacer.size,
         },
         mediaQueries.oneColumnDown({
             width: calc(`100% - ${unit(mobileGutter)}`),
@@ -210,7 +209,6 @@ export const editorFormClasses = useThemeCache(() => {
         spacer,
         title,
         editor,
-        embedBar,
         header,
         embedBarContainer,
         bodyErrorMessage,
