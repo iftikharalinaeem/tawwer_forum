@@ -23,7 +23,6 @@ import Translate from "@library/content/Translate";
 
 export interface IOtherLangaugesProps {
     articleLocaleData: IArticleLocale[];
-    languageSelect?: boolean;
     dateUpdated?: string;
 }
 
@@ -35,6 +34,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
     const id = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
     const classesPanelList = panelListClasses();
+
     const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
     if (!showPicker || !currentLocale) {
         return null;
@@ -48,26 +48,24 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
         return {
             selected: isSelected,
             name: data.locale,
-            icon: data.translationStatus === "not-translated" && <AlertIcon className={"selectBox-selectedIcon"} />,
+            icon: data.translationStatus === "not-translated" && (
+                <ToolTip
+                    label={
+                        <Translate
+                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
+                            c0={<DateTime timestamp={props.dateUpdated} />}
+                        />
+                    }
+                    ariaLabel={"This article was editied in its source locale."}
+                >
+                    <span>
+                        <AlertIcon className={"selectBox-selectedIcon"} />
+                    </span>
+                </ToolTip>
+            ),
             content: (
                 <>
-                    {data.translationStatus !== "not-translated" && (
-                        <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                    )}
-                    {data.translationStatus === "not-translated" && (
-                        <ToolTip
-                            label={`${(
-                                <Translate
-                                    source="This article was editied in its source locale on <0/>. Edit this article to update its translation and clear this meesage."
-                                    c0={<DateTime timestamp={props.dateUpdated} />}
-                                />
-                            )}`}
-                        >
-                            <span>
-                                <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                            </span>
-                        </ToolTip>
-                    )}
+                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
             onClick: () => {

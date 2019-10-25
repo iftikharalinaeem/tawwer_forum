@@ -13,6 +13,7 @@ import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/mode
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 export interface IArticleState {
     articlesByID: {
@@ -176,6 +177,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     return ArticleModel.INITIAL_STATE;
 
                 case ArticleActions.GET_ARTICLE_LOCALES_RESPONSE:
+                    nextState.localesByID = {};
                     const localeData = action.payload.data || {};
                     localeData.forEach(d => {
                         nextState.localesByID[d.articleRevisionID] = d;
