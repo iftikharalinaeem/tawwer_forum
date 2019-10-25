@@ -103,7 +103,7 @@ export function EditorForm(props: IProps) {
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
-    const clasesMessages = messagesClasses();
+    const classesMessages = messagesClasses();
 
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
@@ -135,8 +135,8 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
-                <div className={clasesMessages.iconWrap}>
-                    <WarningIcon className={clasesMessages.messageIcon} />
+                <div className={classesMessages.iconWrap}>
+                    <WarningIcon className={classesMessages.messageIcon} />
                     <div>
                         {t(
                             "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
@@ -148,6 +148,7 @@ export function EditorForm(props: IProps) {
             stringContents={t(
                 "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
             )}
+            actionButton={classesMessages.actionButton}
         />
     );
 
