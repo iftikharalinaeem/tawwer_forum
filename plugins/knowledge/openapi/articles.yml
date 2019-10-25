@@ -29,6 +29,12 @@ paths:
                    required: false
                    schema:
                        type: string
+                -  description: Provide only translated articles.
+                   in: query
+                   name: only-translated
+                   required: false
+                   schema:
+                       type: boolean
                 - in: query
                   name: limit
                   required: true
@@ -494,6 +500,12 @@ paths:
                   required: false
                   schema:
                       type: string
+                - description: Provide only translated articles.
+                  in: query
+                  name: only-translated
+                  required: false
+                  schema:
+                      type: boolean
             responses:
                 "200":
                     content:
@@ -543,6 +555,12 @@ paths:
                   required: false
                   schema:
                       type: string
+                - description: Provide only translated articles.
+                  in: query
+                  name: only-translated
+                  required: false
+                  schema:
+                      type: boolean
             responses:
                 "200":
                     content:

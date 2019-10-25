@@ -27,11 +27,12 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
     /** @var int */
     private static $knowledgeCategoryID;
 
+    protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
+
     /**
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass() {
-        self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
 
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
@@ -49,10 +50,6 @@ class ArticleRevisionsLocaleTest extends AbstractAPIv2Test {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
-
-        $siteSectionProvider = new MockSiteSectionProvider();
-        self::container()
-            ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
     }
 
     /**

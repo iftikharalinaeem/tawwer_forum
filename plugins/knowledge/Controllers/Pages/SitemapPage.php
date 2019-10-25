@@ -59,7 +59,8 @@ class SitemapPage extends KbPage {
      * @inheritdoc
      */
     public function initialize() {
-        ; // abstract method implemented
+        $this->setSeoRequired(false);
+        $this->disableSiteSectionValidation();
     }
 
     /**

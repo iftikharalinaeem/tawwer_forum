@@ -244,7 +244,7 @@ export function EditorForm(props: IProps) {
                         >
                             <EditorEmbedBar
                                 contentRef={embedBarRef}
-                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                                className={classNames(classesEditorForm.containerWidth)}
                             />
                         </animated.div>
                         <animated.div
@@ -292,7 +292,10 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
-                            <EditorContent placeholder={t("Type your article.")} />
+                            <EditorContent
+                                placeholderClassName={classesRichEditor.placeholder}
+                                placeholder={t("Type your article.")}
+                            />
                             <EditorInlineMenus />
                             <EditorParagraphMenu />
                         </div>
