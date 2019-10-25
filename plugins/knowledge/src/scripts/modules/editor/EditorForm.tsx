@@ -292,7 +292,10 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
-                            <EditorContent placeholder={t("Type your article.")} />
+                            <EditorContent
+                                placeholderClassName={classesRichEditor.placeholder}
+                                placeholder={t("Type your article.")}
+                            />
                             <EditorInlineMenus />
                             <EditorParagraphMenu />
                         </div>
