@@ -101,16 +101,18 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     );
 
     public getArticles = (
-        categoryID: number,
+        knowledgeCategoryID: number,
         page: number = 1,
         limit: number = ArticleActions.DEFAULT_ARTICLES_LIMIT,
     ) => {
-        return this.dispatchApi(
-            "get",
-            `/articles?knowledgeCategoryID=${categoryID}&expand=excerpt&limit=${limit}&page=${page}`,
-            ArticleActions.getArticlesACs,
-            {},
-        );
+        const query = {
+            knowledgeCategoryID,
+            expand: "excerpt",
+            locale: getCurrentLocale(),
+            limit,
+            page,
+        };
+        return this.dispatchApi("get", `/articles`, ArticleActions.getArticlesACs, query);
     };
 
     public static readonly PATCH_ARTICLE_STATUS_REQUEST = "@@article/PATCH_ARTICLE_STATUS_REQUEST";
