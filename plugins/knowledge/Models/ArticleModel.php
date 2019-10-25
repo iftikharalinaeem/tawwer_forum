@@ -181,6 +181,38 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
     public function getWithRevision(array $where = [], array $options = []): array {
+        if (($options['only-translated'] ?? false)
+            || empty($options['arl.locale'])) {
+            $options['selectColumns'] = [
+                "a.*, c.knowledgeBaseID",
+                "ar.articleRevisionID",
+                "ar.name",
+                "ar.locale",
+                "ar.translationStatus"
+            ];
+            if ($options["includeBody"] ?? true) {
+                $options['selectColumns'][] = "ar.format";
+                $options['selectColumns'][] = "ar.body";
+                $options['selectColumns'][] = "ar.excerpt";
+                $options['selectColumns'][] = "ar.bodyRendered";
+                $options['selectColumns'][] = "ar.outline";
+            }
+        } else {
+            $options['selectColumns'] = [
+                "a.*, c.knowledgeBaseID",
+                "ar.articleRevisionID",
+                ['arl.name, ar.name', 'COALESCE', 'name'],
+                ['arl.locale, ar.locale', 'COALESCE', 'locale'],
+                "ar.translationStatus"
+            ];
+            if ($options["includeBody"] ?? true) {
+                $options['selectColumns'][] = ['arl.format, ar.format', 'COALESCE', 'format'];
+                $options['selectColumns'][] = ['arl.body, ar.body', 'COALESCE', 'body'];
+                $options['selectColumns'][] = ['arl.excerpt, ar.excerpt', 'COALESCE', 'excerpt'];
+                $options['selectColumns'][] = ['arl.bodyRendered, ar.bodyRendered', 'COALESCE', 'bodyRendered'];
+                $options['selectColumns'][] = ['arl.outline, ar.outline', 'COALESCE', 'outline'];
+            }
+        }
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_SELECT);
         $databaseOperation->setCaller($this);
@@ -195,26 +227,31 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $orderDirection = $options["orderDirection"] ?? "asc";
             $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
             $offset = $options["offset"] ?? 0;
-            $includeBody = $options["includeBody"] ?? true;
 
-            $sql = $this->sql()
-                ->select("a.*, c.knowledgeBaseID")
-                ->select("ar.articleRevisionID")
-                ->select("ar.name")
-                ->select("ar.locale")
-                ->select("ar.translationStatus")
-                ->from($this->getTable() . " as a")
-                ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
-                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left")
-                ->limit($limit, $offset);
-
-            if ($includeBody) {
-                $sql->select("ar.format")
-                    ->select("ar.body")
-                    ->select("ar.excerpt")
-                    ->select("ar.bodyRendered")
-                    ->select("ar.outline");
+            $sql = $this->sql();
+            foreach ($options['selectColumns'] as $selectColumn) {
+                if (is_array($selectColumn)) {
+                    $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);
+                } else {
+                    $sql->select($selectColumn);
+                }
             }
+            $sql->from($this->getTable() . " as a")
+                ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
+                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
+            if (!empty($where["kb.status"])) {
+                $sql->leftJoin('knowledgeBase kb', "c.knowledgeBaseID = kb.knowledgeBaseID");
+            }
+            if (!empty($options['arl.locale'])) {
+                $sql->leftJoin(
+                    'articleRevision arl',
+                    'arl.status = "'.self::STATUS_PUBLISHED.'" 
+                    AND ar.articleID = arl.articleID 
+                    AND arl.locale = "'.$options['arl.locale'].'" '
+                );
+            }
+            $sql->limit($limit, $offset);
+
             if ($orderFields) {
                 $sql->orderBy($orderFields, $orderDirection);
             }
@@ -373,7 +410,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         if (!$name || !$articleID) {
             throw new \Exception('Invalid article row.');
         }
-
+        if (array_key_exists("queryLocale", $article) && isset($article["queryLocale"])) {
+            $article["locale"] = ($article["queryLocale"] === $article["locale"]) ? $article["locale"] : $article["queryLocale"];
+        }
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
         $siteSectionSlug = $this->kbModel->getSiteSectionSlug($article['knowledgeBaseID'], $article['locale']);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/articles/" . $slug);

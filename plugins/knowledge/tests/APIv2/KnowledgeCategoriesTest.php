@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
@@ -124,7 +125,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             $this->assertEquals(409, $ex->getCode());
         }
 
-        $this->expectException(NotFoundException::class);
+        $this->expectException(ServerException::class);
         $this->api()->get("{$this->kbArticlesUrl}/{$article['articleID']}");
     }
 

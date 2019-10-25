@@ -270,9 +270,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission("knowledge.kb.view");
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
+
+        $query["id"] = $id;
+        $query = $in->validate($query);
+
         $out = $this->articleSchema("out");
         $article = $this->retrieveRow($id, $query);
-
         $this->userModel->expandUsers(
             $article,
             ["insertUserID", "updateUserID"]
@@ -293,7 +296,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $this->sessionInterface->UserID
             ),
         ];
-
+        if (isset($query["locale"])) {
+            $article["queryLocale"] = $query["locale"];
+        }
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
@@ -379,7 +384,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function get_edit(int $id, array $query): array {
         $this->permission("knowledge.articles.add");
 
-        $this->idParamSchema()->setDescription("Get an article for editing.");
+        $in = $this->idParamSchema()->setDescription("Get an article for editing.");
+
+        $query["id"] = $id;
+        $query = $in->validate($query);
+
         $out = $this->schema(Schema::parse([
             "articleID",
             "knowledgeCategoryID",
@@ -431,6 +440,11 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "locale:s?" => [
                 "description" => "Filter revisions by locale.",
             ],
+            "only-translated?" => [
+                "description" => "If transalted revisions does not exist don not return related article.",
+                "type" => "boolean",
+                "default" => false
+            ],
         ], "in")->setDescription("List published articles in a given knowledge category.");
         $out = $this->schema([":a" => $this->articleSimpleSchema()], "out");
 
@@ -468,15 +482,32 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $options["orderDirection"] = $sortRule[1];
 
         $locale = $query["locale"] ?? $knowledgeBase["sourceLocale"];
+
+        $where = [
+            "a.knowledgeCategoryID" => $query["knowledgeCategoryID"],
+            "ar.locale" => $locale,
+        ];
+
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
+
+        if ($options['only-translated']) {
+            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+        } else {
+            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
+                $options['arl.locale'] = $query['locale'];
+            }
+        }
+
         $rows = $this->articleModel->getWithRevision(
-            [
-                "a.knowledgeCategoryID" => $query["knowledgeCategoryID"],
-                "ar.locale" => $locale,
-            ],
+            $where,
             $options
         );
 
         foreach ($rows as &$row) {
+            if (isset($query["locale"])) {
+                $row["queryLocale"] = $locale;
+            }
             $row = $this->normalizeOutput($row);
             if (!$includeExcerpts) {
                 unset($row["excerpt"]);
@@ -1399,27 +1430,40 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Get an article row by it's id and locale.
      *
      * @param int $id
-     * @param array $body
+     * @param array $query
      * @return array
      * @throws ClientException When no record is found.
      */
-    private function retrieveRow(int $id, array $body): array {
-        $records = $this->articleByID($id, true, false, true);
-        $firstRecord = reset($records);
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($firstRecord["knowledgeCategoryID"]);
-        $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
-        $locale = (!empty($body["locale"])) ? $body["locale"] : $sourceLocale;
-        $row = [];
-        foreach ($records as $record) {
-            if ($record["locale"] === $locale) {
-                $row = $record;
+    private function retrieveRow(int $id, array $query = []): array {
+        $article = $this->articleModel->selectSingle(["articleID" => $id]);
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($article["knowledgeCategoryID"]);
+        $options = [];
+        $where = [];
+
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
+
+        if ($options['only-translated']) {
+            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+        } else {
+            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
+                $options['arl.locale'] = $query['locale'];
             }
         }
-        if (!$row) {
+
+        $where["a.articleID"] = $id;
+        $where["kb.status"] = KnowledgeBaseModel::STATUS_PUBLISHED;
+        $options["limit"] = ArticleRevisionModel::DEFAULT_LIMIT;
+
+        $record = $this->articleModel->getWithRevision($where, $options);
+        $record = reset($record);
+
+        if (!$record) {
             throw new ClientException("Article not found", 404);
         }
-        return $row;
+        return $record;
     }
+
 
     /**
      * Check if an locale is supported by a knowledge-base.
