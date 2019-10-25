@@ -42,7 +42,8 @@ import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
 import { LocaleDisplayer } from "@vanilla/i18n";
-import {WarningIcon} from "@library/icons/common";
+import { WarningIcon } from "@library/icons/common";
+import { messagesClasses } from "@library/messages/messageStyles";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -102,6 +103,7 @@ export function EditorForm(props: IProps) {
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
+    const clasesMessages = messagesClasses();
 
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
@@ -133,10 +135,14 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
-                <>
-                    <WarningIcon/>
-                    {t("This article hasn't been translated yet. The original article text has been loaded to aid translation."}
-                </>
+                <div className={clasesMessages.iconWrap}>
+                    <WarningIcon className={clasesMessages.messageIcon} />
+                    <div>
+                        {t(
+                            "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+                        )}
+                    </div>
+                </div>
             }
             onConfirm={props.actions.clearFallbackLocaleNotice}
             stringContents={t(

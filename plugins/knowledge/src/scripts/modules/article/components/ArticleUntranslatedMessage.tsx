@@ -9,6 +9,8 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@vanilla/i18n";
 import { useHistory } from "react-router";
 import { getRelativeUrl } from "@library/utility/appUtils";
+import { WarningIcon } from "@library/icons/common";
+import { messagesClasses } from "@library/messages/messageStyles";
 
 interface IProps {
     articleID: number;
@@ -23,11 +25,19 @@ export function ArticleUntranslatedMessage(props: IProps) {
         history.push(url);
     };
 
+    const classes = messagesClasses();
+
     return (
         <Message
             confirmText={t("Translate")}
             onConfirm={onConfirm}
             stringContents={t("This article hasn't been translated yet.")}
+            contents={
+                <div className={classes.iconWrap}>
+                    <WarningIcon className={classes.messageIcon} />
+                    <div>{t("This article hasn't been translated yet.")}</div>
+                </div>
+            }
         />
     );
 }
