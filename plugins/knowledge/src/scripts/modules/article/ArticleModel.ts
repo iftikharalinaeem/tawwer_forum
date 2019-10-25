@@ -77,17 +77,6 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     }
 
     /**
-     * Select a locale.
-     *
-     * @param state A full state instance.
-     * @param localeID The ID of the revision to select.
-     */
-    public static selectLocaleFragment(state: IKnowledgeAppStoreState, localeID: number): IArticleLocale | null {
-        const stateSlice = this.stateSlice(state);
-        return stateSlice.localesByID[localeID] || null;
-    }
-
-    /**
      * Select an article draft out of the stored drafts.
      *
      * @param state A full state instance.
