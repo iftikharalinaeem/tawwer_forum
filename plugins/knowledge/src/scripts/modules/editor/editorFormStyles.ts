@@ -18,12 +18,11 @@ import {
     sticky,
     unit,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
-import { standardAnimations } from "@library/styles/animationHelpers";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 export const editorFormClasses = useThemeCache(() => {
