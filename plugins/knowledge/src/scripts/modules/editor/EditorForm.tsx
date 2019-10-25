@@ -42,6 +42,7 @@ import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
 import { LocaleDisplayer } from "@vanilla/i18n";
+import {WarningIcon} from "@library/icons/common";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -132,18 +133,15 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
-                <Translate
-                    source="This is the first time translating this article into this language. The original article content in <0 /> has been loaded."
-                    c0={
-                        <LocaleDisplayer
-                            displayLocale={props.fallbackLocale.locale}
-                            localeContent={props.fallbackLocale.locale}
-                        />
-                    }
-                />
+                <>
+                    <WarningIcon/>
+                    {t("This article hasn't been translated yet. The original article text has been loaded to aid translation."}
+                </>
             }
             onConfirm={props.actions.clearFallbackLocaleNotice}
-            stringContents={t("This is the first time translating content into this language")}
+            stringContents={t(
+                "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+            )}
         />
     );
 

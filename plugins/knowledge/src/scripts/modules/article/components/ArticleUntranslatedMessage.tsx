@@ -27,7 +27,7 @@ export function ArticleUntranslatedMessage(props: IProps) {
         <Message
             confirmText={t("Translate")}
             onConfirm={onConfirm}
-            stringContents={t("This article hasn't been translated in this locale.")}
+            stringContents={t("This article hasn't been translated yet.")}
         />
     );
 }
