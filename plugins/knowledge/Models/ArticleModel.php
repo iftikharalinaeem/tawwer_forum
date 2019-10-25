@@ -410,7 +410,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         if (!$name || !$articleID) {
             throw new \Exception('Invalid article row.');
         }
-
+        if (array_key_exists("queryLocale", $article) && isset($article["queryLocale"])) {
+            $article["locale"] = ($article["queryLocale"] === $article["locale"]) ? $article["locale"] : $article["queryLocale"];
+        }
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
         $siteSectionSlug = $this->kbModel->getSiteSectionSlug($article['knowledgeBaseID'], $article['locale']);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/articles/" . $slug);

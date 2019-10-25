@@ -276,7 +276,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $out = $this->articleSchema("out");
         $article = $this->retrieveRow($id, $query);
-
         $this->userModel->expandUsers(
             $article,
             ["insertUserID", "updateUserID"]
@@ -297,7 +296,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $this->sessionInterface->UserID
             ),
         ];
-
+        if (isset($query["locale"])) {
+            $article["queryLocale"] = $query["locale"];
+        }
         $article = $this->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
@@ -504,6 +505,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         );
 
         foreach ($rows as &$row) {
+            if (isset($query["locale"])) {
+                $row["queryLocale"] = $locale;
+            }
             $row = $this->normalizeOutput($row);
             if (!$includeExcerpts) {
                 unset($row["excerpt"]);
