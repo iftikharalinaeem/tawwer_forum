@@ -9,6 +9,7 @@ use Garden\EventManager;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
 use Vanilla\Web\Page;
 use \Garden\Container\Reference;
+use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
 
 /**
  * Class SubcommunitiesPlugin
@@ -53,7 +54,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->setInherit(true)
             ->addCall('registerReduxActionProvider', $providerArgs)
             ->rule(Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(\Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider::class)
+            ->setClass(SubcomunitiesSiteSectionProvider::class)
             ->setShared(true)
         ;
     }
