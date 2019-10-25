@@ -169,7 +169,7 @@ $BadgeModel->define([
      'Name' => '25000 Comments',
      'Slug' => 'comment-25000',
      'Type' => 'UserCount',
-     'Body' => 'Who&rsquo;s house? Your house.',
+     'Body' => 'Whose house? Your house.',
      'Photo' => 'https://badges.v-cdn.net/svg/comment-9.svg',
      'Points' => 20,
      'Attributes' => ['Column' => 'CountComments'],
