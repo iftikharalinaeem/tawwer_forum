@@ -244,7 +244,7 @@ export function EditorForm(props: IProps) {
                         >
                             <EditorEmbedBar
                                 contentRef={embedBarRef}
-                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                                className={classNames(classesEditorForm.containerWidth)}
                             />
                         </animated.div>
                         <animated.div
