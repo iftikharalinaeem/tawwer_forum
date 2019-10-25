@@ -128,7 +128,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                     </PanelWidget>
                                 )}
                             <PanelWidget>
-                                <OtherLanguages articleLocaleData={Object.values(articlelocales)} />
+                                <OtherLanguages articleLocaleData={articlelocales} />
                             </PanelWidget>
                         </>
                     }
@@ -144,9 +144,7 @@ interface IProps extends IDeviceProps {
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
-    articlelocales: {
-        [key: string]: IArticleLocale;
-    };
+    articlelocales: IArticleLocale[];
 }
 
 export default withDevice(ArticleLayout);
