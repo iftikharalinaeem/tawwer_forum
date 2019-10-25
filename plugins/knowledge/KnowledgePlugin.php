@@ -108,6 +108,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall("addVariableProvider", [new Reference(KnowledgeVariablesProvider::class)])
             ->rule(SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeArticle()])
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->addCall('add', [new Reference(\Vanilla\Site\Application::class, ['knowledge-base', ['kb']])])
         ;
     }
 
