@@ -68,9 +68,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                     <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
-            onClick: () => {
-                window.location.href = data.url;
-            },
+            url: data.url,
         };
     });
 
