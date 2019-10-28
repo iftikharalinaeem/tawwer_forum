@@ -108,22 +108,26 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $options = [];
         $where = [];
 
-        list($options, $where) = $this->getOnlyTranslatedQueryParams($options, $knowledgeBase);
+        list($options, $where) = $this->getOnlyTranslatedQueryParams($query, $knowledgeBase);
 
         $options["queryLocale"] = $query["locale"] ?? null;
 
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
-                $where = [
-                    'a.knowledgeCategoryID' => $catIds,
-                    'a.status' => ArticleModel::STATUS_PUBLISHED
-                ];
-                $options = [
-                    "limit" => false,
-                    "orderFields" => 'sort',
-                    "orderDirection" => 'asc',
-                ];
+                $where = array_merge($where,
+                    [
+                        'a.knowledgeCategoryID' => $catIds,
+                        'a.status' => ArticleModel::STATUS_PUBLISHED
+                    ]
+                );
+                $options = array_merge($options,
+                    [
+                        "limit" => false,
+                        "orderFields" => 'sort',
+                        "orderDirection" => 'asc',
+                    ]
+                );
 
                 $articles = $this->articleModel->getExtended(
                     $where,
@@ -390,7 +394,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
         } else {
             $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
+            if (!empty($query['locale'])) {
                 $options['arl.locale'] = $query['locale'];
             }
         }
