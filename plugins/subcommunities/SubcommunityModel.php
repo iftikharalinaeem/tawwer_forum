@@ -1,5 +1,8 @@
 <?php
 
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Subcommunities\Models\ProductModel;
+
 class SubcommunityModel extends Gdn_Model {
     const CACHE_KEY = 'subcommunities';
     const CACHE_KEY_DEFAULTSITE = 'subcommunities.defaultsite';
@@ -35,6 +38,11 @@ class SubcommunityModel extends Gdn_Model {
 
         $this->Validation->addRule('Folder', 'function:validate_folder');
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
+
+        if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+            $this->Validation->addRule('Product', 'Required');
+            $this->Validation->applyRule('ProductID', 'Product', '%s must be assigned to a subcommunity.');
+        }
     }
 
     /**
@@ -399,7 +407,24 @@ class SubcommunityModel extends Gdn_Model {
             $this->Validation->addValidationResult('Folder', 'Folder is reserved for system use.');
         }
 
+        if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+            $this->validateProductAssignment($formPostValues);
+        }
+
         return $this->Validation->validate($formPostValues, $insert);
+    }
+
+    /**
+     * @param $formPostValues
+     */
+    private function validateProductAssignment($formPostValues): void {
+        $product = null;
+        if (array_key_exists('ProductID', $formPostValues)) {
+            $product = $formPostValues['ProductID'];
+        }
+        if (!$product) {
+            $this->Validation->addValidationResult('ProductID', 'A product must be assigned to a subcommunity');
+        }
     }
 }
 
