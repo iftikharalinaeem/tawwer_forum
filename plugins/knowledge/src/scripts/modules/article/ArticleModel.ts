@@ -30,7 +30,7 @@ export interface IArticleState {
     draftsByID: {
         [key: number]: IResponseArticleDraft;
     };
-    articlesIDsWithTranslationFallback: number[];
+    articleIDsWithTranslationFallback: number[];
 }
 
 type ReducerType = KnowledgeReducer<IArticleState>;
@@ -104,7 +104,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         revisionsByID: {},
         revisionFragmentsByID: {},
         draftsByID: {},
-        articlesIDsWithTranslationFallback: [],
+        articleIDsWithTranslationFallback: [],
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -125,11 +125,6 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     nextState.revisionFragmentsByID = {};
                     nextState.revisionsByID = {};
                     break;
-                case ArticleActions.GET_ARTICLE_RESPONSE: {
-                    const { articleID } = action.payload.data;
-                    nextState.articlesByID[articleID] = action.payload.data;
-                    break;
-                }
                 case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                     const revisions = action.payload.data;
                     revisions.forEach(rev => {
@@ -165,12 +160,18 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public reducer = produce(
         reducerWithInitialState<IArticleState>(ArticleModel.INITIAL_STATE)
-            .case(ArticleActions.articleUsesTranslationFallbackAC, (nextState, payload) => {
-                if (payload.usesFallback && !nextState.articlesIDsWithTranslationFallback.includes(payload.articleID)) {
-                    nextState.articlesIDsWithTranslationFallback.push(payload.articleID);
-                } else if (!payload.usesFallback) {
-                    nextState.articlesIDsWithTranslationFallback = nextState.articlesIDsWithTranslationFallback.filter(
-                        id => id !== payload.articleID,
+            .case(ArticleActions.getArticleACs.done, (nextState, payload) => {
+                const { articleID } = payload.params;
+                nextState.articlesByID[articleID] = payload.result;
+
+                // If the locale does not match up to our request locale, then we are using a fallback.
+                const requestLocale = payload.params.locale;
+                const responseLocale = payload.result.locale;
+                if (requestLocale != null && requestLocale !== responseLocale) {
+                    nextState.articleIDsWithTranslationFallback.push(articleID);
+                } else {
+                    nextState.articleIDsWithTranslationFallback = nextState.articleIDsWithTranslationFallback.filter(
+                        id => id !== articleID,
                     );
                 }
                 return nextState;

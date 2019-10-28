@@ -43,7 +43,6 @@ import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
-import qs from "qs";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -73,10 +72,9 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         return this.dispatch(apiThunk);
     };
 
-    public static articleUsesTranslationFallbackAC = createAction<{ articleID: number; usesFallback: boolean }>(
-        "ARTICLE_USES_TRANSLATION_FALLBACK",
+    public static getArticleACs = createAction.async<IGetArticleRequestBody, IGetArticleResponseBody, IApiError>(
+        "GET_ARTICLE",
     );
-    public articleUsesTranslationFallback = this.bindDispatch(ArticleActions.articleUsesTranslationFallbackAC);
 
     // FSA actions.
 
@@ -153,7 +151,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         | ActionsUnion<typeof ArticleActions.postArticleACs>
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.patchArticleACs>
-        | ActionsUnion<typeof ArticleActions.getArticleACs>
         | ActionsUnion<typeof ArticleActions.getDraftACs>
         | ActionsUnion<typeof ArticleActions.getDraftsACs>
         | ActionsUnion<typeof ArticleActions.postDraftACs>
@@ -172,18 +169,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IPatchArticleStatusResponseBody,
         {} as IPatchArticleStatusRequestBody,
-    );
-
-    /**
-     * Static action creators for the get article endpoint.
-     */
-    private static readonly getArticleACs = ReduxActions.generateApiActionCreators(
-        ArticleActions.GET_ARTICLE_REQUEST,
-        ArticleActions.GET_ARTICLE_RESPONSE,
-        ArticleActions.GET_ARTICLE_ERROR,
-        // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
-        {} as IGetArticleResponseBody,
-        {} as IGetArticleRequestBody,
     );
 
     /**
@@ -425,36 +410,27 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public fetchByID = async (
         options: IGetArticleRequestBody,
         force: boolean = false,
-    ): Promise<IApiResponse<IGetArticleResponseBody> | undefined> => {
+    ): Promise<IGetArticleResponseBody | undefined> => {
         const { articleID, ...rest } = options;
         const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
+        const params = { ...rest, expand: "all" };
+
+        if (!params.locale) {
+            params.locale = getCurrentLocale();
+        }
+
         if (existingArticle && !force) {
             const articleResponse: IApiResponse<IGetArticleResponseBody> = { data: existingArticle, status: 200 };
-            this.dispatch(ArticleActions.getArticleACs.response(articleResponse, options));
-            return Promise.resolve(articleResponse);
+            this.dispatch(ArticleActions.getArticleACs.done({ params: options, result: existingArticle }, options));
+            return Promise.resolve(articleResponse.data);
         }
 
-        if (!rest.locale) {
-            rest.locale = getCurrentLocale();
-        }
-        const hasLocale = await this.checkArticleHasTranslation(articleID, rest.locale);
-        if (!hasLocale) {
-            delete rest.locale;
-            this.articleUsesTranslationFallback({ articleID, usesFallback: true });
-        } else {
-            this.articleUsesTranslationFallback({ articleID, usesFallback: false });
-        }
+        const thunk = bindThunkAction(ArticleActions.getArticleACs, async () => {
+            const response = await this.api.get(`/articles/${options.articleID}`, { params });
+            return response.data;
+        })(options);
 
-        const params = qs.stringify({ expand: all, ...rest });
-        console.log("request with params", params);
-
-        return this.dispatchApi<IGetArticleResponseBody>(
-            "get",
-            `/articles/${options.articleID}?${params}`,
-            ArticleActions.getArticleACs,
-            rest,
-            { articleID },
-        );
+        return this.dispatch(thunk);
     };
 
     public fetchRevisionsForArticle = (options: IGetArticleRevisionsRequestBody) => {
@@ -487,21 +463,4 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             );
         }
     };
-
-    /**
-     * Check that an article has a translation in a particular locale.
-     */
-    public async checkArticleHasTranslation(articleID: number, inLocale: string) {
-        // Temp implementation until neena's changed are merged in.
-        const availableLanguages = await this.api.get(`/articles/${articleID}/translations`);
-        let hasTranslation = true;
-
-        for (const translation of availableLanguages.data) {
-            if (translation.locale === inLocale && translation.translationStatus === "not-translated") {
-                hasTranslation = false;
-            }
-        }
-
-        return hasTranslation;
-    }
 }

@@ -173,7 +173,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const notifyTranslationFallback =
         article &&
         article.data &&
-        state.knowledge.articles.articlesIDsWithTranslationFallback.includes(article.data.articleID);
+        state.knowledge.articles.articleIDsWithTranslationFallback.includes(article.data.articleID);
     const categoryID = article.data ? article.data.knowledgeCategoryID : null;
 
     return {
