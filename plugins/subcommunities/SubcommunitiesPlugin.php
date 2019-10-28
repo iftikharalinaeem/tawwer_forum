@@ -7,6 +7,7 @@
 use Garden\Container\Container;
 use Garden\EventManager;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
+use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 use Vanilla\Web\Page;
 use \Garden\Container\Reference;
 use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
@@ -46,6 +47,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function container_init(Container $dic) {
         $providerArgs = ['provider' => new Reference(MultisiteReduxPreloader::class)];
+        $plugin = $this;
         $dic
             ->rule(Page::class)
             ->setInherit(true)
@@ -53,9 +55,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->rule(Gdn_Controller::class)
             ->setInherit(true)
             ->addCall('registerReduxActionProvider', $providerArgs)
-            ->rule(Vanilla\Contracts\Site\SiteSectionProviderInterface::class)
-            ->setClass(SubcomunitiesSiteSectionProvider::class)
-            ->setShared(true)
+            ->rule(\Vanilla\Site\SiteSectionModel::class)
+            ->addCall('addProvider', [new Reference(SubcomunitiesSiteSectionProvider::class)])
         ;
     }
 
@@ -392,14 +393,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             '',
             false
         );
-
+        die(var_dump($site));
         if ($site) {
             Gdn::request()->path($path);
             $webroot = self::$originalWebRoot;
 
             Gdn::request()->setAssetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
-
+die(var_dump($site));
             $this->initializeSite($site);
         } elseif (!$this->api) {
             if ($defaultSite) {

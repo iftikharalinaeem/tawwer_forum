@@ -8,126 +8,52 @@ namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
-use Vanilla\Site\DefaultSiteSection;
 
 /**
  * Site section provider for subcommunities.
  */
 class SubcomunitiesSiteSectionProvider implements SiteSectionProviderInterface {
-
-    /** @var SubcommunitySiteSection */
-    private $currentSiteSection;
-
-    /** @var array */
-    private $currentSubcommunity;
-
-    /** @var array */
-    private $defaultSubcommunity;
-    
     /** @var \SubcommunityModel */
     private $subcommunityModel;
 
     /** @var $subcommunities */
     private $subcommunities;
 
-    /** @var ProductModel */
-    private $productModel;
-
     /** @var SiteSectionInterface[] */
-    private $allSiteSections;
+    private $siteSections;
 
-    /** @var DefaultSiteSection */
-    private $defaultSiteSection;
 
     /**
      * SubcomunitiesSiteSectionProvider constructor.
      *
      * @param \SubcommunityModel $subcommunityModel
-     * @param ProductModel $productModel
-     * @param DefaultSiteSection $defaultSiteSection
      */
-    public function __construct(\SubcommunityModel $subcommunityModel, ProductModel $productModel, DefaultSiteSection $defaultSiteSection) {
-        $this->defaultSiteSection = $defaultSiteSection;
+    public function __construct(\SubcommunityModel $subcommunityModel) {
         $this->subcommunityModel = $subcommunityModel;
-        $this->productModel = $productModel;
         $this->subcommunities = $this->subcommunityModel::all();
-        $this->allSiteSections = $this->getAll();
-        $this->defaultSubcommunity = $this->subcommunityModel::getDefaultSite();
-        $this->currentSubcommunity = $this->subcommunityModel::getCurrent();
-
-        if (!empty($this->currentSubcommunity)) {
-            $this->currentSiteSection = new SubcommunitySiteSection($this->currentSubcommunity);
-        }
     }
 
     /**
      * @inheritdoc
      */
     public function getAll(): array {
-        $allSiteSections =[$this->defaultSiteSection];
-        foreach ($this->subcommunities as $subcommunity) {
-            $allSiteSections[] =  new SubcommunitySiteSection($subcommunity);
+        if (is_null($this->siteSections)) {
+            $this->siteSections = [];
+            foreach ($this->subcommunities as $subcommunity) {
+                $this->siteSections[] =  new SubcommunitySiteSection($subcommunity);
+            }
         }
-        return $allSiteSections;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getByID(int $id): ?SiteSectionInterface {
-        if ($subCommunity = $this->subcommunityModel->getID($id)) {
-            return new SubcommunitySiteSection($subCommunity);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getByBasePath(string $basePath): ?SiteSectionInterface {
-        if ($subCommunity = $this->subcommunityModel->getSite($basePath)) {
-            return new SubcommunitySiteSection($subCommunity);
-        } else {
-            return null;
-        }
+        return $this->siteSections;
     }
 
     /**
      * @inheritDoc
      */
-    public function getForSectionGroup(string $sectionGroupKey): array {
-        $siteSections = [];
-
-        foreach ($this->allSiteSections as $siteSection) {
-            if ($siteSection->getSectionGroup() === $sectionGroupKey) {
-                $siteSections[] = $siteSection;
-            }
+    public function getCurrentSiteSection(): ?SiteSectionInterface {
+        $currentSubcommunity = $this->subcommunityModel::getCurrent();
+        if (!empty($currentSubcommunity)) {
+            $siteSection = new SubcommunitySiteSection($currentSubcommunity);
         }
-
-        if (empty($siteSections)) {
-            $siteSections = [$this->defaultSiteSection];
-        }
-
-        return $siteSections;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getForLocale(string $localeKey): array {
-        $siteSections =[];
-        $subCommunities = $this->subcommunityModel->getWhere(['locale' => $localeKey]);
-        foreach ($subCommunities as $subCommunity) {
-            $siteSections[] =  new SubcommunitySiteSection($subCommunity);
-        }
-        return $siteSections;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrentSiteSection(): SiteSectionInterface {
-        return $this->currentSiteSection ?? $this->defaultSiteSection;
+        return $siteSection ?? null;
     }
 }
