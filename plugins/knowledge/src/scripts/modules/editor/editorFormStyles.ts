@@ -11,18 +11,18 @@ import {
     absolutePosition,
     colorOut,
     margins,
+    negative,
     paddings,
     placeholderStyles,
     pointerEvents,
     sticky,
     unit,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
-import { standardAnimations } from "@library/styles/animationHelpers";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 
 export const editorFormClasses = useThemeCache(() => {
@@ -147,8 +147,6 @@ export const editorFormClasses = useThemeCache(() => {
         zIndex: 3,
     });
 
-    const embedBar = style("embedBar", {});
-
     const embedBarMixin: NestedCSSProperties = {
         position: "absolute",
         transform: `translateX(-50%)`,
@@ -168,7 +166,7 @@ export const editorFormClasses = useThemeCache(() => {
         {
             top: percent(100),
             left: percent(50),
-            width: layoutVars.middleColumn.width + globalVars.gutter.half,
+            width: layoutVars.middleColumn.width + globalVars.gutter.half + globalVars.spacer.size,
         },
         mediaQueries.oneColumnDown({
             width: calc(`100% - ${unit(mobileGutter)}`),
@@ -210,7 +208,6 @@ export const editorFormClasses = useThemeCache(() => {
         spacer,
         title,
         editor,
-        embedBar,
         header,
         embedBarContainer,
         bodyErrorMessage,

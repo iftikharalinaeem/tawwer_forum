@@ -462,4 +462,24 @@ MESSAGE
         $locales = array_column($supportedLocales, "locale");
         return $locales;
     }
+
+    /**
+     * Get siteSection slug by locale.
+     *
+     * @param int $knowledgeBaseID
+     * @param string $locale
+     * @return string
+     */
+    public function getSiteSectionSlug(int $knowledgeBaseID, string $locale): string {
+        $slug = '';
+        $knowledgeBase = $this->selectSingle(['knowledgeBaseID' => $knowledgeBaseID]);
+        $siteSections = $this->siteSectionProvider->getForSectionGroup($knowledgeBase['siteSectionGroup']);
+        foreach ($siteSections as $siteSection) {
+            if ($siteSection->getContentLocale() === $locale) {
+                $slug = $siteSection->getBasePath();
+                break;
+            }
+        }
+        return $slug;
+    }
 }

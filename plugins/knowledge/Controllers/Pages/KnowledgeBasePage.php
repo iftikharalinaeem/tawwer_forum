@@ -39,6 +39,7 @@ class KnowledgeBasePage extends KbPage {
     public function initialize(string $urlCode = null) {
         $urlCode = ltrim($urlCode, "/");
         $this->knowledgeBase = $this->kbApi->get_byUrlCode(['urlCode' => $urlCode]);
+        $this->validateSiteSection($this->knowledgeBase['knowledgeBaseID']);
     }
 
     /**

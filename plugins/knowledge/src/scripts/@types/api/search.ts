@@ -42,6 +42,8 @@ export interface ISearchRequestBody {
     page?: number;
     limit?: number;
     categoryIDs?: number[];
+    locale?: string;
+    siteSectionGroup?: string;
 }
 
 export type ISearchResponseBody = ISearchResult[];

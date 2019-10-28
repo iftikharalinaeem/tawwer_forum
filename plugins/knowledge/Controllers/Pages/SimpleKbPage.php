@@ -16,7 +16,10 @@ class SimpleKbPage extends KbPage {
      * @inheritdoc
      */
     public function initialize(string $title = "") {
-        $this->setSeoRequired(false);
-        $this->setSeoTitle($title);
+        $this
+            ->setSeoRequired(false)
+            ->disableSiteSectionValidation()
+            ->setSeoTitle($title)
+        ;
     }
 }

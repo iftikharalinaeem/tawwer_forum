@@ -43,6 +43,7 @@ class ArticlePage extends KbPage {
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
+            ->validateSiteSection($article['knowledgeBaseID'])
         ;
 
         // Preload redux actions for faster page loads.
