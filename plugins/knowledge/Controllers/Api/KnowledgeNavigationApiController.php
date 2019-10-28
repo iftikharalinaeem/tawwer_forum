@@ -105,6 +105,22 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ]
         );
 
+        if (isset($query['only-translated'])) {
+            $options['only-translated'] = $query['only-translated'];
+        } else {
+            $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
+        }
+
+        if ($options['only-translated']) {
+            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+        } else {
+            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale'])) {
+                $options['arl.locale'] = $query['locale'];
+            }
+        }
+        $options["queryLocale"] = $query["locale"];
+
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
@@ -117,20 +133,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     "orderFields" => 'sort',
                     "orderDirection" => 'asc',
                 ];
-                if (isset($query['only-translated'])) {
-                    $options['only-translated'] = $query['only-translated'];
-                } else {
-                    $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
-                }
 
-                if ($options['only-translated']) {
-                    $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
-                } else {
-                    $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-                    if (!empty($query['locale'])) {
-                        $options['arl.locale'] = $query['locale'];
-                    }
-                }
                 $articles = $this->articleModel->getExtended(
                     $where,
                     $options,
@@ -142,7 +145,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                     $catIds,
                     $orderField,
                     $orderDirection,
-                    self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT
+                    self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT,
+                    $where,
+                    $options
                 );
             }
         } else {

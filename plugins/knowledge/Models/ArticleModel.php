@@ -373,22 +373,31 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @param string $orderField
      * @param string $orderDirection
      * @param int $limit
+     * @param array $where
+     * @param array $options
+     *
+     * @return array
      */
-    public function getTopPerCategory(array $knowledgeCategoryIDs, string $orderField, string $orderDirection, int $limit): array {
+    public function getTopPerCategory(array $knowledgeCategoryIDs, string $orderField, string $orderDirection, int $limit, array $where = [], array $options = []): array {
         $result = [];
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
+            $where["a.knowledgeCategoryID"] = $knowledgeCategoryID;
+            $where[ "a.status"] = self::STATUS_PUBLISHED;
+            $options = array_merge($options,   [
+                "limit" => $limit,
+                "orderFields" => $orderField,
+                "orderDirection" => $orderDirection,
+            ]);
             $rows = $this->getExtended(
-                [
-                    "a.knowledgeCategoryID" => $knowledgeCategoryID,
-                    "a.status" => self::STATUS_PUBLISHED,
-                ],
-                [
-                    "limit" => $limit,
-                    "orderFields" => $orderField,
-                    "orderDirection" => $orderDirection,
-                ]
+                $where,
+                $options
             );
+            if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
+                foreach ($rows as &$row) {
+                    $row['queryLocale'] = $options['queryLocale'];
+                }
+            }
             $result = array_merge($result, $rows);
         }
 
