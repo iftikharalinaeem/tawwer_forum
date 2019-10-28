@@ -105,20 +105,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ]
         );
 
-        if (isset($query['only-translated'])) {
-            $options['only-translated'] = $query['only-translated'];
-        } else {
-            $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
-        }
+        $options = [];
+        $where = [];
 
-        if ($options['only-translated']) {
-            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
-        } else {
-            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale'])) {
-                $options['arl.locale'] = $query['locale'];
-            }
-        }
+        list($options, $where) = $this->getOnlyTranslatedQueryParams($options, $knowledgeBase);
+
         $options["queryLocale"] = $query["locale"];
 
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
@@ -375,5 +366,32 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             }
         }
         return null;
+    }
+
+    /**
+     * @param array $query
+     * @param array $knowledgeBase
+     *
+     * @return array
+     */
+    private function getOnlyTranslatedQueryParams(array $query, array $knowledgeBase): array {
+        $options = [];
+        $where = [];
+
+        if (isset($query['only-translated'])) {
+            $options['only-translated'] = $query['only-translated'];
+        } else {
+            $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
+        }
+
+        if ($options['only-translated']) {
+            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+        } else {
+            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale'])) {
+                $options['arl.locale'] = $query['locale'];
+            }
+        }
+        return array($options, $where);
     }
 }
