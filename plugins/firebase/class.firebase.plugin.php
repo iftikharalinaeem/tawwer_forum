@@ -81,7 +81,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
-        $sender->setData('RedirectMessage', t('Redirecting...'));
+        $sender->setData('RedirectMessage', t('Connecting...'));
         include $sender->fetchViewLocation('firebase-js', '', 'plugins/firebase');
    }
 
@@ -207,18 +207,21 @@ class FireBasePlugin extends Gdn_OAuth2 {
 
         // Once the profile data has been saved to the session, Firebase SDK will redirect the browser to the connect page.
         $sessionModel = new SessionModel();
+        $expiryTime = new \DateTimeImmutable('now + 5 minutes');
         $stashID = $sessionModel->insert(
             [
                 'Attributes' => [
                     'Profile' => $profile,
                 ],
-                'DateExpires' => date(MYSQL_DATE_FORMAT, strtotime('3 minutes')),
+                'DateExpires' => $expiryTime->format(MYSQL_DATE_FORMAT),
             ]
         );
-        $sender->deliveryType(DELIVERY_METHOD_JSON);
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_DATA);
+        $sender->setData('stashID', $stashID);
         // Pass the stashID back to Javascript to append to the redirect to connect.
-        echo json_encode(['stashID' => $stashID]);
-        return;
+
+        $sender->render();
     }
 
     /**

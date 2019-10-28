@@ -57,8 +57,7 @@
                     },
                     success: function(result) {
                         // Get the Profile is stashed, get the stashID and pass it on to the connect script.
-                        var entryResult = JSON.parse(result);
-                        stashID = entryResult.stashID;
+                        var stashID = result.stashID;
                         if (!stashID && debug) {
                             console.debug('StashID was expected but not found.');
                         }
