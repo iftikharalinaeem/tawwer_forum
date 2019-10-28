@@ -132,11 +132,17 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 );
             } else {
                 list($orderField, $orderDirection) = $this->knowledgeBaseModel->articleSortConfig($knowledgeBase["sortArticles"]);
+
+                $options = array_merge($options,
+                    [
+                        "limit" => self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT,
+                        "orderFields" => $orderField,
+                        "orderDirection" => $orderDirection,
+                    ]
+                );
+
                 $articles = $this->articleModel->getTopPerCategory(
                     $catIds,
-                    $orderField,
-                    $orderDirection,
-                    self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT,
                     $where,
                     $options
                 );
@@ -378,20 +384,17 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         $options = [];
         $where = [];
 
-        if (isset($query['only-translated'])) {
-            $options['only-translated'] = $query['only-translated'];
-        } else {
-            $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
-        }
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
 
         if ($options['only-translated']) {
             $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
         } else {
             $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale'])) {
+            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
                 $options['arl.locale'] = $query['locale'];
             }
         }
+
         return array($options, $where);
     }
 }
