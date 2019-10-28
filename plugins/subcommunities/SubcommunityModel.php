@@ -414,7 +414,7 @@ class SubcommunityModel extends Gdn_Model {
      *
      * @param $formPostValues
      */
-    private function validateProductAssigned($formPostValues): void {
+    private function validateProductAssigned(array $formPostValues): void {
         $product = null;
         if (array_key_exists('ProductID', $formPostValues)) {
             $product = $formPostValues['ProductID'];
@@ -424,7 +424,6 @@ class SubcommunityModel extends Gdn_Model {
         }
     }
 }
-
 
 if (!function_exists('validate_folder')) {
     function validate_folder($value) {
