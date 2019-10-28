@@ -38,7 +38,7 @@ import {
 } from "@knowledge/@types/api/articleRevision";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { IApiError, IApiResponse } from "@library/@types/api/core";
+import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
@@ -79,6 +79,12 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         "ARTICLE_USES_TRANSLATION_FALLBACK",
     );
     public articleUsesTranslationFallback = this.bindDispatch(ArticleActions.articleUsesTranslationFallbackAC);
+
+    public static getArticleLocalesACs = createAction.async<
+        IGetArticleLocalesRequestBody,
+        IGetArticleLocalesResponseBody,
+        IApiError
+    >("GET_LOCALES");
 
     // FSA actions.
 
@@ -162,7 +168,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         | ActionsUnion<typeof ArticleActions.patchArticleStatusACs>
         | ActionsUnion<typeof ArticleActions.patchArticleACs>
         | ActionsUnion<typeof ArticleActions.getArticleACs>
-        | ActionsUnion<typeof ArticleActions.getArticleLocalesACs>
         | ActionsUnion<typeof ArticleActions.getDraftACs>
         | ActionsUnion<typeof ArticleActions.getDraftsACs>
         | ActionsUnion<typeof ArticleActions.postDraftACs>
@@ -193,18 +198,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         // https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
         {} as IGetArticleResponseBody,
         {} as IGetArticleRequestBody,
-    );
-
-    /**
-     * Static action creators for the get article  translations endpoint.
-     */
-    private static readonly getArticleLocalesACs = ReduxActions.generateApiActionCreators(
-        ArticleActions.GET_ARTICLE_LOCALES_REQUEST,
-        ArticleActions.GET_ARTICLE_LOCALES_RESPONSE,
-        ArticleActions.GET_ARTICLE_LOCALES_ERROR,
-
-        {} as IGetArticleLocalesResponseBody,
-        {} as IGetArticleLocalesRequestBody,
     );
 
     /**
@@ -473,7 +466,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         }
 
         const params = qs.stringify({ expand: all, ...rest });
-        console.log("request with params", params);
 
         return this.dispatchApi<IGetArticleResponseBody>(
             "get",
@@ -487,20 +479,20 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     /**
      * Get an article Locales by its ID from the API.
      */
-    public fetchLocales = (
-        options: IGetArticleLocalesRequestBody,
-        force: boolean = false,
-    ): Promise<IApiResponse<IGetArticleLocalesResponseBody> | undefined> => {
-        const { articleID, ...rest } = options;
-        const existingArticle = ArticleModel.selectArticle(this.getState(), articleID);
+    public fetchLocales = (options: IGetArticleLocalesRequestBody, force: boolean = false) => {
+        const { articleID } = options;
 
-        return this.dispatchApi<IGetArticleLocalesResponseBody>(
-            "get",
-            `/articles/${options.articleID}/translations`,
-            ArticleActions.getArticleLocalesACs,
-            { articleID },
-            options,
-        );
+        const existingLocale = ArticleModel.selectArticleLocale(this.getState(), articleID);
+
+        if (!force && existingLocale.status !== LoadStatus.PENDING) {
+            return existingLocale;
+        }
+
+        const apiThunk = bindThunkAction(ArticleActions.getArticleLocalesACs, async () => {
+            const response = await this.api.get(`/articles/${articleID}/translations`);
+            return response.data;
+        })(options);
+        return this.dispatch(apiThunk);
     };
 
     public fetchRevisionsForArticle = (options: IGetArticleRevisionsRequestBody) => {

@@ -54,8 +54,9 @@ class ArticlePage extends KbPage {
         $articleID = $article['articleID'];
         $translationResponse = $this->articlesApi->get_translations($articleID, []);
         $this->addReduxAction(new ReduxAction(
-            ActionConstants::GET_ARTICLE_TRANSLATIONS_RESPONSE,
-            Data::box($translationResponse)
+            ActionConstants::GET_ARTICLE_LOCALES,
+            Data::box($translationResponse),
+            ['articleID' => $articleID]
         ));
     }
 
