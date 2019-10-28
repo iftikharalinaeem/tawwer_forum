@@ -38,11 +38,6 @@ class SubcommunityModel extends Gdn_Model {
 
         $this->Validation->addRule('Folder', 'function:validate_folder');
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
-
-        if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
-            $this->Validation->addRule('Product', 'Required');
-            $this->Validation->applyRule('ProductID', 'Product', '%s must be assigned to a subcommunity.');
-        }
     }
 
     /**
@@ -408,16 +403,18 @@ class SubcommunityModel extends Gdn_Model {
         }
 
         if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
-            $this->validateProductAssignment($formPostValues);
+           $this->validateProductAssigned($formPostValues);
         }
 
         return $this->Validation->validate($formPostValues, $insert);
     }
 
     /**
+     * Ensure that product has been assigned to a subcommunity.
+     *
      * @param $formPostValues
      */
-    private function validateProductAssignment($formPostValues): void {
+    private function validateProductAssigned($formPostValues): void {
         $product = null;
         if (array_key_exists('ProductID', $formPostValues)) {
             $product = $formPostValues['ProductID'];
@@ -427,6 +424,7 @@ class SubcommunityModel extends Gdn_Model {
         }
     }
 }
+
 
 if (!function_exists('validate_folder')) {
     function validate_folder($value) {
