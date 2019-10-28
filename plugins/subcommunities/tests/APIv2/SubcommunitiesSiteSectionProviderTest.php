@@ -27,16 +27,9 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
 
         self::createSubcommunities();
-//        $provider = new SubcomunitiesSiteSectionProvider(self::container()->get(\SubcommunityModel::class));
-//        static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
+        $provider = new SubcomunitiesSiteSectionProvider(self::container()->get(\SubcommunityModel::class));
+        static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
         self::$provider = static::container()->get(SiteSectionModel::class);
-
-        $test = true;
-        //die(var_dump(static::container()->get(SiteSectionModel::class)));
-//        $siteSectionModel = new SiteSectionModel();
-
-        //$siteSectionModel->addProvider($provider);
-        //die(var_dump(static::container()->get(SiteSectionModel::class)));
     }
 
     /**
@@ -44,7 +37,7 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      */
     public function testGetAll() {
         $all = self::$provider->getAll();
-        $this->assertCount(6, $all);
+        $this->assertCount(5, $all);
     }
 
     /**
@@ -121,9 +114,7 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
              $subcommunityModel->insert($subCommunity);
         }
 
-//        $currentSubcommunity = $subcommunityModel->getID(1, DATASET_TYPE_ARRAY);
-//        $subcommunityModel::setCurrent($currentSubcommunity);
-//        $currentSubcommunity = $subcommunityModel::getDefaultSite();
-        //die(var_dump($currentSubcommunity));
+        $currentSubcommunity = $subcommunityModel->getID(1, DATASET_TYPE_ARRAY);
+        $subcommunityModel::setCurrent($currentSubcommunity);
     }
 }

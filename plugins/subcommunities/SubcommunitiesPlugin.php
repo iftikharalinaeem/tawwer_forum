@@ -47,7 +47,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function container_init(Container $dic) {
         $providerArgs = ['provider' => new Reference(MultisiteReduxPreloader::class)];
-        $plugin = $this;
         $dic
             ->rule(Page::class)
             ->setInherit(true)
@@ -56,7 +55,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->setInherit(true)
             ->addCall('registerReduxActionProvider', $providerArgs)
             ->rule(\Vanilla\Site\SiteSectionModel::class)
-            ->addCall('addProvider', [new Reference(SubcomunitiesSiteSectionProvider::class)])
+            ->addCall('addProvider', [$dic->get(SubcomunitiesSiteSectionProvider::class)])
         ;
     }
 
@@ -393,14 +392,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             '',
             false
         );
-        die(var_dump($site));
+
         if ($site) {
             Gdn::request()->path($path);
             $webroot = self::$originalWebRoot;
 
             Gdn::request()->setAssetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
-die(var_dump($site));
             $this->initializeSite($site);
         } elseif (!$this->api) {
             if ($defaultSite) {
