@@ -105,10 +105,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ]
         );
 
-        $options = [];
-        $where = [];
-
-        list($options, $where) = $this->getOnlyTranslatedQueryParams($query, $knowledgeBase);
+        [$options, $where] = $this->getOnlyTranslatedQueryParams($query, $knowledgeBase);
 
         $options["queryLocale"] = $query["locale"] ?? null;
 
