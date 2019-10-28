@@ -455,16 +455,16 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (!editArticleResponse || !articleResponse) {
             return;
         }
-        const article: IArticle = {
-            ...articleResponse.data,
+
+        editArticleResponse.data = {
+            ...articleResponse,
             ...editArticleResponse.data,
         };
-        editArticleResponse.data = article;
 
         this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
 
         if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
-            this.loadInitialFormBody(articleResponse.data, editArticleResponse.data);
+            this.loadInitialFormBody(articleResponse, editArticleResponse.data);
         }
 
         return editArticleResponse;
