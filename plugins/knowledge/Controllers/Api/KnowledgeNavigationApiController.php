@@ -110,7 +110,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
 
         list($options, $where) = $this->getOnlyTranslatedQueryParams($options, $knowledgeBase);
 
-        $options["queryLocale"] = $query["locale"];
+        $options["queryLocale"] = $query["locale"] ?? null;
 
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
