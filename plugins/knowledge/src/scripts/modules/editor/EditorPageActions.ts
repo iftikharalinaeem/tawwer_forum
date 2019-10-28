@@ -120,6 +120,10 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
     private locationActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api, this.getState);
 
+    public setLocationActions(actions) {
+        this.locationActions = actions;
+    }
+
     /**
      * Initialize the add page.
      *
