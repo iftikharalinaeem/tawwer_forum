@@ -49,6 +49,15 @@ class ArticlePage extends KbPage {
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
         $this->preloadNavigation($article['knowledgeBaseID']);
+
+        // Preload translation data as well
+        $articleID = $article['articleID'];
+        $translationResponse = $this->articlesApi->get_translations($articleID, []);
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ARTICLE_LOCALES,
+            Data::box($translationResponse),
+            ['articleID' => $articleID]
+        ));
     }
 
     /**

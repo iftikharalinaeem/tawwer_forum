@@ -18,6 +18,7 @@ abstract class ActionConstants {
     const ARTICLE_TRANSLATION_FALLBACK = "@@article/ARTICLE_USES_TRANSLATION_FALLBACK";
 
     // Article page
+    const GET_ARTICLE_LOCALES = "@@article/GET_LOCALES_DONE";
     const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     const GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_ERROR";
 

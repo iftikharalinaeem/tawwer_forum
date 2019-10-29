@@ -13,7 +13,7 @@ import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayo
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { CategoryRoute, EditorRoute } from "@knowledge/routes/pageRoutes";
+import { CategoryRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -28,9 +28,8 @@ import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
-import Message from "@library/messages/Message";
-import { t } from "@vanilla/i18n";
 import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -44,9 +43,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render(): React.ReactNode {
-        const { article } = this.props;
+        const { article, articlelocales } = this.props;
         const articleID = this.articleID;
-
         if (!articleID) {
             return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
@@ -60,7 +58,12 @@ export class ArticlePage extends React.Component<IProps, IState> {
             recordType: KbRecordType.ARTICLE,
         };
 
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) || !article.data) {
+        if (
+            [LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) ||
+            !article.data ||
+            !articlelocales ||
+            !articlelocales.data
+        ) {
             return <NavigationLoadingLayout activeRecord={activeRecord} />;
         }
 
@@ -74,6 +77,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     nextNavArticle={this.props.nextNavArticle}
                     currentNavCategory={this.props.currentNavCategory}
                     messages={this.renderMessages()}
+                    articlelocales={articlelocales.data}
                 />
             </DocumentTitle>
         );
@@ -154,7 +158,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (id === null) {
             return;
         }
-
         void articlePageActions.init(id);
     }
 }
@@ -185,6 +188,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
                 : null,
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
+        articlelocales: article.data ? ArticleModel.selectArticleLocale(state, article.data.articleID) : null,
         notifyTranslationFallback,
     };
 }
