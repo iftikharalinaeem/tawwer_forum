@@ -379,7 +379,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $result = [];
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
-            $where = array_merge($where,
+            $where = array_merge(
+                $where,
                 [
                     "a.knowledgeCategoryID" => $knowledgeCategoryID,
                     "a.status" => self::STATUS_PUBLISHED
