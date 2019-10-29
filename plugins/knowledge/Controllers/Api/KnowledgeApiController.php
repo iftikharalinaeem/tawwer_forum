@@ -561,7 +561,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
 
             $result = [
-                "name" => (t($typeData['namePrefix']) ?? '').' '.$record['Name'],
+                "name" => t($typeData['namePrefix'] ?? '').' '.$record['Name'],
                 "body" => \Gdn_Format::excerpt($record['Body'], $record['Format']),
                 "url" => $url,
                 "insertUserID" => $record['InsertUserID'],
