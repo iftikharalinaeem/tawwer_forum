@@ -4,6 +4,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+use Vanilla\Web\CurlWrapper;
+use Vanilla\SafeCurl\Exception;
+
 /**
  * Class LinkedInPlugin
  */
@@ -54,7 +57,7 @@ class LinkedInPlugin extends Gdn_Plugin {
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function aPI($path, $post = false) {
+    public function api($path, $post = false) {
         // Build the url.
         $url = 'https://api.linkedin.com/v2/'.ltrim($path, '/');
 
@@ -83,9 +86,11 @@ class LinkedInPlugin extends Gdn_Plugin {
         } else {
             trace("  GET  $url");
         }
-
-        $response = curl_exec($ch);
-
+        try {
+            $response = CurlWrapper::curlExec($url, $ch, false);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
 
@@ -152,7 +157,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($c, CURLOPT_URL, $url);
-        $contents = curl_exec($c);
+        $contents = CurlWrapper::curlExec($url, $c);
 
         $info = curl_getinfo($c);
         if (strpos(val('content_type', $info, ''), 'application/json') !== false) {
@@ -174,8 +179,8 @@ class LinkedInPlugin extends Gdn_Plugin {
      * @return array|mixed
      */
     public function getProfile() {
-        $profile = $this->aPI('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
-        $emailArray =  $this->aPI('/emailAddress?q=members&projection=(elements*(handle~))');
+        $profile = $this->api('me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))');
+        $emailArray =  $this->api('/emailAddress?q=members&projection=(elements*(handle~))');
         $language = $profile['firstName']['preferredLocale']['language'] ?? 'en';
         $country = $profile['firstName']['preferredLocale']['country'] ?? 'US';
         $preferredLocale = $language.'_'.$country;
