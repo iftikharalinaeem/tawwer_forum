@@ -114,6 +114,13 @@ export function SearchFormFilters(props: IProps) {
                 end={form.endDate}
                 className={classesDateRange.root}
             />
+            {SearchFormFilters.extraFilters.map((extraFilter, i) => {
+                if (extraFilter.searchDomain === form.domain) {
+                    return <React.Fragment key={i}>{extraFilter.filterNode}</React.Fragment>;
+                } else {
+                    return null;
+                }
+            })}
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}
@@ -130,3 +137,17 @@ export function SearchFormFilters(props: IProps) {
         </form>
     );
 }
+
+interface IExtraFilter {
+    searchDomain: SearchDomain;
+    filterNode: React.ReactNode;
+}
+
+SearchFormFilters.extraFilters = [] as IExtraFilter[];
+
+SearchFormFilters.addSearchFilter = (domain: SearchDomain, filterNode: React.ReactNode) => {
+    SearchFormFilters.extraFilters.push({
+        searchDomain: domain,
+        filterNode,
+    });
+};
