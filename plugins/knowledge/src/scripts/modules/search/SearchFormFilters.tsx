@@ -28,6 +28,7 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { searchFormFilterClasses } from "@knowledge/modules/search/searchFormFilterStyles";
+import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
     hideTitle?: boolean;
@@ -44,6 +45,9 @@ export function SearchFormFilters(props: IProps) {
     const classes = searchFormFilterClasses();
     const classesTypography = typographyClasses();
     const classesInputBlock = inputBlockClasses();
+
+    const { getFilterComponentsForDomain } = useSearchFilters();
+
     return (
         <form
             className={classes.root}
@@ -114,13 +118,7 @@ export function SearchFormFilters(props: IProps) {
                 end={form.endDate}
                 className={classesDateRange.root}
             />
-            {SearchFormFilters.extraFilters.map((extraFilter, i) => {
-                if (extraFilter.searchDomain === form.domain) {
-                    return <React.Fragment key={i}>{extraFilter.filterNode}</React.Fragment>;
-                } else {
-                    return null;
-                }
-            })}
+            {getFilterComponentsForDomain(form.domain)}
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}
@@ -137,17 +135,3 @@ export function SearchFormFilters(props: IProps) {
         </form>
     );
 }
-
-interface IExtraFilter {
-    searchDomain: SearchDomain;
-    filterNode: React.ReactNode;
-}
-
-SearchFormFilters.extraFilters = [] as IExtraFilter[];
-
-SearchFormFilters.addSearchFilter = (domain: SearchDomain, filterNode: React.ReactNode) => {
-    SearchFormFilters.extraFilters.push({
-        searchDomain: domain,
-        filterNode,
-    });
-};

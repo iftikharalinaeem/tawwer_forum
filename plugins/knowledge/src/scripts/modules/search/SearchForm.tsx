@@ -27,13 +27,10 @@ import qs from "qs";
 import * as React from "react";
 import { useEffect, useCallback } from "react";
 import { useHistory } from "react-router";
+import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
-}
-
-interface IState {
-    lastQuery: string | null;
 }
 
 function SearchForm(props: IProps) {
@@ -43,6 +40,7 @@ function SearchForm(props: IProps) {
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
 
     useQueryParamSynchronization();
+    useSearchContextValueSync();
 
     const { search, updateForm } = useSearchPageActions();
     const debouncedSearch = useCallback(
@@ -109,8 +107,20 @@ function SearchForm(props: IProps) {
     );
 }
 
+function useSearchContextValueSync() {
+    const { updateForm } = useSearchPageActions();
+    const { form } = useSearchPageData();
+    const { getQueryValuesForDomain, updateQueryValuesForDomain } = useSearchFilters();
+    const extraValues = getQueryValuesForDomain(form.domain);
+    useEffect(() => {
+        console.log("Sync external to internal", extraValues);
+        updateForm(extraValues);
+    }, [extraValues]);
+}
+
 function useQueryParamSynchronization() {
     const { updateForm, search, reset } = useSearchPageActions();
+    const { updateQueryValuesForDomain } = useSearchFilters();
     const { location } = useHistory();
     const queryString = location.search;
 
@@ -135,6 +145,12 @@ function useQueryParamSynchronization() {
         }
 
         updateForm(initialForm);
+
+        if (initialForm.siteSectionGroup) {
+            const initialDomain = initialForm.domain || INITIAL_SEARCH_FORM.domain;
+            // Syncing back to provider.
+            updateQueryValuesForDomain(initialDomain, { siteSectionGroup: initialForm.siteSectionGroup });
+        }
         void search();
 
         // Cleanup when we leave the page.
