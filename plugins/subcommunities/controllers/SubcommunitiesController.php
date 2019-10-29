@@ -5,7 +5,6 @@
  * @license Proprietary
  */
 
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Subcommunities\Models\ProductModel;
 
@@ -132,7 +131,7 @@ class SubcommunitiesController extends DashboardController {
                 $siteID = $this->site['SubcommunityID'];
                 $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
             } else {
-                    $siteID = $this->siteModel->insert($postData);
+                $siteID = $this->siteModel->insert($postData);
             }
 
             $this->form->setValidationResults($this->siteModel->Validation->results());
