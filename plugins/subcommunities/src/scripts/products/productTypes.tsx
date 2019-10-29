@@ -7,6 +7,7 @@ import { IServerError } from "@library/@types/api/core";
 
 export interface IProduct {
     productID: number;
+    siteSectionGroup: string;
     name: string;
     body?: string;
     dateInserted: string;

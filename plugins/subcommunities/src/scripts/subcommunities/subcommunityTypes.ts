@@ -8,6 +8,8 @@ import { IProduct } from "@subcommunities/products/productTypes";
 
 export interface ISubcommunity extends IApiDateInfo {
     subcommunityID: number;
+    siteSectionID: string;
+    siteSectionGroup: string;
     name: string;
     folder: string;
     categoryID: string | null;
