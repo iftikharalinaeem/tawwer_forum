@@ -21,7 +21,7 @@ import Drawer from "@library/layout/drawer/Drawer";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
-import { t } from "@library/utility/appUtils";
+import { t, getSiteSection } from "@library/utility/appUtils";
 import debounce from "lodash/debounce";
 import qs from "qs";
 import * as React from "react";
@@ -52,11 +52,16 @@ function SearchForm(props: IProps) {
         [search],
     );
 
+    const defaults = {
+        ...INITIAL_SEARCH_FORM,
+        siteSectionGroup: getSiteSection().sectionGroup,
+    };
+
     return (
         <DocumentTitle title={form.query ? form.query : t("Search Results")}>
             <TitleBar title={t("Search")} />
             <Container>
-                <QueryString value={form} defaults={INITIAL_SEARCH_FORM} />
+                <QueryString value={form} defaults={defaults} />
                 <PanelLayout
                     className="hasLargePadding"
                     leftTop={isFullWidth && <PanelEmptyColumn />}

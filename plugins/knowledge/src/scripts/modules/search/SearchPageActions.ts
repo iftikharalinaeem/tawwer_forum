@@ -14,6 +14,7 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import actionCreatorFactory from "typescript-fsa";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -126,6 +127,11 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
             query.knowledgeBaseID = parseInt(knowledgeBaseID, 10);
         }
 
+        if (form.siteSectionGroup && form.siteSectionGroup !== "all") {
+            // Backend doesn't actually support an all parameter. Rather, all is the default.
+            query.siteSectionGroup = form.siteSectionGroup;
+        }
+
         const requestOptions: ISearchRequestBody = {
             ...query,
             updateUserIDs: form.authors.map(author => author.value as number),
@@ -133,6 +139,7 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
             statuses,
             dateUpdated,
             expand: ["users", "breadcrumbs"],
+            locale: getCurrentLocale(),
             page,
             limit,
         };
