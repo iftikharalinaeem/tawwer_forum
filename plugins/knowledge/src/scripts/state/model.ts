@@ -21,8 +21,7 @@ import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import SearchPageActions from "@knowledge/modules/search/SearchPageActions";
-import { ISearchPageState } from "@knowledge/modules/search/SearchPageModel";
+import { ISearchPageState } from "@knowledge/modules/search/searchPageReducer";
 import { INavigationStoreState } from "@knowledge/navigation/state/NavigationModel";
 import { IRouteState } from "@knowledge/routes/RouteReducer";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -35,7 +34,6 @@ export type KNOWLEDGE_ACTION =
     | typeof ArticlePageActions.ACTION_TYPES
     | typeof ArticleActions.ACTION_TYPES
     | typeof RevisionsPageActions.ACTION_TYPES
-    | typeof SearchPageActions.ACTION_TYPES
     | typeof DraftsPageActions.ACTION_TYPES;
 
 export type KnowledgeReducer<S> = Reducer<S, KNOWLEDGE_ACTION>;

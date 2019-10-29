@@ -13,7 +13,7 @@ import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
 import NavigationModel from "@knowledge/navigation/state/NavigationModel";
-import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import { searchPageReducer } from "@knowledge/modules/search/searchPageReducer";
 import { IKbState } from "@knowledge/state/model";
 import { combineReducers } from "redux";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
@@ -30,7 +30,7 @@ const knowledgeReducer = combineReducers<IKbState>({
     categories: new CategoryModel().reducer,
     categoriesPage: categoryPageReducer,
     locationPicker: new LocationPickerModel().reducer,
-    searchPage: new SearchPageModel().reducer,
+    searchPage: searchPageReducer,
     navigation: new NavigationModel().reducer,
     route: routeReducer,
     knowledgeBases: new KnowledgeBaseModel().reducer,

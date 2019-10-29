@@ -5,15 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { margins, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const advancedSearchVariables = useThemeCache(() => {
+export const searchFormFilterVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const makeThemeVars = variableFactory("advancedSearch");
+    const makeThemeVars = variableFactory("searchFormFilters");
 
     const spacer = makeThemeVars("spacer", {
         default: globalVars.spacer.size,
@@ -24,10 +21,9 @@ export const advancedSearchVariables = useThemeCache(() => {
     };
 });
 
-export const advancedSearchClasses = useThemeCache(() => {
-    const vars = advancedSearchVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("advancedSearch");
+export const searchFormFilterClasses = useThemeCache(() => {
+    const vars = searchFormFilterVariables();
+    const style = styleFactory("searchFormFilters");
 
     const root = style({
         display: "block",
