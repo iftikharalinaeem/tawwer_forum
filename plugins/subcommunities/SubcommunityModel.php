@@ -416,9 +416,7 @@ class SubcommunityModel extends Gdn_Model {
      */
     private function validateProductAssigned(array $formPostValues): void {
         $product = null;
-        if (array_key_exists('ProductID', $formPostValues)) {
-            $product = $formPostValues['ProductID'];
-        }
+        $product = $formPostValues['ProductID'] ?? null;
         if (!$product) {
             $this->Validation->addValidationResult('ProductID', 'A product must be assigned to a subcommunity');
         }
