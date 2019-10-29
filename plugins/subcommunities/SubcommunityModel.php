@@ -33,13 +33,11 @@ class SubcommunityModel extends Gdn_Model {
         'ru__PETR1708' => 'ru'
     ];
 
-    /** @var array Reserved slugs, not allowed for subcommunities. */
-    protected static $reservedSlugs = ['api', 'entry', 'sso', 'utility'];
-
     /// Methods ///
 
     public function __construct(ProductModel $productModel, $name = '') {
         parent::__construct('Subcommunity');
+
         $this->productModel = $productModel;
         $this->Validation->addRule('Folder', 'function:validate_folder');
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
@@ -220,8 +218,10 @@ class SubcommunityModel extends Gdn_Model {
      * @param string $slug
      * @return bool
      */
-    public static function isReservedSlug($slug) {
-        return in_array(strtolower($slug), self::$reservedSlugs);
+    public static function isReservedSlug($slug): bool {
+       /** @var \Vanilla\Contracts\Site\ApplicationProviderInterface $apps */
+        $apps = Gdn::getContainer()->get(\Vanilla\Contracts\Site\ApplicationProviderInterface::class);
+        return in_array(strtolower($slug), $apps->getReservedSlugs());
     }
 
     /**

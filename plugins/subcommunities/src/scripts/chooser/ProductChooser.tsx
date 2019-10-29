@@ -5,7 +5,7 @@
 
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { LeftChevronCompactIcon } from "@library/icons/common";
+import { CheckIcon, LeftChevronCompactIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
 import { assetUrl } from "@library/utility/appUtils";
 import { useProductsForLocale } from "@subcommunities/products/productSelectors";
@@ -20,6 +20,7 @@ interface IProps {
     forLocale: string;
     communityID: number | null;
     onBack?: () => void;
+    activeSubcommunityID?: number;
 }
 
 /**
@@ -63,7 +64,12 @@ export function ProductChooser(props: IProps) {
                         key={`product${product ? product.productID : ""}-sub${community.subcommunityID}`}
                         to={window.location.origin + assetUrl("/" + community.folder) + options.linkSuffix}
                     >
-                        <span className={classes.rowIndented}>{community.name}</span>
+                        <span className={classes.rowIndented}>
+                            {community.name}
+                            {community.subcommunityID === props.activeSubcommunityID && (
+                                <CheckIcon className={classes.check} />
+                            )}
+                        </span>
                     </DropDownItemLink>
                 );
             })}

@@ -6,7 +6,7 @@
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { DownTriangleIcon } from "@library/icons/common";
+import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -39,7 +39,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const device = useDevice();
     const showHeader = device === Devices.MOBILE || device === Devices.XS;
 
-    if (!subcommunity || !availableLocales) {
+    if (!availableLocales) {
         return null;
     }
 
@@ -47,9 +47,9 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
 
     const classes = subcommunityChooserClasses();
 
-    let toggleName = subcommunity.name;
-    if (hasMultipleLocales) {
-        toggleName += ` (${subcommunity.locale}) `;
+    let toggleName: React.ReactNode = <GlobeIcon />;
+    if (hasMultipleLocales && subcommunity) {
+        toggleName = `${subcommunity.name} (${subcommunity.locale}) `;
     }
 
     return (
@@ -104,7 +104,11 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
                 }
                 body={
                     <FrameBody selfPadded className={classes.body}>
-                        <SubcommunityChooser activeSection={activeSection} setActiveSection={setActiveSection} />
+                        <SubcommunityChooser
+                            activeSubcommunityID={subcommunity ? subcommunity.subcommunityID : undefined}
+                            activeSection={activeSection}
+                            setActiveSection={setActiveSection}
+                        />
                     </FrameBody>
                 }
                 footer={null}
@@ -116,11 +120,13 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
 export function SubcommunityChooser(props: {
     activeSection: SectionName;
     setActiveSection: (section: SectionName) => void;
+    activeSubcommunityID?: number;
 }) {
-    const { activeSection, setActiveSection } = props;
+    const { activeSection, setActiveSection, activeSubcommunityID } = props;
     const subcommunity = useCurrentSubcommunity();
     const [selectedLocale, setSelectedLocale] = useState<string | null>(subcommunity ? subcommunity.locale : null);
     const availableLocales = useAvailableSubcommunityLocales();
+
     const { currentLocale } = useLocaleInfo();
     useEffect(() => {
         if (currentLocale) {
@@ -138,6 +144,7 @@ export function SubcommunityChooser(props: {
     if (activeSection === "product" && selectedLocale) {
         return (
             <ProductChooser
+                activeSubcommunityID={activeSubcommunityID}
                 forLocale={selectedLocale}
                 communityID={communityID}
                 onBack={() => {
