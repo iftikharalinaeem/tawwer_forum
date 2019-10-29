@@ -370,28 +370,33 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * Given a list of knowledge category IDs, get the top X articles in each.
      *
      * @param array $knowledgeCategoryIDs
-     * @param string $orderField
-     * @param string $orderDirection
-     * @param int $limit
+     * @param array $where
+     * @param array $options
+     *
+     * @return array
      */
-    public function getTopPerCategory(array $knowledgeCategoryIDs, string $orderField, string $orderDirection, int $limit): array {
+    public function getTopPerCategory(array $knowledgeCategoryIDs, array $where = [], array $options = []): array {
         $result = [];
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
-            $rows = $this->getExtended(
+            $where = array_merge(
+                $where,
                 [
                     "a.knowledgeCategoryID" => $knowledgeCategoryID,
-                    "a.status" => self::STATUS_PUBLISHED,
-                ],
-                [
-                    "limit" => $limit,
-                    "orderFields" => $orderField,
-                    "orderDirection" => $orderDirection,
+                    "a.status" => self::STATUS_PUBLISHED
                 ]
             );
+            $rows = $this->getExtended(
+                $where,
+                $options
+            );
+            if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
+                foreach ($rows as &$row) {
+                    $row['queryLocale'] = $options['queryLocale'];
+                }
+            }
             $result = array_merge($result, $rows);
         }
-
         return $result;
     }
 

@@ -105,32 +105,29 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             ]
         );
 
+        [$options, $where] = $this->getOnlyTranslatedQueryParams($query, $knowledgeBase);
+
+        $options["queryLocale"] = $query["locale"] ?? null;
+
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
-                $where = [
-                    'a.knowledgeCategoryID' => $catIds,
-                    'a.status' => ArticleModel::STATUS_PUBLISHED
-                ];
-                $options = [
-                    "limit" => false,
-                    "orderFields" => 'sort',
-                    "orderDirection" => 'asc',
-                ];
-                if (isset($query['only-translated'])) {
-                    $options['only-translated'] = $query['only-translated'];
-                } else {
-                    $options['only-translated'] = (!empty($query['locale']) && ($query['locale'] !== $knowledgeBase['sourceLocale']));
-                }
+                $where = array_merge(
+                    $where,
+                    [
+                        'a.knowledgeCategoryID' => $catIds,
+                        'a.status' => ArticleModel::STATUS_PUBLISHED
+                    ]
+                );
+                $options = array_merge(
+                    $options,
+                    [
+                        "limit" => false,
+                        "orderFields" => 'sort',
+                        "orderDirection" => 'asc',
+                    ]
+                );
 
-                if ($options['only-translated']) {
-                    $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
-                } else {
-                    $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-                    if (!empty($query['locale'])) {
-                        $options['arl.locale'] = $query['locale'];
-                    }
-                }
                 $articles = $this->articleModel->getExtended(
                     $where,
                     $options,
@@ -138,11 +135,20 @@ class KnowledgeNavigationApiController extends AbstractApiController {
                 );
             } else {
                 list($orderField, $orderDirection) = $this->knowledgeBaseModel->articleSortConfig($knowledgeBase["sortArticles"]);
+
+                $options = array_merge(
+                    $options,
+                    [
+                        "limit" => self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT,
+                        "orderFields" => $orderField,
+                        "orderDirection" => $orderDirection,
+                    ]
+                );
+
                 $articles = $this->articleModel->getTopPerCategory(
                     $catIds,
-                    $orderField,
-                    $orderDirection,
-                    self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT
+                    $where,
+                    $options
                 );
             }
         } else {
@@ -370,5 +376,31 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the query options and where clauses when Only-Translated parameters is passed.
+     *
+     * @param array $query
+     * @param array $knowledgeBase
+     *
+     * @return array
+     */
+    private function getOnlyTranslatedQueryParams(array $query, array $knowledgeBase): array {
+        $options = [];
+        $where = [];
+
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
+
+        if ($options['only-translated']) {
+            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+        } else {
+            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale'])) {
+                $options['arl.locale'] = $query['locale'];
+            }
+        }
+
+        return array($options, $where);
     }
 }
