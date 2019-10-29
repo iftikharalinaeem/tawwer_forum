@@ -52,7 +52,7 @@ function SearchForm(props: IProps) {
         [search],
     );
 
-    const defaults = {
+    const queryParamDefaults = {
         ...INITIAL_SEARCH_FORM,
         siteSectionGroup: getSiteSection().sectionGroup,
     };
@@ -61,7 +61,7 @@ function SearchForm(props: IProps) {
         <DocumentTitle title={form.query ? form.query : t("Search Results")}>
             <TitleBar title={t("Search")} />
             <Container>
-                <QueryString value={form} defaults={defaults} />
+                <QueryString value={form} defaults={queryParamDefaults} />
                 <PanelLayout
                     className="hasLargePadding"
                     leftTop={isFullWidth && <PanelEmptyColumn />}
