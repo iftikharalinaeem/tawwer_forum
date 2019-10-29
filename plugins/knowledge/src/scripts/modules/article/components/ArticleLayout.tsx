@@ -6,6 +6,7 @@
 import ArticleMenu from "@knowledge/modules/article/ArticleMenu";
 import { ArticleMeta } from "@knowledge/modules/article/components/ArticleMeta";
 import ArticleTOC from "@knowledge/modules/article/components/ArticleTOC";
+import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
@@ -18,7 +19,7 @@ import NextPrevious from "@library/navigation/NextPrevious";
 import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
-import { IArticle } from "@knowledge/@types/api/article";
+import { IArticle, IArticleLocale } from "@knowledge/@types/api/article";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
@@ -29,17 +30,28 @@ import { typographyClasses } from "@library/styles/typographyStyles";
  */
 export class ArticleLayout extends React.Component<IProps> {
     public render() {
-        const { article, currentNavCategory, messages, device, nextNavArticle, prevNavArticle } = this.props;
+        const {
+            article,
+            currentNavCategory,
+            messages,
+            device,
+            nextNavArticle,
+            prevNavArticle,
+            articlelocales,
+        } = this.props;
+
         const { articleID } = article;
 
-        const activeRecord = { recordID: articleID, recordType: KbRecordType.ARTICLE };
+        const activeRecord = {
+            recordID: articleID,
+            recordType: KbRecordType.ARTICLE,
+        };
         const classesButtons = buttonClasses();
 
         let title = "";
         if (currentNavCategory) {
             title = currentNavCategory.name;
         }
-
         return (
             <Container>
                 <TitleBar
@@ -106,14 +118,19 @@ export class ArticleLayout extends React.Component<IProps> {
                         </>
                     }
                     rightTop={
-                        device !== Devices.MOBILE &&
-                        device !== Devices.TABLET &&
-                        article.outline &&
-                        article.outline.length > 0 && (
+                        <>
+                            {device !== Devices.MOBILE &&
+                                device !== Devices.TABLET &&
+                                article.outline &&
+                                article.outline.length > 0 && (
+                                    <PanelWidget>
+                                        <ArticleTOC items={article.outline} />
+                                    </PanelWidget>
+                                )}
                             <PanelWidget>
-                                <ArticleTOC items={article.outline} />
+                                <OtherLanguages articleLocaleData={articlelocales} />
                             </PanelWidget>
-                        )
+                        </>
                     }
                 />
             </Container>
@@ -127,6 +144,7 @@ interface IProps extends IDeviceProps {
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
+    articlelocales: IArticleLocale[];
 }
 
 export default withDevice(ArticleLayout);
