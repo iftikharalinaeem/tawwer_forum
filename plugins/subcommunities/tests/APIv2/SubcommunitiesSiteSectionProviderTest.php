@@ -6,65 +6,53 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Tests for SubcommunitiesSiteSectionProvider.
  */
 class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
 
-    /** @var SubcomunitiesSiteSectionProvider */
-    private $provider;
+    /** @var SiteSectionModel */
+    private static $provider;
+
+    protected static $addons = ['vanilla', 'subcommunities'];
 
     /**
      * @inheritdoc
      */
     public static function setupBeforeClass() {
-        self::$addons = ['vanilla', 'subcommunities'];
         parent::setupBeforeClass();
+
         self::createSubcommunities();
+        $provider = new SubcomunitiesSiteSectionProvider(self::container()->get(\SubcommunityModel::class));
+        static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
+        self::$provider = static::container()->get(SiteSectionModel::class);
     }
 
     /**
-     * Set the site section provider.
-     */
-    public function setProvider() {
-        $this->provider = static::container()->get(SubcomunitiesSiteSectionProvider::class);
-    }
-
-    /**
-     * Test for getAll.
+     * Test for getAll
      */
     public function testGetAll() {
-        $this->setProvider();
-        $all = $this->provider->getAll();
-        $this->assertCount(6, $all);
-    }
-
-    /**
-     * Test for getByID.
-     */
-    public function testGetByID() {
-        $this->setProvider();
-        $subcomunnitySiteSection = $this->provider->getByID(1);
-        $this->assertEquals("es", $subcomunnitySiteSection->getContentLocale());
+        $all = self::$provider->getAll();
+        $this->assertCount(5, $all);
     }
 
     /**
      * Test for getByBasePath.
      */
     public function testGetByBasePath() {
-        $this->setProvider();
-        $subcomunnitySiteSection = $this->provider->getByBasePath("ru");
+        $subcomunnitySiteSection = self::$provider->getByBasePath("/ru");
         $this->assertEquals("ru", $subcomunnitySiteSection->getContentLocale());
     }
 
     /**
-     * Test for getForLocale.
+     * Test for getForLocale.s
      */
     public function testGetForLocale() {
-        $this->setProvider();
-        $subcomunnitySiteSections = $this->provider->getForLocale("en");
+        $subcomunnitySiteSections = self::$provider->getForLocale("en");
         $this->assertCount(2, $subcomunnitySiteSections);
     }
 
@@ -72,8 +60,7 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Test for getCurrentSiteSection.
      */
     public function testGetCurrentSiteSection() {
-        $this->setProvider();
-        $subcomunnitySiteSections = $this->provider->getCurrentSiteSection();
+        $subcomunnitySiteSections = self::$provider->getCurrentSiteSection();
         $this->assertEquals("es", $subcomunnitySiteSections->getContentLocale() );
     }
 
@@ -81,27 +68,33 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
      * Create subcommunities for Tests.
      */
     private static function createSubcommunities() {
+        /** @var \SubcommunityModel $subcommunityModel */
        $subcommunityModel = static::container()->get(\SubcommunityModel::class);
        $rows = [
             [
                 "locale" => "es",
-                "folder" => "es"
+                "folder" => "es",
+                "isDefault" => true
             ],
             [
                 "locale" => "ru",
-                "folder" => "ru"
+                "folder" => "ru",
+                "isDefault" => false
             ],
             [
                 "locale" => "fr",
-                "folder" => "fr"
+                "folder" => "fr",
+                "isDefault" => false
             ],
             [
                 "locale" => "en",
-                "folder" => "en_1"
+                "folder" => "en_1",
+                "isDefault" => false
             ],
             [
                 "locale" => "en",
-                "folder" => "en_2"
+                "folder" => "en_2",
+                "isDefault" => false
             ]
         ];
 
@@ -113,7 +106,8 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
                 "CategoryID" => 1,
                 "Locale" => $row["locale"],
                 "Sort" => 1,
-                "ProductID" => 5
+                "ProductID" => 5,
+                "isDefault" => $row["isDefault"]
             ];
         }
         foreach ($subCommunities as $subCommunity) {
