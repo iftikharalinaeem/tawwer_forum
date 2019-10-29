@@ -148,7 +148,6 @@ export function EditorForm(props: IProps) {
             stringContents={t(
                 "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
             )}
-            actionButton={classesMessages.actionButton}
         />
     );
 
