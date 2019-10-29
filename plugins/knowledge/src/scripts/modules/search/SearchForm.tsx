@@ -44,7 +44,7 @@ function SearchForm(props: IProps) {
 
     useQueryParamSynchronization();
 
-    const { search } = useSearchPageActions();
+    const { search, updateForm } = useSearchPageActions();
     const debouncedSearch = useCallback(
         debounce(() => {
             search();
@@ -65,7 +65,7 @@ function SearchForm(props: IProps) {
                             <PanelWidget>
                                 <SearchBar
                                     placeholder={props.placeholder}
-                                    onChange={debouncedSearch}
+                                    onChange={newQuery => updateForm({ query: newQuery })}
                                     value={form.query}
                                     isBigInput={true}
                                     onSearch={debouncedSearch}
