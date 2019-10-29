@@ -108,6 +108,10 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         background: colorOut(globalVars.border.color),
     });
 
+    const check = style("check", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
     return {
         toggle,
         toggleFullWidth,
@@ -119,5 +123,6 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         rowBack,
         body,
         headingDivider,
+        check,
     };
 });
