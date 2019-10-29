@@ -415,7 +415,6 @@ class SubcommunityModel extends Gdn_Model {
      * @param $formPostValues
      */
     private function validateProductAssigned(array $formPostValues): void {
-        $product = null;
         $product = $formPostValues['ProductID'] ?? null;
         if (!$product) {
             $this->Validation->addValidationResult('ProductID', 'A product must be assigned to a subcommunity');
