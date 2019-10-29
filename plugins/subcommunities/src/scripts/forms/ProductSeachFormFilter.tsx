@@ -9,20 +9,21 @@ import { t } from "@vanilla/i18n";
 import { useProducts } from "@subcommunities/products/productSelectors";
 import { getSiteSection } from "@library/utility/appUtils";
 import SelectOne from "@library/forms/select/SelectOne";
-import { useSearchPageData } from "@knowledge/modules/search/searchPageReducer";
-import { useSearchPageActions } from "@knowledge/modules/search/SearchPageActions";
+import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
     default: "all" | "current";
+    searchDomain: string;
 }
 
 /**
  * Search filter to add into the search form.
  */
 export function ProductSearchFormFilter(props: IProps) {
+    const { searchDomain } = props;
     const { productsById } = useProducts();
-    const { form } = useSearchPageData();
-    const { updateForm } = useSearchPageActions();
+    const { updateQueryValuesForDomain, getQueryValuesForDomain } = useSearchFilters();
+    const existingValues = getQueryValuesForDomain(props.searchDomain);
 
     const currentSiteSection = getSiteSection();
     const siteSectionGroupOptions: IComboBoxOption[] = [
@@ -41,21 +42,19 @@ export function ProductSearchFormFilter(props: IProps) {
 
     const defaultSectionGroup = props.default === "all" ? siteSectionGroupOptions[0] : siteSectionGroupOptions[1];
     const placeHolderText = defaultSectionGroup.label;
-    let value = siteSectionGroupOptions.find(option => option.value === form.siteSectionGroup);
+    let value = siteSectionGroupOptions.find(option => option.value === existingValues.siteSectionGroup);
 
-    const formSectionGroup = form.siteSectionGroup;
+    const formSectionGroup = existingValues.siteSectionGroup;
     const defaultValueToSet = defaultSectionGroup.value.toString();
+
     useEffect(() => {
         // On mount be sure to set our default value into the search form if it's not set.
         if (!formSectionGroup) {
-            updateForm({ siteSectionGroup: defaultValueToSet });
+            updateQueryValuesForDomain(searchDomain, { siteSectionGroup: defaultValueToSet });
         }
-    }, [formSectionGroup, defaultValueToSet]);
-
-    useEffect(() => {
         // Always clear the form on unmount.
         return () => {
-            updateForm({ siteSectionGroup: null });
+            updateQueryValuesForDomain(searchDomain, { siteSectionGroup: null });
         };
     }, []);
 
@@ -76,11 +75,12 @@ export function ProductSearchFormFilter(props: IProps) {
             label={"Product"}
             value={value}
             placeholder={placeHolderText}
+            isClearable={false}
             onChange={value => {
                 if (!value) {
                     return;
                 }
-                updateForm({ siteSectionGroup: value.value.toString() });
+                updateQueryValuesForDomain(searchDomain, { siteSectionGroup: value.value.toString() });
             }}
         />
     );
