@@ -43,6 +43,7 @@ class ArticlePage extends KbPage {
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
+            ->validateSiteSection($article['knowledgeBaseID'])
         ;
 
         $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
@@ -58,6 +59,15 @@ class ArticlePage extends KbPage {
             ]
         ));
         $this->preloadNavigation($article['knowledgeBaseID']);
+
+        // Preload translation data as well
+        $articleID = $article['articleID'];
+        $translationResponse = $this->articlesApi->get_translations($articleID, []);
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ARTICLE_LOCALES,
+            Data::box($translationResponse),
+            ['articleID' => $articleID]
+        ));
     }
 
     /**

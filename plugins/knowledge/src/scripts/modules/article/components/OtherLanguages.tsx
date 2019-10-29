@@ -8,52 +8,83 @@ import * as React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
 import Heading from "@library/layout/Heading";
 import { t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import LanguagesDropDown, { ILanguageProps } from "@library/layout/LanguagesDropDown";
+import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
+import { IArticleLocale } from "@knowledge/@types/api/article";
+import { useUniqueID } from "@library/utility/idUtils";
+import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { AlertIcon } from "@library/icons/common";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
 
 export interface IOtherLangaugesProps {
-    id?: string;
-    selected: any;
-    children: ILanguageProps[];
+    articleLocaleData: IArticleLocale[];
+    dateUpdated?: string;
 }
 
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default class OtherLangauges extends React.Component<IOtherLangaugesProps> {
-    private id = uniqueIDFromPrefix("articleOtherLanguages");
-    private get titleID() {
-        return this.id + "-title";
-    }
 
-    public render() {
-        const classesPanelList = panelListClasses();
-        const showPicker = this.props.children && this.props.children.length > 1;
-        if (showPicker) {
-            return (
-                <PanelWidget>
-                    <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                        <Heading
-                            id={this.titleID}
-                            title={t("Other Languages")}
-                            className={classNames("panelList-title", classesPanelList.title)}
-                        />
-                        <LanguagesDropDown
-                            titleID={this.titleID}
-                            widthOfParent={true}
-                            className="otherLanguages-select"
-                            renderLeft={true}
-                            selected={this.props.selected}
-                        >
-                            {this.props.children}
-                        </LanguagesDropDown>
-                    </div>
-                </PanelWidget>
-            );
-        } else {
-            return null;
-        }
+export default function OtherLangauges(props: IOtherLangaugesProps) {
+    const id = useUniqueID("articleOtherLanguages");
+    const { currentLocale } = useLocaleInfo();
+    const classesPanelList = panelListClasses();
+
+    const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
+    if (!showPicker || !currentLocale) {
+        return null;
     }
+    let selectedIndex = 0;
+    const selectBoxItems: ISelectBoxItem[] = props.articleLocaleData.map((data, index) => {
+        const isSelected = data.locale === currentLocale;
+        if (isSelected) {
+            selectedIndex = index;
+        }
+        return {
+            selected: isSelected,
+            name: data.locale,
+            icon: data.translationStatus === "not-translated" && (
+                <ToolTip
+                    label={
+                        <Translate
+                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
+                            c0={<DateTime timestamp={props.dateUpdated} />}
+                        />
+                    }
+                    ariaLabel={"This article was editied in its source locale."}
+                >
+                    <span>
+                        <AlertIcon className={"selectBox-selectedIcon"} />
+                    </span>
+                </ToolTip>
+            ),
+            content: (
+                <>
+                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
+                </>
+            ),
+            url: data.url,
+        };
+    });
+
+    return (
+        <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+            <Heading title={t("Other Languages")} className={classNames("panelList-title", classesPanelList.title)} />
+            <LanguagesDropDown
+                titleID={id}
+                widthOfParent={true}
+                className="otherLanguages-select"
+                data={props.articleLocaleData}
+                currentLocale={currentLocale}
+                dateUpdated={props.dateUpdated}
+                selcteBoxItems={selectBoxItems}
+                selectedIndex={selectedIndex}
+            />
+        </div>
+    );
 }

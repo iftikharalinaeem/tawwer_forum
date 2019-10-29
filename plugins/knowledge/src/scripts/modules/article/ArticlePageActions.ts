@@ -63,6 +63,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             article = articleResponse.data;
         }
 
+        await this.articleActions.fetchLocales({ articleID });
         const kbID = article.knowledgeBaseID;
         await this.navigationActions.getNavigationFlat(kbID);
         return article;

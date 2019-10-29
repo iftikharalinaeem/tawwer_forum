@@ -10,21 +10,27 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { AxiosResponse } from "axios";
 import apiv2 from "@library/apiv2";
 import qs from "qs";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getSiteSection } from "@library/utility/appUtils";
 import pDebounce from "p-debounce";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { PublishStatus } from "@library/@types/api/core";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     /**
      * Simple data loading function for the search bar/react-select.
      */
     private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
+        const locale = getCurrentLocale();
+        const siteSection = getSiteSection();
+
         const queryObj: ISearchRequestBody = {
             all: value,
             statuses: [PublishStatus.PUBLISHED],
             limit: 10,
             expand: ["breadcrumbs"],
+            locale: locale,
+            siteSectionGroup: siteSection.sectionGroup,
             ...options,
         };
         const query = qs.stringify(queryObj);

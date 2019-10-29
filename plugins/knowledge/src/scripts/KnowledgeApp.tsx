@@ -19,7 +19,7 @@ import Loader from "@library/loaders/Loader";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { Router } from "@library/Router";
 import PagesContext from "@library/routing/PagesContext";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useDebugValue } from "react";
 import { hot } from "react-hot-loader";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
@@ -46,17 +46,17 @@ function KnowledgeApp() {
                 <ErrorPage error={routeState.error} />
             </BrowserRouter>
         );
-    }
-
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
+    } else if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
         content = (
             <BrowserRouter>
                 <Loader />
             </BrowserRouter>
         );
-    }
-
-    if (kbLoadable.status === LoadStatus.SUCCESS && kbLoadable.data && Object.values(kbLoadable.data).length === 0) {
+    } else if (
+        kbLoadable.status === LoadStatus.SUCCESS &&
+        kbLoadable.data &&
+        Object.values(kbLoadable.data).length === 0
+    ) {
         content = (
             <BrowserRouter>
                 <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />
@@ -92,12 +92,14 @@ function useConnect() {
     const clearError = useCallback(() => dispatch(RouteActions.resetAC), [dispatch]);
     const kbActions = useKnowledgeBaseActions();
 
-    return {
+    const result = {
         kbLoadable,
         routeState,
         clearError,
         requestKnowledgeBases: kbActions.getAll,
     };
+    useDebugValue(result);
+    return result;
 }
 
 export default hot(module)(KnowledgeApp);

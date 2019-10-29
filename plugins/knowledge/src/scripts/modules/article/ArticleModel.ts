@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocale } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -13,22 +13,26 @@ import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/mode
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 
 export interface IArticleState {
     articlesByID: {
-        [key: number]: IArticle;
+        [articleID: number]: IArticle;
     };
     articleFragmentsByID: {
-        [key: number]: IArticleFragment;
+        [articleID: number]: IArticleFragment;
+    };
+    articleLocalesByID: {
+        [articleID: number]: ILoadable<IArticleLocale[]>;
     };
     revisionsByID: {
-        [key: number]: IRevision;
+        [revisionID: number]: IRevision;
     };
     revisionFragmentsByID: {
-        [key: number]: IRevisionFragment;
+        [revisionID: number]: IRevisionFragment;
     };
     draftsByID: {
-        [key: number]: IResponseArticleDraft;
+        [draftID: number]: IResponseArticleDraft;
     };
     articleIDsWithTranslationFallback: number[];
 }
@@ -48,6 +52,21 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     public static selectArticle(state: IKnowledgeAppStoreState, articleID: number): IArticle | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.articlesByID[articleID] || null;
+    }
+
+    /**
+     * Select article locales out of the stored ones.
+     *
+     * @param state
+     * @param articleID
+     */
+    public static selectArticleLocale(state: IKnowledgeAppStoreState, articleID: number): ILoadable<IArticleLocale[]> {
+        const stateSlice = this.stateSlice(state);
+        return (
+            stateSlice.articleLocalesByID[articleID] || {
+                status: LoadStatus.PENDING,
+            }
+        );
     }
 
     /**
@@ -105,6 +124,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         revisionFragmentsByID: {},
         draftsByID: {},
         articleIDsWithTranslationFallback: [],
+        articleLocalesByID: {},
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -174,6 +194,21 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                         id => id !== articleID,
                     );
                 }
+                return nextState;
+            })
+            .case(ArticleActions.getArticleLocalesACs.started, (nextState, payload) => {
+                const existing = nextState.articleLocalesByID[payload.articleID] || {};
+                nextState.articleLocalesByID[payload.articleID] = {
+                    ...existing,
+                    status: LoadStatus.LOADING,
+                };
+                return nextState;
+            })
+            .case(ArticleActions.getArticleLocalesACs.failed, (nextState, payload) => {
+                nextState.articleLocalesByID[payload.params.articleID] = {
+                    status: LoadStatus.ERROR,
+                    error: payload.error,
+                };
                 return nextState;
             })
             .case(ArticleActions.putReactACs.done, (nextState, payload) => {

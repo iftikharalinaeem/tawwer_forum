@@ -42,6 +42,8 @@ import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
 import { LocaleDisplayer } from "@vanilla/i18n";
+import { WarningIcon } from "@library/icons/common";
+import { messagesClasses } from "@library/messages/messageStyles";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -101,6 +103,7 @@ export function EditorForm(props: IProps) {
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
+    const classesMessages = messagesClasses();
 
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
@@ -132,18 +135,19 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
-                <Translate
-                    source="This is the first time translating this article into this language. The original article content in <0 /> has been loaded."
-                    c0={
-                        <LocaleDisplayer
-                            displayLocale={props.fallbackLocale.locale}
-                            localeContent={props.fallbackLocale.locale}
-                        />
-                    }
-                />
+                <div className={classesMessages.iconWrap}>
+                    <WarningIcon className={classesMessages.messageIcon} />
+                    <div>
+                        {t(
+                            "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+                        )}
+                    </div>
+                </div>
             }
             onConfirm={props.actions.clearFallbackLocaleNotice}
-            stringContents={t("This is the first time translating content into this language")}
+            stringContents={t(
+                "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+            )}
         />
     );
 
@@ -244,7 +248,7 @@ export function EditorForm(props: IProps) {
                         >
                             <EditorEmbedBar
                                 contentRef={embedBarRef}
-                                className={classNames(classesEditorForm.embedBar, classesEditorForm.containerWidth)}
+                                className={classNames(classesEditorForm.containerWidth)}
                             />
                         </animated.div>
                         <animated.div
@@ -292,7 +296,10 @@ export function EditorForm(props: IProps) {
                     >
                         <EditorDescriptions id={domDescriptionID} />
                         <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
-                            <EditorContent placeholder={t("Type your article.")} />
+                            <EditorContent
+                                placeholderClassName={classesRichEditor.placeholder}
+                                placeholder={t("Type your article.")}
+                            />
                             <EditorInlineMenus />
                             <EditorParagraphMenu />
                         </div>

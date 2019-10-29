@@ -30,7 +30,11 @@ class HomePage extends KbPage {
      * Initialize for the URL format /kb.
      */
     public function initialize() {
-        $this->setSeoRequired(false)->setSeoTitle(\Gdn::translate('Help'));
+        $this
+            ->setSeoRequired(false)
+            ->disableSiteSectionValidation()
+            ->setSeoTitle(\Gdn::translate('Help'))
+        ;
     }
 
     /**
