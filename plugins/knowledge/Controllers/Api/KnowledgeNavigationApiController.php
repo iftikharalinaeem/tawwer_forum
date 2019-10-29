@@ -112,13 +112,15 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         if ($recordType === self::FILTER_RECORD_TYPE_ALL) {
             $catIds = array_column($categories, 'knowledgeCategoryID');
             if ($knowledgeBase["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
-                $where = array_merge($where,
+                $where = array_merge(
+                    $where,
                     [
                         'a.knowledgeCategoryID' => $catIds,
                         'a.status' => ArticleModel::STATUS_PUBLISHED
                     ]
                 );
-                $options = array_merge($options,
+                $options = array_merge(
+                    $options,
                     [
                         "limit" => false,
                         "orderFields" => 'sort',
@@ -134,7 +136,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             } else {
                 list($orderField, $orderDirection) = $this->knowledgeBaseModel->articleSortConfig($knowledgeBase["sortArticles"]);
 
-                $options = array_merge($options,
+                $options = array_merge(
+                    $options,
                     [
                         "limit" => self::HELP_CENTER_DEFAULT_ARTICLES_LIMIT,
                         "orderFields" => $orderField,
@@ -376,6 +379,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     }
 
     /**
+     * Get the query options and where clauses when Only-Translated parameters is passed.
+     *
      * @param array $query
      * @param array $knowledgeBase
      *
