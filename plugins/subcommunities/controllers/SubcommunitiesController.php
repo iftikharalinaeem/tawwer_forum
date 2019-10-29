@@ -125,16 +125,14 @@ class SubcommunitiesController extends DashboardController {
             }
 
             if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
-                $this->verifyProductExists($postData);
+                $this->siteModel->validateProduct($postData);
             }
 
-            if ($this->form->errorCount() === 0) {
-                if ($this->site) {
-                    $siteID = $this->site['SubcommunityID'];
-                    $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
-                } else {
+            if ($this->site) {
+                $siteID = $this->site['SubcommunityID'];
+                $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
+            } else {
                     $siteID = $this->siteModel->insert($postData);
-                }
             }
 
             $this->form->setValidationResults($this->siteModel->Validation->results());
@@ -333,20 +331,6 @@ class SubcommunitiesController extends DashboardController {
         }
 
         $this->render();
-    }
-    /**
-     * Check if the posted Product exists.
-     *
-     * @param array $postData
-     */
-    public function verifyProductExists(array $postData) {
-        if (isset($postData['ProductID'])) {
-            try {
-                $this->productModel->selectSingle(['productID' => $postData['ProductID']]);
-            } catch (NoResultsException $e) {
-                $this->form->addError('The specified product doesn\'t exist');
-            }
-        }
     }
 }
 
