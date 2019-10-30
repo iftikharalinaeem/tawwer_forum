@@ -12,6 +12,8 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Fixtures\KbPageFixture;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Site\SiteSectionModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\fixtures\MockSiteSection;
@@ -49,11 +51,26 @@ class KbPageTest extends AbstractAPIv2Test {
      */
     public function testGroupValidation() {
         $defaultSection = new DefaultSiteSection(new MockConfig());
-        $siteSectionProvider = new MockSiteSectionProvider($defaultSection);
-        $section1 = new MockSiteSection("section1", "en", "1", 1, "group1");
-        $section2 = new MockSiteSection("section2", "en", "2", 2, "group2");
-        $siteSectionProvider->addSiteSections([$section1, $section2]);
-        self::container()->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
+        /** @var SiteSectionProviderInterface $siteSectionProvider */
+        $siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
+
+        $section1 = new MockSiteSection(
+            "siteSectionName_en",
+            'en',
+            '/en',
+            "mockSiteSection-en",
+            "mockSiteSectionGroup-1"
+        );
+        $section2 = new MockSiteSection(
+            "ssg2_siteSectionName_en",
+            'en',
+            '/ssg2-en',
+            "ssg2-mockSiteSection-en",
+            "mockSiteSectionGroup-2"
+        );
+        //$section2 = new MockSiteSection("section2", "en", "2", 2, "group2");
+        //$siteSectionProvider->addSiteSections([$section1, $section2]);
+        //self::container()->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
 
         // Insert a knowledge base in $section1's group.
         $kb = [
@@ -65,7 +82,7 @@ class KbPageTest extends AbstractAPIv2Test {
             'sortArticles' => 'manual',
             'sourceLocale' => 'en',
             'urlCode' => 'test-knowledge-base-kb-page',
-            "siteSectionGroup" => $section1->getSectionGroup(),
+            "siteSectionGroup" => "mockSiteSectionGroup-1",
         ];
         $response = $this->api()->post('/knowledge-bases', $kb);
         $kbID = $response['knowledgeBaseID'];
@@ -73,7 +90,6 @@ class KbPageTest extends AbstractAPIv2Test {
 
         /** @var KbPageFixture $page */
         $page = self::container()->get(KbPageFixture::class);
-
         // Passthrough in correct section.
         $siteSectionProvider->setCurrentSiteSection($section1);
         $page->validateSiteSection($kbID);
@@ -84,7 +100,12 @@ class KbPageTest extends AbstractAPIv2Test {
 
         // Throw an error if the site section is incorrect
         $this->expectException(NotFoundException::class);
-        $siteSectionProvider->setCurrentSiteSection($section2);
+        /** @var SiteSectionModel $siteSectionModel */
+        $siteSectionModel = self::container()->get(SiteSectionModel::class);
+        $newSiteSectionProvider = new MockSiteSectionProvider($defaultSection);
+        $newSiteSectionProvider->addSiteSections([$section2]);
+        $newSiteSectionProvider->setCurrentSiteSection($section2);
+        $siteSectionModel->addProvider($newSiteSectionProvider);
         $page->validateSiteSection($kbID);
     }
 }

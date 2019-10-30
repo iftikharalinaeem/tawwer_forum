@@ -11,7 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -163,8 +163,8 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
-    /** @var SiteSectionProviderInterface */
-    private $siteSectionProvider;
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
 
     /**
      * DI.
@@ -176,7 +176,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -186,7 +186,7 @@ class KnowledgeApiController extends AbstractApiController {
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
         BreadcrumbModel $breadcrumbModel,
-        SiteSectionProviderInterface $siteSectionProvider
+        SiteSectionModel $siteSectionModel
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -195,7 +195,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->commentModel = $commentModel;
         $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
-        $this->siteSectionProvider = $siteSectionProvider;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -380,7 +380,7 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['locale'])) {
             $this->sphinx->setFilterString('locale', $this->query['locale']);
         } else {
-            $siteSection = $this->siteSectionProvider->getCurrentSiteSection();
+            $siteSection = $this->siteSectionModel->getCurrentSiteSection();
             $this->sphinx->setFilterString('locale', $siteSection->getContentLocale());
         }
         if (isset($this->query['siteSectionGroup'])) {
@@ -561,7 +561,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
 
             $result = [
-                "name" => (t($typeData['namePrefix']) ?? '').' '.$record['Name'],
+                "name" => t($typeData['namePrefix'] ?? '').' '.$record['Name'],
                 "body" => \Gdn_Format::excerpt($record['Body'], $record['Format']),
                 "url" => $url,
                 "insertUserID" => $record['InsertUserID'],

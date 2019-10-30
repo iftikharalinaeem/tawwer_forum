@@ -16,7 +16,6 @@ use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
-use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;

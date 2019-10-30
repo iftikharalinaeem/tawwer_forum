@@ -10,7 +10,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { AxiosResponse } from "axios";
 import apiv2 from "@library/apiv2";
 import qs from "qs";
-import { formatUrl, getSiteSection } from "@library/utility/appUtils";
+import { getSiteSection } from "@library/utility/appUtils";
 import pDebounce from "p-debounce";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { PublishStatus } from "@library/@types/api/core";

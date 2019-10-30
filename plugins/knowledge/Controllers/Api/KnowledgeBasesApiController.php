@@ -11,7 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
@@ -31,8 +31,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
-    /** @var SiteSectionProviderInterface */
-    private $siteSectionProvider;
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
 
     /**
      * KnowledgeBaseApiController constructor.
@@ -40,18 +40,18 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param KnowledgeNavigationApiController $knowledgeNavigationApi
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         KnowledgeBaseModel $knowledgeBaseModel,
         KnowledgeNavigationApiController $knowledgeNavigationApi,
         KnowledgeCategoryModel $knowledgeCategoryModel,
-        SiteSectionProviderInterface $siteSectionProvider
+        SiteSectionModel $siteSectionModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
-        $this->siteSectionProvider = $siteSectionProvider;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -156,7 +156,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param array $row
      */
     private function expandSiteSections(array &$row) {
-        $siteSections = $this->siteSectionProvider->getForSectionGroup($row['siteSectionGroup']);
+        $siteSections = $this->siteSectionModel->getForSectionGroup($row['siteSectionGroup']);
         $row['siteSections'] = $siteSections;
     }
 
@@ -170,6 +170,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema($this->knowledgeBasePostSchema())
+            ->addValidator("siteSectionGroup", [$this->knowledgeBaseModel, "validateSiteSectionGroup"])
             ->setDescription("Create a new knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in);
@@ -317,6 +318,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeBasePostSchema())
+            ->addValidator("siteSectionGroup", [$this->knowledgeBaseModel, "validateSiteSectionGroup"])
             ->setDescription("Update an existing knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in, $id);

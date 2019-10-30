@@ -6,6 +6,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Site\DefaultSiteSection;
@@ -190,6 +192,36 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test validation of siteSectionGroup field on POST endpoint
+     */
+    public function testPostSiteSectionGroupValidation() {
+        $record = $this->record();
+        $knowledgeBase = $this->api()->post($this->baseUrl, $record)->getBody();
+        $this->assertEquals($record['siteSectionGroup'], $knowledgeBase['siteSectionGroup']);
+
+        $record['siteSectionGroup'] = 'random-group-name-to-fail-validation';
+        $this->expectException(ClientException::class);
+        $knowledgeBase = $this->api()->post($this->baseUrl, $record)->getBody();
+    }
+
+    /**
+     * Test validation of siteSectionGroup field on PATCH endpoint
+     */
+    public function testPatchSiteSectionGroupValidation() {
+        $record = $this->record();
+        $knowledgeBase = $this->api()->post($this->baseUrl, $record)->getBody();
+        $this->assertEquals($record['siteSectionGroup'], $knowledgeBase['siteSectionGroup']);
+
+        $record['siteSectionGroup'] = 'mockSiteSectionGroup-1';
+        $knowledgeBase = $this->api()->patch($this->baseUrl.'/'.$knowledgeBase['knowledgeBaseID'], $record)->getBody();
+        $this->assertEquals($record['siteSectionGroup'], $knowledgeBase['siteSectionGroup']);
+
+        $record['siteSectionGroup'] = 'random-group-name-to-fail-validation';
+        $this->expectException(ClientException::class);
+        $knowledgeBase = $this->api()->patch($this->baseUrl.'/'.$knowledgeBase['knowledgeBaseID'], $record)->getBody();
+    }
+
+    /**
      * Test adding an article to a guide that has not met or exceeded the article limits.
      */
     public function testAddGuideArticleOverLimit() {
@@ -297,7 +329,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         $knowledgeBases = $knowledgeModel->get();
 
         for ($i = 0; $i <= 2; $i++) {
-            $siteSectionGroup = ($i !== 2) ? 'subcommunities-group-1' : 'subcommunities-group-2';
+            $siteSectionGroup = ($i !== 2) ? 'mockSiteSectionGroup-1' : 'mockSiteSectionGroup-2';
             $this->api()->patch(
                 $this->baseUrl.'/'.$knowledgeBases[$i]['knowledgeBaseID'],
                 ['siteSectionGroup' => $siteSectionGroup]
@@ -320,11 +352,11 @@ class KnowledgeBasesTest extends AbstractResourceTest {
      */
     public function filteringSiteSectionProvider() {
         return [
-            ['subcommunities-group-1', 2],
-            ['subcommunities-group-2', 1],
-            ['subcommunities-group-3', 0],
-            ['all', 7],
-            [null, 7],
+            ['mockSiteSectionGroup-1', 3],
+            ['mockSiteSectionGroup-2', 1],
+            ['mockSiteSectionGroup-3', 0],
+            ['all', 9],
+            [null, 9],
         ];
     }
 }

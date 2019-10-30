@@ -86,7 +86,7 @@ class ArticlePage extends KbPage {
             throw new NotFoundException('Article');
         }
 
-        $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
         $currentLocale = $currentSiteSection->getContentLocale();
         $availableTranslations = $this->articlesApi->get_translations($id, []);
 
