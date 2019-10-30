@@ -42,7 +42,7 @@ interface IEditorURLData {
 function makeEditorUrl(data?: IEditorURLData) {
     let baseUrl = "";
     const addRoot = "/kb/articles/add";
-    let articleRedirection = false;
+    let articleRedirection: boolean | undefined = undefined;
 
     if (!data) {
         return addRoot;
@@ -77,13 +77,12 @@ function makeEditorUrl(data?: IEditorURLData) {
                 }
             } else {
                 return addRoot;
-                articleRedirection = false;
             }
         }
         //baseUrl = addRoot;
     } else {
         baseUrl = `/kb/articles/${data.articleID}/editor`;
-        articleRedirection = false;
+        articleRedirection = undefined;
     }
 
     let { knowledgeCategoryID } = data;
@@ -94,10 +93,17 @@ function makeEditorUrl(data?: IEditorURLData) {
         );
         knowledgeCategoryID = undefined;
     }
-    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID, discussionID });
+    const query = qs.stringify({
+        articleRevisionID,
+        draftID,
+        knowledgeCategoryID,
+        knowledgeBaseID,
+        discussionID,
+        articleRedirection,
+    });
 
     if (query) {
-        baseUrl += `?${query}&articleRedirection=${articleRedirection}`;
+        baseUrl += `?${query}`;
     }
 
     return baseUrl;
