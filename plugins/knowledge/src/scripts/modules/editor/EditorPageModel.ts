@@ -390,7 +390,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 nextState.submit.error = action.payload;
                 break;
             // Respond to the article page get instead of the response of the patch, because the patch didn't give us all the data.
-            case ArticleActions.GET_ARTICLE_RESPONSE:
+            case ArticleActions.getArticleACs.done.type:
                 nextState.submit.status = LoadStatus.SUCCESS;
                 break;
         }

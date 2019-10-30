@@ -191,3 +191,12 @@ export interface ICommunityPost {
 export interface IGetArticleFromDiscussionResponse extends ICommunityPost {
     acceptedAnswers?: ICommunityPost[];
 }
+
+export interface IArticleTranslation {
+    articleRevisionID: number;
+    name: string;
+    url: string;
+    locale: string;
+    sourceLocale: string;
+    translationStatus: "out-of-date" | "up-to-date" | "untranslated";
+}
