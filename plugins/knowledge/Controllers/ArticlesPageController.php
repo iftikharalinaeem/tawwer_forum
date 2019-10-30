@@ -100,6 +100,7 @@ class ArticlesPageController extends PageDispatchController {
      * @return Data
      */
     public function get_aliases(string $path): Data {
+        $this->useSimplePage(''); // No title because this is either a redirect or an error.
         $article = $this->articlesApi->get_byAlias(['alias' => $path]);
 
         return (new Data('', ['status' => 301]))->setHeader('Location', $article['url']);
