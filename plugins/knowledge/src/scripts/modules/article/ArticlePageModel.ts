@@ -34,7 +34,7 @@ export const ARTICLE_PAGE_INITIAL_STATE: IArticlePageState = {
 };
 
 export const articlePageReducer = produce(
-    reducerWithInitialState(clone(ARTICLE_PAGE_INITIAL_STATE))
+    reducerWithInitialState<IArticlePageState>(clone(ARTICLE_PAGE_INITIAL_STATE))
         .case(ArticleActions.putReactACs.started, (nextState, payload) => {
             if (payload.articleID !== nextState.articleID) {
                 return nextState;
@@ -60,6 +60,25 @@ export const articlePageReducer = produce(
             nextState.reactionLoadable.error = payload.error;
             return nextState;
         })
+        .case(ArticleActions.getArticleACs.started, (nextState, payload) => {
+            if (nextState.articleID === payload.articleID) {
+                nextState.articleLoadable.status = LoadStatus.LOADING;
+            }
+            return nextState;
+        })
+        .case(ArticleActions.getArticleACs.done, (nextState, payload) => {
+            if (nextState.articleID === payload.params.articleID) {
+                nextState.articleLoadable.status = LoadStatus.SUCCESS;
+            }
+            return nextState;
+        })
+        .case(ArticleActions.getArticleACs.failed, (nextState, payload) => {
+            if (nextState.articleID === payload.params.articleID) {
+                nextState.articleLoadable.status = LoadStatus.ERROR;
+                nextState.articleLoadable.error = payload.error;
+            }
+            return nextState;
+        })
         .default((nextState, action: KNOWLEDGE_ACTION) => {
             switch (action.type) {
                 case ArticlePageActions.INIT:
@@ -71,31 +90,6 @@ export const articlePageReducer = produce(
                     break;
                 case ArticlePageActions.RESET:
                     return ARTICLE_PAGE_INITIAL_STATE;
-            }
-
-            if (
-                "meta" in action &&
-                action.meta &&
-                action.meta.articleID &&
-                nextState.articleID === action.meta.articleID
-            ) {
-                switch (action.type) {
-                    case ArticleActions.GET_ARTICLE_REQUEST:
-                        nextState.articleLoadable.status = LoadStatus.LOADING;
-                        break;
-                    case ArticleActions.GET_ARTICLE_RESPONSE:
-                        nextState.articleLoadable.status = LoadStatus.SUCCESS;
-                        break;
-                    case ArticleActions.GET_ARTICLE_ERROR:
-                        nextState.articleLoadable.status = LoadStatus.ERROR;
-                        break;
-                    case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
-                        nextState.restoreStatus = LoadStatus.LOADING;
-                        break;
-                    case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                        nextState.restoreStatus = LoadStatus.SUCCESS;
-                        break;
-                }
             }
 
             return nextState;

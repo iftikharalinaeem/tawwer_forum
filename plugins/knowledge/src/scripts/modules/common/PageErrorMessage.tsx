@@ -171,7 +171,13 @@ export function messageFromErrorCode(errorCode?: string | number) {
 }
 
 export function getErrorCode(errorMessageProps: IErrorMessageProps) {
-    return errorMessageProps.apiError ? errorMessageProps.apiError.response.status : errorMessageProps.defaultError;
+    if (errorMessageProps.apiError) {
+        return errorMessageProps.apiError.response.status;
+    } else if (errorMessageProps.error && errorMessageProps.error.status) {
+        return errorMessageProps.error.status;
+    } else {
+        return errorMessageProps.defaultError;
+    }
 }
 
 export interface IErrorMessageProps {
@@ -183,6 +189,7 @@ export interface IErrorMessageProps {
 }
 
 export interface IError {
+    status?: number;
     message: string;
     messageAsParagraph?: boolean;
     description?: ReactNode;

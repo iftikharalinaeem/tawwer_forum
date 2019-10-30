@@ -13,28 +13,28 @@ import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/mode
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { article } from "@knowledge/navigation/navigationManagerIcons";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 
 export interface IArticleState {
     articlesByID: {
-        [key: number]: IArticle;
+        [articleID: number]: IArticle;
     };
     articleFragmentsByID: {
-        [key: number]: IArticleFragment;
+        [articleID: number]: IArticleFragment;
+    };
+    articleLocalesByID: {
+        [articleID: number]: ILoadable<IArticleLocale[]>;
     };
     revisionsByID: {
-        [key: number]: IRevision;
+        [revisionID: number]: IRevision;
     };
     revisionFragmentsByID: {
-        [key: number]: IRevisionFragment;
+        [revisionID: number]: IRevisionFragment;
     };
     draftsByID: {
-        [key: number]: IResponseArticleDraft;
+        [draftID: number]: IResponseArticleDraft;
     };
-    localesByID: {
-        [key: number]: IArticleLocale;
-    };
-    articlesIDsWithTranslationFallback: number[];
+    articleIDsWithTranslationFallback: number[];
 }
 
 type ReducerType = KnowledgeReducer<IArticleState>;
@@ -52,6 +52,21 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     public static selectArticle(state: IKnowledgeAppStoreState, articleID: number): IArticle | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.articlesByID[articleID] || null;
+    }
+
+    /**
+     * Select article locales out of the stored ones.
+     *
+     * @param state
+     * @param articleID
+     */
+    public static selectArticleLocale(state: IKnowledgeAppStoreState, articleID: number): ILoadable<IArticleLocale[]> {
+        const stateSlice = this.stateSlice(state);
+        return (
+            stateSlice.articleLocalesByID[articleID] || {
+                status: LoadStatus.PENDING,
+            }
+        );
     }
 
     /**
@@ -108,8 +123,8 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         revisionsByID: {},
         revisionFragmentsByID: {},
         draftsByID: {},
-        localesByID: {},
-        articlesIDsWithTranslationFallback: [],
+        articleIDsWithTranslationFallback: [],
+        articleLocalesByID: {},
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -130,11 +145,6 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     nextState.revisionFragmentsByID = {};
                     nextState.revisionsByID = {};
                     break;
-                case ArticleActions.GET_ARTICLE_RESPONSE: {
-                    const { articleID } = action.payload.data;
-                    nextState.articlesByID[articleID] = action.payload.data;
-                    break;
-                }
                 case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                     const revisions = action.payload.data;
                     revisions.forEach(rev => {
@@ -164,28 +174,41 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     break;
                 case CategoryActions.PATCH_CATEGORY_RESPONSE:
                     return ArticleModel.INITIAL_STATE;
-
-                case ArticleActions.GET_ARTICLE_LOCALES_RESPONSE:
-                    nextState.localesByID = {};
-                    const localeData = action.payload.data || {};
-                    localeData.forEach(d => {
-                        nextState.localesByID[d.articleRevisionID] = d;
-                    });
-                    break;
             }
         });
     };
 
     public reducer = produce(
         reducerWithInitialState<IArticleState>(ArticleModel.INITIAL_STATE)
-            .case(ArticleActions.articleUsesTranslationFallbackAC, (nextState, payload) => {
-                if (payload.usesFallback && !nextState.articlesIDsWithTranslationFallback.includes(payload.articleID)) {
-                    nextState.articlesIDsWithTranslationFallback.push(payload.articleID);
-                } else if (!payload.usesFallback) {
-                    nextState.articlesIDsWithTranslationFallback = nextState.articlesIDsWithTranslationFallback.filter(
-                        id => id !== payload.articleID,
+            .case(ArticleActions.getArticleACs.done, (nextState, payload) => {
+                const { articleID } = payload.params;
+                nextState.articlesByID[articleID] = payload.result;
+
+                // If the locale does not match up to our request locale, then we are using a fallback.
+                const requestLocale = payload.params.locale;
+                const responseLocale = payload.result.locale;
+                if (requestLocale != null && requestLocale !== responseLocale) {
+                    nextState.articleIDsWithTranslationFallback.push(articleID);
+                } else {
+                    nextState.articleIDsWithTranslationFallback = nextState.articleIDsWithTranslationFallback.filter(
+                        id => id !== articleID,
                     );
                 }
+                return nextState;
+            })
+            .case(ArticleActions.getArticleLocalesACs.started, (nextState, payload) => {
+                const existing = nextState.articleLocalesByID[payload.articleID] || {};
+                nextState.articleLocalesByID[payload.articleID] = {
+                    ...existing,
+                    status: LoadStatus.LOADING,
+                };
+                return nextState;
+            })
+            .case(ArticleActions.getArticleLocalesACs.failed, (nextState, payload) => {
+                nextState.articleLocalesByID[payload.params.articleID] = {
+                    status: LoadStatus.ERROR,
+                    error: payload.error,
+                };
                 return nextState;
             })
             .case(ArticleActions.putReactACs.done, (nextState, payload) => {
