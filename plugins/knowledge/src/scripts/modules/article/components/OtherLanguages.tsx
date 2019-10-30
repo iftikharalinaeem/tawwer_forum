@@ -68,30 +68,23 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                     <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
                 </>
             ),
-            onClick: () => {
-                window.location.href = data.url;
-            },
+            url: data.url,
         };
     });
 
     return (
-        <PanelWidget>
-            <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                <Heading
-                    title={t("Other Languages")}
-                    className={classNames("panelList-title", classesPanelList.title)}
-                />
-                <LanguagesDropDown
-                    titleID={id}
-                    widthOfParent={true}
-                    className="otherLanguages-select"
-                    data={props.articleLocaleData}
-                    currentLocale={currentLocale}
-                    dateUpdated={props.dateUpdated}
-                    selcteBoxItems={selectBoxItems}
-                    selectedIndex={selectedIndex}
-                />
-            </div>
-        </PanelWidget>
+        <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+            <Heading title={t("Other Languages")} className={classNames("panelList-title", classesPanelList.title)} />
+            <LanguagesDropDown
+                titleID={id}
+                widthOfParent={true}
+                className="otherLanguages-select"
+                data={props.articleLocaleData}
+                currentLocale={currentLocale}
+                dateUpdated={props.dateUpdated}
+                selcteBoxItems={selectBoxItems}
+                selectedIndex={selectedIndex}
+            />
+        </div>
     );
 }

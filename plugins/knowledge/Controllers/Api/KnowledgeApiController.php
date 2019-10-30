@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -162,6 +163,9 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
     /**
      * DI.
      *
@@ -172,6 +176,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -180,7 +185,8 @@ class KnowledgeApiController extends AbstractApiController {
         DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        SiteSectionModel $siteSectionModel
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -189,6 +195,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->commentModel = $commentModel;
         $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -209,6 +216,8 @@ class KnowledgeApiController extends AbstractApiController {
                 "dateUpdated?" => ["type" => "datetime"],
                 "knowledgeCategoryID?" => ["type" => "integer"],
                 "status?" => ["type" => "string"],
+                "locale?" => ["type" => "string"],
+                "siteSectionGroup?" => ["type" => "string"],
                 "recordType" => [
                     "enum" => ["article", "knowledgeCategory", "discussion", "comment"],
                     "type" => "string",
@@ -236,7 +245,6 @@ class KnowledgeApiController extends AbstractApiController {
 
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
         $this->query = $in->validate($query);
-
         $searchResults = $this->sphinxSearch();
 
         $results = $this->getNormalizedData($searchResults);
@@ -369,7 +377,15 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
         }
 
-
+        if (isset($this->query['locale'])) {
+            $this->sphinx->setFilterString('locale', $this->query['locale']);
+        } else {
+            $siteSection = $this->siteSectionModel->getCurrentSiteSection();
+            $this->sphinx->setFilterString('locale', $siteSection->getContentLocale());
+        }
+        if (isset($this->query['siteSectionGroup'])) {
+            $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
+        }
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
             $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
         }
@@ -545,7 +561,7 @@ class KnowledgeApiController extends AbstractApiController {
             }
 
             $result = [
-                "name" => (t($typeData['namePrefix']) ?? '').' '.$record['Name'],
+                "name" => t($typeData['namePrefix'] ?? '').' '.$record['Name'],
                 "body" => \Gdn_Format::excerpt($record['Body'], $record['Format']),
                 "url" => $url,
                 "insertUserID" => $record['InsertUserID'],
@@ -632,6 +648,8 @@ class KnowledgeApiController extends AbstractApiController {
             "name:s?" => "Keywords to search against article name.",
             "body:s?" => "Keywords to search against article body.",
             "all:s?" => "Keywords to search against article name or body.",
+            "locale:s?" => "The locale articles are published in",
+            "siteSectionGroup:s?" => "The site-section-group articles are associated to",
             "global:b?" => "Global search flag. Default: false",
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',

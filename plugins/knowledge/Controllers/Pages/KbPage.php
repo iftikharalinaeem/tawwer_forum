@@ -8,20 +8,24 @@
 namespace Vanilla\Knowledge\Controllers\Pages;
 
 use Garden\Web\Data;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
-use \ThemesApiController;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\ThemedPage;
 use Vanilla\Contracts\Analytics\ClientInterface as AnalyticsClient;
@@ -57,10 +61,14 @@ abstract class KbPage extends ThemedPage {
     /** @var array */
     protected $knowledgeBases;
 
-    /** @var SiteSectionProviderInterface */
-    protected $siteSectionProvider;
+    /** @var SiteSectionModel */
+    protected $siteSectionModel;
 
+    /** @var KnowledgeBaseModel $kbModel */
+    protected $kbModel;
 
+    /** @var bool */
+    private $siteSectionValidated = false;
 
     /**
      * @inheritdoc
@@ -80,7 +88,8 @@ abstract class KbPage extends ThemedPage {
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
         DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
         AnalyticsClient $analyticsClient = null, // Default needed for method extensions
-        SiteSectionProviderInterface $siteSectionProvider = null // Default needed for method extensions
+        SiteSectionModel $siteSectionModel = null, // Default needed for method extensions
+        KnowledgeBaseModel $kbModel = null // Default needed for method extensions
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider);
         $this->usersApi = $usersApi;
@@ -89,7 +98,8 @@ abstract class KbPage extends ThemedPage {
         $this->categoriesApi = $categoriesApi;
         $this->deploymentCacheBuster = $deploymentCacheBuster;
         $this->analyticsClient = $analyticsClient;
-        $this->siteSectionProvider = $siteSectionProvider;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->kbModel = $kbModel;
 
         // Shared initialization.
         $this->initSharedData();
@@ -106,14 +116,72 @@ abstract class KbPage extends ThemedPage {
     }
 
     /**
+     * Override render to ensure we've validated our site section.
+     * @inheritdoc
+     */
+    public function render(): Data {
+        if ($this->siteMeta->getDebugModeEnabled() && !$this->siteSectionValidated) {
+            throw new ServerException(
+                "Site Section must be validated.",
+                500,
+                ["description" => "User either `validateSiteSection()` or `disableSiteSectionValidation()`"]
+            );
+        }
+        return parent::render();
+    }
+
+    /**
+     * Disable site section validation for the page.
+     *
+     * @return $this
+     */
+    protected function disableSiteSectionValidation(): KbPage {
+        $this->siteSectionValidated = true;
+        return $this;
+    }
+
+    /**
+     * Validate that a knowledge base has a correct site section for request.
+     *
+     * @param int $kbID The knowledge base ID to validate the current site section against.
+     *
+     * @return $this
+     */
+    protected function validateSiteSection(int $kbID): KbPage {
+        $this->siteSectionValidated = true;
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+        if ($currentSiteSection instanceof DefaultSiteSection) {
+            // Any knowledge base is allowed in the default site section to prevent broken URLs.
+            return $this;
+        }
+
+        try {
+            $knowledgeBase = $this->kbModel->selectSingle(["knowledgeBaseID" => $kbID]);
+        } catch (NoResultsException $e) {
+            // Rethrow as a more generic exception.
+            throw new NotFoundException();
+        }
+
+        if ($knowledgeBase["siteSectionGroup"] !== $currentSiteSection->getSectionGroup()) {
+            // The knowledge base doesn't exist in this site section group.
+            throw new NotFoundException();
+        }
+
+        return $this;
+    }
+
+    /**
      * Add global redux actions that apply to any /kb page.
      */
     private function initSharedData() {
         $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
-        $currentSection = $this->siteSectionProvider->getCurrentSiteSection();
-        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup(),'expand' => 'all'];
+        $currentSection = $this->siteSectionModel->getCurrentSiteSection();
+        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup(), 'expand' => 'all'];
+        if ($currentSection instanceof DefaultSiteSection) {
+            unset($kbArgs['siteSectionGroup']);
+        }
         $this->knowledgeBases = $this->kbApi->index($kbArgs);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ALL_KBS,
@@ -127,17 +195,19 @@ abstract class KbPage extends ThemedPage {
             []
         ));
 
-        $this->addReduxAction(new ReduxAction(
-            \Vanilla\Analytics\ActionConstants::GET_CONFIG,
-            new Data($this->analyticsClient->config()),
-            []
-        ));
+        if ($this->analyticsClient !== null) {
+            $this->addReduxAction(new ReduxAction(
+                \Vanilla\Analytics\ActionConstants::GET_CONFIG,
+                new Data($this->analyticsClient->config()),
+                []
+            ));
 
-        $this->addReduxAction(new ReduxAction(
-            \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
-            new Data($this->analyticsClient->eventDefaults()),
-            []
-        ));
+            $this->addReduxAction(new ReduxAction(
+                \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
+                new Data($this->analyticsClient->eventDefaults()),
+                []
+            ));
+        }
     }
 
     /**
@@ -149,7 +219,7 @@ abstract class KbPage extends ThemedPage {
         $options = [
             "knowledgeBaseID" => $knowledgeBaseID,
             "recordType" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL,
-            "locale" => $this->siteSectionProvider->getCurrentSiteSection()->getContentLocale(),
+            "locale" => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
         ];
 
 

@@ -60,7 +60,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
                 return;
             }
 
-            article = articleResponse.data;
+            article = articleResponse;
         }
 
         await this.articleActions.fetchLocales({ articleID });

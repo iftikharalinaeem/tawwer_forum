@@ -128,6 +128,10 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     private articleActions: ArticleActions = new ArticleActions(this.dispatch, this.api, this.getState);
     private locationActions: LocationPickerActions = new LocationPickerActions(this.dispatch, this.api, this.getState);
 
+    public setLocationActions(actions) {
+        this.locationActions = actions;
+    }
+
     /**
      * Initialize the add page.
      *
@@ -181,17 +185,16 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     private async initializeDraftFromUrl(history: History): Promise<boolean> {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const draftID = "draftID" in queryParams ? parseInt(queryParams.draftID, 10) : null;
-
-        let draftLoaded = false;
         if (draftID !== null) {
             this.dispatch(EditorPageActions.setInitialDraftAC(draftID));
             const draftResponse = await this.articleActions.getDraft({ draftID });
             if (draftResponse) {
                 this.pushDraftToForm(draftResponse.data);
-                draftLoaded = true;
+                return true;
             }
         }
-        return draftLoaded;
+
+        return false;
     }
 
     /**
@@ -212,26 +215,14 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     public async initializeEditPage(history: History, articleID: number) {
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
 
-        const currentLocale = getCurrentLocale();
-        const localeExists = await this.articleActions.checkArticleHasTranslation(articleID, currentLocale);
-
-        if (localeExists) {
-            if (queryParams.articleRevisionID) {
-                const revisionID = parseInt(queryParams.articleRevisionID, 10);
-                await this.fetchArticleAndRevisionForEdit(history, articleID, currentLocale, revisionID);
-            } else {
-                await this.fetchArticleForEdit(history, articleID, currentLocale);
-            }
+        if (queryParams.articleRevisionID) {
+            const revisionID = parseInt(queryParams.articleRevisionID, 10);
+            await this.fetchArticleAndRevisionForEdit(history, articleID, revisionID);
         } else {
-            await this.loadArticleTranslationFallback(history, articleID);
+            await this.fetchArticleForEdit(history, articleID);
         }
 
-        // We may have had a 404 on the article. This could be because the article doesn't exist in this locale.
-
         const initialRecord = this.getInitialRecordForEdit();
-
-        // Get our current locale & source locale to compare.
-
         if (initialRecord) {
             await this.locationActions.initLocationPickerFromRecord(initialRecord, this.getCurrentArticle());
         }
@@ -440,15 +431,13 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID({
+        const article = await this.articleActions.fetchByID({
             articleID: response.data.articleID,
             locale: currentLocale,
         });
-        if (!fullArticleResponse) {
+        if (!article) {
             return;
         }
-
-        const article = fullArticleResponse.data;
 
         // Redirect
         const editLocation = {
@@ -471,12 +460,8 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * @param articleID - The ID of the article to fetch.
      * @param forRevision - Whether or not we're fetching with a revision.
      */
-    private async fetchArticleForEdit(
-        history: History,
-        articleID: number,
-        locale?: string,
-        forRevision: boolean = false,
-    ) {
+    private async fetchArticleForEdit(history: History, articleID: number, forRevision: boolean = false) {
+        const locale = getCurrentLocale();
         // We don't have an article, but we have ID for one. Go get it.
         const [editArticleResponse, articleResponse, draftLoaded] = await Promise.all([
             this.getEditableArticleByID(articleID, locale),
@@ -488,16 +473,16 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (!editArticleResponse || !articleResponse) {
             return;
         }
-        const article: IArticle = {
-            ...articleResponse.data,
+
+        editArticleResponse.data = {
+            ...articleResponse,
             ...editArticleResponse.data,
         };
-        editArticleResponse.data = article;
 
         this.dispatch(EditorPageActions.getArticleACs.response(editArticleResponse));
 
         if (!draftLoaded && !forRevision && editArticleResponse && editArticleResponse.data) {
-            this.loadInitialFormBody(articleResponse.data, editArticleResponse.data);
+            this.loadInitialFormBody(articleResponse, editArticleResponse.data);
         }
 
         return editArticleResponse;
@@ -528,15 +513,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * Useful for restoring a revision.
      *
      * @param articleID - The ID of the article to fetch.
-     * @param locale - The locale to fetch the article for.
      * @param revision - Start from a particular revision.
      */
-    private async fetchArticleAndRevisionForEdit(
-        history: History,
-        articleID: number,
-        locale: string,
-        revisionID: number,
-    ) {
+    private async fetchArticleAndRevisionForEdit(history: History, articleID: number, revisionID: number) {
         const draftLoaded = await this.initializeDraftFromUrl(history);
         if (draftLoaded) {
             return;
@@ -544,7 +523,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
 
         this.dispatch(EditorPageActions.createSetRevision(revisionID));
         const [article, revision] = await Promise.all([
-            this.fetchArticleForEdit(history, articleID, locale, true),
+            this.fetchArticleForEdit(history, articleID, true),
             this.articleActions.fetchRevisionByID({ revisionID }),
         ]);
 
@@ -562,20 +541,20 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     /**
      * Submit the editor's form data to the API.
      */
-    private async updateArticle(article: IPatchArticleRequestBody, history: History) {
-        const response = await this.articleActions.patchArticle(article);
+    private async updateArticle(updateFields: IPatchArticleRequestBody, history: History) {
+        const response = await this.articleActions.patchArticle(updateFields);
         if (!response) {
             return;
         }
-        const fullArticleResponse = await this.articleActions.fetchByID(
+        const article = await this.articleActions.fetchByID(
             { articleID: response.data.articleID, locale: getCurrentLocale() },
             true,
         );
-        if (!fullArticleResponse) {
+        if (!article) {
             return;
         }
 
-        this.redirectToArticleUrl(history, fullArticleResponse.data.url);
+        this.redirectToArticleUrl(history, article.url);
     }
 
     private redirectToArticleUrl(history: History, url: string) {

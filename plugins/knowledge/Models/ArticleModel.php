@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * A model for managing articles.
@@ -40,14 +41,19 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var KnowledgeBaseModel */
+    private $kbModel;
+
     /**
      * ArticleModel constructor.
      *
      * @param Gdn_Session $session
+     * @param KnowledgeBaseModel $kbModel
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $kbModel) {
         parent::__construct("article");
         $this->session = $session;
+        $this->kbModel = $kbModel;
 
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -175,6 +181,38 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
     public function getWithRevision(array $where = [], array $options = []): array {
+        if (($options['only-translated'] ?? false)
+            || empty($options['arl.locale'])) {
+            $options['selectColumns'] = [
+                "a.*, c.knowledgeBaseID",
+                "ar.articleRevisionID",
+                "ar.name",
+                "ar.locale",
+                "ar.translationStatus"
+            ];
+            if ($options["includeBody"] ?? true) {
+                $options['selectColumns'][] = "ar.format";
+                $options['selectColumns'][] = "ar.body";
+                $options['selectColumns'][] = "ar.excerpt";
+                $options['selectColumns'][] = "ar.bodyRendered";
+                $options['selectColumns'][] = "ar.outline";
+            }
+        } else {
+            $options['selectColumns'] = [
+                "a.*, c.knowledgeBaseID",
+                "ar.articleRevisionID",
+                ['arl.name, ar.name', 'COALESCE', 'name'],
+                ['arl.locale, ar.locale', 'COALESCE', 'locale'],
+                "ar.translationStatus"
+            ];
+            if ($options["includeBody"] ?? true) {
+                $options['selectColumns'][] = ['arl.format, ar.format', 'COALESCE', 'format'];
+                $options['selectColumns'][] = ['arl.body, ar.body', 'COALESCE', 'body'];
+                $options['selectColumns'][] = ['arl.excerpt, ar.excerpt', 'COALESCE', 'excerpt'];
+                $options['selectColumns'][] = ['arl.bodyRendered, ar.bodyRendered', 'COALESCE', 'bodyRendered'];
+                $options['selectColumns'][] = ['arl.outline, ar.outline', 'COALESCE', 'outline'];
+            }
+        }
         $databaseOperation = new Operation();
         $databaseOperation->setType(Operation::TYPE_SELECT);
         $databaseOperation->setCaller($this);
@@ -189,26 +227,31 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $orderDirection = $options["orderDirection"] ?? "asc";
             $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
             $offset = $options["offset"] ?? 0;
-            $includeBody = $options["includeBody"] ?? true;
 
-            $sql = $this->sql()
-                ->select("a.*, c.knowledgeBaseID")
-                ->select("ar.articleRevisionID")
-                ->select("ar.name")
-                ->select("ar.locale")
-                ->select("ar.translationStatus")
-                ->from($this->getTable() . " as a")
-                ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
-                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left")
-                ->limit($limit, $offset);
-
-            if ($includeBody) {
-                $sql->select("ar.format")
-                    ->select("ar.body")
-                    ->select("ar.excerpt")
-                    ->select("ar.bodyRendered")
-                    ->select("ar.outline");
+            $sql = $this->sql();
+            foreach ($options['selectColumns'] as $selectColumn) {
+                if (is_array($selectColumn)) {
+                    $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);
+                } else {
+                    $sql->select($selectColumn);
+                }
             }
+            $sql->from($this->getTable() . " as a")
+                ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
+                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
+            if (!empty($where["kb.status"])) {
+                $sql->leftJoin('knowledgeBase kb', "c.knowledgeBaseID = kb.knowledgeBaseID");
+            }
+            if (!empty($options['arl.locale'])) {
+                $sql->leftJoin(
+                    'articleRevision arl',
+                    'arl.status = "'.self::STATUS_PUBLISHED.'" 
+                    AND ar.articleID = arl.articleID 
+                    AND arl.locale = "'.$options['arl.locale'].'" '
+                );
+            }
+            $sql->limit($limit, $offset);
+
             if ($orderFields) {
                 $sql->orderBy($orderFields, $orderDirection);
             }
@@ -262,9 +305,14 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
         if (($options['only-translated'] ?? false)
         || empty($options['arl.locale'])) {
-            $selectColumns = ['a.*, ar.name, c.knowledgeBaseID'];
+            $selectColumns = ['a.*, ar.name, ar.locale, c.knowledgeBaseID'];
         } else {
-            $selectColumns = ['a.*', ['arl.name, ar.name', 'COALESCE', 'name'], 'c.knowledgeBaseID'];
+            $selectColumns = [
+                'a.*',
+                ['arl.name, ar.name', 'COALESCE', 'name'],
+                ['arl.locale, ar.locale', 'COALESCE', 'locale'],
+                'c.knowledgeBaseID'
+            ];
         }
 
         $orderFields = $options["orderFields"] ?? "";
@@ -322,28 +370,33 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * Given a list of knowledge category IDs, get the top X articles in each.
      *
      * @param array $knowledgeCategoryIDs
-     * @param string $orderField
-     * @param string $orderDirection
-     * @param int $limit
+     * @param array $where
+     * @param array $options
+     *
+     * @return array
      */
-    public function getTopPerCategory(array $knowledgeCategoryIDs, string $orderField, string $orderDirection, int $limit): array {
+    public function getTopPerCategory(array $knowledgeCategoryIDs, array $where = [], array $options = []): array {
         $result = [];
 
         foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
-            $rows = $this->getExtended(
+            $where = array_merge(
+                $where,
                 [
                     "a.knowledgeCategoryID" => $knowledgeCategoryID,
-                    "a.status" => self::STATUS_PUBLISHED,
-                ],
-                [
-                    "limit" => $limit,
-                    "orderFields" => $orderField,
-                    "orderDirection" => $orderDirection,
+                    "a.status" => self::STATUS_PUBLISHED
                 ]
             );
+            $rows = $this->getExtended(
+                $where,
+                $options
+            );
+            if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
+                foreach ($rows as &$row) {
+                    $row['queryLocale'] = $options['queryLocale'];
+                }
+            }
             $result = array_merge($result, $rows);
         }
-
         return $result;
     }
 
@@ -362,9 +415,32 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         if (!$name || !$articleID) {
             throw new \Exception('Invalid article row.');
         }
+        if (array_key_exists("queryLocale", $article) && isset($article["queryLocale"])) {
+            $article["locale"] = ($article["queryLocale"] === $article["locale"]) ? $article["locale"] : $article["queryLocale"];
+        }
+        $slug = \Gdn_Format::url("{$articleID}-{$name}");
+        $siteSectionSlug = $this->kbModel->getSiteSectionSlug($article['knowledgeBaseID'], $article['locale']);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/articles/" . $slug);
+        return $result;
+    }
+
+    /**
+     * Generate a URL slug for an article row .
+     *
+     * @param array $article An array with just 2 filed required: name, articleID.
+     *
+     * @return string
+     * @throws \Exception If the row does not contain a valid ID or name.
+     */
+    public function getSlug(array $article): string {
+        $name = $article["name"] ?? null;
+        $articleID = $article["articleID"] ?? null;
+
+        if (!$name || !$articleID) {
+            throw new \Exception('Invalid article row.');
+        }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
-        $result = \Gdn::request()->url("/kb/articles/" . $slug, $withDomain);
-        return $result;
+        return $slug;
     }
 }

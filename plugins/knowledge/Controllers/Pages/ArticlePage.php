@@ -43,18 +43,30 @@ class ArticlePage extends KbPage {
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
+            ->validateSiteSection($article['knowledgeBaseID'])
         ;
 
+        $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $currentLocale = $currentSiteSection->getContentLocale();
+
         // Preload redux actions for faster page loads.
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_RESPONSE, Data::box($article)));
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_ARTICLE_RESPONSE,
+            Data::box(['data' => $article, 'meta']),
+            [
+                'articleID' => $article['articleID'],
+                'locale' => $currentLocale,
+            ]
+        ));
         $this->preloadNavigation($article['knowledgeBaseID']);
 
         // Preload translation data as well
         $articleID = $article['articleID'];
         $translationResponse = $this->articlesApi->get_translations($articleID, []);
         $this->addReduxAction(new ReduxAction(
-            ActionConstants::GET_ARTICLE_TRANSLATIONS_RESPONSE,
-            Data::box($translationResponse)
+            ActionConstants::GET_ARTICLE_LOCALES,
+            Data::box($translationResponse),
+            ['articleID' => $articleID]
         ));
     }
 
@@ -74,7 +86,7 @@ class ArticlePage extends KbPage {
             throw new NotFoundException('Article');
         }
 
-        $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
         $currentLocale = $currentSiteSection->getContentLocale();
         $availableTranslations = $this->articlesApi->get_translations($id, []);
 
