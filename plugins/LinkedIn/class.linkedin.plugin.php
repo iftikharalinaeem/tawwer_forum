@@ -85,11 +85,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         } else {
             trace("  GET  $url");
         }
-        try {
-            $response = CurlWrapper::curlExec($url, $ch, false);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
+        $response = CurlWrapper::curlExec($ch, false);
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
 
@@ -156,8 +152,8 @@ class LinkedInPlugin extends Gdn_Plugin {
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($c, CURLOPT_URL, $url);
-        $contents = CurlWrapper::curlExec($url, $c);
 
+        $contents = CurlWrapper::curlExec($c, false);
         $info = curl_getinfo($c);
         if (strpos(val('content_type', $info, ''), 'application/json') !== false) {
             $tokens = json_decode($contents, true);
