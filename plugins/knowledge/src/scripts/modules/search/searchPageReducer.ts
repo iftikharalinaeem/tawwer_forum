@@ -47,6 +47,7 @@ export interface ISearchFormState {
     includeDeleted: boolean;
     kb: IComboBoxOption | undefined;
     page: number;
+    siteSectionGroup: string | null;
 }
 
 export interface ISearchPageState {
@@ -67,6 +68,7 @@ export const INITIAL_SEARCH_FORM: ISearchFormState = {
     kb: undefined,
     communityCategory: undefined,
     page: 1,
+    siteSectionGroup: null,
 };
 
 export const INITIAL_SEARCH_STATE: ISearchPageState = {

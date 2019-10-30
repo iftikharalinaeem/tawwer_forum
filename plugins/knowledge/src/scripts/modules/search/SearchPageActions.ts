@@ -5,15 +5,17 @@
  */
 
 import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
-import { ISearchFormState, SearchDomain } from "@knowledge/modules/search/searchPageReducer";
+import { ISearchFormState, SearchDomain, useSearchPageData } from "@knowledge/modules/search/searchPageReducer";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import actionCreatorFactory from "typescript-fsa";
+import { getCurrentLocale } from "@vanilla/i18n";
+import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
@@ -126,6 +128,11 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
             query.knowledgeBaseID = parseInt(knowledgeBaseID, 10);
         }
 
+        if (form.siteSectionGroup && form.siteSectionGroup !== "all") {
+            // Backend doesn't actually support an all parameter. Rather, all is the default.
+            query.siteSectionGroup = form.siteSectionGroup;
+        }
+
         const requestOptions: ISearchRequestBody = {
             ...query,
             updateUserIDs: form.authors.map(author => author.value as number),
@@ -133,6 +140,7 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
             statuses,
             dateUpdated,
             expand: ["users", "breadcrumbs"],
+            locale: getCurrentLocale(),
             page,
             limit,
         };
@@ -146,5 +154,6 @@ export function useSearchPageActions() {
     const actions = useMemo(() => {
         return new SearchPageActions(dispatch, apiv2);
     }, [dispatch]);
+
     return actions;
 }

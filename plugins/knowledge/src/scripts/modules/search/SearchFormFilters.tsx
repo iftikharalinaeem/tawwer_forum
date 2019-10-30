@@ -28,6 +28,7 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { searchFormFilterClasses } from "@knowledge/modules/search/searchFormFilterStyles";
+import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
     hideTitle?: boolean;
@@ -44,6 +45,9 @@ export function SearchFormFilters(props: IProps) {
     const classes = searchFormFilterClasses();
     const classesTypography = typographyClasses();
     const classesInputBlock = inputBlockClasses();
+
+    const { getFilterComponentsForDomain } = useSearchFilters();
+
     return (
         <form
             className={classes.root}
@@ -114,6 +118,7 @@ export function SearchFormFilters(props: IProps) {
                 end={form.endDate}
                 className={classesDateRange.root}
             />
+            {getFilterComponentsForDomain(form.domain)}
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}
