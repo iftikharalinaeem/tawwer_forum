@@ -828,7 +828,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         // Get the record.
         if ($recordType && $recordID) {
-            $recordID = $this->normalizeRecordID($recordID);
+            $recordID = $this->normalizeRecordIDs($recordID);
 
             //if the user has already been warned, let the mod know and move on.
             if ($this->checkAlreadyWarned($sender, $recordID, $recordType)) {
@@ -867,7 +867,6 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         $form->setValue('Body', $warningBody);
-        $form->setFormValue('Body', $warningBody);
 
         $sender->setData('Profile', $user);
         $sender->setData('Title', sprintf(t('Warn %s'), htmlspecialchars(val('Name', $user))));
@@ -893,7 +892,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         return false;
     }
 
-    private function normalizeRecordID($recordID):array {
+    private function normalizeRecordIDs($recordID):array {
         return gettype($recordID) === 'string' ? explode(',', $recordID) : $recordID;
     }
 

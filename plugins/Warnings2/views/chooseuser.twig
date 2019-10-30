@@ -1,8 +1,10 @@
 <h2>{{ t('Choose User') }}</h2>
+{{ form.open() }}
+{{ form.errors() }}
+
 <div class="P">
     {{ t('You have selected ') }}{{ RecordType }}{{ t(' from the users:') }}
 </div>
-
 <div class="P">
     <ul class="users-list">
         {% for User in Users %}
@@ -12,3 +14,7 @@
 </div>
 <br>
 <div class="P">{{ t('Only one user can be warned at a time.') }}</div>
+<div class="Buttons Buttons-Confirm">
+    {{ form.button('Ok') }}
+</div>
+{{ form.close()}}
