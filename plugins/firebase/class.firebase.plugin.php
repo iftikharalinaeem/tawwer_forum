@@ -81,6 +81,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
+        $sender->setData('RedirectMessage', t('Connecting...'));
         include $sender->fetchViewLocation('firebase-js', '', 'plugins/firebase');
    }
 
@@ -197,7 +198,6 @@ class FireBasePlugin extends Gdn_OAuth2 {
             throw new Gdn_UserException($error);
         }
 
-        Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
 
         /* @var Gdn_Form $form */
         $form = $sender->Form; //new gdn_Form();
@@ -206,8 +206,22 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $profile = $this->translateProfileResults($rawProfile['providerData'][0]);
 
         // Once the profile data has been saved to the session, Firebase SDK will redirect the browser to the connect page.
-        Gdn::session()->stash($this->getProviderKey(), ['Profile' => $profile]);
-        return true;
+        $sessionModel = new SessionModel();
+        $expiryTime = new \DateTimeImmutable('now + 5 minutes');
+        $stashID = $sessionModel->insert(
+            [
+                'Attributes' => [
+                    'Profile' => $profile,
+                ],
+                'DateExpires' => $expiryTime->format(MYSQL_DATE_FORMAT),
+            ]
+        );
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryType(DELIVERY_TYPE_DATA);
+        $sender->setData('stashID', $stashID);
+        // Pass the stashID back to Javascript to append to the redirect to connect.
+
+        $sender->render();
     }
 
     /**
