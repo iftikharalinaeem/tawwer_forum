@@ -1,19 +1,14 @@
 <h2>{{ t('Choose User') }}</h2>
-{{ form.open() }}
-{{ form.errors() }}
-
 <div class="P">
-    {{ t('Only one user can be warned at a time. Please choose the user you wish to warn bellow:') }}
+    {{ t('You have selected ') }}{{ RecordType }}{{ t(' from the users:') }}
 </div>
 
-<div class="P ChooseUsers form-group">
-    <ul class="radio-list">
+<div class="P">
+    <ul class="users-list">
         {% for User in Users %}
-            <li>{{ form.radio('UserID', User.Name, {value: User.UserID, default: (loop.first) ? true : false }) }}</li>
+            <li><b>{{ User.Name }}</b></li>
         {% endfor %}
     </ul>
 </div>
-<div class="Buttons Buttons-Confirm">
-    {{ form.button('Save') }}
-</div>
-{{ form.close()}}
+<br>
+<div class="P">{{ t('Only one user can be warned at a time.') }}</div>

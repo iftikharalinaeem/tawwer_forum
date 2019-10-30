@@ -793,19 +793,9 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         if (count(explode(',', $userIDs)) === 1) {
-            $this->profileController_warn_create($sender, $userIDs, $recordType, $recordIDs, false);
-            //$sender->warn($sender, $userIDs, $recordType, $recordIDs, false);
+            $this->profileController_warn_create($sender, $userIDs, $recordType, $recordIDs);
         } else {
-            if ($sender->Form->authenticatedPostBack()) {
-                $userID = $sender->Form->getFormValue('UserID');    // a user has been chosen
-
-                // strip records that do not belong to the chosen user
-                $recordIDs = $this->filterRecords($recordIDs, $recordType, $userID);
-                $this->profileController_warn_create($sender, $userID, $recordType, implode(',', $recordIDs), false);
-                //$sender->warn($sender, $userID, $recordType, implode(',', $recordIDs), false);
-            } else {
-                $this->chooseUser($sender, $userIDs);   // more than one userID has been passed, prompt the user to choose one
-            }
+            $this->chooseUser($sender, $userIDs, $recordType);   // more than one userID has been passed, prompt the user to reselect records
         }
     }
 
@@ -856,7 +846,6 @@ class Warnings2Plugin extends Gdn_Plugin {
             $warningBody = $this->getWarningBody($recordID, $recordType, c('Garden.InputFormatter'));
         }
 
-        //if ($form->authenticatedPostBack() && $sender->SelfUrl !== 'profile/multiplewarnings') {
         if ($form->authenticatedPostBack()) {
             $model = new WarningModel();
             $form->setModel($model);
@@ -906,19 +895,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     private function normalizeRecordID($recordID):array {
         return gettype($recordID) === 'string' ? explode(',', $recordID) : $recordID;
-    }
-
-    private function filterRecords($recordIDs, $recordType, $userID):array {
-        $filteredRecordIDs = [];
-
-        foreach (explode(',', $recordIDs) as $recordID) {
-            $record = getRecord($recordType, $recordID);
-            if ($record['InsertUserID'] == $userID) {
-                $filteredRecordIDs[] = $recordID;
-            }
-        }
-
-        return $filteredRecordIDs;
     }
 
     private function getWarningBody($recordIDs, $recordType, $format):string {
@@ -1036,17 +1012,22 @@ EOT;
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userids='.join($authorIDs, ',').'&recordtype=Discussion&recordids='.join($discussionIDs, ','), 'Warn Popup');
     }
 
-    private function chooseUser(\ProfileController $sender, string $userIDs) {
+    private function chooseUser(\ProfileController $sender, string $userIDs, string $recordType) {
         $users = [];
 
+        //set users to view
         foreach (explode(',', $userIDs) as $userID) {
             $user = Gdn::userModel()->getID($userID);
             if (!empty($user)) {
                 $users[] = $user;
             }
         }
-
         $sender->setData('Users', $users);
+
+        // set record type to view
+        $recordType = strtolower($recordType) === 'discussion' ? t('discussions') : t('comments');
+        $sender->setData('RecordType', $recordType);
+
         $this->render('chooseuser');
     }
 
