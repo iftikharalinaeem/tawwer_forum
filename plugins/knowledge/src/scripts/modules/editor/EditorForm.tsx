@@ -8,18 +8,11 @@ import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import EditorMenu from "@knowledge/modules/editor/components/EditorMenu";
 import { editorFormClasses } from "@knowledge/modules/editor/editorFormStyles";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
-import EditorPageModel, {
-    IEditorPageForm
-} from "@knowledge/modules/editor/EditorPageModel";
+import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import {
-    useLocaleInfo,
-    LocaleDisplayer,
-    ILocale,
-    loadLocales
-} from "@vanilla/i18n";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -59,21 +52,11 @@ export function EditorForm(props: IProps) {
     const domTitleErrorsID = domTitleID + "Errors";
     const domEditorErrorID = domID + "editorError";
     const domDescriptionID = domID + "description";
-    const {
-        article,
-        draft,
-        revision,
-        form,
-        formNeedsRefresh,
-        saveDraft,
-        formErrors
-    } = props;
+    const { article, draft, revision, form, formNeedsRefresh, saveDraft, formErrors } = props;
     const classesRichEditor = richEditorClasses(false);
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
-    const isLoading = [article.status, revision.status, draft.status].includes(
-        LoadStatus.LOADING
-    );
+    const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
     const updateDraft = useDraftThrottling(props.actions.syncDraft);
 
     /**
@@ -84,7 +67,7 @@ export function EditorForm(props: IProps) {
             props.actions.updateForm(delta);
             updateDraft();
         },
-        [props.actions.updateForm, updateDraft]
+        [props.actions.updateForm, updateDraft],
     );
 
     /**
@@ -94,7 +77,7 @@ export function EditorForm(props: IProps) {
         (categoryID: number, sort?: number) => {
             handleFormChange({ knowledgeCategoryID: categoryID, sort });
         },
-        [handleFormChange]
+        [handleFormChange],
     );
 
     /**
@@ -104,7 +87,7 @@ export function EditorForm(props: IProps) {
         debounce((content: DeltaOperation[]) => {
             handleFormChange({ body: content });
         }, 1000 / 60),
-        [handleFormChange]
+        [handleFormChange],
     );
     /**
      * Change handler for the title
@@ -113,18 +96,13 @@ export function EditorForm(props: IProps) {
         (event: React.ChangeEvent<HTMLInputElement>) => {
             handleFormChange({ name: event.target.value });
         },
-        [handleFormChange]
+        [handleFormChange],
     );
 
     const categoryError = formErrors.knowledgeCategoryID;
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
-    const canSubmit =
-        !isLoading &&
-        !props.notifyConversion &&
-        !categoryError &&
-        !titleError &&
-        !bodyError;
+    const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
     const sourceLocale = useLocaleInfo();
     const classesMessages = messagesClasses();
 
@@ -137,19 +115,16 @@ export function EditorForm(props: IProps) {
             event.stopPropagation();
             void props.actions.publish(props.history);
         },
-        [props.actions.publish, props.history]
+        [props.actions.publish, props.history],
     );
 
     const { clearConversionNotice } = props.actions;
     const message = t(
-        "This text has been converted from another format. As a result you may lose some of your formatting. Do you wish to continue?"
+        "This text has been converted from another format. As a result you may lose some of your formatting. Do you wish to continue?",
     );
     const conversionNotice = props.notifyConversion && (
         <Message
-            className={classNames(
-                classesEditorForm.containerWidth,
-                classesEditorForm.conversionNotice
-            )}
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             onCancel={props.history.goBack}
             onConfirm={clearConversionNotice}
             contents={message}
@@ -157,48 +132,37 @@ export function EditorForm(props: IProps) {
         />
     );
 
-    const translationNotice = props.fallbackLocale.notify &&
-        props.fallbackLocale.locale && (
-            <Message
-                className={classNames(
-                    classesEditorForm.containerWidth,
-                    classesEditorForm.conversionNotice
-                )}
-                contents={
-                    <div className={classesMessages.iconWrap}>
-                        <WarningIcon className={classesMessages.messageIcon} />
-                        <div>
-                            {t(
-                                "This article hasn't been translated yet. The original article text has been loaded to aid translation."
-                            )}
-                        </div>
+    const translationNotice = props.fallbackLocale.notify && props.fallbackLocale.locale && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            contents={
+                <div className={classesMessages.iconWrap}>
+                    <WarningIcon className={classesMessages.messageIcon} />
+                    <div>
+                        {t(
+                            "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+                        )}
                     </div>
-                }
-                onConfirm={props.actions.clearFallbackLocaleNotice}
-                stringContents={t(
-                    "This article hasn't been translated yet. The original article text has been loaded to aid translation."
-                )}
-            />
-        );
+                </div>
+            }
+            onConfirm={props.actions.clearFallbackLocaleNotice}
+            stringContents={t(
+                "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+            )}
+        />
+    );
 
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
-            className={classNames(
-                classesEditorForm.containerWidth,
-                classesEditorForm.conversionNotice
-            )}
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
                 <div className={classesMessages.iconWrap}>
                     <WarningIcon className={classesMessages.messageIcon} />
                     <Translate source="You have been redirected to the source locale to insert the article." />
                 </div>
             }
-            onConfirm={() =>
-                props.actions.notifyRedirection({ shouldNotify: false })
-            }
-            stringContents={t(
-                "You have been redirected to the source locale to insert the article."
-            )}
+            onConfirm={() => props.actions.notifyRedirection({ shouldNotify: false })}
+            stringContents={t("You have been redirected to the source locale to insert the article.")}
         />
     );
     const contentRef = useRef<HTMLDivElement>(null);
@@ -210,10 +174,7 @@ export function EditorForm(props: IProps) {
     return (
         <TouchScrollable>
             <form
-                className={classNames(
-                    classesEditorForm.root,
-                    EDITOR_SCROLL_CONTAINER_CLASS
-                )}
+                className={classNames(classesEditorForm.root, EDITOR_SCROLL_CONTAINER_CLASS)}
                 onSubmit={onSubmit}
                 onScroll={transition.scrollHandler}
                 ref={formRef}
@@ -222,19 +183,16 @@ export function EditorForm(props: IProps) {
                 <animated.div
                     className={classesEditorForm.header}
                     style={{
-                        boxShadow: transition.headerBoxShadow
+                        boxShadow: transition.headerBoxShadow,
                     }}
                 >
                     <EditorHeader
                         canSubmit={canSubmit}
-                        isSubmitLoading={
-                            props.submit.status === LoadStatus.LOADING
-                        }
+                        isSubmitLoading={props.submit.status === LoadStatus.LOADING}
                         draft={draft}
                         useShadow={false}
                         optionsMenu={
-                            article.status === LoadStatus.SUCCESS &&
-                            article.data ? (
+                            article.status === LoadStatus.SUCCESS && article.data ? (
                                 <EditorMenu article={article.data} />
                             ) : null
                         }
@@ -255,28 +213,22 @@ export function EditorForm(props: IProps) {
                         onChange={locationPickerChangeHandler}
                         error={categoryError}
                         inputClassName={classNames({
-                            [classesEditorForm.hasError]: categoryError
+                            [classesEditorForm.hasError]: categoryError,
                         })}
                     />
                     <label>
                         <input
                             id={domTitleID}
-                            className={classNames(
-                                "inputText",
-                                classesEditorForm.title,
-                                {
-                                    [classesEditorForm.hasError]: !!titleError
-                                }
-                            )}
+                            className={classNames("inputText", classesEditorForm.title, {
+                                [classesEditorForm.hasError]: !!titleError,
+                            })}
                             type="text"
                             placeholder={t("Title")}
                             value={props.form.name || ""}
                             onChange={titleChangeHandler}
                             disabled={isLoading}
                             aria-invalid={!!titleError}
-                            aria-errormessage={
-                                titleError ? domTitleErrorsID : undefined
-                            }
+                            aria-errormessage={titleError ? domTitleErrorsID : undefined}
                         />
                         {!!titleError && (
                             <AccessibleError
@@ -302,46 +254,34 @@ export function EditorForm(props: IProps) {
                         <animated.div
                             className={classesEditorForm.embedBarTop}
                             style={{
-                                opacity: transition.headerBorderOpacity
+                                opacity: transition.headerBorderOpacity,
                             }}
                         />
                         <animated.div
                             style={{
-                                boxShadow: transition.embedBarBoxShadow
+                                boxShadow: transition.embedBarBoxShadow,
                             }}
                         >
                             <EditorEmbedBar
                                 contentRef={embedBarRef}
-                                className={classNames(
-                                    classesEditorForm.containerWidth
-                                )}
+                                className={classNames(classesEditorForm.containerWidth)}
                             />
                         </animated.div>
                         <animated.div
                             className={classesEditorForm.embedBarBottom}
                             style={{
-                                opacity: transition.embedBarBorderOpacity
+                                opacity: transition.embedBarBorderOpacity,
                             }}
                         />
                         {bodyError && (
-                            <div
-                                className={classNames(
-                                    classesEditorForm.containerWidth
-                                )}
-                            >
-                                <div
-                                    className={classesEditorForm.bodyErrorWrap}
-                                >
+                            <div className={classNames(classesEditorForm.containerWidth)}>
+                                <div className={classesEditorForm.bodyErrorWrap}>
                                     <AccessibleError
                                         id={domEditorErrorID}
                                         ariaHidden={true}
                                         error={bodyError}
-                                        className={classNames(
-                                            classesEditorForm.bodyErrorMessage
-                                        )}
-                                        paragraphClassName={
-                                            classesEditorForm.categoryErrorParagraph
-                                        }
+                                        className={classNames(classesEditorForm.bodyErrorMessage)}
+                                        paragraphClassName={classesEditorForm.categoryErrorParagraph}
                                         wrapClassName={classesUserContent.root}
                                     />
                                 </div>
@@ -360,7 +300,7 @@ export function EditorForm(props: IProps) {
                             classesEditorForm.editor(contentSize.top),
                             { [classesEditorForm.hasError]: bodyError },
                             classesRichEditor.root,
-                            classesEditorForm.containerWidth
+                            classesEditorForm.containerWidth,
                         )}
                         ref={contentRef}
                         aria-label={t("Type your message.")}
@@ -368,22 +308,13 @@ export function EditorForm(props: IProps) {
                         role="textbox"
                         aria-multiline={true}
                         id={domID}
-                        aria-errormessage={
-                            bodyError ? domEditorErrorID : undefined
-                        }
+                        aria-errormessage={bodyError ? domEditorErrorID : undefined}
                         aria-invalid={!!bodyError}
                     >
                         <EditorDescriptions id={domDescriptionID} />
-                        <div
-                            className={classNames(
-                                classesEditorForm.modernFrame,
-                                inheritHeightClass()
-                            )}
-                        >
+                        <div className={classNames(classesEditorForm.modernFrame, inheritHeightClass())}>
                             <EditorContent
-                                placeholderClassName={
-                                    classesRichEditor.placeholder
-                                }
+                                placeholderClassName={classesRichEditor.placeholder}
                                 placeholder={t("Type your article.")}
                             />
                             <EditorInlineMenus />
@@ -404,9 +335,9 @@ function useDraftThrottling(handler: () => void) {
     const throttledDraft = useCallback(
         throttle(handler, 10000, {
             leading: false,
-            trailing: true
+            trailing: true,
         }),
-        [handler]
+        [handler],
     );
     return throttledDraft;
 }
@@ -425,7 +356,7 @@ function useDraftThrottling(handler: () => void) {
  */
 function useFormScrollTransition(
     formRef: React.RefObject<HTMLFormElement>,
-    embedBarRef: React.RefObject<HTMLDivElement>
+    embedBarRef: React.RefObject<HTMLDivElement>,
 ) {
     const [scrollPos, setScrollPos] = useState(0);
 
@@ -449,19 +380,19 @@ function useFormScrollTransition(
     }
     const { y } = useSpring({
         y: Math.max(start, Math.min(end, scrollPos)),
-        tension: 100
+        tension: 100,
     });
 
     // Fades in.
     const headerBorderOpacity = y.interpolate({
         range: [start, end],
-        output: [0, 1]
+        output: [0, 1],
     });
 
     // Fades out.
     const embedBarBorderOpacity = y.interpolate({
         range: [start, end],
-        output: [1, 0]
+        output: [1, 0],
     });
 
     const transparentShadow = shadowHelper().makeShadow(0);
@@ -470,13 +401,13 @@ function useFormScrollTransition(
     // Fades out.
     const headerBoxShadow = y.interpolate({
         range: [start, end],
-        output: [fullShadow, transparentShadow]
+        output: [fullShadow, transparentShadow],
     });
 
     // Fades in.
     const embedBarBoxShadow = y.interpolate({
         range: [start, end],
-        output: [transparentShadow, fullShadow]
+        output: [transparentShadow, fullShadow],
     });
 
     return {
@@ -484,7 +415,7 @@ function useFormScrollTransition(
         headerBorderOpacity,
         headerBoxShadow,
         embedBarBorderOpacity,
-        embedBarBoxShadow
+        embedBarBoxShadow,
     };
 }
 
@@ -492,9 +423,7 @@ interface IOwnProps extends RouteComponentProps<any> {
     titleID?: string;
 }
 
-type IProps = IOwnProps &
-    ReturnType<typeof mapStateToProps> &
-    ReturnType<typeof mapDispatchToProps>;
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IKnowledgeAppStoreState) {
     const {
@@ -507,7 +436,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         notifyConversion,
         formErrors,
         fallbackLocale,
-        notifyArticleRedirection
+        notifyArticleRedirection,
     } = EditorPageModel.getStateSlice(state);
 
     return {
@@ -522,7 +451,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         notifyConversion,
         fallbackLocale,
         notifyArticleRedirection,
-        formErrors
+        formErrors,
     };
 }
 
@@ -533,7 +462,7 @@ function mapDispatchToProps(dispatch) {
 
 const withRedux = connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 );
 
 export default withRedux(withRouter(EditorForm));
