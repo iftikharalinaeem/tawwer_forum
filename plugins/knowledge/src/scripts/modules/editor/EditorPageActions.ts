@@ -162,7 +162,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                 null,
             );
         }
-        this.dispatch(EditorPageActions.notifyRedirectionAC({ shouldNotify: articleRedirection }));
+        if (articleRedirection) {
+            this.notifyRedirection({ shouldNotify: articleRedirection });
+        }
     }
 
     private async initializeDiscussionFromUrl(history: History): Promise<boolean> {
