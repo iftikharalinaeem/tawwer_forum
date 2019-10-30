@@ -11,6 +11,8 @@ import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getMeta } from "@library/utility/appUtils";
+import { ProductSearchFormFilter } from "@subcommunities/forms/ProductSeachFormFilter";
+import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
 
 const providerArgs = {
     hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
@@ -42,3 +44,12 @@ TitleBarNav.addNavItem(() => {
         </CommunityFilterContext.Provider>
     );
 });
+
+SearchFilterContextProvider.addSearchFilter(
+    "articles",
+    <ProductSearchFormFilter searchDomain="articles" default="current" />,
+);
+SearchFilterContextProvider.addSearchFilter(
+    "everywhere",
+    <ProductSearchFormFilter searchDomain="everywhere" default="all" />,
+);

@@ -42,7 +42,7 @@ const INITIAL_PRODUCTS_STATE: IProductsState = {
 };
 
 export const productsReducer = produce(
-    reducerWithInitialState(INITIAL_PRODUCTS_STATE)
+    reducerWithInitialState<IProductsState>(INITIAL_PRODUCTS_STATE)
         .case(ProductActions.getAllACs.started, state => {
             state.allProductLoadable.status = LoadStatus.LOADING;
             return state;

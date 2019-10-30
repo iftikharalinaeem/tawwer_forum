@@ -7,7 +7,7 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { t } from "@library/utility/appUtils";
 import { useProductsState } from "@subcommunities/products/productSelectors";
-import React, { Children, useState } from "react";
+import React, { useState } from "react";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { useProductActions } from "@subcommunities/products/ProductActions";
 import { LoadStatus } from "@library/@types/api/core";
