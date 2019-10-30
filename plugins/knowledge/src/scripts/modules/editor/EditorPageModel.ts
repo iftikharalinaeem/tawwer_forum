@@ -52,6 +52,7 @@ export interface IEditorPageState {
         notify: boolean;
         locale: string | null;
     };
+    notifyArticleRedirection?: boolean;
 }
 
 type ReducerType = KnowledgeReducer<IEditorPageState>;
@@ -152,6 +153,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             notify: false,
             locale: null,
         },
+        notifyArticleRedirection: false,
     };
     public initialState = EditorPageModel.INITIAL_STATE;
 
@@ -238,6 +240,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 if (typeof queuedItem === "string") {
                     // The item needs conversion.
                     nextState.notifyConversion = true;
+                    nextState.notifyArticleRedirection = true;
                 }
             });
 
@@ -250,6 +253,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         })
         .case(EditorPageActions.clearConversionNoticeAC, nextState => {
             nextState.notifyConversion = false;
+            nextState.notifyArticleRedirection = false;
             return nextState;
         });
 

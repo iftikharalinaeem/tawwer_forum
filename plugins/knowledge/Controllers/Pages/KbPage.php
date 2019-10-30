@@ -113,7 +113,7 @@ abstract class KbPage extends ThemedPage {
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
         $currentSection = $this->siteSectionProvider->getCurrentSiteSection();
-        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup()];
+        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup(),'expand' => 'all'];
         $this->knowledgeBases = $this->kbApi->index($kbArgs);
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ALL_KBS,

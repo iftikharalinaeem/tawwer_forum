@@ -133,6 +133,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         const initialCategoryID =
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
         const initialKbID = "knowledgeBaseID" ? parseInt(queryParams.knowledgeBaseID, 10) : null;
+        const articleRedirection = "articleRedirection" ? queryParams.articleRedirection : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
         if (!draftLoaded) {
             await this.initializeDiscussionFromUrl(history);
@@ -140,13 +141,13 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                 this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
             }
         }
-
         if (initialCategoryID !== null && initialKbID !== null) {
             await this.locationActions.initLocationPickerFromRecord(
                 {
                     recordType: KbRecordType.CATEGORY,
                     recordID: initialCategoryID,
                     knowledgeBaseID: initialKbID,
+                    articleRedirection: articleRedirection,
                 },
                 null,
             );
@@ -336,9 +337,17 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
-        const { form, article, draft, isDirty, notifyConversion, fallbackLocale } = state.knowledge.editorPage;
+        const {
+            form,
+            article,
+            draft,
+            isDirty,
+            notifyConversion,
+            fallbackLocale,
+            notifyArticleRedirection,
+        } = state.knowledge.editorPage;
 
-        if (!isDirty || notifyConversion || fallbackLocale.notify) {
+        if (!isDirty || notifyConversion || fallbackLocale.notify || notifyArticleRedirection) {
             return;
         }
 

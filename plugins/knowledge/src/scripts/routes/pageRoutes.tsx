@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import qs from "qs";
@@ -12,10 +12,16 @@ import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@vanilla/utils";
 import RouteHandler from "@library/routing/RouteHandler";
 import ModalLoader from "@library/modal/ModalLoader";
-import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
+import { IArticleFragment, IArticle, IArticleLocale } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import getStore from "@library/redux/getStore";
+import { t, getSiteSection, siteUrl } from "@library/utility/appUtils";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { assetUrl } from "@library/utility/appUtils";
+import { getCurrentLocale } from "@vanilla/i18n";
+import { IKnowledgeBase, IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IEditorURLData {
     articleID?: number;
@@ -34,14 +40,25 @@ interface IEditorURLData {
 function makeEditorUrl(data?: IEditorURLData) {
     let baseUrl = "";
     const addRoot = "/kb/articles/add";
+    let articleRedirection = false;
 
     if (!data) {
         return addRoot;
     }
 
     if (data.articleID === undefined) {
-        baseUrl = addRoot;
+        baseUrl = siteUrl("/food-en/kb/articles/add");
+        articleRedirection = true;
+        //baseUrl = addRoot;
     } else {
+        /* const article = getStore<IKnowledgeAppStoreState>().getState().knowledge.articles.articlesByID[data.articleID];
+        const { contentLocale, basePath } = getSiteSection();
+        if (article.locale !== contentLocale) {
+            console.log("==>", window.location.search);
+            baseUrl = siteUrl("/food-en/kb/articles/add");
+        } else {
+            baseUrl = `/kb/articles/${data.articleID}/editor`;
+        }*/
         baseUrl = `/kb/articles/${data.articleID}/editor`;
     }
 
@@ -56,7 +73,11 @@ function makeEditorUrl(data?: IEditorURLData) {
     const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID, discussionID });
 
     if (query) {
-        baseUrl += `?${query}`;
+        if (articleRedirection) {
+            baseUrl += `?${query}&articleRedirection=${articleRedirection}`;
+        } else {
+            baseUrl += `?${query}`;
+        }
     }
 
     return baseUrl;
