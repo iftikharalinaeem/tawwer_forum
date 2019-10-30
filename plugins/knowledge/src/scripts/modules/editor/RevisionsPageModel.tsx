@@ -15,6 +15,7 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import DraftsPageActions from "../drafts/DraftsPageActions";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IRevisionsPageState {
     articleID: number | null;
@@ -123,10 +124,37 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
         },
     };
 
+    public reducer = produce(
+        reducerWithInitialState<IRevisionsPageState>(RevisionsPageModel.INITIAL_STATE)
+            .case(ArticleActions.getArticleACs.started, (nextState, payload) => {
+                if (payload.articleID === nextState.articleID) {
+                    nextState.articleStatus.status = LoadStatus.LOADING;
+                }
+                return nextState;
+            })
+            .case(ArticleActions.getArticleACs.done, (nextState, payload) => {
+                if (payload.params.articleID === nextState.articleID) {
+                    nextState.articleStatus.status = LoadStatus.SUCCESS;
+                    nextState.articleStatus.error = undefined;
+                }
+                return nextState;
+            })
+            .case(ArticleActions.getArticleACs.failed, (nextState, payload) => {
+                if (payload.params.articleID === nextState.articleID) {
+                    nextState.articleStatus.status = LoadStatus.ERROR;
+                    nextState.articleStatus.error = payload.error;
+                }
+                return nextState;
+            })
+            .default((nextState, action) => {
+                return this.fallbackReducer(nextState, action);
+            }),
+    );
+
     /**
      * Reducer implementation for the revisions page resources.
      */
-    public reducer = (
+    private fallbackReducer = (
         state: IRevisionsPageState = RevisionsPageModel.INITIAL_STATE,
         action: typeof ArticleActions.ACTION_TYPES | typeof RevisionsPageActions.ACTION_TYPES,
     ): IRevisionsPageState => {
@@ -177,16 +205,6 @@ export default class RevisionsPageModel implements ReduxReducer<IRevisionsPageSt
             // Handle some revision actions if they pertain to our own article.
             if (action.meta && action.meta.articleID && draft.articleID === action.meta.articleID) {
                 switch (action.type) {
-                    case ArticleActions.GET_ARTICLE_REQUEST:
-                        draft.articleStatus.status = LoadStatus.LOADING;
-                        break;
-                    case ArticleActions.GET_ARTICLE_RESPONSE:
-                        draft.articleStatus.status = LoadStatus.SUCCESS;
-                        break;
-                    case ArticleActions.GET_ARTICLE_ERROR:
-                        draft.articleStatus.status = LoadStatus.ERROR;
-                        draft.articleStatus.error = action.payload;
-                        break;
                     case ArticleActions.GET_ARTICLE_REVISIONS_REQUEST:
                         draft.revisionsStatus.status = LoadStatus.LOADING;
                         break;
