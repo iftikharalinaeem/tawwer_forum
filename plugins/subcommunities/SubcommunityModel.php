@@ -1,5 +1,10 @@
 <?php
 
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Subcommunities\Models\ProductModel;
+use Gdn_Session;
+
 class SubcommunityModel extends Gdn_Model {
     const CACHE_KEY = 'subcommunities';
     const CACHE_KEY_DEFAULTSITE = 'subcommunities.defaultsite';
@@ -11,6 +16,9 @@ class SubcommunityModel extends Gdn_Model {
      * @var SubcommunityModel
      */
     protected static $instance;
+
+    /** @var ProductModel */
+    private $productModel;
 
     protected static $all;
 
@@ -27,8 +35,10 @@ class SubcommunityModel extends Gdn_Model {
 
     /// Methods ///
 
-    public function __construct($name = '') {
+    public function __construct(ProductModel $productModel, $name = '') {
         parent::__construct('Subcommunity');
+
+        $this->productModel = $productModel;
         $this->Validation->addRule('Folder', 'function:validate_folder');
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
     }
@@ -355,7 +365,7 @@ class SubcommunityModel extends Gdn_Model {
      */
     public static function instance() {
         if (!isset(self::$instance)) {
-            self::$instance = new SubcommunityModel();
+            self::$instance = \Gdn::getContainer()->get(\SubcommunityModel::class);
         }
         return self::$instance;
     }
@@ -398,6 +408,24 @@ class SubcommunityModel extends Gdn_Model {
         }
 
         return $this->Validation->validate($formPostValues, $insert);
+    }
+
+    /**
+     * Ensure that product has been assigned to a subcommunity.
+     *
+     * @param $formPostValues
+     */
+    public function validateProduct(array $formPostValues): void {
+        $product = $formPostValues['ProductID'] ?? null;
+        if (!$product) {
+                $this->Validation->addValidationResult('ProductID', 'A product must be assigned to a subcommunity');
+        } else {
+            try {
+                $this->productModel->selectSingle(['productID' =>$product]);
+            } catch (NoResultsException $e) {
+                $this->Validation->addValidationResult('ProductID', 'The specified product doesn\'t exist');
+            }
+        }
     }
 }
 

@@ -123,9 +123,12 @@ class SubcommunitiesController extends DashboardController {
                 $postData['IsDefault'] = null;
             }
 
+            if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
+                $this->siteModel->validateProduct($postData);
+            }
+
             if ($this->site) {
                 $siteID = $this->site['SubcommunityID'];
-
                 $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
             } else {
                 $siteID = $this->siteModel->insert($postData);
