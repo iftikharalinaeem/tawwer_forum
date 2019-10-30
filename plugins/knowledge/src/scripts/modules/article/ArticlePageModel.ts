@@ -34,7 +34,7 @@ export const ARTICLE_PAGE_INITIAL_STATE: IArticlePageState = {
 };
 
 export const articlePageReducer = produce(
-    reducerWithInitialState(clone(ARTICLE_PAGE_INITIAL_STATE))
+    reducerWithInitialState<IArticlePageState>(clone(ARTICLE_PAGE_INITIAL_STATE))
         .case(ArticleActions.putReactACs.started, (nextState, payload) => {
             if (payload.articleID !== nextState.articleID) {
                 return nextState;

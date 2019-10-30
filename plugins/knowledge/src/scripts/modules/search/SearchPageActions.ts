@@ -5,33 +5,32 @@
  */
 
 import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
-import SearchPageModel, { ISearchFormState, SearchDomain } from "@knowledge/modules/search/SearchPageModel";
+import { ISearchFormState, SearchDomain } from "@knowledge/modules/search/searchPageReducer";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { IApiError, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
-import { PublishStatus } from "@library/@types/api/core";
+import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
+import { useMemo } from "react";
+import { useDispatch } from "react-redux";
+import actionCreatorFactory from "typescript-fsa";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
 }
 
+const createAction = actionCreatorFactory("@@searchPage");
+
 /**
  * Action class for the search page/form.
  */
 export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreState> {
+    public static readonly LIMIT_DEFAULT = 10;
+
     // Action constants
     public static readonly GET_SEARCH_REQUEST = "@@searchPage/GET_SEARCH_REQUEST";
     public static readonly GET_SEARCH_RESPONSE = "@@searchPage/GET_SEARCH_RESPONSE";
     public static readonly GET_SEARCH_ERROR = "@@searchPage/GET_SEARCH_ERROR";
-    public static readonly UPDATE_FORM = "@@searchPage/UPDATE_FORM";
-
-    private static readonly LIMIT_DEFAULT = 10;
-
-    // Sum of all action types.
-    public static readonly ACTION_TYPES:
-        | ReturnType<typeof SearchPageActions.updateFormAC>
-        | ReturnType<typeof SearchPageActions.resetAC>
-        | ActionsUnion<typeof SearchPageActions.getSearchACs>;
 
     /**
      * Mapping function for react-redux.
@@ -45,41 +44,45 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
     /**
      * Action creators for search.
      */
-    private static getSearchACs = ReduxActions.generateApiActionCreators(
-        SearchPageActions.GET_SEARCH_REQUEST,
-        SearchPageActions.GET_SEARCH_RESPONSE,
-        SearchPageActions.GET_SEARCH_ERROR,
-        {} as ISearchResponseBody,
-        {} as ISearchRequestBody,
-    );
-
+    public static getSearchACs = createAction.async<
+        ISearchRequestBody,
+        { body: ISearchResponseBody; pagination: ILinkPages },
+        IApiError
+    >("GET_SEARCH");
     /**
-     * Create an action for updating the form.
-     *
-     * @param updates A partial form value.
+     * Thunk for performing a search.
      */
-    private static updateFormAC(updates: Partial<ISearchFormState>) {
-        return ReduxActions.createAction(SearchPageActions.UPDATE_FORM, { updates });
+    private getSearch(params: ISearchRequestBody) {
+        const { page, limit } = params;
+        params.page = page || 1;
+        params.limit = limit || SearchPageActions.LIMIT_DEFAULT;
+
+        const thunk = bindThunkAction(SearchPageActions.getSearchACs, async () => {
+            const response = await this.api.get("/knowledge/search", { params });
+            return {
+                body: response.data,
+                pagination: SimplePagerModel.parseLinkHeader(response.headers["link"], "page"),
+            };
+        })(params);
+
+        return this.dispatch(thunk);
     }
 
+    public static updateFormAC = createAction<Partial<ISearchFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(SearchPageActions.updateFormAC);
 
-    public static readonly RESET = "@@searchPage/RESET";
-
-    /**
-     * Reset to initial state.
-     */
-    private static resetAC() {
-        return ReduxActions.createAction(SearchPageActions.RESET);
-    }
-
+    public static resetAC = createAction("RESET");
     public reset = this.bindDispatch(SearchPageActions.resetAC);
 
     /**
      * Perform a search with the values in the form.
      */
     public search = async (page?: number, limit?: number) => {
-        const form = SearchPageModel.stateSlice(this.getState()).form;
+        const { form } = this.getState().knowledge.searchPage;
+
+        if (page == null) {
+            page = form.page;
+        }
 
         const statuses = [PublishStatus.PUBLISHED];
         if (form.includeDeleted) {
@@ -130,23 +133,18 @@ export default class SearchPageActions extends ReduxActions<IKnowledgeAppStoreSt
             statuses,
             dateUpdated,
             expand: ["users", "breadcrumbs"],
+            page,
+            limit,
         };
 
-        return await this.getSearch(requestOptions, page, limit);
+        return await this.getSearch(requestOptions);
     };
+}
 
-    /**
-     * Thunk for performing a search.
-     */
-    private getSearch(request: ISearchRequestBody, page?: number, limit?: number) {
-        request.page = page || 1;
-        request.limit = limit || SearchPageActions.LIMIT_DEFAULT;
-
-        return this.dispatchApi<ISearchResponseBody>(
-            "get",
-            "/knowledge/search",
-            SearchPageActions.getSearchACs,
-            request,
-        );
-    }
+export function useSearchPageActions() {
+    const dispatch = useDispatch();
+    const actions = useMemo(() => {
+        return new SearchPageActions(dispatch, apiv2);
+    }, [dispatch]);
+    return actions;
 }
