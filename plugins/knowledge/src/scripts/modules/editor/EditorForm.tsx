@@ -12,6 +12,7 @@ import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/Edit
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -41,7 +42,7 @@ import { useMeasure } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
-import { LocaleDisplayer } from "@vanilla/i18n";
+import getStore from "@library/redux/getStore";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -54,7 +55,6 @@ export function EditorForm(props: IProps) {
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
     const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
-
     const updateDraft = useDraftThrottling(props.actions.syncDraft);
 
     /**
@@ -101,7 +101,7 @@ export function EditorForm(props: IProps) {
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
-
+    const sourceLocale = useLocaleInfo();
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
@@ -135,10 +135,13 @@ export function EditorForm(props: IProps) {
                 <Translate
                     source="This is the first time translating this article into this language. The original article content in <0 /> has been loaded."
                     c0={
-                        <LocaleDisplayer
-                            displayLocale={props.fallbackLocale.locale}
-                            localeContent={props.fallbackLocale.locale}
-                        />
+                        <span>
+                            {" "}
+                            <LocaleDisplayer
+                                displayLocale={props.fallbackLocale.locale}
+                                localeContent={props.fallbackLocale.locale}
+                            />
+                        </span>
                     }
                 />
             }
@@ -147,6 +150,24 @@ export function EditorForm(props: IProps) {
         />
     );
 
+    const articleRedirectionNotice = props.notifyArticleRedirection && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            contents={
+                <Translate
+                    source="You have been redirected to the source locale  <0 />  to add this article."
+                    c0={
+                        <span>
+                            {" "}
+                            <LocaleDisplayer displayLocale={"en"} localeContent={"en"} />
+                        </span>
+                    }
+                />
+            }
+            onConfirm={props.actions.clearFallbackLocaleNotice}
+            stringContents={t("This is the first time translating content into this language")}
+        />
+    );
     const contentRef = useRef<HTMLDivElement>(null);
     const embedBarRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -271,6 +292,7 @@ export function EditorForm(props: IProps) {
 
                     {conversionNotice}
                     {translationNotice}
+                    {articleRedirectionNotice}
                     <div
                         className={classNames(
                             "richEditor",
@@ -409,6 +431,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         notifyConversion,
         formErrors,
         fallbackLocale,
+        notifyArticleRedirection,
     } = EditorPageModel.getStateSlice(state);
 
     return {
@@ -422,6 +445,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         editorOperationsQueue,
         notifyConversion,
         fallbackLocale,
+        notifyArticleRedirection,
         formErrors,
     };
 }

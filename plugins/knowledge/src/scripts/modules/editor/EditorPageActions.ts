@@ -31,6 +31,7 @@ import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
+import getStore from "@library/redux/getStore";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
@@ -44,6 +45,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     public static readonly RESET = "@@articleEditor/RESET";
     public static readonly RESET_ERROR = "@@articleEditor/RESET_ERROR";
     public static readonly SET_ACTIVE_REVISION = "@@articleEditor/SET_ACTIVE_REVISION";
+    public static readonly SOURCE_LOCALE_ARTICLE_REDIRECTION = "@@articleEditor/SOURCE_LOCALE_ARTICLE_REDIRECTION";
 
     /**
      * Union of all possible action types in this class.
@@ -54,6 +56,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setInitialDraftAC>
         | ReturnType<typeof EditorPageActions.createResetAction>
+        | ReturnType<typeof EditorPageActions.createArticleRedirectionAction>
         | ReturnType<typeof EditorPageActions.createResetErrorAction>;
 
     /**
@@ -73,6 +76,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     private static createResetAction() {
         return EditorPageActions.createAction(EditorPageActions.RESET, {});
+    }
+    private static createArticleRedirectionAction(articleRedirection: boolean) {
+        return EditorPageActions.createAction(EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION, {
+            articleRedirection,
+        });
     }
 
     /**
@@ -132,9 +140,10 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         const queryParams = qs.parse(history.location.search.replace(/^\?/, ""));
         const initialCategoryID =
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
-        const initialKbID = "knowledgeBaseID" ? parseInt(queryParams.knowledgeBaseID, 10) : null;
-        const articleRedirection = "articleRedirection" ? queryParams.articleRedirection : null;
+        const initialKbID = "knowledgeBaseID" in queryParams ? parseInt(queryParams.knowledgeBaseID, 10) : null;
+        const articleRedirection = "articleRedirection" in queryParams ? queryParams.articleRedirection : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
+
         if (!draftLoaded) {
             await this.initializeDiscussionFromUrl(history);
             if (initialCategoryID !== null) {
@@ -147,11 +156,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                     recordType: KbRecordType.CATEGORY,
                     recordID: initialCategoryID,
                     knowledgeBaseID: initialKbID,
-                    articleRedirection: articleRedirection,
                 },
                 null,
             );
         }
+        this.dispatch(EditorPageActions.createArticleRedirectionAction(articleRedirection));
     }
 
     private async initializeDiscussionFromUrl(history: History): Promise<boolean> {

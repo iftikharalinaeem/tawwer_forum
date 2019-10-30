@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import qs from "qs";
+import find from "lodash/find";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@vanilla/utils";
 import RouteHandler from "@library/routing/RouteHandler";
@@ -22,6 +23,7 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { assetUrl } from "@library/utility/appUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { IKnowledgeBase, IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { map } from "lodash";
 
 interface IEditorURLData {
     articleID?: number;
@@ -47,19 +49,41 @@ function makeEditorUrl(data?: IEditorURLData) {
     }
 
     if (data.articleID === undefined) {
-        baseUrl = siteUrl("/food-en/kb/articles/add");
-        articleRedirection = true;
+        if (data.knowledgeBaseID == null) {
+            return addRoot;
+        } else {
+            const kbsByID = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID;
+
+            if (!kbsByID.data) {
+                return addRoot;
+            }
+
+            const kb = kbsByID.data[data.knowledgeBaseID];
+            if (!kb) {
+                logWarning(
+                    "Attempting to generate an editor URL for a knowledge base ID that doesn't exist",
+                    data.knowledgeBaseID,
+                );
+                return addRoot;
+            }
+            const product = kb.siteSections.find(o => o.contentLocale === kb.sourceLocale) || null;
+            const locale = getCurrentLocale();
+            if (kb.sourceLocale !== locale) {
+                if (!product) {
+                    return addRoot;
+                } else {
+                    baseUrl = siteUrl(`${product.basePath}/kb/articles/add`);
+                    articleRedirection = true;
+                }
+            } else {
+                return addRoot;
+                articleRedirection = false;
+            }
+        }
         //baseUrl = addRoot;
     } else {
-        /* const article = getStore<IKnowledgeAppStoreState>().getState().knowledge.articles.articlesByID[data.articleID];
-        const { contentLocale, basePath } = getSiteSection();
-        if (article.locale !== contentLocale) {
-            console.log("==>", window.location.search);
-            baseUrl = siteUrl("/food-en/kb/articles/add");
-        } else {
-            baseUrl = `/kb/articles/${data.articleID}/editor`;
-        }*/
         baseUrl = `/kb/articles/${data.articleID}/editor`;
+        articleRedirection = false;
     }
 
     let { knowledgeCategoryID } = data;
@@ -73,11 +97,7 @@ function makeEditorUrl(data?: IEditorURLData) {
     const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID, discussionID });
 
     if (query) {
-        if (articleRedirection) {
-            baseUrl += `?${query}&articleRedirection=${articleRedirection}`;
-        } else {
-            baseUrl += `?${query}`;
-        }
+        baseUrl += `?${query}&articleRedirection=${articleRedirection}`;
     }
 
     return baseUrl;

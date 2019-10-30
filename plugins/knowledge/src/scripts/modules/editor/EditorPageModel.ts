@@ -171,6 +171,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceEditorQueue,
                 this.reduceErrors,
                 this.reduceTranslation,
+                //this.reduceArticleRedirection,
             )(nextState, action);
         });
     };
@@ -182,6 +183,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         switch (action.type) {
             case EditorPageActions.UPDATE_FORM:
                 // Check for changed values.
+
                 const hasChange = (): boolean => {
                     if (action.payload.forceRefresh) {
                         return true;
@@ -217,6 +219,9 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;
+            case EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION:
+                nextState.notifyArticleRedirection = action.payload.articleRedirection;
+                break;
         }
 
         return nextState;
@@ -328,7 +333,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         }
         return nextState;
     };
-
+    /*private reduceArticleRedirection: ReducerType = (nextState = this.initialState, action) => {
+        if (EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION) {
+            return nextState;
+        }
+    };*/
     private reduceRevision: ReducerType = (nextState = this.initialState, action) => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_ACTIVE_REVISION) {
