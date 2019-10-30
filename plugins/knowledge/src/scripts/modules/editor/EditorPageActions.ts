@@ -31,10 +31,16 @@ import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import qs from "qs";
 import actionCreatorFactory from "typescript-fsa";
+import getStore from "@library/redux/getStore";
 
 const createAction = actionCreatorFactory("@@articleEditor");
 
 export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreState> {
+    // FSA actions
+
+    public static notifyRedirectionAC = createAction<{ shouldNotify: boolean }>("NOTIFY_REDIRECTION");
+    public notifyRedirection = this.bindDispatch(EditorPageActions.notifyRedirectionAC);
+
     // API actions
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
@@ -137,14 +143,15 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         const initialCategoryID =
             "knowledgeCategoryID" in queryParams ? parseInt(queryParams.knowledgeCategoryID, 10) : null;
         const initialKbID = "knowledgeBaseID" in queryParams ? parseInt(queryParams.knowledgeBaseID, 10) : null;
+        const articleRedirection = "articleRedirection" in queryParams ? queryParams.articleRedirection : null;
         const draftLoaded = await this.initializeDraftFromUrl(history);
+
         if (!draftLoaded) {
             await this.initializeDiscussionFromUrl(history);
             if (initialCategoryID !== null) {
                 this.updateForm({ knowledgeCategoryID: initialCategoryID }, true);
             }
         }
-
         if (initialCategoryID !== null && initialKbID !== null) {
             await this.locationActions.initLocationPickerFromRecord(
                 {
@@ -154,6 +161,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                 },
                 null,
             );
+        }
+        if (articleRedirection) {
+            this.notifyRedirection({ shouldNotify: articleRedirection });
         }
     }
 
@@ -327,9 +337,17 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public syncDraft = async (newDraftID: string = uniqueId()) => {
         const state = this.getState();
-        const { form, article, draft, isDirty, notifyConversion, fallbackLocale } = state.knowledge.editorPage;
+        const {
+            form,
+            article,
+            draft,
+            isDirty,
+            notifyConversion,
+            fallbackLocale,
+            notifyArticleRedirection,
+        } = state.knowledge.editorPage;
 
-        if (!isDirty || notifyConversion || fallbackLocale.notify) {
+        if (!isDirty || notifyConversion || fallbackLocale.notify || notifyArticleRedirection) {
             return;
         }
 

@@ -52,6 +52,7 @@ export interface IEditorPageState {
         notify: boolean;
         locale: string | null;
     };
+    notifyArticleRedirection?: boolean;
 }
 
 type ReducerType = KnowledgeReducer<IEditorPageState>;
@@ -152,6 +153,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             notify: false,
             locale: null,
         },
+        notifyArticleRedirection: false,
     };
     public initialState = EditorPageModel.INITIAL_STATE;
 
@@ -168,7 +170,8 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceArticle,
                 this.reduceEditorQueue,
                 this.reduceErrors,
-                this.reduceTranslation,
+                this.reduceNotifications,
+                //this.reduceArticleRedirection,
             )(nextState, action);
         });
     };
@@ -180,6 +183,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         switch (action.type) {
             case EditorPageActions.UPDATE_FORM:
                 // Check for changed values.
+
                 const hasChange = (): boolean => {
                     if (action.payload.forceRefresh) {
                         return true;
@@ -220,7 +224,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         return nextState;
     };
 
-    private reduceTranslation = reducerWithoutInitialState<IEditorPageState>()
+    private reduceNotifications = reducerWithoutInitialState<IEditorPageState>()
+        .case(EditorPageActions.notifyRedirectionAC, (nextState, payload) => {
+            nextState.notifyArticleRedirection = payload.shouldNotify;
+            return nextState;
+        })
         .case(EditorPageActions.setFallbackLocaleAC, (nextState, payload) => {
             nextState.fallbackLocale.notify = true;
             nextState.fallbackLocale.locale = payload;
@@ -238,6 +246,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 if (typeof queuedItem === "string") {
                     // The item needs conversion.
                     nextState.notifyConversion = true;
+                    nextState.notifyArticleRedirection = true;
                 }
             });
 
@@ -250,6 +259,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         })
         .case(EditorPageActions.clearConversionNoticeAC, nextState => {
             nextState.notifyConversion = false;
+            nextState.notifyArticleRedirection = false;
             return nextState;
         });
 
@@ -324,7 +334,11 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
         }
         return nextState;
     };
-
+    /*private reduceArticleRedirection: ReducerType = (nextState = this.initialState, action) => {
+        if (EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION) {
+            return nextState;
+        }
+    };*/
     private reduceRevision: ReducerType = (nextState = this.initialState, action) => {
         // Simple setter.
         if (action.type === EditorPageActions.SET_ACTIVE_REVISION) {

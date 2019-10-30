@@ -12,6 +12,7 @@ import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/Edit
 import LocationInput from "@knowledge/modules/locationPicker/LocationInput";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
+import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
 import AccessibleError from "@library/forms/AccessibleError";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -41,7 +42,7 @@ import { useMeasure } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
-import { LocaleDisplayer } from "@vanilla/i18n";
+import getStore from "@library/redux/getStore";
 import { WarningIcon } from "@library/icons/common";
 import { messagesClasses } from "@library/messages/messageStyles";
 
@@ -56,7 +57,6 @@ export function EditorForm(props: IProps) {
     const classesEditorForm = editorFormClasses();
     const classesUserContent = userContentClasses();
     const isLoading = [article.status, revision.status, draft.status].includes(LoadStatus.LOADING);
-
     const updateDraft = useDraftThrottling(props.actions.syncDraft);
 
     /**
@@ -103,6 +103,7 @@ export function EditorForm(props: IProps) {
     const titleError = formErrors.name || false;
     const bodyError = formErrors.body;
     const canSubmit = !isLoading && !props.notifyConversion && !categoryError && !titleError && !bodyError;
+    const sourceLocale = useLocaleInfo();
     const classesMessages = messagesClasses();
 
     /**
@@ -151,6 +152,19 @@ export function EditorForm(props: IProps) {
         />
     );
 
+    const articleRedirectionNotice = props.notifyArticleRedirection && (
+        <Message
+            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            contents={
+                <div className={classesMessages.iconWrap}>
+                    <WarningIcon className={classesMessages.messageIcon} />
+                    <Translate source="You have been redirected to the source locale to insert the article." />
+                </div>
+            }
+            onConfirm={() => props.actions.notifyRedirection({ shouldNotify: false })}
+            stringContents={t("You have been redirected to the source locale to insert the article.")}
+        />
+    );
     const contentRef = useRef<HTMLDivElement>(null);
     const embedBarRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -198,7 +212,9 @@ export function EditorForm(props: IProps) {
                         disabled={isLoading}
                         onChange={locationPickerChangeHandler}
                         error={categoryError}
-                        inputClassName={classNames({ [classesEditorForm.hasError]: categoryError })}
+                        inputClassName={classNames({
+                            [classesEditorForm.hasError]: categoryError,
+                        })}
                     />
                     <label>
                         <input
@@ -275,6 +291,7 @@ export function EditorForm(props: IProps) {
 
                     {conversionNotice}
                     {translationNotice}
+                    {articleRedirectionNotice}
                     <div
                         className={classNames(
                             "richEditor",
@@ -361,7 +378,10 @@ function useFormScrollTransition(
         start = rect.top / 2;
         end = rect.top + rect.height * 2;
     }
-    const { y } = useSpring({ y: Math.max(start, Math.min(end, scrollPos)), tension: 100 });
+    const { y } = useSpring({
+        y: Math.max(start, Math.min(end, scrollPos)),
+        tension: 100,
+    });
 
     // Fades in.
     const headerBorderOpacity = y.interpolate({
@@ -416,6 +436,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         notifyConversion,
         formErrors,
         fallbackLocale,
+        notifyArticleRedirection,
     } = EditorPageModel.getStateSlice(state);
 
     return {
@@ -429,6 +450,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState) {
         editorOperationsQueue,
         notifyConversion,
         fallbackLocale,
+        notifyArticleRedirection,
         formErrors,
     };
 }

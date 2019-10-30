@@ -204,6 +204,13 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                 };
                 return nextState;
             })
+            .case(ArticleActions.getArticleLocalesACs.done, (nextState, payload) => {
+                nextState.articleLocalesByID[payload.params.articleID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: payload.result,
+                };
+                return nextState;
+            })
             .case(ArticleActions.getArticleLocalesACs.failed, (nextState, payload) => {
                 nextState.articleLocalesByID[payload.params.articleID] = {
                     status: LoadStatus.ERROR,

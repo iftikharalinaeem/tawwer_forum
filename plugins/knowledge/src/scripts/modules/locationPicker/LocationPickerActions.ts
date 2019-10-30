@@ -90,7 +90,7 @@ export default class LocationPickerActions extends ReduxActions<IKnowledgeAppSto
     public initLocationPickerFromRecord = async (record: ILocationPickerRecord, article: IArticle | null) => {
         if (record) {
             const { knowledgeBases, navigation } = this.getState().knowledge;
-            const { recordID, recordType, knowledgeBaseID } = record;
+            const { recordID, recordType, knowledgeBaseID, articleRedirection } = record;
 
             if (
                 !navigation.fetchStatusesByKbID[knowledgeBaseID] ||

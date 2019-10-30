@@ -19,8 +19,8 @@ abstract class ActionConstants {
 
     // Article page
     const GET_ARTICLE_LOCALES = "@@article/GET_LOCALES_DONE";
-    const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
-    const GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_ERROR";
+    const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_DONE";
+    const GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_FAILED";
 
     // Editor
     const GET_EDITOR_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";

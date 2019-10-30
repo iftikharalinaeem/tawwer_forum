@@ -56,6 +56,7 @@ export class EditorPage extends React.Component<IProps> {
      */
     public componentDidMount() {
         const { article, requestData } = this.props;
+
         if (article.status === LoadStatus.PENDING) {
             requestData();
         }

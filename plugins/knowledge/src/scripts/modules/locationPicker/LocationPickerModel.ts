@@ -143,6 +143,7 @@ export interface ILocationPickerRecord {
     recordID: number;
     knowledgeBaseID: number;
     position?: number;
+    articleRedirection?: boolean;
 }
 
 export interface ILocationPickerState {

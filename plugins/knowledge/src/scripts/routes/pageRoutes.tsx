@@ -4,18 +4,26 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import qs from "qs";
+import find from "lodash/find";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@vanilla/utils";
 import RouteHandler from "@library/routing/RouteHandler";
 import ModalLoader from "@library/modal/ModalLoader";
-import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
+import { IArticleFragment, IArticle, IArticleLocale } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import getStore from "@library/redux/getStore";
+import { t, getSiteSection, siteUrl } from "@library/utility/appUtils";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { assetUrl } from "@library/utility/appUtils";
+import { getCurrentLocale } from "@vanilla/i18n";
+import { IKnowledgeBase, IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { map } from "lodash";
 
 interface IEditorURLData {
     articleID?: number;
@@ -34,15 +42,47 @@ interface IEditorURLData {
 function makeEditorUrl(data?: IEditorURLData) {
     let baseUrl = "";
     const addRoot = "/kb/articles/add";
+    let articleRedirection: boolean | undefined = undefined;
 
     if (!data) {
         return addRoot;
     }
 
     if (data.articleID === undefined) {
-        baseUrl = addRoot;
+        if (data.knowledgeBaseID == null) {
+            return addRoot;
+        } else {
+            const kbsByID = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID;
+
+            if (!kbsByID.data) {
+                return addRoot;
+            }
+
+            const kb = kbsByID.data[data.knowledgeBaseID];
+            if (!kb) {
+                logWarning(
+                    "Attempting to generate an editor URL for a knowledge base ID that doesn't exist",
+                    data.knowledgeBaseID,
+                );
+                return addRoot;
+            }
+            const product = kb.siteSections.find(o => o.contentLocale === kb.sourceLocale) || null;
+            const locale = getCurrentLocale();
+            if (kb.sourceLocale !== locale) {
+                if (!product) {
+                    return addRoot;
+                } else {
+                    baseUrl = siteUrl(`${product.basePath}/kb/articles/add`);
+                    articleRedirection = true;
+                }
+            } else {
+                return addRoot;
+            }
+        }
+        //baseUrl = addRoot;
     } else {
         baseUrl = `/kb/articles/${data.articleID}/editor`;
+        articleRedirection = undefined;
     }
 
     let { knowledgeCategoryID } = data;
@@ -53,7 +93,14 @@ function makeEditorUrl(data?: IEditorURLData) {
         );
         knowledgeCategoryID = undefined;
     }
-    const query = qs.stringify({ articleRevisionID, draftID, knowledgeCategoryID, knowledgeBaseID, discussionID });
+    const query = qs.stringify({
+        articleRevisionID,
+        draftID,
+        knowledgeCategoryID,
+        knowledgeBaseID,
+        discussionID,
+        articleRedirection,
+    });
 
     if (query) {
         baseUrl += `?${query}`;
