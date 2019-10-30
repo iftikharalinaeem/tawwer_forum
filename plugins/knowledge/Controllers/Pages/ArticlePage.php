@@ -46,13 +46,13 @@ class ArticlePage extends KbPage {
             ->validateSiteSection($article['knowledgeBaseID'])
         ;
 
-        $currentSiteSection = $this->siteSectionProvider->getCurrentSiteSection();
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
         $currentLocale = $currentSiteSection->getContentLocale();
 
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_RESPONSE,
-            Data::box(['data' => $article, 'meta']),
+            Data::box($article),
             [
                 'articleID' => $article['articleID'],
                 'locale' => $currentLocale,
