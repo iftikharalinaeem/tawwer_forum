@@ -36,6 +36,11 @@ import getStore from "@library/redux/getStore";
 const createAction = actionCreatorFactory("@@articleEditor");
 
 export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreState> {
+    // FSA actions
+
+    public static notifyRedirectionAC = createAction<{ shouldNotify: boolean }>("NOTIFY_REDIRECTION");
+    public notifyRedirection = this.bindDispatch(EditorPageActions.notifyRedirectionAC);
+
     // API actions
     public static readonly GET_ARTICLE_REQUEST = "@@articleEditor/GET_EDIT_ARTICLE_REQUEST";
     public static readonly GET_ARTICLE_RESPONSE = "@@articleEditor/GET_EDIT_ARTICLE_RESPONSE";
@@ -45,7 +50,6 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
     public static readonly RESET = "@@articleEditor/RESET";
     public static readonly RESET_ERROR = "@@articleEditor/RESET_ERROR";
     public static readonly SET_ACTIVE_REVISION = "@@articleEditor/SET_ACTIVE_REVISION";
-    public static readonly SOURCE_LOCALE_ARTICLE_REDIRECTION = "@@articleEditor/SOURCE_LOCALE_ARTICLE_REDIRECTION";
 
     /**
      * Union of all possible action types in this class.
@@ -56,7 +60,6 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         | ReturnType<typeof EditorPageActions.updateFormAC>
         | ReturnType<typeof EditorPageActions.setInitialDraftAC>
         | ReturnType<typeof EditorPageActions.createResetAction>
-        | ReturnType<typeof EditorPageActions.createArticleRedirectionAction>
         | ReturnType<typeof EditorPageActions.createResetErrorAction>;
 
     /**
@@ -76,11 +79,6 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     private static createResetAction() {
         return EditorPageActions.createAction(EditorPageActions.RESET, {});
-    }
-    private static createArticleRedirectionAction(articleRedirection: boolean) {
-        return EditorPageActions.createAction(EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION, {
-            articleRedirection,
-        });
     }
 
     /**
@@ -164,7 +162,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                 null,
             );
         }
-        this.dispatch(EditorPageActions.createArticleRedirectionAction(articleRedirection));
+        this.dispatch(EditorPageActions.notifyRedirectionAC({ shouldNotify: articleRedirection }));
     }
 
     private async initializeDiscussionFromUrl(history: History): Promise<boolean> {

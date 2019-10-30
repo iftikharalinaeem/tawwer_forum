@@ -170,7 +170,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 this.reduceArticle,
                 this.reduceEditorQueue,
                 this.reduceErrors,
-                this.reduceTranslation,
+                this.reduceNotifications,
                 //this.reduceArticleRedirection,
             )(nextState, action);
         });
@@ -219,15 +219,16 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
                 break;
             case EditorPageActions.RESET:
                 return this.initialState;
-            case EditorPageActions.SOURCE_LOCALE_ARTICLE_REDIRECTION:
-                nextState.notifyArticleRedirection = action.payload.articleRedirection;
-                break;
         }
 
         return nextState;
     };
 
-    private reduceTranslation = reducerWithoutInitialState<IEditorPageState>()
+    private reduceNotifications = reducerWithoutInitialState<IEditorPageState>()
+        .case(EditorPageActions.notifyRedirectionAC, (nextState, payload) => {
+            nextState.notifyArticleRedirection = payload.shouldNotify;
+            return nextState;
+        })
         .case(EditorPageActions.setFallbackLocaleAC, (nextState, payload) => {
             nextState.fallbackLocale.notify = true;
             nextState.fallbackLocale.locale = payload;
