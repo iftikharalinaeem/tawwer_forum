@@ -80,6 +80,15 @@ export interface IArticleFragment {
     excerpt?: string; // Excerpt of the article's content.
 }
 
+export interface IArticleLocale {
+    articleRevisionID: number;
+    locale: string;
+    name: string;
+    translationStatus: string;
+    url: string;
+    lang: string;
+}
+
 // Request/Response interfaces
 
 // POST /articles
@@ -100,6 +109,12 @@ export interface IGetArticleRequestBody {
     locale?: string;
 }
 export interface IGetArticleResponseBody extends IArticle {}
+
+// GET /articles/:id/translations
+export interface IGetArticleLocalesRequestBody {
+    articleID: number;
+}
+export type IGetArticleLocalesResponseBody = IArticleLocale[];
 
 // PATCH /articles/:id/status
 export interface IPatchArticleStatusRequestBody {

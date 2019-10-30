@@ -10,11 +10,10 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
-use Vanilla\Contracts\Site\SiteSectionInterface;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * A model for managing knowledge bases.
@@ -43,19 +42,19 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
-    /** @var SiteSectionProviderInterface */
-    private $siteSectionProvider;
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
 
     /**
      * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
-     * @param SiteSectionProviderInterface $siteSectionProvider
+     * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(Gdn_Session $session, SiteSectionProviderInterface $siteSectionProvider) {
+    public function __construct(Gdn_Session $session, SiteSectionModel $siteSectionModel) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
-        $this->siteSectionProvider = $siteSectionProvider;
+        $this->siteSectionModel = $siteSectionModel;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -304,7 +303,7 @@ MESSAGE
      */
     public function getLocales(string $siteSectionGroup): array {
         $locales = [];
-        foreach ($this->siteSectionProvider->getAll() as $siteSection) {
+        foreach ($this->siteSectionModel->getAll() as $siteSection) {
             if ($siteSection->getSectionGroup() === $siteSectionGroup) {
                 $locales[] = ['locale' => $siteSection->getContentLocale(), 'slug' => $siteSection->getBasePath()];
             }
@@ -473,7 +472,7 @@ MESSAGE
     public function getSiteSectionSlug(int $knowledgeBaseID, string $locale): string {
         $slug = '';
         $knowledgeBase = $this->selectSingle(['knowledgeBaseID' => $knowledgeBaseID]);
-        $siteSections = $this->siteSectionProvider->getForSectionGroup($knowledgeBase['siteSectionGroup']);
+        $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
         foreach ($siteSections as $siteSection) {
             if ($siteSection->getContentLocale() === $locale) {
                 $slug = $siteSection->getBasePath();
@@ -481,5 +480,24 @@ MESSAGE
             }
         }
         return $slug;
+    }
+
+    /**
+     * Validator for siteSectionGroup field
+     *
+     * @param string $siteSectionGroup
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public function validateSiteSectionGroup(string $siteSectionGroup, \Garden\Schema\ValidationField $validationField): bool {
+        $siteSections = $this->siteSectionModel->getForSectionGroup($siteSectionGroup);
+        $valid = !empty($siteSections);
+        if (!$valid) {
+            $validationField->getValidation()->addError(
+                $validationField->getName(),
+                "Invalid site section group ".$siteSectionGroup.'. Or group has no sections yet. '
+            );
+        }
+        return $valid;
     }
 }

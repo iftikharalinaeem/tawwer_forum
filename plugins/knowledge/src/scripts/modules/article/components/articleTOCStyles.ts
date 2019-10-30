@@ -4,11 +4,8 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
+import { colorOut, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { GlobalsNumber } from "csstype";
-import { important, percent, px, ColorHelper, em } from "csx";
-import { setAllLinkColors } from "@library/styles/styleHelpers";
 
 export const articleTOCClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");

@@ -1347,31 +1347,38 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
 
         foreach ($allLocales as $locale) {
-            $current = [
-                "articleRevisionID" => -1,
-                "name" => '',
-                "url" => '',
-                "locale" => $locale["locale"],
-                "sourceLocale" => $knowledgeBase["sourceLocale"],
-                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
-            ];
+            $matchingArticleTranslation = null;
             foreach ($article as $translation) {
                 if ($translation['locale'] === $locale['locale']) {
-                    $slug = \Gdn_Format::url("{$translation['articleID']}-{$translation["name"]}");
-                    $url = \Gdn::request()->url($locale['slug'] . "kb/articles/" . $slug, true);
-
-                    $current = [
-                        "articleRevisionID" => $translation["articleRevisionID"],
-                        "name" => $translation["name"],
-                        "url" => $url,
-                        "locale" => $translation["locale"],
-                        "sourceLocale" => $knowledgeBase["sourceLocale"],
-                        "translationStatus" => $translation["translationStatus"],
-                    ];
+                    $matchingArticleTranslation = $translation;
                     break;
                 }
             }
-            $result[] = $current;
+
+            if ($matchingArticleTranslation) {
+                $translation['queryLocale'] = $locale['locale'];
+                $url = $this->articleModel->url($translation);
+
+                $result[] = [
+                    "articleRevisionID" => $translation["articleRevisionID"],
+                    "name" => $translation["name"],
+                    "url" => $url,
+                    "locale" => $translation["locale"],
+                    "sourceLocale" => $knowledgeBase["sourceLocale"],
+                    "translationStatus" => $translation["translationStatus"],
+                ];
+            } else {
+                $articleToGenerateFrom = $firstRevision + ['queryLocale' => $locale['locale']];
+                $notFound = [
+                    "articleRevisionID" => -1,
+                    "name" => '',
+                    "url" => $this->articleModel->url($articleToGenerateFrom),
+                    "locale" => $locale["locale"],
+                    "sourceLocale" => $knowledgeBase["sourceLocale"],
+                    "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
+                ];
+                $result[] = $notFound;
+            }
         }
         return $result;
     }
