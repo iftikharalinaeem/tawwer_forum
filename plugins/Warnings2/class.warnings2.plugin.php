@@ -789,6 +789,14 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('viewnote', '', 'plugins/Warnings2');
     }
 
+    /**
+     * Endpoint for multiple records selected
+     *
+     * @param \ProfileController $sender
+     * @param string $userIDs
+     * @param string|bool $recordType
+     * @param string|bool $recordIDs
+     */
     public function profileController_multipleWarnings_create($sender, $userIDs, $recordType = false, $recordIDs = false) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
@@ -800,9 +808,12 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Warn popup form endpoint
      *
      * @param ProfileController $sender
      * @param string $userID
+     * @param string|bool $recordType
+     * @param string|bool $recordID
      */
     public function profileController_warn_create($sender, $userID, $recordType = false, $recordID = false) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
@@ -876,26 +887,57 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->render('', '');
     }
 
-    private function checkAlreadyWarned($sender, $recordIDs, $recordType) {
+    /**
+     * Check if record has warning ID
+     *
+     * @param \ProfileController $sender
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return bool
+     */
+    private function checkAlreadyWarned(\ProfileController $sender, array $recordIDs, string $recordType): bool {
         $warningModule = new WarningModel();
+        $warnedPostIDs = [];
         $model = $warningModule->getModel(strtolower($recordType));
         if ($model) {
+            $sender->setData('RecordIDs', $recordIDs);
             foreach ($recordIDs as $recordID) {
                 $record = $model->getID($recordID);
                 if (isset($record->Attributes['WarningID']) && $record->Attributes['WarningID']) {
-                    $sender->title(sprintf(t('Already Warned')));
-                    $sender->render('alreadywarned', '', 'plugins/Warnings2');
-                    return true;
+                    $warnedPostIDs[] = $recordID;
                 }
             }
         }
-        return false;
+
+        if (count($warnedPostIDs) > 0) {
+            $warnedPostUrls = $this->getRecordUrls($warnedPostIDs, $recordType);
+            $sender->setData('WarnedPostUrls', $warnedPostUrls);
+            $sender->title(sprintf(t('Already Warned')));
+            $sender->render('alreadywarned', '', 'plugins/Warnings2');
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private function normalizeRecordIDs($recordID):array {
-        return gettype($recordID) === 'string' ? explode(',', $recordID) : $recordID;
+    /**
+     * Convert $recordIDs to array
+     *
+     * @param string|array $recordIDs
+     * @return array
+     */
+    private function normalizeRecordIDs($recordIDs):array {
+        return gettype($recordIDs) === 'string' ? explode(',', $recordIDs) : $recordIDs;
     }
 
+    /**
+     * Return warn body message
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @param string $format
+     * @return string
+     */
     private function getWarningBody($recordIDs, $recordType, $format):string {
         $recordUrls = $this->getRecordUrls($recordIDs, $recordType);
 
@@ -918,6 +960,13 @@ class Warnings2Plugin extends Gdn_Plugin {
         return $body;
     }
 
+    /**
+     * Return records urls
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return array
+     */
     private function getRecordUrls($recordIDs, $recordType):array {
         $recordUrls = [];
 
@@ -939,6 +988,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         return $recordUrls;
     }
 
+    /**
+     * Return warn body message in rich format
+     *
+     * @param array $recordUrls
+     * @return string
+     */
     private function getRichWarningBody($recordUrls):string {
         $richBody = '[{"insert": "'.plural(
             count($recordUrls),

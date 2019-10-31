@@ -6,8 +6,15 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 
-echo '<div class="P">'.sprintf(t('The user has already been warned for this %s.'), t('post')).'</div>';
-
+echo '<div class="P">'.sprintf(t('The user has already been warned for the %s:'), t('post')).'</div>';
+?>
+<ul>
+    <?php foreach ($this->Data['WarnedPostUrls'] as $WarnedPostURL) {
+        echo '<li>'.anchor($WarnedPostURL, url($WarnedPostURL, true)).'</li>';
+    }
+    ?>
+</ul>
+<?php
 echo '<div class="Buttons Buttons-Confirm">';
 echo $this->Form->button('OK', ['class' => 'Button Primary']);
 echo '<div>';
