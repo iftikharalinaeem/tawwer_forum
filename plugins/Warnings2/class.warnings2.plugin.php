@@ -235,78 +235,13 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
 
-        $quote = false;
-        switch ($warning['RecordType']) {
-            // comment warning
-            case 'comment':
-                $commentModel = new CommentModel;
-                $comment = $commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
-                $discussionModel = new DiscussionModel;
-                $discussion = $discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
+        $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
 
-                $quote = true;
-                if ($comment && $discussion) {
-                    $context = formatQuote($comment);
-                    $location = '';//warningContext($comment, $discussion);
-                // Fallback. Use the warning's "RecordBody" field.
-                } else {
-                    $context = formatQuote([
-                        'Body' => val('RecordBody', $warning),
-                        'Format' => val('RecordFormat', $warning),
-                    ], false);
-                    $location = 'Comment content';
-                }
-                break;
+        $content = wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
+        $content .= "<br>";
+        $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
 
-            // discussion warning
-            case 'discussion':
-                $discussionModel = new DiscussionModel;
-                $discussion = $discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
-
-                $quote = true;
-                if ($discussion) {
-                    $context = formatQuote($discussion);
-                    $location = '';//warningContext($discussion);
-                // Fallback. Use the warning's "RecordBody" field.
-                } else {
-                    $context = formatQuote([
-                        'Body' => val('RecordBody', $warning),
-                        'Format' => val('RecordFormat', $warning),
-                    ], false);
-                    $location = 'Discussion content';
-                }
-                break;
-
-            // activity warning
-            case 'activity':
-                $activityModel = new ActivityModel;
-                $activity = $activityModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
-
-                $quote = true;
-                $context = '';
-                $location = '';//warningContext($activity);
-                break;
-
-            // profile/direct user warning
-            default:
-                // Nothing for this
-                break;
-        }
-
-        if ($quote) {
-            $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
-
-            //$content = sprintf(t('Re: %s'), "{$location}<br>{$context}");
-            $content = wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
-            $content .= "<br>";
-            $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
-
-//            echo wrap($content, 'div', [
-//                'class' => 'WarningContext'
-//            ]);
-
-            echo $content;
-        }
+        echo $content;
     }
 
     /**
