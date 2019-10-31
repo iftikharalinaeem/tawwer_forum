@@ -29,12 +29,12 @@ $St
     ->set();
 
 $St->table('UserTag')
-    ->column('RecordType', ['Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'User-Total', 'Activity', 'Activity-Total', 'ActivityComment', 'ActivityComment-Total'], FALSE, 'primary')
+    ->column('RecordType', ['Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'User-Total', 'Activity', 'Activity-Total', 'ActivityComment', 'ActivityComment-Total'], FALSE, ['primary', 'index.combined'])
     ->column('RecordID', 'int', FALSE, 'primary')
-    ->column('TagID', 'int', FALSE, ['primary', 'key'])
-    ->column('UserID', 'int', FALSE, ['primary', 'key'])
-    ->column('DateInserted', 'datetime', false, 'index')
-    ->column('Total', 'int', 0)
+    ->column('TagID', 'int', FALSE, ['primary', 'key', 'index.combined'])
+    ->column('UserID', 'int', FALSE, ['primary', 'key', 'index.combined'])
+    ->column('DateInserted', 'datetime', false, ['index', 'index.combined'])
+    ->column('Total', 'int', 0, ['index.combined'])
     ->set();
 
 $Rm = new ReactionModel();
