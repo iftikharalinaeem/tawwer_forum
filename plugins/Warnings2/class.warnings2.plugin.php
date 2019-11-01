@@ -902,7 +902,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $recordType
      * @return array
      */
-    private function getRecordUrls($recordIDs, $recordType):array {
+    private function getRecordUrls(array $recordIDs, string $recordType): array {
         $recordUrls = [];
 
         if (strtolower($recordType) == 'comment') {
