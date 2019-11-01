@@ -142,12 +142,26 @@ export const navigationManagerClasses = useThemeCache(() => {
   });
 
   const container = style("container", {
-    paddingTop: globalVars.gutter.size,
+    paddingTop: globalVars.gutter.size - 16,
     position: "relative",
     maxWidth: unit(800),
     width: percent(100),
     ...margins({ horizontal: "auto" })
   });
+
+  const containerWidth = style(
+    "containerWidth",
+    {
+      paddingBottom: 15,
+      paddingTop: 0
+    },
+
+    media.oneColumnDown({
+      ...paddings({
+        // horizontal: mobileGutter
+      })
+    })
+  );
 
   const formError = style("formError", {
     position: "absolute",
@@ -159,7 +173,8 @@ export const navigationManagerClasses = useThemeCache(() => {
   const header = style("header", {
     ...paddings({
       left: unit(globalVars.gutter.half),
-      right: unit(globalVars.gutter.half)
+      right: unit(globalVars.gutter.half),
+      top: globalVars.gutter.size
     })
   });
 
@@ -329,19 +344,6 @@ export const navigationManagerClasses = useThemeCache(() => {
     flexBasis: unit(buttonWidth),
     padding: 0
   });
-  const containerWidth = style(
-    "containerWidth",
-    {
-      paddingBottom: 15,
-      paddingTop: 0
-    },
-
-    media.oneColumnDown({
-      ...paddings({
-        // horizontal: mobileGutter
-      })
-    })
-  );
 
   const articlePage = style("articlePage", {
     display: "flex",

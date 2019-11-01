@@ -43,7 +43,6 @@ class OrganizeCategoriesPage extends React.Component<IProps, IState> {
   };
 
   public setWarning = () => {
-    //console.log("Click===>");
     this.setState({
       warningFlag: false
     });
@@ -51,7 +50,9 @@ class OrganizeCategoriesPage extends React.Component<IProps, IState> {
 
   public render() {
     const { knowledgeBase } = this.props;
-    const sourceLocale = knowledgeBase.data.sourceLocale;
+    const sourceLocale = knowledgeBase.data
+      ? knowledgeBase.data.sourceLocale
+      : null;
     const showWarning = sourceLocale !== getCurrentLocale() ? true : false;
     const pageTitle = t("Organize Categories");
     const classesNavigationManager = navigationManagerClasses();
