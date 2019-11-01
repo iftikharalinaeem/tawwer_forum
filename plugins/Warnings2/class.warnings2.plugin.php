@@ -929,7 +929,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param array $recordUrls
      * @return string
      */
-    private function getRichWarningBody($recordUrls):string {
+    private function getRichWarningBody(array $recordUrls): string {
         $richBody = '[{"insert": "'.plural(
             count($recordUrls),
             t('You are being warned for the following post:'),
