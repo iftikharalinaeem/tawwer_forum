@@ -728,12 +728,22 @@ class Warnings2Plugin extends Gdn_Plugin {
      * Endpoint for multiple records selected
      *
      * @param \ProfileController $sender
-     * @param string $userIDs
-     * @param string|bool $recordType
-     * @param string|bool $recordIDs
+     * @param string|null $userIDs
+     * @param string|null $recordType
+     * @param string|null $recordIDs
      */
-    public function profileController_multipleWarnings_create($sender, $userIDs, $recordType = false, $recordIDs = false) {
+    public function profileController_multipleWarnings_create(
+        \ProfileController $sender,
+        ?string $userIDs,
+        ?string $recordType = null,
+        ?string $recordIDs = null
+    ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
+
+        if (empty($userIDs) || empty($recordType) || empty($recordIDs)) {
+            $errorMsg = $this->getErrorMsg($userIDs, $recordType, $recordIDs);
+            throw new Gdn_UserException($errorMsg);
+        }
 
         if (count(explode(',', $userIDs)) === 1) {
             $this->profileController_warn_create($sender, $userIDs, $recordType, $recordIDs);
@@ -746,12 +756,22 @@ class Warnings2Plugin extends Gdn_Plugin {
      * Warn popup form endpoint
      *
      * @param ProfileController $sender
-     * @param string $userID
-     * @param string|bool $recordType
-     * @param string|bool $recordID
+     * @param string|null $userID
+     * @param string|null $recordType
+     * @param string|null $recordID
      */
-    public function profileController_warn_create($sender, $userID, $recordType = false, $recordID = false) {
+    public function profileController_warn_create(
+        \ProfileController $sender,
+        ?string $userID,
+        ?string $recordType = null,
+        ?string $recordID = null
+    ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
+
+        if (empty($userID) || empty($recordType) || empty($recordID)) {
+            $errorMsg = $this->getErrorMsg($userID, $recordType, $recordID);
+            throw new Gdn_UserException($errorMsg);
+        }
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
@@ -823,6 +843,31 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Return error message
+     *
+     * @param string|null $userIDs
+     * @param string|null $recordType
+     * @param string|null $recordIDs
+     * @return string
+     */
+    private function getErrorMsg(?string $userIDs, ?string $recordType, ?string $recordIDs) {
+        $params = [];
+        if (empty($userIDs)) {
+            $params[] = 'User ID';
+        }
+
+        if (empty($recordType)) {
+            $params[] = 'Record Type';
+        }
+
+        if (empty($recordIDs)) {
+            $params[] = 'Record ID';
+        }
+
+        return implode($params, ', ').plural(count($params), t(' parameter is invalid.'), t(' parameters are invalid.'));
+    }
+
+    /**
      * Check if record has warning ID
      *
      * @param \ProfileController $sender
@@ -847,7 +892,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (count($warnedPostIDs) > 0) {
             $warnedPostUrls = $this->getRecordUrls($warnedPostIDs, $recordType);
             $sender->setData('WarnedPostUrls', $warnedPostUrls);
-            $sender->title(sprintf(t('Already Warned')));
+            $sender->title(t('Already Warned'));
             $sender->render('alreadywarned', '', 'plugins/Warnings2');
             return true;
         } else {
@@ -976,7 +1021,12 @@ EOT;
         $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
-    public function base_beforeCheckComments_handler($sender) {
+    /**
+     * Add multiplewarnings endpoint
+     *
+     * @param \ModerationController $sender
+     */
+    public function base_beforeCheckComments_handler(\Gdn_Controller $sender) {
         if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             return;
         }
@@ -989,7 +1039,12 @@ EOT;
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userids='.join($authorIDs, ',').'&recordtype=Comment&recordids='.join($commentIDs, ','), 'Warn Popup');
     }
 
-    public function base_beforeCheckDiscussions($sender) {
+    /**
+     * Add multiplewarnings endpoint
+     *
+     * @param \ModerationController $sender
+     */
+    public function base_beforeCheckDiscussions(\Gdn_Controller  $sender) {
         if (!checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             return;
         }
@@ -1001,6 +1056,13 @@ EOT;
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userids='.join($authorIDs, ',').'&recordtype=Discussion&recordids='.join($discussionIDs, ','), 'Warn Popup');
     }
 
+    /**
+     * Render Choose User view
+     *
+     * @param \ProfileController $sender
+     * @param string $userIDs
+     * @param string string $recordType
+     */
     private function chooseUser(\ProfileController $sender, string $userIDs, string $recordType) {
         $users = [];
 
@@ -1020,12 +1082,25 @@ EOT;
         $this->render('chooseuser');
     }
 
+    /**
+     * Return Comments IDs
+     *
+     * @param int $discussionID
+     * @return array
+     */
     private function getCommentIDs(int $discussionID): array {
         $commentIDs = Gdn::userModel()->getAttribute(Gdn::session()->UserID, 'CheckedComments', []);
         $commentIDs = $commentIDs[$discussionID];
         return $commentIDs;
     }
 
+    /**
+     * Return records author IDs
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return array
+     */
     private function getAuthorIDs(array $recordIDs, string $recordType): array {
         $authorIDs = [];
 
@@ -1036,7 +1111,6 @@ EOT;
             case 'discussion':
                 $recordModel = new DiscussionModel();
                 break;
-
         }
 
         foreach ($recordIDs as $recordID) {
