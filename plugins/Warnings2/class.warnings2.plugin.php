@@ -1026,7 +1026,7 @@ EOT;
         return $commentIDs;
     }
 
-    private function getAuthorIDs($recordIDs, $recordType):array {
+    private function getAuthorIDs(array $recordIDs, string $recordType): array {
         $authorIDs = [];
 
         switch ($recordType) {
