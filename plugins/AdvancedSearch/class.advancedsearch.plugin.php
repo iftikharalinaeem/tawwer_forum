@@ -514,6 +514,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         // Now that we have the wheres, lets do the search.
         $vanillaSearch = new VanillaSearchModel();
+        $searchModel->EventArguments['Limit'] = $limit;
+        $searchModel->EventArguments['Offset'] = $offset;
         $searches = [];
 
         if ($dsearch) {
@@ -571,7 +573,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             ->getSelect();
         Gdn::sql()->reset();
 
-        $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
+        $union = '';
+        foreach ($searches as $subQuery) {
+            $union .= empty($union) ? '' : ' union all ';
+            $union .= ' ( '.$subQuery.' ) ';
+        }
+        $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".$union."\n)", $Sql);
 
         $Result = Gdn::database()->query($Sql)->resultArray();
 
