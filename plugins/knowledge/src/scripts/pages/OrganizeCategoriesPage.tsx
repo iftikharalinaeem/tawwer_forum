@@ -27,94 +27,145 @@ import { hot } from "react-hot-loader";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { getCurrentLocale } from "@vanilla/i18n";
+import Message from "@library/messages/Message";
+import { WarningIcon } from "@library/icons/common";
+import { messagesClasses } from "@library/messages/messageStyles";
 
-class OrganizeCategoriesPage extends React.Component<IProps> {
-    private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
+interface IState {
+  warningFlag: boolean;
+}
 
-    public render() {
-        const { knowledgeBase } = this.props;
-        const pageTitle = t("Organize Categories");
-        const classesNavigationManager = navigationManagerClasses();
+class OrganizeCategoriesPage extends React.Component<IProps, IState> {
+  private titleID = uniqueIDFromPrefix("organizeCategoriesTitle");
+  public state: IState = {
+    warningFlag: true
+  };
 
-        if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
-            return <Loader />;
+  public setWarning = () => {
+    //console.log("Click===>");
+    this.setState({
+      warningFlag: false
+    });
+  };
+
+  public render() {
+    const { knowledgeBase } = this.props;
+    const sourceLocale = knowledgeBase.data.sourceLocale;
+    const showWarning = sourceLocale !== getCurrentLocale() ? true : false;
+    const pageTitle = t("Organize Categories");
+    const classesNavigationManager = navigationManagerClasses();
+    const classesMessages = messagesClasses();
+
+    const categoriesWarning = showWarning && this.state.warningFlag && (
+      <Message
+        className={classNames(classesNavigationManager.containerWidth)}
+        contents={
+          <div className={classesMessages.iconWrap}>
+            <WarningIcon className={classesMessages.messageIcon} />
+            <div>
+              {t(
+                "You are viewing this page in the source locale. Make sure you name new categories using the source locale."
+              )}
+            </div>
+          </div>
         }
+        onConfirm={this.setWarning}
+        stringContents={t(
+          "You are viewing this page in the source locale. Make sure you name new categories using the source locale."
+        )}
+      />
+    );
 
-        if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
-            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
-        }
-
-        return (
-            <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
-                <AnalyticsData uniqueKey="organizeCategoriesPage" />
-                <FullKnowledgeModal scrollable={true} titleID={this.titleID}>
-                    <NavigationManagerMenu />
-                    <div className={classNames(classesNavigationManager.container)}>
-                        <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
-                        <DocumentTitle title={pageTitle}>
-                            <Heading
-                                id={this.titleID}
-                                depth={1}
-                                renderAsDepth={2}
-                                className={classNames(
-                                    "pageSubTitle",
-                                    "navigationManager-header",
-                                    classesNavigationManager.header,
-                                )}
-                                title={pageTitle}
-                            />
-                        </DocumentTitle>
-                        <NavigationManager knowledgeBase={knowledgeBase.data} />
-                    </div>
-                </FullKnowledgeModal>
-            </Permission>
-        );
+    if (
+      [LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)
+    ) {
+      return <Loader />;
     }
 
-    public componentDidMount() {
-        if (this.props.knowledgeBase.status === LoadStatus.PENDING) {
-            this.props.requestData();
-        }
+    if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
+      return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
     }
+
+    return (
+      <Permission
+        permission="articles.add"
+        fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}
+      >
+        <AnalyticsData uniqueKey="organizeCategoriesPage" />
+        <FullKnowledgeModal scrollable={true} titleID={this.titleID}>
+          <NavigationManagerMenu />
+          <div className={classNames(classesNavigationManager.container)}>
+            <NavigationManagerErrors
+              knowledgeBaseID={knowledgeBase.data.knowledgeBaseID}
+            />
+            {categoriesWarning}
+            <DocumentTitle title={pageTitle}>
+              <Heading
+                id={this.titleID}
+                depth={1}
+                renderAsDepth={2}
+                className={classNames(
+                  "pageSubTitle",
+                  "navigationManager-header",
+                  classesNavigationManager.header
+                )}
+                title={pageTitle}
+              />
+            </DocumentTitle>
+            <NavigationManager knowledgeBase={knowledgeBase.data} />
+          </div>
+        </FullKnowledgeModal>
+      </Permission>
+    );
+  }
+
+  public componentDidMount() {
+    if (this.props.knowledgeBase.status === LoadStatus.PENDING) {
+      this.props.requestData();
+    }
+  }
 }
 
 interface IOwnProps {
-    match: match<{
-        id: string;
-        page?: string;
-    }>;
+  match: match<{
+    id: string;
+    page?: string;
+  }>;
 }
 
-type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+type IProps = IOwnProps &
+  ReturnType<typeof mapStateToProps> &
+  ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
-    const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
-    const kbID = parseInt(ownProps.match.params.id, 10);
+  const { knowledgeBasesByID } = state.knowledge.knowledgeBases;
+  const kbID = parseInt(ownProps.match.params.id, 10);
 
-    const knowledgeBase = {
-        ...knowledgeBasesByID,
-        data: knowledgeBasesByID.data ? knowledgeBasesByID.data[kbID] : undefined,
-    };
+  const knowledgeBase = {
+    ...knowledgeBasesByID,
+    data: knowledgeBasesByID.data ? knowledgeBasesByID.data[kbID] : undefined
+  };
 
-    const hasError = !!state.knowledge.navigation.currentError;
+  const hasError = !!state.knowledge.navigation.currentError;
 
-    return {
-        knowledgeBase,
-        hasError,
-    };
+  return {
+    knowledgeBase,
+    hasError
+  };
 }
 
 function mapDispatchToProps(dispatch: any) {
-    const kbActions = new KnowledgeBaseActions(dispatch, apiv2);
+  const kbActions = new KnowledgeBaseActions(dispatch, apiv2);
 
-    return {
-        requestData: () => kbActions.getAll(),
-    };
+  return {
+    requestData: () => kbActions.getAll()
+  };
 }
 
 export default hot(module)(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(OrganizeCategoriesPage),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(OrganizeCategoriesPage)
 );
