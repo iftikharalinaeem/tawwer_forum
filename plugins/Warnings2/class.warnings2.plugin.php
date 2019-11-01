@@ -1020,7 +1020,7 @@ EOT;
         $this->render('chooseuser');
     }
 
-    private function getCommentIDs($discussionID):array {
+    private function getCommentIDs(int $discussionID): array {
         $commentIDs = Gdn::userModel()->getAttribute(Gdn::session()->UserID, 'CheckedComments', []);
         $commentIDs = $commentIDs[$discussionID];
         return $commentIDs;
