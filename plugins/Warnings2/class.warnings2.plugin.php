@@ -861,7 +861,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string|array $recordIDs
      * @return array
      */
-    private function normalizeRecordIDs($recordIDs):array {
+    private function normalizeRecordIDs($recordIDs): array {
         return gettype($recordIDs) === 'string' ? explode(',', $recordIDs) : $recordIDs;
     }
 
