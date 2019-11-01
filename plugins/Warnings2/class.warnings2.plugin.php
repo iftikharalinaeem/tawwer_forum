@@ -913,7 +913,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         } else {    // discussion
             foreach ($recordIDs as $recordID) {
                 $discussionModel = new DiscussionModel();
-                $discussion = (array)$discussionModel->getID($recordID);
+                $discussion = $discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
                 $discussionSlug = Gdn_Format::url($discussion['Name']);
                 $url = url("/discussion/{$recordID}/{$discussionSlug}", true);
                 $recordUrls[] = $url;
