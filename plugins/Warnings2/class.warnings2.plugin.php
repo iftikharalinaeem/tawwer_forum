@@ -873,7 +873,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $format
      * @return string
      */
-    private function getWarningBody($recordIDs, $recordType, $format):string {
+    private function getWarningBody(array $recordIDs, string $recordType, string $format): string {
         $recordUrls = $this->getRecordUrls($recordIDs, $recordType);
 
         switch (strtolower($format)) {
