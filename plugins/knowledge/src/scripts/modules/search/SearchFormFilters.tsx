@@ -89,6 +89,18 @@ export function SearchFormFilters(props: IProps) {
                 }}
                 value={form.authors}
             />
+            <DateRange
+                onStartChange={(date: string) => {
+                    updateForm({ startDate: date });
+                }}
+                onEndChange={(date: string) => {
+                    updateForm({ endDate: date });
+                }}
+                start={form.startDate}
+                end={form.endDate}
+                className={classesDateRange.root}
+            />
+            {getFilterComponentsForDomain(form.domain)}
             {form.domain === SearchDomain.EVERYWHERE && (
                 <CommunityCategoryInput
                     className="inputBlock"
@@ -107,18 +119,7 @@ export function SearchFormFilters(props: IProps) {
                     value={form.kb}
                 />
             )}
-            <DateRange
-                onStartChange={(date: string) => {
-                    updateForm({ startDate: date });
-                }}
-                onEndChange={(date: string) => {
-                    updateForm({ endDate: date });
-                }}
-                start={form.startDate}
-                end={form.endDate}
-                className={classesDateRange.root}
-            />
-            {getFilterComponentsForDomain(form.domain)}
+
             <Permission permission="articles.add">
                 <Checkbox
                     label={t("Deleted Articles")}
