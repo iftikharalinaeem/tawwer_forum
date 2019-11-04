@@ -3,7 +3,6 @@
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Subcommunities\Models\ProductModel;
-use Gdn_Session;
 
 class SubcommunityModel extends Gdn_Model {
     const CACHE_KEY = 'subcommunities';
