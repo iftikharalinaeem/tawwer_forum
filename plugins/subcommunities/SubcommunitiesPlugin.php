@@ -282,7 +282,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function categoriesController_render_before($sender) {
         $categoryID = val('CategoryID', $sender->data('Category'));
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
-        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
+
+        //set canonical tag
+        $canonicalUrl = $sender->Data['isHomepage'] ? url('/', true) : self::getCanonicalUrl(Gdn::request()->path(), $subcommunity);
+        $sender->canonicalUrl($canonicalUrl);
+
         if (!SubcommunityModel::getCurrent()) {
             return;
         }
