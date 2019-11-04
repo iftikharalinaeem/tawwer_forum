@@ -7,7 +7,6 @@
 
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use Vanilla\Contracts\ConfigurationInterface;
 
 class SphinxSearchTest extends AbstractAPIv2Test {
 
