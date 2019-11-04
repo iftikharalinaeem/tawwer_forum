@@ -9,7 +9,6 @@ import "../../scss/knowledge-styles.scss";
 
 // Vendors
 import React from "react";
-import { AppContainer } from "react-hot-loader";
 
 // Our own libraries
 import apiv2 from "@library/apiv2";
@@ -35,11 +34,9 @@ Router.addRoutes(getPageRoutes());
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
     mountReact(
-        <AppContainer>
-            <AppContext errorComponent={<ErrorPage />}>
-                <KnowledgeApp />
-            </AppContext>
-        </AppContainer>,
+        <AppContext errorComponent={<ErrorPage />}>
+            <KnowledgeApp />
+        </AppContext>,
         app,
     );
 };
@@ -48,9 +45,3 @@ onReady(() => {
     initAllUserContent();
     render();
 });
-
-if (module.hot) {
-    module.hot.accept("@knowledge/KnowledgeApp", () => {
-        render();
-    });
-}
