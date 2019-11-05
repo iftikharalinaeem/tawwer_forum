@@ -1,5 +1,5 @@
 <?php
-/**
+/**@author VanillaForums.
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -9,7 +9,7 @@ namespace VanillaTests\APIv2;
 /**
  * Test  /api/v2/comments with groups
  */
-class GroupsCommentsTest  extends AbstractAPIv2Test {
+class GroupsCommentsTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $groups;
     /** @var array */
