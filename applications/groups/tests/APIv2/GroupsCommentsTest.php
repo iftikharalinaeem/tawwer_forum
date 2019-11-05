@@ -7,6 +7,8 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
     protected static $groups;
     /** @var array */
     protected static $secretGroups;
+    /** @var array */
+    protected static $privateGroups;
     /** @var string */
     protected  $baseUrl;
     /** @var array List of userID's */
@@ -58,6 +60,16 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
                 'privacy' => 'secret',
             ]);
         }
+        // Create private groups
+        for ($i = 1; $i <= 2; $i++) {
+            $groupTxt = uniqid(__CLASS__." $i ");
+            self::$privateGroups[] = $groupsAPIController->post([
+                'name' => $groupTxt,
+                'description' => $groupTxt,
+                'format' => 'Markdown',
+                'privacy' => 'private',
+            ]);
+        }
         // Create members
         self::createUsers(8);
         $session->end();
@@ -75,7 +87,7 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
 
         $classParts = explode('\\', __CLASS__);
         $className = $classParts[count($classParts) - 1];
-        for ($i = 1; $i <= 4; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $user = $usersAPIController->post([
                 'name' => self::randomUsername(),
                 'email' => "{$className}{$i}$i@example.com",
@@ -147,7 +159,7 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
      * Test /comments/:discussionID endpoint with a public group and a guest user.
      */
     public function testPublicGroupNotMemberCommentID() {
-        $publicGroupID = self::$groups[0]['groupID'];
+        $publicGroupID = self::$groups[1]['groupID'];
         $publicDiscussionID = $this->createDiscussion($publicGroupID);
         $publicCommentID = $this->createComment($publicDiscussionID);
         $session = self::container()->get(\Gdn_Session::class);
@@ -184,11 +196,45 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
      * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
      */
     public function testFailSecretGroupCommentID() {
-        $secretGroupID = self::$secretGroups[0]['groupID'];
+        $secretGroupID = self::$secretGroups[1]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
         $this->createComment($secretDiscussionID);
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[3], false, false);
         $this->api()->get($this->baseUrl, ['discussionID' => $secretDiscussionID]);
+    }
+
+    /**
+     * Test /comments/:discussionID endpoint with a private group and a member.
+     */
+    public function testSuccessPrivateGroupCommentID() {
+        $privateGroupID = self::$privateGroups[0]['groupID'];
+        $privateDiscussionID = $this->createDiscussion($privateGroupID);
+        $privateCommentID = $this->createComment($privateDiscussionID);
+        // add user as member to secret group.
+        $groupModel = static::container()->get('GroupModel');
+        $groupModel->resetCachedPermissions();
+        $groupModel->addUser($privateGroupID, self::$userIDs[4], 'Member');
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[4], false, false);
+        $result = $this->api()->get($this->baseUrl, ['discussionID' => $privateDiscussionID]);
+        $this->assertEquals(200, $result->getStatusCode());
+        $requestedDiscussion = $result->getBody();
+        $this->assertEquals($privateCommentID, $requestedDiscussion[0]['commentID']);
+    }
+
+    /**
+     * Test /comments/:discussionID endpoint with a private group and a guest.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
+     */
+    public function testFailPrivateGroupCommentID() {
+        $privateGroupID = self::$privateGroups[1]['groupID'];
+        $privateDiscussionID = $this->createDiscussion($privateGroupID);
+        $privateCommentID = $this->createComment($privateDiscussionID);
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[5], false, false);
+        $this->api()->get($this->baseUrl, ['discussionID' => $privateDiscussionID]);
     }
 }
