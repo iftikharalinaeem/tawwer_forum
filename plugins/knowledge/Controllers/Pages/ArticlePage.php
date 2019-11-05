@@ -50,6 +50,7 @@ class ArticlePage extends KbPage {
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
             ->setCanonicalUrl($article['url'])
             ->addOpenGraphTag('og:type', 'article')
+            ->addOpenGraphTag('og:image', $article['seoImage'] ?? $this->siteMeta->getLogo())
             ->addJsonLDItem(new ArticleJsonLD($article, $this->siteMeta))
         ;
 

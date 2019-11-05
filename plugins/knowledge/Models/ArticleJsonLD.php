@@ -45,6 +45,7 @@ final class ArticleJsonLD extends AbstractJsonLDItem {
                 "@type" => 'WebPage',
                 '@id' => "https://google.com/article",
             ],
+            'image' => [$this->articleData['seoImage'] ?? $this->siteMeta->getLogo()],
             'headline' => $this->articleData['name'],
             'datePublished' => $this->articleData['dateInserted'],
             'dateModified' => $this->articleData['dateUpdated'],

@@ -1298,6 +1298,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $revision["body"] = "[]";
             }
 
+            $images = $this->formatterService->parseImageUrls($revision['body'], $revision['format']);
+            $revision['seoImage'] = count($images) > 0 ? $images[0] : null;
             $revision["bodyRendered"] = $this->formatterService->renderHTML($revision['body'], $revision['format']);
             $revision["plainText"] = $this->formatterService->renderPlainText($revision['body'], $revision['format']);
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
