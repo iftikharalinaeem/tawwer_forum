@@ -284,7 +284,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $subcommunity = self::getCanonicalSubcommunity($categoryID);
 
         //set canonical tag
-        $canonicalUrl = $sender->Data['isHomepage'] ? url('/', true) : self::getCanonicalUrl(Gdn::request()->path(), $subcommunity);
+        $canonicalUrl = empty($sender->Data['isHomepage']) ?
+            self::getCanonicalSubcommunityUrl(Gdn::request()->path(), $subcommunity, self::URL_TYPE_DISCUSSION) :
+            url('/', true);
         $sender->canonicalUrl($canonicalUrl);
 
         if (!SubcommunityModel::getCurrent()) {
