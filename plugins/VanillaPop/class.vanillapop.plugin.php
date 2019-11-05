@@ -856,7 +856,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /**
      * @param ActivityModel $sender
-     * @param type $args
+     * @param array $args
      */
     public function activityModel_beforeSendNotification_handler($sender, $args) {
         if (isset($args['RecordType']) && isset($args['RecordID'])) {
@@ -866,6 +866,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             list($type, $iD) = self::parseRoute(val('Route', $args));
         }
 
+        $checkPermissions = array_key_exists("UserAuthorized", $args) ? !$args["UserAuthorized"] : true;
         $formatData = ['Title' => c('Garden.Title'), 'Signature' => self::emailSignature(val('Route', $args))];
         $notifyUserID = getValueR('Activity.NotifyUserID', $args);
 
@@ -878,7 +879,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $discussionModel = new DiscussionModel();
                     $discussion = $discussionModel->getID($iD);
                     if ($discussion) {
-                        if ($notifyUserID) {
+                        if ($checkPermissions) {
                             // See if the user has permission to view this discussion on the site.
                             $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
                             $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
@@ -939,7 +940,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $discussion = (array)$discussionModel->getID($comment['DiscussionID']);
 
                         if ($discussion) {
-                            if ($notifyUserID) {
+                            if ($checkPermissions) {
                                 // See if the user has permission to view this discussion on the site.
                                 $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
                                 $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
