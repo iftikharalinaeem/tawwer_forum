@@ -8,7 +8,6 @@ namespace Vanilla\TranslationsAPI\models;
 
 use Garden\Web\Exception\ClientException;
 use Gdn_Session;
-use mysql_xdevapi\Exception;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
@@ -36,8 +35,6 @@ class ResourceKeyModel extends PipelineModel {
         "parentRecordID" => true,
         "parentRecordType" => true,
     ];
-
-
 
     /**
      * resourceKeyModel constructor.
@@ -75,13 +72,12 @@ class ResourceKeyModel extends PipelineModel {
      * @param array $record
      *
      * @return array
-     * @throws ClientException
      */
     public function createResourceKey(string $path, array $record): array {
         $this->resourceModel->ensureResourceExists($path, $record["recordType"]);
         $record["resource"] = $path;
 
-        $identifier = $this->validateRecordIdentifier($record);
+        $identifier = $this->getRecordIdentifier($record);
 
         $record["key"] = self::constructKey($record["recordType"], $identifier, $record["propertyType"]);
         $resourceKey = $this->get(["key" =>  $record["key"]]);
@@ -109,6 +105,8 @@ class ResourceKeyModel extends PipelineModel {
     }
 
     /**
+     * Get a resource key with the translations.
+     *
      * @param array $where
      * @param array $options
      * @return array
@@ -117,7 +115,7 @@ class ResourceKeyModel extends PipelineModel {
 
         $sql = $this->sql();
         $sql->from($this->getTable() . " as rk")
-            ->join("translations t", "rk.key = t.key", 'left');
+            ->join("translations t", "rk.key = t.key", 'inner');
 
         $sql->where($where);
         $result = $sql->get()->resultArray();
@@ -130,7 +128,7 @@ class ResourceKeyModel extends PipelineModel {
      * @return mixed
      * @throws ClientException
      */
-    public function validateRecordIdentifier(array $record) {
+    public function getRecordIdentifier(array $record) {
         $identifier = null;
 
         if (isset($record["recordID"]) && isset($record["recordKey"])) {
@@ -140,7 +138,6 @@ class ResourceKeyModel extends PipelineModel {
         } else {
             $identifier = $record["recordID"] ?? $record["recordKey"];
         }
-
         return $identifier;
     }
 }

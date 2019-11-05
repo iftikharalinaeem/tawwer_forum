@@ -38,7 +38,7 @@ class resourceModel extends PipelineModel {
 
 
     /**
-     * ThemeModel constructor.
+     * ResourceModel constructor.
      *
      * @param Gdn_Session $session
      */

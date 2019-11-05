@@ -21,10 +21,16 @@ class TranslationsApiController extends AbstractApiController {
     private $resourceSchema;
 
     /** @var Schema */
-    private $postTranslation;
+    private $getResourceSchema;
+
+    /** @var Schema */
+    private $postTranslationSchema;
 
     /** @var Schema */
     private $simpleTranslationSchema;
+
+    /** @var Schema */
+    private $translationSchema;
 
     /** @var resourceModel */
     private $resourceModel;
@@ -88,7 +94,7 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
-     * Create a resource key with a translation.
+     * POST /Translations/:resource
      *
      * @param string $path Resource slug
      * @param array $body
@@ -96,7 +102,7 @@ class TranslationsApiController extends AbstractApiController {
      */
     public function post(string $path, array $body = []): array {
         $this->permission("Garden.Moderation.Manage");
-        $in = $this->schema([":a?" => $this->postTranslation()], "in");
+        $in = $this->schema([":a" => $this->postTranslationSchema()], "in");
         $records = $in->validate($body);
         $path = substr($path, 1);
 
@@ -116,13 +122,15 @@ class TranslationsApiController extends AbstractApiController {
             $results[] = $this->normalizeResourceTranslations($resourceKey, $translation);
         }
 
-        $out = $this->schema([":a?" => $this->postTranslation()], "out");
+        $out = $this->schema([":a" => $this->postTranslationSchema()], "out");
         $results = $out->validate($results);
 
         return $results;
     }
 
     /**
+     * Merge the translations records with the resource keys.
+     *
      * @param $recordKey
      * @param $translation
      * @return array
@@ -132,6 +140,7 @@ class TranslationsApiController extends AbstractApiController {
             "resource" => $recordKey["resource"],
             "recordType" => $recordKey["recordType"],
             "recordKey" => $recordKey["recordKey"],
+            "propertyType" => $recordKey["propertyType"],
             "key" => $recordKey["key"],
             "locale" => $translation["locale"],
             "translation" => $translation["translation"],
@@ -141,6 +150,8 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
+     * PUT /Translations/:resource
+     *
      * @param string $path
      * @param array $body
      *
@@ -152,7 +163,7 @@ class TranslationsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $path = substr($path, 1);
-        $identifier = $this->resourceKeyModel->validateRecordIdentifier($body);
+        $identifier = $this->resourceKeyModel->getRecordIdentifier($body);
         $key = ResourceKeyModel::constructKey($body["recordType"], $identifier, $body["propertyType"]);
 
         $translation = $this->getSingleTranslation($path, $body, $key);
@@ -174,15 +185,19 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
+     * GET /Translations/:resource
+     *
      * @param string $path
      * @param array $query
      * @return array
      */
-    public function get(string $path, array $query) {
+    public function get(string $path, array $query = []) {
         $this->permission("Garden.Moderation.Manage");
-        // $in = $this->resourceSchema("in");
-        // $query = $in->validate($query);
         $path = substr($path, 1);
+
+        $in = $this->getTranslationsSchema("in");
+        $query["url"] = $path;
+        $query = $in->validate($query);
         $where["rk.resource"] = $path;
 
         if (isset($query["recordType"])) {
@@ -197,24 +212,29 @@ class TranslationsApiController extends AbstractApiController {
 
         $results = $this->resourceKeyModel->getResourceWithTranslation($where);
 
-        return $results;
-    }
-
-    /**
-     * Get a resource.
-     *
-     * @param array $query
-     * @return array
-     */
-    public function get_index(array $query = []): array {
-        $this->permission("Garden.Moderation.Manage");
-       // $in = $this->resourceSchema("in");
-       // $query = $in->validate($query);
-
-        $results = $this->resourceModel->get();
+        $out = $this->schema([":a" => $this->translationSchema()], "out");
+        $results = $out->validate($results);
 
         return $results;
     }
+
+//    /**
+//     * GET /Translations
+//     *
+//     * @param array $query
+//     * @return array
+//     */
+//    public function get_index(array $query = []): array {
+//        $this->permission("Garden.Moderation.Manage");
+//        $in = $this->resourceSchema("in");
+//        $query = $in->validate($query);
+//
+//        $results = $this->resourceModel->get($query);
+//
+//        $out = $this->schema([":a" => $this->resourceSchema()], "out");
+//        $results = $out->validate($results);
+//        return $results;
+//    }
 
 
     /**
@@ -235,17 +255,36 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
+     * Simplified resource schema.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function getTranslationsSchema(string $type = ""): Schema {
+        if ($this->getResourceSchema === null) {
+            $this->getResourceSchema = $this->schema(Schema::parse([
+                "recordType?",
+                "recordID?",
+                "recordKey?",
+                "locale?",
+            ]));
+        }
+        return $this->schema($this->getResourceSchema, $type);
+    }
+
+    /**
      * Post translation schema.
      *
      * @param string $type
      * @return Schema
      */
-    public function postTranslation(string $type = ""): Schema {
-        if ($this->postTranslation=== null) {
-            $this->postTranslation = $this->schema(Schema::parse([
+    public function postTranslationSchema(string $type = ""): Schema {
+        if ($this->postTranslationSchema === null) {
+            $this->postTranslationSchema = $this->schema(Schema::parse([
                 "recordType",
                 "recordID?",
                 "recordKey?",
+                "key",
                 "locale?",
                 "propertyType",
                 "translation?",
@@ -253,7 +292,7 @@ class TranslationsApiController extends AbstractApiController {
                 "parentRecordType?",
             ]));
         }
-        return $this->schema($this->postTranslation, $type);
+        return $this->schema($this->postTranslationSchema, $type);
     }
 
     /**
@@ -263,22 +302,23 @@ class TranslationsApiController extends AbstractApiController {
      * @return Schema
      */
     public function patchTranslation(string $type = ""): Schema {
-        if ($this->postTranslation=== null) {
-            $this->postTranslation = $this->schema(Schema::parse([
+        if ($this->postTranslationSchema=== null) {
+            $this->postTranslationSchema = $this->schema(Schema::parse([
                 "recordType",
                 "recordID?",
                 "recordKey?",
+                "key",
                 "locale",
                 "propertyType",
                 "translation",
                 "previousTranslation?"
             ]));
         }
-        return $this->schema($this->postTranslation, $type);
+        return $this->schema($this->postTranslationSchema, $type);
     }
 
     /**
-     * Patch translation schema.
+     * simple translation schema.
      *
      * @param string $type
      * @return Schema
@@ -296,9 +336,27 @@ class TranslationsApiController extends AbstractApiController {
         return $this->schema($this->simpleTranslationSchema, $type);
     }
 
-
+    /**
+     * simple translation schema.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function translationSchema(string $type = ""): Schema {
+        if ($this->translationSchema === null) {
+            $this->translationSchema = $this->schema(Schema::parse([
+                "resource",
+                "key",
+                "locale",
+                "translation",
+            ]));
+        }
+        return $this->schema($this->translationSchema, $type);
+    }
 
     /**
+     * Get a single translation based on the unique key.
+     *
      * @param string $path
      * @param array $body
      * @param string $key
@@ -308,11 +366,16 @@ class TranslationsApiController extends AbstractApiController {
      */
     protected function getSingleTranslation(string $path, array $body, string $key): array {
         try {
-            $translation = $this->translationModel->selectSingle(["resource" => $path, "key" => $key, "locale" => $body["locale"]]);
+            $translation = $this->translationModel->selectSingle(
+                [
+                    "resource" => $path,
+                    "key" => $key,
+                    "locale" => $body["locale"]
+                ]
+            );
         } catch (NoResultsException $e) {
             throw new ClientException("Resource not found");
         }
         return $translation;
     }
-
 }

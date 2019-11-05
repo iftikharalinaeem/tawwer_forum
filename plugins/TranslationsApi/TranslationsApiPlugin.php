@@ -9,7 +9,6 @@ namespace Vanilla\TranslationsAPI;
 use \Gdn_Database;
 use \Gdn_Plugin;
 
-
 class TranslationsApiPlugin extends Gdn_Plugin {
 
     /** @var Gdn_Database */
@@ -76,7 +75,6 @@ class TranslationsApiPlugin extends Gdn_Plugin {
             ->column("dateUpdated", "datetime")
             ->set()
         ;
-
     }
 }
 

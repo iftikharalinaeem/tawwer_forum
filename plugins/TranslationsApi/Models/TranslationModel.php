@@ -59,10 +59,14 @@ class TranslationModel extends PipelineModel {
     }
 
     /**
+     * Create a translation record.
+     *
      * @param string $resource
      * @param string $locale
      * @param $key
      * @param $translationString
+     *
+     * @return array
      */
     public function createTranslation(string $resource, string $locale, string $key, string $translationString): array {
         $sourceLocale =  $this->configurationModule->get("Garden.Locale");
@@ -76,6 +80,8 @@ class TranslationModel extends PipelineModel {
         $translationInSource = in_array($sourceLocale, $translationsLocales);
         $translationInRequestedLocale = in_array($locale, $translationsLocales);
 
+        // if no translations exist create new one and make sure the source locale translation is created.
+        // This logic needs to be re-worked. Temporary solution.
         if (!$translations) {
             $translationRecord = [
                 "resource" => $resource,
@@ -101,6 +107,7 @@ class TranslationModel extends PipelineModel {
                 "locale" => $locale,
                 "translation" => $translationString,
             ];
+
             $this->insert($translationRecord);
             $translation =  $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
         } else {
@@ -113,6 +120,8 @@ class TranslationModel extends PipelineModel {
     }
 
     /**
+     * Validate a locale exists.
+     *
      * @param string $locale
      * @param string $sourceLocale
      * @throws ClientException
@@ -129,6 +138,8 @@ class TranslationModel extends PipelineModel {
     }
 
     /**
+     * Get Translations in it's source locale or a specified locale.
+     *
      * @param string $resource
      * @param string $locale
      * @param string $key
