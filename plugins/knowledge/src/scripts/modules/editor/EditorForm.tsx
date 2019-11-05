@@ -154,7 +154,7 @@ export function EditorForm(props: IProps) {
 
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
-            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            className={classNames(classesEditorForm.containerWidth)}
             contents={
                 <div className={classesMessages.iconWrap}>
                     <WarningIcon className={classesMessages.messageIcon} />
