@@ -1,7 +1,14 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 namespace VanillaTests\APIv2;
 
+/**
+ * Test  /api/v2/comments with groups
+ */
 class GroupsCommentsTest  extends AbstractAPIv2Test {
     /** @var array */
     protected static $groups;
@@ -10,7 +17,7 @@ class GroupsCommentsTest  extends AbstractAPIv2Test {
     /** @var array */
     protected static $privateGroups;
     /** @var string */
-    protected  $baseUrl;
+    protected $baseUrl;
     /** @var array List of userID's */
     protected static $userIDs;
 
