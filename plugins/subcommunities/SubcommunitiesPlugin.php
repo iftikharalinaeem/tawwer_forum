@@ -40,24 +40,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $categories;
 
     /// Methods ///
-    /**
-     * Configure the container with multisite configuration.
-     *
-     * @param Container $dic
-     */
-    public function container_init(Container $dic) {
-        $providerArgs = ['provider' => new Reference(MultisiteReduxPreloader::class)];
-        $dic
-            ->rule(Page::class)
-            ->setInherit(true)
-            ->addCall('registerReduxActionProvider', $providerArgs)
-            ->rule(Gdn_Controller::class)
-            ->setInherit(true)
-            ->addCall('registerReduxActionProvider', $providerArgs)
-            ->rule(\Vanilla\Site\SiteSectionModel::class)
-            ->addCall('addProvider', [$dic->get(SubcomunitiesSiteSectionProvider::class)])
-        ;
-    }
 
     public function setup() {
         $this->structure();
