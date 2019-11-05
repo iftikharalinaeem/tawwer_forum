@@ -135,10 +135,12 @@ class TranslationModel extends PipelineModel {
      * @param $sourceLocale
      * @return array
      */
-    protected function getTranslationsByLocale(string $resource, string $locale, string $key, string $sourceLocale) {
+    protected function getTranslationsByLocale(string $resource, string $locale, string $key, string $sourceLocale = null) {
+        $locales = (isset($sourceLocale)) ? [$locale, $sourceLocale] : [$locale];
+
         $sql = $this->sql();
         $sql->from($this->getTable() . " as t");
-        $sql->whereIn("locale", [$locale, $sourceLocale]);
+        $sql->whereIn("locale", $locales);
         $sql->where(["resource" => $resource, "key" => $key]);
         $result = $sql->get()->resultArray();
 

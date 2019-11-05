@@ -130,7 +130,7 @@ class ResourceKeyModel extends PipelineModel {
      * @return mixed
      * @throws ClientException
      */
-    protected function validateRecordIdentifier(array $record) {
+    public function validateRecordIdentifier(array $record) {
         $identifier = null;
 
         if (isset($record["recordID"]) && isset($record["recordKey"])) {
