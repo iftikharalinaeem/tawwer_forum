@@ -878,9 +878,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $discussionModel = new DiscussionModel();
                     $discussion = $discussionModel->getID($iD);
                     if ($discussion) {
-                        // See if the user has permission to view this discussion on the site.
-                        $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
-                        $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                        if ($notifyUserID) {
+                            // See if the user has permission to view this discussion on the site.
+                            $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
+                            $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                        } else {
+                            // If there isn't one specific user being notified, avoid attempting permission checks.
+                            $canView = $canReply = true;
+                        }
                         $formatData['Signature'] = self::emailSignature(val('Route', $args), $canView, $canReply);
 
                         $discussion = (array)$discussion;
@@ -934,9 +939,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $discussion = (array)$discussionModel->getID($comment['DiscussionID']);
 
                         if ($discussion) {
-                            // See if the user has permission to view this discussion on the site.
-                            $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
-                            $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                            if ($notifyUserID) {
+                                // See if the user has permission to view this discussion on the site.
+                                $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
+                                $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                            } else {
+                                // If there isn't one specific user being notified, avoid attempting permission checks.
+                                $canView = $canReply = true;
+                            }
                             $formatData['Signature'] = self::emailSignature(val('Route', $args), $canView, $canReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
 
                             $discussion['Name'] = Gdn_Format::plainText($discussion['Name'], 'Text');
