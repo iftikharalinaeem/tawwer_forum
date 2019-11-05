@@ -41,27 +41,42 @@ class TranslationsApiPlugin extends Gdn_Plugin {
      */
     public function structure() {
         $this->database->structure()
-            ->table("Translations")
-            ->column("resource", "varchar(64)", false, ["index", "unique.resourceKey"])
-            ->column("key", "varchar(255)", false, ["index", "unique.resourceKey"])
-            ->column("locale", "varchar(10)", false, ["index", "unique.resourceKey"])
-            ->column("tanslations", "mediumtext", false)
+            ->table("translations")
+            ->column("resource", "varchar(64)", false, ["index", "unique.resourceRecordKey"])
+            ->column("key", "varchar(255)", false, ["index", "unique.resourceRecordKey"])
+            ->column("locale", "varchar(10)", false, ["index", "unique.resourceRecordKey"])
+            ->column("translation", "mediumtext", false)
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime")
             ->set()
         ;
 
         $this->database->structure()
-            ->table("Resources")
+            ->table("resourceKey")
             ->column("resource", "varchar(64)", false, ["index"])
-            ->column("recordType", "varchar(64)", 0, ["index"])
-            ->column("recordID", "int", false)
-            ->column("recordKey", "varchar(32)", false)
-            ->column("key", "varchar(255)", false)
+            ->column("recordType", "varchar(64)", false, ["index"])
+            ->column("recordID", "int", true)
+            ->column("recordKey", "varchar(32)", true)
+            ->column("propertyType", "varchar(32)", false)
+            ->column("key", "varchar(255)", false, ["index","unique.Key"])
+            ->column("parentRecordID", "int", true)
+            ->column("parentRecordType", "varchar(32)", true)
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime")
             ->set()
         ;
+
+        $this->database->structure()
+            ->table("resource")
+            ->primaryKey("resourceID")
+            ->column("name", "varchar(64)", false, "unique.resourceKey")
+            ->column("sourceLocale", "varchar(10)", false, "unique.resourceKey")
+            ->column("url", "varchar(32)", false, "unique.resourceKey")
+            ->column("dateInserted", "datetime")
+            ->column("dateUpdated", "datetime")
+            ->set()
+        ;
+
     }
 }
 
