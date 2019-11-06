@@ -23,7 +23,6 @@ import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { hot } from "react-hot-loader";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -208,4 +207,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default hot(module)(withDevice(withRedux(ArticlePage)));
+export default withDevice(withRedux(ArticlePage));
