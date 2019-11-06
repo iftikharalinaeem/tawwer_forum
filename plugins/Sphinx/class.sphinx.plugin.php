@@ -12,7 +12,6 @@ use Vanilla\Sphinx\Models\SearchRecordTypeProvider;
 use Vanilla\Sphinx\Models\SearchRecordTypeDiscussion;
 use Vanilla\Sphinx\Models\SearchRecordTypeComment;
 
-
 /**
  * Sphinx Plugin
  *
@@ -66,17 +65,16 @@ class SphinxPlugin extends Gdn_Plugin {
      * @param Container $dic The container to initialize.
      */
     public function container_init(Container $dic) {
-        $dic->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
-           ->setClass(SearchRecordTypeProvider::class) //this is kludge
-           ->addCall('setType', [new SearchRecordTypeDiscussion()])
-           ->addCall('setType', [new SearchRecordTypeComment()])
-           ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
-           ->addCall('addProviderGroup', [self::PROVIDER_GROUP])
-           ->addAlias('SearchRecordTypeProvider')
-           ->rule(\SearchModel::class)
+        $dic->rule(SearchRecordTypeProviderInterface::class)
+            ->setClass(SearchRecordTypeProvider::class) //this is kludge
+            ->addCall('setType', [new SearchRecordTypeDiscussion()])
+            ->addCall('setType', [new SearchRecordTypeComment()])
+            ->addCall('addProviderGroup', [SearchRecordTypeDiscussion::PROVIDER_GROUP])
+            ->addCall('addProviderGroup', [self::PROVIDER_GROUP])
+            ->addAlias('SearchRecordTypeProvider')
+            ->rule(\SearchModel::class)
             ->setShared(true)
             ->setClass(\SphinxSearchModel::class)
-
         ;
     }
 
@@ -315,4 +313,95 @@ class SphinxPlugin extends Gdn_Plugin {
         $sender->render('settings', '', 'plugins/Sphinx');
     }
 
+    /**
+     * Hook into single-field discussion updates.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     * @return void
+     */
+    public function discussionModel_afterSetField_handler($sender, array $args = []): void {
+        $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
+    }
+
+    /**
+     * Hook into full-record discussion updates.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     * @return void
+     */
+    public function discussionModel_afterSaveDiscussion($sender, array $args = []): void {
+        $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
+    }
+
+    /**
+     * Refresh specific attributes of a discussion and its comments.
+     *
+     * @param integer $discussionID
+     * @return void
+     */
+    private function refreshDiscussionAttributes(int $discussionID): void {
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+        $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            return;
+        }
+
+        $discussionIndex = current($this->getSearchModel()->indexes(["Discussion"]));
+        $discussionDocumentID = (intval($discussionID) * 10) + 1;
+
+        $this->getSearchModel()->sphinxClient()->updateAttributes(
+            $discussionIndex,
+            ["CategoryID"],
+            [
+                $discussionDocumentID => [
+                    $discussion["CategoryID"]
+                ]
+            ]
+        );
+
+        $commentIndex = current($this->getSearchModel()->indexes(["Comment"]));
+        /** @var CommentModel $commentModel */
+        $commentModel = Gdn::getContainer()->get(CommentModel::class);
+        $comments = $commentModel->getWhere(["DiscussionID" => $discussionID]);
+        $commentUpdates = [];
+        foreach ($comments->resultArray() as $comment) {
+            $commentDocumentID = (intval($comment["CommentID"]) * 10) + 2;
+            $commentUpdates[$commentDocumentID] = [$discussion["CategoryID"]];
+        }
+        $this->getSearchModel()->sphinxClient()->updateAttributes(
+            $commentIndex,
+            ["CategoryID"],
+            $commentUpdates
+        );
+    }
+
+    /**
+     * Schedule update of a discussion's attributes.
+     *
+     * @param integer|null $discussionID
+     * @return void
+     */
+    private function scheduleDiscussionUpdate(?int $discussionID): void {
+        static $pending = [];
+
+        if (!$discussionID || in_array($discussionID, $pending)) {
+            return;
+        }
+
+        /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
+        $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
+        $scheduler->addJob(
+            Vanilla\Scheduler\Job\CallbackJob::class,
+            [
+                "callback" => function () use ($discussionID) {
+                    $this->refreshDiscussionAttributes($discussionID);
+                }
+            ]
+        );
+
+        $pending[] = $discussionID;
+    }
 }
