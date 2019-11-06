@@ -17,21 +17,9 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $privateGroups;
     /** @var string */
-    protected $baseUrl;
+    protected $baseUrl = '/comments';
     /** @var array List of userID's */
     protected static $userIDs;
-
-    /**
-     * GroupsCommentsTest constructor.
-     *
-     * @param null $name
-     * @param array $data
-     * @param string $dataName
-     */
-    public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/comments';
-        parent::__construct($name, $data, $dataName);
-    }
 
     /**
      * {@inheritdoc}
@@ -47,32 +35,23 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
 
         /** @var \GroupsApiController $groupsAPIController */
         $groupsAPIController = static::container()->get('GroupsApiController');
-        // Create public groups
-        foreach ([1, 2] as $i) {
-            $groupTxt = uniqid(__CLASS__." $i ");
+        // Create test groups
+        for ($i = 1; $i <= 2; $i++) {
             self::$groups[] = $groupsAPIController->post([
-                'name' => $groupTxt,
-                'description' => $groupTxt,
+                'name' => uniqid(__CLASS__),
+                'description' => uniqid(__CLASS__),
                 'format' => 'Markdown',
                 'privacy' => 'public',
             ]);
-        }
-        // Create secret groups
-        for ($i = 1; $i <= 2; $i++) {
-            $groupTxt = uniqid(__CLASS__." $i ");
             self::$secretGroups[] = $groupsAPIController->post([
-                'name' => $groupTxt,
-                'description' => $groupTxt,
+                'name' => uniqid(__CLASS__),
+                'description' => uniqid(__CLASS__),
                 'format' => 'Markdown',
                 'privacy' => 'secret',
             ]);
-        }
-        // Create private groups
-        for ($i = 1; $i <= 2; $i++) {
-            $groupTxt = uniqid(__CLASS__." $i ");
             self::$privateGroups[] = $groupsAPIController->post([
-                'name' => $groupTxt,
-                'description' => $groupTxt,
+                'name' => uniqid(__CLASS__),
+                'description' => uniqid(__CLASS__),
                 'format' => 'Markdown',
                 'privacy' => 'private',
             ]);
@@ -81,8 +60,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
         self::createUsers(8);
         $session->end();
     }
-
-
+    
     /**
      * Create Users for test.
      *
@@ -122,7 +100,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
             "groupID" => $groupID,
         ])->getBody();
 
-        $discussionID = $discussion['discussionID'] ?? 0 ;
+        $discussionID = $discussion['discussionID'] ?? 0;
         return $discussionID;
     }
 
@@ -139,7 +117,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
             "discussionID" => $discussionID
         ])->getBody();
 
-        $commentID = $comment['commentID'] ?? 0 ;
+        $commentID = $comment['commentID'] ?? 0;
         return $commentID;
     }
 
