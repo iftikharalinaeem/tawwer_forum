@@ -51,15 +51,14 @@ class TranslationsApiPlugin extends Gdn_Plugin {
         ;
 
         $this->database->structure()
-            ->table("resourceKey")
+            ->table("translationProperty")
             ->column("resource", "varchar(64)", false, ["index"])
             ->column("recordType", "varchar(64)", false, ["index"])
             ->column("recordID", "int", true)
             ->column("recordKey", "varchar(32)", true)
-            ->column("propertyType", "varchar(32)", false)
+            ->column("propertyName", "varchar(32)", false, ["index"])
+            ->column("propertyType", "varchar(32)", true)
             ->column("key", "varchar(255)", false, ["index","unique.Key"])
-            ->column("parentRecordID", "int", true)
-            ->column("parentRecordType", "varchar(32)", true)
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime")
             ->set()

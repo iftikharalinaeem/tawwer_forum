@@ -15,7 +15,7 @@ use Vanilla\Models\PipelineModel;
 /**
  *
  */
-class ResourceKeyModel extends PipelineModel {
+class TranslationPropertyModel extends PipelineModel {
 
     /** @var resourceModel */
     private $resourceModel;
@@ -26,14 +26,16 @@ class ResourceKeyModel extends PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** Default limit on the number of results returned. */
+    const LIMIT_DEFAULT = 100;
+
     const RESOURCE_KEY_RECORD = [
         "recordType" => true,
         "recordID" => true,
         "recordKey" => true,
+        "propertyName" =>  true,
         "propertyType" => true,
         "key" => true,
-        "parentRecordID" => true,
-        "parentRecordType" => true,
     ];
 
     /**
@@ -48,7 +50,7 @@ class ResourceKeyModel extends PipelineModel {
         resourceModel $resourcesModel,
         TranslationModel $translationModel
     ) {
-        parent::__construct("resourceKey");
+        parent::__construct("translationProperty");
 
         $this->session = $session;
         $this->resourceModel = $resourcesModel;
@@ -74,67 +76,82 @@ class ResourceKeyModel extends PipelineModel {
      * @return array
      */
     public function createResourceKey(string $path, array $record): array {
-        $this->resourceModel->ensureResourceExists($path, $record["recordType"]);
         $record["resource"] = $path;
 
         $identifier = $this->getRecordIdentifier($record);
 
-        $record["key"] = self::constructKey($record["recordType"], $identifier, $record["propertyType"]);
-        $resourceKey = $this->get(["key" =>  $record["key"]]);
-
-        if (!$resourceKey) {
-            $this->insert($record);
-            $resourceKey = $this->get(["key" => $record["key"]]);
-        }
+        $record["key"] = self::constructKey($record["propertyName"], $record["recordType"], $identifier);
+        $this->insert($record);
+        $resourceKey = $this->get(["key" => $record["key"]]);
 
         $result = reset($resourceKey);
         return $result;
     }
 
     /**
+     * Get a Translation-Property.
+     *
+     * @param array $record
+     * @return array
+     */
+    public function getTranslationProperty(array $record) :array {
+        $recordIdentifier = $this->getRecordIdentifier($record);
+        $key = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $translationProperty = $this->get(["key" =>  $key]);
+        if ($translationProperty) {
+            $translationProperty = reset($translationProperty);
+        }
+
+        return $translationProperty;
+    }
+
+    /**
      * Construct a key for the resource translations.
      *
+     * @param string $recordProperty
      * @param string $recordType
      * @param mixed $recordID
-     * @param string $recordProperty
      *
      * @return string;
      */
-    public static function constructKey(string $recordType, $recordID, string $recordProperty): string {
+    public static function constructKey(string $recordProperty, string $recordType = null, $recordID = null): string {
         return $recordType.'.'.$recordID.'.'.$recordProperty;
     }
 
     /**
-     * Get a resource key with the translations.
+     * Get translations.
      *
      * @param array $where
      * @param array $options
      * @return array
      */
-    public function getResourceWithTranslation(array $where = [], array $options = []) {
+    public function getTranslations(array $where = [], array $options = []) {
+        $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
+        $offset = $options["offset"] ?? 0;
 
         $sql = $this->sql();
         $sql->from($this->getTable() . " as rk")
             ->join("translations t", "rk.key = t.key", 'inner');
 
         $sql->where($where);
+        $sql->limit($limit, $offset);
+
         $result = $sql->get()->resultArray();
 
         return $result;
     }
 
     /**
+     * Get the record identifier used to build a translation-property key.
+     *
      * @param array $record
      * @return mixed
      * @throws ClientException
      */
-    public function getRecordIdentifier(array $record) {
+    private function getRecordIdentifier(array $record) {
         $identifier = null;
-
         if (isset($record["recordID"]) && isset($record["recordKey"])) {
             throw new ClientException("A resource key can't have both a recordID or recordKey");
-        } elseif (!isset($record["recordID"]) && !isset($record["recordKey"])) {
-            throw new ClientException("A resource key must have either a recordID or recordKey");
         } else {
             $identifier = $record["recordID"] ?? $record["recordKey"];
         }

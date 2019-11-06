@@ -21,22 +21,6 @@ class resourceModel extends PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
-    /** @var string */
-    private $resource;
-
-    /** @var string */
-    private $recordType;
-
-    /** @var int */
-    private $recordID;
-
-    /** @var string */
-    private $recordKey;
-
-    /** @var string */
-    private $key;
-
-
     /**
      * ResourceModel constructor.
      *
@@ -59,19 +43,17 @@ class resourceModel extends PipelineModel {
 
     /**
      * @param string $resource
-     * @param string $recordType
      * @throws ClientException
      */
-    public function ensureResourceExists(string $resource, string $recordType) {
+    public function ensureResourceExists(string $resource) {
         try {
             $this->selectSingle(
                 [
                     "url" => $resource,
-                    "name" => $recordType
                 ]
             );
         } catch (NoResultsException $e) {
-            throw new ClientException("Resource doesn't exist");
+            throw new ClientException("The ". $resource." resource doesn't exist");
         }
     }
 
