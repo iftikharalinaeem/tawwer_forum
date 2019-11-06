@@ -370,6 +370,7 @@ class SphinxPlugin extends Gdn_Plugin {
             return;
         }
 
+        // If we already have the original attributes for this discussion, do not proceed.
         if (array_key_exists($discussionID, $this->originalDiscussionAttributes)) {
             return;
         }
@@ -378,9 +379,11 @@ class SphinxPlugin extends Gdn_Plugin {
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$discussion) {
+            // Nothing to do here. This discussion isn't valid.
             return;
         }
 
+        // Record the relevant attributes for comparison at a later time.
         $this->originalDiscussionAttributes[$discussionID] = [
             "CategoryID" => $discussion["CategoryID"],
         ];
