@@ -74,43 +74,17 @@ class TranslationModel extends PipelineModel {
             $this->validateLocale($locale, $sourceLocale);
         }
 
-        // Get translations by the requested locale or source locale.
-        $translations = $this->getTranslationsByLocale($resource, $locale, $key, $sourceLocale);
-        $translationsLocales = array_column($translations, "locale");
-        $translationInSource = in_array($sourceLocale, $translationsLocales);
-        $translationInRequestedLocale = in_array($locale, $translationsLocales);
+        // Get translations by the requested locale
+        $translation = $this->getTranslationsByLocale($resource, $locale, $key);
 
-        // if no translations exist create new one and make sure the source locale translation is created.
-        // This logic needs to be re-worked. Temporary solution.
-        if (!$translations) {
+        if (!$translation) {
             $translationRecord = [
                 "resource" => $resource,
                 "key" => $key,
                 "locale" => $locale,
                 "translation" => $translationString,
             ];
-            if (!$translationInSource  && ($locale !== $sourceLocale)) {
-                $translationSourceRecord = [
-                    "resource" => $resource,
-                    "key" => $key,
-                    "locale" => $sourceLocale,
-                    "translation" => '',
-                ];
-                $this->insert($translationSourceRecord);
-            }
             $this->insert($translationRecord);
-            $translation =  $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
-        } elseif (!$translationInRequestedLocale && $translationInSource) {
-            $translationRecord = [
-                "resource" => $resource,
-                "key" => $key,
-                "locale" => $locale,
-                "translation" => $translationString,
-            ];
-
-            $this->insert($translationRecord);
-            $translation =  $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
-        } else {
             $translation =  $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
         }
 

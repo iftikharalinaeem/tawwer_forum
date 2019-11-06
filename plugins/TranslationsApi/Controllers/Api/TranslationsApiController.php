@@ -76,7 +76,7 @@ class TranslationsApiController extends AbstractApiController {
         $in = $this->resourceSchema("in");
         $body = $in->validate($body);
 
-        $body["sourceLocale"] = $this->configurationModule->get("Garden.Locale");
+        $body["sourceLocale"] = $body["sourceLocale"] ?? $this->configurationModule->get("Garden.Locale");
         $this->resourceModel->insert($body);
 
         $where = [
@@ -284,7 +284,7 @@ class TranslationsApiController extends AbstractApiController {
                 "recordType",
                 "recordID?",
                 "recordKey?",
-                "key",
+                "key?",
                 "locale?",
                 "propertyType",
                 "translation?",
