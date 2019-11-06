@@ -340,14 +340,14 @@ class SphinxPlugin extends Gdn_Plugin {
         $formPostValues = $args["FormPostValues"] ?? null;
         $insert = $args["Insert"] ?? null;
         $formDiscussionID = $formPostValues["DiscussionID"] ?? null;
+        $formCategoryID = $formPostValues["CategoryID"] ?? null;
 
         // Attempt to determine if this is a discussion update. Bail out of it isn't.
-        if ($insert === true || $formDiscussionID === null) {
+        if ($insert === true || $formDiscussionID === null || $formCategoryID === null) {
             return;
         }
 
         // Make sure relevant fields have changed enough to warrant an update.
-        $formCategoryID = $formPostValues["CategoryID"] ?? null;
         $originalAttributes = $this->originalDiscussionAttributes[$formDiscussionID] ?? [];
         $originalCategoryID = $originalAttributes["CategoryID"] ?? null;
         if ($formCategoryID == $originalCategoryID) {
