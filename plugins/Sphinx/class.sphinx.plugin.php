@@ -334,6 +334,15 @@ class SphinxPlugin extends Gdn_Plugin {
      * @return void
      */
     public function discussionModel_afterSaveDiscussion($sender, array $args = []): void {
+        $formPostValues = $args["FormPostValues"] ?? null;
+        $insert = $args["Insert"] ?? null;
+        $formDiscussionID = $formPostValues["DiscussionID"] ?? null;
+
+        // Attempt to determine if this is a discussion update. Bail out of it isn't.
+        if ($insert === true || $formDiscussionID === null) {
+            return;
+        }
+
         $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
     }
 
