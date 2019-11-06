@@ -517,6 +517,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         trace($categoryMap, 'categoryMap');
+        $categoryModel = new CategoryModel();
 
         // Remove the synchronization from other categories.
         foreach ($otherCategories as $hubID) {
@@ -540,10 +541,10 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         foreach ($deleteIDs as $categoryID) {
             if ($categoryID <= 0) {
-                cotinue;
+                continue;
             }
-            $category = (object)CategoryModel::categories($categoryID);
-            $categoryModel->delete($category, -1);
+            $category = CategoryModel::categories($categoryID);
+            $categoryModel->deleteID($category['CategoryID']);
         }
 
         // Update the sort order of categories that aren't from the hub.
@@ -607,12 +608,13 @@ class SiteNodePlugin extends Gdn_Plugin {
         $missingHubIDs = Gdn::sql()
             ->select('RoleID')
             ->from('Role')
+            ->where('HubID is not null')
             ->whereNotIn('HubID', array_keys($roles))
             ->get()->resultArray();
 
         foreach ($missingHubIDs as $missingRow) {
             $missingRoleID = $missingRow['RoleID'];
-            $roleModel->delete($missingRoleID, 0);
+            $roleModel->deleteID($missingRoleID);
         }
 
         return $roleMap;
@@ -908,6 +910,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         $sender->render('blank');
     }
 
+    /**
+     * @param UtilityController $sender
+     */
     public function utilityController_syncNodeInfo_create($sender) {
         $sender->permission('Garden.Settings.Manage');
 
