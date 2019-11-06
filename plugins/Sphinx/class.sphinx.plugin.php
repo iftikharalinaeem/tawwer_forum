@@ -33,6 +33,9 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var DiscussionModel */
     private $discussionModel;
 
+    /** @var array */
+    private $originalDiscussionAttributes = [];
+
     /** @var SphinxSearchModel */
     private $searchModel;
 
@@ -333,7 +336,7 @@ class SphinxPlugin extends Gdn_Plugin {
      * @param array $args
      * @return void
      */
-    public function discussionModel_afterSaveDiscussion($sender, array $args = []): void {
+    public function discussionModel_afterSaveDiscussion_handler($sender, array $args = []): void {
         $formPostValues = $args["FormPostValues"] ?? null;
         $insert = $args["Insert"] ?? null;
         $formDiscussionID = $formPostValues["DiscussionID"] ?? null;
@@ -343,7 +346,44 @@ class SphinxPlugin extends Gdn_Plugin {
             return;
         }
 
+        // Make sure relevant fields have changed enough to warrant an update.
+        $formCategoryID = $formPostValues["CategoryID"] ?? null;
+        $originalAttributes = $this->originalDiscussionAttributes[$formDiscussionID] ?? [];
+        $originalCategoryID = $originalAttributes["CategoryID"] ?? null;
+        if ($formCategoryID == $originalCategoryID) {
+            return;
+        }
+
         $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
+    }
+
+    /**
+     * Hook in before a discussion is saved.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     * @return void
+     */
+    public function discussionModel_beforeSaveDiscussion_handler($sender, array $args = []): void {
+        $discussionID = $args["DiscussionID"] ?? null;
+        if ($discussionID === null) {
+            return;
+        }
+
+        if (array_key_exists($discussionID, $this->originalDiscussionAttributes)) {
+            return;
+        }
+
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+        $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            return;
+        }
+
+        $this->originalDiscussionAttributes[$discussionID] = [
+            "CategoryID" => $discussion["CategoryID"],
+        ];
     }
 
     /**
