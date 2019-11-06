@@ -321,7 +321,9 @@ class SphinxPlugin extends Gdn_Plugin {
      * @return void
      */
     public function discussionModel_afterSetField_handler($sender, array $args = []): void {
-        $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
+        if (isset($args['SetField']['CategoryID'])) {
+            $this->scheduleDiscussionUpdate($args["DiscussionID"] ?? null);
+        }
     }
 
     /**
@@ -349,20 +351,21 @@ class SphinxPlugin extends Gdn_Plugin {
             return;
         }
 
-        $discussionIndex = current($this->getSearchModel()->indexes(["Discussion"]));
+        // Update the discussion in all relevant indexes.
         $discussionDocumentID = (intval($discussionID) * 10) + 1;
-
-        $this->getSearchModel()->sphinxClient()->updateAttributes(
-            $discussionIndex,
-            ["CategoryID"],
-            [
-                $discussionDocumentID => [
-                    $discussion["CategoryID"]
+        foreach ($this->getSearchModel()->indexes(["Discussion"]) as $discussionIndex) {
+            $this->getSearchModel()->sphinxClient()->updateAttributes(
+                $discussionIndex,
+                ["CategoryID"],
+                [
+                    $discussionDocumentID => [
+                        $discussion["CategoryID"]
+                    ]
                 ]
-            ]
-        );
+            );
+        }
 
-        $commentIndex = current($this->getSearchModel()->indexes(["Comment"]));
+        // Build a list of attributes to update, per-comment.
         /** @var CommentModel $commentModel */
         $commentModel = Gdn::getContainer()->get(CommentModel::class);
         $comments = $commentModel->getWhere(["DiscussionID" => $discussionID]);
@@ -371,11 +374,15 @@ class SphinxPlugin extends Gdn_Plugin {
             $commentDocumentID = (intval($comment["CommentID"]) * 10) + 2;
             $commentUpdates[$commentDocumentID] = [$discussion["CategoryID"]];
         }
-        $this->getSearchModel()->sphinxClient()->updateAttributes(
-            $commentIndex,
-            ["CategoryID"],
-            $commentUpdates
-        );
+
+        // Update discussion comments in all relevant indexes.
+        foreach ($this->getSearchModel()->indexes(["Comment"]) as $commentIndex) {
+            $this->getSearchModel()->sphinxClient()->updateAttributes(
+                $commentIndex,
+                ["CategoryID"],
+                $commentUpdates
+            );
+        }
     }
 
     /**
