@@ -11,6 +11,9 @@ import Loader from "@library/loaders/Loader";
 import qs from "qs";
 import React from "react";
 import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyKnowledgeBasesResults";
+import DashboardHeaderBlock from "@dashboard/components/DashboardHeaderBlock";
+import { t } from "@vanilla/i18n";
+import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBaseAddEdit";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
@@ -24,6 +27,7 @@ export function ManageKnowledgeBasesPage() {
 
     return (
         <>
+            <DashboardHeaderBlock title={t("Add Knowledge Base")} actionButtons={<KnowledgeBaseAddEdit />} />
             <DashboardTable
                 head={
                     <tr>
