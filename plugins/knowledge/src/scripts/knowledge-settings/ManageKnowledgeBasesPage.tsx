@@ -11,8 +11,8 @@ import Loader from "@library/loaders/Loader";
 import qs from "qs";
 import React from "react";
 import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyKnowledgeBasesResults";
-import DashboardHeaderBlock from "@dashboard/components/DashboardHeaderBlock";
 import { t } from "@vanilla/i18n";
+import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBaseAddEdit";
 const { HeadItem } = DashboardTable;
 
