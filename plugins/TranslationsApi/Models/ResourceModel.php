@@ -49,11 +49,11 @@ class resourceModel extends PipelineModel {
         try {
             $this->selectSingle(
                 [
-                    "url" => $resource,
+                    "urlCode" => $resource,
                 ]
             );
         } catch (NoResultsException $e) {
-            throw new ClientException("The ". $resource." resource doesn't exist");
+            throw new ClientException("The '". $resource."' resource doesn't exist");
         }
     }
 

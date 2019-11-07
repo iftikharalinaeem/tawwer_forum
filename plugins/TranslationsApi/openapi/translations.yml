@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
 paths:
-  /translations/{resource}:
+  /translations/{resourceUrl}:
       get:
         parameters:
         - description: resource to filter.
@@ -63,7 +63,7 @@ paths:
         parameters:
           - description: resource to add\update in.
             in: path
-            name: resource
+            name: resourceUrl
             required: true
             schema:
               type: string

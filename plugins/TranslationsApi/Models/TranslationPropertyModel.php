@@ -80,11 +80,11 @@ class TranslationPropertyModel extends PipelineModel {
 
         $recordIdentifier = $this->getRecordIdentifier($record);
 
-        $record["key"] = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $record["translationPropertyKey"] = self::createtranslationPropertykey($record["propertyName"], $record["recordType"], $recordIdentifier);
         $this->insert($record);
-        $resourceKey = $this->get(["key" => $record["key"]]);
+        $translationProperty = $this->get(["translationPropertyKey" => $record["translationPropertyKey"]]);
 
-        $result = reset($resourceKey);
+        $result = reset($translationProperty);
         return $result;
     }
 
@@ -96,8 +96,8 @@ class TranslationPropertyModel extends PipelineModel {
      */
     public function getTranslationProperty(array $record) :array {
         $recordIdentifier = $this->getRecordIdentifier($record);
-        $key = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
-        $translationProperty = $this->get(["key" =>  $key]);
+        $key = self::createtranslationPropertykey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $translationProperty = $this->get(["translationPropertyKey" =>  $key]);
         if ($translationProperty) {
             $translationProperty = reset($translationProperty);
         }
@@ -106,7 +106,7 @@ class TranslationPropertyModel extends PipelineModel {
     }
 
     /**
-     * Construct a key for the resource translations.
+     * Construct a translationPropertykey for the resource translations.
      *
      * @param string $recordProperty
      * @param string $recordType
@@ -114,7 +114,7 @@ class TranslationPropertyModel extends PipelineModel {
      *
      * @return string;
      */
-    public static function constructKey(string $recordProperty, string $recordType = null, $recordID = null): string {
+    public static function createtranslationPropertykey(string $recordProperty, string $recordType = null, $recordID = null): string {
         return $recordType.'.'.$recordID.'.'.$recordProperty;
     }
 
@@ -130,8 +130,8 @@ class TranslationPropertyModel extends PipelineModel {
         $offset = $options["offset"] ?? 0;
 
         $sql = $this->sql();
-        $sql->from($this->getTable() . " as rk")
-            ->join("translations t", "rk.key = t.key", 'inner');
+        $sql->from($this->getTable() . " as tp")
+            ->join("translations t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
 
         $sql->where($where);
         $sql->limit($limit, $offset);

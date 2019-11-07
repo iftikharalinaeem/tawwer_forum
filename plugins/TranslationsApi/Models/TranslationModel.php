@@ -28,12 +28,6 @@ class TranslationModel extends PipelineModel {
     /** @var Gdn_Configuration */
     private $configurationModule;
 
-    const TRANSLATION_RECORD = [
-        "locale" => true,
-        "translation" => true
-    ];
-
-
     /**
      *  constructor.
      *
@@ -74,12 +68,12 @@ class TranslationModel extends PipelineModel {
             $this->validateLocale($locale, $sourceLocale);
         }
 
-        $translation = $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
+        $translation = $this->get(["resource" => $resource, "translationPropertyKey" => $key, "locale" => $locale]);
 
         if (!$translation) {
             $translationRecord = [
                 "resource" => $resource,
-                "key" => $key,
+                "translationPropertyKey" => $key,
                 "locale" => $locale,
                 "translation" => $translationString,
             ];
@@ -87,7 +81,7 @@ class TranslationModel extends PipelineModel {
         } else {
            $result = $this->update(
                ["translation" => $translationString],
-               ["resource" => $resource, "key" => $key, "locale" => $locale]
+               ["resource" => $resource, "translationPropertyKey" => $key, "locale" => $locale]
            );
         }
 
@@ -107,7 +101,7 @@ class TranslationModel extends PipelineModel {
         $valid = in_array($locale, $availableLocales);
 
         if (!$valid) {
-            throw new ClientException("locale". $locale . "is not available");
+            throw new ClientException("Locale '". $locale . "' is not available");
         }
 
     }

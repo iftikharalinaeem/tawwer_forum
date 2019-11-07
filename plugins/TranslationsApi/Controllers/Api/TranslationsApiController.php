@@ -10,7 +10,6 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
-use Exception;
 use Vanilla\TranslationsAPI\models\resourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
@@ -79,13 +78,13 @@ class TranslationsApiController extends AbstractApiController {
             [
                 "name" => $body["name"],
                 "sourceLocale" => $body["sourceLocale"],
-                "url" => $body["url"]
+                "urlCode" => $body["urlCode"]
             ]
         );
 
         if ($resourceExists) {
             throw new ClientException(
-                "The resource ". $body["url"] . "-" . $body["sourceLocale"] . "-" .  $body["name"] . " exists"
+                "The resource ". $body["urlCode"] . "-" . $body["sourceLocale"] . "-" .  $body["name"] . " exists"
             );
         } else {
             $this->resourceModel->insert($body);
@@ -113,9 +112,9 @@ class TranslationsApiController extends AbstractApiController {
 
             if (!$translationProperty) {
                 $newTranslationProperty = $this->translationPropertyModel->createTranslationProperty($path, $resourceKeyRecord);
-                $key = $newTranslationProperty["key"];
+                $key = $newTranslationProperty["translationPropertyKey"];
             } else {
-                $key = $translationProperty["key"];
+                $key = $translationProperty["translationPropertyKey"];
             }
             $this->translationModel->createTranslation(
                 $path,
@@ -139,19 +138,19 @@ class TranslationsApiController extends AbstractApiController {
 
         $in = $this->getTranslationsSchema("in");
 
-        $query["url"] = $path;
+        $query["urlCode"] = $path;
         $query = $in->validate($query);
 
-        $where["rk.resource"] = $query["url"];
+        $where["tp.resource"] = $query["urlCode"];
 
         if (isset($query["recordType"])) {
-            $where["rk.recordType"] = $query["recordType"];
+            $where["tp.recordType"] = $query["recordType"];
         }
         if (isset($query["recordID"]) && isset($query["recordType"])) {
-            $where["rk.recordID"] = $query["recordID"];
+            $where["tp.recordID"] = $query["recordID"];
         }
         if (isset($query["recordKey"]) && isset($query["recordType"])) {
-            $where["rk.recordKey"] = $query["recordKey"];
+            $where["tp.recordKey"] = $query["recordKey"];
         }
         if (isset($query["locale"])) {
             $where["t.locale"] = $query["locale"];
@@ -180,9 +179,9 @@ class TranslationsApiController extends AbstractApiController {
     public function resourceSchema(string $type = ""): Schema {
         if ($this->resourceSchema === null) {
             $this->resourceSchema = $this->schema(Schema::parse([
-                "name",
+                "name?",
                 "sourceLocale?",
-                "url",
+                "urlCode",
             ]));
         }
         return $this->schema($this->resourceSchema, $type);
@@ -197,7 +196,7 @@ class TranslationsApiController extends AbstractApiController {
     public function getTranslationsSchema(string $type = ""): Schema {
         if ($this->getResourceSchema === null) {
             $this->getResourceSchema = $this->schema(Schema::parse([
-                "url?",
+                "urlCode?",
                 "recordType?",
                 "recordID?",
                 "recordKey?",
@@ -250,7 +249,11 @@ class TranslationsApiController extends AbstractApiController {
             $this->translationSchema = $this->schema(Schema::parse([
                 "resource",
                 "recordType",
-                "key",
+                "recordID?",
+                "recordKey?",
+                "propertyName",
+                "propertyType?",
+                "translationPropertyKey",
                 "locale",
                 "translation",
             ]));
