@@ -26,9 +26,6 @@ class TranslationPropertyModel extends PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
-    /** Default limit on the number of results returned. */
-    const LIMIT_DEFAULT = 100;
-
     const RESOURCE_KEY_RECORD = [
         "recordType" => true,
         "recordID" => true,
@@ -37,6 +34,9 @@ class TranslationPropertyModel extends PipelineModel {
         "propertyType" => true,
         "key" => true,
     ];
+
+    /** Default limit on the number of results returned. */
+    const LIMIT_DEFAULT = 100;
 
     /**
      * resourceKeyModel constructor.
@@ -152,8 +152,12 @@ class TranslationPropertyModel extends PipelineModel {
         $identifier = null;
         if (isset($record["recordID"]) && isset($record["recordKey"])) {
             throw new ClientException("A resource key can't have both a recordID or recordKey");
+        } elseif (isset($record["recordID"])) {
+            $identifier = $record["recordID"];
+        } elseif (isset($record["recordKey"])) {
+            $identifier = $record["recordKey"];
         } else {
-            $identifier = $record["recordID"] ?? $record["recordKey"];
+            $identifier = '';
         }
         return $identifier;
     }

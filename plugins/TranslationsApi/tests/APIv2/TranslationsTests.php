@@ -69,8 +69,12 @@ class TranslationsTests extends AbstractAPIv2Test {
     /**
      *  Post /translations failure
      *
-     * @depends testPostResource
+     * @depends      testPostResource
      * @dataProvider translationsPropertyProvider
+     *
+     * @param $record
+     * @param $key
+     * @param $translation
      */
     public function testPutTranslations($record, $key, $translation) {
 
@@ -99,13 +103,37 @@ class TranslationsTests extends AbstractAPIv2Test {
                [[
                    "recordType"=> "knowledgebase",
                    "recordID"=> 8,
-                   "propertyName"=> "name",
                    "recordKey"=> "",
+                   "propertyName"=> "name",
                    "locale"=> "en",
                    "translation"=> "english kb name"
                ]],
                 "knowledgebase.8.name",
                 "english kb name",
+            ],
+            [
+                [[
+                    "recordType"=> "knowledgeCategory",
+                    "recordID"=> 9,
+                    "recordKey"=> "",
+                    "propertyName"=> "description",
+                    "locale"=> "en",
+                    "translation"=> "english kb cat description"
+                ]],
+                "knowledgeCategory.9.description",
+                "english kb cat description",
+            ],
+            [
+                [[
+                    "recordType"=> "knowledgeCategory",
+                    "recordID"=> null,
+                    "recordKey"=> null,
+                    "propertyName"=> "name",
+                    "locale"=> "en",
+                    "translation"=> "name"
+                ]],
+                "knowledgeCategory..name",
+                "name",
             ],
         ];
     }
