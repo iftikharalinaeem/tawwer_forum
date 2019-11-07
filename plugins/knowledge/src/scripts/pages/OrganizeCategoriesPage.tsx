@@ -63,7 +63,6 @@ class OrganizeCategoriesPage extends React.Component<IProps, IState> {
         const categoriesWarning = showWarning && this.state.warningFlag && (
             <Message
                 isContained={true}
-                // className={classNames(classesNavigationManager.containerWidth)}
                 contents={
                     <div className={classesMessages.iconWrap}>
                         <AttachmentErrorIcon className={classesMessages.errorIcon} />
