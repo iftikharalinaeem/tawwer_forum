@@ -63,19 +63,18 @@ class TranslationModel extends PipelineModel {
      *
      * @param string $resource
      * @param string $locale
-     * @param $key
-     * @param $translationString
+     * @param string $key
+     * @param string $translationString
      *
-     * @return array
+     * @return bool
      */
-    public function createTranslation(string $resource, string $locale, string $key, string $translationString): array {
+    public function createTranslation(string $resource, string $locale, string $key, string $translationString): bool {
         $sourceLocale =  $this->configurationModule->get("Garden.Locale");
         if ($locale !== $sourceLocale) {
             $this->validateLocale($locale, $sourceLocale);
         }
 
-        // Get translations by the requested locale
-        $translation = $this->getTranslationsByLocale($resource, $locale, $key);
+        $translation = $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
 
         if (!$translation) {
             $translationRecord = [
@@ -84,11 +83,13 @@ class TranslationModel extends PipelineModel {
                 "locale" => $locale,
                 "translation" => $translationString,
             ];
-            $this->insert($translationRecord);
-            $translation =  $this->get(["resource" => $resource, "key" => $key, "locale" => $locale]);
+           $result = $this->insert($translationRecord);
+        } else {
+           $result = $this->update(
+               ["translation" => $translationString],
+               ["resource" => $resource, "key" => $key, "locale" => $locale]
+           );
         }
-
-        $result = reset($translation);
 
         return $result;
     }
@@ -109,27 +110,6 @@ class TranslationModel extends PipelineModel {
             throw new ClientException("locale". $locale . "is not available");
         }
 
-    }
-
-    /**
-     * Get Translations in it's source locale or a specified locale.
-     *
-     * @param string $resource
-     * @param string $locale
-     * @param string $key
-     * @param $sourceLocale
-     * @return array
-     */
-    protected function getTranslationsByLocale(string $resource, string $locale, string $key, string $sourceLocale = null) {
-        $locales = (isset($sourceLocale)) ? [$locale, $sourceLocale] : [$locale];
-
-        $sql = $this->sql();
-        $sql->from($this->getTable() . " as t");
-        $sql->whereIn("locale", $locales);
-        $sql->where(["resource" => $resource, "key" => $key]);
-        $result = $sql->get()->resultArray();
-
-        return $result;
     }
 
 }

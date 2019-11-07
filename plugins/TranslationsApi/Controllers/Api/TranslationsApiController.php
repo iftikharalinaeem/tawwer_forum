@@ -8,7 +8,9 @@ namespace Vanilla\TranslationsAPI\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
+use Exception;
 use Vanilla\TranslationsAPI\models\resourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
@@ -64,6 +66,7 @@ class TranslationsApiController extends AbstractApiController {
      * Create a resource.
      *
      * @param array $body
+     * @throws ClientException
      */
     public function post_resource(array $body = []){
         $this->permission("Garden.Moderation.Manage");
@@ -71,7 +74,22 @@ class TranslationsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $body["sourceLocale"] = $body["sourceLocale"] ?? $this->configurationModule->get("Garden.Locale");
-        $this->resourceModel->insert($body);
+
+        $resourceExists = $this->resourceModel->get(
+            [
+                "name" => $body["name"],
+                "sourceLocale" => $body["sourceLocale"],
+                "url" => $body["url"]
+            ]
+        );
+
+        if ($resourceExists) {
+            throw new ClientException(
+                "The resource ". $body["url"] . "-" . $body["sourceLocale"] . "-" .  $body["name"] . " exists"
+            );
+        } else {
+            $this->resourceModel->insert($body);
+        }
     }
 
     /**
@@ -94,12 +112,11 @@ class TranslationsApiController extends AbstractApiController {
             $translationProperty = $this->translationPropertyModel->getTranslationProperty($resourceKeyRecord);
 
             if (!$translationProperty) {
-                $newTranslationProperty = $this->translationPropertyModel->createResourceKey($path, $resourceKeyRecord);
+                $newTranslationProperty = $this->translationPropertyModel->createTranslationProperty($path, $resourceKeyRecord);
                 $key = $newTranslationProperty["key"];
             } else {
                 $key = $translationProperty["key"];
             }
-
             $this->translationModel->createTranslation(
                 $path,
                 $record["locale"],
@@ -132,6 +149,9 @@ class TranslationsApiController extends AbstractApiController {
         }
         if (isset($query["recordID"]) && isset($query["recordType"])) {
             $where["rk.recordID"] = $query["recordID"];
+        }
+        if (isset($query["recordKey"]) && isset($query["recordType"])) {
+            $where["rk.recordKey"] = $query["recordKey"];
         }
         if (isset($query["locale"])) {
             $where["t.locale"] = $query["locale"];

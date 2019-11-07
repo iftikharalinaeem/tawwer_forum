@@ -75,12 +75,12 @@ class TranslationPropertyModel extends PipelineModel {
      *
      * @return array
      */
-    public function createResourceKey(string $path, array $record): array {
+    public function createTranslationProperty(string $path, array $record): array {
         $record["resource"] = $path;
 
-        $identifier = $this->getRecordIdentifier($record);
+        $recordIdentifier = $this->getRecordIdentifier($record);
 
-        $record["key"] = self::constructKey($record["propertyName"], $record["recordType"], $identifier);
+        $record["key"] = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
         $this->insert($record);
         $resourceKey = $this->get(["key" => $record["key"]]);
 
