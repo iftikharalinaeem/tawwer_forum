@@ -55,7 +55,7 @@ paths:
                 schema:
                   items:
                     $ref: '#/components/schemas/Translation'
-                  type: object
+                  type: array
             description: Success
         tags:
         - Translations
@@ -88,20 +88,21 @@ paths:
            description: Success
         tags:
           - Translations
-      requestBody:
-          content:
-            application/json:
-              schema:
-                  name:
-                    description: Descriptive name of the resource.
-                    type: string
-                  sourceLocale:
-                    description: The source locale of the resource.
-                    type: string
-                  url:
-                    description: The resource.
-                    type: string
-          required: true
+        requestBody:
+            content:
+              application/json:
+                properties:
+                  schema:
+                    name:
+                      description: Descriptive name of the resource.
+                      type: string
+                    sourceLocale:
+                      description: The source locale of the resource.
+                      type: string
+                    url:
+                      description: The resource.
+                      type: string
+            required: true
       summary: Add a Resource.
 components:
     schemas:

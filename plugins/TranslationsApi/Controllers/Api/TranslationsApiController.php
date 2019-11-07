@@ -68,7 +68,7 @@ class TranslationsApiController extends AbstractApiController {
      * @param array $body
      * @throws ClientException
      */
-    public function post_resource(array $body = []){
+    public function post(array $body = []) {
         $this->permission("Garden.Moderation.Manage");
         $in = $this->resourceSchema("in");
         $body = $in->validate($body);
