@@ -34,6 +34,7 @@ import { messagesClasses } from "@library/messages/messageStyles";
 import { LocaleDisplayer } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
 import { string } from "prop-types";
+import Container from "@library/layout/components/Container";
 
 interface IState {
     warningFlag: boolean;
@@ -61,8 +62,8 @@ class OrganizeCategoriesPage extends React.Component<IProps, IState> {
 
         const categoriesWarning = showWarning && this.state.warningFlag && (
             <Message
-                isFullWidth={true}
-                className={classNames(classesNavigationManager.containerWidth)}
+                isContained={true}
+                // className={classNames(classesNavigationManager.containerWidth)}
                 contents={
                     <div className={classesMessages.iconWrap}>
                         <AttachmentErrorIcon className={classesMessages.errorIcon} />
@@ -98,7 +99,8 @@ class OrganizeCategoriesPage extends React.Component<IProps, IState> {
                 <AnalyticsData uniqueKey="organizeCategoriesPage" />
                 <FullKnowledgeModal scrollable={true} titleID={this.titleID}>
                     <NavigationManagerMenu />
-                    {categoriesWarning}
+                    <div className={classNames(classesNavigationManager.containerWidth)}>{categoriesWarning}</div>
+
                     <div className={classNames(classesNavigationManager.container)}>
                         <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
 

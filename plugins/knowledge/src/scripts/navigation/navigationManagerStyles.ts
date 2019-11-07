@@ -139,19 +139,9 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...margins({ horizontal: "auto" }),
     });
 
-    const containerWidth = style(
-        "containerWidth",
-        {
-            paddingBottom: 0,
-            paddingTop: 0,
-        },
-
-        media.oneColumnDown({
-            ...paddings({
-                // horizontal: mobileGutter
-            }),
-        }),
-    );
+    const containerWidth = style("containerWidth", {
+        height: 55,
+    });
 
     const formError = style("formError", {
         position: "absolute",
@@ -164,7 +154,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...paddings({
             left: unit(globalVars.gutter.half),
             right: unit(globalVars.gutter.half),
-            top: globalVars.gutter.size,
+            top: globalVars.gutter.size - 6,
         }),
     });
 
