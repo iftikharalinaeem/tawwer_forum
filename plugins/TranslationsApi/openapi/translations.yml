@@ -126,4 +126,30 @@ components:
           - locale
           - translation
           type: object
+        PutTranslations:
+          properties:
+            recordType:
+              description: Name of the resource associated to the translation.
+              type: string
+            recordID:
+              description: The recordID associated to the translation.
+              type: integer
+            recordKey:
+              description: The recordKey associated to the translation.
+              type: string
+            locale:
+              description: The locale associated to the translation.
+              type: string
+            propertyName:
+              description: The property name associated to the translation.
+              type: string
+            translation:
+              description: The translation sentence.
+              type: string
+          required:
+            - recordType
+            - locale
+            - propertyName
+            - translation
+          type: object
 
