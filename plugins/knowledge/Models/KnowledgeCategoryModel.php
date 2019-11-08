@@ -137,7 +137,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
      * @throws \Vanilla\Exception\Database\NoResultsException If the target category or its ancestors cannot be found.
      */
-    public function selectWithAncestors(int $categoryID, string $locale =  null): array {
+    public function selectWithAncestors(int $categoryID, string $locale = null): array {
         $result = [];
 
         do {
@@ -160,7 +160,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectSingleFragment(int $categoryID, string $locale =  null): KbCategoryFragment {
+    public function selectSingleFragment(int $categoryID, string $locale = null): KbCategoryFragment {
         $rows = $this->sql()
             ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
             ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)

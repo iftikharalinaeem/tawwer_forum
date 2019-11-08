@@ -68,9 +68,6 @@ class KbPageTest extends AbstractAPIv2Test {
             "ssg2-mockSiteSection-en",
             "mockSiteSectionGroup-2"
         );
-        //$section2 = new MockSiteSection("section2", "en", "2", 2, "group2");
-        //$siteSectionProvider->addSiteSections([$section1, $section2]);
-        //self::container()->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
 
         // Insert a knowledge base in $section1's group.
         $kb = [
@@ -106,6 +103,7 @@ class KbPageTest extends AbstractAPIv2Test {
         $newSiteSectionProvider->addSiteSections([$section2]);
         $newSiteSectionProvider->setCurrentSiteSection($section2);
         $siteSectionModel->addProvider($newSiteSectionProvider);
+        $currentSiteSection = $siteSectionModel->getCurrentSiteSection();
         $page->validateSiteSection($kbID);
     }
 }
