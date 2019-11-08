@@ -4,7 +4,6 @@
  */
 
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { useUniqueID } from "@library/utility/idUtils";
 import { ITranslationProperty, LocaleDisplayer } from "@vanilla/i18n";
 import classNames from "classnames";
 import React, { useCallback, useEffect, useState } from "react";
@@ -17,41 +16,21 @@ interface ITranslations {
     [propertyKey: string]: string;
 }
 
+type TranslationUpdater = (key: string, value: string) => void;
+
 export interface ITranslationGrid {
     properties: ITranslationProperty[];
     existingTranslations: ITranslations;
+    onTranslationUpdate: TranslationUpdater;
     inScrollingContainer?: boolean;
-    dateUpdated?: string;
+    onLocaleChange?: (newLocale?: string) => void;
+    activeLocale: string;
     sourceLocale: string;
 }
 
-function useTranslationState(initialTranslations: ITranslations) {
-    const [inProgressTranslations, setInProgressTranslations] = useState(initialTranslations);
-    useEffect(() => {
-        setInProgressTranslations(initialTranslations);
-    }, [initialTranslations]);
-
-    const updateTranslationDraft = useCallback(
-        (propertyKey: string, translation: string) => {
-            setInProgressTranslations({
-                ...inProgressTranslations,
-                [propertyKey]: translation,
-            });
-        },
-        [setInProgressTranslations, inProgressTranslations],
-    );
-
-    return { inProgressTranslations, updateTranslationDraft };
-}
-
-/**
- * Translation UI
- * @param props
- * @constructor
- */
 export function TranslationGrid(props: ITranslationGrid) {
-    const { existingTranslations } = props;
-    const { inProgressTranslations, updateTranslationDraft } = useTranslationState(existingTranslations);
+    const { existingTranslations, onTranslationUpdate } = props;
+    const { inProgressTranslations, updateTranslationDraft } = useTranslationState(existingTranslations, onTranslationUpdate);
 
     const classesPanelList = panelListClasses();
     const { properties, inScrollingContainer = false } = props;
@@ -75,7 +54,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classNames(classes.rightCell, classes.headerRight)}>
                         <div className={classes.languageDropdown}>
                             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale="ca" />
+                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={() => props.onLocaleChange?.()} />
                             </div>
                         </div>
                     </div>
@@ -96,4 +75,24 @@ export function TranslationGrid(props: ITranslationGrid) {
             </div>
         </div>
     );
+}
+
+function useTranslationState(initialTranslations: ITranslations, afterSelfUpdate?: TranslationUpdater) {
+    const [inProgressTranslations, setInProgressTranslations] = useState(initialTranslations);
+    useEffect(() => {
+        setInProgressTranslations(initialTranslations);
+    }, [initialTranslations]);
+
+    const updateTranslationDraft = useCallback(
+        (propertyKey: string, translation: string) => {
+            setInProgressTranslations({
+                ...inProgressTranslations,
+                [propertyKey]: translation,
+            });
+            afterSelfUpdate?.(propertyKey, translation);
+        },
+        [setInProgressTranslations, inProgressTranslations],
+    );
+
+    return { inProgressTranslations, updateTranslationDraft };
 }

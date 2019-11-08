@@ -13,8 +13,7 @@ import { loadLocales, LocaleProvider } from "@vanilla/i18n";
 import { TranslationGrid } from "./TranslationGrid";
 import { localeData, makeTestTranslationProperty } from "./translationGrid.storyData";
 
-const story = storiesOf("Components", module);
-const dateUpdated = "2019-10-09T20:05:51+00:00";
+const story = storiesOf("Translation", module);
 loadLocales(localeData);
 const ipsum =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sagittis porta nibh, a egestas tortor lobortis ac. \nPraesent interdum congue nunc, congue volutpat dui maximus commodo. Nunc sagittis libero id ex commodo aliquet. Vivamus venenatis pellentesque lorem, sed molestie justo vehicula eu.";
@@ -49,9 +48,9 @@ story.add("Translation Grid", () => {
                             makeTestTranslationProperty("test.6", "Hello world 6!", false),
                         ]}
                         existingTranslations={{
-                            "test.1": "Bonjour World!",
+                            "test.1": "你好，世界",
                             "test.4":
-                                "Cum saepe multa, tum memini domi in hemicyclio sedentem, ut solebat, cum et ego essem una et pauci admodum familiares, in eum sermonem illum incidere qui tum forte multis erat in ore. Meministi enim profecto, Attice, et eo magis, quod P. Sulpicio utebare multum, cum is tribunus plebis capitali odio a Q. Pompeio, qui tum erat consul, dissideret, quocum coniunctissime et amantissime vixerat, quanta esset hominum vel admiratio vel querella.",
+                                "存有悲坐阿梅德，consectetur adipiscing ELIT。前庭sagittis Aliquam NIBH，一个egestas tortor lobortis交流。现在，Planning有时目前，规划周末DUI最大的方便。现在，它是免费的箭头香蕉的优势。 LOREM活消毒的营养，但电视的车辆只是足球",
                         }}
                         inScrollingContainer={true}
                     />

@@ -55,6 +55,7 @@ export function TranslationGridLocaleChooser(props: IProps) {
         <div className={classes.languageDropdown}>
             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
                 <SelectBox
+                    label={"test"}
                     widthOfParent={true}
                     value={selectedOption}
                     onChange={option => props.onChange(option.value)}
