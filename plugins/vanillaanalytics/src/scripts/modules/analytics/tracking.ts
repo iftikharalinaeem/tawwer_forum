@@ -7,7 +7,7 @@ import getStore from "@library/redux/getStore";
 import { logError } from "@vanilla/utils";
 import KeenTracking from "keen-tracking";
 import { IStoreState } from "./analyticsReducer";
-import { clone } from "lodash";
+import clone from "lodash/clone";
 
 enum Collection {
     ARTICLE = "article",
