@@ -69,12 +69,12 @@ class TranslationsTests extends AbstractAPIv2Test {
     /**
      * Post /translations failure
      *
-     * @depends      testPostResource
-     * @dataProvider translationsPropertyProvider
-     *
      * @param $record
      * @param $key
      * @param $translation
+     *
+     * @depends      testPostResource
+     * @dataProvider translationsPropertyProvider
      */
     public function testPutTranslations($record, $key, $translation) {
         $this->api()->put(

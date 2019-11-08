@@ -110,7 +110,7 @@ class TranslationsApiController extends AbstractApiController {
 
         foreach ($records as $record) {
             $this->resourceModel->ensureResourceExists($path);
-            $resourceKeyRecord = array_intersect_key($record,TranslationPropertyModel::RESOURCE_KEY_RECORD);
+            $resourceKeyRecord = array_intersect_key($record, TranslationPropertyModel::RESOURCE_KEY_RECORD);
 
             $translationProperty = $this->translationPropertyModel->getTranslationProperty($resourceKeyRecord);
 
