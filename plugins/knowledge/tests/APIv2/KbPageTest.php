@@ -103,7 +103,6 @@ class KbPageTest extends AbstractAPIv2Test {
         $newSiteSectionProvider->addSiteSections([$section2]);
         $newSiteSectionProvider->setCurrentSiteSection($section2);
         $siteSectionModel->addProvider($newSiteSectionProvider);
-        $currentSiteSection = $siteSectionModel->getCurrentSiteSection();
         $page->validateSiteSection($kbID);
     }
 }
