@@ -59,28 +59,6 @@ paths:
             description: Success
         tags:
         - Translations
-      put:
-        parameters:
-          - description: resource to add\update in.
-            in: path
-            name: resourceUrl
-            required: true
-            schema:
-              type: string
-        responses:
-            '200':
-              description: Success
-            '400':
-              description: Bad Request
-        tags:
-            - Translations
-        requestBody:
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/PutTranslations'
-            required: true
-        summary: Add or update translations.
   /translations:
     post:
       responses:
@@ -124,32 +102,6 @@ components:
           - resource
           - key
           - locale
-          - translation
-          type: object
-        PutTranslations:
-          properties:
-            recordType:
-              description: Name of the resource associated to the translation.
-              type: string
-            recordID:
-              description: The recordID associated to the translation.
-              type: integer
-            recordKey:
-              description: The recordKey associated to the translation.
-              type: string
-            locale:
-              description: The locale associated to the translation.
-              type: string
-            propertyName:
-              description: The property name associated to the translation.
-              type: string
-            translation:
-              description: The translation sentence.
-              type: string
-          required:
-          - recordType
-          - locale
-          - propertyName
           - translation
           type: object
 

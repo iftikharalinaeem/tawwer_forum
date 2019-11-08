@@ -10,10 +10,14 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\TranslationsAPI\models\resourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 
+/**
+ * Class TranslationsApiController
+ */
 class TranslationsApiController extends AbstractApiController {
 
     /** @var Schema */
@@ -34,8 +38,8 @@ class TranslationsApiController extends AbstractApiController {
     /** @var TranslationModel */
     private $translationModel;
 
-    /** @var Gdn_Configuration */
-    private $configurationModule;
+    /** @var ConfigurationInterface */
+    private $config;
 
     /** @var TranslationPropertyModel */
     private $translationPropertyModel;
@@ -52,12 +56,12 @@ class TranslationsApiController extends AbstractApiController {
         resourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
-        Gdn_Configuration $configurationModule
+        ConfigurationInterface $configurationModule
     ) {
         $this->resourceModel = $resourcesModel;
         $this->translationModel = $translationModel;
         $this->translationPropertyModel = $translationPropertyModel;
-        $this->configurationModule = $configurationModule;
+        $this->config = $configurationModule;
 
     }
 
@@ -72,7 +76,7 @@ class TranslationsApiController extends AbstractApiController {
         $in = $this->resourceSchema("in");
         $body = $in->validate($body);
 
-        $body["sourceLocale"] = $body["sourceLocale"] ?? $this->configurationModule->get("Garden.Locale");
+        $body["sourceLocale"] = $body["sourceLocale"] ?? $this->config->get("Garden.Locale");
 
         $resourceExists = $this->resourceModel->get(
             [
@@ -88,40 +92,6 @@ class TranslationsApiController extends AbstractApiController {
             );
         } else {
             $this->resourceModel->insert($body);
-        }
-    }
-
-    /**
-     * PUT /Translations/:resource
-     *
-     * @param string $path Resource slug
-     * @param array $body
-     */
-    public function put(string $path, array $body = []) {
-        $this->permission("Garden.Moderation.Manage");
-        $in = $this->schema([":a" => $this->putTranslationSchema()], "in");
-        $path = substr($path, 1);
-
-        $records = $in->validate($body);
-
-        foreach ($records as $record) {
-            $this->resourceModel->ensureResourceExists($path);
-            $resourceKeyRecord = array_intersect_key($record,TranslationPropertyModel::RESOURCE_KEY_RECORD);
-
-            $translationProperty = $this->translationPropertyModel->getTranslationProperty($resourceKeyRecord);
-
-            if (!$translationProperty) {
-                $newTranslationProperty = $this->translationPropertyModel->createTranslationProperty($path, $resourceKeyRecord);
-                $key = $newTranslationProperty["translationPropertyKey"];
-            } else {
-                $key = $translationProperty["translationPropertyKey"];
-            }
-            $this->translationModel->createTranslation(
-                $path,
-                $record["locale"],
-                $key,
-                $record["translation"]
-            );
         }
     }
 

@@ -7,20 +7,14 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
-use VanillaTests\Fixtures\MockConfig;
-use VanillaTests\Fixtures\MockLocale;
+
 
 /**
  * Test Translations APIv2 endpoints.
  */
 class TranslationsTests extends AbstractAPIv2Test {
-
-    /** @var MockConfig */
-    private static $config;
-
     /**
      * {@inheritdoc}
      */
@@ -71,75 +65,4 @@ class TranslationsTests extends AbstractAPIv2Test {
             $resource
         );
     }
-
-    /**
-     * Post /translations failure
-     *
-     * @depends      testPostResource
-     * @dataProvider translationsPropertyProvider
-     *
-     * @param $record
-     * @param $key
-     * @param $translation
-     */
-    public function testPutTranslations($record, $key, $translation) {
-        $this->api()->put(
-            'translations/kb',
-                $record
-        );
-
-        $record = reset($record);
-        $translationPropertyModel = self::container()->get(TranslationPropertyModel::class);
-        $result = $translationPropertyModel->get(["recordType" => $record["recordType"], "recordID" => $record["recordID"], "propertyName" => $record["propertyName"]]);
-        $translationModel = self::container()->get(TranslationModel::class);
-        $this->assertEquals($key, $result[0]["translationPropertyKey"]);
-
-        $result = $translationModel->get(["translationPropertyKey" => $result[0]["translationPropertyKey"]]);
-        $this->assertEquals($translation, $result[0]["translation"]);
-    }
-
-    /**
-     * @return array
-     */
-    public function translationsPropertyProvider(): array {
-        return [
-            [
-               [[
-                   "recordType" => "knowledgebase",
-                   "recordID" => 8,
-                   "recordKey" => "",
-                   "propertyName" => "name",
-                   "locale" => "en",
-                   "translation" => "english kb name"
-               ]],
-                "knowledgebase.8.name",
-                "english kb name",
-            ],
-            [
-                [[
-                    "recordType" => "knowledgeCategory",
-                    "recordID" => 9,
-                    "recordKey" => "",
-                    "propertyName" => "description",
-                    "locale" => "en",
-                    "translation" => "english kb cat description"
-                ]],
-                "knowledgeCategory.9.description",
-                "english kb cat description",
-            ],
-            [
-                [[
-                    "recordType" => "knowledgeCategory",
-                    "recordID" => null,
-                    "recordKey" => null,
-                    "propertyName" => "name",
-                    "locale" => "en",
-                    "translation"=> "name"
-                ]],
-                "knowledgeCategory..name",
-                "name",
-            ],
-        ];
-    }
-
 }

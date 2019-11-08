@@ -7,15 +7,15 @@
 namespace Vanilla\TranslationsAPI\models;
 
 use Garden\Web\Exception\ClientException;
-use Gdn_Configuration;
 use Gdn_Session;
 use LocalesApiController;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
 
 /**
- * Translation Model
+ * TranslationModel
  */
 class TranslationModel extends PipelineModel {
 
@@ -25,21 +25,25 @@ class TranslationModel extends PipelineModel {
     /** @var LocalesApiController */
     private $localesApiController;
 
-    /** @var Gdn_Configuration */
-    private $configurationModule;
+    /** @var ConfigurationInterface */
+    private $config;
 
     /**
-     *  constructor.
+     * TranslationModel constructor.
      *
      * @param Gdn_Session $session
      * @param LocalesApiController $localesApiController
-     * @param Gdn_Configuration $configurationModule
+     * @param ConfigurationInterface $config
      */
-    public function __construct(Gdn_Session $session, LocalesApiController $localesApiController, Gdn_Configuration $configurationModule) {
+    public function __construct(
+        Gdn_Session $session,
+        LocalesApiController $localesApiController,
+        ConfigurationInterface $config
+    ) {
         parent::__construct("translations");
         $this->session = $session;
         $this->localesApiController = $localesApiController;
-        $this->configurationModule = $configurationModule;
+        $this->config = $config;
 
         $dateProcessor = new CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -63,7 +67,7 @@ class TranslationModel extends PipelineModel {
      * @return bool
      */
     public function createTranslation(string $resource, string $locale, string $key, string $translationString): bool {
-        $sourceLocale =  $this->configurationModule->get("Garden.Locale");
+        $sourceLocale =  $this->config->get("Garden.Locale");
         if ($locale !== $sourceLocale) {
             $this->validateLocale($locale, $sourceLocale);
         }
@@ -73,7 +77,7 @@ class TranslationModel extends PipelineModel {
         if (!$translation) {
             $translationRecord = [
                 "resource" => $resource,
-                "translationPropertyKey" => $key,
+                "key" => $key,
                 "locale" => $locale,
                 "translation" => $translationString,
             ];

@@ -13,7 +13,7 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
 
 /**
- *
+ * TranslationPropertyModel class.
  */
 class TranslationPropertyModel extends PipelineModel {
 
@@ -80,7 +80,7 @@ class TranslationPropertyModel extends PipelineModel {
 
         $recordIdentifier = $this->getRecordIdentifier($record);
 
-        $record["translationPropertyKey"] = self::createtranslationPropertykey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $record["translationPropertyKey"] = self::createTranslationPropertyKey($record["propertyName"], $record["recordType"], $recordIdentifier);
         $this->insert($record);
         $translationProperty = $this->get(["translationPropertyKey" => $record["translationPropertyKey"]]);
 
@@ -96,7 +96,7 @@ class TranslationPropertyModel extends PipelineModel {
      */
     public function getTranslationProperty(array $record) :array {
         $recordIdentifier = $this->getRecordIdentifier($record);
-        $key = self::createtranslationPropertykey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $key = self::createTranslationPropertyKey($record["propertyName"], $record["recordType"], $recordIdentifier);
         $translationProperty = $this->get(["translationPropertyKey" =>  $key]);
         if ($translationProperty) {
             $translationProperty = reset($translationProperty);
@@ -110,12 +110,12 @@ class TranslationPropertyModel extends PipelineModel {
      *
      * @param string $recordProperty
      * @param string $recordType
-     * @param mixed $recordID
+     * @param mixed $recordIdentifier
      *
      * @return string;
      */
-    public static function createtranslationPropertykey(string $recordProperty, string $recordType = null, $recordID = null): string {
-        return $recordType.'.'.$recordID.'.'.$recordProperty;
+    public static function createTranslationPropertyKey(string $recordProperty, string $recordType = null, $recordIdentifier = null): string {
+        return $recordType.'.'.$recordIdentifier.'.'.$recordProperty;
     }
 
     /**

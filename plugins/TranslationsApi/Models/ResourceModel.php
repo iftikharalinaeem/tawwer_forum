@@ -14,7 +14,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
 
 /**
- *
+ * ResourceModel
  */
 class resourceModel extends PipelineModel {
 
@@ -42,6 +42,8 @@ class resourceModel extends PipelineModel {
     }
 
     /**
+     * Ensure that a resource exists.
+     *
      * @param string $resource
      * @throws ClientException
      */
@@ -56,6 +58,4 @@ class resourceModel extends PipelineModel {
             throw new ClientException("The '". $resource."' resource doesn't exist");
         }
     }
-
-
 }
