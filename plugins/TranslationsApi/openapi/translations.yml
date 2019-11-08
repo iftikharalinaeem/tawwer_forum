@@ -59,6 +59,28 @@ paths:
             description: Success
         tags:
         - Translations
+      put:
+        parameters:
+          - description: resource to add\update in.
+            in: path
+            name: resourceUrl
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Success
+          '400':
+            description: Bad Request
+        tags:
+          - Translations
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutTranslations'
+          required: true
+        summary: Add or update translations.
   /translations:
     post:
       responses:

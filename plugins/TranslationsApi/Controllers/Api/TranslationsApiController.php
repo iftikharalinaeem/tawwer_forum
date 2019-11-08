@@ -96,6 +96,41 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
+     * PUT /Translations/:resource
+     *
+     * @param string $path Resource slug
+     * @param array $body
+     */
+    public function put(string $path, array $body = []) {
+        $this->permission("Garden.Moderation.Manage");
+        $in = $this->schema([":a" => $this->putTranslationSchema()], "in");
+        $path = substr($path, 1);
+
+        $records = $in->validate($body);
+
+        foreach ($records as $record) {
+            $this->resourceModel->ensureResourceExists($path);
+            $resourceKeyRecord = array_intersect_key($record,TranslationPropertyModel::RESOURCE_KEY_RECORD);
+
+            $translationProperty = $this->translationPropertyModel->getTranslationProperty($resourceKeyRecord);
+
+            if (!$translationProperty) {
+                $newTranslationProperty = $this->translationPropertyModel->createTranslationProperty($path, $resourceKeyRecord);
+                $key = $newTranslationProperty["translationPropertyKey"];
+            } else {
+                $key = $translationProperty["translationPropertyKey"];
+            }
+
+            $this->translationModel->createTranslation(
+                $path,
+                $record["locale"],
+                $key,
+                $record["translation"]
+            );
+        }
+    }
+
+    /**
      * GET /Translations/:resource
      *
      * @param string $path
