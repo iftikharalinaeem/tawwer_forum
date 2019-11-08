@@ -6,7 +6,7 @@ paths:
         parameters:
         - description: resource to filter.
           in: path
-          name: resource
+          name: resourceUrl
           required: true
           schema:
             type: string
@@ -81,28 +81,28 @@ paths:
                   $ref: '#/components/schemas/PutTranslations'
             required: true
         summary: Add or update translations.
-  /translations/resource:
-      post:
-        responses:
-          '201':
-           description: Success
-        tags:
-          - Translations
-        requestBody:
-            content:
-              application/json:
-                properties:
-                  schema:
-                    name:
-                      description: Descriptive name of the resource.
-                      type: string
-                    sourceLocale:
-                      description: The source locale of the resource.
-                      type: string
-                    url:
-                      description: The resource.
-                      type: string
-            required: true
+  /translations:
+    post:
+      responses:
+        '201':
+          description: Success
+      tags:
+        - Translations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  description: Descriptive name of the resource.
+                  type: string
+                sourceLocale:
+                  description: The source locale of the resource.
+                  type: string
+                url:
+                  description: The resource.
+                  type: string
+        required: true
       summary: Add a Resource.
 components:
     schemas:
