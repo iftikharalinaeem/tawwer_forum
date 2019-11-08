@@ -36,7 +36,7 @@ class TranslationPropertyModel extends PipelineModel {
     ];
 
     /** Default limit on the number of results returned. */
-    const LIMIT_DEFAULT = 100;
+    const LIMIT_DEFAULT = 1000;
 
     /**
      * resourceKeyModel constructor.
