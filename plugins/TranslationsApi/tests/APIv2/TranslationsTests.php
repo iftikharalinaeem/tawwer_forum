@@ -69,9 +69,9 @@ class TranslationsTests extends AbstractAPIv2Test {
     /**
      * Post /translations failure
      *
-     * @param $record
-     * @param $key
-     * @param $translation
+     * @param array $record
+     * @param string $key
+     * @param string $translation
      *
      * @depends      testPostResource
      * @dataProvider translationsPropertyProvider
