@@ -87,10 +87,10 @@ export function useProductsByLocale() {
 export function useProductsForLocale(localeKey: string | null) {
     const productsByLocale = useProductsByLocale();
 
-    if (!localeKey || !productsByLocale) {
-        return null;
+    let result: ICommunityLocaleGroup[] | null = null;
+    if (localeKey && productsByLocale) {
+        result = productsByLocale[localeKey];
     }
-    const result = productsByLocale[localeKey];
     useDebugValue(result);
     return result;
 }
