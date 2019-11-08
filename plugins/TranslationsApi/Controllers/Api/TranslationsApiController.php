@@ -103,7 +103,7 @@ class TranslationsApiController extends AbstractApiController {
      * @return array
      */
     public function get(string $path, array $query = []) {
-        $this->permission("Garden.Moderation.Manage");
+        $this->permission();
         $path = substr($path, 1);
 
         $in = $this->getTranslationsSchema("in");
