@@ -10,11 +10,14 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
-use Exception;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\TranslationsAPI\models\resourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 
+/**
+ * Class TranslationsApiController
+ */
 class TranslationsApiController extends AbstractApiController {
 
     /** @var Schema */
@@ -35,8 +38,8 @@ class TranslationsApiController extends AbstractApiController {
     /** @var TranslationModel */
     private $translationModel;
 
-    /** @var Gdn_Configuration */
-    private $configurationModule;
+    /** @var ConfigurationInterface */
+    private $config;
 
     /** @var TranslationPropertyModel */
     private $translationPropertyModel;
@@ -53,12 +56,12 @@ class TranslationsApiController extends AbstractApiController {
         resourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
-        Gdn_Configuration $configurationModule
+        ConfigurationInterface $configurationModule
     ) {
         $this->resourceModel = $resourcesModel;
         $this->translationModel = $translationModel;
         $this->translationPropertyModel = $translationPropertyModel;
-        $this->configurationModule = $configurationModule;
+        $this->config = $configurationModule;
 
     }
 
@@ -73,56 +76,22 @@ class TranslationsApiController extends AbstractApiController {
         $in = $this->resourceSchema("in");
         $body = $in->validate($body);
 
-        $body["sourceLocale"] = $body["sourceLocale"] ?? $this->configurationModule->get("Garden.Locale");
+        $body["sourceLocale"] = $body["sourceLocale"] ?? $this->config->get("Garden.Locale");
 
         $resourceExists = $this->resourceModel->get(
             [
                 "name" => $body["name"],
                 "sourceLocale" => $body["sourceLocale"],
-                "url" => $body["url"]
+                "urlCode" => $body["urlCode"]
             ]
         );
 
         if ($resourceExists) {
             throw new ClientException(
-                "The resource ". $body["url"] . "-" . $body["sourceLocale"] . "-" .  $body["name"] . " exists"
+                "The resource ". $body["urlCode"] . "-" . $body["sourceLocale"] . "-" .  $body["name"] . " exists"
             );
         } else {
             $this->resourceModel->insert($body);
-        }
-    }
-
-    /**
-     * PUT /Translations/:resource
-     *
-     * @param string $path Resource slug
-     * @param array $body
-     */
-    public function put(string $path, array $body = []) {
-        $this->permission("Garden.Moderation.Manage");
-        $in = $this->schema([":a" => $this->putTranslationSchema()], "in");
-        $path = substr($path, 1);
-
-        $records = $in->validate($body);
-
-        foreach ($records as $record) {
-            $this->resourceModel->ensureResourceExists($path);
-            $resourceKeyRecord = array_intersect_key($record,TranslationPropertyModel::RESOURCE_KEY_RECORD);
-
-            $translationProperty = $this->translationPropertyModel->getTranslationProperty($resourceKeyRecord);
-
-            if (!$translationProperty) {
-                $newTranslationProperty = $this->translationPropertyModel->createTranslationProperty($path, $resourceKeyRecord);
-                $key = $newTranslationProperty["key"];
-            } else {
-                $key = $translationProperty["key"];
-            }
-            $this->translationModel->createTranslation(
-                $path,
-                $record["locale"],
-                $key,
-                $record["translation"]
-            );
         }
     }
 
@@ -134,24 +103,24 @@ class TranslationsApiController extends AbstractApiController {
      * @return array
      */
     public function get(string $path, array $query = []) {
-        $this->permission("Garden.Moderation.Manage");
+        $this->permission();
         $path = substr($path, 1);
 
         $in = $this->getTranslationsSchema("in");
 
-        $query["url"] = $path;
+        $query["urlCode"] = $path;
         $query = $in->validate($query);
 
-        $where["rk.resource"] = $query["url"];
+        $where["tp.resource"] = $query["urlCode"];
 
         if (isset($query["recordType"])) {
-            $where["rk.recordType"] = $query["recordType"];
+            $where["tp.recordType"] = $query["recordType"];
         }
         if (isset($query["recordID"]) && isset($query["recordType"])) {
-            $where["rk.recordID"] = $query["recordID"];
+            $where["tp.recordID"] = $query["recordID"];
         }
         if (isset($query["recordKey"]) && isset($query["recordType"])) {
-            $where["rk.recordKey"] = $query["recordKey"];
+            $where["tp.recordKey"] = $query["recordKey"];
         }
         if (isset($query["locale"])) {
             $where["t.locale"] = $query["locale"];
@@ -180,9 +149,9 @@ class TranslationsApiController extends AbstractApiController {
     public function resourceSchema(string $type = ""): Schema {
         if ($this->resourceSchema === null) {
             $this->resourceSchema = $this->schema(Schema::parse([
-                "name",
+                "name?",
                 "sourceLocale?",
-                "url",
+                "urlCode",
             ]));
         }
         return $this->schema($this->resourceSchema, $type);
@@ -197,7 +166,7 @@ class TranslationsApiController extends AbstractApiController {
     public function getTranslationsSchema(string $type = ""): Schema {
         if ($this->getResourceSchema === null) {
             $this->getResourceSchema = $this->schema(Schema::parse([
-                "url?",
+                "urlCode?",
                 "recordType?",
                 "recordID?",
                 "recordKey?",
@@ -250,7 +219,11 @@ class TranslationsApiController extends AbstractApiController {
             $this->translationSchema = $this->schema(Schema::parse([
                 "resource",
                 "recordType",
-                "key",
+                "recordID?",
+                "recordKey?",
+                "propertyName",
+                "propertyType?",
+                "translationPropertyKey",
                 "locale",
                 "translation",
             ]));

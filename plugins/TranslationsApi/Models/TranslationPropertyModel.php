@@ -13,7 +13,7 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
 
 /**
- *
+ * TranslationPropertyModel class.
  */
 class TranslationPropertyModel extends PipelineModel {
 
@@ -26,9 +26,6 @@ class TranslationPropertyModel extends PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
-    /** Default limit on the number of results returned. */
-    const LIMIT_DEFAULT = 100;
-
     const RESOURCE_KEY_RECORD = [
         "recordType" => true,
         "recordID" => true,
@@ -37,6 +34,9 @@ class TranslationPropertyModel extends PipelineModel {
         "propertyType" => true,
         "key" => true,
     ];
+
+    /** Default limit on the number of results returned. */
+    const LIMIT_DEFAULT = 1000;
 
     /**
      * resourceKeyModel constructor.
@@ -80,11 +80,11 @@ class TranslationPropertyModel extends PipelineModel {
 
         $recordIdentifier = $this->getRecordIdentifier($record);
 
-        $record["key"] = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $record["translationPropertyKey"] = self::createTranslationPropertyKey($record["propertyName"], $record["recordType"], $recordIdentifier);
         $this->insert($record);
-        $resourceKey = $this->get(["key" => $record["key"]]);
+        $translationProperty = $this->get(["translationPropertyKey" => $record["translationPropertyKey"]]);
 
-        $result = reset($resourceKey);
+        $result = reset($translationProperty);
         return $result;
     }
 
@@ -96,8 +96,8 @@ class TranslationPropertyModel extends PipelineModel {
      */
     public function getTranslationProperty(array $record) :array {
         $recordIdentifier = $this->getRecordIdentifier($record);
-        $key = self::constructKey($record["propertyName"], $record["recordType"], $recordIdentifier);
-        $translationProperty = $this->get(["key" =>  $key]);
+        $key = self::createTranslationPropertyKey($record["propertyName"], $record["recordType"], $recordIdentifier);
+        $translationProperty = $this->get(["translationPropertyKey" =>  $key]);
         if ($translationProperty) {
             $translationProperty = reset($translationProperty);
         }
@@ -106,16 +106,16 @@ class TranslationPropertyModel extends PipelineModel {
     }
 
     /**
-     * Construct a key for the resource translations.
+     * Construct a translationPropertykey for the resource translations.
      *
      * @param string $recordProperty
      * @param string $recordType
-     * @param mixed $recordID
+     * @param mixed $recordIdentifier
      *
      * @return string;
      */
-    public static function constructKey(string $recordProperty, string $recordType = null, $recordID = null): string {
-        return $recordType.'.'.$recordID.'.'.$recordProperty;
+    public static function createTranslationPropertyKey(string $recordProperty, string $recordType = null, $recordIdentifier = null): string {
+        return $recordType.'.'.$recordIdentifier.'.'.$recordProperty;
     }
 
     /**
@@ -130,8 +130,8 @@ class TranslationPropertyModel extends PipelineModel {
         $offset = $options["offset"] ?? 0;
 
         $sql = $this->sql();
-        $sql->from($this->getTable() . " as rk")
-            ->join("translations t", "rk.key = t.key", 'inner');
+        $sql->from($this->getTable() . " as tp")
+            ->join("translations t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
 
         $sql->where($where);
         $sql->limit($limit, $offset);
@@ -152,8 +152,12 @@ class TranslationPropertyModel extends PipelineModel {
         $identifier = null;
         if (isset($record["recordID"]) && isset($record["recordKey"])) {
             throw new ClientException("A resource key can't have both a recordID or recordKey");
+        } elseif (isset($record["recordID"])) {
+            $identifier = $record["recordID"];
+        } elseif (isset($record["recordKey"])) {
+            $identifier = $record["recordKey"];
         } else {
-            $identifier = $record["recordID"] ?? $record["recordKey"];
+            $identifier = '';
         }
         return $identifier;
     }

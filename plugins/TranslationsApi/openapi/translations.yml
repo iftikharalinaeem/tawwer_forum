@@ -1,12 +1,12 @@
 openapi: 3.0.2
 info:
 paths:
-  /translations/{resource}:
+  /translations/{resourceUrl}:
       get:
         parameters:
-        - description: resource to filter.
+        - description: Resource to filter.
           in: path
-          name: resource
+          name: resourceUrl
           required: true
           schema:
             type: string
@@ -59,50 +59,28 @@ paths:
             description: Success
         tags:
         - Translations
-      put:
-        parameters:
-          - description: resource to add\update in.
-            in: path
-            name: resource
-            required: true
+  /translations:
+    post:
+      responses:
+        '201':
+          description: Success
+      tags:
+        - Translations
+      requestBody:
+        content:
+          application/json:
             schema:
-              type: string
-        responses:
-            '200':
-              description: Success
-            '400':
-              description: Bad Request
-        tags:
-            - Translations
-        requestBody:
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/PutTranslations'
-            required: true
-        summary: Add or update translations.
-  /translations/resource:
-      post:
-        responses:
-          '201':
-           description: Success
-        tags:
-          - Translations
-        requestBody:
-            content:
-              application/json:
-                properties:
-                  schema:
-                    name:
-                      description: Descriptive name of the resource.
-                      type: string
-                    sourceLocale:
-                      description: The source locale of the resource.
-                      type: string
-                    url:
-                      description: The resource.
-                      type: string
-            required: true
+              properties:
+                name:
+                  description: Descriptive name of the resource.
+                  type: string
+                sourceLocale:
+                  description: The source locale of the resource.
+                  type: string
+                url:
+                  description: The resource.
+                  type: string
+        required: true
       summary: Add a Resource.
 components:
     schemas:
@@ -124,32 +102,6 @@ components:
           - resource
           - key
           - locale
-          - translation
-          type: object
-        PutTranslations:
-          properties:
-            recordType:
-              description: Name of the resource associated to the translation.
-              type: string
-            recordID:
-              description: The recordID associated to the translation.
-              type: integer
-            recordKey:
-              description: The recordKey associated to the translation.
-              type: string
-            locale:
-              description: The locale associated to the translation.
-              type: string
-            propertyName:
-              description: The property name associated to the translation.
-              type: string
-            translation:
-              description: The translation sentence.
-              type: string
-          required:
-          - recordType
-          - locale
-          - propertyName
           - translation
           type: object
 

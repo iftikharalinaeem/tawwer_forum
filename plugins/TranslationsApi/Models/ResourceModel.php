@@ -14,7 +14,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
 
 /**
- *
+ * ResourceModel
  */
 class resourceModel extends PipelineModel {
 
@@ -42,6 +42,8 @@ class resourceModel extends PipelineModel {
     }
 
     /**
+     * Ensure that a resource exists.
+     *
      * @param string $resource
      * @throws ClientException
      */
@@ -49,13 +51,11 @@ class resourceModel extends PipelineModel {
         try {
             $this->selectSingle(
                 [
-                    "url" => $resource,
+                    "urlCode" => $resource,
                 ]
             );
         } catch (NoResultsException $e) {
-            throw new ClientException("The ". $resource." resource doesn't exist");
+            throw new ClientException("The '". $resource."' resource doesn't exist");
         }
     }
-
-
 }
