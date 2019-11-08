@@ -1,0 +1,17 @@
+{
+    "name": "Translations API",
+    "description": "Provides an API to manage translations resources.",
+    "version": "1.0",
+    "priority": 1000,
+    "key": "TranslationsApi",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Chris Chabilall",
+            "email": "chris.c@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.8.3"
+    }
+}
