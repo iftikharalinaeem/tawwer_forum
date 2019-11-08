@@ -32,7 +32,6 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
-import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 
@@ -330,4 +329,4 @@ function LoadMoreButton(props: { nextPage?: number; onClick: () => void }) {
     );
 }
 
-export default hot(module)(withRedux(withDevice(RevisionsPage)));
+export default withRedux(withDevice(RevisionsPage));

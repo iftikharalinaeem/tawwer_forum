@@ -34,7 +34,7 @@ class NavigationManagerErrors extends React.Component<IProps> {
                     className={classes.formError}
                     onConfirm={retryHandler ? this.handleRetry : undefined}
                     confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
-                    onCancel={this.props.onClear}
+                    onCancel={() => this.props.onClear()}
                     stringContents={
                         getGlobalErrorMessage(currentError.error) ||
                         t("Something went wrong while contacting the server.")
