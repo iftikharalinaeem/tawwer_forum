@@ -348,7 +348,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $Breadcrumbs = [];
 
         foreach ($Data as &$Row) {
-            $Row['Title'] = markString($SearchTerms, Gdn_Format::text($Row['Title'], false));
+            $Row['Title'] = htmlspecialchars($Row['Title']);
             $Row['Score'] = (int)$Row['Score'];
 
             // Generate record URLs based on their type.
