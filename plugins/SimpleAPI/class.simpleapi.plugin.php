@@ -407,7 +407,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             if (!$MappedURI) throw new Exception('Unable to map request');
 
             // Apply the mapped replacement
-            Gdn::request()->withURI($MappedURI);
+            Gdn::request()->setURI($MappedURI);
 
             // Authenticate & prepare data
             $this->prepareAPI($Sender);
