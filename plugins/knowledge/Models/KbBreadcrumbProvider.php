@@ -40,7 +40,7 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getForRecord(RecordInterface $record): array {
+    public function getForRecord(RecordInterface $record, string $locale = null): array {
         if (!$record instanceof KbCategoryRecordType) {
             return [];
         }
