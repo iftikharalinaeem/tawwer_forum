@@ -867,7 +867,7 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test PUT /articles/{ID}/invalidateTranslations.
+     * Test PUT /articles/{ID}/invalidate-translations.
      */
     public function testInvalidatingTranslations() {
         $this->api()->patch(
@@ -876,7 +876,7 @@ class ArticlesTest extends AbstractResourceTest {
         );
 
         $articleID = $this->createArticleWithRevisions(["es","ru"]);
-        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidateTranslations", ["invalidateTranslations" => true]);
+        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidate-translations", ["invalidateTranslations" => true]);
 
         $revisions = $response->getBody();
         $translationStatuses = array_column($revisions, "translationStatus", "locale");
