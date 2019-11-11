@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\TranslationsAPI\models;
+namespace Vanilla\TranslationsApi\Models;
 
 use Garden\Web\Exception\ClientException;
 use Gdn_Session;

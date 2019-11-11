@@ -4,16 +4,16 @@
  * @license Proprietary
  */
 
-namespace Vanilla\TranslationsAPI\Controllers\Api;
+namespace Vanilla\TranslationsApi\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\TranslationsAPI\models\ResourceModel;
-use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
-use Vanilla\TranslationsAPI\models\TranslationModel;
+use Vanilla\TranslationsApi\Models\ResourceModel;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
+use Vanilla\TranslationsApi\Models\TranslationModel;
 
 /**
  * Class TranslationsApiController
