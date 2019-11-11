@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { Omit } from "@library/@types/utils";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";

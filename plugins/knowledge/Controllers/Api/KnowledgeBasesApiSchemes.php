@@ -184,6 +184,7 @@ trait KnowledgeBasesApiSchemes {
                     "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
                     ],
                     "sourceLocale?",
+                    "locale?",
                     "siteSectionGroup?"
                 ]),
                 $type

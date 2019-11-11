@@ -126,7 +126,7 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             onCancel={props.history.goBack}
-            onConfirm={clearConversionNotice}
+            onConfirm={() => clearConversionNotice()}
             contents={message}
             stringContents={message}
         />
@@ -145,7 +145,7 @@ export function EditorForm(props: IProps) {
                     </div>
                 </div>
             }
-            onConfirm={props.actions.clearFallbackLocaleNotice}
+            onConfirm={() => props.actions.clearFallbackLocaleNotice()}
             stringContents={t(
                 "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
             )}
@@ -248,7 +248,7 @@ export function EditorForm(props: IProps) {
                     reinitialize={formNeedsRefresh}
                     initialValue={form.body}
                     operationsQueue={props.editorOperationsQueue}
-                    clearOperationsQueue={props.actions.clearEditorOps}
+                    clearOperationsQueue={() => props.actions.clearEditorOps()}
                 >
                     <div className={classesEditorForm.embedBarContainer}>
                         <animated.div

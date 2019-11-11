@@ -4,26 +4,22 @@
  * @license Proprietary
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { Route } from "react-router-dom";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import qs from "qs";
-import find from "lodash/find";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { logWarning } from "@vanilla/utils";
 import RouteHandler from "@library/routing/RouteHandler";
 import ModalLoader from "@library/modal/ModalLoader";
-import { IArticleFragment, IArticle, IArticleLocale } from "@knowledge/@types/api/article";
+import { IArticleFragment, IArticle } from "@knowledge/@types/api/article";
 import { IRevisionFragment, IRevision } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import getStore from "@library/redux/getStore";
-import { t, getSiteSection, siteUrl } from "@library/utility/appUtils";
+import { siteUrl } from "@library/utility/appUtils";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { assetUrl } from "@library/utility/appUtils";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { IKnowledgeBase, IKnowledgeBasesState } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { map } from "lodash";
 
 interface IEditorURLData {
     articleID?: number;
@@ -217,10 +213,4 @@ export function getPageRoutes() {
         HomeRoute.route,
         <Route component={NotFound} key={"not found"} />,
     ];
-}
-
-// The point where `mountReact` or ReactDOM.render() is what will re-render the tree.
-// This is only here to prevent changes to these modules from causing a full reload.
-if (module.hot) {
-    module.hot.accept();
 }

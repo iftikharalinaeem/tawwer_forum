@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * A model for managing knowledge categories.
@@ -40,17 +41,21 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var SiteSectionModel $siteSectionModel */
+    private $siteSectionModel;
+
     /**
      * KnowledgeCategoryModel constructor.
      *
      * @param Gdn_Session $session
      * @param KnowledgeBaseModel $knowledgeBaseModel
      */
-    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel) {
+    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel, SiteSectionModel $siteSectionModel) {
         parent::__construct("knowledgeCategory");
 
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
+        $this->siteSectionModel = $siteSectionModel;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -126,16 +131,17 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * Given a category ID, get the row and the rows of all its ancestors in order.
      *
      * @param int $categoryID
+     * @param string $locale
      * @return KbCategoryFragment[]
      *
      * @throws \Garden\Schema\ValidationException If a queried row fails to validate against its output schema.
      * @throws \Vanilla\Exception\Database\NoResultsException If the target category or its ancestors cannot be found.
      */
-    public function selectWithAncestors(int $categoryID): array {
+    public function selectWithAncestors(int $categoryID, string $locale = null): array {
         $result = [];
 
         do {
-            $row = $this->selectSingleFragment($categoryID);
+            $row = $this->selectSingleFragment($categoryID, $locale);
             array_unshift($result, $row);
             $categoryID = $row->getParentID();
         } while ($categoryID > 0);
@@ -147,13 +153,14 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * Select a KbCategoryFragment for a given id.
      *
      * @param int $categoryID Conditions for the select query.
+     * @param string $locale
      *
      * @return KbCategoryFragment
      *
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectSingleFragment(int $categoryID): KbCategoryFragment {
+    public function selectSingleFragment(int $categoryID, string $locale = null): KbCategoryFragment {
         $rows = $this->sql()
             ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
             ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)
@@ -164,6 +171,7 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             throw new NoResultsException("Could not find category fragment for id $categoryID");
         }
         $result = reset($rows);
+        $result['locale'] = $locale ?? $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $result['knowledgeBaseID']])['sourceLocale']; //$this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
 
         // Normalize the fragment.
         $url = $this->url($result);
@@ -294,7 +302,10 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
-        $result = \Gdn::request()->url("/kb/categories/" . $slug, $withDomain);
+
+        $locale = $knowledgeCategory['locale'] ?? $knowledgeCategory['sourceLocale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $siteSectionSlug = $this->knowledgeBaseModel->getSiteSectionSlug($knowledgeCategory['knowledgeBaseID'], $locale);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/categories/" . $slug);
 
         return $result;
     }

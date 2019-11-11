@@ -23,7 +23,6 @@ import NavigationManagerErrors from "@knowledge/navigation/subcomponents/Navigat
 import classNames from "classnames";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
-import { hot } from "react-hot-loader";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -164,9 +163,7 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default hot(module)(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(OrganizeCategoriesPage),
-);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(OrganizeCategoriesPage);

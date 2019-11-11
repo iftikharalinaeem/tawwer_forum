@@ -243,11 +243,13 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 $sql->leftJoin('knowledgeBase kb', "c.knowledgeBaseID = kb.knowledgeBaseID");
             }
             if (!empty($options['arl.locale'])) {
+                $joinCondition = $sql->conditionExpr('arl.status', self::STATUS_PUBLISHED);
+                $joinCondition .= ' AND '.$sql->conditionExpr('ar.articleID', 'arl.articleID', false, false);
+                $joinCondition .= ' AND '.$sql->conditionExpr('arl.locale', $options['arl.locale']);
+
                 $sql->leftJoin(
                     'articleRevision arl',
-                    'arl.status = "'.self::STATUS_PUBLISHED.'" 
-                    AND ar.articleID = arl.articleID 
-                    AND arl.locale = "'.$options['arl.locale'].'" '
+                    $joinCondition
                 );
             }
             $sql->limit($limit, $offset);
@@ -337,11 +339,12 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $sql->join("articleRevision ar", 'ar.status = "'.self::STATUS_PUBLISHED.'" AND a.articleID = ar.articleID')
             ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
         if (!empty($options['arl.locale'])) {
+            $joinCondition = $sql->conditionExpr('arl.status', self::STATUS_PUBLISHED);
+            $joinCondition .= ' AND '.$sql->conditionExpr('ar.articleID', 'arl.articleID', false, false);
+            $joinCondition .= ' AND '.$sql->conditionExpr('arl.locale', $options['arl.locale']);
             $sql->leftJoin(
                 'articleRevision arl',
-                'arl.status = "'.self::STATUS_PUBLISHED.'" 
-                    AND ar.articleID = arl.articleID 
-                    AND arl.locale = "'.$options['arl.locale'].'" '
+                $joinCondition
             );
         }
         foreach ($pseudoFields as $field => $val) {
