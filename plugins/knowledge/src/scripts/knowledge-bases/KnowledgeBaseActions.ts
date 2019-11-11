@@ -5,12 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import {
-    IKnowledgeBase,
-    KnowledgeBaseStatus,
-    IPostKnowledgeBaseRequest,
-    IPatchKnowledgeBaseRequest,
-} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -21,6 +16,12 @@ import { type } from "os";
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 
 type IGetKnowledgeBaseRequest = {
+    kbID: number;
+};
+type IPostKnowledgeBaseRequest = {
+    kbID: number;
+};
+type IPatchKnowledgeBaseRequest = {
     kbID: number;
 };
 type IDeleteKnowledgeBaseRequest = {
@@ -42,13 +43,12 @@ export default class KnowledgeBaseActions extends ReduxActions {
     public getAll = (status: KnowledgeBaseStatus = KnowledgeBaseStatus.PUBLISHED) => {
         const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
             const response = await this.api.get(`/knowledge-bases?expand=all&status=${status}`);
-            console.log("==>", response.data);
             return response.data;
         })({ status });
         return this.dispatch(thunk);
     };
 
-    public static getAllKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
+    public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
         "GET",
     );
     public static postKB_ACs = actionCreator.async<IPostKnowledgeBaseRequest, IPostKnowledgeBaseResponse, IApiError>(
@@ -63,8 +63,8 @@ export default class KnowledgeBaseActions extends ReduxActions {
         IApiError
     >("DELETE");
 
-    public getKBs(options: IGetKnowledgeBaseRequest) {
-        const thunk = bindThunkAction(KnowledgeBaseActions.getAllKB_ACs, async () => {
+    public getKB(options: IGetKnowledgeBaseRequest) {
+        const thunk = bindThunkAction(KnowledgeBaseActions.getKB_ACs, async () => {
             const { kbID, ...rest } = options;
             const params = { ...rest, expand: "all" };
             const response = await this.api.get(`/knowledge-bases/${options.kbID}`, { params });
@@ -75,7 +75,7 @@ export default class KnowledgeBaseActions extends ReduxActions {
     }
 
     public postKB(options: IPostKnowledgeBaseRequest) {
-        const thunk = bindThunkAction(KnowledgeBaseActions.getAllKB_ACs, async () => {
+        const thunk = bindThunkAction(KnowledgeBaseActions.postKB_ACs, async () => {
             const response = await this.api.post(`/knowledge-bases/`);
             return response.data;
         })();
@@ -84,13 +84,20 @@ export default class KnowledgeBaseActions extends ReduxActions {
     }
 
     public patchKB(options: IPatchKnowledgeBaseRequest) {
-        const thunk = bindThunkAction(KnowledgeBaseActions.getAllKB_ACs, async () => {
-            const response = await this.api.patch(`/knowledge-bases/`);
+        const thunk = bindThunkAction(KnowledgeBaseActions.patchKB_ACs, async () => {
+            const response = await this.api.patch(`/knowledge-bases/${options.kbID}`);
             return response.data;
         })();
 
         return this.dispatch(thunk);
     }
+    public deleteKB = (options: IDeleteKnowledgeBaseRequest) => {
+        const apiThunk = bindThunkAction(KnowledgeBaseActions.deleteKB_ACs, async () => {
+            const response = await this.api.delete(`/products/${options.kbID}`);
+            return response.data;
+        })(options);
+        return this.dispatch(apiThunk);
+    };
 }
 
 export function useKnowledgeBaseActions() {

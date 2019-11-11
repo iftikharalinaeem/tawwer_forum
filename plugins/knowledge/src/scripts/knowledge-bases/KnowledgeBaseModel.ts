@@ -88,6 +88,53 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         .case(KnowledgeBaseActions.GET_ACS.failed, (state, action) => {
             state.knowledgeBasesByID.error = action.error;
             return state;
+        })
+        .case(KnowledgeBaseActions.postKB_ACs.started, (state, payload) => {
+            state.knowledgeBasesByID[payload.kbID] = {
+                status: LoadStatus.PENDING,
+                data: payload,
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.postKB_ACs.done, (state, payload) => {
+            delete state.knowledgeBasesByID[payload.params.kbID];
+            state.knowledgeBasesByID[payload.params.kbID] = {
+                knowledgeBase: payload.result,
+                patchKB: { status: LoadStatus.PENDING },
+                deleteKB: { status: LoadStatus.PENDING },
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.patchKB_ACs.started, (state, payload) => {
+            const existingKB = state.knowledgeBasesByID[payload.kbID];
+            existingKB.patchKB = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.patchKB_ACs.done, (state, payload) => {
+            const existingKB = state.knowledgeBasesByID[payload.params.kbID];
+            existingKB.kb = payload.result;
+            existingKB.patchKB = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.deleteKB_ACs.started, (state, payload) => {
+            const existingKB = state.knowledgeBasesByID[payload.kbID];
+            existingKB;
+            existingKB.deleteKB.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(KnowledgeBaseActions.deleteKB_ACs.done, (state, payload) => {
+            delete state.knowledgeBasesByID[payload.params.kbID];
+            return state;
+        })
+        .case(KnowledgeBaseActions.deleteKB_ACs.failed, (state, payload) => {
+            const existingKB = state.knowledgeBasesByID[payload.params.kbID];
+            existingKB.deleteKB.status = LoadStatus.ERROR;
+            existingKB.deleteKB.error = payload.error.response.data;
+            return state;
         });
 }
 
