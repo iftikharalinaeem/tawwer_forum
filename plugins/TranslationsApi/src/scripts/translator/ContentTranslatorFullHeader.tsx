@@ -28,7 +28,7 @@ export function ContentTranslaterFullHeader(props: { onBack: () => void; onSave:
                             <li>
                                 <BackLink
                                     visibleLabel={true}
-                                    clickHandler={e => {
+                                    onClick={e => {
                                         e.preventDefault();
                                         props.onBack();
                                     }}
