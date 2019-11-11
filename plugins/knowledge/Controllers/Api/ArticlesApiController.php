@@ -729,6 +729,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
         $row["url"] = $this->articleModel->url($row);
 
+        if (isset($row["queryLocale"])) {
+            $row["translationStatus"] = ($row["locale"] === $row["queryLocale"]) ?
+                ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE :
+                ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
+        }
+
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
