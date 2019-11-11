@@ -4,22 +4,19 @@
  * @license Proprietary
  */
 
-import * as React from "react";
-import { PanelWidget } from "@library/layout/PanelLayout";
-import Heading from "@library/layout/Heading";
-import { t } from "@library/utility/appUtils";
-import LanguagesDropDown from "@library/layout/LanguagesDropDown";
-import { panelListClasses } from "@library/layout/panelListStyles";
-import classNames from "classnames";
 import { IArticleLocale } from "@knowledge/@types/api/article";
-import { useUniqueID } from "@library/utility/idUtils";
-import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { useLocaleInfo, LocaleDisplayer, ILocale, loadLocales } from "@vanilla/i18n";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { AlertIcon } from "@library/icons/common";
-import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { AlertIcon } from "@library/icons/common";
+import Heading from "@library/layout/Heading";
+import { panelListClasses } from "@library/layout/panelListStyles";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { t } from "@library/utility/appUtils";
+import { useUniqueID } from "@library/utility/idUtils";
+import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
+import classNames from "classnames";
+import * as React from "react";
 
 export interface IOtherLangaugesProps {
     articleLocaleData: IArticleLocale[];
@@ -29,9 +26,8 @@ export interface IOtherLangaugesProps {
 /**
  * Implements "other languages" DropDown for articles.
  */
-
 export default function OtherLangauges(props: IOtherLangaugesProps) {
-    const id = useUniqueID("articleOtherLanguages");
+    const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
     const classesPanelList = panelListClasses();
 
@@ -39,14 +35,9 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
     if (!showPicker || !currentLocale) {
         return null;
     }
-    let selectedIndex = 0;
-    const selectBoxItems: ISelectBoxItem[] = props.articleLocaleData.map((data, index) => {
-        const isSelected = data.locale === currentLocale;
-        if (isSelected) {
-            selectedIndex = index;
-        }
+    const options: ISelectBoxItem[] = props.articleLocaleData.map((data, index) => {
         return {
-            selected: isSelected,
+            value: data.locale,
             name: data.locale,
             icon: data.translationStatus === "not-translated" && (
                 <ToolTip
@@ -63,27 +54,26 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                     </span>
                 </ToolTip>
             ),
-            content: (
-                <>
-                    <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />
-                </>
-            ),
+            content: <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />,
             url: data.url,
         };
     });
 
+    const activeOption = options.find(option => option.value === currentLocale);
+
     return (
         <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-            <Heading title={t("Other Languages")} className={classNames("panelList-title", classesPanelList.title)} />
-            <LanguagesDropDown
-                titleID={id}
+            <Heading
+                title={t("Other Languages")}
+                className={classNames("panelList-title", classesPanelList.title)}
+                id={titleID}
+            />
+            <SelectBox
                 widthOfParent={true}
                 className="otherLanguages-select"
-                data={props.articleLocaleData}
-                currentLocale={currentLocale}
-                dateUpdated={props.dateUpdated}
-                selcteBoxItems={selectBoxItems}
-                selectedIndex={selectedIndex}
+                options={options}
+                describedBy={titleID}
+                value={activeOption}
             />
         </div>
     );
