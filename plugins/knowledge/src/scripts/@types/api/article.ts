@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-import { Omit } from "@library/@types/utils";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { IUserFragment } from "@library/@types/api/users";
 import { PublishStatus } from "@library/@types/api/core";
