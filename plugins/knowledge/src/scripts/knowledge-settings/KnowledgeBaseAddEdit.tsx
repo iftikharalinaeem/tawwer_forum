@@ -23,6 +23,7 @@ import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
+import classNames from "classnames";
 
 interface IProps {}
 
@@ -70,9 +71,9 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     exitHandler={onCancel}
                     titleID={titleID}
                     elementToFocusOnExit={toggleButtonRef.current as HTMLElement}
-                    scrollable={true}
                 >
                     <Frame
+                        canGrow={true}
                         header={
                             <FrameHeader titleID={titleID} closeFrame={onClose} title={t("Add/Edit Knowledge Base")} />
                         }
@@ -103,6 +104,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                                         onClick={event => {
                                                             setIsProductManagementOpen(true);
                                                         }}
+                                                        disabled={isLoading}
                                                     >
                                                         {content}
                                                     </Button>
@@ -130,12 +132,14 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
                                         )}
                                         onChange={doNothing}
+                                        disabled={isLoading}
                                         value={""}
                                     />
                                     <DashboardImageUploadGroup
                                         label="Banner Image"
                                         description={t("Homepage banner image for this knowledge base.")}
                                         onChange={doNothing}
+                                        disabled={isLoading}
                                         value={""}
                                     />
                                     <DashboardFormGroup
@@ -150,6 +154,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                                 )}
                                                 value={""}
                                                 name={viewType}
+                                                disabled={isLoading}
                                             />
                                             <DashboardRadioButton
                                                 label={"Help Center"}
@@ -158,6 +163,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                                 )}
                                                 value={""}
                                                 name={viewType}
+                                                disabled={isLoading}
                                             />
                                         </DashboardRadioGroup>
                                     </DashboardFormGroup>
@@ -172,18 +178,19 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                             </FrameBody>
                         }
                         footer={
-                            <FrameFooter justifyRight={true}>
+                            <FrameFooter justifyRight={true} forDashboard={true}>
                                 <Button
-                                    className={classFrameFooter.actionButton}
-                                    baseClass={ButtonTypes.TEXT}
+                                    className={classNames(classFrameFooter.actionButton)}
+                                    baseClass={ButtonTypes.DASHBOARD_SECONDARY}
                                     onClick={onCancel}
+                                    disabled={isLoading}
                                 >
                                     {t("Cancel")}
                                 </Button>
                                 <Button
-                                    className={classFrameFooter.actionButton}
+                                    className={classNames(classFrameFooter.actionButton)}
                                     onClick={save}
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    baseClass={ButtonTypes.DASHBOARD_PRIMARY}
                                     disabled={isLoading}
                                 >
                                     {isLoading ? <ButtonLoader /> : t("Save")}
