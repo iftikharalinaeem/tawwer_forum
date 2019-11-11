@@ -348,7 +348,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $Breadcrumbs = [];
 
         foreach ($Data as &$Row) {
-            $Row['Title'] = markString($SearchTerms, Gdn_Format::text($Row['Title'], false));
+            $Row['Title'] = htmlspecialchars($Row['Title']);
             $Row['Score'] = (int)$Row['Score'];
 
             // Generate record URLs based on their type.
@@ -370,7 +370,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $media = Search::extractMedia($Summary);
             $Row['Media'] = $media;
 
-            $Row['Summary'] = searchExcerpt(Gdn_Format::plainText($Summary, 'Raw'), $SearchTerms, $Length);
+            $Row['Summary'] = searchExcerpt(Gdn_Format::plainText($Summary, 'Raw'), $SearchTerms, $Length, false);
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
 
             $Row['Format'] = 'Html';
