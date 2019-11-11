@@ -83,8 +83,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             >
                 {t("Add Knowledge Base")}
             </Button>
-            {/*{openForm && (*/}
-            {
+            {openForm && (
                 <Modal
                     size={ModalSizes.XL}
                     exitHandler={onCancel}
@@ -212,7 +211,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                         }
                     />
                 </Modal>
-            }
+            )}
             {openProductManagement && <ProductManager asModal={true} onClose={() => setOpenProductManagement(false)} />}
         </>
     );
