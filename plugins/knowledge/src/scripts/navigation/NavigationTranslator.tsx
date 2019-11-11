@@ -18,7 +18,7 @@ interface IProps {
 export function OrganizeCategoriesTranslator(props: IProps) {
     const { Translator, shouldDisplay } = useContentTranslator();
     const items = useNavigationCategoriesForKB(props.kbID);
-    const status = useStatus(props.kbID)
+    const status = useStatus(props.kbID);
 
     const isLoading = status === LoadStatus.LOADING;
 
@@ -26,13 +26,15 @@ export function OrganizeCategoriesTranslator(props: IProps) {
         return null;
     }
 
-    return <Translator
-        properties={items.map(navItemToTranslationProperty)}
-        afterSave={() => { }}
-        onDismiss={() => { }}
-        isLoading={isLoading}
-        isFullScreen
-    />;
+    return (
+        <Translator
+            properties={items.map(navItemToTranslationProperty)}
+            afterSave={() => {}}
+            onDismiss={() => {}}
+            isLoading={isLoading}
+            isFullScreen
+        />
+    );
 }
 
 function navItemToTranslationProperty(item: INormalizedNavigationItem): ITranslationProperty {
@@ -46,19 +48,21 @@ function navItemToTranslationProperty(item: INormalizedNavigationItem): ITransla
         sourceText: item.name,
         propertyValidation: {
             minLength: 1,
-        }
-    }
+        },
+    };
 }
 
 function useStatus(kbID: number) {
-    const status = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.fetchStatusesByKbID[kbID]);
+    const status = useSelector(
+        (state: IKnowledgeAppStoreState) => state.knowledge.navigation.fetchStatusesByKbID[kbID],
+    );
 
     return status;
 }
 
 function useNavigationCategoriesForKB(kbID: number) {
-    const navItemsByID = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems)
-    const itemsForKb = Object.values(navItemsByID).filter(item => item?.knowledgeBaseID === kbID);
+    const navItemsByID = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems);
+    const itemsForKb = Object.values(navItemsByID).filter(item => item && item.knowledgeBaseID === kbID);
     useDebugValue(kbID);
     return itemsForKb;
 }
