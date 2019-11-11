@@ -54,7 +54,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classNames(classes.rightCell, classes.headerRight)}>
                         <div className={classes.languageDropdown}>
                             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={(locale) => props.onActiveLocaleChange?.(locale)} />
+                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={(locale) => props.onActiveLocaleChange && props.onActiveLocaleChange(locale)} />
                             </div>
                         </div>
                     </div>
