@@ -5,25 +5,26 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import {
+    IKnowledgeBase,
+    KnowledgeBaseStatus,
+    IPostKnowledgeBaseRequest,
+    IPatchKnowledgeBaseRequest,
+} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
-import { createAction } from "@library/redux/utility";
 import { type } from "os";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
-
+interface IKknowledgeBaseParams {
+    kbID: string;
+}
 type IGetKnowledgeBaseRequest = {
     kbID: number;
 };
-type IPostKnowledgeBaseRequest = {
-    kbID: number;
-};
-type IPatchKnowledgeBaseRequest = {
-    kbID: number;
-};
+
 type IDeleteKnowledgeBaseRequest = {
     kbID: number;
 };
@@ -51,12 +52,16 @@ export default class KnowledgeBaseActions extends ReduxActions {
     public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
         "GET",
     );
-    public static postKB_ACs = actionCreator.async<IPostKnowledgeBaseRequest, IPostKnowledgeBaseResponse, IApiError>(
-        "POST",
-    );
-    public static patchKB_ACs = actionCreator.async<IPatchKnowledgeBaseRequest, IPatchKnowledgeBaseResponse, IApiError>(
-        "PATCH",
-    );
+    public static postKB_ACs = actionCreator.async<
+        IPostKnowledgeBaseRequest & IKknowledgeBaseParams,
+        IPostKnowledgeBaseResponse & IKknowledgeBaseParams,
+        IApiError
+    >("POST");
+    public static patchKB_ACs = actionCreator.async<
+        IPatchKnowledgeBaseRequest & IKknowledgeBaseParams,
+        IPatchKnowledgeBaseResponse & IKknowledgeBaseParams,
+        IApiError
+    >("PATCH");
     public static deleteKB_ACs = actionCreator.async<
         IDeleteKnowledgeBaseRequest,
         IDeleteKnowledgeBaseResponse,
@@ -76,7 +81,7 @@ export default class KnowledgeBaseActions extends ReduxActions {
 
     public postKB(options: IPostKnowledgeBaseRequest) {
         const thunk = bindThunkAction(KnowledgeBaseActions.postKB_ACs, async () => {
-            const response = await this.api.post(`/knowledge-bases/`);
+            const response = await this.api.post(`/knowledge-bases/`, options);
             return response.data;
         })();
 
@@ -85,7 +90,7 @@ export default class KnowledgeBaseActions extends ReduxActions {
 
     public patchKB(options: IPatchKnowledgeBaseRequest) {
         const thunk = bindThunkAction(KnowledgeBaseActions.patchKB_ACs, async () => {
-            const response = await this.api.patch(`/knowledge-bases/${options.kbID}`);
+            const response = await this.api.patch(`/knowledge-bases/${options}`);
             return response.data;
         })();
 

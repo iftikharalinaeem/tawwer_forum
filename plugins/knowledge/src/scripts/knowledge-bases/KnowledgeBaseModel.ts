@@ -14,6 +14,11 @@ import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 
+export interface ILoadedProduct {
+    kb: IKnowledgeBase;
+    patchKB: ILoadable<IKnowledgeBase>;
+    deleteKB: ILoadable<{}, IKnowledgeBase>;
+}
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
  */
