@@ -9,12 +9,10 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
-
 /**
  * Test Translations APIv2 endpoints.
  */
 class TranslationsTests extends AbstractAPIv2Test {
-
     /**
      * {@inheritdoc}
      */
@@ -28,7 +26,6 @@ class TranslationsTests extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         self::$addons = ['translationsApi', 'vanilla'];
         parent::setUpBeforeClass();
-
     }
 
     /**
