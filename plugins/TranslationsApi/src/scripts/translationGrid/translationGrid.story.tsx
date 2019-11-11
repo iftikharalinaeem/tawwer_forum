@@ -56,12 +56,10 @@ story.add("Translation Grid", () => {
                         inScrollingContainer={true}
                         activeLocale="ca"
                         onActiveLocaleChange={newLocale => {
-                            action(`Changing active locale to '${newLocale}'`);
+                            action(`Changing active locale`)(newLocale);
                         }}
-                        onTranslationUpdate={newTranslations => {
-                            action(
-                                `Updating translation value w/ payload \n${JSON.stringify(newTranslations, null, 4)}`,
-                            );
+                        onTranslationUpdate={(field, translation) => {
+                            action(`Updating translation value`)(field, translation);
                         }}
                     />
                 </div>

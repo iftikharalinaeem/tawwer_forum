@@ -5,7 +5,7 @@
 
 import React, { useEffect } from "react";
 import { translationGridClasses } from "./TranslationGridStyles";
-import { panelListVariables, panelListClasses } from "@library/layout/panelListStyles";
+import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useLocaleInfo, LocaleDisplayer } from "@vanilla/i18n";
