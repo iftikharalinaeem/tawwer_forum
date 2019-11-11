@@ -92,7 +92,10 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         }
 
         $slug = \Gdn_Format::url($urlCode);
-        $result = \Gdn::request()->url("/kb/" . $slug, $withDomain);
+
+        $locale = $knowledgeBase['locale'] ?? $knowledgeBase['sourceLocale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/" . $slug);
         return $result;
     }
 
@@ -163,9 +166,9 @@ MESSAGE
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectSingleFragment(int $knowledgeBaseID): KnowledgeBaseFragment {
+    public function selectSingleFragment(int $knowledgeBaseID, string $locale = null): KnowledgeBaseFragment {
         $rows = $this->sql()
-            ->select('knowledgeBaseID, rootCategoryID, name, urlCode, viewType, status')
+            ->select('knowledgeBaseID, rootCategoryID, name, urlCode, viewType, status, sourceLocale')
             ->getWhere($this->getTable(), ['knowledgeBaseID' => $knowledgeBaseID], null, null, 1)
             ->resultArray()
         ;
@@ -174,6 +177,7 @@ MESSAGE
             throw new NoResultsException("Could not find knowledge base fragment for knowledgeBaseID $knowledgeBaseID.");
         }
         $result = reset($rows);
+        $result['locale'] = $locale ?? $result['sourceLocale'];
 
         // Normalize the fragment.
         $url = $this->url($result);
@@ -186,15 +190,16 @@ MESSAGE
      * Select a KnowledgeBaseFragment from it's root category ID.
      *
      * @param int $categoryID Conditions for the select query.
+     * @param string $locale Locale to represent content in.
      *
      * @return KnowledgeBaseFragment
      *
      * @throws ValidationException If the data from the DB was corrupted.
      * @throws NoResultsException If no record was found for the given ID.
      */
-    public function selectFragmentForCategoryID(int $categoryID) {
+    public function selectFragmentForCategoryID(int $categoryID, string $locale = null) {
         $rows = $this->sql()
-            ->select('kb.knowledgeBaseID, kb.rootCategoryID, kb.name, kb.urlCode, kb.viewType, kb.status')
+            ->select('kb.knowledgeBaseID, kb.rootCategoryID, kb.name, kb.urlCode, kb.viewType, kb.status, kb.sourceLocale')
             ->from('knowledgeCategory kc')
             ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = kc.knowledgeBaseID')
             ->where('kc.knowledgeCategoryID', $categoryID)
@@ -207,6 +212,7 @@ MESSAGE
             throw new NoResultsException("Could not find knowledge base fragment for rootCategoryID $rootCategoryID.");
         }
         $result = reset($rows);
+        $result['locale'] = $locale ?? $result['sourceLocale'];
 
         // Normalize the fragment.
         $url = $this->url($result);
@@ -469,12 +475,13 @@ MESSAGE
      * @param string $locale
      * @return string
      */
-    public function getSiteSectionSlug(int $knowledgeBaseID, string $locale): string {
+    public function getSiteSectionSlug(int $knowledgeBaseID, string $locale = null): string {
         $slug = '';
         $knowledgeBase = $this->selectSingle(['knowledgeBaseID' => $knowledgeBaseID]);
         $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
         foreach ($siteSections as $siteSection) {
-            if ($siteSection->getContentLocale() === $locale) {
+            if ($siteSection->getContentLocale() === $locale
+                || (is_null($locale) && $siteSection->getContentLocale() === $knowledgeBase['sourceLocale'])) {
                 $slug = $siteSection->getBasePath();
                 break;
             }
