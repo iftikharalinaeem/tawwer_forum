@@ -1118,9 +1118,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function put_invalidateTranslations(int $id, array $body): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->schema([
-            "invalidateTranslations:b"
-        ], "in")->setDescription("Invalidate translations for a particular article.");
+        $in = $this->schema($this->idParamSchema(), "in");
+        $in->validate(['id' => $id]);
 
         $out = $this->schema([":a" => Schema::parse([
             "articleID:i",
@@ -1132,9 +1131,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out")
         ]);
 
-        if ($body["invalidateTranslations"]) {
-            $this->updateInvalidateArticleTranslations($id);
-        }
+        $this->updateInvalidateArticleTranslations($id);
+
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $results = $out->validate($articles);
 
