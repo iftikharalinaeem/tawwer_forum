@@ -27,13 +27,13 @@ import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { useContentTranslator } from "@vanilla/i18n";
+import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTranslator";
 
 function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
     const { knowledgeBase } = props;
     const pageTitle = t("Organize Categories");
     const classesNavigationManager = navigationManagerClasses();
-    const { shouldDisplay, Translator } = useContentTranslator();
 
     useEffect(() => {
         if (props.knowledgeBase.status === LoadStatus.PENDING) {
@@ -69,7 +69,7 @@ function OrganizeCategoriesPage(props: IProps) {
                             title={pageTitle}
                         >
                             {pageTitle}
-                            <Translator />
+                            <OrganizeCategoriesTranslator kbID={props.kbID} />
                         </Heading>
                     </DocumentTitle>
                     <NavigationManager knowledgeBase={knowledgeBase.data} />
@@ -102,6 +102,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     return {
         knowledgeBase,
         hasError,
+        kbID,
     };
 }
 
