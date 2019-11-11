@@ -9,8 +9,6 @@ namespace VanillaTests\APIv2;
 use Garden\Web\Exception\ClientException;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
-
-
 /**
  * Test Translations APIv2 endpoints.
  */
@@ -55,7 +53,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     public function testPostResourceFailure() {
         $this->expectException(ClientException::class);
         $resource = [
-            "name" => "resource one",
+            "name" => "resource one name",
             "sourceLocale" => "en",
             "urlCode" => "resourceOne",
         ];
@@ -109,7 +107,7 @@ class TranslationsTests extends AbstractAPIv2Test {
                     "translation" => "english recordTypeOne name"
                 ]],
                 "recordTypeOne.8.name",
-                "english recordType name",
+                "english recordTypeOne name",
             ],
             [
                 [[
@@ -121,7 +119,7 @@ class TranslationsTests extends AbstractAPIv2Test {
                     "translation" => "english recordTypeTwo cat description"
                 ]],
                 "recordTypeTwo.9.description",
-                "english recordType cat description",
+                "english recordTypeTwo cat description",
             ],
             [
                 [[
