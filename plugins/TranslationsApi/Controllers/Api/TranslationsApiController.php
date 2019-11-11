@@ -11,7 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\TranslationsAPI\models\resourceModel;
+use Vanilla\TranslationsAPI\models\ResourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
 
@@ -32,7 +32,7 @@ class TranslationsApiController extends AbstractApiController {
     /** @var Schema */
     private $translationSchema;
 
-    /** @var resourceModel */
+    /** @var ResourceModel */
     private $resourceModel;
 
     /** @var TranslationModel */
@@ -47,13 +47,13 @@ class TranslationsApiController extends AbstractApiController {
     /**
      * TranslationsApiController constructor.
      *
-     * @param resourceModel $resourcesModel
+     * @param ResourceModel $resourcesModel
      * @param TranslationModel $translationModel
      * @param TranslationPropertyModel $translationPropertyModel
      * @param Gdn_Configuration $configurationModule
      */
     public function __construct(
-        resourceModel $resourcesModel,
+        ResourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
         ConfigurationInterface $configurationModule
@@ -80,8 +80,6 @@ class TranslationsApiController extends AbstractApiController {
 
         $resourceExists = $this->resourceModel->get(
             [
-                "name" => $body["name"],
-                "sourceLocale" => $body["sourceLocale"],
                 "urlCode" => $body["urlCode"]
             ]
         );

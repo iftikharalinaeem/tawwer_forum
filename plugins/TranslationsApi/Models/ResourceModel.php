@@ -16,7 +16,7 @@ use Vanilla\Models\PipelineModel;
 /**
  * ResourceModel
  */
-class resourceModel extends PipelineModel {
+class ResourceModel extends PipelineModel {
 
     /** @var Gdn_Session */
     private $session;

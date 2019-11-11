@@ -17,7 +17,7 @@ use Vanilla\Models\PipelineModel;
  */
 class TranslationPropertyModel extends PipelineModel {
 
-    /** @var resourceModel */
+    /** @var ResourceModel */
     private $resourceModel;
 
     /** @var TranslationModel */
@@ -42,12 +42,12 @@ class TranslationPropertyModel extends PipelineModel {
      * resourceKeyModel constructor.
      *
      * @param Gdn_Session $session
-     * @param resourceModel $resourcesModel
+     * @param ResourceModel $resourcesModel
      * @param TranslationModel $translationModel
      */
     public function __construct(
         Gdn_Session $session,
-        resourceModel $resourcesModel,
+        ResourceModel $resourcesModel,
         TranslationModel $translationModel
     ) {
         parent::__construct("translationProperty");
