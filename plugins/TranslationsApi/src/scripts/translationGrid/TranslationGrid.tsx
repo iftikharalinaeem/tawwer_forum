@@ -23,8 +23,8 @@ export interface ITranslationGrid {
     existingTranslations: ITranslations;
     onTranslationUpdate: TranslationUpdater;
     inScrollingContainer?: boolean;
-    onLocaleChange?: (newLocale?: string) => void;
-    activeLocale: string;
+    onActiveLocaleChange?: (newLocale: string | null) => void;
+    activeLocale: string | null;
     sourceLocale: string;
 }
 
@@ -54,7 +54,7 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classNames(classes.rightCell, classes.headerRight)}>
                         <div className={classes.languageDropdown}>
                             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={() => props.onLocaleChange?.()} />
+                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={() => props.onActiveLocaleChange?.()} />
                             </div>
                         </div>
                     </div>

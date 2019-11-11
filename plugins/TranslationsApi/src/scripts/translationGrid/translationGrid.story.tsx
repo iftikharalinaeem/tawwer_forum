@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import { action } from "@storybook/addon-actions";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
@@ -53,6 +54,15 @@ story.add("Translation Grid", () => {
                                 "存有悲坐阿梅德，consectetur adipiscing ELIT。前庭sagittis Aliquam NIBH，一个egestas tortor lobortis交流。现在，Planning有时目前，规划周末DUI最大的方便。现在，它是免费的箭头香蕉的优势。 LOREM活消毒的营养，但电视的车辆只是足球",
                         }}
                         inScrollingContainer={true}
+                        activeLocale="ca"
+                        onActiveLocaleChange={newLocale => {
+                            action(`Changing active locale to '${newLocale}'`);
+                        }}
+                        onTranslationUpdate={newTranslations => {
+                            action(
+                                `Updating translation value w/ payload \n${JSON.stringify(newTranslations, null, 4)}`,
+                            );
+                        }}
                     />
                 </div>
             </LocaleProvider>

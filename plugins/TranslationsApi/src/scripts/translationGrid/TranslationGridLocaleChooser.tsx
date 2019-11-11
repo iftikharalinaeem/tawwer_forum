@@ -13,7 +13,7 @@ import { AlertIcon } from "@library/icons/common";
 
 interface IProps {
     onChange: (selectedLocale: string) => void;
-    selectedLocale: string;
+    selectedLocale: string | null;
     sourceLocale: string;
 }
 

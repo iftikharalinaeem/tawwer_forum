@@ -12,7 +12,11 @@ import { TranslationGrid } from "./TranslationGrid";
 
 export const ContentTranslator: React.FC<IContentTranslatorProps> = props => {
     let [displayModal, setDisplayModal] = useState(false);
-    const { locales } = useLocaleInfo();
+    let [activeLocale, setActiveLocale] = useState<string | null>(null);
+    const { currentLocale } = useLocaleInfo();
+    if (!currentLocale) {
+        return null;
+    }
 
     return (
         <>
@@ -44,6 +48,12 @@ export const ContentTranslator: React.FC<IContentTranslatorProps> = props => {
                                 propertyValidation: {},
                             },
                         ]}
+                        activeLocale={activeLocale}
+                        onActiveLocaleChange={setActiveLocale}
+                        onTranslationUpdate={newTranslations => {
+                            console.log("Has new translations", newTranslations);
+                        }}
+                        sourceLocale={currentLocale}
                         existingTranslations={{}}
                     />
                 </Modal>
