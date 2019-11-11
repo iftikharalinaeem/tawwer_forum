@@ -101,38 +101,38 @@ class TranslationsTests extends AbstractAPIv2Test {
         return [
             [
                 [[
-                    "recordType" => "knowledgebase",
+                    "recordType" => "recordTypeOne",
                     "recordID" => 8,
                     "recordKey" => "",
                     "propertyName" => "name",
                     "locale" => "en",
-                    "translation" => "english kb name"
+                    "translation" => "english recordType name"
                 ]],
-                "knowledgebase.8.name",
+                "recordTypeOne.8.name",
                 "english kb name",
             ],
             [
                 [[
-                    "recordType" => "knowledgeCategory",
+                    "recordType" => "recordTypeTwo",
                     "recordID" => 9,
                     "recordKey" => "",
                     "propertyName" => "description",
                     "locale" => "en",
-                    "translation" => "english kb cat description"
+                    "translation" => "english recordType cat description"
                 ]],
-                "knowledgeCategory.9.description",
+                "recordTypeTwo.9.description",
                 "english kb cat description",
             ],
             [
                 [[
-                    "recordType" => "knowledgeCategory",
+                    "recordType" => "recordTypeThree",
                     "recordID" => null,
                     "recordKey" => null,
                     "propertyName" => "name",
                     "locale" => "en",
                     "translation"=> "name"
                 ]],
-                "knowledgeCategory..name",
+                "recordTypeThree..name",
                 "name",
             ],
         ];

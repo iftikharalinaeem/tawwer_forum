@@ -77,7 +77,7 @@ class TranslationModel extends PipelineModel {
         if (!$translation) {
             $translationRecord = [
                 "resource" => $resource,
-                "key" => $key,
+                "translationPropertyKey" => $key,
                 "locale" => $locale,
                 "translation" => $translationString,
             ];
