@@ -14,6 +14,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\TranslationsAPI\models\resourceModel;
 use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
 use Vanilla\TranslationsAPI\models\TranslationModel;
+use LocalesApiController;
 
 /**
  * Class TranslationsApiController
@@ -43,6 +44,8 @@ class TranslationsApiController extends AbstractApiController {
 
     /** @var TranslationPropertyModel */
     private $translationPropertyModel;
+    /** @var LocalesApiController $localeApi */
+    private $localeApi;
 
     /**
      * TranslationsApiController constructor.
@@ -56,12 +59,14 @@ class TranslationsApiController extends AbstractApiController {
         resourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
-        ConfigurationInterface $configurationModule
+        ConfigurationInterface $configurationModule,
+        LocalesApiController $localeApi
     ) {
         $this->resourceModel = $resourcesModel;
         $this->translationModel = $translationModel;
         $this->translationPropertyModel = $translationPropertyModel;
         $this->config = $configurationModule;
+        $this->localeApi = $localeApi;
 
     }
 
@@ -203,9 +208,11 @@ class TranslationsApiController extends AbstractApiController {
             $this->getResourceSchema = $this->schema(Schema::parse([
                 "urlCode?",
                 "recordType?",
-                "recordID?",
+                "recordID:i?",
                 "recordKey?",
-                "locale",
+                "locale" => [
+                    ''
+                ],
                 "limit" => [
                     "default" => 100,
                     "minimum" => 1,
@@ -218,7 +225,7 @@ class TranslationsApiController extends AbstractApiController {
                     "minimum" => 1,
                     "maximum" => 100,
                 ],
-            ]));
+            ]))->addValidator('locale', [$this->localeApi, 'validateLocale']);
         }
         return $this->schema($this->getResourceSchema, $type);
     }
