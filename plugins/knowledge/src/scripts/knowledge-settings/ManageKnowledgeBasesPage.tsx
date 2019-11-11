@@ -11,6 +11,10 @@ import Loader from "@library/loaders/Loader";
 import qs from "qs";
 import React from "react";
 import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyKnowledgeBasesResults";
+import { t } from "@vanilla/i18n";
+import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
+import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBaseAddEdit";
+import { BrowserRouter } from "react-router-dom";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
@@ -23,7 +27,8 @@ export function ManageKnowledgeBasesPage() {
     }
 
     return (
-        <>
+        <BrowserRouter>
+            {/*<DashboardHeaderBlock title={t("Add Knowledge Base")} actionButtons={<KnowledgeBaseAddEdit />} />*/}
             <DashboardTable
                 head={
                     <tr>
@@ -38,6 +43,6 @@ export function ManageKnowledgeBasesPage() {
                 ))}
             />
             {Object.entries(kbs.data).length === 0 && <EmptyKnowledgeBasesResults forStatus={status} />}
-        </>
+        </BrowserRouter>
     );
 }
