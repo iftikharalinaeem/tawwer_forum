@@ -23,6 +23,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         'vanillaforums.com' => 'vanillaforums.email',
         'vanillacommunity.com' => 'vanillacommunity.email',
         'vanillacommunities.com' => 'vanillacommunities.email',
+        'vanillastaging.com' => 'vanillastaging.email',
         'vanillawip.com' => 'dev.vanillaforums.email'
     ];
 
@@ -855,7 +856,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /**
      * @param ActivityModel $sender
-     * @param type $args
+     * @param array $args
      */
     public function activityModel_beforeSendNotification_handler($sender, $args) {
         if (isset($args['RecordType']) && isset($args['RecordID'])) {
@@ -865,6 +866,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             list($type, $iD) = self::parseRoute(val('Route', $args));
         }
 
+        $userAuthorized = $args["UserAuthorized"] ?? false;
         $formatData = ['Title' => c('Garden.Title'), 'Signature' => self::emailSignature(val('Route', $args))];
         $notifyUserID = getValueR('Activity.NotifyUserID', $args);
 
@@ -877,9 +879,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $discussionModel = new DiscussionModel();
                     $discussion = $discussionModel->getID($iD);
                     if ($discussion) {
-                        // See if the user has permission to view this discussion on the site.
-                        $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
-                        $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                        if (!$userAuthorized) {
+                            // See if the user has permission to view this discussion on the site.
+                            $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
+                            $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                        } else {
+                            // If there isn't one specific user being notified, avoid attempting permission checks.
+                            $canView = $canReply = true;
+                        }
                         $formatData['Signature'] = self::emailSignature(val('Route', $args), $canView, $canReply);
 
                         $discussion = (array)$discussion;
@@ -933,9 +940,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $discussion = (array)$discussionModel->getID($comment['DiscussionID']);
 
                         if ($discussion) {
-                            // See if the user has permission to view this discussion on the site.
-                            $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
-                            $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                            if (!$userAuthorized) {
+                                // See if the user has permission to view this discussion on the site.
+                                $canView = Gdn::userModel()->getCategoryViewPermission($notifyUserID, val('CategoryID', $discussion));
+                                $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
+                            } else {
+                                // If there isn't one specific user being notified, avoid attempting permission checks.
+                                $canView = $canReply = true;
+                            }
                             $formatData['Signature'] = self::emailSignature(val('Route', $args), $canView, $canReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
 
                             $discussion['Name'] = Gdn_Format::plainText($discussion['Name'], 'Text');

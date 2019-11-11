@@ -33,9 +33,8 @@ class GroupsHooks extends Gdn_Plugin {
      * @param PermissionModel $permissionModel
      */
     public function permissionModel_defaultPermissions_handler(PermissionModel $permissionModel) {
-        $socialGroups = CategoryModel::categories('social-groups');
-        if ($socialGroups) {
-            $categoryID = val('CategoryID', $socialGroups);
+        $groupCategoryIDs = GroupModel::getGroupCategoryIDs();
+        foreach ($groupCategoryIDs as $categoryID) {
             // Disable view permissions for the new category by default.
             $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
             $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
@@ -947,6 +946,28 @@ class GroupsHooks extends Gdn_Plugin {
         if (!isset($id)) {
             return;
         }
+        $this->overrideGroupPermissions($id);
+    }
+
+    /**
+     * Override group permissions to allow users to see category
+     *
+     * @param CommentsAPIController $controller
+     * @param int $id discussion id
+     */
+    public function commentsApiController_getFilters(CommentsApiController $controller, $id) {
+        if (!isset($id)) {
+            return;
+        }
+        $this->overrideGroupPermissions($id);
+    }
+
+    /**
+     * Overrides group permissions to view a category.
+     *
+     * @param $id
+     */
+    public function overrideGroupPermissions($id) {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!empty($discussion['GroupID'])) {

@@ -65,4 +65,76 @@ class TranslationsTests extends AbstractAPIv2Test {
             $resource
         );
     }
+
+    /**
+     * Post /translations failure
+     *
+     * @param array $record
+     * @param string $key
+     * @param string $translation
+     *
+     * @depends      testPostResource
+     * @dataProvider translationsPropertyProvider
+     */
+    public function testPutTranslations($record, $key, $translation) {
+        $this->api()->put(
+            'translations/kb',
+            $record
+        );
+
+        $record = reset($record);
+        $translationPropertyModel = self::container()->get(TranslationPropertyModel::class);
+        $result = $translationPropertyModel->get(["recordType" => $record["recordType"], "recordID" => $record["recordID"], "propertyName" => $record["propertyName"]]);
+        $translationModel = self::container()->get(TranslationModel::class);
+        $this->assertEquals($key, $result[0]["translationPropertyKey"]);
+
+        $result = $translationModel->get(["translationPropertyKey" => $result[0]["translationPropertyKey"]]);
+        $this->assertEquals($translation, $result[0]["translation"]);
+    }
+
+    /**
+     * Provider for PUT /translations/:resource
+     *
+     * @return array
+     */
+    public function translationsPropertyProvider(): array {
+        return [
+            [
+                [[
+                    "recordType" => "recordTypeOne",
+                    "recordID" => 8,
+                    "recordKey" => "",
+                    "propertyName" => "name",
+                    "locale" => "en",
+                    "translation" => "english recordType name"
+                ]],
+                "recordTypeOne.8.name",
+                "english kb name",
+            ],
+            [
+                [[
+                    "recordType" => "recordTypeTwo",
+                    "recordID" => 9,
+                    "recordKey" => "",
+                    "propertyName" => "description",
+                    "locale" => "en",
+                    "translation" => "english recordType cat description"
+                ]],
+                "recordTypeTwo.9.description",
+                "english kb cat description",
+            ],
+            [
+                [[
+                    "recordType" => "recordTypeThree",
+                    "recordID" => null,
+                    "recordKey" => null,
+                    "propertyName" => "name",
+                    "locale" => "en",
+                    "translation"=> "name"
+                ]],
+                "recordTypeThree..name",
+                "name",
+            ],
+        ];
+    }
 }

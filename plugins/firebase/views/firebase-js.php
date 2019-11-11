@@ -18,6 +18,7 @@
     function initFirebaseDetection() {
         var targetUrl = "<?php echo Gdn::request()->get('Target') ?>";
         var debug = "<?php echo $sender->data('DebugJavascript') ?>";
+        var stashID = '';
 
         if (debug) {
             console.debug('useFirebaseUI', useFirebaseUI);
@@ -55,6 +56,12 @@
                         "providerData": user.providerData
                     },
                     success: function(result) {
+                        // Get the Profile is stashed, get the stashID and pass it on to the connect script.
+                        var stashID = result.stashID;
+                        if (!stashID && debug) {
+                            console.debug('StashID was expected but not found.');
+                        }
+
                         if (targetUrl) {
                             var target = targetUrl;
                         } else {
@@ -67,12 +74,16 @@
                             target += '?bc='+new Date().getTime();
                         }
 
-                        var redirectUri = '/entry/connect/firebase?target='+encodeURIComponent(target);
+                        var redirectUri = '/entry/connect/firebase?target='+encodeURIComponent(target)+'&stashID='+stashID;
 
                         if (debug) {
                             console.debug('Entry Connect Redirect: '+ redirectUri)
                         }
-                        window.location = redirectUri;
+                        if (stashID) {
+                            $('#firebaseui-auth-container').html('<?php echo $sender->data('RedirectMessage'); ?>');
+                            window.location = redirectUri;
+                            return;
+                        }
                     },
                     error: function(msg) {
                         if (debug) {
@@ -83,7 +94,7 @@
                 });
             }
 
-            if (!user && useFirebaseUI) {
+            if ((!user || !stashID) && useFirebaseUI) {
                 // FirebaseUI config.
                 var uiConfig = {
                     signInSuccessUrl: window.location,

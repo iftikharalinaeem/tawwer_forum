@@ -4,6 +4,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
+use Vanilla\Web\CurlWrapper;
+
 /**
  * Class ZendeskCurlRequest.
  */
@@ -37,7 +39,8 @@ class ZendeskCurlRequest implements IZendeskHttpRequest {
      * @return mixed
      */
     public function execute() {
-        return curl_exec($this->handle);
+        $response = CurlWrapper::curlExec($this->handle, false);
+        return $response;
     }
 
     /**

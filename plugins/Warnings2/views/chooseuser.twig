@@ -1,0 +1,19 @@
+<h2>{{ t('Choose User') }}</h2>
+{{ form.open() }}
+{{ form.errors() }}
+
+<div class="P">
+    {{ t('Only one user can be warned at a time and you have selected ') }}{{ RecordType }}{{ t(' from the users:') }}
+</div>
+<div class="P">
+    <ul class="users-list">
+        {% for User in Users %}
+            <li><b>{{ User.Name }}</b></li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="P">{{ t('Reselect the ') }}{{ RecordType }}{{ t(' to target the user you really want to warn.') }}</div>
+<div class="Buttons Buttons-Confirm">
+    {{ form.button('Ok') }}
+</div>
+{{ form.close()}}

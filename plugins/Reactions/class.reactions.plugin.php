@@ -774,7 +774,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         // A discussion with a low score counts as sunk.
         $discussion =& $args['Discussion'];
-        if ((int)val('Score', $discussion) <= -5) {
+        if ((int)val('Score', $discussion) <= c('Reactions.BuryValue', -5)) {
             $controller = Gdn::controller();
             if ($controller instanceof Gdn_Controller) {
                 $controller->setData('Score', val('Score', $discussion));
@@ -1154,10 +1154,16 @@ class ReactionsPlugin extends Gdn_Plugin {
         // Set the title, breadcrumbs, canonical
         $sender->title(t('Best Of'));
         $sender->setData('Breadcrumbs', [['Name' => t('Best Of'), 'Url' => '/bestof/everything']]);
-        $sender->canonicalUrl(
-            url(concatSep('/', 'bestof/'.$reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)), true),
-            Gdn::session()->UserID == 0
-        );
+
+        // set canonical url
+        if ($sender->Data['isHomepage']) {
+            $sender->canonicalUrl(url('/', true));
+        } else {
+            $sender->canonicalUrl(
+                url(concatSep('/', 'bestof/'.$reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)), true),
+                Gdn::session()->UserID == 0
+            );
+        }
 
         // Render the page (or deliver the view)
         $sender->render($view, '', 'plugins/Reactions');

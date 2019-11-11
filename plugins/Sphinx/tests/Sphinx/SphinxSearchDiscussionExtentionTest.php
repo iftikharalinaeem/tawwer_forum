@@ -7,8 +7,6 @@
 
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use DiscussionsApiController;
-use CategoryModel;
 
 class SphinxSearchDiscussionExtentionTest extends AbstractAPIv2Test {
 

@@ -32,9 +32,7 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
       // Loop over the logged-in user's roles
       $myRoleData = Gdn::userModel()->getRoles(Gdn::session()->UserID)->result();
-      $roleIDs = array_column($myRoleData, 'RoleID');
-      $roleNames = array_column($myRoleData, 'Name');
-      $myRoles = arrayCombine($roleIDs, $roleNames);
+      $myRoles = array_column($myRoleData, 'Name', 'RoleID');
       foreach ($myRoles as $roleID => $roleName) {
          $editableRolesList = c("Plugins.RoleProtect.{$roleID}.CanAffect", NULL);
          if (!is_null($editableRolesList)) {
@@ -133,9 +131,7 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
       // Get all the roles of the user we're trying to edit
       $theirRoleData = Gdn::userModel()->getRoles($targetUserID)->result();
-      $theirRoleIDs = array_column($theirRoleData, 'RoleID');
-      $theirRoleNames = array_column($theirRoleData, 'Name');
-      $theirRoles = arrayCombine($theirRoleIDs, $theirRoleNames);
+      $theirRoles = array_column($theirRoleData, 'Name', 'RoleID');
 
       foreach ($theirRoles as $theirRoleID => $theirRoleName) {
          if (array_key_exists($theirRoleID, $this->ProtectedRoles)) {
