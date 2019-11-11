@@ -258,13 +258,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id
      * @param array $query
      * @return array
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws NotFoundException If the article could not be found.
-     * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
         $this->permission("knowledge.kb.view");
@@ -281,7 +274,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ["insertUserID", "updateUserID"]
         );
 
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']));
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']), $query['locale'] ?? null);
         $article['breadcrumbs'] = $crumbs;
 
         $reactionCounts = $this->articleReactionModel->getReactionCount($id);
@@ -766,7 +759,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->save($body, $id);
         $row = $this->retrieveRow($id, $body);
 
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $locale = $body['locale'] ?? $row['locale'] ?? null;
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']), $locale);
         $row['breadcrumbs'] = $crumbs;
 
         $row = $this->normalizeOutput($row);

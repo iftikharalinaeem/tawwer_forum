@@ -185,23 +185,22 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * Get a single knowledge category.
      *
      * @param int $id
+     * @param array $query Query parameters array. Ex: ["locale": "en"]
      * @return array
-     * @throws \Exception If no session is available.
-     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
      */
-    public function get(int $id): array {
+    public function get(int $id, array $query = []): array {
         $this->permission("knowledge.kb.view");
 
-        $this->idParamSchema()->setDescription("Get a single knowledge category.");
+        /** @var Schema $in */
+        $in = $this->idParamSchema()->setDescription("Get a single knowledge category.");
+        $query['id'] = $id;
+        $query = $in->validate($query);
+
         $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->knowledgeCategoryByID($id);
 
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']), $query['locale']);
         $row['breadcrumbs'] = $crumbs;
 
         $row = $this->normalizeOutput($row);
@@ -246,7 +245,14 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     public function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
-                Schema::parse(["id:i" => "Knowledge category ID."]),
+                Schema::parse([
+                    "id:i" => "Knowledge category ID.",
+                    "locale" => [
+                        "description" => "Locale to represent content in.",
+                        "type" => "string",
+                        "default" => "en"
+                    ],
+                ]),
                 $type
             );
         }

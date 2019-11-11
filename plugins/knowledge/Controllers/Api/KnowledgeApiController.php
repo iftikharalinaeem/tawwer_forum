@@ -492,7 +492,7 @@ class KnowledgeApiController extends AbstractApiController {
 
             if ($this->isExpandField('breadcrumbs', $expand)) {
                 // Casing and naming here is due to sphinx normalization.
-                $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID));
+                $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeCategoryID), $articleWithRevision['locale'] ?? null);
                 $articleWithRevision['breadcrumbs'] = $crumbs;
             }
         }
@@ -531,7 +531,7 @@ class KnowledgeApiController extends AbstractApiController {
             $articleWithRevision["DateInserted"] = $articleWithRevision['dateInserted']->format('Y-m-d H:i:s');
             $articleWithRevision["Type"] = $typeData['recordType'];
 
-            $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($articleWithRevision['knowledgeCategoryID']));
+            $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($articleWithRevision['knowledgeCategoryID']), $articleWithRevision['locale'] ?? null);
             $articleWithRevision['Breadcrumbs'] = $this->breadcrumbModel->crumbsAsArray($crumbs);
         }
 
