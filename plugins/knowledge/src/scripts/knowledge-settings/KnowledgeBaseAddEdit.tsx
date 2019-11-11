@@ -13,12 +13,11 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import Translate from "@library/content/Translate";
-import { ProductManager } from "@subcommunities/products/ProductManager";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
@@ -194,9 +193,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     />
                 </Modal>
             )}
-            {isProductManagementOpen && (
-                <ProductManager asModal={true} onClose={() => setIsProductManagementOpen(false)} />
-            )}
+            {isProductManagementOpen &&
+                {
+                    /*<ProductManager asModal={true} onClose={() => setIsProductManagementOpen(false)} />*/
+                }}
         </>
     );
 }
