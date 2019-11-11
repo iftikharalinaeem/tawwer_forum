@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import InputTextBlock from "@library/forms/InputTextBlock";
 
-export function TranslationProperty(props: {
+export const TranslationProperty = React.memo(function TranslationProperty(props: {
     property: ITranslationProperty;
     translationValue: string;
     onTranslationChange: (propertyKey: string, newValue: string) => void;
@@ -86,4 +86,4 @@ export function TranslationProperty(props: {
             }
         />
     );
-}
+});

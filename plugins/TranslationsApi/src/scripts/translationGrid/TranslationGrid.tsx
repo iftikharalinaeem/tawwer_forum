@@ -79,9 +79,6 @@ export function TranslationGrid(props: ITranslationGrid) {
 
 function useTranslationState(initialTranslations: ITranslations, afterSelfUpdate?: TranslationUpdater) {
     const [inProgressTranslations, setInProgressTranslations] = useState(initialTranslations);
-    useEffect(() => {
-        setInProgressTranslations(initialTranslations);
-    }, [initialTranslations]);
 
     const updateTranslationDraft = useCallback(
         (propertyKey: string, translation: string) => {
