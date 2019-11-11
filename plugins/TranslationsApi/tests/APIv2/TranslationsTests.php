@@ -35,9 +35,9 @@ class TranslationsTests extends AbstractAPIv2Test {
      */
     public function testPostResource() {
         $resource = [
-            "name" => "knowledgebase",
+            "name" => "resource one name",
             "sourceLocale" => "en",
-            "urlCode" => "kb",
+            "urlCode" => "resourceOne",
         ];
 
         $result = $this->api()->post(
@@ -55,14 +55,86 @@ class TranslationsTests extends AbstractAPIv2Test {
     public function testPostResourceFailure() {
         $this->expectException(ClientException::class);
         $resource = [
-            "name" => "knowledgebase",
+            "name" => "resource one",
             "sourceLocale" => "en",
-            "urlCode" => "kb",
+            "urlCode" => "resourceOne",
         ];
 
         $this->api()->post(
             'translations',
             $resource
         );
+    }
+
+    /**
+     * Post /translations failure
+     *
+     * @param array $record
+     * @param string $key
+     * @param string $translation
+     *
+     * @depends      testPostResource
+     * @dataProvider translationsPropertyProvider
+     */
+    public function testPutTranslations($record, $key, $translation) {
+        $this->api()->put(
+            'translations/resourceOne',
+            $record
+        );
+
+        $record = reset($record);
+        $translationPropertyModel = self::container()->get(TranslationPropertyModel::class);
+        $result = $translationPropertyModel->get(["recordType" => $record["recordType"], "recordID" => $record["recordID"], "propertyName" => $record["propertyName"]]);
+        $translationModel = self::container()->get(TranslationModel::class);
+        $this->assertEquals($key, $result[0]["translationPropertyKey"]);
+
+        $result = $translationModel->get(["translationPropertyKey" => $result[0]["translationPropertyKey"]]);
+        $this->assertEquals($translation, $result[0]["translation"]);
+    }
+
+    /**
+     * Provider for PUT /translations/:resource
+     *
+     * @return array
+     */
+    public function translationsPropertyProvider(): array {
+        return [
+            [
+                [[
+                    "recordType" => "recordTypeOne",
+                    "recordID" => 8,
+                    "recordKey" => "",
+                    "propertyName" => "name",
+                    "locale" => "en",
+                    "translation" => "english recordTypeOne name"
+                ]],
+                "recordTypeOne.8.name",
+                "english recordType name",
+            ],
+            [
+                [[
+                    "recordType" => "recordTypeTwo",
+                    "recordID" => 9,
+                    "recordKey" => "",
+                    "propertyName" => "description",
+                    "locale" => "en",
+                    "translation" => "english recordTypeTwo cat description"
+                ]],
+                "recordTypeTwo.9.description",
+                "english recordType cat description",
+            ],
+            [
+                [[
+                    "recordType" => "recordTypeThree",
+                    "recordID" => null,
+                    "recordKey" => null,
+                    "propertyName" => "name",
+                    "locale" => "en",
+                    "translation"=> "name"
+                ]],
+                "recordTypeThree..name",
+                "name",
+            ],
+        ];
     }
 }
