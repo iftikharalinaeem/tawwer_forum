@@ -876,7 +876,7 @@ class ArticlesTest extends AbstractResourceTest {
         );
 
         $articleID = $this->createArticleWithRevisions(["es","ru"]);
-        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidate-translations", ["invalidateTranslations" => true]);
+        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidate-translations");
 
         $revisions = $response->getBody();
         $translationStatuses = array_column($revisions, "translationStatus", "locale");
