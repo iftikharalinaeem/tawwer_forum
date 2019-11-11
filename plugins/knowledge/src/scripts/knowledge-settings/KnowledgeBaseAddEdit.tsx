@@ -112,7 +112,24 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             />
                                         }
                                     >
-                                        <DashboardSelect disabled={isLoading} options={[]} onChange={doNothing} />
+                                        <DashboardSelect
+                                            disabled={isLoading}
+                                            options={[
+                                                {
+                                                    value: "en",
+                                                    label: "English",
+                                                },
+                                                {
+                                                    value: "en",
+                                                    label: "English1",
+                                                },
+                                                {
+                                                    value: "en",
+                                                    label: "English2",
+                                                },
+                                            ]}
+                                            onChange={doNothing}
+                                        />
                                     </DashboardFormGroup>
 
                                     <DashboardFormGroup
@@ -173,7 +190,24 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     label="Locales"
                                     description={"Determines how the categories and articles within it will display"}
                                 >
-                                    <DashboardSelect disabled={isLoading} options={[]} onChange={doNothing} />
+                                    <DashboardSelect
+                                        disabled={isLoading}
+                                        options={[
+                                            {
+                                                value: "en",
+                                                label: "English",
+                                            },
+                                            {
+                                                value: "en",
+                                                label: "English1",
+                                            },
+                                            {
+                                                value: "en",
+                                                label: "English2",
+                                            },
+                                        ]}
+                                        onChange={doNothing}
+                                    />
                                 </DashboardFormGroup>
                             </FrameBody>
                         }
