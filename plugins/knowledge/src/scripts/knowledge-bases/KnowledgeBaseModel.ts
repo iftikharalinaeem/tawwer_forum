@@ -122,6 +122,25 @@ export enum KnowledgeBaseStatus {
     PUBLISHED = "published",
 }
 
+export interface IPatchKnowledgeBaseRequest {
+    description: string;
+    icon?: string;
+    name: string;
+    sortArticles?: KnowledgeBaseSortMode;
+    sourceLocale?: string;
+    urlCode: string;
+    viewType: KbViewType;
+}
+export interface IPostKnowledgeBaseRequest {
+    description: string;
+    icon?: string;
+    name: string;
+    sortArticles?: KnowledgeBaseSortMode;
+    sourceLocale?: string;
+    urlCode: string;
+    viewType: KbViewType;
+}
+
 /**
  * Interface representing a knowledge base resource.
  */
