@@ -30,7 +30,10 @@ export interface ITranslationGrid {
 
 export function TranslationGrid(props: ITranslationGrid) {
     const { existingTranslations, onTranslationUpdate } = props;
-    const { inProgressTranslations, updateTranslationDraft } = useTranslationState(existingTranslations, onTranslationUpdate);
+    const { inProgressTranslations, updateTranslationDraft } = useTranslationState(
+        existingTranslations,
+        onTranslationUpdate,
+    );
 
     const classesPanelList = panelListClasses();
     const { properties, inScrollingContainer = false } = props;
@@ -54,7 +57,13 @@ export function TranslationGrid(props: ITranslationGrid) {
                     <div className={classNames(classes.rightCell, classes.headerRight)}>
                         <div className={classes.languageDropdown}>
                             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
-                                <TranslationGridLocaleChooser sourceLocale={props.sourceLocale} selectedLocale={props.activeLocale} onChange={(locale) => props.onActiveLocaleChange && props.onActiveLocaleChange(locale)} />
+                                <TranslationGridLocaleChooser
+                                    sourceLocale={props.sourceLocale}
+                                    selectedLocale={props.activeLocale}
+                                    onChange={locale =>
+                                        props.onActiveLocaleChange && props.onActiveLocaleChange(locale)
+                                    }
+                                />
                             </div>
                         </div>
                     </div>
@@ -86,7 +95,7 @@ function useTranslationState(initialTranslations: ITranslations, afterSelfUpdate
                 ...inProgressTranslations,
                 [propertyKey]: translation,
             });
-            afterSelfUpdate?.(propertyKey, translation);
+            afterSelfUpdate && afterSelfUpdate(propertyKey, translation);
         },
         [setInProgressTranslations, inProgressTranslations],
     );
