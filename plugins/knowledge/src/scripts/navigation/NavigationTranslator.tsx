@@ -10,7 +10,6 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { INormalizedNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
-import ModalSizes from "@library/modal/ModalSizes";
 
 interface IProps {
     kbID: number;
@@ -32,8 +31,7 @@ export function OrganizeCategoriesTranslator(props: IProps) {
         afterSave={() => { }}
         onDismiss={() => { }}
         isLoading={isLoading}
-        modalType={ModalSizes.FULL_SCREEN}
-        // modalTypes={ModalTyp}
+        isFullScreen
     />;
 }
 

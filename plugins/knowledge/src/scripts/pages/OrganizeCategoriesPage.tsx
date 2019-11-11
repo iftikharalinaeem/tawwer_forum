@@ -12,7 +12,7 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import Loader from "@library/loaders/Loader";
 import Heading from "@library/layout/Heading";
@@ -26,7 +26,6 @@ import Permission from "@library/features/users/Permission";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
-import { useContentTranslator } from "@vanilla/i18n";
 import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTranslator";
 
 function OrganizeCategoriesPage(props: IProps) {
