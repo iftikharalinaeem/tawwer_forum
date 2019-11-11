@@ -14,6 +14,7 @@ import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyK
 import { t } from "@vanilla/i18n";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBaseAddEdit";
+import { BrowserRouter } from "react-router-dom";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
@@ -26,7 +27,7 @@ export function ManageKnowledgeBasesPage() {
     }
 
     return (
-        <>
+        <BrowserRouter>
             {/*<DashboardHeaderBlock title={t("Add Knowledge Base")} actionButtons={<KnowledgeBaseAddEdit />} />*/}
             <DashboardTable
                 head={
@@ -42,6 +43,6 @@ export function ManageKnowledgeBasesPage() {
                 ))}
             />
             {Object.entries(kbs.data).length === 0 && <EmptyKnowledgeBasesResults forStatus={status} />}
-        </>
+        </BrowserRouter>
     );
 }
