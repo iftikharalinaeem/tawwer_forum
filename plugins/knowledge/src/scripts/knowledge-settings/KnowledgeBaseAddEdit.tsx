@@ -34,6 +34,10 @@ import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ProductManager } from "@subcommunities/products/ProductManager";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
+import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
+import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
+import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 
 interface IProps {}
 
@@ -50,6 +54,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const titleID = useMemo(() => {
         return uniqueIDFromPrefix("addKnowledgeBase");
+    }, []);
+
+    const viewType = useMemo(() => {
+        return uniqueIDFromPrefix("knowledgeBaseViewType");
     }, []);
 
     const classFrameFooter = frameFooterClasses();
@@ -75,9 +83,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             >
                 {t("Add Knowledge Base")}
             </Button>
-            {openForm && (
+            {/*{openForm && (*/}
+            {
                 <Modal
-                    size={ModalSizes.LARGE}
+                    size={ModalSizes.XL}
                     exitHandler={onCancel}
                     titleID={titleID}
                     elementToFocusOnExit={toggleButtonRef.current as HTMLElement}
@@ -90,6 +99,19 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                         body={
                             <FrameBody>
                                 <DashboardFormList>
+                                    <DashboardFormGroup label="Title" description={t("Title of the knowledge base.")}>
+                                        <DashboardInput inputProps={{ disabled: loading, onChange: doNothing }} />
+                                    </DashboardFormGroup>
+
+                                    <DashboardFormGroup
+                                        label="URL Code"
+                                        description={t(
+                                            "A customized version of the knowledge base name as it should appear in URLs.",
+                                        )}
+                                    >
+                                        <DashboardInput inputProps={{ disabled: loading, onChange: doNothing }} />
+                                    </DashboardFormGroup>
+
                                     <DashboardFormGroup
                                         label="Product"
                                         description={
@@ -110,7 +132,63 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     >
                                         <DashboardSelect disabled={loading} options={[]} onChange={doNothing} />
                                     </DashboardFormGroup>
+
+                                    <DashboardFormGroup
+                                        label="Description"
+                                        description={t(
+                                            "A description of the knowledge base. Displayed in the knowledge base picker.",
+                                        )}
+                                    >
+                                        <DashboardInput
+                                            inputProps={{ disabled: loading, onChange: doNothing, multiline: true }}
+                                        />
+                                    </DashboardFormGroup>
+
+                                    <DashboardImageUploadGroup
+                                        label="Icon"
+                                        description={t(
+                                            "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
+                                        )}
+                                        onChange={doNothing}
+                                        value={""}
+                                    />
+                                    <DashboardImageUploadGroup
+                                        label="Banner Image"
+                                        description={t("Homepage banner image for this knowledge base.")}
+                                        onChange={doNothing}
+                                        value={""}
+                                    />
+                                    <DashboardFormGroup
+                                        label="View Type"
+                                        description={t("Homepage banner image for this knowledge base.")}
+                                    >
+                                        <DashboardRadioGroup>
+                                            <DashboardRadioButton
+                                                label={"Guide"}
+                                                note={t(
+                                                    'Guides are for making howto guides, documentation, or any "book" like content that should be read in order.',
+                                                )}
+                                                value={""}
+                                                name={viewType}
+                                            />
+                                            <DashboardRadioButton
+                                                label={"Help Center"}
+                                                note={t(
+                                                    "Help centers are for making free-form help articles that are organized into categories.",
+                                                )}
+                                                value={""}
+                                                name={viewType}
+                                            />
+                                        </DashboardRadioGroup>
+                                    </DashboardFormGroup>
                                 </DashboardFormList>
+
+                                <DashboardFormGroup
+                                    label="Locales"
+                                    description={"Determines how the categories and articles within it will display"}
+                                >
+                                    <DashboardSelect disabled={loading} options={[]} onChange={doNothing} />
+                                </DashboardFormGroup>
                             </FrameBody>
                         }
                         footer={
@@ -134,7 +212,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                         }
                     />
                 </Modal>
-            )}
+            }
             {openProductManagement && <ProductManager asModal={true} onClose={() => setOpenProductManagement(false)} />}
         </>
     );
