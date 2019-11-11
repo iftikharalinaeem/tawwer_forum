@@ -316,7 +316,6 @@ class ReactionsPlugin extends Gdn_Plugin {
         $comment += ['recordType' => 'Comment', 'recordID' => $comment['CommentID']];
         $rows = $this->reactionModel->getRecordReactions(
             $comment,
-            $comment['CommentID'],
             true,
             $query['type'],
             $offset,
