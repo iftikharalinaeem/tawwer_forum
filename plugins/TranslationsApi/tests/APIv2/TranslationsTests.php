@@ -35,9 +35,9 @@ class TranslationsTests extends AbstractAPIv2Test {
      */
     public function testPostResource() {
         $resource = [
-            "name" => "knowledgebase",
+            "name" => "resource one name",
             "sourceLocale" => "en",
-            "urlCode" => "kb",
+            "urlCode" => "resourceOne",
         ];
 
         $result = $this->api()->post(
@@ -55,9 +55,9 @@ class TranslationsTests extends AbstractAPIv2Test {
     public function testPostResourceFailure() {
         $this->expectException(ClientException::class);
         $resource = [
-            "name" => "knowledgebase",
+            "name" => "resource one",
             "sourceLocale" => "en",
-            "urlCode" => "kb",
+            "urlCode" => "resourceOne",
         ];
 
         $this->api()->post(
@@ -78,7 +78,7 @@ class TranslationsTests extends AbstractAPIv2Test {
      */
     public function testPutTranslations($record, $key, $translation) {
         $this->api()->put(
-            'translations/kb',
+            'translations/resourceOne',
             $record
         );
 
@@ -106,10 +106,10 @@ class TranslationsTests extends AbstractAPIv2Test {
                     "recordKey" => "",
                     "propertyName" => "name",
                     "locale" => "en",
-                    "translation" => "english recordType name"
+                    "translation" => "english recordTypeOne name"
                 ]],
                 "recordTypeOne.8.name",
-                "english kb name",
+                "english recordType name",
             ],
             [
                 [[
@@ -118,10 +118,10 @@ class TranslationsTests extends AbstractAPIv2Test {
                     "recordKey" => "",
                     "propertyName" => "description",
                     "locale" => "en",
-                    "translation" => "english recordType cat description"
+                    "translation" => "english recordTypeTwo cat description"
                 ]],
                 "recordTypeTwo.9.description",
-                "english kb cat description",
+                "english recordType cat description",
             ],
             [
                 [[
