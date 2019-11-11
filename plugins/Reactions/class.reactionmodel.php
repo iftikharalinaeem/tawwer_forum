@@ -141,7 +141,7 @@ class ReactionModel extends Gdn_Model {
     }
 
     /**
-     * Get reactions on a record.
+     * Get reactions on a record, given only a record type and ID.
      *
      * @param string $recordType Type of record (e.g. Discussion, Category).
      * @param int $id Unique ID of the record.
@@ -152,6 +152,30 @@ class ReactionModel extends Gdn_Model {
      * @return array
      */
     public function getByRecord($recordType, $id, $restricted = true, $urlCode = null, $offset = 0, $limit = null) {
+        list($record, $model, $_) = $this->getRow($recordType, $id);
+        $record['recordType'] = $recordType;
+        $record['recordID'] = $id;
+
+        $result = $this->getRecordReactions($record, $restricted, $urlCode, $offset, $limit);
+        return $result;
+    }
+
+    /**
+     * Get the reactions on a record.
+     *
+     * Note that in this case the record is the full database record, plus the following keys:
+     *
+     * - recordType: The type of the record.
+     * - recordID: The ID of the record.
+     *
+     * @param array $record The record to get the reactions for.
+     * @param bool $restricted Filter result based on the current user's permissions.
+     * @param string|null $urlCode Filter reaction results by a particular type's URL code.
+     * @param int $offset
+     * @param int|null $limit
+     * @return array
+     */
+    public function getRecordReactions(array $record, bool $restricted = true, ?string $urlCode = null, int $offset = 0, ?int $limit = null): array {
         if ($limit === null) {
             $limit = $this->getDefaultLimit();
         }
@@ -167,12 +191,13 @@ class ReactionModel extends Gdn_Model {
             $where['UrlCode'] = $urlCode;
         }
 
-        $types = self::getReactionTypes($where);
+        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getRecordSummary_typesFilter', $where, $this, $record);
+        $types = self::getReactionTypes($typesWhere);
         $tagIDs = array_column($types, 'TagID', 'TagID');
 
         $rows = $this->SQL->getWhere(
             'UserTag',
-            ['RecordType' => $recordType, 'RecordID' => $id, 'TagID' => $tagIDs],
+            ['RecordType' => $record['recordType'], 'RecordID' => $record['recordID'], 'TagID' => $tagIDs],
             'DateInserted',
             'desc',
             $limit,
