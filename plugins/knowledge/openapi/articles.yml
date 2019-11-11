@@ -910,17 +910,6 @@ paths:
                   required: true
                   schema:
                     type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                invalidateTranslations:
-                                    description: The status of the article.
-                                    type: boolean
-                            required:
-                                - invalidateTranslations
             responses:
                 "200":
                     content:
