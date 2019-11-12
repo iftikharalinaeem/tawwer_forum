@@ -68,7 +68,7 @@ function OrganizeCategoriesPage(props: IProps) {
                             title={pageTitle}
                         >
                             {pageTitle}
-                            {/* <OrganizeCategoriesTranslator kbID={props.kbID} /> */}
+                            <OrganizeCategoriesTranslator kbID={props.kbID} />
                         </Heading>
                     </DocumentTitle>
                     <NavigationManager knowledgeBase={knowledgeBase.data} />
