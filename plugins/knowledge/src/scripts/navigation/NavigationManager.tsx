@@ -447,7 +447,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
         return (
             deleteItem && (
                 <ModalConfirm
-                    title={(<Translate source={'Delete "<0/>"'} c0={deleteItem.data.name} /> as unknown) as string}
+                    title={((<Translate source={'Delete "<0/>"'} c0={deleteItem.data.name} />) as unknown) as string}
                     onCancel={this.dismissDeleteModal}
                     onConfirm={this.handleDeleteConfirm}
                     elementToFocusOnExit={this.state.elementToFocusOnDeleteClose || document.body}
@@ -842,9 +842,6 @@ function mapDispatchToProps(dispatch): IActions {
         categoryActions: new CategoryActions(dispatch, apiv2),
     };
 }
-const Connected = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(NavigationManager);
+const Connected = connect(mapStateToProps, mapDispatchToProps)(NavigationManager);
 
 export default Connected;
