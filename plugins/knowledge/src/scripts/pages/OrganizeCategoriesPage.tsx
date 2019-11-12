@@ -47,7 +47,7 @@ function OrganizeCategoriesPage(props: IProps) {
     const isNonSourceLocale = knowledgeBase.data && knowledgeBase.data.sourceLocale !== currentLocale;
     const [warningFlag, setWarning] = useState(isNonSourceLocale);
 
-    const categoriesWarning = isNonSourceLocale && (
+    const categoriesWarning = warningFlag && (
         <Message
             isFixed={true}
             contents={
@@ -58,11 +58,7 @@ function OrganizeCategoriesPage(props: IProps) {
                     <div>
                         <Translate
                             source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
-                            c0={
-                                <>
-                                    <LocaleDisplayer localeContent={sourceLocale || " "} />
-                                </>
-                            }
+                            c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
                         />
                     </div>
                 </div>
