@@ -60,10 +60,13 @@ class KnowledgeBasePage extends KbPage {
      * Render the help center type homepage.
      */
     private function renderHelpCenterHomepage(): Data {
+        $currentLocale = $this->siteSectionModel
+            ->getCurrentSiteSection()
+            ->getContentLocale();
         $this->preloadNavigation($this->knowledgeBase['knowledgeBaseID']);
         $this->setSeoRequired(false)
             ->setSeoDescription($this->knowledgeBase['description'])
-            ->setSeoCrumbsForCategory($this->knowledgeBase['rootCategoryID'])
+            ->setSeoCrumbsForCategory($this->knowledgeBase['rootCategoryID'], $currentLocale)
             ->setCanonicalUrl($this->knowledgeBase['url'])
             ->setSeoTitle($this->knowledgeBase['name']);
         return parent::render();

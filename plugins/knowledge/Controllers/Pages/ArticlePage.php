@@ -11,6 +11,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Models\ArticleJsonLD;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -36,19 +37,26 @@ class ArticlePage extends KbPage {
      * @param string|null $path
      */
     public function initialize(string $path = null) {
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+        $currentLocale = $currentSiteSection->getContentLocale();
+
         $article = $this->getArticleForPath($path);
+
+        // URL Validation
+        $this->validateSiteSection($article['knowledgeBaseID']);
+
+        // Apply common SEO information.
         $this
             ->setSeoTitle($article['name'] ?? "")
             ->setSeoDescription($article['excerpt'] ?? "")
             ->setSeoContent($this->renderKbView('seo/pages/article.twig', ['article' => $article]))
-            ->setSeoCrumbsForCategory($article['knowledgeCategoryID'])
+            ->setSeoCrumbsForCategory($article['knowledgeCategoryID'], $currentLocale)
             ->setCanonicalUrl($article['url'])
-            ->validateSiteSection($article['knowledgeBaseID'])
+            ->addOpenGraphTag('og:type', 'article')
+            ->addOpenGraphTag('og:image', $article['seoImage'] ?? $this->siteMeta->getLogo())
+            ->addJsonLDItem(new ArticleJsonLD($article, $this->siteMeta))
         ;
-
-        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
-        $currentLocale = $currentSiteSection->getContentLocale();
-
+      
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_RESPONSE,
@@ -60,12 +68,32 @@ class ArticlePage extends KbPage {
         ));
         $this->preloadNavigation($article['knowledgeBaseID']);
 
-        // Preload translation data as well
+        // Prepare translation data
         $articleID = $article['articleID'];
         $translationResponse = $this->articlesApi->get_translations($articleID, []);
+        $translationData = Data::box($translationResponse);
+
+        // Add translation meta tags for alternative language versions.
+        foreach ($translationData->getData() as $translation) {
+            if ($translation['locale'] !== $article['locale'] // The current article must always be included.
+                // From Google: "Each language version must list itself as well as all other language versions."
+                && $translation['translationStatus'] === ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
+            ) {
+                // Don't display untranslated articles.
+                continue;
+            }
+
+            $this->addMetaTag([
+                'rel' => 'alternate',
+                'hreflang' => $translation['locale'],
+                'href' => $translation['url'],
+            ]);
+        }
+
+        // Preload the data for the frontend.
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_LOCALES,
-            Data::box($translationResponse),
+            $translationData,
             ['articleID' => $articleID]
         ));
     }
@@ -86,34 +114,14 @@ class ArticlePage extends KbPage {
             throw new NotFoundException('Article');
         }
 
-        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
-        $currentLocale = $currentSiteSection->getContentLocale();
-        $availableTranslations = $this->articlesApi->get_translations($id, []);
+        $currentLocale = $this->siteSectionModel
+            ->getCurrentSiteSection()
+            ->getContentLocale();
 
-        $hasTranslation = true;
-        foreach ($availableTranslations as $translation) {
-            if ($translation['locale'] === $currentLocale
-                && $translation['translationStatus'] === ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED
-            ) {
-                $hasTranslation = false;
-                break;
-            }
-        }
-
-        $query = ["expand" => "all"];
-        if ($hasTranslation) {
-            $query['locale'] = $currentLocale;
-        } else {
-            $this->addReduxAction(new ReduxAction(
-                ActionConstants::ARTICLE_TRANSLATION_FALLBACK,
-                Data::box([
-                    'articleID' => $id,
-                    'usesFallback' => true,
-                ]),
-                [],
-                true
-            ));
-        }
+        $query = [
+            'expand' => 'all',
+            'locale' => $currentLocale
+        ];
 
         return $this->articlesApi->get($id, $query);
     }

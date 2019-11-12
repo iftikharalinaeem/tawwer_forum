@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent, calc } from "csx";
+import { important, percent, calc, px } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
@@ -15,6 +15,7 @@ import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { style } from "typestyle";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -151,6 +152,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const header = style("header", {
+        display: "flex",
         ...paddings({
             left: unit(globalVars.gutter.half),
             right: unit(globalVars.gutter.half),
@@ -390,6 +392,24 @@ export const navigationManagerClasses = useThemeCache(() => {
         },
     });
 
+    const height = titleBarVars => {
+        return style(
+            "height",
+            {
+                $nest: {
+                    "&&": { height: px(titleBarVars.sizing.height) },
+                },
+            },
+            media.oneColumnDown({
+                $nest: {
+                    "&&": {
+                        height: px(titleBarVars.sizing.mobile.height),
+                    },
+                },
+            }),
+        );
+    };
+
     return {
         root,
         container,
@@ -415,5 +435,6 @@ export const navigationManagerClasses = useThemeCache(() => {
         editMode,
         text,
         button,
+        height,
     };
 });

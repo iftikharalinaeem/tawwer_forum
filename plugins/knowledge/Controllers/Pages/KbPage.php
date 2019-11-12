@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers\Pages;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Knowledge\Models\SearchJsonLD;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
@@ -112,6 +113,7 @@ abstract class KbPage extends ThemedPage {
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts('knowledge'));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets('knowledge'));
+        $this->addJsonLDItem(new SearchJsonLD($this->request));
         parent::initAssets();
     }
 
@@ -178,7 +180,11 @@ abstract class KbPage extends ThemedPage {
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
         $currentSection = $this->siteSectionModel->getCurrentSiteSection();
-        $kbArgs = ['siteSectionGroup' => $currentSection->getSectionGroup(), 'expand' => 'all'];
+        $kbArgs = [
+            'siteSectionGroup' => $currentSection->getSectionGroup(),
+            'expand' => 'all',
+            'locale' => $currentSection->getContentLocale()
+        ];
         if ($currentSection instanceof DefaultSiteSection) {
             unset($kbArgs['siteSectionGroup']);
         }
@@ -235,11 +241,12 @@ abstract class KbPage extends ThemedPage {
      * Set the SEO breadcrumbs based off of our knowledge base ID.
      *
      * @param int $knowledgeBaseID
+     * @param string $locale
      *
      * @return $this Own instance for chaining.
      */
-    protected function setSeoCrumbsForCategory(int $knowledgeBaseID): self {
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeBaseID));
+    protected function setSeoCrumbsForCategory(int $knowledgeBaseID, string $locale): self {
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($knowledgeBaseID), $locale);
         $this->setSeoBreadcrumbs($crumbs);
         return $this;
     }

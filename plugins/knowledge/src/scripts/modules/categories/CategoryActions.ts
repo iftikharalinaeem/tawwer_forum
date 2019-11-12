@@ -18,6 +18,7 @@ import {
 import actionCreatorFactory from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 const createAction = actionCreatorFactory("@@category");
 
@@ -56,7 +57,7 @@ export default class CategoryActions extends ReduxActions {
     public getCategory(request: IGetKbCategoryRequestBody): Promise<IGetKbCategoryResponseBody> {
         const { id } = request;
         const apiThunk = bindThunkAction(CategoryActions.getCategoryACs, async () => {
-            const response = await this.api.get(`/knowledge-categories/${id}?expand=all`);
+            const response = await this.api.get(`/knowledge-categories/${id}?expand=all&locale=${getCurrentLocale()}`);
             return response.data as IGetKbCategoryResponseBody;
         })(request);
         return this.dispatch(apiThunk);

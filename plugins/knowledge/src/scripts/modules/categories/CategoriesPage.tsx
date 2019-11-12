@@ -20,7 +20,6 @@ import apiv2 from "@library/apiv2";
 import { ResultMeta } from "@library/result/ResultMeta";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import React, { useEffect, useMemo } from "react";
-import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
@@ -147,9 +146,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default hot(module)(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(CategoriesPage),
-);
+export default connect(mapStateToProps, mapDispatchToProps)(CategoriesPage);

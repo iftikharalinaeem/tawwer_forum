@@ -246,6 +246,7 @@ trait ArticlesApiSchemes {
                 "body",
                 "outline",
                 "excerpt",
+                "seoDescription",
                 "seoName",
                 "seoDescription",
                 "slug",
@@ -541,6 +542,9 @@ trait ArticlesApiSchemes {
                 'level:i' => 'Heading level',
                 'text:s' => 'Heading text line',
             ]),
+            "seoImage:s?" => [
+                "allowNull" => true,
+            ],
             "translationStatus:s" => [
                 "allowNull" => false,
                 "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",

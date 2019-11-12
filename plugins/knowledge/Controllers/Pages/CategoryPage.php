@@ -47,9 +47,13 @@ class CategoryPage extends KbPage {
             "expand" => "excerpt",
             "knowledgeCategoryID" => $category['knowledgeCategoryID'],
         ]);
+        $currentLocale = $this->siteSectionModel
+            ->getCurrentSiteSection()
+            ->getContentLocale();
+
         $this
             ->setSeoRequired(false)
-            ->setSeoCrumbsForCategory($category['knowledgeCategoryID'])
+            ->setSeoCrumbsForCategory($category['knowledgeCategoryID'], $currentLocale)
             ->setSeoTitle($category['name'] ?? "")
             ->setSeoContent($this->renderKbView('seo/pages/flatCategories.twig', [
                 'category' => $category,
