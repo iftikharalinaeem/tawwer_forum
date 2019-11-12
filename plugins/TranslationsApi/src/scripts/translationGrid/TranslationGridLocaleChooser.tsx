@@ -35,11 +35,11 @@ export function TranslationGridLocaleChooser(props: IProps) {
                 return {
                     value: locale.localeKey,
                     name: locale.localeKey,
-                    icon: (
-                        <span tabIndex={0}>
-                            <AlertIcon className={"selectBox-selectedIcon"} />
-                        </span>
-                    ),
+                    // icon: (
+                    //     <span tabIndex={0}>
+                    //         <AlertIcon className={"selectBox-selectedIcon"} />
+                    //     </span>
+                    // ),
                     content: (
                         <>
                             <LocaleDisplayer displayLocale={locale.localeKey} localeContent={locale.localeKey} />

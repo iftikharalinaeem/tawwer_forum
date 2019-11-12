@@ -13,8 +13,9 @@ import { t } from "@vanilla/i18n";
 import classNames from "classnames";
 import React from "react";
 import { contentTranslatorClasses } from "./contentTranslatorStyles";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
-export function ContentTranslaterFullHeader(props: { onBack: () => void; onSave: () => void }) {
+export function ContentTranslaterFullHeader(props: { onBack: () => void; isSubmitLoading?: boolean }) {
     const classesModal = modalClasses();
 
     const classes = contentTranslatorClasses();
@@ -35,13 +36,12 @@ export function ContentTranslaterFullHeader(props: { onBack: () => void; onSave:
                                 />
                             </li>
                             <li>
-                                <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={() => {
-                                        props.onSave();
-                                    }}
-                                >
-                                    {t("Save")}
+                                <Button baseClass={ButtonTypes.TEXT_PRIMARY} submit>
+                                    {props.isSubmitLoading ? (
+                                        <ButtonLoader buttonType={ButtonTypes.TEXT_PRIMARY} />
+                                    ) : (
+                                        t("Save")
+                                    )}
                                 </Button>
                             </li>
                         </ul>
