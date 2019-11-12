@@ -30,8 +30,15 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useThrowError } from "@vanilla/react-utils";
 import Permission from "@library/features/users/Permission";
 
+/**
+ * Constant to represent "no existing translations".
+ * This ensure we don't cause unnecessray re-renders by dynamically recreating an object as a prop.
+ */
 const EMPTY_TRANSLATIONS: ITranslations = {};
 
+/**
+ * ContentTranslator implementation for ContentTranslationProvider.
+ */
 export const ContentTranslator = (props: IContentTranslatorProps) => {
     let [displayModal, setDisplayModal] = useState(false);
     const { currentLocale } = useLocaleInfo();
