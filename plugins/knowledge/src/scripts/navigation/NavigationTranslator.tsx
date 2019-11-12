@@ -7,7 +7,7 @@ import React, { useDebugValue } from "react";
 import { useContentTranslator, ITranslationProperty, TranslationPropertyType } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationModel, { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
 import { Permission } from "@library/features/users/Permission";
@@ -61,8 +61,15 @@ function useStatus(kbID: number) {
 function useNavigationCategoriesForKB(kbID: number) {
     const navItemsByID = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems);
     const itemsForKb = Object.values(navItemsByID).filter(
-        item => item && item.knowledgeBaseID === kbID && item.recordType === KbRecordType.CATEGORY,
+        item =>
+            item &&
+            item.knowledgeBaseID === kbID &&
+            item.recordType === KbRecordType.CATEGORY &&
+            item.parentID !== NavigationModel.SYNTHETIC_ROOT.recordID,
     );
-    useDebugValue(kbID);
+    useDebugValue({
+        kbID,
+        itemsForKb,
+    });
     return itemsForKb;
 }
