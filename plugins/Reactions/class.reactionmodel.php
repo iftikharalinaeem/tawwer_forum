@@ -191,7 +191,7 @@ class ReactionModel extends Gdn_Model {
             $where['UrlCode'] = $urlCode;
         }
 
-        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getRecordSummary_typesFilter', $where, $this, $record);
+        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getReactionTypesFilter', $where, $record);
         $types = self::getReactionTypes($typesWhere);
         $tagIDs = array_column($types, 'TagID', 'TagID');
 
@@ -367,7 +367,7 @@ class ReactionModel extends Gdn_Model {
             'Class' => $classes,
             'Active' => 1
         ];
-        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getRecordSummary_typesFilter', $typesWhere, $this, $row);
+        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getReactionTypesFilter', $typesWhere, $row);
         $result = self::getReactionTypes($typesWhere);
         $result = array_values($result);
 
