@@ -6,7 +6,7 @@
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { ITranslationProperty, LocaleDisplayer } from "@vanilla/i18n";
 import classNames from "classnames";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { translationGridClasses } from "./TranslationGridStyles";
 import { TranslationProperty } from "./TranslationProperty";
 import { TranslationGridLocaleChooser } from "./TranslationGridLocaleChooser";

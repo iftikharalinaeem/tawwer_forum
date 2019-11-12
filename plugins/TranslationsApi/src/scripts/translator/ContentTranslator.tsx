@@ -254,5 +254,5 @@ function useInitSync(props: IContentTranslatorProps) {
             translationLocale: firstLocale,
             resource,
         });
-    }, [firstLocale, resource]);
+    }, [firstLocale, resource, init]);
 }

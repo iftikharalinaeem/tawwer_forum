@@ -1,15 +1,12 @@
 /**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 import { TranslationPropertyType, ITranslationProperty, ILocale } from "@vanilla/i18n";
 
 export function makeTestTranslationProperty(key: string, source: string, isMultiLine?: boolean): ITranslationProperty {
     return {
-        translationPropertyKey: key,
-        resource: "custom",
         recordType: "custom",
         propertyType: isMultiLine ? TranslationPropertyType.TEXT_MULTILINE : TranslationPropertyType.TEXT,
         recordID: 1312,
