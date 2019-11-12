@@ -11,7 +11,7 @@ import { mountModal } from "@library/modal/Modal";
 import React from "react";
 import { ConfirmLocaleChange } from "@knowledge/knowledge-settings/ConfirmLocaleChange";
 
-addComponent("knowledge-bases-table", ManageKnowledgeBasesPage);
+addComponent("knowledge-bases-manage", ManageKnowledgeBasesPage);
 onReady(handleKBViewTypeChange);
 onContent(() => {
     handleKBViewTypeChange();

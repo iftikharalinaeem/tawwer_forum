@@ -155,6 +155,15 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             $articles = [];
         }
 
+        if (!empty($options['queryLocale'])) {
+            foreach ($articles as &$article) {
+                $article['queryLocale'] = $options['queryLocale'];
+            }
+            foreach ($categories as &$category) {
+                $category['locale'] = $options['queryLocale'];
+            }
+        }
+
         $result = $this->getNavigation($categories, $articles, $flat, KnowledgeCategoryModel::ROOT_ID, $knowledgeBase["sortArticles"]);
         return $result;
     }
@@ -167,6 +176,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param bool $flatMode Mode: flat or tree
      * @param int $rootCategoryID Category ID to start from
      * @param string $sortOrder Knowledge base sort order settings
+     * @param string $locale Locale
      *
      * @return array
      */
@@ -175,7 +185,8 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         array $articles,
         bool $flatMode = true,
         int $rootCategoryID = KnowledgeCategoryModel::ROOT_ID,
-        string $sortOrder = KnowledgeBaseModel::ORDER_MANUAL
+        string $sortOrder = KnowledgeBaseModel::ORDER_MANUAL,
+        string $locale = null
     ): array {
         $categories = $this->normalizeOutput($categories, Navigation::RECORD_TYPE_CATEGORY);
         $articles = $this->normalizeOutput($articles, Navigation::RECORD_TYPE_ARTICLE);

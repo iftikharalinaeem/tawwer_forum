@@ -122,9 +122,9 @@ function mapStateToProps(store: IKnowledgeAppStoreState, ownProps: IOwnProps) {
                     navItems.data = [];
                 } else {
                     const rootID = ownProps.activeRecord.recordType + ownProps.activeRecord.recordID;
-                    navItems.data = NavigationSelector.selectDirectChildren(items, rootID, [KbRecordType.CATEGORY]).map(
-                        item => ({ ...item, children: [] }),
-                    );
+                    navItems.data = NavigationSelector.selectDirectChildren(items, rootID, [
+                        KbRecordType.CATEGORY,
+                    ]).map(item => ({ ...item, children: [] }));
                 }
             }
         }
@@ -147,7 +147,4 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(Navigation);
+export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

@@ -120,6 +120,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 "default" => KnowledgeBaseModel::STATUS_PUBLISHED,
             ],
             "sourceLocale?",
+            "locale?",
             "siteSectionGroup?",
             "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections"]),
         ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
@@ -137,12 +138,16 @@ class KnowledgeBasesApiController extends AbstractApiController {
             unset($query['siteSectionGroup']);
         }
 
+        $locale = $query['locale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        unset($query['locale']);
+
         $rows = $this->knowledgeBaseModel->get($query);
 
-        $rows = array_map(function ($row) use ($expandSiteSections) {
+        $rows = array_map(function ($row) use ($expandSiteSections, $locale) {
             if ($expandSiteSections) {
                 $this->expandSiteSections($row);
             }
+            $row['locale'] = $locale;
             return $this->normalizeOutput($row);
         }, $rows);
         $result = $out->validate($rows);
@@ -473,7 +478,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 $record['defaultArticleID'] = null;
             }
         }
-        $record['url'] = $this->knowledgeBaseModel->url($record, true);
+        $record['url'] = $this->knowledgeBaseModel->url($record);
         return $record;
     }
 }

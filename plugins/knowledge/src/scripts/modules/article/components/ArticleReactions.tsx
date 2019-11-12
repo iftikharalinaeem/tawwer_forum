@@ -199,7 +199,4 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(ArticleReactions);
+export default connect(mapStateToProps, mapDispatchToProps)(ArticleReactions);

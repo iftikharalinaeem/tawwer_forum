@@ -18,7 +18,6 @@ import Splash from "@library/splash/Splash";
 import { splashVariables } from "@library/splash/splashStyles";
 import { t } from "@library/utility/appUtils";
 import React from "react";
-import { hot } from "react-hot-loader";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import VanillaHomeHeader from "@library/headers/TitleBarHome";
@@ -72,9 +71,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default hot(module)(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(HomePage),
-);
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
