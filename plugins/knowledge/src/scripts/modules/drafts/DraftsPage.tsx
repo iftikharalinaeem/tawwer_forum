@@ -19,6 +19,8 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
+import { FallbackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { HomeRoute } from "@knowledge/routes/pageRoutes";
 
 interface IOwnProps
     extends RouteComponentProps<{
@@ -46,6 +48,7 @@ export class DraftsPage extends React.Component<IProps> {
             >
                 <AnalyticsData uniqueKey="draftsPage" />
                 <PageLoader status={this.props.userDrafts.status}>
+                    <FallbackUrlSetter url={HomeRoute.url(undefined)} />
                     <DocumentTitle title={t("Drafts")}>
                         <DraftsLayout {...this.props} data={this.props.userDrafts.data || []} />
                     </DocumentTitle>
