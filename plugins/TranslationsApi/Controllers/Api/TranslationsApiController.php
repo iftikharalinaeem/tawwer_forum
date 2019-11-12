@@ -14,6 +14,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\TranslationsApi\Models\ResourceModel;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 use Vanilla\TranslationsApi\Models\TranslationModel;
+use LocalesApiController;
 
 /**
  * Class TranslationsApiController
@@ -43,6 +44,8 @@ class TranslationsApiController extends AbstractApiController {
 
     /** @var TranslationPropertyModel */
     private $translationPropertyModel;
+    /** @var LocalesApiController $localeApi */
+    private $localeApi;
 
     /**
      * TranslationsApiController constructor.
@@ -56,12 +59,14 @@ class TranslationsApiController extends AbstractApiController {
         ResourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
-        ConfigurationInterface $configurationModule
+        ConfigurationInterface $configurationModule,
+        LocalesApiController $localeApi
     ) {
         $this->resourceModel = $resourcesModel;
         $this->translationModel = $translationModel;
         $this->translationPropertyModel = $translationPropertyModel;
         $this->config = $configurationModule;
+        $this->localeApi = $localeApi;
 
     }
 
@@ -223,7 +228,7 @@ class TranslationsApiController extends AbstractApiController {
                     "minimum" => 1,
                     "maximum" => 100,
                 ],
-            ]));
+            ]))->addValidator('locale', [$this->localeApi, 'validateLocale']);
         }
         return $this->schema($this->getResourceSchema, $type);
     }
