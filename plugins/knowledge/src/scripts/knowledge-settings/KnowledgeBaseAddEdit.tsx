@@ -24,6 +24,7 @@ import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUpload
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import classNames from "classnames";
+import { MenuPlacement } from "@library/forms/select/SelectOne";
 
 interface IProps {}
 
@@ -207,6 +208,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             },
                                         ]}
                                         onChange={doNothing}
+                                        menuPlacement={MenuPlacement.TOP}
                                     />
                                 </DashboardFormGroup>
                             </FrameBody>
