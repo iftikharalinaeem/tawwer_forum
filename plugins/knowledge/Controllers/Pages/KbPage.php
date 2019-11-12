@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers\Pages;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Knowledge\Models\SearchJsonLD;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
@@ -112,6 +113,7 @@ abstract class KbPage extends ThemedPage {
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts('knowledge'));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets('knowledge'));
+        $this->addJsonLDItem(new SearchJsonLD($this->request));
         parent::initAssets();
     }
 
