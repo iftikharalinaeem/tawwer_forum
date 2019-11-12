@@ -19,34 +19,68 @@ import ModalSizes from "@library/modal/ModalSizes";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { useUniqueID } from "@library/utility/idUtils";
 import { IContentTranslatorProps, t, useLocaleInfo } from "@vanilla/i18n";
-import React, { useState } from "react";
-import { TranslationGrid } from "../translationGrid/TranslationGrid";
+import React, { useState, useEffect, useMemo, useDebugValue } from "react";
+import { TranslationGrid, ITranslations } from "../translationGrid/TranslationGrid";
 import { contentTranslatorClasses } from "./contentTranslatorStyles";
 import { ContentTranslaterFullHeader } from "./ContentTranslatorFullHeader";
+import { useTranslationActions, useTranslationData, validateProperties } from "./translationHooks";
+import { LoadStatus } from "@library/@types/api/core";
+import { makeTranslationKey } from "./TranslationActions";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { useThrowError } from "@vanilla/react-utils";
+import Permission from "@library/features/users/Permission";
 
-const EMPTY_TRANSLATIONS = {};
+/**
+ * Constant to represent "no existing translations".
+ * This ensure we don't cause unnecessray re-renders by dynamically recreating an object as a prop.
+ */
+const EMPTY_TRANSLATIONS: ITranslations = {};
 
+/**
+ * ContentTranslator implementation for ContentTranslationProvider.
+ */
 export const ContentTranslator = (props: IContentTranslatorProps) => {
     let [displayModal, setDisplayModal] = useState(false);
-    let [activeLocale, setActiveLocale] = useState<string | null>(null);
     const { currentLocale } = useLocaleInfo();
     const titleID = useUniqueID("translateCategoriesTitle");
     let [showCloseConfirm, setShowCloseConfirm] = useState(false);
     let [showChangeConfirm, setShowChangeConfirm] = useState<string | null>(null);
-    let [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+    const { translationsByLocale, formTranslations, submitLoadable, translationLocale } = useTranslationData();
+    const { publishForm, init, updateForm } = useTranslationActions();
+    const hasUnsavedChanges = Object.entries(formTranslations).length > 0;
+
+    const currentTranslations = useCurrentTranslations();
+    // Show the loader if we have a loader & don't have data yet.
+    // We don't want show the loader unless we have absolutely nothing to show.
+    const showLoader =
+        (props.isLoading || currentTranslations.status === LoadStatus.LOADING) && !currentTranslations.data;
+    const isSubmitLoading = submitLoadable.status === LoadStatus.LOADING;
+
+    const { properties } = props;
+
+    useEffect(() => {
+        validateProperties(properties);
+    }, [properties]);
+
+    useInitSync(props);
+    const existingTranslations = useExistingTranslations(props, !displayModal);
+
+    const closeSelf = () => {
+        setShowCloseConfirm(false);
+        setDisplayModal(false);
+    };
 
     const promptCloseConfirmation = () => {
         if (hasUnsavedChanges) {
             setShowCloseConfirm(true);
         } else {
-            setDisplayModal(false);
+            closeSelf();
         }
     };
 
-    const closeSelf = () => {
-        setHasUnsavedChanges(false);
-        setShowCloseConfirm(false);
-        setDisplayModal(false);
+    const setLocale = (locale: string) => {
+        init({ resource: props.resource, translationLocale: locale });
     };
 
     if (!currentLocale) {
@@ -55,26 +89,23 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
 
     const classes = contentTranslatorClasses();
 
-    let content = props.isLoading ? (
+    let content = showLoader ? (
         <Loader size={200} />
     ) : (
         <TranslationGrid
-            key={activeLocale || undefined}
+            key={translationLocale || undefined}
             properties={props.properties}
-            activeLocale={activeLocale}
+            activeLocale={translationLocale}
             onActiveLocaleChange={locale => {
                 if (hasUnsavedChanges) {
                     setShowChangeConfirm(locale);
                 } else {
-                    setActiveLocale(locale);
+                    setLocale(locale!);
                 }
             }}
-            onTranslationUpdate={newTranslations => {
-                setHasUnsavedChanges(true);
-                console.log("Has new translations", newTranslations);
-            }}
+            onTranslationUpdate={updateForm}
             sourceLocale={currentLocale}
-            existingTranslations={EMPTY_TRANSLATIONS}
+            existingTranslations={existingTranslations}
         />
     );
 
@@ -82,13 +113,13 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     if (props.isFullScreen) {
         content = (
             <>
-                <ContentTranslaterFullHeader onBack={promptCloseConfirmation} onSave={promptCloseConfirmation} />
-                <Container className={classes.content}>
+                <ContentTranslaterFullHeader onBack={promptCloseConfirmation} isSubmitLoading={isSubmitLoading} />
+                <div className={classes.content}>
                     <DocumentTitle title={title}>
-                        <Heading id={titleID} depth={1} renderAsDepth={2} title={title} />
+                        <Heading id={titleID} className={classes.title} depth={1} renderAsDepth={2} title={title} />
                     </DocumentTitle>
                     {content}
-                </Container>
+                </div>
             </>
         );
     } else {
@@ -98,11 +129,11 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                 body={<FrameBody>{content}</FrameBody>}
                 footer={
                     <FrameFooter>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_STANDARD}>
-                            Cancel
+                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.STANDARD}>
+                            {t("Cancel")}
                         </Button>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_PRIMARY}>
-                            Save
+                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.PRIMARY}>
+                            {isSubmitLoading ? <ButtonLoader buttonType={ButtonTypes.PRIMARY} /> : t("Save")}
                         </Button>
                     </FrameFooter>
                 }
@@ -111,8 +142,12 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     }
 
     return (
-        <>
-            <Button baseClass={ButtonTypes.ICON} onClick={() => setDisplayModal(true)}>
+        <Permission permission="settings.manage">
+            <Button
+                className={classes.translateIcon}
+                baseClass={ButtonTypes.ICON}
+                onClick={() => setDisplayModal(true)}
+            >
                 <TranslateIcon />
             </Button>
             {displayModal && (
@@ -122,11 +157,25 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                     size={props.isFullScreen ? ModalSizes.FULL_SCREEN : ModalSizes.LARGE}
                     scrollable={props.isFullScreen}
                 >
-                    {content}
+                    <form
+                        onSubmit={e => {
+                            e.preventDefault();
+                            if (!translationLocale) {
+                                return;
+                            }
+                            publishForm(props.properties);
+                        }}
+                    >
+                        {content}
+                    </form>
                 </Modal>
             )}
             {showCloseConfirm && (
-                <ModalConfirm title={t("Unsaved Changes")} onConfirm={closeSelf} onCancel={closeSelf}>
+                <ModalConfirm
+                    title={t("Unsaved Changes")}
+                    onConfirm={closeSelf}
+                    onCancel={() => setShowCloseConfirm(false)}
+                >
                     {t(
                         "You have unsaved changes and your work will be lost. Are you sure you want to continue without saving?",
                     )}
@@ -137,7 +186,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                 <ModalConfirm
                     title={t("Unsaved Changes")}
                     onConfirm={() => {
-                        setActiveLocale(showChangeConfirm);
+                        setLocale(showChangeConfirm!);
                         setShowChangeConfirm(null);
                     }}
                     onCancel={() => {
@@ -149,6 +198,72 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                     )}
                 </ModalConfirm>
             )}
-        </>
+        </Permission>
     );
 };
+
+function useCurrentTranslations() {
+    const { translationsByLocale, translationLocale } = useTranslationData();
+
+    return translationLocale && translationsByLocale[translationLocale]
+        ? translationsByLocale[translationLocale]
+        : { status: LoadStatus.PENDING };
+}
+
+function useExistingTranslations(props: IContentTranslatorProps, ignoreFetch: boolean) {
+    const { properties } = props;
+    const { translationLocale, resource } = useTranslationData();
+    const currentTranslations = useCurrentTranslations();
+    const { getTranslationsForProperties } = useTranslationActions();
+    const translationData = currentTranslations.data;
+    const translationStatus = currentTranslations.status;
+
+    useEffect(() => {
+        if (!translationLocale || ignoreFetch || translationStatus !== LoadStatus.PENDING) {
+            return;
+        }
+        getTranslationsForProperties(properties);
+    }, [translationLocale, translationStatus, resource, ignoreFetch, getTranslationsForProperties, properties]);
+
+    const result = useMemo(() => {
+        if (!translationData) {
+            return EMPTY_TRANSLATIONS;
+        } else {
+            const result: ITranslations = {};
+            for (const translation of Object.values(translationData)) {
+                result[makeTranslationKey(translation)] = translation.translation;
+            }
+            return result;
+        }
+    }, [translationData]);
+
+    useDebugValue({ existingTranslations: result });
+    return result;
+}
+
+function useFirstNonSourceLocale() {
+    const { locales, currentLocale } = useLocaleInfo();
+    const thrower = useThrowError();
+    const filtered = locales.filter(locale => locale.localeKey !== currentLocale);
+    if (filtered.length === 0) {
+        thrower(new Error("<ContentTranslator /> should not be instantiated w/ only 1 locale"));
+    }
+
+    const result = filtered[0].localeKey;
+    useDebugValue({
+        firstNonSourceLocale: result,
+    });
+    return result;
+}
+
+function useInitSync(props: IContentTranslatorProps) {
+    const { init } = useTranslationActions();
+    const firstLocale = useFirstNonSourceLocale();
+    const { resource } = props;
+    useEffect(() => {
+        init({
+            translationLocale: firstLocale,
+            resource,
+        });
+    }, [firstLocale, resource, init]);
+}

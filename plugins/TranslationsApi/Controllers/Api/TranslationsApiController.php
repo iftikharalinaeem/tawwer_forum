@@ -150,12 +150,14 @@ class TranslationsApiController extends AbstractApiController {
 
         if (isset($query["recordType"])) {
             $where["tp.recordType"] = $query["recordType"];
-        }
-        if (isset($query["recordID"]) && isset($query["recordType"])) {
-            $where["tp.recordID"] = $query["recordID"];
-        }
-        if (isset($query["recordKey"]) && isset($query["recordType"])) {
-            $where["tp.recordKey"] = $query["recordKey"];
+
+            if (isset($query["recordID"]) || isset($query['recordIDs'])) {
+                $where["tp.recordID"] = $query['recordID'] || $query['recordIDs'];
+            }
+
+            if (isset($query["recordKey"]) || isset($query['recordKeys'])) {
+                $where["tp.recordKey"] = $query['recordKey'] || $query['recordKeys'];
+            }
         }
         if (isset($query["locale"])) {
             $where["t.locale"] = $query["locale"];
