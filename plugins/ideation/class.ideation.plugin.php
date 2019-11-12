@@ -1179,7 +1179,7 @@ EOT
      * @param array $record
      * @return array Returns the new filter (where clause).
      */
-    public function reactionsModel_getReactionTypesFilter(array $filter, array $record) {
+    public function reactionsModel_getReactionTypesFilter_handler(array $filter, array $record) {
         $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
         $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
 
