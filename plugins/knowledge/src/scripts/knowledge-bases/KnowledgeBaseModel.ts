@@ -19,6 +19,103 @@ export interface ILoadedProduct {
     patchKB: ILoadable<IKnowledgeBase>;
     deleteKB: ILoadable<{}, IKnowledgeBase>;
 }
+export interface IKbFormState {
+    title: string;
+    url: string;
+    product: string;
+    description: string;
+    icon: string;
+    image: string;
+    viewType: KbViewType;
+    locale: string;
+}
+export interface IKnowledgeBasesState {
+    knowledgeBasesByID: ILoadable<{
+        [id: number]: IKnowledgeBase;
+    }>;
+    form: IKbFormState;
+}
+
+export enum KbViewType {
+    HELP = "help",
+    GUIDE = "guide",
+}
+
+export enum KnowledgeBaseSortMode {
+    MANUAL = "manual",
+    NAME = "name",
+    DATE_INSERTED = "dateInserted",
+    DATE_INSERTED_DESC = "dateInsertedDesc",
+}
+export const INTIAL_KB_FORM: IKbFormState = {
+    title: "",
+    url: "",
+    product: "",
+    description: "",
+    icon: "",
+    image: "",
+    viewType: KbViewType.HELP,
+    locale: "",
+};
+
+interface ISiteSection {
+    basePath: string;
+    contentLocale: string;
+    sectionGroup: string;
+    sectionID: string;
+    name: string;
+}
+
+export enum KnowledgeBaseStatus {
+    DELETED = "deleted",
+    PUBLISHED = "published",
+}
+
+export interface IPatchKnowledgeBaseRequest {
+    description: string;
+    icon?: string;
+    name: string;
+    sortArticles?: KnowledgeBaseSortMode;
+    sourceLocale?: string;
+    urlCode: string;
+    viewType: KbViewType;
+}
+export interface IPostKnowledgeBaseRequest {
+    description: string;
+    icon?: string;
+    name: string;
+    sortArticles?: KnowledgeBaseSortMode;
+    sourceLocale?: string;
+    urlCode: string;
+    viewType: KbViewType;
+}
+
+/**
+ * Interface representing a knowledge base resource.
+ */
+export interface IKnowledgeBase {
+    knowledgeBaseID: number;
+    name: string;
+    description: string;
+    sortArticles: KnowledgeBaseSortMode;
+    insertUserID: number;
+    dateInserted: string;
+    updateUserID: number;
+    dateUpdated: string;
+    countArticles: number;
+    countCategories: number;
+    urlCode: string;
+    url: string;
+    icon: string;
+    status: KnowledgeBaseStatus;
+    bannerImage: string;
+    sourceLocale: string;
+    viewType: KbViewType;
+    rootCategoryID: number;
+    defaultArticleID: number | null;
+    siteSections: ISiteSection[];
+}
+
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
  */
@@ -64,6 +161,7 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         knowledgeBasesByID: {
             status: LoadStatus.PENDING,
         },
+        form: INTIAL_KB_FORM,
     };
 
     public initialState = KnowledgeBaseModel.INITIAL_STATE;
@@ -143,82 +241,6 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         });
 }
 
-export interface IKnowledgeBasesState {
-    knowledgeBasesByID: ILoadable<{
-        [id: number]: IKnowledgeBase;
-    }>;
-}
-
-export enum KbViewType {
-    HELP = "help",
-    GUIDE = "guide",
-}
-
-export enum KnowledgeBaseSortMode {
-    MANUAL = "manual",
-    NAME = "name",
-    DATE_INSERTED = "dateInserted",
-    DATE_INSERTED_DESC = "dateInsertedDesc",
-}
-
-interface ISiteSection {
-    basePath: string;
-    contentLocale: string;
-    sectionGroup: string;
-    sectionID: string;
-    name: string;
-}
-
-export enum KnowledgeBaseStatus {
-    DELETED = "deleted",
-    PUBLISHED = "published",
-}
-
-export interface IPatchKnowledgeBaseRequest {
-    description: string;
-    icon?: string;
-    name: string;
-    sortArticles?: KnowledgeBaseSortMode;
-    sourceLocale?: string;
-    urlCode: string;
-    viewType: KbViewType;
-}
-export interface IPostKnowledgeBaseRequest {
-    description: string;
-    icon?: string;
-    name: string;
-    sortArticles?: KnowledgeBaseSortMode;
-    sourceLocale?: string;
-    urlCode: string;
-    viewType: KbViewType;
-}
-
-/**
- * Interface representing a knowledge base resource.
- */
-export interface IKnowledgeBase {
-    knowledgeBaseID: number;
-    name: string;
-    description: string;
-    sortArticles: KnowledgeBaseSortMode;
-    insertUserID: number;
-    dateInserted: string;
-    updateUserID: number;
-    dateUpdated: string;
-    countArticles: number;
-    countCategories: number;
-    urlCode: string;
-    url: string;
-    icon: string;
-    status: KnowledgeBaseStatus;
-    bannerImage: string;
-    sourceLocale: string;
-    viewType: KbViewType;
-    rootCategoryID: number;
-    defaultArticleID: number | null;
-    siteSections: ISiteSection[];
-}
-
 type ReducerType = KnowledgeReducer<IKnowledgeBasesState>;
 
 export function useKnowledgeBases(status: KnowledgeBaseStatus) {
@@ -232,4 +254,7 @@ export function useKnowledgeBases(status: KnowledgeBaseStatus) {
     }, [knowledgeBasesByID, getAll]);
 
     return knowledgeBasesByID;
+}
+export function useKBData() {
+    return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
 }

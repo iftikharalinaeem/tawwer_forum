@@ -4,12 +4,15 @@
  */
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { actionCreatorFactory } from "typescript-fsa";
 import {
     IKnowledgeBase,
     KnowledgeBaseStatus,
     IPostKnowledgeBaseRequest,
     IPatchKnowledgeBaseRequest,
+    IKnowledgeBasesState,
+    IKbFormState,
 } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
@@ -49,6 +52,9 @@ export default class KnowledgeBaseActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
+    public static updateFormAC = actionCreator<Partial<IKbFormState>>("UPDATE_FORM");
+    public updateForm = this.bindDispatch(KnowledgeBaseActions.updateFormAC);
+
     public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
         "GET",
     );
@@ -78,6 +84,11 @@ export default class KnowledgeBaseActions extends ReduxActions {
 
         return this.dispatch(thunk);
     }
+    public saveKbForm = async () => {
+        const form;
+
+        return await this.postKB();
+    };
 
     public postKB(options: IPostKnowledgeBaseRequest) {
         const thunk = bindThunkAction(KnowledgeBaseActions.postKB_ACs, async () => {
