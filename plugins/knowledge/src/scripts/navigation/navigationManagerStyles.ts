@@ -147,6 +147,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const header = style("header", {
+        display: "flex",
         ...paddings({
             left: unit(globalVars.gutter.half),
             right: unit(globalVars.gutter.half),
