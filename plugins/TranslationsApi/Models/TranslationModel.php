@@ -40,7 +40,7 @@ class TranslationModel extends PipelineModel {
         LocalesApiController $localesApiController,
         ConfigurationInterface $config
     ) {
-        parent::__construct("translations");
+        parent::__construct("translation");
         $this->session = $session;
         $this->localesApiController = $localesApiController;
         $this->config = $config;

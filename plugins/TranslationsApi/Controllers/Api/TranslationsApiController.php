@@ -138,7 +138,7 @@ class TranslationsApiController extends AbstractApiController {
      * @return array
      */
     public function get(string $path, array $query = []) {
-        $this->permission();
+        $this->permission("Garden.Moderation.Manage");
         $path = substr($path, 1);
 
         $in = $this->getTranslationsSchema("in");
@@ -152,11 +152,11 @@ class TranslationsApiController extends AbstractApiController {
             $where["tp.recordType"] = $query["recordType"];
 
             if (isset($query["recordID"]) || isset($query['recordIDs'])) {
-                $where["tp.recordID"] = $query['recordID'] || $query['recordIDs'];
+                $where["tp.recordID"] = $query['recordID'] ?? $query['recordIDs'];
             }
 
             if (isset($query["recordKey"]) || isset($query['recordKeys'])) {
-                $where["tp.recordKey"] = $query['recordKey'] || $query['recordKeys'];
+                $where["tp.recordKey"] = $query['recordKey'] ?? $query['recordKeys'];
             }
         }
         if (isset($query["locale"])) {
@@ -206,7 +206,13 @@ class TranslationsApiController extends AbstractApiController {
                 "urlCode:s?",
                 "recordType:s?",
                 "recordID:i?",
+                "recordIDs:a?" => [
+                    'items' => ['type' => 'integer'],
+                ],
                 "recordKey:s?",
+                "recordKeys:a?" => [
+                        'items' => ['type' => 'string'],
+                ],
                 "locale:s",
                 "limit:i?" => [
                     "default" => 100,

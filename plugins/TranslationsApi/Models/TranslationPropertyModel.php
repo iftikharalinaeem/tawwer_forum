@@ -131,7 +131,7 @@ class TranslationPropertyModel extends PipelineModel {
 
         $sql = $this->sql();
         $sql->from($this->getTable() . " as tp")
-            ->join("translations t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
+            ->join("translation t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
 
         $sql->where($where);
         $sql->limit($limit, $offset);
