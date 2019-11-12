@@ -258,13 +258,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id
      * @param array $query
      * @return array
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws NotFoundException If the article could not be found.
-     * @throws ServerException If there was an error normalizing the output.
      */
     public function get(int $id, array $query = []) {
         $this->permission("knowledge.kb.view");
@@ -281,7 +274,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ["insertUserID", "updateUserID"]
         );
 
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']));
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']), $query['locale'] ?? null);
         $article['breadcrumbs'] = $crumbs;
 
         $reactionCounts = $this->articleReactionModel->getReactionCount($id);
@@ -729,6 +722,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
         $row["url"] = $this->articleModel->url($row);
 
+        if (isset($row["queryLocale"])) {
+            $row["translationStatus"] = ($row["locale"] === $row["queryLocale"]) ?
+                ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE :
+                ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
+        }
+
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -766,7 +765,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->save($body, $id);
         $row = $this->retrieveRow($id, $body);
 
-        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+        $locale = $body['locale'] ?? $row['locale'] ?? null;
+        $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']), $locale);
         $row['breadcrumbs'] = $crumbs;
 
         $row = $this->normalizeOutput($row);
@@ -1124,9 +1124,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function put_invalidateTranslations(int $id, array $body): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->schema([
-            "invalidateTranslations:b"
-        ], "in")->setDescription("Invalidate translations for a particular article.");
+        $in = $this->schema($this->idParamSchema(), "in");
+        $in->validate(['id' => $id]);
 
         $out = $this->schema([":a" => Schema::parse([
             "articleID:i",
@@ -1138,9 +1137,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out")
         ]);
 
-        if ($body["invalidateTranslations"]) {
-            $this->updateInvalidateArticleTranslations($id);
-        }
+        $this->updateInvalidateArticleTranslations($id);
+
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $results = $out->validate($articles);
 

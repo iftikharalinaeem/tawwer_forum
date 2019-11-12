@@ -77,7 +77,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(KnowledgeBaseList);
+export default connect(mapStateToProps, mapDispatchToProps)(KnowledgeBaseList);

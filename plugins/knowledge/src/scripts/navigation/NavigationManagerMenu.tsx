@@ -15,6 +15,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { px } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { modalClasses } from "@library/modal/modalStyles";
+import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 
 interface IProps {
     className?: string;
@@ -27,14 +28,9 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
     public render() {
         const debug = debugHelper("navigationManagerMenu");
         const titleBarVars = titleBarVariables();
-        const mediaQueries = layoutVariables().mediaQueries();
         const classesModal = modalClasses();
-        const heightStyle = style(
-            { height: px(titleBarVars.sizing.height), ...debug.name("items") },
-            mediaQueries.oneColumnDown({
-                height: px(titleBarVars.sizing.mobile.height),
-            }),
-        );
+        const classes = navigationManagerClasses();
+        const height = classes.height(titleBarVars);
 
         return (
             <nav
@@ -48,11 +44,11 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
-                            <ul className={classNames("navigationManagerMenu-items", heightStyle)}>
-                                <li className={classNames("navigationManagerMenu-item", "isPullLeft", heightStyle)}>
+                            <ul className={classNames("navigationManagerMenu-items", height)}>
+                                <li className={classNames("navigationManagerMenu-item", "isPullLeft", height)}>
                                     <BackLink
                                         visibleLabel={true}
-                                        className={classNames("navigationManagerMenu-backLink", heightStyle)}
+                                        className={classNames("navigationManagerMenu-backLink", height)}
                                     />
                                 </li>
                             </ul>

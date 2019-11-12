@@ -20,7 +20,6 @@ import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { Router } from "@library/Router";
 import PagesContext from "@library/routing/PagesContext";
 import React, { useCallback, useEffect, useDebugValue } from "react";
-import { hot } from "react-hot-loader";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import PageLoader from "@library/routing/PageLoader";
@@ -102,4 +101,4 @@ function useConnect() {
     return result;
 }
 
-export default hot(module)(KnowledgeApp);
+export default KnowledgeApp;

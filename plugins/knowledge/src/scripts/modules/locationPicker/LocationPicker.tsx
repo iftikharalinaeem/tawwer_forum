@@ -164,7 +164,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(LocationPicker);
+export default connect(mapStateToProps, mapDispatchToProps)(LocationPicker);
