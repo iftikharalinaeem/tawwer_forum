@@ -12,35 +12,58 @@ import { EditIcon, AlertIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import InputTextBlock from "@library/forms/InputTextBlock";
+import { makeTranslationKey } from "../translator/TranslationActions";
 
-export const TranslationProperty = React.memo(function TranslationProperty(props: {
+interface IProps {
+    /** The translation property to represent */
     property: ITranslationProperty;
+
+    /**
+     * The current translated value for the property
+     * This is NOT saved anywhere & represents a WIP draft state.
+     **/
     translationValue: string;
+
+    /**
+     * Callback for when the tranlsation draft state changes.
+     */
     onTranslationChange: (propertyKey: string, newValue: string) => void;
+
+    /**
+     * An existing translation for the row if it exists.
+     * This is used to initiliaze the content of the row.
+     */
     existingTranslation: string | null;
+
+    /** For UI alignment. */
     isFirst?: boolean;
+
+    /** For UI alignment. */
     isLast?: boolean;
-}) {
+}
+
+/**
+ * Wired up data component to represent a translation property in a grid row.
+ *
+ * Using memo for performance reasons (when the grid update we don't want to re-render every row).
+ */
+export const TranslationProperty = React.memo(function TranslationProperty(props: IProps) {
     const { existingTranslation, property, translationValue, isFirst, isLast } = props;
     let isEditing = false;
     if (existingTranslation) {
         isEditing = existingTranslation !== translationValue;
     } else {
-        if (!translationValue) {
-            // The input hasn't been touched.
-            isEditing = false;
-        } else {
-            isEditing = translationValue !== property.sourceText;
-        }
+        isEditing = !!translationValue;
     }
 
     const isMultiLine = property.propertyType === TranslationPropertyType.TEXT_MULTILINE;
 
     const classes = translationGridClasses();
+    const properyKey = makeTranslationKey(property);
 
     return (
         <TranslationGridRow
-            key={property.translationPropertyKey}
+            key={properyKey}
             isFirst={isFirst}
             leftCell={<TranslationGridText text={property.sourceText} />}
             rightCell={
@@ -69,7 +92,7 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
                             inputClassNames: classNames(classes.input, { [classes.fullHeight]: isLast }),
                             onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                                 const { value } = event.target;
-                                props.onTranslationChange(property.translationPropertyKey, value);
+                                props.onTranslationChange(properyKey, value);
                             },
                             value: translationValue != null ? translationValue : property.sourceText,
                             multiline: isMultiLine,

@@ -9,24 +9,32 @@ import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useLocaleInfo, LocaleDisplayer } from "@vanilla/i18n";
-import { AlertIcon } from "@library/icons/common";
 
 interface IProps {
+    /** Handler for when the locale changes. */
     onChange: (selectedLocale: string) => void;
+
+    /** The current selected locale. */
     selectedLocale: string | null;
+
+    /** The source locale of the translation. This will be excluded as a target from the dropdown. */
     sourceLocale: string;
 }
 
+/**
+ * Component for choosing a target locale in the <TranslationGrid />
+ */
 export function TranslationGridLocaleChooser(props: IProps) {
     const classes = translationGridClasses();
     const classesPanelList = panelListClasses();
     const { locales } = useLocaleInfo();
 
+    const { selectedLocale, onChange } = props;
     useEffect(() => {
-        if (!props.selectedLocale) {
-            props.onChange(locales[0].localeKey);
+        if (!selectedLocale) {
+            onChange(locales[0].localeKey);
         }
-    }, [props.selectedLocale, props.onChange]);
+    }, [selectedLocale, onChange, locales]);
 
     const options = locales
         .filter(locale => locale.localeKey !== props.sourceLocale)
@@ -35,11 +43,12 @@ export function TranslationGridLocaleChooser(props: IProps) {
                 return {
                     value: locale.localeKey,
                     name: locale.localeKey,
-                    icon: (
-                        <span tabIndex={0}>
-                            <AlertIcon className={"selectBox-selectedIcon"} />
-                        </span>
-                    ),
+                    // Commented out because we don't currently have data for it.
+                    // icon: (
+                    //     <span tabIndex={0}>
+                    //         <AlertIcon className={"selectBox-selectedIcon"} />
+                    //     </span>
+                    // ),
                     content: (
                         <>
                             <LocaleDisplayer displayLocale={locale.localeKey} localeContent={locale.localeKey} />
