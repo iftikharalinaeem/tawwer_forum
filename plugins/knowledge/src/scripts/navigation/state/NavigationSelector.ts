@@ -160,10 +160,12 @@ export default class NavigationSelector {
             return [];
         }
 
-        return rootItem.children
-            .map(itemID => navItems[itemID])
-            // Cast needed because typescript doesn't infer anything from undefined check + filter.
-            .filter(item => item !== undefined && recordTypes.includes(item.recordType)) as IKbNavigationItem[];
+        return (
+            rootItem.children
+                .map(itemID => navItems[itemID])
+                // Cast needed because typescript doesn't infer anything from undefined check + filter.
+                .filter(item => item !== undefined && recordTypes.includes(item.recordType)) as IKbNavigationItem[]
+        );
     }
 
     /**

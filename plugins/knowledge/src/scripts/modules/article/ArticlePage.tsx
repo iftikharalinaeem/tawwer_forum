@@ -202,9 +202,6 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export default withDevice(withRedux(ArticlePage));

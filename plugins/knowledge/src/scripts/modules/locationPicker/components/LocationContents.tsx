@@ -354,7 +354,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(LocationContents);
+export default connect(mapStateToProps, mapDispatchToProps)(LocationContents);
