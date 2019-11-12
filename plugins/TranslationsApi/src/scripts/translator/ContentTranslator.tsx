@@ -114,12 +114,12 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
         content = (
             <>
                 <ContentTranslaterFullHeader onBack={promptCloseConfirmation} isSubmitLoading={isSubmitLoading} />
-                <Container className={classes.content}>
+                <div className={classes.content}>
                     <DocumentTitle title={title}>
-                        <Heading id={titleID} depth={1} renderAsDepth={2} title={title} />
+                        <Heading id={titleID} className={classes.title} depth={1} renderAsDepth={2} title={title} />
                     </DocumentTitle>
                     {content}
-                </Container>
+                </div>
             </>
         );
     } else {
@@ -143,7 +143,11 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
 
     return (
         <Permission permission="settings.manage">
-            <Button baseClass={ButtonTypes.ICON} onClick={() => setDisplayModal(true)}>
+            <Button
+                className={classes.translateIcon}
+                baseClass={ButtonTypes.ICON}
+                onClick={() => setDisplayModal(true)}
+            >
                 <TranslateIcon />
             </Button>
             {displayModal && (
