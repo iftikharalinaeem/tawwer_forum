@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IResponseArticleDraft, IArticle } from "@knowledge/@types/api/article";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
@@ -25,6 +25,8 @@ import { editorHeaderClasses } from "@knowledge/modules/editor/components/editor
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
+import { ArticleRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 interface IProps {
     callToAction?: string;
@@ -40,6 +42,7 @@ interface IProps {
     mobileDropDownTitle?: string; // For mobile
     useShadow?: boolean;
     selfPadded?: boolean;
+    article?: IArticle;
 }
 
 interface IState {
@@ -68,6 +71,8 @@ export default function EditorHeader(props: IProps) {
             ? { minWidth: unit(largerWidth) }
             : { minWidth: unit(globalVars.icon.sizes.default) };
 
+    const backUrlFallback = props.article != null ? ArticleRoute.url(props.article) : HomeRoute.url(undefined);
+
     const content = (
         <ul className={classNames(classesEditorHeader.items)}>
             <li
@@ -76,6 +81,7 @@ export default function EditorHeader(props: IProps) {
                 style={minButtonSizeStyles}
             >
                 <BackLink
+                    fallbackUrl={backUrlFallback}
                     title={t("Cancel")}
                     visibleLabel={true}
                     className={classNames("editorHeader-backLink", classesEditorHeader.backLink)}
