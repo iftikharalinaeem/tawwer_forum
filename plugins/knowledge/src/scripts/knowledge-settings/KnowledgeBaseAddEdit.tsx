@@ -111,7 +111,15 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         )}
                                     >
                                         <DashboardInput
-                                            inputProps={{ disabled: isLoading, onChange: doNothing, multiline: true }}
+                                            inputProps={{
+                                                disabled: isLoading,
+                                                onChange: doNothing,
+                                                multiline: true,
+                                            }}
+                                            multiLineProps={{
+                                                rows: 6,
+                                                maxRows: 6,
+                                            }}
                                         />
                                     </DashboardFormGroup>
 
