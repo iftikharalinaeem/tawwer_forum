@@ -15,11 +15,12 @@ import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
 import { makeSiteSectionGroup } from "@subcommunities/products/productTypes";
 import { ILoadedProduct } from "@subcommunities/products/productReducer";
+import { getComponent } from "@library/utility/componentRegistry";
 
 interface IProps {
     initialValue: number | null | boolean; // Gdn_Form can give us some nasty values.
-    formFieldName: string;
     valueType: "sectionGroup" | "productID";
+    disabled?: boolean;
 }
 
 /**
@@ -74,7 +75,11 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
                 <Translate
                     source="Assosciate a product with this Subcommunity. <0>Use the management UI</0> to replace add, edit, or delete products."
                     c0={content => (
-                        <Button baseClass={ButtonTypes.TEXT_PRIMARY} onClick={() => setModalOpen(true)}>
+                        <Button
+                            disabled={props.disabled}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                            onClick={() => setModalOpen(true)}
+                        >
                             {content}
                         </Button>
                     )}
@@ -82,9 +87,8 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             }
         >
             {modalOpen && <ProductManager onClose={() => setModalOpen(false)} asModal />}
-            <input name={props.formFieldName} type="hidden" value={value != null ? value : ""} />
             <DashboardSelect
-                disabled={allProductLoadable.status !== LoadStatus.SUCCESS}
+                disabled={allProductLoadable.status !== LoadStatus.SUCCESS || props.disabled}
                 options={options}
                 value={currentComboBoxValue!}
                 onChange={value => {
