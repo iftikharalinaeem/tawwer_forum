@@ -37,7 +37,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { optionsKnob } from "@storybook/addon-knobs";
 
 const doNothing = () => {
-    return;
+    return "test";
 };
 
 interface IKbForm {
@@ -56,24 +56,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const { updateForm, saveKbForm } = useKnowledgeBaseActions();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isProductManagementOpen, setIsProductManagementOpen] = useState(false);
-    /* const kbObj: IKbForm = {
-        title: "",
-        url: "",
-        product: "",
-        description: "",
-        icon: "",
-        image: "",
-        viewType: KbViewType.HELP,
-        locale: "",
-    };
-    const [obj, setKbObj] = useState(kbObj);
-    const setValue = (partial: Partial<IKbForm>) => {
-        console.log("inside setVale");
-        return setKbObj({
-            ...obj,
-            ...partial,
-        });
-    };*/
 
     const [isLoading, setIsLoading] = useState(false);
     const { locales, currentLocale } = useLocaleInfo();
@@ -111,11 +93,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const onClose = () => {
         setIsFormOpen(false);
     };
-
-    /* const save = e => {
-        // setIsFormOpen(false);
-        console.log("values==>", obj);
-    };*/
 
     return (
         <>
