@@ -151,12 +151,12 @@ class TranslationsApiController extends AbstractApiController {
         if (isset($query["recordType"])) {
             $where["tp.recordType"] = $query["recordType"];
 
-            if (isset($query["recordID"]) || isset($query['recordIDs'])) {
-                $where["tp.recordID"] = $query['recordID'] ?? $query['recordIDs'];
+            if (isset($query['recordIDs'])) {
+                $where["tp.recordID"] =  $query['recordIDs'];
             }
 
-            if (isset($query["recordKey"]) || isset($query['recordKeys'])) {
-                $where["tp.recordKey"] = $query['recordKey'] ?? $query['recordKeys'];
+            if (isset($query['recordKeys'])) {
+                $where["tp.recordKey"] = $query['recordKeys'];
             }
         }
         if (isset($query["locale"])) {
@@ -205,11 +205,9 @@ class TranslationsApiController extends AbstractApiController {
             $this->getResourceSchema = $this->schema(Schema::parse([
                 "urlCode:s?",
                 "recordType:s?",
-                "recordID:i?",
                 "recordIDs:a?" => [
                     'items' => ['type' => 'integer'],
                 ],
-                "recordKey:s?",
                 "recordKeys:a?" => [
                         'items' => ['type' => 'string'],
                 ],
