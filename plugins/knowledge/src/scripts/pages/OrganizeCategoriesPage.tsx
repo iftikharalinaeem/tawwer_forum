@@ -113,7 +113,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(OrganizeCategoriesPage);
+export default connect(mapStateToProps, mapDispatchToProps)(OrganizeCategoriesPage);

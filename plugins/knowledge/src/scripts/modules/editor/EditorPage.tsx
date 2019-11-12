@@ -154,7 +154,4 @@ function mapDispatchToProps(dispatch: Dispatch<any>, ownProps: IOwnProps) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(EditorPage);
+export default connect(mapStateToProps, mapDispatchToProps)(EditorPage);
