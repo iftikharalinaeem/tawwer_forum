@@ -42,7 +42,6 @@ interface IProps {
     mobileDropDownTitle?: string; // For mobile
     useShadow?: boolean;
     selfPadded?: boolean;
-    article?: IArticle;
 }
 
 interface IState {
