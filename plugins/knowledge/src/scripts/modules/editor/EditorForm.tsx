@@ -197,7 +197,6 @@ export function EditorForm(props: IProps) {
                             ) : null
                         }
                         saveDraft={saveDraft}
-                        article={article.data}
                     />
                 </animated.div>
 

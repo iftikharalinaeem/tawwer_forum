@@ -71,8 +71,6 @@ export default function EditorHeader(props: IProps) {
             ? { minWidth: unit(largerWidth) }
             : { minWidth: unit(globalVars.icon.sizes.default) };
 
-    const backUrlFallback = props.article != null ? ArticleRoute.url(props.article) : HomeRoute.url(undefined);
-
     const content = (
         <ul className={classNames(classesEditorHeader.items)}>
             <li
@@ -81,7 +79,6 @@ export default function EditorHeader(props: IProps) {
                 style={minButtonSizeStyles}
             >
                 <BackLink
-                    fallbackUrl={backUrlFallback}
                     title={t("Cancel")}
                     visibleLabel={true}
                     className={classNames("editorHeader-backLink", classesEditorHeader.backLink)}
