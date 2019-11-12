@@ -34,7 +34,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import { FallbackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -70,7 +70,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
                 <AnalyticsData uniqueKey={analyticsDataID} />
-                <FallbackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
+                <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 <PageLoader status={loadStatus}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className={classNames(inheritHeightClass())} onSubmit={this.onSubmit}>

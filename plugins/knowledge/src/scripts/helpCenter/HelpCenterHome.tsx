@@ -29,7 +29,7 @@ import TitleBar from "@library/headers/TitleBar";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
-import { FallbackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 /**
  * Component representing the the full home page of a help center.
@@ -74,7 +74,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         return (
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-                <FallbackUrlSetter url={HomeRoute.url(undefined)} />
+                <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
                 <Splash
                     action={splashAction}
                     styleOverwrite={{ outerBackgroundImage: bannerImage }}

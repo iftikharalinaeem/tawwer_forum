@@ -23,7 +23,7 @@ import React, { useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
-import { FallbackUrlSetter, useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
+import { FallbackBackUrlSetter, useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 
 /**
  * Page component for a flat category list.

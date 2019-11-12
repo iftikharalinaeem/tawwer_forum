@@ -29,7 +29,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
 import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
-import { FallbackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -73,7 +73,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
                 <AnalyticsData data={articleEventFields(article.data)} uniqueKey={article.data.articleID} />
-                <FallbackUrlSetter url={lastCrumb?.url ?? HomeRoute.url(undefined)} />
+                <FallbackBackUrlSetter url={lastCrumb?.url ?? HomeRoute.url(undefined)} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
                     article={article.data}
