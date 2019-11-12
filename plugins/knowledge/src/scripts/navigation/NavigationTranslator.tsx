@@ -10,6 +10,7 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
+import { Permission } from "@library/features/users/Permission";
 
 interface IProps {
     kbID: number;
@@ -20,17 +21,15 @@ export function OrganizeCategoriesTranslator(props: IProps) {
     const items = useNavigationCategoriesForKB(props.kbID);
     const status = useStatus(props.kbID);
 
-    const isLoading = status === LoadStatus.LOADING;
-
     if (!shouldDisplay) {
         return null;
     }
 
+    const isLoading = status === LoadStatus.LOADING;
+
     return (
         <Translator
             properties={items.map(navItemToTranslationProperty)}
-            afterSave={() => {}}
-            onDismiss={() => {}}
             isLoading={isLoading}
             isFullScreen
             resource={KB_RESOURCE_NAME}
