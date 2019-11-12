@@ -1212,7 +1212,7 @@ EOT
      * @param ReactionsPlugin $sender
      * @param array $args
      */
-    public function reactionsPlugin_reactionsButtonReplacement_handler($sender, $args) {
+    public function reactionPlugin_reactionsButtonReplacement_handler($sender, $args) {
         $discussion = val('Record', $args);
         if (val('Type', $discussion) != 'Idea') {
             return;
