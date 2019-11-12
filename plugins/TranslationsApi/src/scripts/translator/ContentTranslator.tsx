@@ -28,6 +28,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { makeTranslationKey } from "./TranslationActions";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useThrowError } from "@vanilla/react-utils";
+import Permission from "@library/features/users/Permission";
 
 const EMPTY_TRANSLATIONS: ITranslations = {};
 
@@ -134,7 +135,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     }
 
     return (
-        <>
+        <Permission permission="settings.manage">
             <Button baseClass={ButtonTypes.ICON} onClick={() => setDisplayModal(true)}>
                 <TranslateIcon />
             </Button>
@@ -186,7 +187,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                     )}
                 </ModalConfirm>
             )}
-        </>
+        </Permission>
     );
 };
 
