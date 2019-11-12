@@ -23,6 +23,7 @@ import React, { useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
+import { FallbackUrlSetter, useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 
 /**
  * Page component for a flat category list.
@@ -53,6 +54,8 @@ export function CategoriesPage(props: IProps) {
         void requestArticles(id, pageNumber);
         void requestCategory(id);
     }, [id, page]);
+
+    useFallbackBackUrl(props.knowledgeBase?.url);
 
     // Handle errors
     if (id === null) {
@@ -117,7 +120,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
  * Map in the state from the redux store.
  */
 function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
-    const { categoriesPage, categories } = state.knowledge;
+    const { categoriesPage, categories, knowledgeBases } = state.knowledge;
     const categoryID = parseInt(ownProps.match.params.id, 10);
 
     const category = {
@@ -125,10 +128,15 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
         data: categories.categoriesByID[categoryID],
     };
 
+    const knowledgeBase = category.data
+        ? knowledgeBases.knowledgeBasesByID.data?.[category.data.knowledgeBaseID] ?? null
+        : null;
+
     return {
         category,
         articles: categoriesPage.articles,
         pages: categoriesPage.pages,
+        knowledgeBase,
     };
 }
 
