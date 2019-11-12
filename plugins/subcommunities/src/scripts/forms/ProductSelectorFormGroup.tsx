@@ -15,7 +15,6 @@ import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
 import { makeSiteSectionGroup } from "@subcommunities/products/productTypes";
 import { ILoadedProduct } from "@subcommunities/products/productReducer";
-import { getComponent } from "@library/utility/componentRegistry";
 
 interface IProps {
     initialValue: number | null | boolean; // Gdn_Form can give us some nasty values.
