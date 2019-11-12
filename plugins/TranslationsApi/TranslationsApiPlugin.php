@@ -8,6 +8,8 @@ namespace Vanilla\TranslationsApi;
 
 use \Gdn_Database;
 use \Gdn_Plugin;
+use Vanilla\TranslationsApi\Models\TranslationProvider;
+use Garden\Container\Reference;
 
 class TranslationsApiPlugin extends Gdn_Plugin {
 
@@ -24,6 +26,17 @@ class TranslationsApiPlugin extends Gdn_Plugin {
     ) {
         parent::__construct();
         $this->database = $database;
+    }
+
+    /**
+     * Initialize container dependencies
+     *
+     * @param \Garden\Container\Container $container Container to support dependency injection
+     */
+    public function container_init(\Garden\Container\Container $container) {
+        $container->rule(\Vanilla\Site\TranslationModel::class)
+            ->addCall('addProvider', [new Reference(TranslationProvider::class)])
+        ;
     }
 
     /**
