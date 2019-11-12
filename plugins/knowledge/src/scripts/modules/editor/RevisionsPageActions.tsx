@@ -8,6 +8,7 @@ import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
 import apiv2 from "@library/apiv2";
 import ReduxActions from "@library/redux/ReduxActions";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 export interface IInjectableRevisionsPageActions {
     revisionsPageActions: RevisionsPageActions;
@@ -79,7 +80,7 @@ export default class RevisionsPageActions extends ReduxActions {
         this.dispatch(RevisionsPageActions.setArticleAC(articleID));
 
         void Promise.all([
-            this.articleActions.fetchByID({ articleID }),
+            this.articleActions.fetchByID({ articleID, locale: getCurrentLocale() }),
             this.articleActions.getDrafts({ articleID }, RevisionsPageActions.IDENTIFIER),
             this.articleActions.fetchRevisionsForArticle({ articleID }).then(() => this.setActiveRevision()),
         ]);

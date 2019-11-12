@@ -54,6 +54,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         } else {
             this.dispatch(ArticlePageActions.createInitAction(articleID));
             const articleResponse = await this.articleActions.fetchByID({
+                locale: getCurrentLocale(),
                 articleID,
             });
             if (!articleResponse) {
