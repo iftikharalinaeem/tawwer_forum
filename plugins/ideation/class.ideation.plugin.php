@@ -1179,7 +1179,7 @@ EOT
      * @param array $record
      * @return array Returns the new filter (where clause).
      */
-    public function reactionsModel_getReactionTypesFilter_handler(array $filter, array $record) {
+    public function reactionModel_getReactionTypesFilter_handler(array $filter, array $record) {
         $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
         $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
 
@@ -1212,7 +1212,7 @@ EOT
      * @param ReactionsPlugin $sender
      * @param array $args
      */
-    public function reactionPlugin_reactionsButtonReplacement_handler($sender, $args) {
+    public function reactionsPlugin_reactionsButtonReplacement_handler($sender, $args) {
         $discussion = val('Record', $args);
         if (val('Type', $discussion) != 'Idea') {
             return;
