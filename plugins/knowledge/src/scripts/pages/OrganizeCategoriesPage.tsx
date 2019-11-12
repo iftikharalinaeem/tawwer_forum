@@ -47,10 +47,12 @@ function OrganizeCategoriesPage(props: IProps) {
 
     const categoriesWarning = showWarning && (
         <Message
-            isContained={true}
+            isFixed={true}
             contents={
-                <div className={classesMessages.iconWrap}>
-                    <AttachmentErrorIcon className={classesMessages.errorIcon} />
+                <div className={classesMessages.content}>
+                    <AttachmentErrorIcon
+                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
+                    />
                     <div>
                         <Translate
                             source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
@@ -90,9 +92,10 @@ function OrganizeCategoriesPage(props: IProps) {
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
             <FullKnowledgeModal scrollable={true} titleID={titleID}>
                 <NavigationManagerMenu />
+                {categoriesWarning}
                 <div className={classNames(classesNavigationManager.container)}>
                     <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
-                    <div className={classNames(classesNavigationManager.containerWidth)}>{categoriesWarning}</div>
+
                     <DocumentTitle title={pageTitle}>
                         <Heading
                             id={titleID}
