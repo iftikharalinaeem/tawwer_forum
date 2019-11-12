@@ -26,7 +26,7 @@ import { ContentTranslaterFullHeader } from "./ContentTranslatorFullHeader";
 
 const EMPTY_TRANSLATIONS = {};
 
-export const ContentTranslator: React.FC<IContentTranslatorProps> = props => {
+export const ContentTranslator = (props: IContentTranslatorProps) => {
     let [displayModal, setDisplayModal] = useState(false);
     let [activeLocale, setActiveLocale] = useState<string | null>(null);
     const { currentLocale } = useLocaleInfo();
