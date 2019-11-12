@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/vanillaHeaderStyles";
+import { unit } from "@library/styles/styleHelpers";
 
 export const contentTranslatorVariables = useThemeCache(() => {
     return {};
@@ -34,5 +35,9 @@ export const contentTranslatorClasses = useThemeCache(() => {
         }),
     });
 
-    return { content, header };
+    const translateIcon = style("translateIcon", {
+        marginLeft: unit(12),
+    });
+
+    return { content, header, translateIcon };
 });

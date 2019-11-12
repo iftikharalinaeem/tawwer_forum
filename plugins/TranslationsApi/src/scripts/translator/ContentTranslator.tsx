@@ -112,7 +112,11 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
 
     return (
         <>
-            <Button baseClass={ButtonTypes.ICON} onClick={() => setDisplayModal(true)}>
+            <Button
+                className={classes.translateIcon}
+                baseClass={ButtonTypes.ICON}
+                onClick={() => setDisplayModal(true)}
+            >
                 <TranslateIcon />
             </Button>
             {displayModal && (
