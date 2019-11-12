@@ -103,9 +103,6 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-const withRedux = connect(
-    DraftsPageModel.mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(DraftsPageModel.mapStateToProps, mapDispatchToProps);
 
 export default withRedux(DraftMenu);

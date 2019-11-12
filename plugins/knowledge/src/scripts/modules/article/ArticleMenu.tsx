@@ -202,9 +202,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
     };
 }
 
-const withRedux = connect(
-    ArticleMenuModel.mapStateToProps,
-    ArticleActions.mapDispatchToProps,
-);
+const withRedux = connect(ArticleMenuModel.mapStateToProps, ArticleActions.mapDispatchToProps);
 
 export default withRedux(ArticleMenu);

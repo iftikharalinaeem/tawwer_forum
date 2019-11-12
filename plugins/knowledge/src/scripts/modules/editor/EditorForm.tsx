@@ -460,9 +460,6 @@ function mapDispatchToProps(dispatch) {
     return { actions };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export default withRedux(withRouter(EditorForm));
