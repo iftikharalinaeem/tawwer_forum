@@ -34,13 +34,14 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import e from "express";
 import { KbViewType, useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { optionsKnob } from "@storybook/addon-knobs";
 
 const doNothing = () => {
     return;
 };
 
 interface IKbForm {
-    title: string;
+    name: string;
     url: string;
     product: string;
     description: string;
@@ -76,7 +77,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const [isLoading, setIsLoading] = useState(false);
     const { locales, currentLocale } = useLocaleInfo();
-
+    const [value, setValue] = useState<number | string | null>();
     const localeOptions = Object.values(locales).map(locale => {
         return {
             value: locale.localeKey,
@@ -111,10 +112,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
         setIsFormOpen(false);
     };
 
-    const save = e => {
+    /* const save = e => {
         // setIsFormOpen(false);
         console.log("values==>", obj);
-    };
+    };*/
 
     return (
         <>
@@ -125,7 +126,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             >
                 {t("Add Knowledge Base")}
             </Button>
-            {(isFormOpen || true) && (
+            {isFormOpen && (
                 <Modal
                     size={ModalSizes.XL}
                     exitHandler={onCancel}
@@ -133,159 +134,183 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     elementToFocusOnExit={toggleButtonRef.current as HTMLElement}
                     scrollable={true}
                 >
-                    <Frame
-                        header={
-                            <FrameHeader titleID={titleID} closeFrame={onClose} title={t("Add/Edit Knowledge Base")} />
-                        }
-                        body={
-                            <FrameBody>
-                                <DashboardFormList>
-                                    <DashboardFormGroup label="Title" description={t("Title of the knowledge base.")}>
-                                        <DashboardInput
-                                            inputProps={{
-                                                disabled: isLoading,
-                                                onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const { value } = event.target;
-                                                    updateForm({ title: value });
-                                                },
-                                            }}
-                                        />
-                                    </DashboardFormGroup>
-
-                                    <DashboardFormGroup
-                                        label="URL Code"
-                                        description={t(
-                                            "A customized version of the knowledge base name as it should appear in URLs.",
-                                        )}
-                                    >
-                                        <DashboardInput
-                                            inputProps={{
-                                                disabled: isLoading,
-                                                onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const { value } = event.target;
-                                                    updateForm({ url: value });
-                                                },
-                                            }}
-                                        />
-                                    </DashboardFormGroup>
-
-                                    <DashboardFormGroup
-                                        label="Product"
-                                        description={
-                                            <Translate
-                                                source="Associate a product with this Subcommunity. <0>Use the product management UI</0> to replace add, edit, or delete products."
-                                                c0={content => (
-                                                    <Button
-                                                        baseClass={ButtonTypes.TEXT_PRIMARY}
-                                                        onClick={event => {
-                                                            setIsProductManagementOpen(true);
-                                                        }}
-                                                    >
-                                                        {content}
-                                                    </Button>
-                                                )}
+                    <form
+                        onSubmit={event => {
+                            event.preventDefault();
+                            return saveKbForm();
+                        }}
+                    >
+                        <Frame
+                            header={
+                                <FrameHeader
+                                    titleID={titleID}
+                                    closeFrame={onClose}
+                                    title={t("Add/Edit Knowledge Base")}
+                                />
+                            }
+                            body={
+                                <FrameBody>
+                                    <DashboardFormList>
+                                        <DashboardFormGroup
+                                            label="Title"
+                                            description={t("Title of the knowledge base.")}
+                                        >
+                                            <DashboardInput
+                                                inputProps={{
+                                                    disabled: isLoading,
+                                                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = event.target;
+                                                        updateForm({ name: value });
+                                                    },
+                                                }}
                                             />
+                                        </DashboardFormGroup>
+
+                                        <DashboardFormGroup
+                                            label="URL Code"
+                                            description={t(
+                                                "A customized version of the knowledge base name as it should appear in URLs.",
+                                            )}
+                                        >
+                                            <DashboardInput
+                                                inputProps={{
+                                                    disabled: isLoading,
+                                                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = event.target;
+                                                        updateForm({ urlCode: value });
+                                                    },
+                                                }}
+                                            />
+                                        </DashboardFormGroup>
+
+                                        <DashboardFormGroup
+                                            label="Product"
+                                            description={
+                                                <Translate
+                                                    source="Associate a product with this Subcommunity. <0>Use the product management UI</0> to replace add, edit, or delete products."
+                                                    c0={content => (
+                                                        <Button
+                                                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                                                            onClick={event => {
+                                                                setIsProductManagementOpen(true);
+                                                            }}
+                                                        >
+                                                            {content}
+                                                        </Button>
+                                                    )}
+                                                />
+                                            }
+                                        >
+                                            <DashboardSelect
+                                                disabled={isLoading}
+                                                options={productOptions}
+                                                onChange={(options: IComboBoxOption) => {
+                                                    updateForm({ product: options.value.toString() });
+                                                }}
+                                                value={productOptions.find(val => {
+                                                    return val.label == form.product;
+                                                })}
+                                            />
+                                        </DashboardFormGroup>
+
+                                        <DashboardFormGroup
+                                            label="Description"
+                                            description={t(
+                                                "A description of the knowledge base. Displayed in the knowledge base picker.",
+                                            )}
+                                        >
+                                            <DashboardInput
+                                                inputProps={{
+                                                    disabled: isLoading,
+                                                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const { value } = event.target;
+                                                        updateForm({ description: value });
+                                                    },
+                                                    multiline: true,
+                                                }}
+                                            />
+                                        </DashboardFormGroup>
+
+                                        <DashboardImageUploadGroup
+                                            label="Icon"
+                                            description={t(
+                                                "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
+                                            )}
+                                            onChange={doNothing}
+                                            value={""}
+                                        />
+                                        <DashboardImageUploadGroup
+                                            label="Banner Image"
+                                            description={t("Homepage banner image for this knowledge base.")}
+                                            onChange={doNothing}
+                                            value={""}
+                                        />
+                                        <DashboardFormGroup
+                                            label="View Type"
+                                            description={t("Homepage banner image for this knowledge base.")}
+                                        >
+                                            <DashboardRadioGroup>
+                                                <DashboardRadioButton
+                                                    label={"Guide"}
+                                                    note={t(
+                                                        'Guides are for making howto guides, documentation, or any "book" like content that should be read in order.',
+                                                    )}
+                                                    value={KbViewType.GUIDE}
+                                                    name={viewType}
+                                                />
+                                                <DashboardRadioButton
+                                                    label={"Help Center"}
+                                                    note={t(
+                                                        "Help centers are for making free-form help articles that are organized into categories.",
+                                                    )}
+                                                    value={KbViewType.HELP}
+                                                    name={viewType}
+                                                />
+                                            </DashboardRadioGroup>
+                                        </DashboardFormGroup>
+                                    </DashboardFormList>
+
+                                    <DashboardFormGroup
+                                        label="Locales"
+                                        description={
+                                            "Determines how the categories and articles within it will display"
                                         }
                                     >
                                         <DashboardSelect
                                             disabled={isLoading}
-                                            options={productOptions}
-                                            onChange={doNothing}
-                                        />
-                                    </DashboardFormGroup>
-
-                                    <DashboardFormGroup
-                                        label="Description"
-                                        description={t(
-                                            "A description of the knowledge base. Displayed in the knowledge base picker.",
-                                        )}
-                                    >
-                                        <DashboardInput
-                                            inputProps={{
-                                                disabled: isLoading,
-                                                onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const { value } = event.target;
-                                                    updateForm({ description: value });
-                                                },
-                                                multiline: true,
+                                            options={localeOptions}
+                                            onChange={(options: IComboBoxOption) => {
+                                                updateForm({ locale: options.value.toString() });
                                             }}
+                                            value={localeOptions.find(val => {
+                                                return val.label == form.locale;
+                                            })}
                                         />
                                     </DashboardFormGroup>
-
-                                    <DashboardImageUploadGroup
-                                        label="Icon"
-                                        description={t(
-                                            "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
-                                        )}
-                                        onChange={doNothing}
-                                        value={""}
-                                    />
-                                    <DashboardImageUploadGroup
-                                        label="Banner Image"
-                                        description={t("Homepage banner image for this knowledge base.")}
-                                        onChange={doNothing}
-                                        value={""}
-                                    />
-                                    <DashboardFormGroup
-                                        label="View Type"
-                                        description={t("Homepage banner image for this knowledge base.")}
+                                </FrameBody>
+                            }
+                            footer={
+                                <FrameFooter justifyRight={true}>
+                                    <Button
+                                        className={classFrameFooter.actionButton}
+                                        baseClass={ButtonTypes.TEXT}
+                                        onClick={onCancel}
                                     >
-                                        <DashboardRadioGroup>
-                                            <DashboardRadioButton
-                                                label={"Guide"}
-                                                note={t(
-                                                    'Guides are for making howto guides, documentation, or any "book" like content that should be read in order.',
-                                                )}
-                                                value={KbViewType.GUIDE}
-                                                name={viewType}
-                                            />
-                                            <DashboardRadioButton
-                                                label={"Help Center"}
-                                                note={t(
-                                                    "Help centers are for making free-form help articles that are organized into categories.",
-                                                )}
-                                                value={KbViewType.HELP}
-                                                name={viewType}
-                                            />
-                                        </DashboardRadioGroup>
-                                    </DashboardFormGroup>
-                                </DashboardFormList>
-
-                                <DashboardFormGroup
-                                    label="Locales"
-                                    description={"Determines how the categories and articles within it will display"}
-                                >
-                                    <DashboardSelect
+                                        {t("Cancel")}
+                                    </Button>
+                                    <Button
+                                        className={classFrameFooter.actionButton}
+                                        //onClick={saveKb}
+                                        baseClass={ButtonTypes.TEXT_PRIMARY}
                                         disabled={isLoading}
-                                        options={localeOptions}
-                                        onChange={(options: IComboBoxOption[]) => {
-                                            updateForm({ locale: options });
-                                        }}
-                                        value={form.locale}
-                                    />
-                                </DashboardFormGroup>
-                            </FrameBody>
-                        }
-                        footer={
-                            <FrameFooter justifyRight={true}>
-                                <Button
-                                    className={classFrameFooter.actionButton}
-                                    baseClass={ButtonTypes.TEXT}
-                                    onClick={onCancel}
-                                >
-                                    {t("Cancel")}
-                                </Button>
-                                <Button
-                                    className={classFrameFooter.actionButton}
-                                    onClick={saveKb}
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? <ButtonLoader /> : t("Save")}
-                                </Button>
-                            </FrameFooter>
-                        }
-                    />
+                                        submit={true}
+                                    >
+                                        {isLoading ? <ButtonLoader /> : t("Save")}
+                                    </Button>
+                                </FrameFooter>
+                            }
+                        />
+                    </form>
                 </Modal>
             )}
             {isProductManagementOpen && (
@@ -323,9 +348,6 @@ function mapDispatchToProps(dispatch) {
     return { actions };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
 export default withRedux(KnowledgeBaseAddEdit);

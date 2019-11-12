@@ -20,8 +20,8 @@ export interface ILoadedProduct {
     deleteKB: ILoadable<{}, IKnowledgeBase>;
 }
 export interface IKbFormState {
-    title: string;
-    url: string;
+    name: string;
+    urlCode: string;
     product: string;
     description: string;
     icon: string;
@@ -48,8 +48,8 @@ export enum KnowledgeBaseSortMode {
     DATE_INSERTED_DESC = "dateInsertedDesc",
 }
 export const INTIAL_KB_FORM: IKbFormState = {
-    title: "",
-    url: "",
+    name: "",
+    urlCode: "",
     product: "",
     description: "",
     icon: "",
@@ -128,9 +128,8 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
     /**
      * Selector for a list of loaded knowledge bases.
      */
-    public static selectKnowledgeBases = createSelector(
-        [KnowledgeBaseModel.selectSelf],
-        selfState => Object.values(selfState.knowledgeBasesByID.data || {}),
+    public static selectKnowledgeBases = createSelector([KnowledgeBaseModel.selectSelf], selfState =>
+        Object.values(selfState.knowledgeBasesByID.data || {}),
     );
 
     public static selectKnowledgeBasesAsNavItems = createSelector(

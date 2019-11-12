@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
 import { type } from "os";
+import { ISearchRequestBody } from "@knowledge/@types/api/search";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 interface IKknowledgeBaseParams {
@@ -39,7 +40,7 @@ type IDeleteKnowledgeBaseResponse = undefined;
 /**
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
-export default class KnowledgeBaseActions extends ReduxActions {
+export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static readonly GET_ACS = actionCreator.async<{ status: KnowledgeBaseStatus }, IKnowledgeBase[], IApiError>(
         "GET_ALL",
     );
@@ -85,9 +86,31 @@ export default class KnowledgeBaseActions extends ReduxActions {
         return this.dispatch(thunk);
     }
     public saveKbForm = async () => {
-        const form;
+        const { form } = this.getState().knowledge.knowledgeBases;
+        const query: IPostKnowledgeBaseRequest = {};
+        if (!form.description) {
+            query.description = form.description;
+        }
+        if (!form.name) {
+            query.name = form.name;
+        }
+        if (!form.urlCode) {
+            query.urlCode = form.urlCode;
+        }
+        if (!form.viewType) {
+            query.viewType = form.viewType;
+        }
+        const icon = form.icon;
+        const product = form.product;
+        const image = form.image;
+        const locale = form.locale;
 
-        return await this.postKB();
+        const requestOptions: IPostKnowledgeBaseRequest = {
+            ...query,
+            icon,
+        };
+
+        return await this.postKB(requestOptions);
     };
 
     public postKB(options: IPostKnowledgeBaseRequest) {
