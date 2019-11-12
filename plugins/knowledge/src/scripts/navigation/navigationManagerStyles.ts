@@ -14,8 +14,6 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { style } from "typestyle";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -140,6 +138,10 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...margins({ horizontal: "auto" }),
     });
 
+    const containerWidth = style("containerWidth", {
+        height: 55,
+    });
+
     const formError = style("formError", {
         position: "absolute",
         top: unit(globalVars.gutter.half),
@@ -152,6 +154,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         ...paddings({
             left: unit(globalVars.gutter.half),
             right: unit(globalVars.gutter.half),
+            top: globalVars.gutter.size - 6,
         }),
     });
 
@@ -408,6 +411,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     return {
         root,
         container,
+        containerWidth,
         formError,
         header,
         item,

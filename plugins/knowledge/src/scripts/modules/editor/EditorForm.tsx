@@ -136,7 +136,7 @@ export function EditorForm(props: IProps) {
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
-                <div className={classesMessages.iconWrap}>
+                <div className={classesMessages.content}>
                     <WarningIcon className={classesMessages.messageIcon} />
                     <div>
                         {t(
@@ -154,9 +154,9 @@ export function EditorForm(props: IProps) {
 
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
-            className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
+            className={classNames(classesEditorForm.containerWidth)}
             contents={
-                <div className={classesMessages.iconWrap}>
+                <div className={classesMessages.content}>
                     <WarningIcon className={classesMessages.messageIcon} />
                     <Translate source="You have been redirected to the source locale to insert the article." />
                 </div>

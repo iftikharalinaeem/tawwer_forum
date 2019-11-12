@@ -16,7 +16,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import Loader from "@library/loaders/Loader";
 import Heading from "@library/layout/Heading";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
@@ -27,13 +27,50 @@ import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTranslator";
+import Message from "@library/messages/Message";
+import { AttachmentErrorIcon } from "@library/icons/fileTypes";
+import { messagesClasses } from "@library/messages/messageStyles";
+import { LocaleDisplayer, getCurrentLocale, useLocaleInfo } from "@vanilla/i18n";
+import Translate from "@library/content/Translate";
+import { string } from "prop-types";
+import Container from "@library/layout/components/Container";
 
 function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
     const { knowledgeBase } = props;
     const pageTitle = t("Organize Categories");
-    const classesNavigationManager = navigationManagerClasses();
 
+    const { currentLocale } = useLocaleInfo();
+    const classesNavigationManager = navigationManagerClasses();
+    const classesMessages = messagesClasses();
+    const sourceLocale = knowledgeBase.data ? knowledgeBase.data.sourceLocale : null;
+    const isNonSourceLocale = knowledgeBase.data && knowledgeBase.data.sourceLocale !== currentLocale;
+    const [warningFlag, setWarning] = useState(isNonSourceLocale);
+
+    const categoriesWarning = warningFlag && (
+        <Message
+            isFixed={true}
+            contents={
+                <div className={classesMessages.content}>
+                    <AttachmentErrorIcon
+                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
+                    />
+                    <div>
+                        <Translate
+                            source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
+                            c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
+                        />
+                    </div>
+                </div>
+            }
+            onConfirm={() => {
+                setWarning(false);
+            }}
+            stringContents={t(
+                "You are viewing categories in the source locale. Make sure you name new categories using the source locale.",
+            )}
+        />
+    );
     useEffect(() => {
         if (props.knowledgeBase.status === LoadStatus.PENDING) {
             props.requestData();
@@ -47,14 +84,15 @@ function OrganizeCategoriesPage(props: IProps) {
     if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
         return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
     }
-
     return (
         <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
             <FullKnowledgeModal scrollable={true} titleID={titleID}>
                 <NavigationManagerMenu />
+                {categoriesWarning}
                 <div className={classNames(classesNavigationManager.container)}>
                     <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
+
                     <DocumentTitle title={pageTitle}>
                         <Heading
                             id={titleID}
