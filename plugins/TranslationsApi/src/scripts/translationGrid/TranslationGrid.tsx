@@ -6,13 +6,14 @@
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { ITranslationProperty, LocaleDisplayer } from "@vanilla/i18n";
 import classNames from "classnames";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { translationGridClasses } from "./TranslationGridStyles";
 import { TranslationProperty } from "./TranslationProperty";
 import { TranslationGridLocaleChooser } from "./TranslationGridLocaleChooser";
 import Translate from "@library/content/Translate";
+import { makeTranslationKey } from "../translator/TranslationActions";
 
-interface ITranslations {
+export interface ITranslations {
     [propertyKey: string]: string;
 }
 
@@ -69,17 +70,20 @@ export function TranslationGrid(props: ITranslationGrid) {
                     </div>
                 </div>
                 <div className={classes.body}>
-                    {properties.map((property, i) => (
-                        <TranslationProperty
-                            key={property.translationPropertyKey}
-                            isFirst={i === 0}
-                            isLast={i === properties.length - 1}
-                            property={property}
-                            existingTranslation={existingTranslations[property.translationPropertyKey] || null}
-                            translationValue={inProgressTranslations[property.translationPropertyKey]}
-                            onTranslationChange={updateTranslationDraft}
-                        />
-                    ))}
+                    {properties.map((property, i) => {
+                        const propertyKey = makeTranslationKey(property);
+                        return (
+                            <TranslationProperty
+                                key={propertyKey}
+                                isFirst={i === 0}
+                                isLast={i === properties.length - 1}
+                                property={property}
+                                existingTranslation={existingTranslations[propertyKey] || null}
+                                translationValue={inProgressTranslations[propertyKey]}
+                                onTranslationChange={updateTranslationDraft}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

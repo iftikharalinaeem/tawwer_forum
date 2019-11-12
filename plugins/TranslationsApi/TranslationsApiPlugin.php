@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\TranslationsAPI;
+namespace Vanilla\TranslationsApi;
 
 use \Gdn_Database;
 use \Gdn_Plugin;

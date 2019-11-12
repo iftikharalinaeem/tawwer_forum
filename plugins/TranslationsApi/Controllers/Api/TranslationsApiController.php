@@ -4,16 +4,16 @@
  * @license Proprietary
  */
 
-namespace Vanilla\TranslationsAPI\Controllers\Api;
+namespace Vanilla\TranslationsApi\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Gdn_Configuration;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\TranslationsAPI\models\resourceModel;
-use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
-use Vanilla\TranslationsAPI\models\TranslationModel;
+use Vanilla\TranslationsApi\Models\ResourceModel;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
+use Vanilla\TranslationsApi\Models\TranslationModel;
 
 /**
  * Class TranslationsApiController
@@ -32,7 +32,7 @@ class TranslationsApiController extends AbstractApiController {
     /** @var Schema */
     private $translationSchema;
 
-    /** @var resourceModel */
+    /** @var ResourceModel */
     private $resourceModel;
 
     /** @var TranslationModel */
@@ -47,13 +47,13 @@ class TranslationsApiController extends AbstractApiController {
     /**
      * TranslationsApiController constructor.
      *
-     * @param resourceModel $resourcesModel
+     * @param ResourceModel $resourcesModel
      * @param TranslationModel $translationModel
      * @param TranslationPropertyModel $translationPropertyModel
      * @param Gdn_Configuration $configurationModule
      */
     public function __construct(
-        resourceModel $resourcesModel,
+        ResourceModel $resourcesModel,
         TranslationModel $translationModel,
         TranslationPropertyModel $translationPropertyModel,
         ConfigurationInterface $configurationModule
@@ -82,7 +82,7 @@ class TranslationsApiController extends AbstractApiController {
             [
                 "name" => $body["name"],
                 "sourceLocale" => $body["sourceLocale"],
-                "urlCode" => $body["urlCode"]
+                "urlCode" => $body["urlCode"],
             ]
         );
 
@@ -150,12 +150,14 @@ class TranslationsApiController extends AbstractApiController {
 
         if (isset($query["recordType"])) {
             $where["tp.recordType"] = $query["recordType"];
-        }
-        if (isset($query["recordID"]) && isset($query["recordType"])) {
-            $where["tp.recordID"] = $query["recordID"];
-        }
-        if (isset($query["recordKey"]) && isset($query["recordType"])) {
-            $where["tp.recordKey"] = $query["recordKey"];
+
+            if (isset($query["recordID"]) || isset($query['recordIDs'])) {
+                $where["tp.recordID"] = $query['recordID'] || $query['recordIDs'];
+            }
+
+            if (isset($query["recordKey"]) || isset($query['recordKeys'])) {
+                $where["tp.recordKey"] = $query['recordKey'] || $query['recordKeys'];
+            }
         }
         if (isset($query["locale"])) {
             $where["t.locale"] = $query["locale"];
