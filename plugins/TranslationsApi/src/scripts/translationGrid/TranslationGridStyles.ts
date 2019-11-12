@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate } from "csx";
+import { dropDownVariables } from "@library/flyouts/dropDownStyles";
 
 export const translationGridVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("translationGrid");
@@ -41,6 +42,8 @@ export const translationGridClasses = useThemeCache(() => {
 
     const innerPadding = vars.cell.paddings.inner;
     const oneLineHeight = Math.ceil(globalVars.lineHeights.condensed * globalVars.fonts.size.medium);
+
+    const dropDownOffset = dropDownVariables().item.padding.horizontal;
 
     const input = style("input", {
         $nest: {
@@ -90,6 +93,11 @@ export const translationGridClasses = useThemeCache(() => {
                 fontWeight: "normal",
             },
         },
+    });
+
+    const languageDropdownToggle = style("languageDropdownToggle", {
+        paddingLeft: unit(dropDownOffset + globalVars.border.width),
+        paddingRight: unit(dropDownOffset),
     });
 
     const leftCell = style("leftCell", {
@@ -158,7 +166,8 @@ export const translationGridClasses = useThemeCache(() => {
     const headerRight = style("headerRight", {
         fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
-            horizontal: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
+            right: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
+            left: vars.cell.paddings.outer + vars.cell.paddings.inner + 3 - dropDownOffset,
         }),
     });
 
@@ -236,5 +245,6 @@ export const translationGridClasses = useThemeCache(() => {
         multiLine,
         icon,
         languageDropdown,
+        languageDropdownToggle,
     };
 });
