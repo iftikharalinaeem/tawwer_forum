@@ -99,7 +99,7 @@ paths:
                 sourceLocale:
                   description: The source locale of the resource.
                   type: string
-                url:
+                urlCode:
                   description: The resource.
                   type: string
         required: true

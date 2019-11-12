@@ -201,16 +201,15 @@ class TranslationsApiController extends AbstractApiController {
     public function getTranslationsSchema(string $type = ""): Schema {
         if ($this->getResourceSchema === null) {
             $this->getResourceSchema = $this->schema(Schema::parse([
-                "urlCode?",
-                "recordType?",
-                "recordID?",
-                "recordKey?",
-                "locale",
-                "limit" => [
+                "urlCode:s?",
+                "recordType:s?",
+                "recordID:i?",
+                "recordKey:s?",
+                "locale:s",
+                "limit:i?" => [
                     "default" => 100,
                     "minimum" => 1,
                     "maximum" => 100,
-                    "type" => "integer",
                 ],
                 "page:i?" => [
                     "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
@@ -232,12 +231,12 @@ class TranslationsApiController extends AbstractApiController {
     public function putTranslationSchema(string $type = ""): Schema {
         if ($this->postTranslationSchema === null) {
             $this->postTranslationSchema = $this->schema(Schema::parse([
-                "recordType",
-                "recordID?",
-                "recordKey?",
-                "locale",
-                "propertyName",
-                "translation",
+                "recordType:s",
+                "recordID:i?",
+                "recordKey:s?",
+                "locale:s",
+                "propertyName:s",
+                "translation:s",
             ]));
         }
         return $this->schema($this->postTranslationSchema, $type);
@@ -252,15 +251,15 @@ class TranslationsApiController extends AbstractApiController {
     public function translationSchema(string $type = ""): Schema {
         if ($this->translationSchema === null) {
             $this->translationSchema = $this->schema(Schema::parse([
-                "resource",
-                "recordType",
-                "recordID?",
-                "recordKey?",
-                "propertyName",
-                "propertyType?",
-                "translationPropertyKey",
-                "locale",
-                "translation",
+                "resource:s",
+                "recordType:s",
+                "recordID:i?",
+                "recordKey:s?",
+                "propertyName:s",
+                "propertyType:s?",
+                "translationPropertyKey:s",
+                "locale:s",
+                "translation:s",
             ]));
         }
         return $this->schema($this->translationSchema, $type);
