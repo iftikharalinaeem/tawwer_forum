@@ -17,14 +17,13 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import Translate from "@library/content/Translate";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import classNames from "classnames";
-import { MenuPlacement } from "@library/forms/select/SelectOne";
+import { getComponent } from "@library/utility/componentRegistry";
 
 interface IProps {}
 
@@ -56,6 +55,8 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const save = () => {
         setIsFormOpen(false);
     };
+
+    const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
 
     return (
         <>
@@ -94,44 +95,14 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         <DashboardInput inputProps={{ disabled: isLoading, onChange: doNothing }} />
                                     </DashboardFormGroup>
 
-                                    <DashboardFormGroup
-                                        label="Product"
-                                        description={
-                                            <Translate
-                                                source="Associate a product with this Subcommunity. <0>Use the product management UI</0> to replace add, edit, or delete products."
-                                                c0={content => (
-                                                    <Button
-                                                        baseClass={ButtonTypes.TEXT_PRIMARY}
-                                                        onClick={event => {
-                                                            setIsProductManagementOpen(true);
-                                                        }}
-                                                        disabled={isLoading}
-                                                    >
-                                                        {content}
-                                                    </Button>
-                                                )}
-                                            />
-                                        }
-                                    >
-                                        <DashboardSelect
+                                    {ProductSelectorFormGroup && (
+                                        <ProductSelectorFormGroup.Component
+                                            formFieldName={""}
+                                            initialValue={null}
+                                            valueType={"sectionGroup"}
                                             disabled={isLoading}
-                                            options={[
-                                                {
-                                                    value: "en",
-                                                    label: "English",
-                                                },
-                                                {
-                                                    value: "en",
-                                                    label: "English1",
-                                                },
-                                                {
-                                                    value: "en",
-                                                    label: "English2",
-                                                },
-                                            ]}
-                                            onChange={doNothing}
                                         />
-                                    </DashboardFormGroup>
+                                    )}
 
                                     <DashboardFormGroup
                                         label="Description"
@@ -208,7 +179,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             },
                                         ]}
                                         onChange={doNothing}
-                                        menuPlacement={MenuPlacement.TOP}
                                     />
                                 </DashboardFormGroup>
                             </FrameBody>
@@ -236,10 +206,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     />
                 </Modal>
             )}
-            {isProductManagementOpen &&
-                {
-                    /*<ProductManager asModal={true} onClose={() => setIsProductManagementOpen(false)} />*/
-                }}
         </>
     );
 }
