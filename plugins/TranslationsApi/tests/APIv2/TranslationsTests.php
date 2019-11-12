@@ -7,8 +7,9 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
-use Vanilla\TranslationsAPI\models\TranslationModel;
-use Vanilla\TranslationsAPI\models\TranslationPropertyModel;
+use Vanilla\TranslationsApi\Models\TranslationModel;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
+
 /**
  * Test Translations APIv2 endpoints.
  */
