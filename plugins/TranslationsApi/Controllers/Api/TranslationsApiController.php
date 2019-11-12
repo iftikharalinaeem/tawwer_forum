@@ -210,9 +210,7 @@ class TranslationsApiController extends AbstractApiController {
                 "recordType?",
                 "recordID:i?",
                 "recordKey?",
-                "locale" => [
-                    ''
-                ],
+                "locale",
                 "limit" => [
                     "default" => 100,
                     "minimum" => 1,
