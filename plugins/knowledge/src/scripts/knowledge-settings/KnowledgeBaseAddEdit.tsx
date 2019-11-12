@@ -17,12 +17,13 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import Translate from "@library/content/Translate";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
+import classNames from "classnames";
+import { getComponent } from "@library/utility/componentRegistry";
 
 interface IProps {}
 
@@ -55,6 +56,8 @@ export function KnowledgeBaseAddEdit(props: IProps) {
         setIsFormOpen(false);
     };
 
+    const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
+
     return (
         <>
             <Button
@@ -70,9 +73,9 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     exitHandler={onCancel}
                     titleID={titleID}
                     elementToFocusOnExit={toggleButtonRef.current as HTMLElement}
-                    scrollable={true}
                 >
                     <Frame
+                        canGrow={true}
                         header={
                             <FrameHeader titleID={titleID} closeFrame={onClose} title={t("Add/Edit Knowledge Base")} />
                         }
@@ -92,26 +95,14 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         <DashboardInput inputProps={{ disabled: isLoading, onChange: doNothing }} />
                                     </DashboardFormGroup>
 
-                                    <DashboardFormGroup
-                                        label="Product"
-                                        description={
-                                            <Translate
-                                                source="Associate a product with this Subcommunity. <0>Use the product management UI</0> to replace add, edit, or delete products."
-                                                c0={content => (
-                                                    <Button
-                                                        baseClass={ButtonTypes.TEXT_PRIMARY}
-                                                        onClick={event => {
-                                                            setIsProductManagementOpen(true);
-                                                        }}
-                                                    >
-                                                        {content}
-                                                    </Button>
-                                                )}
-                                            />
-                                        }
-                                    >
-                                        <DashboardSelect disabled={isLoading} options={[]} onChange={doNothing} />
-                                    </DashboardFormGroup>
+                                    {ProductSelectorFormGroup && (
+                                        <ProductSelectorFormGroup.Component
+                                            formFieldName={""}
+                                            initialValue={null}
+                                            valueType={"sectionGroup"}
+                                            disabled={isLoading}
+                                        />
+                                    )}
 
                                     <DashboardFormGroup
                                         label="Description"
@@ -120,7 +111,15 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         )}
                                     >
                                         <DashboardInput
-                                            inputProps={{ disabled: isLoading, onChange: doNothing, multiline: true }}
+                                            inputProps={{
+                                                disabled: isLoading,
+                                                onChange: doNothing,
+                                                multiline: true,
+                                            }}
+                                            multiLineProps={{
+                                                rows: 6,
+                                                maxRows: 6,
+                                            }}
                                         />
                                     </DashboardFormGroup>
 
@@ -130,12 +129,14 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
                                         )}
                                         onChange={doNothing}
+                                        disabled={isLoading}
                                         value={""}
                                     />
                                     <DashboardImageUploadGroup
                                         label="Banner Image"
                                         description={t("Homepage banner image for this knowledge base.")}
                                         onChange={doNothing}
+                                        disabled={isLoading}
                                         value={""}
                                     />
                                     <DashboardFormGroup
@@ -150,6 +151,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                                 )}
                                                 value={""}
                                                 name={viewType}
+                                                disabled={isLoading}
                                             />
                                             <DashboardRadioButton
                                                 label={"Help Center"}
@@ -158,6 +160,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                                 )}
                                                 value={""}
                                                 name={viewType}
+                                                disabled={isLoading}
                                             />
                                         </DashboardRadioGroup>
                                     </DashboardFormGroup>
@@ -167,23 +170,41 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     label="Locales"
                                     description={"Determines how the categories and articles within it will display"}
                                 >
-                                    <DashboardSelect disabled={isLoading} options={[]} onChange={doNothing} />
+                                    <DashboardSelect
+                                        disabled={isLoading}
+                                        options={[
+                                            {
+                                                value: "en",
+                                                label: "English",
+                                            },
+                                            {
+                                                value: "en",
+                                                label: "English1",
+                                            },
+                                            {
+                                                value: "en",
+                                                label: "English2",
+                                            },
+                                        ]}
+                                        onChange={doNothing}
+                                    />
                                 </DashboardFormGroup>
                             </FrameBody>
                         }
                         footer={
-                            <FrameFooter justifyRight={true}>
+                            <FrameFooter justifyRight={true} forDashboard={true}>
                                 <Button
-                                    className={classFrameFooter.actionButton}
-                                    baseClass={ButtonTypes.TEXT}
+                                    className={classNames(classFrameFooter.actionButton)}
+                                    baseClass={ButtonTypes.DASHBOARD_SECONDARY}
                                     onClick={onCancel}
+                                    disabled={isLoading}
                                 >
                                     {t("Cancel")}
                                 </Button>
                                 <Button
-                                    className={classFrameFooter.actionButton}
+                                    className={classNames(classFrameFooter.actionButton)}
                                     onClick={save}
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    baseClass={ButtonTypes.DASHBOARD_PRIMARY}
                                     disabled={isLoading}
                                 >
                                     {isLoading ? <ButtonLoader /> : t("Save")}
@@ -193,10 +214,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     />
                 </Modal>
             )}
-            {isProductManagementOpen &&
-                {
-                    /*<ProductManager asModal={true} onClose={() => setIsProductManagementOpen(false)} />*/
-                }}
         </>
     );
 }
