@@ -30,7 +30,7 @@ import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTr
 import Message from "@library/messages/Message";
 import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
-import { LocaleDisplayer, getCurrentLocale } from "@vanilla/i18n";
+import { LocaleDisplayer, getCurrentLocale, useLocaleInfo } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
 import { string } from "prop-types";
 import Container from "@library/layout/components/Container";
@@ -39,13 +39,15 @@ function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
     const { knowledgeBase } = props;
     const pageTitle = t("Organize Categories");
+
+    const { currentLocale } = useLocaleInfo();
     const classesNavigationManager = navigationManagerClasses();
     const classesMessages = messagesClasses();
     const sourceLocale = knowledgeBase.data ? knowledgeBase.data.sourceLocale : null;
-    const showWarning = sourceLocale !== getCurrentLocale() ? true : false;
-    const [warningFlag, setWarning] = useState(showWarning);
+    const isNonSourceLocale = knowledgeBase.data && knowledgeBase.data.sourceLocale !== currentLocale;
+    const [warningFlag, setWarning] = useState(isNonSourceLocale);
 
-    const categoriesWarning = showWarning && (
+    const categoriesWarning = isNonSourceLocale && (
         <Message
             isFixed={true}
             contents={
@@ -86,7 +88,6 @@ function OrganizeCategoriesPage(props: IProps) {
     if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
         return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
     }
-
     return (
         <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
