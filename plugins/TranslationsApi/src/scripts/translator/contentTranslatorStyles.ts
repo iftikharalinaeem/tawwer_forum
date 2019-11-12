@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/vanillaHeaderStyles";
-import { unit } from "@library/styles/styleHelpers";
+import { margins, paddings, unit } from "@library/styles/styleHelpers";
 
 export const contentTranslatorVariables = useThemeCache(() => {
     return {};
@@ -18,11 +18,14 @@ export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
     const layoutVars = layoutVariables();
     const titleBarVars = titleBarVariables();
+    const globalVars = globalVariables();
 
     const content = style("content", {
-        paddingTop: globalVariables().gutter.size,
-        maxWidth: layoutVars.middleColumn.width,
+        paddingTop: globalVars.gutter.size,
+        position: "relative",
+        maxWidth: unit(800),
         width: percent(100),
+        ...margins({ horizontal: "auto" }),
     });
 
     const header = style("header", {
@@ -35,9 +38,16 @@ export const contentTranslatorClasses = useThemeCache(() => {
         }),
     });
 
+    const title = style("title", {
+        ...paddings({
+            left: unit(globalVars.gutter.half),
+            right: unit(globalVars.gutter.half),
+        }),
+    });
+
     const translateIcon = style("translateIcon", {
         marginLeft: unit(12),
     });
 
-    return { content, header, translateIcon };
+    return { content, header, translateIcon, title };
 });

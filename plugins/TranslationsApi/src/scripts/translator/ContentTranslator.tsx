@@ -83,12 +83,12 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
         content = (
             <>
                 <ContentTranslaterFullHeader onBack={promptCloseConfirmation} onSave={promptCloseConfirmation} />
-                <Container className={classes.content}>
+                <div className={classes.content}>
                     <DocumentTitle title={title}>
-                        <Heading id={titleID} depth={1} renderAsDepth={2} title={title} />
+                        <Heading id={titleID} className={classes.title} depth={1} renderAsDepth={2} title={title} />
                     </DocumentTitle>
                     {content}
-                </Container>
+                </div>
             </>
         );
     } else {
