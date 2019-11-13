@@ -11,6 +11,7 @@ use Gdn_Session;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
+use PDO;
 
 /**
  * TranslationPropertyModel class.
@@ -141,6 +142,37 @@ class TranslationPropertyModel extends PipelineModel {
         return $result;
     }
 
+    /**
+     * Get translation of properties.
+     *
+     * @param array $where
+     * @param array $properties
+     * @return array
+     */
+    public function translateProperties(array $where, array $properties) {
+        $result = [];
+
+        $sql = $this->sql();
+        $sql->from($this->getTable() . " as tp")
+            ->select('tp.recordID')
+            ->join("translations t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
+
+
+        if (count($properties) > 0) {
+            $where['tp.propertyName'] = $properties;
+            foreach ($properties as $propertyName) {
+                $pdo = $sql->Database->connection();
+                $sql->select('IF(tp.propertyName = '.$pdo->quote($propertyName, PDO::PARAM_STR).', t.translation, null)', 'MAX', $propertyName);
+            }
+
+            $sql->where($where);
+            $sql->groupBy('recordID');
+
+            $result = $sql->get()->resultArray();
+            $result = array_combine(array_column($result, 'recordID'), $result);
+        }
+        return $result;
+    }
     /**
      * Get the record identifier used to build a translation-property key.
      *
