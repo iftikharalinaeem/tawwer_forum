@@ -11,7 +11,7 @@ import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { KbViewType, KnowledgeBaseSortMode, useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -32,6 +32,7 @@ import classNames from "classnames";
 import React, { useState, useEffect } from "react";
 import Message from "@library/messages/Message";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     kbID?: number;
@@ -92,6 +93,8 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const { Translator, shouldDisplay } = useContentTranslator();
 
+    const errors = formSubmit.error?.response.data?.errors;
+
     return (
         <Modal size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
             <form
@@ -129,22 +132,17 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             sourceText: form.description,
                                         },
                                     ]}
+                                    title={t("Translate Knowledge Base")}
                                 ></Translator>
                             )}
                         </FrameHeader>
                     }
                     body={
                         <FrameBody>
-                            {formSubmit.error && (
-                                <Message
-                                    stringContents={formSubmit.error.message}
-                                    onCancel={() => clearError()}
-                                    cancelText={t("Dismiss")}
-                                ></Message>
-                            )}
                             <DashboardFormList>
                                 <DashboardFormGroup label="Title" description={t("Title of the knowledge base.")}>
                                     <DashboardInput
+                                        errors={errors?.["name"]}
                                         inputProps={{
                                             disabled: isLoading,
                                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +160,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     )}
                                 >
                                     <DashboardInput
+                                        errors={errors?.["urlCode"]}
                                         inputProps={{
                                             disabled: isLoading,
                                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,6 +262,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         description={t("Sorting method for articles.")}
                                     >
                                         <DashboardSelect
+                                            isClearable={false}
                                             options={helpCenterSortOptions}
                                             menuPlacement={MenuPlacement.TOP}
                                             value={helpCenterSortOptions.find(option => {
@@ -281,6 +281,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     description={"Determines how the categories and articles within it will display"}
                                 >
                                     <DashboardSelect
+                                        isClearable={false}
                                         options={localeOptions}
                                         disabled={isLoading}
                                         menuPlacement={MenuPlacement.TOP}

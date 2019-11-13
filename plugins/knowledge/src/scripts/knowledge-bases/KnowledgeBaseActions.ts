@@ -92,6 +92,15 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
     public saveKbForm = async () => {
         const { form } = this.getState().knowledge.knowledgeBases;
 
+        // Kludge our image types to be empty strings if null.
+        if (form.bannerImage === null) {
+            form.bannerImage = "";
+        }
+
+        if (form.icon === null) {
+            form.icon = "";
+        }
+
         if (form.knowledgeBaseID != null) {
             return await this.patchKB(form as any);
         } else {

@@ -17,12 +17,14 @@ import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBas
 import { BrowserRouter } from "react-router-dom";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {
     const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
     const status = initialForm.status || KnowledgeBaseStatus.PUBLISHED;
     const kbs = useKnowledgeBases(status);
+    const { initForm } = useKnowledgeBaseActions();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
 
@@ -75,6 +77,7 @@ export function ManageKnowledgeBasesPage() {
                         forStatus={status}
                         onEditClick={() => {
                             setEditingID(kb.knowledgeBaseID);
+                            initForm({ kbID: kb.knowledgeBaseID });
                             setIsFormOpen(true);
                         }}
                     />
