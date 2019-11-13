@@ -479,6 +479,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             }
         }
         $record['url'] = $this->knowledgeBaseModel->url($record);
+        $this->expandSiteSections($record);
         return $record;
     }
 }

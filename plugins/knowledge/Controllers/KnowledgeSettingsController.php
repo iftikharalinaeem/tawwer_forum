@@ -7,12 +7,9 @@
 use Vanilla\Knowledge\Models\KnowledgeBaseKludgedVars;
 use \Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use \Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
-use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\TwigRenderTrait;
-use Garden\Schema\Validation;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -142,19 +139,11 @@ class KnowledgeSettingsController extends SettingsController {
     public function knowledgeBases($knowledgeBaseID = null, $action = null) {
         $action = strtolower($action ?? "");
 
-        if ($knowledgeBaseID === "add") {
-            $this->knowledgeBasesAddEdit();
-        } elseif ($knowledgeBaseID !== null) {
+        if ($knowledgeBaseID !== null) {
             $knowledgeBaseID = filter_var($knowledgeBaseID, FILTER_VALIDATE_INT);
             switch ($action) {
                 case "delete":
                     $this->knowledgeBasesDelete($knowledgeBaseID, $this->request->get("purge") === "purge");
-                    break;
-                case "edit":
-                    $this->knowledgeBasesAddEdit($knowledgeBaseID);
-                    break;
-                case "publish":
-                    $this->knowledgeBasesPublish($knowledgeBaseID);
                     break;
                 default:
                     throw new NotFoundException("Page");
@@ -193,113 +182,6 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Render the add & edit pages for the knowledge base.
-     *
-     * - /knowledge-settings/knowledge-bases/add
-     * - /knowledge-settings/knowledge-bases/:id/edit
-     *
-     * @param string|int|null $knowledgeBaseID The ID of the KB being edited.
-     *
-     * @return void
-     */
-    private function knowledgeBasesAddEdit($knowledgeBaseID = null) {
-        $this->permission('Garden.Settings.Manage');
-        $defaultLocale = $this->getDefaultLocale($knowledgeBaseID);
-        $options = $this->getSourceLocaleOptions();
-
-        if ($knowledgeBaseID) {
-            $record = $this->apiController->get($knowledgeBaseID);
-            $this->Form->setData($record);
-        }
-
-        if ($this->Form->authenticatedPostBack()) {
-            try {
-                $this->post_addEdit($knowledgeBaseID);
-            } catch (ValidationException $e) {
-                $validation = ModelUtils::validationExceptionToValidationResult($e);
-                $this->Form->setValidationResults($validation->results());
-            }
-        }
-
-        $sourceLocaleOptions = [ "Default" => $defaultLocale];
-
-        // If we've got a KB ID, we've already got a locale set for this KB
-        if ($knowledgeBaseID) {
-            $sourceLocaleOptions["data-sourceLocale-kb"] = $defaultLocale;
-        }
-
-        // Set the form elements on the add/edit form.
-        $formData = [
-            'name' => [
-                'LabelCode' => 'Name',
-                "Description" => "Title of the knowledge base.",
-            ],
-            'urlCode' => [
-                'LabelCode' => 'URL Code',
-                "Description" => "A customized version of the knowledge base name as it should appear in URLs.",
-                "Options" => [
-                    "data-react-input" => true,
-                    "data-validation-filter" => "slug",
-                ],
-            ],
-            'siteSectionGroup' => [
-                'Control' => 'react',
-                'Component' => 'site-section-group-selector-form-group',
-            ],
-            'description' => [
-                'LabelCode' => 'Description',
-                'Control' => 'textbox',
-                'Options' => ['MultiLine' => true],
-                "Description" => "A description of the knowledge base. Displayed in the knowledge base picker.",
-            ],
-            'icon' => [
-                'LabelCode' => 'Icon',
-                'Control' => 'imageuploadpreview',
-                "Description" => "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
-            ],
-            "bannerImage" => [
-                "Control" => "imageuploadpreview",
-                "LabelCode" => "Banner Image",
-                "Description" => "Homepage banner image for this knowledge base."
-            ],
-            'viewType' => [
-                "Description" => "Determines how the categories and articles within it will display",
-                'LabelCode' => 'View Type',
-                'Control' => 'callback',
-                'Callback' => function (Gdn_Form $form, array $inputRow): string {
-                    return $this->renderViewTypePicker($form, $inputRow);
-                },
-            ],
-            'sortArticles' => [
-                "Description" => "Sorting method for articles.",
-                'LabelCode' => 'Sort Articles',
-                'Control' => 'dropdown',
-                'Items' => [
-                    KnowledgeBaseModel::ORDER_DATE_DESC => 'Newest First',
-                    KnowledgeBaseModel::ORDER_DATE_ASC => 'Oldest First',
-                    KnowledgeBaseModel::ORDER_NAME => 'Alphabetically',
-                    // Manual is not an option here. That is determined by the viewType === Guide
-                ],
-                'ItemWrap' => [
-                    '<li class="form-group js-sortArticlesGroup">',
-                    '</li>'
-                ]
-            ],
-            'sourceLocale' => [
-                "Type" => "String",
-                "Description" => "Source locale for the Knowledge-Base",
-                'LabelCode' => 'Locales',
-                'Control' => 'DropDown',
-                'Items' => $options,
-                'Options' => $sourceLocaleOptions
-            ],
-        ];
-
-        $this->setData('formData', $formData);
-        $this->render('addedit');
-    }
-
-    /**
      * Handle a request to "soft" delete a knoweldge base.
      *
      * @param integer $knowledgeBaseID
@@ -321,177 +203,5 @@ class KnowledgeSettingsController extends SettingsController {
             $this->setRedirectTo("/knowledge-settings/knowledge-bases");
             $this->render("blank", "utility", "dashboard");
         }
-    }
-
-    /**
-     * Handle a request to flag a knowledge base as published.
-     *
-     * @param integer $knowledgeBaseID
-     */
-    private function knowledgeBasesPublish(int $knowledgeBaseID) {
-        $this->deliveryMethod(DELIVERY_METHOD_JSON);
-
-        if ($this->Form->authenticatedPostBack()) {
-            $this->apiController->patch($knowledgeBaseID, [
-                "status" => KnowledgeBaseModel::STATUS_PUBLISHED,
-            ]);
-            $this->informMessage(sprintf(self::t("%s published."), self::t("Knowledge Base")));
-            $this->setRedirectTo("/knowledge-settings/knowledge-bases");
-            $this->render("blank", "utility", "dashboard");
-        }
-    }
-
-    /**
-     * Post method for the add/edit pages.
-     *
-     * @param string|null $knowledgeBaseID The ID of the edit page or null for an add page.
-     */
-    private function post_addEdit($knowledgeBaseID = null) {
-        $values = $this->Form->formValues();
-        if ($values['icon_New']) {
-            $values['icon'] = $this->handleFormMediaUpload($values['icon_New'], "icon");
-        }
-        if ($values["bannerImage_New"]) {
-            $values["bannerImage"] = $this->handleFormMediaUpload($values["bannerImage_New"], "bannerImage");
-        }
-
-        // A guide must be sorted manually.
-        if ($values["viewType"] === KnowledgeBaseModel::TYPE_GUIDE) {
-            $values["sortArticles"] = KnowledgeBaseModel::ORDER_MANUAL;
-        } elseif ($values["sortArticles"] === KnowledgeBaseModel::ORDER_MANUAL) {
-            // If it isn't a guide, it can't be sorted manually.
-            $values["sortArticles"] = KnowledgeBaseModel::ORDER_DATE_DESC;
-        }
-
-        if (!isset($values["sourceLocale"])) {
-            $values["sourceLocale"] = $this->getCurrentLocale();
-        }
-
-        if ($knowledgeBaseID) {
-            $knowledgeBaseID = (int)$knowledgeBaseID;
-            $this->apiController->patch($knowledgeBaseID, $values);
-        } else {
-            $this->apiController->post($values);
-        }
-
-        if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
-            $this->jsonTarget('', '', 'Refresh');
-            $this->render('blank', 'utility', 'dashboard');
-        } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            $this->setRedirectTo('/vanilla/settings/categories');
-            $this->render('blank', 'utility', 'dashboard');
-        }
-    }
-
-    /**
-     * Generate HTML for view type picker form inputs.
-     *
-     * @param Gdn_Form $form
-     * @param array $inputRow
-     * @return string
-     */
-    private function renderViewTypePicker(Gdn_Form $form, array $inputRow): string {
-        $descriptionHtml = $inputRow["DescriptionHtml"] ?? "";
-
-        $label = '<div class="label-wrap">' . $form->label(
-            $inputRow["LabelCode"] ?? "",
-            "viewType",
-            $inputRow
-        ) . $descriptionHtml . '</div>';
-
-        $options = [
-            KnowledgeBaseModel::TYPE_GUIDE => [
-                "info" => "Guides are for making howto guides, documentation, or any \"book\" like content that should be read in order.",
-                "label" => self::t("Guide"),
-            ],
-            KnowledgeBaseModel::TYPE_HELP => [
-                "info" => "Help centers are for making free-form help articles that are organized into categories.",
-                "label" => self::t('Help Center'),
-            ],
-        ];
-
-        $controls = "<ul>";
-        foreach ($options as $value => $option) {
-            $info = '<div class="info">' .$option["info"] . '</div>';
-            $control = $form->radio(
-                "viewType",
-                $option["label"],
-                ["class" => "js-viewType", "value" => $value]
-            );
-            $controls .= '<li class="' . $form->getStyle("radio-container") . '">' . $control . $info . '</li>';
-        }
-        $controls .= "</ul>";
-
-        return '<li class="' . $form->getStyle("form-group").'">' . $label . '<div class="input-wrap">' . $controls . '</div></li>';
-    }
-
-    /**
-     * Pass along an UploadFile to the MediaApiController and return it's URL.
-     *
-     * @param Vanilla\UploadedFile $file
-     * @param string $field
-     *
-     * @return string
-     */
-    private function handleFormMediaUpload(Vanilla\UploadedFile $file, string $field): string {
-        try {
-            $image = $this->mediaApiController->post([
-                'file' => $file,
-                'type' => MediaApiController::TYPE_IMAGE,
-            ]);
-        } catch (ValidationException $e) {
-            // Migrate error messages to ensure the ability to associate errors with the correct form field.
-            $validation = $e->getValidation();
-            foreach ($validation->getErrors() as $error) {
-                $validation->addError($field, $error["message"], $error);
-            }
-            throw $e;
-        }
-
-        return $image['url'];
-    }
-
-    /**
-     * Get the source locale options.
-     *
-     * @return array
-     */
-    private function getSourceLocaleOptions(): array {
-        $options = [];
-        $availableLocales = $this->localApiController->index();
-        $localeNames = array_column($availableLocales, 'displayNames', 'localeKey');
-        foreach ($localeNames as $localKey => $displayNames) {
-            $options[$localKey] = $displayNames[$localKey];
-        }
-        return $options;
-    }
-
-    /**
-     * Get the locale that is currently set.
-     *
-     * @return string
-     */
-    private function getCurrentLocale(): string {
-        $currentLocale = $this->localApiController->getLocale();
-        $locale = $currentLocale->Locale;
-
-        return $locale;
-    }
-
-    /**
-     * Get the default locale to use for /knowledge-base add/edit.
-     *
-     * @param int $knowledgeBaseID
-     * @return string
-     */
-    private function getDefaultLocale(int $knowledgeBaseID = null): string {
-        if ($knowledgeBaseID) {
-            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
-            $defaultLocale = $knowledgeBase["sourceLocale"];
-        } else {
-            $defaultLocale = $this->getCurrentLocale();
-        }
-
-        return $defaultLocale;
     }
 }
