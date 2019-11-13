@@ -129,10 +129,10 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                 body={<FrameBody>{content}</FrameBody>}
                 footer={
                     <FrameFooter>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.STANDARD}>
+                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_STANDARD}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.PRIMARY}>
+                        <Button submit baseClass={ButtonTypes.DASHBOARD_PRIMARY}>
                             {isSubmitLoading ? <ButtonLoader buttonType={ButtonTypes.PRIMARY} /> : t("Save")}
                         </Button>
                     </FrameFooter>
@@ -160,6 +160,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                     <form
                         onSubmit={e => {
                             e.preventDefault();
+                            e.stopPropagation();
                             if (!translationLocale) {
                                 return;
                             }
