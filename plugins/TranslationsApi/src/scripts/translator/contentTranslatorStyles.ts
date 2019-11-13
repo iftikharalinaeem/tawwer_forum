@@ -39,9 +39,11 @@ export const contentTranslatorClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
+        display: "flex",
         ...paddings({
             left: unit(globalVars.gutter.half),
             right: unit(globalVars.gutter.half),
+            top: globalVars.gutter.size - 6,
         }),
     });
 
