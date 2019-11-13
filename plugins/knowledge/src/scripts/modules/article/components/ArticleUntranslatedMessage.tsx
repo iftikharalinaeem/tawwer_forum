@@ -33,7 +33,7 @@ export function ArticleUntranslatedMessage(props: IProps) {
             onConfirm={onConfirm}
             stringContents={t("This article hasn't been translated yet.")}
             contents={
-                <div className={classes.iconWrap}>
+                <div className={classes.content}>
                     <WarningIcon className={classes.messageIcon} />
                     <div>{t("This article hasn't been translated yet.")}</div>
                 </div>

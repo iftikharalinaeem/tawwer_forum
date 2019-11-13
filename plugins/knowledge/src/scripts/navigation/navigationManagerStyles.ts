@@ -14,8 +14,6 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { style } from "typestyle";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -133,7 +131,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
-        // paddingTop: globalVars.gutter.size,
+        paddingTop: globalVars.gutter.size,
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),

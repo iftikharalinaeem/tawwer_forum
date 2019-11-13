@@ -228,16 +228,6 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         }
     }
 
-    /**
-     * Load a fallback article content if an article isn't translated.
-     */
-    public async loadArticleTranslationFallback(history: History, articleID: number) {
-        const article = await this.fetchArticleForEdit(history, articleID);
-        if (article) {
-            this.setFallbackLocale(article.data.locale);
-        }
-    }
-
     private getInitialRecordForEdit(): ILocationPickerRecord | null {
         const editorPage = this.getState().knowledge.editorPage;
         if (!editorPage) {
@@ -472,6 +462,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         // Merge together the two results and re-dispatch with the full data.
         if (!editArticleResponse || !articleResponse) {
             return;
+        }
+
+        // We have a different article locale & current locale.
+        if (articleResponse.locale !== locale) {
+            this.setFallbackLocale(articleResponse.locale);
         }
 
         editArticleResponse.data = {

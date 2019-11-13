@@ -105,7 +105,7 @@ export interface IPatchArticleResponseBody extends IArticle {}
 // GET /articles/:id
 export interface IGetArticleRequestBody {
     articleID: number;
-    locale?: string;
+    locale: string;
 }
 export interface IGetArticleResponseBody extends IArticle {}
 
