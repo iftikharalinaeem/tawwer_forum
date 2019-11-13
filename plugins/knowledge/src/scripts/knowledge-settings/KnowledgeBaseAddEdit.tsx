@@ -41,7 +41,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const { updateForm, saveKbForm } = useKnowledgeBaseActions();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isProductManagementOpen, setIsProductManagementOpen] = useState(false);
-
     const [isLoading, setIsLoading] = useState(false);
     const { locales, currentLocale } = useLocaleInfo();
     const [value, setValue] = useState<number | string | null>();
@@ -138,8 +137,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
                                         {ProductSelectorFormGroup && (
                                             <ProductSelectorFormGroup.Component
-                                                formFieldName={""}
-                                                initialValue={null}
+                                                value={form.sectionGroup}
+                                                onChange={sectionGroup => {
+                                                    updateForm({ sectionGroup });
+                                                }}
                                                 valueType={"sectionGroup"}
                                                 disabled={isLoading}
                                             />
@@ -172,16 +173,20 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                             description={t(
                                                 "A small image used to represent the knowledge base. Displayed in the knowledge base picker.",
                                             )}
-                                            onChange={doNothing}
+                                            onChange={icon => {
+                                                updateForm({ icon });
+                                            }}
                                             disabled={isLoading}
-                                            value={""}
+                                            value={form.icon}
                                         />
                                         <DashboardImageUploadGroup
                                             label="Banner Image"
                                             description={t("Homepage banner image for this knowledge base.")}
-                                            onChange={doNothing}
+                                            onChange={image => {
+                                                updateForm({ image });
+                                            }}
                                             disabled={isLoading}
-                                            value={""}
+                                            value={form.image}
                                         />
                                         <DashboardFormGroup
                                             label="View Type"

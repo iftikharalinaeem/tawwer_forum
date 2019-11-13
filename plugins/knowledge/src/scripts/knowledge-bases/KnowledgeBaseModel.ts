@@ -22,10 +22,10 @@ export interface ILoadedProduct {
 export interface IKbFormState {
     name: string;
     urlCode: string;
-    product: string;
+    sectionGroup: string;
     description: string;
-    icon: string;
-    image: string;
+    icon: string | null;
+    image: string | null;
     viewType: KbViewType;
     locale: string;
 }
@@ -50,10 +50,10 @@ export enum KnowledgeBaseSortMode {
 export const INTIAL_KB_FORM: IKbFormState = {
     name: "",
     urlCode: "",
-    product: "",
+    sectionGroup: "",
     description: "",
-    icon: "",
-    image: "",
+    icon: null,
+    image: null,
     viewType: KbViewType.HELP,
     locale: "",
 };
@@ -174,6 +174,13 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
      * Reducer factory for knowledge base items.
      */
     private internalReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
+        .case(KnowledgeBaseActions.updateFormAC, (state, payload) => {
+            state.form = {
+                ...state.form,
+                ...payload,
+            };
+            return state;
+        })
         .case(KnowledgeBaseActions.GET_ACS.started, state => {
             state.knowledgeBasesByID.status = LoadStatus.LOADING;
             return state;

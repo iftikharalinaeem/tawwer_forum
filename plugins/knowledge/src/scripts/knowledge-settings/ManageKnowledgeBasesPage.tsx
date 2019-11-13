@@ -28,7 +28,7 @@ export function ManageKnowledgeBasesPage() {
 
     return (
         <BrowserRouter>
-            {/*<DashboardHeaderBlock title={t("Add Knowledge Base")} actionButtons={<KnowledgeBaseAddEdit />} />*/}
+            <DashboardHeaderBlock title={t("Add Knowledge Base")} actionButtons={<KnowledgeBaseAddEdit />} />
             <DashboardTable
                 head={
                     <tr>
