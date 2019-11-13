@@ -33,6 +33,7 @@ import React, { useState, useEffect } from "react";
 import Message from "@library/messages/Message";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/knowledgeBaseAddEditStyles";
 
 interface IProps {
     kbID?: number;
@@ -94,6 +95,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const { Translator, shouldDisplay } = useContentTranslator();
 
     const errors = formSubmit.error?.response.data?.errors;
+    const kbAddEditClasses = knowledgeBaseAddEditClasses();
 
     return (
         <Modal size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
@@ -106,7 +108,12 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             >
                 <Frame
                     header={
-                        <FrameHeader titleID={titleID} closeFrame={onClose} title={titleString}>
+                        <FrameHeader
+                            titleID={titleID}
+                            closeFrame={onClose}
+                            title={titleString}
+                            titleClass={kbAddEditClasses.heading}
+                        >
                             {shouldDisplay && isEditing && (
                                 <Translator
                                     resource={KB_RESOURCE_NAME}
