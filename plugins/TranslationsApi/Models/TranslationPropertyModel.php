@@ -11,6 +11,7 @@ use Gdn_Session;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Models\PipelineModel;
+use PDO;
 
 /**
  * TranslationPropertyModel class.
