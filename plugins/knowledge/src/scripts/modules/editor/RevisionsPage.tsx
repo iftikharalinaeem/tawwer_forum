@@ -310,10 +310,7 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
-);
+const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
 function LoadMoreButton(props: { nextPage?: number; onClick: () => void }) {
     const { nextPage, onClick } = props;

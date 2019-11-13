@@ -145,7 +145,4 @@ function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(HelpCenterHome);
+export default connect(mapStateToProps, mapDispatchToProps)(HelpCenterHome);

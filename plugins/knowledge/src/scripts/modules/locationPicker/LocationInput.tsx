@@ -223,7 +223,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(LocationInput);
+export default connect(mapStateToProps, mapDispatchToProps)(LocationInput);

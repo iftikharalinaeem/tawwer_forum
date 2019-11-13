@@ -722,6 +722,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
         $row["url"] = $this->articleModel->url($row);
 
+        if (isset($row["queryLocale"])) {
+            $row["translationStatus"] = ($row["locale"] === $row["queryLocale"]) ?
+                ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE :
+                ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
+        }
+
         $bodyRendered = $row["bodyRendered"] ?? null;
         $row["body"] = $bodyRendered;
         $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
@@ -1118,9 +1124,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function put_invalidateTranslations(int $id, array $body): array {
         $this->permission("knowledge.articles.add");
 
-        $in = $this->schema([
-            "invalidateTranslations:b"
-        ], "in")->setDescription("Invalidate translations for a particular article.");
+        $in = $this->schema($this->idParamSchema(), "in");
+        $in->validate(['id' => $id]);
 
         $out = $this->schema([":a" => Schema::parse([
             "articleID:i",
@@ -1132,9 +1137,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out")
         ]);
 
-        if ($body["invalidateTranslations"]) {
-            $this->updateInvalidateArticleTranslations($id);
-        }
+        $this->updateInvalidateArticleTranslations($id);
+
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $results = $out->validate($articles);
 
@@ -1292,6 +1296,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $revision["body"] = "[]";
             }
 
+            $images = $this->formatterService->parseImageUrls($revision['body'], $revision['format']);
+            $revision['seoImage'] = count($images) > 0 ? $images[0] : null;
             $revision["bodyRendered"] = $this->formatterService->renderHTML($revision['body'], $revision['format']);
             $revision["plainText"] = $this->formatterService->renderPlainText($revision['body'], $revision['format']);
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);

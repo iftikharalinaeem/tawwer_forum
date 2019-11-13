@@ -91,7 +91,4 @@ function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(NavigationManagerErrors);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationManagerErrors);

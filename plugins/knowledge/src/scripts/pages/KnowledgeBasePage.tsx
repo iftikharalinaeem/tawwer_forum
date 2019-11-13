@@ -78,7 +78,4 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(KnowledgeBasePage);
+export default connect(mapStateToProps, mapDispatchToProps)(KnowledgeBasePage);

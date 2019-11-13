@@ -260,6 +260,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("outline", "text", true)
             ->column("plainText", "mediumtext", true)
             ->column("excerpt", "text", true)
+            ->column('seoImage', 'varchar(255)', true)
             ->column("locale", "varchar(10)", false, "unique.publishedRevision")
             ->column(
                 "translationStatus",
