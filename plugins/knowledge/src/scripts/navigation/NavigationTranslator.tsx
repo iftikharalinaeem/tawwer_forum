@@ -4,7 +4,7 @@
  */
 
 import React, { useDebugValue } from "react";
-import { useContentTranslator, ITranslationProperty, TranslationPropertyType } from "@vanilla/i18n";
+import { useContentTranslator, ITranslationProperty, TranslationPropertyType, t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import NavigationModel, { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
@@ -33,6 +33,7 @@ export function OrganizeCategoriesTranslator(props: IProps) {
             isLoading={isLoading}
             isFullScreen
             resource={KB_RESOURCE_NAME}
+            title={t("Translate Categories")}
         />
     );
 }

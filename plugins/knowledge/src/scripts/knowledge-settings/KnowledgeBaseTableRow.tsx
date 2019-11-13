@@ -14,10 +14,12 @@ import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n";
 import React from "react";
+import Button from "@library/forms/Button";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
     forStatus: KnowledgeBaseStatus;
+    onEditClick: () => void;
 }
 export function KnowledgeBaseTableRow(props: IProps) {
     const kb = props.knowledgeBase;
@@ -59,13 +61,9 @@ export function KnowledgeBaseTableRow(props: IProps) {
             </td>
             <td>
                 <DashboardTableOptions>
-                    <LinkAsButton
-                        to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/edit`}
-                        className="js-modal btn-icon"
-                        baseClass={ButtonTypes.ICON_COMPACT}
-                    >
+                    <Button className="btn-icon" onClick={props.onEditClick} baseClass={ButtonTypes.ICON_COMPACT}>
                         <EditIcon />
-                    </LinkAsButton>
+                    </Button>
                     {props.forStatus === KnowledgeBaseStatus.DELETED ? (
                         <LinkAsButton
                             to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/publish`}

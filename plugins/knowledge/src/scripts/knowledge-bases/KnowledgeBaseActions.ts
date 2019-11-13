@@ -33,8 +33,8 @@ type IDeleteKnowledgeBaseRequest = {
     kbID: number;
 };
 type IGetKnowledgeBaseResponse = IKnowledgeBase[];
-type IPostKnowledgeBaseResponse = IKnowledgeBase[];
-type IPatchKnowledgeBaseResponse = IKnowledgeBase[];
+type IPostKnowledgeBaseResponse = IKnowledgeBase;
+type IPatchKnowledgeBaseResponse = IKnowledgeBase;
 type IDeleteKnowledgeBaseResponse = undefined;
 
 /**
@@ -53,22 +53,26 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
         return this.dispatch(thunk);
     };
 
+    public static initFormAC = actionCreator<{ kbID?: number }>("INIT_FORM");
+    public initForm = this.bindDispatch(KnowledgeBaseActions.initFormAC);
+
     public static updateFormAC = actionCreator<Partial<IKbFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(KnowledgeBaseActions.updateFormAC);
+
+    public static clearErrorAC = actionCreator("CLEAR_ERROR");
+    public clearError = this.bindDispatch(KnowledgeBaseActions.clearErrorAC);
 
     public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
         "GET",
     );
     public static postKB_ACs = actionCreator.async<
-        IPostKnowledgeBaseRequest & IKknowledgeBaseParams,
+        IPostKnowledgeBaseRequest,
         IPostKnowledgeBaseResponse & IKknowledgeBaseParams,
         IApiError
     >("POST");
-    public static patchKB_ACs = actionCreator.async<
-        IPatchKnowledgeBaseRequest & IKknowledgeBaseParams,
-        IPatchKnowledgeBaseResponse & IKknowledgeBaseParams,
-        IApiError
-    >("PATCH");
+    public static patchKB_ACs = actionCreator.async<IPatchKnowledgeBaseRequest, IPatchKnowledgeBaseResponse, IApiError>(
+        "PATCH",
+    );
     public static deleteKB_ACs = actionCreator.async<
         IDeleteKnowledgeBaseRequest,
         IDeleteKnowledgeBaseResponse,
@@ -87,46 +91,39 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
     }
     public saveKbForm = async () => {
         const { form } = this.getState().knowledge.knowledgeBases;
-        const query: IPostKnowledgeBaseRequest = {};
-        if (!form.description) {
-            query.description = form.description;
-        }
-        if (!form.name) {
-            query.name = form.name;
-        }
-        if (!form.urlCode) {
-            query.urlCode = form.urlCode;
-        }
-        if (!form.viewType) {
-            query.viewType = form.viewType;
-        }
-        const icon = form.icon;
-        const product = form.product;
-        const image = form.image;
-        const locale = form.locale;
 
-        const requestOptions: IPostKnowledgeBaseRequest = {
-            ...query,
-            icon,
-        };
+        // Kludge our image types to be empty strings if null.
+        if (form.bannerImage === null) {
+            form.bannerImage = "";
+        }
 
-        return await this.postKB(requestOptions);
+        if (form.icon === null) {
+            form.icon = "";
+        }
+
+        if (form.knowledgeBaseID != null) {
+            return await this.patchKB(form as any);
+        } else {
+            return await this.postKB(form as any);
+        }
     };
 
     public postKB(options: IPostKnowledgeBaseRequest) {
         const thunk = bindThunkAction(KnowledgeBaseActions.postKB_ACs, async () => {
             const response = await this.api.post(`/knowledge-bases/`, options);
             return response.data;
-        })();
+        })(options);
 
         return this.dispatch(thunk);
     }
 
     public patchKB(options: IPatchKnowledgeBaseRequest) {
+        const { knowledgeBaseID, ...body } = options;
+
         const thunk = bindThunkAction(KnowledgeBaseActions.patchKB_ACs, async () => {
-            const response = await this.api.patch(`/knowledge-bases/${options}`);
+            const response = await this.api.patch(`/knowledge-bases/${knowledgeBaseID}`, body);
             return response.data;
-        })();
+        })(options);
 
         return this.dispatch(thunk);
     }
