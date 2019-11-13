@@ -235,7 +235,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         description={t("Sorting method for articles.")}
                                     >
                                         <DashboardSelect
-                                            isClearable={false}
                                             options={helpCenterSortOptions}
                                             menuPlacement={MenuPlacement.TOP}
                                             value={helpCenterSortOptions.find(option => {
@@ -256,7 +255,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     <DashboardSelect
                                         options={localeOptions}
                                         disabled={isLoading}
-                                        isClearable={false}
                                         menuPlacement={MenuPlacement.TOP}
                                         onChange={(option: IComboBoxOption | null) => {
                                             updateForm({ sourceLocale: option ? option.value.toString() : null });
