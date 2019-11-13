@@ -121,6 +121,12 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                             renderAsDepth={2}
                             title={props.title}
                         />
+                        id={titleID}
+                        className={classes.title}
+                        depth={1}
+                        renderAsDepth={2}
+                        title={props.title}
+                        />
                     </DocumentTitle>
                     {content}
                 </div>
@@ -132,8 +138,8 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                 header={<FrameHeader titleID={titleID} title={props.title} closeFrame={promptCloseConfirmation} />}
                 body={<FrameBody>{content}</FrameBody>}
                 footer={
-                    <FrameFooter>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_STANDARD}>
+                    <FrameFooter justifyRight={true} forDashboard={true}>
+                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_SECONDARY}>
                             {t("Cancel")}
                         </Button>
                         <Button submit baseClass={ButtonTypes.DASHBOARD_PRIMARY}>

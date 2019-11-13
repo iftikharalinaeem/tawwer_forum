@@ -49,6 +49,7 @@ export const contentTranslatorClasses = useThemeCache(() => {
 
     const translateIcon = style("translateIcon", {
         marginLeft: unit(12),
+        marginRight: "auto",
     });
 
     return { content, header, translateIcon, title };
