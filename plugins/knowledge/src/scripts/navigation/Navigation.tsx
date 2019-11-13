@@ -18,6 +18,7 @@ import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React, { useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/core";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -143,7 +144,7 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     return {
         requestNavigation: () => navActions.getNavigationFlat(ownProps.kbID),
         requestKnowledgeBase: () => kbActions.getAll(),
-        preloadArticle: (articleID: number) => articleActions.fetchByID({ articleID }),
+        preloadArticle: (articleID: number) => articleActions.fetchByID({ articleID, locale: getCurrentLocale() }),
     };
 }
 
