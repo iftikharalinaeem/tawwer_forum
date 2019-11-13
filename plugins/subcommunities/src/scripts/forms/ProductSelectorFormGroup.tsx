@@ -84,7 +84,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             label={t("Product")}
             description={
                 <Translate
-                    source="Assosciate a product with this Subcommunity. <0>Use the management UI</0> to replace add, edit, or delete products."
+                    source="Assosciate a product with this Subcommunity. <0>Use the Manage Products UI</0> to replace add, edit, or delete products."
                     c0={content => (
                         <Button
                             disabled={props.disabled}
