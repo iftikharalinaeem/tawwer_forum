@@ -22,7 +22,7 @@ interface IProps {
     formFieldName: string;
 
     // Controlled react component
-    value: number | string | null;
+    value?: number | string | null;
     onChange?: (newValue: number | string | null) => void;
 
     // Genenal props
