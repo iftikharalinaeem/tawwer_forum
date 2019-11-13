@@ -31,6 +31,7 @@ import { KbViewType, useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseM
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { match } from "react-router";
 import apiv2 from "@library/apiv2";
+import { modalClasses } from "@library/modal/modalStyles";
 
 const doNothing = () => {
     return;
@@ -86,13 +87,13 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                     elementToFocusOnExit={toggleButtonRef.current as HTMLElement}
                 >
                     <form
+                        className={modalClasses().frameWrapper}
                         onSubmit={event => {
                             event.preventDefault();
                             return saveKbForm();
                         }}
                     >
                         <Frame
-                            canGrow={true}
                             header={
                                 <FrameHeader
                                     titleID={titleID}
