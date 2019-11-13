@@ -1,0 +1,21 @@
+{
+    "name": "Debug Multisite",
+    "version": "1.2.1",
+    "license": "Proprietary",
+    "icon": "node.png",
+    "key": "debugsite",
+    "type": "addon",
+    "hidden": true,
+    "description": "Synchronize locally a Hub from infrastructure by spoofing being a legitimate Node.",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4",
+        "sitenode": ">=1.2.1"
+    }
+}

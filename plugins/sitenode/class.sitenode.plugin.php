@@ -212,9 +212,14 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         $url = rtrim(http_build_url($this->hubUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
-
-        if ($system && $access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
+        $localhost = $params['localhost'] ?? false;
+        if (!$localhost && $system && $access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $headers['Authorization'] = "token $access_token";
+        }
+
+        if ($localhost) {
+            //This is similar as making an API V1 call as System.
+            $headers['Authorization'] = 'Bearer '.$params['spoofToken'] ?? '';
         }
 
         $request = new ProxyRequest();
@@ -241,9 +246,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         return val('NODE_SLUG', $_SERVER);
     }
 
-    public function syncNode() {
+    public function syncNode($params = []) {
         // Get the config from the hub.
-        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['from' => $this->slug()], true);
+        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', $params + ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
             Logger::event('syncnode_skip', Logger::INFO, "The hub told us not to sync.");
             return;
@@ -297,6 +302,14 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Synchronize the authenticators.
         trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
+
+        // Everything after this communicates with the hub, if you are debugging you
+        // don't want to update the production hub, so return here.
+        if ($params['mode'] && $params['mode'] === 'debug') {
+            Gdn::config()->shutdown();
+            Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
+            return;
+        }
 
         // Push the categories.
         try {
