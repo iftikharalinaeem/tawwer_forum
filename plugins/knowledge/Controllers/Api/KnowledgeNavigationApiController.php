@@ -17,6 +17,8 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Site\TranslationModel;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 
 /**
  * Endpoint for the virtual "knowledge navigation" resource.
@@ -42,6 +44,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var TranslationProviderInterface $translation */
+    private $translation;
+
     /**
      * KnowledgeNavigationApiController constructor.
      *
@@ -52,11 +57,14 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
         ArticleModel $articleModel,
-        KnowledgeBaseModel $knowledgeBaseModel
+        KnowledgeBaseModel $knowledgeBaseModel,
+        TranslationModel $translationModel
     ) {
         $this->articleModel = $articleModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->translation = $translationModel->getContentTranslationProvider();
+
     }
 
 
@@ -275,6 +283,18 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @throws \Exception If $row is not a valid knowledge category.
      */
     private function normalizeOutput(array $rows, string $recordType = Navigation::RECORD_TYPE_CATEGORY): array {
+        if (!is_null($this->translation)
+            && $recordType === Navigation::RECORD_TYPE_CATEGORY
+            && !empty($rows[0]['locale'] ?? null)) {
+            $rows = $this->translation->translateProperties(
+                $rows[0]['locale'],
+                'kb',
+                Navigation::RECORD_TYPE_CATEGORY,
+                'knowledgeCategoryID',
+                $rows,
+                ['name']
+            );
+        }
         foreach ($rows as &$row) {
             if ($recordType === Navigation::RECORD_TYPE_CATEGORY) {
                 $row["recordID"] = $row["knowledgeCategoryID"];
