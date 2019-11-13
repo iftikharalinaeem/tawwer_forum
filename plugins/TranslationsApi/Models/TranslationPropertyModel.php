@@ -149,7 +149,7 @@ class TranslationPropertyModel extends PipelineModel {
      * @param array $properties
      * @return array
      */
-    public function translateProperties(array $where = [], array $properties) {
+    public function translateProperties(array $where, array $properties) {
         $result = [];
 
         $sql = $this->sql();
@@ -162,7 +162,7 @@ class TranslationPropertyModel extends PipelineModel {
             $where['tp.propertyName'] = $properties;
             foreach ($properties as $propertyName) {
                 $pdo = $sql->Database->connection();
-                $sql->select('IF(tp.propertyName = '.$pdo->quote($propertyName,PDO::PARAM_STR).', t.translation, null)','MAX', $propertyName);
+                $sql->select('IF(tp.propertyName = '.$pdo->quote($propertyName, PDO::PARAM_STR).', t.translation, null)', 'MAX', $propertyName);
             }
 
             $sql->where($where);
