@@ -65,6 +65,7 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
         <TranslationGridRow
             key={properyKey}
             isFirst={isFirst}
+            isLast={isLast}
             leftCell={<TranslationGridText text={property.sourceText} />}
             rightCell={
                 <>

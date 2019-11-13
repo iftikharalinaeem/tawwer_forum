@@ -6,7 +6,6 @@
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { TranslateIcon } from "@library/icons/common";
-import Container from "@library/layout/components/Container";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
@@ -109,14 +108,19 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
         />
     );
 
-    const title = t("Translate Categories");
     if (props.isFullScreen) {
         content = (
             <>
                 <ContentTranslaterFullHeader onBack={promptCloseConfirmation} isSubmitLoading={isSubmitLoading} />
                 <div className={classes.content}>
-                    <DocumentTitle title={title}>
-                        <Heading id={titleID} className={classes.title} depth={1} renderAsDepth={2} title={title} />
+                    <DocumentTitle title={props.title}>
+                        <Heading
+                            id={titleID}
+                            className={classes.title}
+                            depth={1}
+                            renderAsDepth={2}
+                            title={props.title}
+                        />
                     </DocumentTitle>
                     {content}
                 </div>
@@ -125,14 +129,14 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     } else {
         content = (
             <Frame
-                header={<FrameHeader titleID={titleID} title={title} closeFrame={promptCloseConfirmation} />}
+                header={<FrameHeader titleID={titleID} title={props.title} closeFrame={promptCloseConfirmation} />}
                 body={<FrameBody>{content}</FrameBody>}
                 footer={
-                    <FrameFooter>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.STANDARD}>
+                    <FrameFooter justifyRight={true} forDashboard={true}>
+                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_SECONDARY}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.PRIMARY}>
+                        <Button submit baseClass={ButtonTypes.DASHBOARD_PRIMARY}>
                             {isSubmitLoading ? <ButtonLoader buttonType={ButtonTypes.PRIMARY} /> : t("Save")}
                         </Button>
                     </FrameFooter>
@@ -160,6 +164,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                     <form
                         onSubmit={e => {
                             e.preventDefault();
+                            e.stopPropagation();
                             if (!translationLocale) {
                                 return;
                             }
