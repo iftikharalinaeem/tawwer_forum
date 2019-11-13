@@ -13,6 +13,8 @@ import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/Nav
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { getCurrentLocale } from "@vanilla/i18n";
+import clone from "lodash/clone";
 
 export interface ILoadedProduct {
     kb: IKnowledgeBase;
@@ -20,20 +22,24 @@ export interface ILoadedProduct {
     deleteKB: ILoadable<{}, IKnowledgeBase>;
 }
 export interface IKbFormState {
+    knowledgeBaseID?: number;
     name: string;
     urlCode: string;
-    sectionGroup: string;
+    siteSectionGroup: string | null;
     description: string;
     icon: string | null;
-    image: string | null;
+    bannerImage: string | null;
     viewType: KbViewType;
-    locale: string;
+    sourceLocale: string | null;
+    sortArticles: KnowledgeBaseSortMode;
 }
 export interface IKnowledgeBasesState {
     knowledgeBasesByID: ILoadable<{
         [id: number]: IKnowledgeBase;
     }>;
     form: IKbFormState;
+    formSubmit: ILoadable<{}>;
+    deleteSubmit: ILoadable<{}>;
 }
 
 export enum KbViewType {
@@ -47,21 +53,22 @@ export enum KnowledgeBaseSortMode {
     DATE_INSERTED = "dateInserted",
     DATE_INSERTED_DESC = "dateInsertedDesc",
 }
-export const INTIAL_KB_FORM: IKbFormState = {
+export const INITIAL_KB_FORM: IKbFormState = {
     name: "",
     urlCode: "",
-    sectionGroup: "",
+    siteSectionGroup: "",
     description: "",
     icon: null,
-    image: null,
-    viewType: KbViewType.HELP,
-    locale: "",
+    bannerImage: null,
+    viewType: KbViewType.GUIDE,
+    sortArticles: KnowledgeBaseSortMode.MANUAL,
+    sourceLocale: getCurrentLocale(),
 };
 
 interface ISiteSection {
     basePath: string;
     contentLocale: string;
-    sectionGroup: string;
+    siteSectionGroup: string;
     sectionID: string;
     name: string;
 }
@@ -72,6 +79,7 @@ export enum KnowledgeBaseStatus {
 }
 
 export interface IPatchKnowledgeBaseRequest {
+    knowledgeBaseID: number;
     description: string;
     icon?: string;
     name: string;
@@ -113,6 +121,7 @@ export interface IKnowledgeBase {
     viewType: KbViewType;
     rootCategoryID: number;
     defaultArticleID: number | null;
+    siteSectionGroup: string | null;
     siteSections: ISiteSection[];
 }
 
@@ -160,11 +169,17 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         knowledgeBasesByID: {
             status: LoadStatus.PENDING,
         },
-        form: INTIAL_KB_FORM,
+        form: INITIAL_KB_FORM,
+        formSubmit: {
+            status: LoadStatus.PENDING,
+        },
+        deleteSubmit: {
+            status: LoadStatus.PENDING,
+        },
     };
 
     public initialState = KnowledgeBaseModel.INITIAL_STATE;
-    public reducer: ReducerType = (state = this.initialState, action) => {
+    public reducer: ReducerType = (state = clone(this.initialState), action) => {
         return produce(state, nextState => {
             return this.internalReducer(nextState, action);
         });
@@ -174,7 +189,26 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
      * Reducer factory for knowledge base items.
      */
     private internalReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
+        .case(KnowledgeBaseActions.initFormAC, (state, payload) => {
+            if (payload.kbID != null) {
+                const existingKB = {
+                    ...state.knowledgeBasesByID.data![payload.kbID],
+                };
+                state.form = existingKB;
+            } else {
+                console.log("restoring to initial");
+                state.form = INITIAL_KB_FORM;
+            }
+
+            return state;
+        })
         .case(KnowledgeBaseActions.updateFormAC, (state, payload) => {
+            if (payload.viewType === KbViewType.GUIDE) {
+                payload.sortArticles = KnowledgeBaseSortMode.MANUAL;
+            } else if (payload.viewType === KbViewType.HELP) {
+                payload.sortArticles = KnowledgeBaseSortMode.DATE_INSERTED_DESC;
+            }
+
             state.form = {
                 ...state.form,
                 ...payload,
@@ -194,45 +228,46 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
             state.knowledgeBasesByID.data = normalized;
             return state;
         })
+        .case(KnowledgeBaseActions.clearErrorAC, state => {
+            state.formSubmit = {
+                status: LoadStatus.PENDING,
+            };
+            return state;
+        })
         .case(KnowledgeBaseActions.GET_ACS.failed, (state, action) => {
             state.knowledgeBasesByID.error = action.error;
             return state;
         })
         .case(KnowledgeBaseActions.postKB_ACs.started, (state, payload) => {
-            state.knowledgeBasesByID[payload.kbID] = {
-                status: LoadStatus.PENDING,
-                data: payload,
-            };
+            state.formSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(KnowledgeBaseActions.postKB_ACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
             return state;
         })
         .case(KnowledgeBaseActions.postKB_ACs.done, (state, payload) => {
-            delete state.knowledgeBasesByID[payload.params.kbID];
-            state.knowledgeBasesByID[payload.params.kbID] = {
-                knowledgeBase: payload.result,
-                patchKB: { status: LoadStatus.PENDING },
-                deleteKB: { status: LoadStatus.PENDING },
-            };
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.knowledgeBasesByID[payload.result.knowledgeBaseID] = payload.result;
             return state;
         })
         .case(KnowledgeBaseActions.patchKB_ACs.started, (state, payload) => {
-            const existingKB = state.knowledgeBasesByID[payload.kbID];
-            existingKB.patchKB = {
-                status: LoadStatus.LOADING,
-            };
+            state.formSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(KnowledgeBaseActions.patchKB_ACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
             return state;
         })
         .case(KnowledgeBaseActions.patchKB_ACs.done, (state, payload) => {
-            const existingKB = state.knowledgeBasesByID[payload.params.kbID];
-            existingKB.kb = payload.result;
-            existingKB.patchKB = {
-                status: LoadStatus.SUCCESS,
-            };
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.knowledgeBasesByID.data![payload.result.knowledgeBaseID] = payload.result;
             return state;
         })
         .case(KnowledgeBaseActions.deleteKB_ACs.started, (state, payload) => {
-            const existingKB = state.knowledgeBasesByID[payload.kbID];
-            existingKB;
-            existingKB.deleteKB.status = LoadStatus.LOADING;
+            state.deleteSubmit.status = LoadStatus.LOADING;
             return state;
         })
         .case(KnowledgeBaseActions.deleteKB_ACs.done, (state, payload) => {
