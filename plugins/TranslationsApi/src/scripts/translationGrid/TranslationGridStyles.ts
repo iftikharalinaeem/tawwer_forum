@@ -96,7 +96,6 @@ export const translationGridClasses = useThemeCache(() => {
     });
 
     const languageDropdownToggle = style("languageDropdownToggle", {
-        paddingLeft: unit(dropDownOffset + globalVars.border.width),
         paddingRight: unit(dropDownOffset),
     });
 
@@ -167,7 +166,7 @@ export const translationGridClasses = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.semiBold,
         ...paddings({
             right: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
-            left: vars.cell.paddings.outer + vars.cell.paddings.inner + 3 - dropDownOffset,
+            left: vars.cell.paddings.outer + vars.cell.paddings.inner + 3,
         }),
     });
 
