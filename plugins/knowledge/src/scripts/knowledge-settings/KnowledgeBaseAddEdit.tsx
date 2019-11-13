@@ -27,10 +27,11 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { modalClasses } from "@library/modal/modalStyles";
 import { getComponent } from "@library/utility/componentRegistry";
 import { useUniqueID } from "@library/utility/idUtils";
-import { t, useLocaleInfo } from "@vanilla/i18n";
+import { t, useLocaleInfo, useContentTranslator, TranslationPropertyType } from "@vanilla/i18n";
 import classNames from "classnames";
 import React, { useState, useEffect } from "react";
 import Message from "@library/messages/Message";
+import { KB_RESOURCE_NAME } from "@knowledge/constants";
 
 interface IProps {
     kbID?: number;
@@ -87,6 +88,9 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     ];
 
     const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
+    const titleString = isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base");
+
+    const { Translator, shouldDisplay } = useContentTranslator();
 
     return (
         <Modal size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
@@ -99,11 +103,35 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             >
                 <Frame
                     header={
-                        <FrameHeader
-                            titleID={titleID}
-                            closeFrame={onClose}
-                            title={isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base")}
-                        />
+                        <FrameHeader titleID={titleID} closeFrame={onClose} title={titleString}>
+                            {shouldDisplay && isEditing && (
+                                <Translator
+                                    resource={KB_RESOURCE_NAME}
+                                    properties={[
+                                        {
+                                            recordType: "knowledgeBase",
+                                            recordID: props.kbID,
+                                            propertyName: "name",
+                                            propertyType: TranslationPropertyType.TEXT,
+                                            propertyValidation: {
+                                                minLength: 1,
+                                            },
+                                            sourceText: form.name,
+                                        },
+                                        {
+                                            recordType: "knowledgeBase",
+                                            recordID: props.kbID,
+                                            propertyName: "description",
+                                            propertyType: TranslationPropertyType.TEXT_MULTILINE,
+                                            propertyValidation: {
+                                                minLength: 1,
+                                            },
+                                            sourceText: form.description,
+                                        },
+                                    ]}
+                                ></Translator>
+                            )}
+                        </FrameHeader>
                     }
                     body={
                         <FrameBody>
