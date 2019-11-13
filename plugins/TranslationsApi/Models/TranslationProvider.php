@@ -75,4 +75,51 @@ class TranslationProvider implements TranslationProviderInterface {
         }
         return $translation;
     }
+
+    /**
+     * Translate properties of some recordType items provided
+     *
+     * @param string $locale
+     * @param string $resource
+     * @param string $recordType Ex: discussion, knwoledgeCategory
+     * @param string $idFieldName Ex: discussionID, categoryID, knowldegeCategoryID, etc
+     * @param array $records
+     * @param array $properties Ex: ['name', 'description']
+     * @return array
+     */
+    public function translateProperties(
+        string $locale,
+        string $resource,
+        string $recordType,
+        string $idFieldName,
+        array $records,
+        array $properties
+    ): array {
+
+        $where = [
+            't.locale' => $locale,
+            'tp.resource' => $resource,
+            'tp.recordType' => $recordType,
+            'tp.propertyName' => $properties,
+        ];
+
+        $ids = array_column($records, $idFieldName);
+        if (count($ids) > 0) {
+            $where['tp.recordID'] = $ids;
+
+            $translations = $this->translationModel->translateProperties($where, ['name']);
+
+            if (count($translations) > 0) {
+                foreach ($records as &$record) {
+                    foreach ($properties as $property) {
+                        if (!empty($translation = $translations[$record[$idFieldName]][$property])) {
+                            $record[$property] = $translation;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $records;
+    }
 }
