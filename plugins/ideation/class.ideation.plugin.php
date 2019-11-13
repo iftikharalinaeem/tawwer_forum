@@ -1176,10 +1176,10 @@ EOT
      * Modify the types filter when getting a summary of reactions on a post.
      *
      * @param array $filter
-     * @param ReactionModel $sender
      * @param array $record
+     * @return array Returns the new filter (where clause).
      */
-    public function reactionsModel_getRecordSummary_typesFilter(array $filter, ReactionModel $sender, array $record) {
+    public function reactionModel_getReactionTypesFilter_handler(array $filter, array $record) {
         $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
         $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
 
@@ -1700,7 +1700,7 @@ EOT
     }
 
     /**
-     * Join TagDiscussion table filtering idea statuses. 
+     * Join TagDiscussion table filtering idea statuses.
      *
      * @param DiscussionModel $sender
      * @param array $args

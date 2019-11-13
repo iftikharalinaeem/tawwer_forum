@@ -161,7 +161,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $sender
+     * @param Gdn_Controller $sender
      */
     private function addJs($sender) {
         $sender->addJsFile('jquery-ui.min.js');
@@ -313,9 +313,9 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $rows = $this->reactionModel->getByRecord(
-            'Comment',
-            $comment['CommentID'],
+        $comment += ['recordType' => 'Comment', 'recordID' => $comment['CommentID']];
+        $rows = $this->reactionModel->getRecordReactions(
+            $comment,
             true,
             $query['type'],
             $offset,
@@ -513,9 +513,9 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $rows = $this->reactionModel->getByRecord(
-            'Discussion',
-            $discussion['DiscussionID'],
+        $discussion += ['recordType' => 'Discussion', 'recordID' => $discussion['DiscussionID']];
+        $rows = $this->reactionModel->getRecordReactions(
+            $discussion,
             true,
             $query['type'],
             $offset,
@@ -687,9 +687,9 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add the reactions CSS to the page.
      *
-     *
-     * @param $sender
+     * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
      */
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('reactions.css', 'plugins/Reactions');
@@ -881,9 +881,9 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render the reactions on the profile.
      *
-     *
-     * @param $sender
+     * @param ProfileController $sender
      */
     public function profileController_render_before($sender) {
         if (!$sender->data('Profile')) {
@@ -983,8 +983,8 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Add a "Best Of" view for reacted content.
      *
-     * @param type $sender Controller firing the event.
-     * @param string $reactionType Type of reaction content to show
+     * @param RootController $sender Controller firing the event.
+     * @param string $reaction Type of reaction content to show
      * @param int $page The current page of content
      */
     public function rootController_bestOfOld_create($sender, $reaction = 'everything') {
@@ -1070,9 +1070,8 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Add a "Best Of" view for reacted content.
      *
-     * @param type $sender Controller firing the event.
-     * @param string $reactionType Type of reaction content to show
-     * @param int $page The current page of content
+     * @param RootController $sender Controller firing the event.
+     * @param string $reaction Type of reaction content to show
      */
     public function rootController_bestOf_create($sender, $reaction = 'everything') {
         Gdn_Theme::section('BestOf');
@@ -1308,7 +1307,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Add Types to TagModel so that tabs in the dashboard will have more info to work with.
      *
-     * @sender TagModel $sender
+     * @param TagModel $sender
      */
     public function tagModel_types_handler($sender) {
         $sender->addType('BestOf', [

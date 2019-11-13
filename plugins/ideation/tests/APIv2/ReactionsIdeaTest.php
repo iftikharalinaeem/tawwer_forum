@@ -125,6 +125,16 @@ class ReactionsIdeaTest extends AbstractAPIv2Test {
         $this->assertIsVoteResponse($response, $type);
         $updated = $this->getDiscussion($id);
         $this->assertEquals($score, $updated['score']);
+
+        $reactions = $this->api()->get("discussions/{$id}/reactions", ['reactionType' => $vote])->getBody();
+        $found = false;
+        foreach ($reactions as $reaction) {
+            if ($reaction['userID'] === $this->api()->getUserID()) {
+                $found = true;
+                $this->assertEquals($vote, $reaction['reactionType']['urlcode'], '', 0.0, 10, false, true);
+            }
+        }
+        $this->assertTrue($found);
     }
 
     /**
