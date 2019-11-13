@@ -17,7 +17,15 @@ import { makeSiteSectionGroup } from "@subcommunities/products/productTypes";
 import { ILoadedProduct } from "@subcommunities/products/productReducer";
 
 interface IProps {
+    // Gdn_Form version (uncontrolled).
     initialValue: number | null | boolean; // Gdn_Form can give us some nasty values.
+    formFieldName: string;
+
+    // Controlled react component
+    value: number | string | null;
+    onChange?: (newValue: number | string | null) => void;
+
+    // Genenal props
     valueType: "sectionGroup" | "productID";
     disabled?: boolean;
 }
@@ -39,9 +47,13 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     }, [productsById]);
     const [modalOpen, setModalOpen] = useState(false);
 
-    const [value, setValue] = useState<number | string | null>(
+    const [ownValue, setOwnValue] = useState<number | string | null>(
         typeof props.initialValue === "boolean" ? null : props.initialValue,
     );
+
+    const setValue = props.onChange ?? setOwnValue;
+    const value = props.value ?? ownValue;
+
     const currentComboBoxValue = useMemo(() => {
         if (value == null) {
             return null;
@@ -86,6 +98,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             }
         >
             {modalOpen && <ProductManager onClose={() => setModalOpen(false)} asModal />}
+            <input name={props.formFieldName} type="hidden" value={value != null ? value : ""} />
             <DashboardSelect
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS || props.disabled}
                 options={options}
