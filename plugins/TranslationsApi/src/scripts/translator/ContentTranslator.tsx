@@ -121,12 +121,6 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                             renderAsDepth={2}
                             title={props.title}
                         />
-                        id={titleID}
-                        className={classes.title}
-                        depth={1}
-                        renderAsDepth={2}
-                        title={props.title}
-                        />
                     </DocumentTitle>
                     {content}
                 </div>
