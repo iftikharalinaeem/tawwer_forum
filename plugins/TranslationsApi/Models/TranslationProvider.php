@@ -10,6 +10,10 @@ namespace Vanilla\TranslationsApi\Models;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 
+/**
+ * Class TranslationProvider
+ * @package Vanilla\TranslationsApi\Models
+ */
 class TranslationProvider implements TranslationProviderInterface {
     /** @var TranslationsApiController $translationApi */
     private $translationModel;
@@ -23,21 +27,21 @@ class TranslationProvider implements TranslationProviderInterface {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function supportContentTranslation(): bool {
+    public function supportsContentTranslation(): bool {
         return true;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function translate(string $propertyKey, $sourceValue): string {
         return Gdn::translate($propertyKey, $sourceValue);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function translateContent(
         string $locale,
