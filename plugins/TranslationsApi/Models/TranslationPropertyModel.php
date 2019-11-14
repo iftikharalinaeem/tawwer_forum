@@ -155,7 +155,7 @@ class TranslationPropertyModel extends PipelineModel {
         $sql = $this->sql();
         $sql->from($this->getTable() . " as tp")
             ->select('tp.recordID')
-            ->join("translations t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
+            ->join("translation t", "tp.translationPropertyKey = t.translationPropertyKey", 'inner');
 
 
         if (count($properties) > 0) {
