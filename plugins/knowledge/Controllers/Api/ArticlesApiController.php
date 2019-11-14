@@ -218,7 +218,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "in")->setDescription("Delete an article draft.");
         $out = $this->schema([], "out");
 
-        $draft = $this->draftByID($draftID);
+        $draft = $this->draftByID($draftID, true);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
             $this->permission("Garden.Settings.Manage");
         }
