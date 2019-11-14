@@ -127,7 +127,7 @@ class ProductsApiController extends AbstractApiController {
      */
     public function index(): array {
         FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
-        $this->permission("'Garden.SignIn.Allow'");
+        $this->permission();
         $out = $this->schema([
             ":a" => $this->productSchema(),
         ], "out");
@@ -153,7 +153,7 @@ class ProductsApiController extends AbstractApiController {
      */
     public function get(int $id): array {
         FeatureFlagHelper::ensureFeature(ProductModel::FEATURE_FLAG);
-        $this->permission("Garden.SignIn.Allow");
+        $this->permission();
         $this->idParamSchema()->setDescription("Get an product id.");
 
         $product = $this->productByID($id);

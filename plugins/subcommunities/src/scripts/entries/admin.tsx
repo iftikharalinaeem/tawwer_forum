@@ -24,4 +24,5 @@ if (isProductIntgrationEnabled) {
         props => <ProductSelectorFormGroup {...props} formFieldName="siteSectionGroup" valueType="sectionGroup" />,
         { overwrite: true },
     );
+    addComponent("ProductSelectorFormGroup", ProductSelectorFormGroup);
 }
