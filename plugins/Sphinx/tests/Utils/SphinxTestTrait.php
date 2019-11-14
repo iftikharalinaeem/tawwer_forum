@@ -27,7 +27,7 @@ trait SphinxTestTrait {
         self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
         sleep(1);
 
-        if (true || !self::$sphinxReindexed) {
+        if (!self::$sphinxReindexed) {
             throw new \Exception('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
         }
     }
