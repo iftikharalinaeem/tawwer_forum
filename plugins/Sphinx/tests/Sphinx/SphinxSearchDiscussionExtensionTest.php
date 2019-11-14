@@ -8,6 +8,9 @@
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
+/**
+ * Test sphinx searching on discussions.
+ */
 class SphinxSearchDiscussionExtensionTest extends AbstractAPIv2Test {
     use \Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 
@@ -168,7 +171,6 @@ class SphinxSearchDiscussionExtensionTest extends AbstractAPIv2Test {
         }
 
         $this->assertNotEquals($first['discussionID'], $result['discussionID']);
-
     }
 
     /**

@@ -8,32 +8,35 @@
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
+/**
+ * Test sphinx searching on comments.
+ */
 class SphinxSearchCommentsExtensionTest extends AbstractAPIv2Test {
     use \Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 
     /** @var array */
     protected static $category;
 
-   /** @var array */
-   protected static $followedCategory;
+    /** @var array */
+    protected static $followedCategory;
 
     /** @var array */
     protected static $discussion;
 
-   /** @var array */
-   protected static $discussionAugust;
+    /** @var array */
+    protected static $discussionAugust;
 
-   /** @var array */
-   protected static $discussionFollowed;
+    /** @var array */
+    protected static $discussionFollowed;
 
     /** @var array */
     protected static $comment;
 
-   /** @var array */
-   protected static $febComment;
+    /** @var array */
+    protected static $febComment;
 
-   /** @var array */
-   protected static $marComment;
+    /** @var array */
+    protected static $marComment;
 
     /** @var Schema */
     protected static $commentsApiSchema;
@@ -131,98 +134,98 @@ class SphinxSearchCommentsExtensionTest extends AbstractAPIv2Test {
         $session->end();
     }
 
-   /**
-    * Test comments/search api.
-    */
-   public function testAllComments() {
-       $params = [
-           'query' => 'comment'
-       ];
-       $response = $this->api()->get('comments/search?' . http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
+    /**
+     * Test comments/search api.
+     */
+    public function testAllComments() {
+        $params = [
+            'query' => 'comment'
+        ];
+        $response = $this->api()->get('comments/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
 
-       $results = $response->getBody();
+        $results = $response->getBody();
 
-       $this->assertEquals(3, count($results));
+        $this->assertEquals(3, count($results));
 
-       foreach ($results as $result) {
-           self::$commentsApiSchema->validate($result);
-       }
-   }
+        foreach ($results as $result) {
+            self::$commentsApiSchema->validate($result);
+        }
+    }
 
-   /**
-    * Test comments/search api with limit.
-    */
-   public function testCommentsLimit() {
-       $params = [
-           'query' => 'comment',
-           'limit' => 1
-       ];
-       $response = $this->api()->get('comments/search?' . http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
+    /**
+     * Test comments/search api with limit.
+     */
+    public function testCommentsLimit() {
+        $params = [
+            'query' => 'comment',
+            'limit' => 1
+        ];
+        $response = $this->api()->get('comments/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
 
-       $results = $response->getBody();
+        $results = $response->getBody();
 
-       $this->assertEquals(1, count($results));
+        $this->assertEquals(1, count($results));
 
-       foreach ($results as $result) {
-           self::$commentsApiSchema->validate($result);
-       }
-       $first = $result;
+        foreach ($results as $result) {
+            self::$commentsApiSchema->validate($result);
+        }
+        $first = $result;
 
-       $params = [
-           'query' => 'comment',
-           'limit' => 1,
-           'page' => 2
-       ];
-       $response = $this->api()->get('comments/search?' . http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
+        $params = [
+            'query' => 'comment',
+            'limit' => 1,
+            'page' => 2
+        ];
+        $response = $this->api()->get('comments/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
 
-       $results = $response->getBody();
+        $results = $response->getBody();
 
-       $this->assertEquals(1, count($results));
+        $this->assertEquals(1, count($results));
 
-       foreach ($results as $result) {
-           self::$commentsApiSchema->validate($result);
-       }
+        foreach ($results as $result) {
+            self::$commentsApiSchema->validate($result);
+        }
 
-       $this->assertNotEquals($first['commentID'], $result['commentID']);
+        $this->assertNotEquals($first['commentID'], $result['commentID']);
 
-   }
+    }
 
-   /**
-    * Test comments/search api scoped to particular categoryID.
-    */
-   public function testCommentsByCategoryID() {
-       $params = [
-           'query' => 'comment',
-           'categoryID' => self::$category['categoryID']
-       ];
-       $response = $this->api()->get('comments/search?' . http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
+    /**
+     * Test comments/search api scoped to particular categoryID.
+     */
+    public function testCommentsByCategoryID() {
+        $params = [
+            'query' => 'comment',
+            'categoryID' => self::$category['categoryID']
+        ];
+        $response = $this->api()->get('comments/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
 
-       $results = $response->getBody();
+        $results = $response->getBody();
 
-       $this->assertEquals(2, count($results));
+        $this->assertEquals(2, count($results));
 
-       foreach ($results as $result) {
-           self::$commentsApiSchema->validate($result);
-       }
-   }
+        foreach ($results as $result) {
+            self::$commentsApiSchema->validate($result);
+        }
+    }
 
-   /**
-    * Test comments/search api scoped to not existing categoryID.
-    */
-   public function testCommentsByWrongCategoryID() {
-       $params = [
-           'query' => 'comment',
-           'categoryID' => 404
-       ];
-       $response = $this->api()->get('comments/search?' . http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
+    /**
+     * Test comments/search api scoped to not existing categoryID.
+     */
+    public function testCommentsByWrongCategoryID() {
+        $params = [
+            'query' => 'comment',
+            'categoryID' => 404
+        ];
+        $response = $this->api()->get('comments/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
 
-       $results = $response->getBody();
+        $results = $response->getBody();
 
-       $this->assertEquals(0, count($results));
-   }
+        $this->assertEquals(0, count($results));
+    }
 }
