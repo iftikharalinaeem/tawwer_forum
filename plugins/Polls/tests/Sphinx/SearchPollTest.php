@@ -6,9 +6,11 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 class SearchPollTest extends AbstractAPIv2Test {
+    use SphinxTestTrait;
 
     /** @var array */
     protected static $category;
@@ -33,12 +35,6 @@ class SearchPollTest extends AbstractAPIv2Test {
 
     /** @var Schema */
     protected static $searchResultSchema;
-
-    /** @var bool */
-    protected static $sphinxReindexed;
-
-    /** @var array */
-    protected static $dockerResponse;
 
     protected static $addons = ['vanilla', 'sphinx', 'polls', 'advancedsearch'];
 
@@ -124,22 +120,10 @@ class SearchPollTest extends AbstractAPIv2Test {
         $session->end();
     }
 
-    public static function sphinxReindex() {
-        $sphinxHost = c('Plugins.Sphinx.Server');
-        exec('curl '.$sphinxHost.':9399', $dockerResponse);
-        self::$dockerResponse = $dockerResponse;
-        self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
-        sleep(1);
-    }
-
-
     /**
      * Test search scoped to discussions.
      */
     public function testRecordTypesDiscussion() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'recordTypes' => 'discussion',
@@ -160,9 +144,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to discussions.
      */
     public function testTypesDiscussion() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'recordTypes' => 'discussion',
@@ -186,9 +167,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to comments.
      */
     public function testRecordTypesComment() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$comment['rawBody'],
             'recordTypes' => 'comment',
@@ -209,9 +187,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to comments.
      */
     public function testRecordTypesPoll() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => 'discussion',
             'recordTypes' => 'discussion',
@@ -234,9 +209,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to a discussion.
      */
     public function testExistingDiscussionID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$comment['rawBody'],
             'discussionID' => self::$discussion['discussionID'],
@@ -257,9 +229,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to a category.
      */
     public function testExistingCategoryID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'categoryID' => self::$category['categoryID'],
@@ -280,9 +249,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search scoped to a category.
      */
     public function testPollCategoryID() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => 'discussion',
             'categoryID' => self::$pollCategory['categoryID'],
@@ -303,9 +269,6 @@ class SearchPollTest extends AbstractAPIv2Test {
      * Test search by user IDs
      */
     public function testInsertUserIDs() {
-        if (!self::$sphinxReindexed)
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => 'discussion',
             'insertUserIDs' => '1,2',
@@ -320,5 +283,4 @@ class SearchPollTest extends AbstractAPIv2Test {
             self::$searchResultSchema->validate($result);
         }
     }
-
 }
