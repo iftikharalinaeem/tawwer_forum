@@ -16,11 +16,11 @@ class DebugSiteNodePlugin extends SiteNodePlugin {
      * Make a call to a Site Hub spoofing as one of its nodes.
      *
      * @param UtilityController $sender
-     * @throws Gdn_UserException
+     * @throws Gdn_UserException For missing config settings.
      */
     public function utilityController_spoofSyncNode_create(UtilityController $sender) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('title',  'Synchronize From a Hub');
+        $sender->setData('title', 'Synchronize From a Hub');
         $sender->setData('messageclass', 'danger');
         $sender->setData('instructions', 'Be careful you are about to overwrite a lot of data in your local database.');
         $sender->setData('configuredHubURL', c('Hub.Spoof.Values.hubURL', 'You have not configured a forum from which to sync. (Hub.Spoof.Values.hubURL)') );
@@ -58,8 +58,8 @@ class DebugSiteNodePlugin extends SiteNodePlugin {
 
     /**
      * Get the parameters from the confg and arrange them into a nice array.
-     * 
-     * @param $spoofValues
+     *
+     * @param array $spoofValues Configured values from that imitate a node's values.
      * @return array
      */
     private function _generateParams($spoofValues): array {
