@@ -7,6 +7,9 @@
 
 namespace Vanilla\Sphinx\Tests\Utils;
 
+/**
+ * Adds a method to re-index sphinx for use in tests.
+ */
 trait SphinxTestTrait {
    /** @var bool */
    protected static $sphinxReindexed;
@@ -14,6 +17,9 @@ trait SphinxTestTrait {
    /** @var array */
    protected static $dockerResponse;
 
+   /**
+    * Reindex sphinx.
+    */
    public static function sphinxReindex() {
       $sphinxHost = c('Plugins.Sphinx.Server');
       exec('curl -s '.$sphinxHost.':9399', $dockerResponse);
@@ -26,6 +32,9 @@ trait SphinxTestTrait {
       }
    }
 
+   /**
+    * Assert that sphinx has been properly re-indexed.
+    */
    protected function assertSphinxReindexed() {
       if (!self::$sphinxReindexed) {
             $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
