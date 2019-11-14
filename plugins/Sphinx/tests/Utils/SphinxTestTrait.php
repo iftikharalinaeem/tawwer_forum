@@ -11,33 +11,33 @@ namespace Vanilla\Sphinx\Tests\Utils;
  * Adds a method to re-index sphinx for use in tests.
  */
 trait SphinxTestTrait {
-   /** @var bool */
-   protected static $sphinxReindexed;
+    /** @var bool */
+    protected static $sphinxReindexed;
 
-   /** @var array */
-   protected static $dockerResponse;
+    /** @var array */
+    protected static $dockerResponse;
 
-   /**
-    * Reindex sphinx.
-    */
-   public static function sphinxReindex() {
-      $sphinxHost = c('Plugins.Sphinx.Server');
-      exec('curl -s '.$sphinxHost.':9399', $dockerResponse);
-      self::$dockerResponse = $dockerResponse;
-      self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
-      sleep(1);
+    /**
+     * Reindex sphinx.
+     */
+    public static function sphinxReindex() {
+        $sphinxHost = c('Plugins.Sphinx.Server');
+        exec('curl -s ' . $sphinxHost . ':9399', $dockerResponse);
+        self::$dockerResponse = $dockerResponse;
+        self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
+        sleep(1);
 
-      if (!self::$sphinxReindexed) {
-         throw new \Exception('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-      }
-   }
+        if (true || !self::$sphinxReindexed) {
+            throw new \Exception('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
+    }
 
-   /**
-    * Assert that sphinx has been properly re-indexed.
-    */
-   protected function assertSphinxReindexed() {
-      if (!self::$sphinxReindexed) {
-            $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-      }
-   }
+    /**
+     * Assert that sphinx has been properly re-indexed.
+     */
+    protected function assertSphinxReindexed() {
+        if (!self::$sphinxReindexed) {
+            $this->fail('Can\'t reindex Sphinx indexes!' . "\n" . end(self::$dockerResponse));
+        }
+    }
 }
