@@ -3,7 +3,7 @@
     "version": "1.2.1",
     "license": "Proprietary",
     "icon": "node.png",
-    "key": "debugsitenode",
+    "key": "debugmultisite",
     "type": "addon",
     "hidden": true,
     "description": "Synchronize locally a Hub from infrastructure by spoofing being a legitimate Node.",
