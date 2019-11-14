@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 class SphinxSearchTest extends AbstractAPIv2Test {
+    use \Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 
     /** @var array */
     protected static $category;
@@ -16,8 +17,8 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     /** @var array */
     protected static $discussion;
 
-   /** @var array */
-   protected static $discussionAugust;
+    /** @var array */
+    protected static $discussionAugust;
 
     /** @var array */
     protected static $comment;
@@ -25,11 +26,11 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     /** @var Schema */
     protected static $searchResultSchema;
 
-   /** @var bool */
-   protected static $sphinxReindexed;
+    /** @var bool */
+    protected static $sphinxReindexed;
 
-   /** @var array */
-   protected static $dockerResponse;
+    /** @var array */
+    protected static $dockerResponse;
 
     protected static $addons = ['vanilla', 'sphinx', 'advancedsearch'];
 
@@ -39,8 +40,8 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
-       saveToConfig('Plugins.Sphinx.Server', '127.0.0.1');
-       saveToConfig('Plugins.Sphinx.UseDeltas', true);
+        saveToConfig('Plugins.Sphinx.Server', '127.0.0.1');
+        saveToConfig('Plugins.Sphinx.UseDeltas', true);
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
@@ -68,12 +69,12 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         ]);
         self::$discussion['rawBody'] = $tmp;
 
-       self::$discussionAugust = $discussionsAPIController->post([
-          'name' => 'August test 2019',
-          'body' => 'August test 2019',
-          'format' => 'markdown',
-          'categoryID' => self::$category['categoryID'],
-       ]);
+        self::$discussionAugust = $discussionsAPIController->post([
+            'name' => 'August test 2019',
+            'body' => 'August test 2019',
+            'format' => 'markdown',
+            'categoryID' => self::$category['categoryID'],
+        ]);
 
         $tmp = uniqid('comment_');
         self::$comment = $commentAPIController->post([
@@ -92,50 +93,35 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         $session->end();
     }
 
-    public static function sphinxReindex() {
-         $sphinxHost = c('Plugins.Sphinx.Server');
-         exec('curl '.$sphinxHost.':9399', $dockerResponse);
-         self::$dockerResponse = $dockerResponse;
-         self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
-         sleep(1);
+    /**
+     * Test search scoped to discussions.
+     */
+    public function testRecordTypesDiscussion() {
+        $params = [
+            'query' => self::$discussion['name'],
+            'recordTypes' => 'discussion',
+        ];
+        $response = $this->api()->get('/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(1, count($results));
+        foreach ($results as $result) {
+            self::$searchResultSchema->validate($result);
+        }
+        $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
     }
-
-
-   /**
-    * Test search scoped to discussions.
-    */
-   public function testRecordTypesDiscussion() {
-      if (!self::$sphinxReindexed)
-         $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
-      $params = [
-         'query' => self::$discussion['name'],
-         'recordTypes' => 'discussion',
-      ];
-      $response = $this->api()->get('/search?'.http_build_query($params));
-      $this->assertEquals(200, $response->getStatusCode());
-
-      $results = $response->getBody();
-
-      $this->assertEquals(1, count($results));
-      foreach ($results as $result) {
-         self::$searchResultSchema->validate($result);
-      }
-      $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
-   }
 
     /**
      * Test search scoped to comments.
      */
     public function testRecordTypesComment() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$comment['rawBody'],
             'recordTypes' => 'comment',
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
@@ -151,14 +137,11 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      * Test search scoped to a discussion.
      */
     public function testExistingDiscussionID() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'discussionID' => self::$discussion['discussionID'],
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
@@ -174,14 +157,11 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      * Test search scoped to a non existing discussion.
      */
     public function testNonExistingDiscussionID() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$comment['rawBody'],
             'discussionID' => 999999,
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
@@ -193,14 +173,11 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      * Test search scoped to a category.
      */
     public function testExistingCategoryID() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'categoryID' => self::$category['categoryID'],
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
 
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -218,15 +195,12 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      * Test search scoped to a non existing category.
      */
     public function testNonExistingCategoryID() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'categoryID' => 777,
         ];
-       $api = $this->api();
-        $response = $api->get('/search?'.http_build_query($params));
+        $api = $this->api();
+        $response = $api->get('/search?' . http_build_query($params));
 
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -235,25 +209,21 @@ class SphinxSearchTest extends AbstractAPIv2Test {
     }
 
 
-
     /**
      * Test search by user names.
      */
     public function testInsertUserNames() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'insertUserNames' => 'travis,daffewfega',
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
 
-       // Correct value is 2.
-       // Partially fixed https://github.com/vanilla/internal/issues/1963
+        // Correct value is 2.
+        // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
         foreach ($results as $result) {
             self::$searchResultSchema->validate($result);
@@ -264,20 +234,17 @@ class SphinxSearchTest extends AbstractAPIv2Test {
      * Test search by user IDs
      */
     public function testInsertUserIDs() {
-       if (!self::$sphinxReindexed)
-          $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
-
         $params = [
             'query' => self::$discussion['name'],
             'insertUserIDs' => '1,2',
         ];
-        $response = $this->api()->get('/search?'.http_build_query($params));
+        $response = $this->api()->get('/search?' . http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
 
-       // Correct value is 2.
-       // Partially fixed https://github.com/vanilla/internal/issues/1963
+        // Correct value is 2.
+        // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
         foreach ($results as $result) {
             self::$searchResultSchema->validate($result);
