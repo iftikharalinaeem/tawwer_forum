@@ -286,10 +286,11 @@ class ArticleDraftsTest extends AbstractResourceTest {
      */
     public function testDeleteDeleted() {
         $draft = $this->prepareDeletedKnowledgeBase(true);
-        $this->expectException(NotFoundException::class);
 
         $r = $this->api()->delete(
             "{$this->baseUrl}/{$draft['draftID']}"
         );
+
+        $this->assertEquals(204, $r->getStatusCode());
     }
 }
