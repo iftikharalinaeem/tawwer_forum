@@ -190,7 +190,6 @@ class SphinxSearchCommentsExtensionTest extends AbstractAPIv2Test {
         }
 
         $this->assertNotEquals($first['commentID'], $result['commentID']);
-
     }
 
     /**
