@@ -41,6 +41,18 @@ if (count($this->data('WarningTypes', [])) <= 1) {
     </div>
 <?php
 }
+
+$ruleOptions = $this->data('RuleOptions', []);
+if (!empty($ruleOptions)) {
+    ?>
+    <div class="P">
+        <?php
+        echo $this->Form->label("Infringed rule", 'RuleID', ['class' => 'B']);
+        echo $this->Form->dropDown('RuleID', $ruleOptions, ['IncludeNull' => true]);
+        ?>
+    </div>
+    <?php
+}
 ?>
 
 <div class="P">

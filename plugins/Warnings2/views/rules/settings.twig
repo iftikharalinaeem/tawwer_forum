@@ -1,0 +1,26 @@
+{{ Heading|raw }}
+<div class="table-wrap">
+    <table id="Rules" class="table-data js-tj">
+        <thead>
+        <tr>
+            <th class="TemplateName column-lg">Rule Name</th>
+            <th class="options column-sm"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for Rule in Rules %}
+            <tr id="Rule_{{ Rule.RuleID }}">
+                <td class="NameColumn">
+                    <div class="strong">{{ Rule.Name }}</div>
+                </td>
+                <td class="options">
+                    <div class="btn-group">
+                        {{ Form.Buttons.Edit[Rule.RuleID]|raw }}
+                        {{ Form.Buttons.Delete[Rule.RuleID]|raw }}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -99,6 +99,14 @@ function writeUserNoteWarning($row) {
                 '</div>';
         }
 
+        if (isset($row['Rule']['Name'])) {
+            echo '<b>'.t('Infringed rule').'</b>: ' . $row['Rule']['Name'];
+
+            if (isset($row['Rule']['Description'])) {
+                echo '<div class="Meta">' . $row['Rule']['Description'] . '</div>';
+            }
+        }
+
         if (val('RecordBody', $row)) {
             echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
         } elseif (val('Record', $row)) {

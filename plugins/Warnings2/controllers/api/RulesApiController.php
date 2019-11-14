@@ -1,0 +1,219 @@
+<?php
+/**
+ * API controller for the `/rules` resource.
+ *
+ * @author Patrick Desjardins <patrick.d@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ */
+
+use Vanilla\ApiUtils;
+use Garden\Web\Exception\ServerException;
+use Garden\Schema\Schema;
+
+/**
+ * Class RuleApiController
+ */
+class RulesApiController extends AbstractApiController {
+
+    /** @var RuleModel */
+    private $ruleModel;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /** @var Schema */
+    private $ruleSchema;
+
+    public function __construct(RuleModel $ruleModel, UserModel $userModel) {
+        $this->ruleModel = $ruleModel;
+        $this->userModel = $userModel;
+    }
+
+    /**
+     * Delete a rule.
+     *
+     * @param int $id
+     */
+    public function delete($id) {
+        $this->permission();
+
+        $in = $this->schema(['id:i' => 'The rule ID.'], 'in')->setDescription('Delete a rule.');
+        $in->validate(['id' => $id]);
+
+        $this->ruleModel->delete(['RuleID' => $id]);
+    }
+
+    /**
+     * Get a rule by id.
+     *
+     * @param $ruleID
+     * @return array
+     */
+    public function get($ruleID) {
+        $this->idParamRuleSchema()->validate(['id' => $ruleID]);
+        $out = $this->schema([':a' => $this->ruleSchema()], 'out');
+
+
+        $rule = $this->getRuleByID($ruleID);
+        return $out->validate($this->normalizeOutput($rule));
+    }
+
+    private function idParamRuleSchema() {
+        return $this->schema(['id:i' => 'The rule ID.'], 'in');
+    }
+
+    /**
+     * Get a list of reaction types.
+     *
+     * @return array
+     */
+    public function index() {
+        $out = $this->schema([':a' => $this->ruleSchema()], 'out');
+        $rows = $this->ruleModel->get();
+
+        foreach ($rows as &$row) {
+            $row = $this->normalizeOutput($row);
+        }
+
+        return $out->validate($rows);
+    }
+
+    /**
+     * Normalize a Schema record to match the database definition.
+     *
+     * @param array $schemaRecord Schema record.
+     * @return array Return a database record.
+     */
+    public function normalizeInput(array $schemaRecord) {
+        return ApiUtils::convertInputKeys($schemaRecord);
+    }
+
+    /**
+     * Update a rule.
+     *
+     * @param int $id The ID of the rule to update.
+     * @param array $body The request body.
+     * @return array
+     */
+    public function patch($id, array $body) {
+        $this->permission();
+
+        $in = $this->postRuleSchema()->setDescription('Update a rule.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $this->idParamRuleSchema()->validate(['id' => $id], true);
+        $this->getRuleByID($id);
+
+        $body = $this->normalizeInput($in->validate($body, true));
+
+        $this->ruleModel->update($body, ['RuleID' => $id]);
+        $this->validateModel($this->ruleModel);
+
+        $rule = $this->ruleModel->getID($id);
+        $this->userModel->expandUsers($rule, ['InsertUserID', 'UpdateUserID']);
+
+        return $out->validate($this->normalizeOutput($rule));
+    }
+
+    /**
+     * Create a rule.
+     *
+     * @throws ServerException If the badge could not be created.
+     * @param array $body The request body.
+     * @return array
+     */
+    public function post(array $body) {
+        $this->permission();
+
+        $in = $this->postRuleSchema()->setDescription('Create a rule.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $body = $in->validate($body);
+        $rule = $this->normalizeInput($body);
+
+        $id = $this->ruleModel->insert($rule);
+        $this->validateModel($this->ruleModel);
+
+        if (!$id) {
+            throw new ServerException('Unable to create rule.', 500);
+        }
+
+        $rule = $this->ruleModel->getID($id);
+        $this->userModel->expandUsers($rule, ['InsertUserID', 'UpdateUserID']);
+
+        return $out->validate($this->normalizeOutput($rule));
+    }
+
+    /**
+     * Get a rule schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function postRuleSchema() {
+        $schema = $this->schema(
+            Schema::parse([
+                'name',
+                'description',
+            ])->add($this->fullSchema()),
+            'RulePost'
+        );
+        return $this->schema($schema, 'in');
+    }
+
+    /**
+     * Get the full role schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function ruleSchema($type = '') {
+        if ($this->ruleSchema === null) {
+            $this->ruleSchema = $this->schema($this->fullSchema(), 'Rule');
+        }
+        return $this->schema($this->ruleSchema, $type);
+    }
+
+    /**
+     * Get a schema instance comprised of all available category fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    private function fullSchema() {
+        $schema = Schema::parse([
+            'ruleID:i' => 'The ID of the rule.',
+            'name:s' => 'The name of the rule.',
+            'description:s|n' => [
+                'description' => 'The description of the rule.',
+                'minLength' => 0,
+            ],
+            'dateInserted:dt' => 'When the rule was created.',
+            'DateUpdated:dt|n' => 'When the rule was last updated.',
+            'insertUserID:i' => 'The user that created the rule.',
+            'insertUser?' => $this->getUserFragmentSchema(),
+        ]);
+
+        return $schema;
+    }
+
+    /**
+     * Get a rule by ID, throws an exception if the rule is not found.
+     *
+     * @param int $id
+     * @return array
+     */
+    private function getRuleByID(int $id): array {
+        return $this->ruleModel->getID($id);
+    }
+
+    /**
+     * Normalize a database record to match the Schema definition.
+     *
+     * @param array $dbRecord Database record.
+     * @param array|false $expand
+     * @return array Return a Schema record.
+     */
+    protected function normalizeOutput(array $dbRecord, array $expand = []): array {
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        return $schemaRecord;
+    }
+}

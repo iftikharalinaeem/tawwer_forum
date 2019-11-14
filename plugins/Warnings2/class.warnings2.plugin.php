@@ -21,6 +21,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public $pageSize = 20;
 
+    private $ruleModel;
+
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
      */
@@ -30,9 +32,13 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
+     * @param RuleModel $ruleModel
      */
-    public function __construct() {
+    public function __construct(RuleModel $ruleModel) {
         parent::__construct();
+        $this->ruleModel = $ruleModel;
+
+        $test = $this->ruleModel->get();
         $this->fireEvent('Init');
     }
 
@@ -715,6 +721,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         $warningModel = new WarningModel();
         $note['HideWarnerIdentity'] = $warningModel->HideWarnerIdentity;
 
+        if (!empty($note['RuleID'])) {
+            $note['Rule'] = $this->ruleModel->getID($note['RuleID']);
+        }
+
         // Join record in question with note.
         $notes = [];
         $notes[] = $note;
@@ -722,6 +732,41 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->setData('Notes', $notes);
         $sender->render('viewnote', '', 'plugins/Warnings2');
+    }
+
+    /**
+     * @param SettingsController $sender
+     */
+    public function settingsController_rules_create(SettingsController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+
+        $rules = $this->ruleModel->get()->result(DATASET_TYPE_ARRAY);
+
+        $form = [];
+        if (!empty($rules)) {
+            foreach ($rules as $rule) {
+                $form['Buttons']['Edit'][$rule['RuleID']] = anchor(
+                    dashboardSymbol('edit'),
+                    '/edit/rule/'.$rule['RuleID'],
+                    'btn btn-icon',
+                    ['aria-label' => t('Edit'), 'title' => t('Edit')]
+                );
+                $form['Buttons']['Delete'][$rule['RuleID']] = anchor(
+                    dashboardSymbol('delete'),
+                    '/settings/deleterule?ruleid='.$rule['RuleID'],
+                    'js-modal-confirm btn btn-icon',
+                    ['aria-label' => t('Delete'), 'title' => t('Delete')]
+                );
+            }
+        }
+
+        $sender->setData('Heading', heading('Rules', sprintf(t('Add %s'), t('Rules'))));
+        $sender->setData('Templates', $rules);
+        $sender->setData('Form', $form);
+
+        $sender->addSideMenu();
+
+        $sender->render('settings', '', 'plugins/Warnings2/views');
     }
 
     /**
@@ -828,8 +873,17 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->setValue('AttachRecord', true);
         }
 
+        $ruleOptions = [];
+        $rules = $this->ruleModel->get();
+        foreach ($rules as $rule) {
+            $ruleOptions[$rule['RuleID']] = [
+                'Text' => $rule['Name'] ?? null,
+            ];
+        }
+
         $sender->setData('Profile', $user);
         $sender->setData('Title', sprintf(t('Warn %s'), htmlspecialchars(val('Name', $user))));
+        $sender->setData('RuleOptions', $ruleOptions);
 
         $sender->View = 'Warn';
         $sender->ApplicationFolder = 'plugins/Warnings2';
