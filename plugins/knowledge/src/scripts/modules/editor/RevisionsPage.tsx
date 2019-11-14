@@ -15,7 +15,7 @@ import RevisionsList from "@knowledge/modules/editor/components/RevisionsList";
 import RevisionsListItem from "@knowledge/modules/editor/components/RevisionsListItem";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import RevisionsPageModel from "@knowledge/modules/editor/RevisionsPageModel";
-import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
+import { EditorRoute, RevisionsRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -34,6 +34,7 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -69,6 +70,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
                 <AnalyticsData uniqueKey={analyticsDataID} />
+                <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 <PageLoader status={loadStatus}>
                     <DocumentTitle title={t("Article Revisions")}>
                         <form className={classNames(inheritHeightClass())} onSubmit={this.onSubmit}>

@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { IResponseArticleDraft } from "@knowledge/@types/api/article";
+import { IResponseArticleDraft, IArticle } from "@knowledge/@types/api/article";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
@@ -25,6 +25,8 @@ import { editorHeaderClasses } from "@knowledge/modules/editor/components/editor
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
+import { ArticleRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
+import { article } from "@knowledge/navigation/navigationManagerIcons";
 
 interface IProps {
     callToAction?: string;
