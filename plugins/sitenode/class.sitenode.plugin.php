@@ -246,7 +246,15 @@ class SiteNodePlugin extends Gdn_Plugin {
         return val('NODE_SLUG', $_SERVER);
     }
 
-    public function syncNode($params = []) {
+    /**
+     *  Call the hub from the node to bring over data and update the local db and config.
+     *
+     * @param array $params Optionally pass parameters for debugging purposes.
+     * @throws Gdn_UserException
+     *
+     * @return mixed;
+     */
+    public function syncNode($params = []) :array {
         // Get the config from the hub.
         $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', $params + ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
@@ -254,7 +262,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             return;
         }
 
-        $siteID = valr('Multisite.MultisiteID', $config);
+        $siteID = valr('Multisite.MultisiteID', $config;
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {

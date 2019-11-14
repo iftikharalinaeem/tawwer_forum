@@ -23,10 +23,10 @@ class DebugSiteNodePlugin extends SiteNodePlugin {
         $sender->setData('title', 'Synchronize From a Hub');
         $sender->setData('messageclass', 'danger');
         $sender->setData('instructions', 'Be careful you are about to overwrite a lot of data in your local database.');
-        $sender->setData('configuredHubURL', c('Hub.Spoof.Values.hubURL', 'You have not configured a forum from which to sync. (Hub.Spoof.Values.hubURL)') );
+        $sender->setData('configuredHubURL', c('Hub.Spoof.Values.hubURL', 'You have not configured a forum from which to sync. (Hub.Spoof.Values.hubURL)'));
         $sender->setData('configuredSpoofSlug', c('Hub.Spoof.Values.spoofSlug'), 'You have not configured the node slug you wish to imitate. (Hub.Spoof.Values.spoofSlug)');
         $sender->setData('configuredSpoofToken', c('Hub.Spoof.Values.spoofToken'), 'You have not configured API V1 Token of the hube site. (Hub.Spoof.Values.spoofToken)');
-        $spoofValues = c('Hub.Spoof.Values',[]);
+        $spoofValues = c('Hub.Spoof.Values', []);
         $params = $this->_generateParams($spoofValues);
         if ($sender->Form->AuthenticatedPostBack()) {
             if (!$spoofValues['hubURL']) {
