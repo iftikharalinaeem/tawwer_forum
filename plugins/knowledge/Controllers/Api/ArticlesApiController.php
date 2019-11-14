@@ -15,6 +15,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn_Format;
 use UserModel;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
@@ -269,6 +270,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $out = $this->articleSchema("out");
         $article = $this->retrieveRow($id, $query);
+
         $this->userModel->expandUsers(
             $article,
             ["insertUserID", "updateUserID"]
@@ -1466,8 +1468,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $record = reset($record);
 
         if (!$record) {
-            throw new ClientException("Article not found", 404);
+            throw new NotFoundException("Article");
         }
+
+        if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
+            // Deleted articles have a special permission check.
+            $this->permission('kb.articles.add');
+        }
+
         return $record;
     }
 
