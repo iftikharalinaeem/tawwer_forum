@@ -90,7 +90,9 @@ class TranslationsApiController extends AbstractApiController {
 
         $resourceExists = $this->resourceModel->get(
             [
-                "urlCode" => $body["urlCode"]
+                "name" => $body["name"],
+                "sourceLocale" => $body["sourceLocale"],
+                "urlCode" => $body["urlCode"],
             ]
         );
 
