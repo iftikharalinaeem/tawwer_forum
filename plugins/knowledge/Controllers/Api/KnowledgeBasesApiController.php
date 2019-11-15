@@ -85,7 +85,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $row = $this->knowledgeBaseByID($id);
         if (isset($query['locale'])) {
             $row['locale'] = $query['locale'];
-            $row = reset($this->translateProperties([$row], $query['locale']));
+            $rows = $this->translateProperties([$row], $query['locale']);
+            $row = reset($rows);
         }
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
