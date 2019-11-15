@@ -89,6 +89,7 @@ export function ProductManagerItem(props: IProps) {
     // Post to the products API and call are after submit handler.
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         if (actualProduct) {
             void patchProduct({
                 productID: actualProduct.productID,
