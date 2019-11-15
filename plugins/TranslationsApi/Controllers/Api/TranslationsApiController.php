@@ -191,7 +191,7 @@ class TranslationsApiController extends AbstractApiController {
      * @param string $path
      * @param array $body
      */
-    public function delete(string $path, array $body) {
+    public function patch_delete(string $path, array $body) {
         $this->permission("Garden.Moderation.Manage");
         $in = $this->schema([":a" => $this->deleteTranslationSchema()], "in");
         $path = substr($path, 1);

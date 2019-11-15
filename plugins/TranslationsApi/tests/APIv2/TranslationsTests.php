@@ -137,30 +137,30 @@ class TranslationsTests extends AbstractAPIv2Test {
         ];
     }
 
-//    /**
-//     * Test Deleting a translation.
-//     *
-//     * @depends testPostResource
-//     */
-//    public function testDeleteTranslation() {
-//        $record = [
-//            "recordType" => "recordTypeOne",
-//            "recordID" => 8,
-//            "recordKey" => null,
-//            "propertyName" => "category-name",
-//            "locale" => "en",
-//            "translation" => "english recordTypeOne category-name"
-//        ];
-//
-//        $this->api()->put(
-//            'translations/resourceOne',
-//            [$record]
-//        );
-//
-//        unset($record["translation"]);
-//
-//        $result = $this->api()->delete('translations/resourceOne');
-//
-//        $this->assertEquals(204, $result->getStatusCode());
-//    }
+    /**
+     * Test Deleting a translation.
+     *
+     * @depends testPostResource
+     */
+    public function testPatchDeleteTranslation() {
+        $record = [
+            "recordType" => "recordTypeOne",
+            "recordID" => 8,
+            "recordKey" => null,
+            "propertyName" => "category-name",
+            "locale" => "en",
+            "translation" => "english recordTypeOne category-name"
+        ];
+
+        $this->api()->patch(
+            'translations/resourceOne',
+            [$record]
+        );
+
+        unset($record["translation"]);
+
+        $result = $this->api()->patch('translations/resourceOne/delete', [$record]);
+
+        $this->assertEquals(200, $result->getStatusCode());
+    }
 }
