@@ -55,11 +55,13 @@ class KnowledgeBasePage extends React.Component<IProps> {
                 id: knowledgeBase.defaultArticleID.toString(),
             },
         };
-        return <ArticlePage match={match} />;
+        return <ArticlePage match={match} isHomeArticle={true} isOnlyKb={this.props.isOnlyKb} />;
     }
 }
 
-interface IOwnProps extends RouteComponentProps<{ urlCode: string }> {}
+interface IOwnProps extends RouteComponentProps<{ urlCode: string }> {
+    isOnlyKb?: boolean;
+}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 

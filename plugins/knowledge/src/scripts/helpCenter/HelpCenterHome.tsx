@@ -82,7 +82,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                 />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar />
+                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}
@@ -110,6 +110,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
 interface IOwnProps {
     knowledgeBase: IKnowledgeBase;
+    isOnlyKb?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

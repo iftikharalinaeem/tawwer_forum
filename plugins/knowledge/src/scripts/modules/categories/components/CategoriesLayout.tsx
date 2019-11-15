@@ -71,6 +71,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         return (
             <Container>
                 <TitleBar
+                    useMobileBackButton={true}
                     title={category.name}
                     mobileDropDownContent={
                         <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
