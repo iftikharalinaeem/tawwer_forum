@@ -19,6 +19,10 @@ use Vanilla\Site\SiteSectionModel;
  * A model for managing knowledge bases.
  */
 class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
+    // Record type for knowledge categories.
+    const RECORD_TYPE = "knowledgeBase";
+    const RECORD_ID = "knowledgeBaseID";
+
     const TYPE_GUIDE = 'guide';
     const TYPE_HELP = 'help';
     const SPHINX_ARTICLES_COUNTER_ID = 5;

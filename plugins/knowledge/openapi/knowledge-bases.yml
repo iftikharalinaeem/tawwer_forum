@@ -14,6 +14,27 @@ paths:
               - deleted
               - published
             type: string
+        - description: Locale the knowledge base names and descriptions to be represented in. (When translated properties are available)
+          in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+          example: fr
+        - description: Locale to filter knowwledge bases by sourceLocale property.
+          in: query
+          name: sourceLocale
+          required: false
+          schema:
+            type: string
+          example: en
+        - description: Site section group to filter knowwledge bases by.
+          in: query
+          name: siteSectionGroup
+          required: false
+          schema:
+            type: string
+          example: vanilla
       responses:
         "200":
           content:
@@ -215,13 +236,19 @@ paths:
       summary: Delete a knowledge base.
     get:
       parameters:
-        - description: |
-            <p>Knowledge base ID.</p>
+        - description: Knowledge base ID.
           in: path
           name: id
           required: true
           schema:
             type: integer
+        - description: Locale the knowledge base name and description to be represented in. (When translated properties are available)
+          in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+          example: fr
       responses:
         "200":
           content:
