@@ -95,7 +95,7 @@ paths:
             schema:
               type: string
         responses:
-          '204':
+          '200':
             description: Success
         tags:
           - Translations
@@ -119,12 +119,11 @@ paths:
                   propertyName:
                     description: The property name associated to the translation.
                     type: string
-          required:
-            - recordType
-            - locale
-            - propertyName
-          type: object
-        required: true
+                required:
+                - recordType
+                - locale
+                - propertyName
+                type: object
       summary: Delete a specified translations.
   /translations:
     x-hidden: true
