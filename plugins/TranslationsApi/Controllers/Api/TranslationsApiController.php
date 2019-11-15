@@ -202,13 +202,14 @@ class TranslationsApiController extends AbstractApiController {
             $this->resourceModel->ensureResourceExists($path);
             $translationProperty = $this->translationPropertyModel->getTranslationProperty($record);
             if ($translationProperty) {
-                     $this->translationModel->delete([
-                    "translationPropertyKey" => $translationProperty["translationPropertyKey"],
-                    "locale" => $record["locale"]
-                ]);
+                $this->translationModel->delete(
+                    [
+                        "translationPropertyKey" => $translationProperty["translationPropertyKey"],
+                        "locale" => $record["locale"]
+                    ]
+                );
             }
         }
-
     }
 
     /**
