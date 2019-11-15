@@ -30,57 +30,51 @@ interface IEditorURLData {
     knowledgeBaseID?: number | null;
 }
 
+function getAddRoot(kbID: number | null | undefined): string | null {
+    if (kbID == null) {
+        return null;
+    }
+
+    const kbsByID = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID;
+
+    if (!kbsByID.data) {
+        return null;
+    }
+
+    const kb = kbsByID.data[kbID];
+    if (!kb) {
+        return null;
+    }
+    const product = kb.siteSections.find(o => o.contentLocale === kb.sourceLocale) || null;
+
+    const locale = getCurrentLocale();
+    if (kb.sourceLocale === locale) {
+        return null;
+    }
+
+    if (!product) {
+        return null;
+    }
+
+    return siteUrl(`${product.basePath}/kb/articles/add`);
+}
+
 /**
  * Get the route for editing a particular article ID.
  *
  * @param articleID - The articleID.
  */
 function makeEditorUrl(data?: IEditorURLData) {
-    let baseUrl = "";
-    const addRoot = "/kb/articles/add";
-    let articleRedirection: boolean | undefined = undefined;
-
+    const defaultAddRoot = "/kb/articles/add";
     if (!data) {
-        return addRoot;
+        return defaultAddRoot;
     }
 
-    if (data.articleID === undefined) {
-        if (data.knowledgeBaseID == null) {
-            return addRoot;
-        } else {
-            const kbsByID = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID;
+    const customAddRoot = getAddRoot(data.knowledgeBaseID);
+    const addRoot = customAddRoot ?? defaultAddRoot;
+    const articleRedirection = customAddRoot ? true : undefined;
 
-            if (!kbsByID.data) {
-                return addRoot;
-            }
-
-            const kb = kbsByID.data[data.knowledgeBaseID];
-            if (!kb) {
-                logWarning(
-                    "Attempting to generate an editor URL for a knowledge base ID that doesn't exist",
-                    data.knowledgeBaseID,
-                );
-                return addRoot;
-            }
-            const product = kb.siteSections.find(o => o.contentLocale === kb.sourceLocale) || null;
-            const locale = getCurrentLocale();
-            if (kb.sourceLocale !== locale) {
-                if (!product) {
-                    return addRoot;
-                } else {
-                    baseUrl = siteUrl(`${product.basePath}/kb/articles/add`);
-                    articleRedirection = true;
-                }
-            } else {
-                return addRoot;
-            }
-        }
-        //baseUrl = addRoot;
-    } else {
-        baseUrl = `/kb/articles/${data.articleID}/editor`;
-        articleRedirection = undefined;
-    }
-
+    let baseUrl = data.articleID ? `/kb/articles/${data.articleID}/editor` : addRoot;
     let { knowledgeCategoryID } = data;
     const { articleRevisionID, draftID, knowledgeBaseID, discussionID } = data;
     if (knowledgeCategoryID !== undefined && knowledgeBaseID === undefined) {

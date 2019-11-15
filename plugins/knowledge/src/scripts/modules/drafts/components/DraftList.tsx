@@ -23,7 +23,7 @@ export default class DraftsList extends React.Component<IProps> {
         return (
             <ResultList
                 results={this.props.data}
-                result={DraftPreview}
+                result={DraftPreview as React.ComponentType}
                 emptyMessage={t("You do not have any drafts.")}
                 className={this.props.className}
             />
