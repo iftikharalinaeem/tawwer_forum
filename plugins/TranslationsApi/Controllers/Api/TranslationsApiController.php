@@ -28,10 +28,13 @@ class TranslationsApiController extends AbstractApiController {
     private $getResourceSchema;
 
     /** @var Schema */
-    private $postTranslationSchema;
+    private $patchTranslationSchema;
 
     /** @var Schema */
     private $translationSchema;
+
+    /** @var Schema */
+    private $deleteTranslationSchema;
 
     /** @var ResourceModel */
     private $resourceModel;
@@ -44,6 +47,7 @@ class TranslationsApiController extends AbstractApiController {
 
     /** @var TranslationPropertyModel */
     private $translationPropertyModel;
+
     /** @var LocalesApiController $localeApi */
     private $localeApi;
 
@@ -53,7 +57,8 @@ class TranslationsApiController extends AbstractApiController {
      * @param ResourceModel $resourcesModel
      * @param TranslationModel $translationModel
      * @param TranslationPropertyModel $translationPropertyModel
-     * @param Gdn_Configuration $configurationModule
+     * @param ConfigurationInterface $configurationModule
+     * @param LocalesApiController $localeApi
      */
     public function __construct(
         ResourceModel $resourcesModel,
@@ -85,9 +90,7 @@ class TranslationsApiController extends AbstractApiController {
 
         $resourceExists = $this->resourceModel->get(
             [
-                "name" => $body["name"],
-                "sourceLocale" => $body["sourceLocale"],
-                "urlCode" => $body["urlCode"],
+                "urlCode" => $body["urlCode"]
             ]
         );
 
@@ -106,9 +109,9 @@ class TranslationsApiController extends AbstractApiController {
      * @param string $path Resource slug
      * @param array $body
      */
-    public function put(string $path, array $body = []) {
+    public function patch(string $path, array $body = []) {
         $this->permission("Garden.Moderation.Manage");
-        $in = $this->schema([":a" => $this->putTranslationSchema()], "in");
+        $in = $this->schema([":a" => $this->patchTranslationSchema()], "in");
         $path = substr($path, 1);
 
         $records = $in->validate($body);
@@ -157,7 +160,7 @@ class TranslationsApiController extends AbstractApiController {
             $where["tp.recordType"] = $query["recordType"];
 
             if (isset($query['recordIDs'])) {
-                $where["tp.recordID"] =  $query['recordIDs'];
+                $where["tp.recordID"] = $query['recordIDs'];
             }
 
             if (isset($query['recordKeys'])) {
@@ -180,6 +183,32 @@ class TranslationsApiController extends AbstractApiController {
         $results = $out->validate($results);
 
         return $results;
+    }
+
+    /**
+     * DELETE /Translations/:resource
+     *
+     * @param string $path
+     * @param array $body
+     */
+    public function delete(string $path, array $body) {
+        $this->permission("Garden.Moderation.Manage");
+        $in = $this->schema([":a" => $this->deleteTranslationSchema()], "in");
+        $path = substr($path, 1);
+
+        $records = $in->validate($body);
+
+        foreach ($records as $record) {
+            $this->resourceModel->ensureResourceExists($path);
+            $translationProperty = $this->translationPropertyModel->getTranslationProperty($record);
+            if ($translationProperty) {
+                     $this->translationModel->delete([
+                    "translationPropertyKey" => $translationProperty["translationPropertyKey"],
+                    "locale" => $record["locale"]
+                ]);
+            }
+        }
+
     }
 
     /**
@@ -239,9 +268,10 @@ class TranslationsApiController extends AbstractApiController {
      * @param string $type
      * @return Schema
      */
-    public function putTranslationSchema(string $type = ""): Schema {
-        if ($this->postTranslationSchema === null) {
-            $this->postTranslationSchema = $this->schema(Schema::parse([
+    public function patchTranslationSchema(string $type = ""): Schema {
+        if ($this->patchTranslationSchema === null) {
+            $this->patchTranslationSchema = $this->schema(Schema::parse([
+                "urlCode:s?",
                 "recordType:s",
                 "recordID:i?",
                 "recordKey:s?",
@@ -250,7 +280,26 @@ class TranslationsApiController extends AbstractApiController {
                 "translation:s",
             ]));
         }
-        return $this->schema($this->postTranslationSchema, $type);
+        return $this->schema($this->patchTranslationSchema, $type);
+    }
+
+    /**
+     * Post translation schema.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function deleteTranslationSchema(string $type = ""): Schema {
+        if ($this->deleteTranslationSchema === null) {
+            $this->deleteTranslationSchema = $this->schema(Schema::parse([
+                "recordType:s",
+                "recordID:i?",
+                "recordKey:s?",
+                "locale:s",
+                "propertyName:s",
+            ]));
+        }
+        return $this->schema($this->deleteTranslationSchema, $type);
     }
 
     /**
