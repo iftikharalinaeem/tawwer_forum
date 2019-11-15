@@ -146,7 +146,6 @@ class TranslationsTests extends AbstractAPIv2Test {
         $record = [
             "recordType" => "recordTypeOne",
             "recordID" => 8,
-            "recordKey" => null,
             "propertyName" => "category-name",
             "locale" => "en",
             "translation" => "english recordTypeOne category-name"
@@ -159,8 +158,10 @@ class TranslationsTests extends AbstractAPIv2Test {
 
         unset($record["translation"]);
 
-        $result = $this->api()->patch('translations/resourceOne/delete', [$record]);
-
+        $result = $this->api()->patch("translations/resourceOne/delete", [$record]);
         $this->assertEquals(200, $result->getStatusCode());
+
+        $result = $this->api()->get("translations/resourceOne", $record);
+        $this->assertEquals(0, count($result->getBody()));
     }
 }
