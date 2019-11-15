@@ -63,6 +63,7 @@ paths:
             description: Success
         tags:
         - Translations
+        summary: Get translations from a specified resource.
       patch:
         parameters:
           - description: resource to add\update in.
@@ -124,7 +125,7 @@ paths:
                 - locale
                 - propertyName
                 type: object
-      summary: Delete a specified translations.
+        summary: Delete a specified translations.
   /translations:
     x-hidden: true
     post:
