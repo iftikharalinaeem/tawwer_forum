@@ -27,6 +27,7 @@ import * as React from "react";
 import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/common";
+import { typographyClasses } from "@library/styles/typographyStyles";
 
 interface IProps extends IDeviceProps {
     category: IKbCategory;
@@ -95,6 +96,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                         <PanelWidget>
                             <PageTitle
                                 className="searchBar-heading"
+                                headingClassName={typographyClasses().largeTitle}
                                 title={category.name}
                                 actions={
                                     <LinkAsButton
