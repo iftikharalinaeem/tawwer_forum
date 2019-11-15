@@ -250,7 +250,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      *  Call the hub from the node to bring over data and update the local db and config.
      *
      * @param array $params Optionally pass parameters for debugging purposes.
-     * @throws Gdn_UserException
+     * @throws Exception Catch problems and log them.
      *
      * @return mixed;
      */
@@ -262,7 +262,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             return;
         }
 
-        $siteID = valr('Multisite.MultisiteID', $config;
+        $siteID = valr('Multisite.MultisiteID', $config);
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
