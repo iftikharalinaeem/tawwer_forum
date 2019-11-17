@@ -164,7 +164,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $schema = $this->getIdeaMetadataFragment();
             $metadata = $this->getIdeaMetadata($row);
 
-            if ($metadata === null) {
+            if ($metadata === null || $metadata['statusID'] === false) {
                 // We added this to relax the schema so that we don't end up with a 422 error when an idea is in a
                 // non-ideation category.
                 $metadata = [
@@ -460,12 +460,17 @@ EOT
      *
      * @param SettingsController $sender
      * @param $statusID
+     * @throws Exception
      */
     public function settingsController_deleteStatus_create($sender, $statusID) {
         $sender->permission('Garden.Settings.Manage');
 
         if ($sender->Form->authenticatedPostBack()) {
             $statusModel = new StatusModel();
+            $status = $statusModel->getID($statusID);
+//            if ($status->Name === 'Active') {
+//                throw new Exception(t('Default status cannot be deleted.'));
+//            }
             $result = $statusModel->delete(['StatusID' => $statusID]);
             if ($result) {
                 $statusModel->clearStatusesCache();
@@ -1700,7 +1705,7 @@ EOT
     }
 
     /**
-     * Join TagDiscussion table filtering idea statuses. 
+     * Join TagDiscussion table filtering idea statuses.
      *
      * @param DiscussionModel $sender
      * @param array $args

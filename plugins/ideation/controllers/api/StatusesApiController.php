@@ -30,6 +30,7 @@ class StatusesApiController extends AbstractApiController {
      * Delete an idea status.
      *
      * @param int $id
+     * @throws Exception
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
@@ -38,7 +39,10 @@ class StatusesApiController extends AbstractApiController {
         $out = $this->schema([], 'out');
 
         $this->statusByID($id);
-
+        $status = $this->statusModel->getID($id);
+        if ($status->Name === 'Active' || $status->IsDefault === 1) {
+            throw new Exception(t('Status cannot be deleted.'));
+        }
         $this->statusModel->deleteID($id);
     }
 
