@@ -467,10 +467,6 @@ EOT
 
         if ($sender->Form->authenticatedPostBack()) {
             $statusModel = new StatusModel();
-            $status = $statusModel->getID($statusID);
-//            if ($status->Name === 'Active') {
-//                throw new Exception(t('Default status cannot be deleted.'));
-//            }
             $result = $statusModel->delete(['StatusID' => $statusID]);
             if ($result) {
                 $statusModel->clearStatusesCache();
