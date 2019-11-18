@@ -191,7 +191,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 $locale,
                 'kb',
                 KnowledgeBaseModel::RECORD_TYPE,
-                KnowledgeBaseModel::RECORD_ID,
+                KnowledgeBaseModel::RECORD_ID_FIELD,
                 $rows,
                 ['name', 'description']
             );

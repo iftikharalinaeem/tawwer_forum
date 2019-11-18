@@ -12,7 +12,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 /**
  * Test the /api/v2/knowledge-bases endpoint.
  */
-class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
+class KnowledgeBasesTranslationTest extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
@@ -23,18 +23,6 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'translationsapi'];
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
-
-    /** @var array Fields to be checked with get/<id>/edit */
-    protected $editFields = [
-        'name',
-        'description',
-        'viewType',
-        'icon',
-        'sortArticles',
-        'sourceLocale',
-        'urlCode',
-        'siteSectionGroup'
-    ];
 
     /**
      * Generate a unique URL code for a knowledge base
@@ -82,7 +70,7 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
         foreach ($properties as $propertyName) {
             $patchBody[] = [
                 'recordType' => KnowledgeBaseModel::RECORD_TYPE,
-                'recordID' => $record[KnowledgeBaseModel::RECORD_ID],
+                'recordID' => $record[KnowledgeBaseModel::RECORD_ID_FIELD],
                 'propertyName' => $propertyName,
                 'locale' => $locale,
                 'translation' => $record[$propertyName].' - '.$locale
@@ -127,7 +115,6 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
                     break;
                 default:
                     //just do no translation
-                    ;
             }
         }
     }
@@ -145,7 +132,7 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
             ->getBody();
         $this->assertEquals(3, count($allKbs));
 
-        for ($i = 1; $i<3; $i++) {
+        for ($i = 1; $i<4; $i++) {
             $result = $this->api()->get($this->baseUrl.'/'.$i.'?locale='.$locale)->getBody();
             if ($i === $id) {
                 $this->assertStringEndsWith(' - '.$locale, $result['name']);

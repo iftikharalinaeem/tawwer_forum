@@ -21,7 +21,7 @@ use Vanilla\Site\SiteSectionModel;
 class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     // Record type for knowledge categories.
     const RECORD_TYPE = "knowledgeBase";
-    const RECORD_ID = "knowledgeBaseID";
+    const RECORD_ID_FIELD = "knowledgeBaseID";
 
     const TYPE_GUIDE = 'guide';
     const TYPE_HELP = 'help';
