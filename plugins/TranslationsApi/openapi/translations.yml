@@ -86,7 +86,7 @@ paths:
               $ref: '#/components/schemas/PatchTranslations'
         required: true
       summary: Add or update translations.
-  /translations/{resourceUrl}/delete:
+  /translations/{resourceUrl}/remove:
     patch:
       parameters:
         - description: Delete a translation.
