@@ -460,7 +460,6 @@ EOT
      *
      * @param SettingsController $sender
      * @param $statusID
-     * @throws Exception
      */
     public function settingsController_deleteStatus_create($sender, $statusID) {
         $sender->permission('Garden.Settings.Manage');
