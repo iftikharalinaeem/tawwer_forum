@@ -36,7 +36,7 @@ class TranslationProvider implements TranslationProviderInterface {
     /**
      * @inheritdoc
      */
-    public function translate(string $propertyKey, $sourceValue): string {
+    public function translate(string $propertyKey, string $sourceValue): string {
         return Gdn::translate($propertyKey, $sourceValue);
     }
 
@@ -107,12 +107,11 @@ class TranslationProvider implements TranslationProviderInterface {
         if (count($ids) > 0) {
             $where['tp.recordID'] = $ids;
 
-            $translations = $this->translationModel->translateProperties($where, ['name']);
-
+            $translations = $this->translationModel->translateProperties($where, $properties);
             if (count($translations) > 0) {
                 foreach ($records as &$record) {
                     foreach ($properties as $property) {
-                        if (!empty($translation = $translations[$record[$idFieldName]][$property])) {
+                        if (!empty($translation = $translations[$record[$idFieldName]][$property] ?? null)) {
                             $record[$property] = $translation;
                         }
                     }
