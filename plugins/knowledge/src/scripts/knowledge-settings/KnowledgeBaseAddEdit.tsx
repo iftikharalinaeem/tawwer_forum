@@ -94,7 +94,8 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
     const titleString = isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base");
-    const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
+    const sourceLocale = form.sourceLocale;
+
     const { Translator, shouldDisplay } = useContentTranslator();
 
     const errors = formSubmit.error?.response.data?.errors;
