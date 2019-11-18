@@ -17,6 +17,13 @@ import {
     IGetArticleResponseBody,
 } from "@knowledge/@types/api/article";
 import { PublishStatus } from "@library/@types/api/core";
+import {
+    IKnowledgeBase,
+    KnowledgeBaseStatus,
+    KbViewType,
+    KnowledgeBaseSortMode,
+    ISiteSection,
+} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export function dummyDraft(overrides: Partial<IArticle> = {}): IResponseArticleDraft {
     return {
@@ -118,5 +125,43 @@ export function dummyRevision(overrides: Partial<IRevision> = {}): IRevision {
         insertUserID: 1,
         bodyRendered: "",
         dateInserted: "",
+    };
+}
+
+export function dummyKnowledgeBase(overrides: Partial<IKnowledgeBase> = {}): IKnowledgeBase {
+    return {
+        knowledgeBaseID: 1,
+        name: "test",
+        description: "test",
+        sortArticles: KnowledgeBaseSortMode.MANUAL,
+        insertUserID: 1,
+        dateInserted: "",
+        updateUserID: 1,
+        dateUpdated: "",
+        countArticles: 100,
+        countCategories: 100,
+        urlCode: "/test",
+        url: "http://test.com/kb/test",
+        icon: "",
+        status: KnowledgeBaseStatus.PUBLISHED,
+        bannerImage: "",
+        sourceLocale: "en",
+        viewType: KbViewType.GUIDE,
+        rootCategoryID: 1,
+        defaultArticleID: null,
+        siteSectionGroup: "vanilla",
+        siteSections: [dummySiteSection()],
+        ...overrides,
+    };
+}
+
+export function dummySiteSection(overrides: Partial<ISiteSection> = {}): ISiteSection {
+    return {
+        sectionID: "test",
+        siteSectionGroup: "test",
+        basePath: "/test",
+        name: "test",
+        contentLocale: "en",
+        ...overrides,
     };
 }
