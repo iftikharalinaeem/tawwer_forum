@@ -34,7 +34,7 @@ export class HomePage extends React.Component<IProps> {
 
         if (knowledgeBases.length === 1) {
             const { urlCode } = knowledgeBases[0];
-            return <KnowledgeBasePage {...this.props} match={{ ...this.props.match, params: { urlCode } }} />;
+            return <KnowledgeBasePage {...this.props} isOnlyKb match={{ ...this.props.match, params: { urlCode } }} />;
         }
 
         return (

@@ -55,6 +55,7 @@ export class ArticleLayout extends React.Component<IProps> {
         return (
             <Container>
                 <TitleBar
+                    useMobileBackButton={this.props.useBackButton}
                     isFixed={true}
                     title={title}
                     mobileDropDownContent={
@@ -92,7 +93,9 @@ export class ArticleLayout extends React.Component<IProps> {
                                     />
                                 }
                                 includeBackLink={
-                                    this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS
+                                    this.props.device !== Devices.MOBILE &&
+                                    this.props.device !== Devices.XS &&
+                                    this.props.useBackButton
                                 }
                             />
                             {messages && <div className="messages">{messages}</div>}
@@ -139,6 +142,7 @@ export class ArticleLayout extends React.Component<IProps> {
 }
 
 interface IProps extends IDeviceProps {
+    useBackButton?: boolean;
     article: IArticle;
     messages?: React.ReactNode;
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
