@@ -306,23 +306,35 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Configuration issues.
      */
     public function base_connectData_handler($sender, $args) {
-        $authenticationKey = $sender->Request->get('authKey');
-        if (!$authenticationKey) {
-            $this->log('not_configured', ['provider' => $this->provider()]);
-            throw new Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
+        //If there is another provider that is the default, do nothing and return.
+            $defaultProvider = $this->authenticationProviderModel->getDefault();
+        if ($defaultProvider && $defaultProvider !== $this->provider()['AuthenticationKey']) {
+            return;
         }
 
-        if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
-            $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
-            throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
+        //If there is another sso method being used, log it, just in case, and return.
+        if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS) {
+            $this->log('User logging in with other SSO method.', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
+            return;
+        }
+
+        $authenticationKey = $sender->Request->get('authKey');
+        if (!$authenticationKey) {
+            $this->log('No authKey sent.', ['provider' => $this->provider(), 'get' => $sender->Request->get()]);
+            return;
+        }
+
+        if ($this->getProviderKey() != $authenticationKey) {
+            $this->log('Wrong authentication key sent.', ['provider' => $this->provider(), 'get' => $sender->Request->get()]);
+            return;
         }
 
         /* @var Gdn_Form $form */
         $form = $sender->Form; //new gdn_Form();
 
         if (!$this->isConfigured()) {
-            $this->log('not_configured', ['provider' => $this->provider()]);
-            throw new Gdn_UserException('JWT authentication is not configured.', 400);
+            $this->log('Not Configured - no secret.', ['provider' => $this->provider()]);
+            return;
         }
 
         // get the Bearer token from the Authorization header
