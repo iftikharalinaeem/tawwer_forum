@@ -242,7 +242,7 @@ paths:
           required: true
           schema:
             type: integer
-        - description: Locale the knowledge base name and description to be represented in. (When translated properties are available)
+        - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
           in: query
           name: locale
           required: false
