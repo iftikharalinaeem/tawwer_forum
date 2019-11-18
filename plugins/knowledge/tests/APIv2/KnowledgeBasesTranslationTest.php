@@ -127,7 +127,6 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
                     break;
                 default:
                     //just do no translation
-                    ;
             }
         }
     }
