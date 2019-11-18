@@ -94,7 +94,9 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
 
 
     /**
-     * Prepare few knowledge bases and translated content
+     * Prepare few knowledge bases and translated content.
+     *
+     * Generate 2 translated knowledge bases, and 2 untranslated knowledge bases.
      */
     public function testPrepareTranslations() {
         $result = $this->api()->post(
