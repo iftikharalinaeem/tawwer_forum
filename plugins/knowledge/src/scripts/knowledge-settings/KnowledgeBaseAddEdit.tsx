@@ -27,13 +27,15 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { modalClasses } from "@library/modal/modalStyles";
 import { getComponent } from "@library/utility/componentRegistry";
 import { useUniqueID } from "@library/utility/idUtils";
-import { t, useLocaleInfo, useContentTranslator, TranslationPropertyType } from "@vanilla/i18n";
+import { t, useLocaleInfo, useContentTranslator, TranslationPropertyType, getCurrentLocale } from "@vanilla/i18n";
 import classNames from "classnames";
 import React, { useState, useEffect } from "react";
 import Message from "@library/messages/Message";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/knowledgeBaseAddEditStyles";
+import getStore from "@library/redux/getStore";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 
 interface IProps {
     kbID?: number;
@@ -51,6 +53,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
             label: locale.displayNames[locale.localeKey],
         };
     });
+
     const isEditing = props.kbID != null;
     const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
 
@@ -91,7 +94,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
     const titleString = isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base");
-
+    const kbLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
     const { Translator, shouldDisplay } = useContentTranslator();
 
     const errors = formSubmit.error?.response.data?.errors;
@@ -140,6 +143,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         },
                                     ]}
                                     title={t("Translate Knowledge Base")}
+                                    kbLocale={kbLocale}
                                 ></Translator>
                             )}
                         </FrameHeader>
