@@ -14,14 +14,14 @@ paths:
               - deleted
               - published
             type: string
-        - description: Locale the knowledge base names and descriptions to be represented in. (When translated properties are available)
+        - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
           in: query
           name: locale
           required: false
           schema:
             type: string
           example: fr
-        - description: Locale to filter knowwledge bases by sourceLocale property.
+        - description: Locale key to filter results by their `sourceLocale` property.
           in: query
           name: sourceLocale
           required: false
