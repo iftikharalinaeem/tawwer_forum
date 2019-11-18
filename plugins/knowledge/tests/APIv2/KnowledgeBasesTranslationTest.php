@@ -70,6 +70,7 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Generate some content
      *
      * @param array $record
      * @param array $properties
@@ -130,13 +131,14 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test if knowledge base properties were properly translated and reflects to the locale when calling api endpoints
      *
      * @param int $id
      * @param string $locale
      * @depends testPrepareTranslations
      * @dataProvider translationsdDataProvider
      */
-    public function testKnowledgeBaseLocales (int $id, string $locale) {
+    public function testKnowledgeBaseLocales(int $id, string $locale) {
         $allKbs = $this->api()->get($this->baseUrl.'?locale='.$locale)
             ->getBody();
         $this->assertEquals(3, count($allKbs));
