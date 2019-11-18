@@ -21,7 +21,7 @@ paths:
           schema:
             type: string
           example: fr
-        - description: Locale to filter knowwledge bases by sourceLocale property.
+        - description: Locale key to filter results by their `sourceLocale` property.
           in: query
           name: sourceLocale
           required: false
