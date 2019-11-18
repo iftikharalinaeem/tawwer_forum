@@ -70,6 +70,7 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     }
 
     /**
+     *
      * @param array $record
      * @param array $properties
      * @param string $locale
@@ -114,12 +115,12 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
                 $this->baseUrl.'/'.$i,
                 $kb
             )->getBody();
-            switch($i) {
+            switch ($i) {
                 case 1:
-                    $result = $this->generateTranslation( $kb, ['name', 'description'], 'fr');
+                    $result = $this->generateTranslation($kb, ['name', 'description'], 'fr');
                     break;
                 case 2:
-                    $result = $this->generateTranslation( $kb, ['name', 'description'], 'es');
+                    $result = $this->generateTranslation($kb, ['name', 'description'], 'es');
                     break;
                 default:
                     //just do no translation
@@ -129,6 +130,9 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     }
 
     /**
+     *
+     * @param int $id
+     * @param string $locale
      * @depends testPrepareTranslations
      * @dataProvider translationsdDataProvider
      */
