@@ -4,7 +4,13 @@
  */
 
 import React, { useDebugValue } from "react";
-import { useContentTranslator, ITranslationProperty, TranslationPropertyType, t } from "@vanilla/i18n";
+import {
+    useContentTranslator,
+    ITranslationProperty,
+    TranslationPropertyType,
+    t,
+    getCurrentLocale,
+} from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import NavigationModel, { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
@@ -14,6 +20,8 @@ import { Permission } from "@library/features/users/Permission";
 
 interface IProps {
     kbID: number;
+    sourceLocale: string | null;
+    activeLocale: string | null;
 }
 
 export function OrganizeCategoriesTranslator(props: IProps) {
@@ -34,6 +42,8 @@ export function OrganizeCategoriesTranslator(props: IProps) {
             isFullScreen
             resource={KB_RESOURCE_NAME}
             title={t("Translate Categories")}
+            sourceLocale={props.sourceLocale}
+            activeLocale={props.activeLocale}
         />
     );
 }

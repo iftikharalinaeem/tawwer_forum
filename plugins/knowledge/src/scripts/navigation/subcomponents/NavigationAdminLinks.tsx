@@ -16,6 +16,10 @@ import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCat
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { NewFolderIcon } from "@library/icons/common";
+import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import Translate from "@library/content/Translate";
+import { button } from "@storybook/addon-knobs";
 
 interface IProps {
     className?: string;
@@ -33,6 +37,9 @@ export default function NavigationAdminLinks(props: IProps) {
     const categoryButtonRef = useRef<HTMLButtonElement>(null);
     const closeModal = () => setModalOpen(false);
     const openModal = () => setModalOpen(true);
+    const currentLocale = getCurrentLocale();
+    const sourceLocale = knowledgeBase.sourceLocale;
+    const isDisable = sourceLocale !== currentLocale;
 
     return (
         <Permission permission="articles.add">
@@ -51,15 +58,43 @@ export default function NavigationAdminLinks(props: IProps) {
                     </OrganizeCategoriesRoute.Link>
                 </li>
                 <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    <Button
-                        onClick={openModal}
-                        buttonRef={categoryButtonRef}
-                        baseClass={ButtonTypes.CUSTOM}
-                        className={classNames(classes.link)}
-                    >
-                        <NewFolderIcon className={classes.linkIcon} />
-                        {t("New Category")}
-                    </Button>
+                    {isDisable ? (
+                        <ToolTip
+                            label={
+                                <Translate
+                                    source="You can only add categories in the source locale: <0/>."
+                                    c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
+                                />
+                            }
+                            ariaLabel={"This article was editied in its source locale."}
+                        >
+                            <span>
+                                {
+                                    <Button
+                                        onClick={openModal}
+                                        buttonRef={categoryButtonRef}
+                                        baseClass={ButtonTypes.CUSTOM}
+                                        className={classNames(classes.link)}
+                                        disabled={isDisable}
+                                    >
+                                        <NewFolderIcon className={classes.linkIcon} />
+                                        {t("New Category")}
+                                    </Button>
+                                }
+                            </span>
+                        </ToolTip>
+                    ) : (
+                        <Button
+                            onClick={openModal}
+                            buttonRef={categoryButtonRef}
+                            baseClass={ButtonTypes.CUSTOM}
+                            className={classNames(classes.link)}
+                            disabled={isDisable}
+                        >
+                            <NewFolderIcon className={classes.linkIcon} />
+                            {t("New Category")}
+                        </Button>
+                    )}
                 </li>
             </ul>
             {modalOpen && (

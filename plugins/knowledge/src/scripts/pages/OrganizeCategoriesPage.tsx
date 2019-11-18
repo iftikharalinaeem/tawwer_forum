@@ -30,7 +30,7 @@ import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTr
 import Message from "@library/messages/Message";
 import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
-import { LocaleDisplayer, getCurrentLocale, useLocaleInfo } from "@vanilla/i18n";
+import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
 import { string } from "prop-types";
 import Container from "@library/layout/components/Container";
@@ -106,7 +106,11 @@ function OrganizeCategoriesPage(props: IProps) {
                             title={pageTitle}
                         >
                             {pageTitle}
-                            <OrganizeCategoriesTranslator kbID={props.kbID} />
+                            <OrganizeCategoriesTranslator
+                                kbID={props.kbID}
+                                sourceLocale={sourceLocale}
+                                activeLocale={currentLocale}
+                            />
                         </Heading>
                     </DocumentTitle>
                     <NavigationManager knowledgeBase={knowledgeBase.data} />
