@@ -20,12 +20,6 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
     /** @var string $translationApi Translation api path */
     protected $translationApi = "/translations";
 
-    /** @var string The name of the primary key of the resource. */
-    protected $pk = "knowledgeBaseID";
-
-    /** @var bool Whether to check if paging works or not in the index. */
-    protected $testPagingOnIndex = false;
-
     protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'translationsapi'];
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
@@ -41,21 +35,6 @@ class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
         'urlCode',
         'siteSectionGroup'
     ];
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function setupBeforeClass() {
-        parent::setupBeforeClass();
-        /** @var ConfigurationInterface $config */
-        $config = self::container()->get(ConfigurationInterface::class);
-        $enabledLocales = [
-            'vf_fr' => 'fr',
-            'vf_es' => 'es',
-            'vf_ru' => 'ru'
-        ];
-        $config->set('EnabledLocales', $enabledLocales, true);
-    }
 
     /**
      * Generate a unique URL code for a knowledge base
