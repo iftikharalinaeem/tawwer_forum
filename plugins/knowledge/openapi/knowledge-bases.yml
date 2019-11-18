@@ -28,7 +28,7 @@ paths:
           schema:
             type: string
           example: en
-        - description: Site section group to filter knowwledge bases by.
+        - description: siteSectionGroup to filter results by their `siteSectionGroup` property.
           in: query
           name: siteSectionGroup
           required: false
