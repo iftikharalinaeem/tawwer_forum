@@ -12,7 +12,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 /**
  * Test the /api/v2/knowledge-bases endpoint.
  */
-class KnowledgeBasesTransaltionTest extends AbstractResourceTest {
+class KnowledgeBasesTransaltionTest extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
@@ -27,6 +27,8 @@ class KnowledgeBasesTransaltionTest extends AbstractResourceTest {
     protected $testPagingOnIndex = false;
 
     protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'translationsapi'];
+
+    protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
 
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
