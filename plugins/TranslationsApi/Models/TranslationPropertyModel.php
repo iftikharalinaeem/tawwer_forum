@@ -107,7 +107,7 @@ class TranslationPropertyModel extends PipelineModel {
     }
 
     /**
-     * Construct a translationPropertykey for the resource translations.
+     * Construct a translationPropertyKey for the resource translations.
      *
      * @param string $recordProperty
      * @param string $recordType

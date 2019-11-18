@@ -66,7 +66,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Post /translations failure
+     * Patch /translations failure
      *
      * @param array $record
      * @param string $key
@@ -75,8 +75,8 @@ class TranslationsTests extends AbstractAPIv2Test {
      * @depends      testPostResource
      * @dataProvider translationsPropertyProvider
      */
-    public function testPutTranslations($record, $key, $translation) {
-        $this->api()->put(
+    public function testPatchTranslations($record, $key, $translation) {
+        $this->api()->patch(
             'translations/resourceOne',
             $record
         );
@@ -92,7 +92,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Provider for PUT /translations/:resource
+     * Provider for Patch /translations/:resource
      *
      * @return array
      */
@@ -102,7 +102,7 @@ class TranslationsTests extends AbstractAPIv2Test {
                 [[
                     "recordType" => "recordTypeOne",
                     "recordID" => 8,
-                    "recordKey" => "",
+                    "recordKey" => null,
                     "propertyName" => "name",
                     "locale" => "en",
                     "translation" => "english recordTypeOne name"
@@ -114,7 +114,7 @@ class TranslationsTests extends AbstractAPIv2Test {
                 [[
                     "recordType" => "recordTypeTwo",
                     "recordID" => 9,
-                    "recordKey" => "",
+                    "recordKey" => null,
                     "propertyName" => "description",
                     "locale" => "en",
                     "translation" => "english recordTypeTwo cat description"
@@ -135,5 +135,33 @@ class TranslationsTests extends AbstractAPIv2Test {
                 "name",
             ],
         ];
+    }
+
+    /**
+     * Test Deleting a translation.
+     *
+     * @depends testPostResource
+     */
+    public function testPatchDeleteTranslation() {
+        $record = [
+            "recordType" => "recordTypeOne",
+            "recordID" => 8,
+            "propertyName" => "category-name",
+            "locale" => "en",
+            "translation" => "english recordTypeOne category-name"
+        ];
+
+        $this->api()->patch(
+            'translations/resourceOne',
+            [$record]
+        );
+
+        unset($record["translation"]);
+
+        $result = $this->api()->patch("translations/resourceOne/delete", [$record]);
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $result = $this->api()->get("translations/resourceOne", $record);
+        $this->assertEquals(0, count($result->getBody()));
     }
 }

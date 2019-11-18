@@ -63,7 +63,8 @@ paths:
             description: Success
         tags:
         - Translations
-      put:
+        summary: Get translations from a specified resource.
+      patch:
         parameters:
           - description: resource to add\update in.
             in: path
@@ -82,10 +83,51 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PutTranslations'
+                $ref: '#/components/schemas/PatchTranslations'
           required: true
         summary: Add or update translations.
+  /translations/{resourceUrl}/delete:
+      patch:
+        parameters:
+          - description: Delete a translation.
+            in: path
+            name: resourceUrl
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Success
+        tags:
+          - Translations
+        requestBody:
+          content:
+            application/json:
+              schema:
+                properties:
+                  recordType:
+                    description: Name of the resource associated to the translation.
+                    type: string
+                  recordID:
+                    description: The recordID associated to the translation.
+                    type: integer
+                  recordKey:
+                    description: The recordKey associated to the translation.
+                    type: string
+                  locale:
+                    description: The locale associated to the translation.
+                    type: string
+                  propertyName:
+                    description: The property name associated to the translation.
+                    type: string
+                required:
+                - recordType
+                - locale
+                - propertyName
+                type: object
+        summary: Delete a specified translations.
   /translations:
+    x-hidden: true
     post:
       responses:
         '201':
@@ -130,7 +172,7 @@ components:
           - locale
           - translation
           type: object
-        PutTranslations:
+        PatchTranslations:
           properties:
             recordType:
               description: Name of the resource associated to the translation.
