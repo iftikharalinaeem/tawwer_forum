@@ -244,7 +244,7 @@ class TranslationsTests extends AbstractAPIv2Test {
 
         unset($record["translation"]);
 
-        $result = $this->api()->patch("translations/resourceOne/delete", [$record]);
+        $result = $this->api()->patch("translations/resourceOne/remove", [$record]);
         $this->assertEquals(200, $result->getStatusCode());
 
         unset($record["recordID"]);

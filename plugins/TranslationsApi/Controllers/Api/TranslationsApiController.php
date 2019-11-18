@@ -154,7 +154,7 @@ class TranslationsApiController extends AbstractApiController {
         $query["resourceUrlCode"] = $path;
         $query = $in->validate($query);
 
-        $where["tp.resource"] = $query["urlCode"];
+        $where["tp.resource"] = $query["resourceUrlCode"];
 
         if (isset($query["recordType"])) {
             $where["tp.recordType"] = $query["recordType"];
