@@ -20,8 +20,9 @@ import getStore from "@library/redux/getStore";
 import { siteUrl } from "@library/utility/appUtils";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { Store } from "redux";
 
-interface IEditorURLData {
+export interface IEditorURLData {
     articleID?: number;
     articleRevisionID?: number;
     draftID?: number;
@@ -30,12 +31,13 @@ interface IEditorURLData {
     knowledgeBaseID?: number | null;
 }
 
-function getAddRoot(kbID: number | null | undefined): string | null {
+function getAddRoot(kbID: number | null | undefined, store?: Store<IKnowledgeAppStoreState>): string | null {
     if (kbID == null) {
         return null;
     }
 
-    const kbsByID = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID;
+    store = store ?? getStore<IKnowledgeAppStoreState>();
+    const kbsByID = store.getState().knowledge.knowledgeBases.knowledgeBasesByID;
 
     if (!kbsByID.data) {
         return null;
@@ -64,12 +66,13 @@ function getAddRoot(kbID: number | null | undefined): string | null {
  *
  * @param articleID - The articleID.
  */
-function makeEditorUrl(data?: IEditorURLData) {
+export function makeEditorUrl(data?: IEditorURLData, store?: Store<IKnowledgeAppStoreState>) {
     const defaultAddRoot = "/kb/articles/add";
     if (!data) {
         return defaultAddRoot;
     }
 
+    store = store ?? getStore<IKnowledgeAppStoreState>();
     const customAddRoot = getAddRoot(data.knowledgeBaseID);
     const addRoot = customAddRoot ?? defaultAddRoot;
     const articleRedirection = customAddRoot ? true : undefined;
