@@ -76,7 +76,7 @@ class KnowledgeBasesTranslationTest extends AbstractAPIv2Test {
                 'translation' => $record[$propertyName].' - '.$locale
             ];
         }
-        $result = $this->api()->put($this->translationApi.'/kb', $patchBody);
+        $result = $this->api()->patch($this->translationApi.'/kb', $patchBody);
         return $result;
     }
 
