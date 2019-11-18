@@ -2,7 +2,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import React, { useState } from "react";
+import React from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -15,7 +15,6 @@ export function ConfirmLocaleChange(props: { onCancel?: () => void; onConfirm: (
             title={t("Are you sure?")}
             onCancel={props.onCancel}
             onConfirm={props.onConfirm}
-            elementToFocusOnExit={props.elementToFocusOnExit}
             size={ModalSizes.SMALL}
         >
             <Paragraph>
