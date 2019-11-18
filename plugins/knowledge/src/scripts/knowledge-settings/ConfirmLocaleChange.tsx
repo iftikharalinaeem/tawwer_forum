@@ -9,20 +9,13 @@ import ModalSizes from "@library/modal/ModalSizes";
 import Paragraph from "@library/layout/Paragraph";
 import Translate from "@library/content/Translate";
 
-export function ConfirmLocaleChange(props: { oldValue: string; target: HTMLSelectElement }) {
-    const { oldValue, target } = props;
-    const [showModal, setShowModal] = useState(true);
-
-    return showModal ? (
+export function ConfirmLocaleChange(props: { onCancel?: () => void; onConfirm: () => void }) {
+    return (
         <ModalConfirm
             title={t("Are you sure?")}
-            onCancel={() => {
-                target.value = oldValue;
-            }}
-            onConfirm={() => {
-                setShowModal(false);
-            }}
-            elementToFocusOnExit={target}
+            onCancel={props.onCancel}
+            onConfirm={props.onConfirm}
+            elementToFocusOnExit={props.elementToFocusOnExit}
             size={ModalSizes.SMALL}
         >
             <Paragraph>
@@ -42,5 +35,5 @@ export function ConfirmLocaleChange(props: { oldValue: string; target: HTMLSelec
                 />
             </Paragraph>
         </ModalConfirm>
-    ) : null;
+    );
 }

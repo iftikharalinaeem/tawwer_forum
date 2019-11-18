@@ -30,10 +30,10 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { t, useLocaleInfo, useContentTranslator, TranslationPropertyType } from "@vanilla/i18n";
 import classNames from "classnames";
 import React, { useState, useEffect } from "react";
-import Message from "@library/messages/Message";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/knowledgeBaseAddEditStyles";
+import { ConfirmLocaleChange } from "@knowledge/knowledge-settings/ConfirmLocaleChange";
+import Select from "react-select";
 
 interface IProps {
     kbID?: number;
@@ -41,6 +41,8 @@ interface IProps {
 }
 
 export function KnowledgeBaseAddEdit(props: IProps) {
+    const localeSelectRef = React.createRef<Select>();
+    const [localeToConfirm, setLocaleToConfirm] = useState<string | null>(null);
     const { form, formSubmit } = useKBData();
     const isLoading = formSubmit.status === LoadStatus.LOADING;
     const { updateForm, saveKbForm, clearError, initForm } = useKnowledgeBaseActions();
@@ -285,21 +287,42 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                 )}
                                 <DashboardFormGroup
                                     label={"Locale"}
-                                    description={"Determines how the categories and articles within it will display"}
+                                    description={"Determines how the categories and articles within it will display."}
                                 >
                                     <DashboardSelect
                                         isClearable={false}
                                         options={localeOptions}
                                         disabled={isLoading}
                                         menuPlacement={MenuPlacement.TOP}
+                                        selectRef={localeSelectRef}
                                         onChange={(option: IComboBoxOption | null) => {
-                                            updateForm({ sourceLocale: option ? option.value.toString() : null });
+                                            const sourceLocale = option ? option.value.toString() : null;
+                                            if (isEditing) {
+                                                // If we are editing an existing KB make sure we show a warning here.
+                                                // This is a potentially very confusing operation to mess up.
+                                                setLocaleToConfirm(sourceLocale);
+                                            } else {
+                                                updateForm({ sourceLocale });
+                                            }
                                         }}
                                         value={localeOptions.find(val => {
                                             return val.value == form.sourceLocale;
                                         })}
                                     />
                                 </DashboardFormGroup>
+                                {localeToConfirm !== null && (
+                                    <ConfirmLocaleChange
+                                        onConfirm={() => {
+                                            updateForm({ sourceLocale: localeToConfirm });
+                                            setLocaleToConfirm(null);
+                                            localeSelectRef.current?.focus();
+                                        }}
+                                        onCancel={() => {
+                                            setLocaleToConfirm(null);
+                                            localeSelectRef.current?.focus();
+                                        }}
+                                    />
+                                )}
                             </DashboardFormList>
                         </FrameBody>
                     }
