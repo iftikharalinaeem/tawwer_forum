@@ -34,8 +34,8 @@ interface IGetTranslationsRequest {
 }
 
 type IGetTranslationsResponse = ITranslationApiItem[];
-type IPutTranslationsRequest = ITranslationApiItem[];
-interface IPutTranslationsResponse {}
+type IPatchTranslationsRequest = ITranslationApiItem[];
+interface IPatchTranslationsResponse {}
 
 export function makeTranslationKey(
     property: Pick<ITranslationApiItem, "propertyName" | "recordType" | "recordID" | "recordKey">,
@@ -61,9 +61,11 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
         "GET",
     );
 
-    public static putTranslationsACs = createAction.async<IPutTranslationsRequest, IPutTranslationsResponse, IApiError>(
-        "PUT",
-    );
+    public static patchTranslationsACs = createAction.async<
+        IPatchTranslationsRequest,
+        IPatchTranslationsResponse,
+        IApiError
+    >("PUT");
 
     ///
     /// Simple actions
@@ -140,7 +142,7 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
             }
         }
 
-        await this.putTranslations(publishFieldValues);
+        await this.patchTranslations(publishFieldValues);
 
         // Simulate getting the saved values back.
         const firstField = publishFieldValues[0];
@@ -172,10 +174,10 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
     /**
      * Submit translations from the /api/v2/translations endpoint.
      */
-    public putTranslations = (translations: IPutTranslationsRequest) => {
+    public patchTranslations = (translations: IPatchTranslationsRequest) => {
         const { resource } = this.getState().translations;
-        const thunk = bindThunkAction(TranslationActions.putTranslationsACs, async () => {
-            const response = await this.api.put(`/translations/${resource}`, translations);
+        const thunk = bindThunkAction(TranslationActions.patchTranslationsACs, async () => {
+            const response = await this.api.patch(`/translations/${resource}`, translations);
             return response.data;
         })(translations);
 
