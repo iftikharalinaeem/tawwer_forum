@@ -65,7 +65,7 @@ export const INITIAL_KB_FORM: IKbFormState = {
     sourceLocale: getCurrentLocale(),
 };
 
-interface ISiteSection {
+export interface ISiteSection {
     basePath: string;
     contentLocale: string;
     siteSectionGroup: string;

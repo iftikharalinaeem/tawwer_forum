@@ -29,7 +29,9 @@ story.add("Results", () => {
             <MemoryRouter>
                 <DraftsList hideTitle={true}>
                     <DraftPreview
+                        format={"text"}
                         dateUpdated={"2016-07-25 17:51:15"}
+                        dateInserted={"2016-07-25 17:51:15"}
                         updateUserID={1}
                         insertUserID={1}
                         body={
@@ -47,7 +49,9 @@ story.add("Results", () => {
                         menuOverwrite={<StoryExampleDropDownDraft />}
                     />
                     <DraftPreview
+                        format={"text"}
                         dateUpdated={"2016-07-25 17:51:15"}
+                        dateInserted={"2016-07-25 17:51:15"}
                         updateUserID={1}
                         insertUserID={1}
                         body={
@@ -63,7 +67,9 @@ story.add("Results", () => {
                         menuOverwrite={<StoryExampleDropDownDraft />}
                     />
                     <DraftPreview
+                        format={"text"}
                         dateUpdated={"2016-07-25 17:51:15"}
+                        dateInserted={"2016-07-25 17:51:15"}
                         updateUserID={1}
                         insertUserID={1}
                         body={
@@ -79,7 +85,9 @@ story.add("Results", () => {
                         menuOverwrite={<StoryExampleDropDownDraft />}
                     />
                     <DraftPreview
+                        format={"text"}
                         dateUpdated={"2016-07-25 17:51:15"}
+                        dateInserted={"2016-07-25 17:51:15"}
                         updateUserID={1}
                         insertUserID={1}
                         body={
