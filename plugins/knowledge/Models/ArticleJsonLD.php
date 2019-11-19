@@ -58,7 +58,7 @@ final class ArticleJsonLD extends AbstractJsonLDItem {
                 "name" => $this->siteMeta->getOrgName(),
                 "logo" => [
                     "@type" => "ImageObject",
-                    "url" => $this->siteMeta->getLogo(),
+                    "url" => $this->siteMeta->getShareImage(),
                 ]
             ],
             'description' => $this->articleData['excerpt'],
