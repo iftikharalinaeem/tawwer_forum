@@ -34,8 +34,6 @@ import Message from "@library/messages/Message";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/knowledgeBaseAddEditStyles";
-import getStore from "@library/redux/getStore";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 
 interface IProps {
     kbID?: number;
