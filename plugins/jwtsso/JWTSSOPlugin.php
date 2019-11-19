@@ -307,7 +307,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     public function base_connectData_handler($sender, $args) {
         //If there is another provider that is the default, do nothing and return.
-            $defaultProvider = $this->authenticationProviderModel->getDefault();
+        $defaultProvider = $this->authenticationProviderModel->getDefault();
         if ($defaultProvider && $defaultProvider !== $this->provider()['AuthenticationKey']) {
             return;
         }
