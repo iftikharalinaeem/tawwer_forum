@@ -70,12 +70,17 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const crumbs = article.data?.breadcrumbs;
         const lastCrumb = crumbs ? crumbs[crumbs.length - 1] ?? null : null;
 
+        const fallbackKbUrl = lastCrumb?.url ?? HomeRoute.url(undefined);
+        const fallbackUrl = this.props.isHomeArticle ? HomeRoute.url(undefined) : fallbackKbUrl;
+        const isAbsoluteKbRoot = this.props.isHomeArticle && this.props.isOnlyKb;
+
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
                 <AnalyticsData data={articleEventFields(article.data)} uniqueKey={article.data.articleID} />
-                <FallbackBackUrlSetter url={lastCrumb?.url ?? HomeRoute.url(undefined)} />
+                <FallbackBackUrlSetter url={fallbackUrl} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
+                    useBackButton={!isAbsoluteKbRoot}
                     article={article.data}
                     prevNavArticle={this.props.prevNavArticle}
                     nextNavArticle={this.props.nextNavArticle}
@@ -170,6 +175,8 @@ interface IOwnProps extends IDeviceProps {
     match: match<{
         id: string;
     }>;
+    isOnlyKb?: boolean;
+    isHomeArticle?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
