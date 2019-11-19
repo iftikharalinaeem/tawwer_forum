@@ -68,7 +68,7 @@ paths:
       parameters:
         - description: resource to add\update in.
           in: path
-          name: resourceUrl
+          name: resourceUrlCode
           required: true
           schema:
             type: string
@@ -86,12 +86,12 @@ paths:
               $ref: '#/components/schemas/PatchTranslations'
         required: true
       summary: Add or update translations.
-  /translations/{resourceUrl}/remove:
+  /translations/{resourceUrlCode}/remove:
     patch:
       parameters:
         - description: Delete a translation.
           in: path
-          name: resourceUrl
+          name: resourceUrlCode
           required: true
           schema:
             type: string

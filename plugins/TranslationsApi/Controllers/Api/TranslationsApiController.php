@@ -104,7 +104,7 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
-     * PATCH /Translations/:resource
+     * PATCH /translations/:resourceUrlCode
      *
      * @param string $path Resource slug
      * @param array $body
@@ -139,7 +139,7 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
-     * GET /Translations/:resource
+     * GET /translations/:resourceUrlCode
      *
      * @param string $path
      * @param array $query
@@ -191,7 +191,7 @@ class TranslationsApiController extends AbstractApiController {
     }
 
     /**
-     * PATCH /Translations/:resource/delete
+     * PATCH /translations/:resourceUrlCode/remove
      *
      * @param string $path
      * @param array $body
