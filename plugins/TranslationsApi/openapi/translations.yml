@@ -55,7 +55,7 @@ paths:
       responses:
         '200':
           content:
-            'application/json':
+            application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/Translation'
@@ -127,7 +127,7 @@ paths:
                   - locale
                   - propertyName
                 type: object
-      summary: Delete a specified translations.
+      summary: Delete specified translations.
   /translations:
     x-hidden: true
     post:
@@ -179,7 +179,7 @@ components:
       items:
         properties:
           recordType:
-            description: Name of the resource associated to the translation.
+            description: They recordType associated to the translation.
             type: string
           recordID:
             description: The recordID associated to the translation.

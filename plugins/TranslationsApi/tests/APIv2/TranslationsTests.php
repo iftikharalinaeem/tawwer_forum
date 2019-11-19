@@ -73,7 +73,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Patch /translations failure
+     * Patch /translations/:resourceUrlCode
      *
      * @param array $record
      * @param string $key
@@ -103,7 +103,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Provider for Patch /translations/:resource
+     * Provider for Patch /translations/:resourceUrlCode
      *
      * @return array
      */
@@ -158,7 +158,7 @@ class TranslationsTests extends AbstractAPIv2Test {
 
 
     /**
-     * Test GET /translation/:resource
+     * Test GET /translation/:resourceUrlCode
      *
      * @param array $query
      * @param int $count
@@ -176,7 +176,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Provider for PUT /translations/:resource
+     * Provider for GET /translations/:resourceUrlCode
      *
      * @return array
      */
