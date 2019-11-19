@@ -75,14 +75,6 @@ class ArticlePage extends KbPage {
 
         // Add translation meta tags for alternative language versions.
         foreach ($translationData->getData() as $translation) {
-            if ($translation['locale'] !== $article['locale'] // The current article must always be included.
-                // From Google: "Each language version must list itself as well as all other language versions."
-                && $translation['translationStatus'] === ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
-            ) {
-                // Don't display untranslated articles.
-                continue;
-            }
-
             $this->addMetaTag([
                 'rel' => 'alternate',
                 'hreflang' => $translation['locale'],
