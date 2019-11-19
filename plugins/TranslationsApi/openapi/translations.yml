@@ -17,7 +17,7 @@ paths:
             type: string
         - description: array of recordIDs of the translation.
           in: query
-          name: recordID
+          name: recordIDs
           schema:
             items:
               type: integer
