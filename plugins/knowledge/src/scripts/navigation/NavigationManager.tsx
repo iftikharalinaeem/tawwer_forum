@@ -90,6 +90,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     expandAll={this.expandAll}
                     newCategory={this.showNewCategoryModal}
                     newCategoryButtonRef={this.newCategoryButtonRef}
+                    newCategoryButtonDisable={!this.props.isEditing}
                 />
                 <div
                     ref={this.self}
@@ -149,6 +150,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
                 isInRoot={this.isItemInRoot(item.parentID)}
+                editCategories={!this.props.isEditing}
             />
         );
     };

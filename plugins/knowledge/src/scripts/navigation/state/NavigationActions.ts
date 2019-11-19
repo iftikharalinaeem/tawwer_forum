@@ -10,7 +10,8 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 import { getCurrentLocale } from "@vanilla/i18n";
-
+import { INITIAL_KB_FORM } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import getStore from "@library/redux/getStore";
 const createAction = actionCreatorFactory("@@navigation");
 
 /**
@@ -23,6 +24,9 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
         IApiError
     >("GET_NAVIGATION_FLAT");
 
+    public static editingCategoriesAC = createAction<{ isEditing: boolean }>("EDIT_CATEGORIES");
+    public editingCategories = this.bindDispatch(NavigationActions.editingCategoriesAC);
+
     /**
      * Get navigation for a knowledge base in the flat format.
      *
@@ -30,6 +34,10 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState();
+        const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
+        const editPermission = sourceLocale == getCurrentLocale();
+        this.editingCategories({ isEditing: editPermission });
+
         const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
 
         if ([LoadStatus.SUCCESS, LoadStatus.LOADING].includes(fetchStatus) && !forceUpdate) {

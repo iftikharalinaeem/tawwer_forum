@@ -21,6 +21,7 @@ interface IProps {
     collapseAll: () => void;
     newCategory: () => void;
     newCategoryButtonRef: React.RefObject<HTMLButtonElement>;
+    newCategoryButtonDisable?: boolean;
 }
 
 export default function NavigationManagerToolBar(props: IProps) {
@@ -56,6 +57,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     onClick={props.newCategory}
                     ariaLabel={t("New Category")}
                     buttonRef={props.newCategoryButtonRef}
+                    disabled={props.newCategoryButtonDisable}
                 >
                     <NewFolderIcon className={classes.icon} />
                     {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
