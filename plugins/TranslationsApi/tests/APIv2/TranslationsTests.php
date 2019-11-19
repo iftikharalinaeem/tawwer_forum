@@ -160,9 +160,9 @@ class TranslationsTests extends AbstractAPIv2Test {
     /**
      * Test GET /translation/:resource
      *
-     * @param $query
-     * @param $count
-     * @depends      testPatchTranslations
+     * @param array $query
+     * @param int $count
+     * @depends testPatchTranslations
      * @dataProvider getTranslationsProvider
      */
     public function testGetTranslations($query, $count) {

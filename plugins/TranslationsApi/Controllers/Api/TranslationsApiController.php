@@ -168,7 +168,7 @@ class TranslationsApiController extends AbstractApiController {
             }
         }
 
-        if (isset($query["propertyName"])){
+        if (isset($query["propertyName"])) {
             $where["tp.propertyName"] = $query['propertyName'];
         }
 
