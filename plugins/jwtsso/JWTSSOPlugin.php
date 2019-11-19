@@ -306,7 +306,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Configuration issues.
      */
     public function base_connectData_handler($sender, $args) {
-         //If there is another sso method being used, log it, just in case, and return.
+         //If there is another sso method being used, just return.
         if (val(0, $args) != self::PROVIDER_SCHEME_ALIAS) {
             return;
         }
