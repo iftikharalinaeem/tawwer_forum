@@ -87,17 +87,17 @@ export const translationReducer = produce(
             };
             return nextState;
         })
-        .case(TranslationActions.putTranslationsACs.started, (nextState, payload) => {
+        .case(TranslationActions.patchTranslationsACs.started, (nextState, payload) => {
             nextState.submitLoadable.status = LoadStatus.LOADING;
             return nextState;
         })
-        .case(TranslationActions.putTranslationsACs.done, (nextState, payload) => {
+        .case(TranslationActions.patchTranslationsACs.done, (nextState, payload) => {
             nextState.submitLoadable.status = LoadStatus.SUCCESS;
             delete nextState.submitLoadable.error;
             nextState.formTranslations = {};
             return nextState;
         })
-        .case(TranslationActions.putTranslationsACs.failed, (nextState, payload) => {
+        .case(TranslationActions.patchTranslationsACs.failed, (nextState, payload) => {
             nextState.submitLoadable.status = LoadStatus.ERROR;
             nextState.submitLoadable.error = payload.error;
             return nextState;

@@ -7,6 +7,8 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
+
+use Gdn_Configuration;
 use Vanilla\TranslationsApi\Models\TranslationModel;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 
@@ -14,6 +16,7 @@ use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
  * Test Translations APIv2 endpoints.
  */
 class TranslationsTests extends AbstractAPIv2Test {
+
     /**
      * {@inheritdoc}
      */
@@ -27,6 +30,10 @@ class TranslationsTests extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         self::$addons = ['translationsApi', 'vanilla'];
         parent::setUpBeforeClass();
+        /** @var Gdn_Configuration $config */
+        $config = static::container()->get(Gdn_Configuration::class);
+        $config->set('EnabledLocales.vf_fr', true);
+
     }
 
     /**
@@ -66,7 +73,7 @@ class TranslationsTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Patch /translations failure
+     * Patch /translations/:resourceUrlCode
      *
      * @param array $record
      * @param string $key
@@ -82,17 +89,21 @@ class TranslationsTests extends AbstractAPIv2Test {
         );
 
         $record = reset($record);
+
+        /** @var TranslationPropertyModel $translationPropertyModel */
         $translationPropertyModel = self::container()->get(TranslationPropertyModel::class);
-        $result = $translationPropertyModel->get(["recordType" => $record["recordType"], "recordID" => $record["recordID"], "propertyName" => $record["propertyName"]]);
-        $translationModel = self::container()->get(TranslationModel::class);
+        $translationProperty = $translationPropertyModel->getTranslationProperty($record);
+        $result = $translationPropertyModel->get(["translationPropertyKey" => $translationProperty["translationPropertyKey"]]);
         $this->assertEquals($key, $result[0]["translationPropertyKey"]);
 
+        /** @var TranslationModel $translationModel */
+        $translationModel = self::container()->get(TranslationModel::class);
         $result = $translationModel->get(["translationPropertyKey" => $result[0]["translationPropertyKey"]]);
         $this->assertEquals($translation, $result[0]["translation"]);
     }
 
     /**
-     * Provider for Patch /translations/:resource
+     * Provider for Patch /translations/:resourceUrlCode
      *
      * @return array
      */
@@ -102,7 +113,6 @@ class TranslationsTests extends AbstractAPIv2Test {
                 [[
                     "recordType" => "recordTypeOne",
                     "recordID" => 8,
-                    "recordKey" => null,
                     "propertyName" => "name",
                     "locale" => "en",
                     "translation" => "english recordTypeOne name"
@@ -114,7 +124,6 @@ class TranslationsTests extends AbstractAPIv2Test {
                 [[
                     "recordType" => "recordTypeTwo",
                     "recordID" => 9,
-                    "recordKey" => null,
                     "propertyName" => "description",
                     "locale" => "en",
                     "translation" => "english recordTypeTwo cat description"
@@ -124,17 +133,94 @@ class TranslationsTests extends AbstractAPIv2Test {
             ],
             [
                 [[
-                    "recordType" => "recordTypeThree",
-                    "recordID" => null,
-                    "recordKey" => null,
-                    "propertyName" => "name",
+                    "recordType" => "recordTypeTwo",
+                    "recordKey" => 'recordTryTwoKey',
+                    "propertyName" => "site",
                     "locale" => "en",
+                    "translation" => "english recordTypeTwo site"
+                ]],
+                "recordTypeTwo.recordTryTwoKey.site",
+                "english recordTypeTwo site",
+            ],
+            [
+                [[
+                    "recordType" => "recordTypeThree",
+                    "propertyName" => "name",
+                    "locale" => "fr",
                     "translation"=> "name"
                 ]],
                 "recordTypeThree..name",
                 "name",
             ],
         ];
+    }
+
+
+
+    /**
+     * Test GET /translation/:resourceUrlCode
+     *
+     * @param array $query
+     * @param int $count
+     * @depends testPatchTranslations
+     * @dataProvider getTranslationsProvider
+     */
+    public function testGetTranslations($query, $count) {
+        $result =$this->api()->get(
+            'translations/resourceOne',
+            $query
+        )->getBody();
+
+
+        $this->assertEquals($count, count($result));
+    }
+
+    /**
+     * Provider for GET /translations/:resourceUrlCode
+     *
+     * @return array
+     */
+    public function getTranslationsProvider(): array {
+        return
+            [
+                [
+                    [
+                        "recordType" => "recordTypeOne",
+                        "recordIDs" => [8],
+                        "locale" => "en",
+                    ],
+                    1,
+                ],
+                [
+                    [
+                        "locale" => "en",
+                    ],
+                    3,
+                ],
+                [
+                    [
+                        "locale" => "fr",
+                    ],
+                    1,
+                ],
+                [
+                    [
+                        "recordType" => "recordTypeThree",
+                        "locale" => "fr"
+
+                    ],
+                    1,
+                ],
+                [
+                    [
+                        "recordType" => "recordTypeThree",
+                        "locale" => "fr",
+                        "recordIDs" => [8],
+                        "recordKeys" => ["recordKey3"]
+                    ],
+                    0,
+                ],
+            ];
     }
 
     /**
@@ -158,8 +244,11 @@ class TranslationsTests extends AbstractAPIv2Test {
 
         unset($record["translation"]);
 
-        $result = $this->api()->patch("translations/resourceOne/delete", [$record]);
+        $result = $this->api()->patch("translations/resourceOne/remove", [$record]);
         $this->assertEquals(200, $result->getStatusCode());
+
+        unset($record["recordID"]);
+        $record["recordIDs"] = [8];
 
         $result = $this->api()->get("translations/resourceOne", $record);
         $this->assertEquals(0, count($result->getBody()));
