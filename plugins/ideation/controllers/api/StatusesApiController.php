@@ -18,18 +18,14 @@ class StatusesApiController extends AbstractApiController {
     /** @var StatusModel */
     private $statusModel;
 
-    /** @var StatusModel */
-    private $tagModel;
-
     /**
      * StatusesApiController constructor.
      *
      * @param StatusModel $statusModel
      * @param TagModel $tagModel
      */
-    public function __construct(StatusModel $statusModel, TagModel $tagModel) {
+    public function __construct(StatusModel $statusModel) {
         $this->statusModel = $statusModel;
-        $this->tagModel = $tagModel;
     }
 
     /**
