@@ -14,6 +14,8 @@ use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Site\TranslationModel;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 
 /**
  * A model for managing knowledge bases.
@@ -49,16 +51,25 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var TranslationProviderInterface */
+    private $translation;
+
     /**
      * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
      * @param SiteSectionModel $siteSectionModel
+     * @param TranslationModel $translationModel
      */
-    public function __construct(Gdn_Session $session, SiteSectionModel $siteSectionModel) {
+    public function __construct(
+        Gdn_Session $session,
+        SiteSectionModel $siteSectionModel,
+        TranslationModel $translationModel
+    ) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
+        $this->translation = $translationModel->getContentTranslationProvider();
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -164,6 +175,7 @@ MESSAGE
      * Select a KnowledgeBaseFragment for a given id.
      *
      * @param int $knowledgeBaseID Conditions for the select query.
+     * @param string $locale
      *
      * @return KnowledgeBaseFragment
      *
@@ -181,6 +193,16 @@ MESSAGE
             throw new NoResultsException("Could not find knowledge base fragment for knowledgeBaseID $knowledgeBaseID.");
         }
         $result = reset($rows);
+        if ($this->translation && !empty($locale)) {
+            $result = $this->translation->translateProperties(
+                $locale,
+                'kb',
+                KnowledgeBaseModel::RECORD_TYPE,
+                KnowledgeBaseModel::RECORD_ID_FIELD,
+                [$result],
+                ['name', 'description']
+            )[0];
+        }
         $result['locale'] = $locale ?? $result['sourceLocale'];
 
         // Normalize the fragment.
@@ -213,9 +235,19 @@ MESSAGE
         ;
 
         if (empty($rows)) {
-            throw new NoResultsException("Could not find knowledge base fragment for rootCategoryID $rootCategoryID.");
+            throw new NoResultsException("Could not find knowledge base fragment for rootCategoryID $categoryID.");
         }
         $result = reset($rows);
+        if ($this->translation && !empty($locale)) {
+            $result = $this->translation->translateProperties(
+                $locale,
+                'kb',
+                KnowledgeBaseModel::RECORD_TYPE,
+                KnowledgeBaseModel::RECORD_ID_FIELD,
+                [$result],
+                ['name', 'description']
+            )[0];
+        }
         $result['locale'] = $locale ?? $result['sourceLocale'];
 
         // Normalize the fragment.

@@ -12,6 +12,8 @@ use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Site\TranslationModel;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 
 /**
  * A model for managing knowledge categories.
@@ -47,18 +49,29 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /** @var SiteSectionModel $siteSectionModel */
     private $siteSectionModel;
 
+    /** @var TranslationProviderInterface */
+    private $translation;
+
     /**
      * KnowledgeCategoryModel constructor.
      *
      * @param Gdn_Session $session
      * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param SiteSectionModel $siteSectionModel
+     * @param TranslationModel $translationModel
      */
-    public function __construct(Gdn_Session $session, KnowledgeBaseModel $knowledgeBaseModel, SiteSectionModel $siteSectionModel) {
+    public function __construct(
+        Gdn_Session $session,
+        KnowledgeBaseModel $knowledgeBaseModel,
+        SiteSectionModel $siteSectionModel,
+        TranslationModel $translationModel
+    ) {
         parent::__construct("knowledgeCategory");
 
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
+        $this->translation = $translationModel->getContentTranslationProvider();
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -174,11 +187,20 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
             throw new NoResultsException("Could not find category fragment for id $categoryID");
         }
         $result = reset($rows);
+        if ($this->translation && !empty($locale)) {
+            $result = $this->translation->translateProperties(
+                $locale,
+                'kb',
+                self::RECORD_TYPE,
+                self::RECORD_ID_FIELD,
+                [$result],
+                ['name']
+            )[0];
+        }
         $result['locale'] = $locale ?? $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $result['knowledgeBaseID']])['sourceLocale']; //$this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
 
         // Normalize the fragment.
-        $url = $this->url($result);
-        $result['url'] = $url;
+        $result['url'] = $this->url($result);
 
         return new KbCategoryFragment($result);
     }
@@ -306,7 +328,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url("{$knowledgeCategoryID}-{$name}");
 
-        $locale = $knowledgeCategory['locale'] ?? $knowledgeCategory['sourceLocale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $locale = $knowledgeCategory['locale']
+            ?? $knowledgeCategory['sourceLocale']
+            ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
         $siteSectionSlug = $this->knowledgeBaseModel->getSiteSectionSlug($knowledgeCategory['knowledgeBaseID'], $locale);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/categories/" . $slug);
 
