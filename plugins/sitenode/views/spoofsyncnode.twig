@@ -1,0 +1,37 @@
+<h1>{{ title }} </h1>
+<div class="padded alert alert-warning">
+    Submitting this form will alter the data in your local database and the config for this site. To configure this feature to synchronize from a hub on infrastructure, put the URL of the hub, the slug of the node you will be "spoofing" and the API V1 token from the hub into your config as `Hub.Spoof.Values.hubURL`, `Hub.Spoof.Values.spoofSlug` and `Hub.Spoof.Values.spoofToken`. Also set `Hub.Spoof.Values.localhost` to `true` if you are performing this from localhost.
+</div>
+<div class="padded alert alert-{{ messageclass }}">{{ instructions }}</div>
+{{ form.open() | raw }}
+ {{ form.errors() | raw }}
+<ul>
+    <li class="form-group">
+        <div class="label-wrap">
+            <label for="hubURL">HubURL</label>
+        </div>
+        <div class="input-wrap">
+            <input type="text" id="hubURL" class="form-control" value="{{ configuredHubURL }}" disabled/>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <label for="spoofSlug">Spoof Slug</label>
+        </div>
+        <div class="input-wrap">
+            <input type="text" id="spoofSlug" class="form-control" value="{{ configuredSpoofSlug }}" disabled/>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <label for="spoofToken">Spoof Token</label>
+        </div>
+        <div class="input-wrap">
+            <input type="text" id="spoofToken" class="form-control" value="{{ configuredSpoofToken }}" disabled/>
+        </div>
+    </li>
+</ul>
+<div class="modal-footer js-modal-fixed">
+    {{ form.button('Sync From Hub') | raw }}
+</div>
+{{ form.close() | raw }}

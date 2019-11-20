@@ -212,9 +212,14 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         $url = rtrim(http_build_url($this->hubUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
-
-        if ($system && $access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
+        $localhost = $params['localhost'] ?? false;
+        if (!$localhost && $system && $access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $headers['Authorization'] = "token $access_token";
+        }
+
+        if ($localhost) {
+            //This is similar as making an API V1 call as System.
+            $headers['Authorization'] = 'Bearer '.$params['spoofToken'] ?? '';
         }
 
         $request = new ProxyRequest();
@@ -241,9 +246,17 @@ class SiteNodePlugin extends Gdn_Plugin {
         return val('NODE_SLUG', $_SERVER);
     }
 
-    public function syncNode() {
+    /**
+     *  Call the hub from the node to bring over data and update the local db and config.
+     *
+     * @param array $params Optionally pass parameters for debugging purposes.
+     * @throws Exception Catch problems and log them.
+     *
+     * @return mixed;
+     */
+    public function syncNode($params = []) {
         // Get the config from the hub.
-        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['from' => $this->slug()], true);
+        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', $params + ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
             Logger::event('syncnode_skip', Logger::INFO, "The hub told us not to sync.");
             return;
@@ -298,6 +311,14 @@ class SiteNodePlugin extends Gdn_Plugin {
         trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
+        // Everything after this communicates with the hub, if you are debugging you
+        // don't want to update the production hub, so return here.
+        $mode = $params['mode'] ?? null;
+        if ($mode && $params['mode'] === 'debug') {
+            $this->syncNodeSuccess();
+            return;
+        }
+
         // Push the categories.
         try {
             trace('Pushing categories.');
@@ -329,8 +350,8 @@ class SiteNodePlugin extends Gdn_Plugin {
             true
         );
 
-        Gdn::config()->shutdown();
-        Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
+        $this->syncNodeSuccess();
+        return;
     }
 
     public function syncAuthenticators(array $authenticators) {
@@ -925,12 +946,85 @@ class SiteNodePlugin extends Gdn_Plugin {
         $sender->render('blank');
     }
 
+
+    /**
+     * Make a call to a Site Hub spoofing as one of its nodes.
+     *
+     * @param UtilityController $sender
+     * @throws Gdn_UserException For missing config settings.
+     */
+    public function utilityController_spoofSyncNode_create(UtilityController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+        if (!c('Hub.Spoof.Enabled')) {
+            throw new Gdn_UserException('This feature is not configured. `Hub.Spoof.Enabled` needs to be `true`.');
+        }
+        $sender->setData('title', 'Synchronize From a Hub');
+        $sender->setData('messageclass', 'danger');
+        $sender->setData('instructions', 'Be careful you are about to overwrite a lot of data in your local database.');
+        $sender->setData('configuredHubURL', c('Hub.Spoof.Values.hubURL', 'You have not configured a forum from which to sync. (Hub.Spoof.Values.hubURL)'));
+        $sender->setData('configuredSpoofSlug', c('Hub.Spoof.Values.spoofSlug'), 'You have not configured the node slug you wish to imitate. (Hub.Spoof.Values.spoofSlug)');
+        $sender->setData('configuredSpoofToken', c('Hub.Spoof.Values.spoofToken'), 'You have not configured API V1 Token of the hube site. (Hub.Spoof.Values.spoofToken)');
+        $spoofValues = c('Hub.Spoof.Values', []);
+        $params = $this->generateParams($spoofValues);
+        if ($sender->Form->AuthenticatedPostBack()) {
+            if (!$spoofValues['hubURL']) {
+                throw new Gdn_UserException('You need to provide a URL of a hub site that you want to sync from in Hub.Spoof.Values.hubURL');
+            }
+
+            if (!$spoofValues['spoofSlug']) {
+                throw new Gdn_UserException('You need to provide the slug of the node site that you want to sync in Hub.Spoof.Values.spoofSlug');
+            }
+
+            if (!$spoofValues['spoofToken']) {
+                throw new Gdn_UserException('You need to provide API V1 token of the hub site that you want to sync from in Hub.Spoof.Values.spoofToken');
+            }
+
+            $this->syncNode($params);
+            $sender->setData('instructions', 'Sychronized successfully!');
+            $sender->setData('messageclass', 'success');
+        }
+
+        /**
+         * TODO loop through the config and display what is configured to happen during syncing.
+         */
+        if ($params) {
+            $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', $params + ['from' => $this->slug()], true);
+            $sender->setData('hubConfig', $config);
+        }
+        $sender->render('spoofsyncnode', '', 'plugins/sitenode');
+    }
+
+    /**
+     * Get the parameters from the confg and arrange them into a nice array.
+     *
+     * @param array $spoofValues Configured values from that imitate a node's values.
+     * @return array
+     */
+    private function generateParams($spoofValues): array {
+        $this->hubUrl = $spoofValues['hubURL'];
+        $localhost = $spoofValues['localhost'] ?? false;
+        $params = [];
+        if ($spoofValues['hubURL'] && $spoofValues['spoofToken'] && $spoofValues['spoofSlug']) {
+            $params = ['from' => $spoofValues['spoofSlug'], 'spoofToken' => $spoofValues['spoofToken'], 'localhost' => $localhost, 'mode' => 'debug'];
+        }
+        return  $params;
+    }
+
+
     public function cleanspeak_init_handler($sender) {
         $siteID = Infrastructure::site('siteid');
         if (!$siteID) {
             throw new Gdn_UserException('Error getting Site ID for cleanspeak plugin.');
         }
         $sender->uuidSeed = [$siteID, 0, 0, 0];
+    }
+
+    /**
+     * Routine for ending the node sync process.
+     */
+    private function syncNodeSuccess(): void {
+        Gdn::config()->shutdown();
+        Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
     }
 
 }
