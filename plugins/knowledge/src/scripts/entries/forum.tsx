@@ -9,6 +9,11 @@ import { delegateEvent } from "@vanilla/dom-utils";
 import { mountModal } from "@library/modal/Modal";
 import React from "react";
 
+import { addComponent } from "@library/utility/componentRegistry";
+import { TitleBarHome } from "@library/headers/TitleBarHome";
+
+addComponent("title-bar-home", TitleBarHome);
+
 delegateEvent("click", ".js-convertDiscussionToArticle", (event, triggeringElement) => {
     event.preventDefault();
     const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
