@@ -53,10 +53,16 @@ class ArticlePage extends KbPage {
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'], $currentLocale)
             ->setCanonicalUrl($article['url'])
             ->addOpenGraphTag('og:type', 'article')
-            ->addOpenGraphTag('og:image', $article['seoImage'] ?? $this->siteMeta->getLogo())
             ->addJsonLDItem(new ArticleJsonLD($article, $this->siteMeta))
         ;
-      
+
+        // Image may or may not be present.
+        $ogImage = $article['seoImage'] ?? $this->siteMeta->getShareImage();
+        if ($ogImage !== null) {
+            $this->addOpenGraphTag('og:image', $ogImage);
+        }
+
+
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_RESPONSE,
