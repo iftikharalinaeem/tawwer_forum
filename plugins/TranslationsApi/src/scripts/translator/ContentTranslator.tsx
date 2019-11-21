@@ -130,7 +130,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
         content = (
             <Frame
                 header={<FrameHeader titleID={titleID} title={props.title} closeFrame={promptCloseConfirmation} />}
-                body={<FrameBody>{content}</FrameBody>}
+                body={<FrameBody selfPadded={true}>{content}</FrameBody>}
                 footer={
                     <FrameFooter justifyRight={true} forDashboard={true}>
                         <Button onClick={promptCloseConfirmation} baseClass={ButtonTypes.DASHBOARD_SECONDARY}>
