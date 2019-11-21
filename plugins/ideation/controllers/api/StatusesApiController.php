@@ -43,7 +43,7 @@ class StatusesApiController extends AbstractApiController {
         $status = $this->statusModel->getID($id);
 
         if ($status->IsDefault === 1) {
-            throw new ClientException('Status cannot be deleted.', 400);
+            throw new ClientException('The default status cannot be deleted.', 400);
         }
         $this->statusModel->deleteID($id);
     }
