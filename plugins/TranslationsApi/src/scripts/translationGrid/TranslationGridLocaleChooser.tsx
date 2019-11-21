@@ -69,7 +69,7 @@ export function TranslationGridLocaleChooser(props: IProps) {
                     onChange={option => props.onChange(option.value)}
                     options={options}
                     buttonClassName={classes.languageDropdownToggle}
-                    renderLeft={true}
+                    renderLeft={false}
                 />
             </div>
         </div>
