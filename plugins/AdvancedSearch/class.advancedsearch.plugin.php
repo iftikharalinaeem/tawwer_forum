@@ -14,6 +14,7 @@ use Vanilla\AdvancedSearch\Models\SearchRecordTypeProvider;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Garden\Container\Container;
+use Vanilla\Formatting\FormatService;
 
 /**
  * Class AdvancedSearchPlugin
@@ -40,6 +41,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      */
     private $searchModel;
 
+    /** @var FormatService */
+    private $formatService;
+
     /// Methods ///
 
     /**
@@ -48,13 +52,15 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * @param AddonManager $addonManager The addon manager dependency.
      * @param ContainerInterface $container
      *
-     * @throws Exception
+     * @param FormatService $formatService
      */
-    public function __construct(AddonManager $addonManager, ContainerInterface $container) {
+    public function __construct(AddonManager $addonManager, ContainerInterface $container, FormatService $formatService) {
         parent::__construct();
 
         $this->addonManager = $addonManager;
         $this->container = $container;
+        $this->formatService = $formatService;
+
         $this->fireEvent('Init');
     }
 
@@ -366,11 +372,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             }
             unset($record);
 
-            $Summary = Gdn_Format::to($Row['Summary'], $Row['Format']);
-            $media = Search::extractMedia($Summary);
-            $Row['Media'] = $media;
-
-            $Row['Summary'] = searchExcerpt(Gdn_Format::plainText($Summary, 'Raw'), $SearchTerms, $Length, false);
+            $Row['ImageUrls'] = $this->formatService->parseImageUrls($Row['Summary'], $Row['Format']);
+            $Row['Summary'] = searchExcerpt($this->formatService->renderPlainText($Row['Summary'], $Row['Format']), $SearchTerms, $Length);
+            
+            // Left behind for compatibility with existing view overrides.
+            // They won't see the media previews unless they are updated, but at least they won't break.
+            $Row['Media'] = [];
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
 
             $Row['Format'] = 'Html';
