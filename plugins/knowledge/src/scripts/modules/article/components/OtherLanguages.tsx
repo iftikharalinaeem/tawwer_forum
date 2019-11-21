@@ -74,6 +74,8 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                 options={options}
                 describedBy={titleID}
                 value={activeOption}
+                renderLeft={false}
+                offsetPaddingTop={true}
             />
         </div>
     );
