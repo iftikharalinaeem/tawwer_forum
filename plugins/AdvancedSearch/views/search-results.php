@@ -14,20 +14,8 @@
                 echo $Photo;
             }
 
-            $i = 0;
-            foreach ($Row['Media'] as $Media) {
-                $src = $Media['src'];
-
-                if (isUrl($src)) {
-                    echo '<div class="ImgExt">'.
-                        $Media['preview'].
-                        '</div>';
-                    $i++;
-
-                    if ($i >= 1 || $Media['type'] == 'video') {
-                        break;
-                    }
-                }
+            foreach ($Row['ImageUrls'] as $imageUrl) {
+                echo '<div class="ImgExt">'.img($imageUrl).'</div>';
             }
             ?>
             <div class="Media-Body">
