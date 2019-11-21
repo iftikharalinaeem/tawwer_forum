@@ -53,10 +53,16 @@ class ArticlePage extends KbPage {
             ->setSeoCrumbsForCategory($article['knowledgeCategoryID'], $currentLocale)
             ->setCanonicalUrl($article['url'])
             ->addOpenGraphTag('og:type', 'article')
-            ->addOpenGraphTag('og:image', $article['seoImage'] ?? $this->siteMeta->getLogo())
             ->addJsonLDItem(new ArticleJsonLD($article, $this->siteMeta))
         ;
-      
+
+        // Image may or may not be present.
+        $ogImage = $article['seoImage'] ?? $this->siteMeta->getShareImage();
+        if ($ogImage !== null) {
+            $this->addOpenGraphTag('og:image', $ogImage);
+        }
+
+
         // Preload redux actions for faster page loads.
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_RESPONSE,
@@ -75,14 +81,6 @@ class ArticlePage extends KbPage {
 
         // Add translation meta tags for alternative language versions.
         foreach ($translationData->getData() as $translation) {
-            if ($translation['locale'] !== $article['locale'] // The current article must always be included.
-                // From Google: "Each language version must list itself as well as all other language versions."
-                && $translation['translationStatus'] === ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
-            ) {
-                // Don't display untranslated articles.
-                continue;
-            }
-
             $this->addMetaTag([
                 'rel' => 'alternate',
                 'hreflang' => $translation['locale'],

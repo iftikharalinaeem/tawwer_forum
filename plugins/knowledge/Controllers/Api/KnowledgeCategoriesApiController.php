@@ -9,20 +9,20 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
-use Garden\Schema\ValidationField;
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
-use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Site\TranslationModel;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
+use LocalesApiController;
 
 /**
  * Endpoint for the knowledge category resource.
  */
 class KnowledgeCategoriesApiController extends AbstractApiController {
+    use KnowledgeCategoriesApiSchemes;
 
     /** @var Schema */
     private $idParamSchema;
@@ -42,6 +42,12 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var TranslationProviderInterface */
+    private $translation;
+
+    /** @var LocalesApiController $localeApi */
+    private $localeApi;
+
     /**
      * KnowledgeCategoriesApiController constructor.
      *
@@ -54,22 +60,22 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         KnowledgeBaseModel $knowledgeBaseModel,
         ArticleModel $articleModel,
-        BreadcrumbModel $breadcrumModel
+        BreadcrumbModel $breadcrumModel,
+        TranslationModel $translationModel,
+        LocalesApiController $localeApi
     ) {
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->articleModel = $articleModel;
         $this->breadcrumbModel = $breadcrumModel;
+        $this->translation = $translationModel->getContentTranslationProvider();
+        $this->localeApi = $localeApi;
     }
 
     /**
      * Delete a knowledge category.
      *
      * @param int $id
-     * @throws ValidationException If output validation fails while getting the knowledge category.
-     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      * @throws \Garden\Web\Exception\ClientException If the target knowledge category is not empty.
      */
     public function delete(int $id) {
@@ -99,89 +105,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a schema representing all available fields for a knowledge category.
-     *
-     * @return Schema
-     */
-    private function fullSchema(): Schema {
-        return Schema::parse([
-            "knowledgeCategoryID" => [
-                "description" => "Unique knowledge category ID.",
-                "type" => "integer",
-            ],
-            "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
-            "name" => [
-                "description" => "Name for the category.",
-                "length" => 255,
-                "type" => "string",
-            ],
-            "parentID" => [
-                "allowNull" => true,
-                "description" => "Unique ID of the parent for a category.",
-                "type" => "integer",
-            ],
-            "knowledgeBaseID" => [
-                "allowNull" => true,
-                "description" => "Knowledge base ID for a category.",
-                "type" => "integer",
-            ],
-            "sortChildren" => [
-                "allowNull" => true,
-                "description" => "Sort order for contents of the category.",
-                "enum" => ["name", "dateInserted", "dateInsertedDesc", "manual"],
-                "type" => "string",
-            ],
-            "sort" => [
-                "allowNull" => true,
-                "description" => "Sort weight of the category. Used when sorting the parent category's contents.",
-                "type" => "integer",
-            ],
-            "insertUserID" => [
-                "description" => "Unique ID of the user who originally created the knowledge category.",
-                "type" => "integer",
-            ],
-            "dateInserted:dt" => [
-                "description" => "When the knowledge category was created.",
-                "type" => "datetime",
-            ],
-            "updateUserID:i" => [
-                "description" => "Unique ID of the last user to update the knowledge category.",
-                "type" => "integer",
-            ],
-            "dateUpdated:dt" => [
-                "description" => "When the knowledge category was last updated.",
-                "type" => "datetime",
-            ],
-            "lastUpdatedArticleID" => [
-                "allowNull" => true,
-                "description" => "Unique ID of the last article to be updated in the category.",
-                "type" => "integer",
-            ],
-            "lastUpdatedUserID" => [
-                "allowNull" => true,
-                "description" => "Unique ID of the last user to update an article in the category.",
-                "type" => "integer",
-            ],
-            "articleCount" => [
-                "description" => "Total articles in the category.",
-                "type" => "integer",
-            ],
-            "articleCountRecursive" => [
-                "description" => "Aggregate total of all articles in the category and its children.",
-                "type" => "integer",
-            ],
-            "childCategoryCount" => [
-                "description" => "Total child categories.",
-                "type" => "integer",
-            ],
-            "url" => [
-                "description" => "Full URL to the knowledge category.",
-                "type" => "string",
-            ],
-        ]);
-    }
-
-    /**
      * Get a single knowledge category.
      *
      * @param int $id
@@ -192,7 +115,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $this->permission("knowledge.kb.view");
 
         /** @var Schema $in */
-        $in = $this->idParamSchema()->setDescription("Get a single knowledge category.");
+        $in = $this->idParamSchema()->addValidator('locale', [$this->localeApi, 'validateLocale']);
         $query['id'] = $id;
         $query = $in->validate($query);
 
@@ -200,12 +123,34 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
 
         $row = $this->knowledgeCategoryByID($id);
 
+        $row = $this->translateProperties([$row], $query['locale'])[0];
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']), $query['locale']);
         $row['breadcrumbs'] = $crumbs;
-
+        $row['locale'] = $query['locale'];
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Translate properties (name, description) of knowledgeCategory records
+     *
+     * @param array $rows Array of knowledgeBase records
+     * @param string $locale Locale to translate properties to
+     * @return array
+     */
+    private function translateProperties(array $rows, string $locale): array {
+        if (!is_null($this->translation)) {
+            $rows = $this->translation->translateProperties(
+                $locale,
+                'kb',
+                KnowledgeCategoryModel::RECORD_TYPE,
+                KnowledgeCategoryModel::RECORD_ID_FIELD,
+                $rows,
+                ['name']
+            );
+        }
+        return $rows;
     }
 
     /**
@@ -213,16 +158,11 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      *
      * @param int $id
      * @return array
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function get_edit(int $id): array {
         $this->permission("knowledge.articles.add");
+        $this->idParamSchema();
 
-        $this->idParamSchema()->setDescription("Get a knowledge category for editing.");
         $out = $this->schema(Schema::parse([
             "knowledgeCategoryID",
             "name",
@@ -237,41 +177,17 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     }
 
     /**
-     * Get an ID-only knowledge category schema.
-     *
-     * @param string $type The type of schema.
-     * @return Schema Returns a schema object.
-     */
-    public function idParamSchema(string $type = "in"): Schema {
-        if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                Schema::parse([
-                    "id:i" => "Knowledge category ID.",
-                    "locale" => [
-                        "description" => "Locale to represent content in.",
-                        "type" => "string",
-                        "default" => "en"
-                    ],
-                ]),
-                $type
-            );
-        }
-        return $this->schema($this->idParamSchema, $type);
-    }
-
-    /**
      * List knowledge categories.
      *
+     * @param array $query Request query params
      * @return array
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
-    public function index(): array {
+    public function index(array $query = []): array {
         $this->permission("knowledge.kb.view");
 
-        $in = $this->schema([])->setDescription("List knowledge categories.");
+        $in = $this->schema(["locale?"], 'in')
+            ->addValidator('locale', [$this->localeApi, 'validateLocale']);
+        $query = $in->validate($query);
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $publishedKnowledgeBases = array_column(
@@ -280,7 +196,13 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         );
 
         $rows = $this->knowledgeCategoryModel->get(['knowledgeBaseID' => $publishedKnowledgeBases]);
+        if ($query['locale'] ?? false) {
+            $rows = $this->translateProperties($rows, $query['locale']);
+        }
         foreach ($rows as &$row) {
+            if ($query['locale'] ?? false) {
+                $row['locale'] = $query['locale'];
+            }
             $row = $this->normalizeOutput($row);
         }
 
@@ -311,29 +233,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a knowledge category schema with minimal add/edit fields.
-     *
-     * @param string $type The type of schema.
-     * @return Schema Returns a schema object.
-     */
-    public function knowledgeCategoryPostSchema(string $type = "in"): Schema {
-        if ($this->knowledgeCategoryPostSchema === null) {
-            $this->knowledgeCategoryPostSchema = $this->schema(
-                Schema::parse([
-                    "name",
-                    "parentID",
-                    "knowledgeBaseID",
-                    "sort?",
-                    "sortChildren?",
-                ])->add($this->fullSchema()),
-                "KnowledgeCategoryPost"
-            );
-        }
-
-        return $this->schema($this->knowledgeCategoryPostSchema, $type);
-    }
-
-    /**
      * Massage knowledge category row data for useful API output.
      *
      * @param array $row
@@ -351,11 +250,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @param int $id
      * @param array $body
      * @return array
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws \Garden\Web\Exception\HttpException If a relevant ban has been applied on the permission(s) for this session.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function patch(int $id, array $body = []): array {
         $this->permission("knowledge.articles.add");
@@ -440,11 +334,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      *
      * @param array $body
      * @return array
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     * @throws \Garden\Web\Exception\HttpException If a relevant ban has been applied on the permission(s) for this session.
-     * @throws \Garden\Web\Exception\NotFoundException If the knowledge category could not be found.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have the specified permission(s).
      */
     public function post(array $body = []): array {
         $this->permission("knowledge.articles.add");
