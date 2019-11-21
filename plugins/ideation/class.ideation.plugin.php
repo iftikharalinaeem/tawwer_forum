@@ -164,7 +164,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $schema = $this->getIdeaMetadataFragment();
             $metadata = $this->getIdeaMetadata($row);
 
-            if ($metadata === null) {
+            if ($metadata === null || $metadata['statusID'] === false) {
                 // We added this to relax the schema so that we don't end up with a 422 error when an idea is in a
                 // non-ideation category.
                 $metadata = [

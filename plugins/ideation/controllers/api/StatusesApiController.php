@@ -4,6 +4,7 @@
  * @license GPLv2
  */
 
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Schema\Schema;
@@ -30,6 +31,7 @@ class StatusesApiController extends AbstractApiController {
      * Delete an idea status.
      *
      * @param int $id
+     * @throws ClientException If the status cannot be deleted.
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
@@ -38,7 +40,11 @@ class StatusesApiController extends AbstractApiController {
         $out = $this->schema([], 'out');
 
         $this->statusByID($id);
+        $status = $this->statusModel->getID($id);
 
+        if ($status->IsDefault === 1) {
+            throw new ClientException('The default status cannot be deleted.', 400);
+        }
         $this->statusModel->deleteID($id);
     }
 
