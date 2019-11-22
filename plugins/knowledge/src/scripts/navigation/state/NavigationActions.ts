@@ -18,15 +18,34 @@ const createAction = actionCreatorFactory("@@navigation");
  * Redux actions for knowledge base navigation data.
  */
 export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreState> {
+    public static getTranslationSourceNavigationItemsACs = createAction.async<
+        { knowledgeBaseID: number },
+        IKbNavigationItem[],
+        IApiError
+    >("GET_TRANSLATIONSOURCE_NAVIGATION_ITEMS");
+
+    public getTranslationSourceNavigationItems = async (knowledgeBaseID: number) => {
+        // GET the source locale from the store.
+        const state = this.getState();
+        const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
+        const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
+        console.log("src--> ", sourceLocale, "cur-->", getCurrentLocale());
+        const apiThunk = bindThunkAction(NavigationActions.getTranslationSourceNavigationItemsACs, async () => {
+            const response = await this.api.get(
+                `/knowledge-bases/${knowledgeBaseID}/navigation-flat?locale=${sourceLocale}`,
+            );
+            console.log("===>", response.data);
+            return response.data;
+        })({ knowledgeBaseID });
+
+        return await this.dispatch(apiThunk);
+    };
+
     public static getNavigationFlatACs = createAction.async<
         { knowledgeBaseID: number },
         IKbNavigationItem[],
         IApiError
     >("GET_NAVIGATION_FLAT");
-
-    public static editingCategoriesAC = createAction<{ isEditing: boolean }>("EDIT_CATEGORIES");
-    public editingCategories = this.bindDispatch(NavigationActions.editingCategoriesAC);
-
     /**
      * Get navigation for a knowledge base in the flat format.
      *
@@ -34,9 +53,6 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState();
-        const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
-        const editPermission = sourceLocale == getCurrentLocale();
-        this.editingCategories({ isEditing: editPermission });
 
         const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
 

@@ -19,7 +19,7 @@ import { NewFolderIcon } from "@library/icons/common";
 import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import Translate from "@library/content/Translate";
-import { button } from "@storybook/addon-knobs";
+//import { button } from "@storybook/addon-knobs";
 
 interface IProps {
     className?: string;
@@ -39,7 +39,7 @@ export default function NavigationAdminLinks(props: IProps) {
     const openModal = () => setModalOpen(true);
     const currentLocale = getCurrentLocale();
     const sourceLocale = knowledgeBase.sourceLocale;
-    const isDisable = sourceLocale !== currentLocale;
+    const isDisabled = sourceLocale !== currentLocale;
 
     return (
         <Permission permission="articles.add">
@@ -58,7 +58,7 @@ export default function NavigationAdminLinks(props: IProps) {
                     </OrganizeCategoriesRoute.Link>
                 </li>
                 <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    {isDisable ? (
+                    {isDisabled ? (
                         <ToolTip
                             label={
                                 <Translate
@@ -75,7 +75,7 @@ export default function NavigationAdminLinks(props: IProps) {
                                         buttonRef={categoryButtonRef}
                                         baseClass={ButtonTypes.CUSTOM}
                                         className={classNames(classes.link)}
-                                        disabled={isDisable}
+                                        disabled={isDisabled}
                                     >
                                         <NewFolderIcon className={classes.linkIcon} />
                                         {t("New Category")}
@@ -89,7 +89,7 @@ export default function NavigationAdminLinks(props: IProps) {
                             buttonRef={categoryButtonRef}
                             baseClass={ButtonTypes.CUSTOM}
                             className={classNames(classes.link)}
-                            disabled={isDisable}
+                            disabled={isDisabled}
                         >
                             <NewFolderIcon className={classes.linkIcon} />
                             {t("New Category")}

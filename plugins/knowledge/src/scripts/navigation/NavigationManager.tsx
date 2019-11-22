@@ -41,6 +41,7 @@ import { navigationManagerClasses } from "@knowledge/navigation/navigationManage
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { PublishStatus } from "@library/@types/api/core";
 import CombineAwareTree from "@knowledge/navigation/CombineAwareTree";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -83,6 +84,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public render() {
         const classesNavigationManager = navigationManagerClasses();
+        const canEdit = this.props.knowledgeBase.sourceLocale == getCurrentLocale();
         return (
             <>
                 <NavigationManagerToolBar
@@ -90,7 +92,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     expandAll={this.expandAll}
                     newCategory={this.showNewCategoryModal}
                     newCategoryButtonRef={this.newCategoryButtonRef}
-                    newCategoryButtonDisable={!this.props.isEditing}
+                    newCategoryButtonDisable={!canEdit}
                 />
                 <div
                     ref={this.self}
@@ -112,7 +114,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
-                        isDragEnabled={this.props.isEditing ?? !this.state.disabled}
+                        isDragEnabled={!this.state.disabled} //this.props.isEditing ?? !this.state.disabled
                         offsetPerLevel={24}
                         isNestingEnabled={this.state.allowCombining}
                     />
@@ -150,7 +152,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
                 isInRoot={this.isItemInRoot(item.parentID)}
-                editCategories={!this.props.isEditing}
+                isEditDisabled={!this.props.isEditing}
             />
         );
     };
@@ -166,7 +168,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public async componentDidMount() {
         const { knowledgeBaseID } = this.props.knowledgeBase;
+
         await this.props.navigationActions.getNavigationFlat(knowledgeBaseID);
+        await this.props.navigationActions.getTranslationSourceNavigationItems(knowledgeBaseID);
     }
 
     /**

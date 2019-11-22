@@ -13,7 +13,11 @@ import {
 } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import NavigationModel, { INormalizedNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationModel, {
+    INormalizedNavigationItem,
+    KbRecordType,
+    IKbNavigationItem,
+} from "@knowledge/navigation/state/NavigationModel";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
 import { Permission } from "@library/features/users/Permission";
@@ -26,8 +30,8 @@ interface IProps {
 
 export function OrganizeCategoriesTranslator(props: IProps) {
     const { Translator, shouldDisplay } = useContentTranslator();
+    // const itemsLoadable = useNavigationCategoriesForKB(props.kbID);
     const items = useNavigationCategoriesForKB(props.kbID);
-    const status = useStatus(props.kbID);
 
     if (!shouldDisplay) {
         return null;
@@ -48,7 +52,8 @@ export function OrganizeCategoriesTranslator(props: IProps) {
     );
 }
 
-function navItemToTranslationProperty(item: INormalizedNavigationItem): ITranslationProperty {
+//function navItemToTranslationProperty(item: IKbNavigationItem): ITranslationProperty {
+function navItemToTranslationProperty(item: IKbNavigationItem): ITranslationProperty {
     return {
         propertyName: "name",
         propertyType: TranslationPropertyType.TEXT,
@@ -63,24 +68,37 @@ function navItemToTranslationProperty(item: INormalizedNavigationItem): ITransla
 
 function useStatus(kbID: number) {
     const status = useSelector(
-        (state: IKnowledgeAppStoreState) => state.knowledge.navigation.fetchStatusesByKbID[kbID],
+        (state: IKnowledgeAppStoreState) => state.knowledge.navigation.translationSourceNavItems.status,
+        //  (state: IKnowledgeAppStoreState) => state.knowledge.navigation.fetchStatusesByKbID[kbID],
     );
 
     return status;
 }
 
 function useNavigationCategoriesForKB(kbID: number) {
-    const navItemsByID = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems);
-    const itemsForKb = Object.values(navItemsByID).filter(
+    //const navItemsByID = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.navigation.navigationItems);
+    const itemsForKbLoadable = useSelector(
+        (state: IKnowledgeAppStoreState) => state.knowledge.navigation.translationSourceNavItems,
+    );
+    const itemsForKb = Object.values(itemsForKbLoadable).filter(
         item =>
             item &&
             item.knowledgeBaseID === kbID &&
             item.recordType === KbRecordType.CATEGORY &&
             item.parentID !== NavigationModel.SYNTHETIC_ROOT.recordID,
     );
+
+    // Instead of pulling form main data
+
+    const status = useStatus(kbID);
+
+    if (status === LoadStatus.PENDING) {
+    }
+
     useDebugValue({
         kbID,
         itemsForKb,
     });
+
     return itemsForKb;
 }
