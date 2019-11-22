@@ -84,7 +84,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public render() {
         const classesNavigationManager = navigationManagerClasses();
-        const canEdit = this.props.knowledgeBase.sourceLocale == getCurrentLocale();
+        const sourceLocale = this.props.knowledgeBase.sourceLocale;
+        const canEdit = sourceLocale == getCurrentLocale();
+
         return (
             <>
                 <NavigationManagerToolBar
@@ -93,6 +95,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     newCategory={this.showNewCategoryModal}
                     newCategoryButtonRef={this.newCategoryButtonRef}
                     newCategoryButtonDisable={!canEdit}
+                    sourceLocale={sourceLocale}
                 />
                 <div
                     ref={this.self}
@@ -114,7 +117,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
-                        isDragEnabled={!this.state.disabled} //this.props.isEditing ?? !this.state.disabled
+                        isDragEnabled={canEdit ?? !this.state.disabled} //this.props.isEditing ?? !this.state.disabled
                         offsetPerLevel={24}
                         isNestingEnabled={this.state.allowCombining}
                     />
@@ -130,7 +133,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
-
+        const canEdit = this.props.knowledgeBase.sourceLocale == getCurrentLocale();
         const hasChildren = item.children && item.children.length > 0;
         const deleteHandler = (focusButton: HTMLButtonElement) => {
             this.setState({ elementToFocusOnDeleteClose: focusButton });
@@ -152,7 +155,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
                 isInRoot={this.isItemInRoot(item.parentID)}
-                isEditDisabled={!this.props.isEditing}
+                canEdit={!canEdit}
             />
         );
     };

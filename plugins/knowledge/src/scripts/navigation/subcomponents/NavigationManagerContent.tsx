@@ -33,7 +33,7 @@ interface IProps {
     firstID: string | null;
     getItemID: (id: string) => string;
     isInRoot: boolean;
-    isEditDisabled?: boolean;
+    canEdit?: boolean;
 }
 
 interface IState {
@@ -50,7 +50,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot, isInRoot, isEditDisabled } = this.props;
+        const { item, provided, snapshot, isInRoot, canEdit } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         const classesNavigationManager = navigationManagerClasses();
@@ -135,7 +135,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
-                                // disabled={isEditDisabled}
+                                disabled={canEdit}
                                 tabIndex={0}
                             >
                                 {t("Rename")}
@@ -153,7 +153,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                     baseClass={ButtonTypes.CUSTOM}
                                     buttonRef={this.deleteButtonRef}
                                     tabIndex={0}
-                                    // disabled={isEditDisabled}
+                                    disabled={canEdit}
                                 >
                                     {t("Delete")}
                                 </Button>

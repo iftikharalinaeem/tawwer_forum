@@ -25,16 +25,15 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
     >("GET_TRANSLATIONSOURCE_NAVIGATION_ITEMS");
 
     public getTranslationSourceNavigationItems = async (knowledgeBaseID: number) => {
-        // GET the source locale from the store.
         const state = this.getState();
         const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
         const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
-        console.log("src--> ", sourceLocale, "cur-->", getCurrentLocale());
+
         const apiThunk = bindThunkAction(NavigationActions.getTranslationSourceNavigationItemsACs, async () => {
             const response = await this.api.get(
                 `/knowledge-bases/${knowledgeBaseID}/navigation-flat?locale=${sourceLocale}`,
             );
-            console.log("===>", response.data);
+
             return response.data;
         })({ knowledgeBaseID });
 

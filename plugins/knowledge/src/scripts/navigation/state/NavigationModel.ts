@@ -59,7 +59,6 @@ export interface INavigationStoreState {
         error: IApiError;
         isLoading: boolean;
     } | null;
-    isEditing: boolean;
 }
 
 export enum KbRecordType {
@@ -100,7 +99,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchStatusesByKbID: [],
         patchTransactionID: null,
         currentError: null,
-        isEditing: false,
         translationSourceNavItems: { status: LoadStatus.PENDING },
     };
 
@@ -134,10 +132,6 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             }
             return state;
         });
-    /*.case(NavigationActions.editingCategoriesAC, (nextState, payload) => {
-            nextState.isEditing = payload.isEditing;
-            return nextState;
-        });*/
 
     /**
      * Reduce actions related to fetching navigation.

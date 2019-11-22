@@ -19,7 +19,6 @@ import { NewFolderIcon } from "@library/icons/common";
 import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import Translate from "@library/content/Translate";
-//import { button } from "@storybook/addon-knobs";
 
 interface IProps {
     className?: string;
@@ -66,7 +65,7 @@ export default function NavigationAdminLinks(props: IProps) {
                                     c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
                                 />
                             }
-                            ariaLabel={"This article was editied in its source locale."}
+                            ariaLabel={"You can only add categories in the source locale."}
                         >
                             <span>
                                 {
