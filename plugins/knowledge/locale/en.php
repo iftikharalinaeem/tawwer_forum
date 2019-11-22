@@ -12,6 +12,8 @@ $Definition['Move'] = 'Move';
 $Definition['Edit article'] = 'Edit article';
 $Definition['Revision History'] = 'Revision History';
 $Definition['This article is not translated yet or it is out of date'] = 'This article is not translated yet or it is out of date';
+$Definition['This article was edited in its source locale on <0/>. Edit this article to update its translation and clear this message.'] = 'This article was edited in its source locale on <0/>. Edit this article to update its translation and clear this message.';
+$Definition['This article was edited in its source locale. Edit this article to update its translation and clear this message.'] = 'This article was edited in its source locale. Edit this article to update its translation and clear this message.';
 
 // Attachment icons.
 $Definition['Attachments: '] = 'Attachments: ';

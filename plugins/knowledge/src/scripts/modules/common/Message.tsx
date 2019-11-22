@@ -9,6 +9,7 @@ import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import classNames from "classnames";
 import { buttonClasses } from "@library/forms/buttonStyles";
+import { messagesClasses } from "@library/messages/messageStyles";
 
 interface IProps {
     className?: string;
@@ -24,16 +25,16 @@ interface IProps {
  */
 export default class Message extends React.Component<IProps> {
     public render() {
-        const buttons = buttonClasses();
+        const classes = messagesClasses();
         const { actionHandler, isActionLoading, title, text, actionTitle, className } = this.props;
         return (
-            <div className={classNames("message", className)}>
-                <div className="message-main">
-                    <h2 className="message-title">{title}</h2>
-                    <p className="message-text">{text}</p>
+            <div className={classNames(classes.root, className)}>
+                <div className={classes.main}>
+                    <h2 className={classes.title}>{title}</h2>
+                    <p className={classes.text}>{text}</p>
                 </div>
                 {actionTitle && (
-                    <Button className={classNames("message-button")} onClick={actionHandler}>
+                    <Button className={classNames(classes.actionButton)} onClick={actionHandler}>
                         {isActionLoading ? <ButtonLoader /> : actionTitle}
                     </Button>
                 )}

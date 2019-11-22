@@ -5,37 +5,42 @@
 
 import React from "react";
 import Message from "@library/messages/Message";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { t } from "@vanilla/i18n";
-import { useHistory } from "react-router";
-import { getRelativeUrl } from "@library/utility/appUtils";
 import { WarningIcon } from "@library/icons/common";
 import { messagesClasses } from "@library/messages/messageStyles";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
+import classNames from "classnames";
 
 interface IProps {
     articleID: number;
+    date?: string;
 }
 
 export function ArticleUntranslatedMessage(props: IProps) {
-    const history = useHistory();
-
-    const onConfirm = () => {
-        let url = EditorRoute.url({ articleID: props.articleID });
-        url = getRelativeUrl(url);
-        history.push(url);
-    };
-
     const classes = messagesClasses();
+
+    const textNoDate = t(
+        "This article was edited in its source locale. Edit this article to update its translation and clear this message.",
+    );
+    const textDate = props.date ? (
+        <Translate
+            source={
+                "This article was edited in its source locale on <0/>. Edit this article to update its translation and clear this message."
+            }
+            c0={<DateTime timestamp={props.date} />}
+        />
+    ) : (
+        textNoDate
+    );
 
     return (
         <Message
-            confirmText={t("Translate")}
-            onConfirm={onConfirm}
-            stringContents={t("This article hasn't been translated yet.")}
+            stringContents={textNoDate}
             contents={
                 <div className={classes.content}>
-                    <WarningIcon className={classes.messageIcon} />
-                    <div>{t("This article hasn't been translated yet.")}</div>
+                    <WarningIcon className={classNames(classes.messageIcon, classes.warningIcon)} />
+                    <div>{textDate}</div>
                 </div>
             }
         />
