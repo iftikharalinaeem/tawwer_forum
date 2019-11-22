@@ -163,7 +163,10 @@ trait KnowledgeBasesApiSchemes {
     public function idParamSchema(string $type = "in"): Schema {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
-                Schema::parse(["id:i" => "Knowledge base ID."]),
+                Schema::parse([
+                        "id:i" => "Knowledge base ID.",
+                        "locale?",
+                    ])->addValidator('locale', [$this->localeApi, 'validateLocale']),
                 $type
             );
         }
@@ -186,7 +189,9 @@ trait KnowledgeBasesApiSchemes {
                     "sourceLocale?",
                     "locale?",
                     "siteSectionGroup?"
-                ]),
+                ])
+                    ->addValidator('locale', [$this->localeApi, 'validateLocale'])
+                    ->addValidator('sourceLocale', [$this->localeApi, 'validateLocale']),
                 $type
             );
         }

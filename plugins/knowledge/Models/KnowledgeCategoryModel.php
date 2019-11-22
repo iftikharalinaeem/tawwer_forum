@@ -17,6 +17,9 @@ use Vanilla\Site\SiteSectionModel;
  * A model for managing knowledge categories.
  */
 class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
+    const RECORD_TYPE = 'knowledgeCategory';
+
+    const RECORD_ID_FIELD = 'knowledgeCategoryID';
 
     /** Maximum articles allowed in a guide KB root-level category. */
     const ROOT_LIMIT_GUIDE_ARTICLES_RECURSIVE = 1000;

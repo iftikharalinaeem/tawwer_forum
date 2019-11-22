@@ -14,6 +14,9 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Site\TranslationModel;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
+use LocalesApiController;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -34,6 +37,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var TranslationProviderInterface $translation */
+    private $translation;
+
+    /** @var LocalesApiController $localeApi */
+    private $localeApi;
+
     /**
      * KnowledgeBaseApiController constructor.
      *
@@ -46,26 +55,39 @@ class KnowledgeBasesApiController extends AbstractApiController {
         KnowledgeBaseModel $knowledgeBaseModel,
         KnowledgeNavigationApiController $knowledgeNavigationApi,
         KnowledgeCategoryModel $knowledgeCategoryModel,
-        SiteSectionModel $siteSectionModel
+        SiteSectionModel $siteSectionModel,
+        TranslationModel $translationModel,
+        LocalesApiController $localeApi
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->siteSectionModel = $siteSectionModel;
+        $this->translation = $translationModel->getContentTranslationProvider();
+        $this->localeApi = $localeApi;
     }
 
     /**
      * Get a single knowledge base.
      *
      * @param int $id
+     * @param array $query
+     *
      * @return array
      */
-    public function get(int $id): array {
+    public function get(int $id, array $query = []): array {
         $this->permission("knowledge.kb.view");
-        $this->idParamSchema()->setDescription("Get a single knowledge base.");
+        $in = $this->schema($this->idParamSchema(), 'in');
+        $query['id'] = $id;
+        $query = $in->validate($query);
         $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->knowledgeBaseByID($id);
+        if (isset($query['locale'])) {
+            $row['locale'] = $query['locale'];
+            $rows = $this->translateProperties([$row], $query['locale']);
+            $row = reset($rows);
+        }
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
@@ -143,6 +165,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $rows = $this->knowledgeBaseModel->get($query);
 
+        $rows = $this->translateProperties($rows, $locale);
         $rows = array_map(function ($row) use ($expandSiteSections, $locale) {
             if ($expandSiteSections) {
                 $this->expandSiteSections($row);
@@ -150,9 +173,30 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $row['locale'] = $locale;
             return $this->normalizeOutput($row);
         }, $rows);
-        $result = $out->validate($rows);
 
+        $result = $out->validate($rows);
         return $result;
+    }
+
+    /**
+     * Translate properties (name, description) of knowledge base records
+     *
+     * @param array $rows Array of knowledgeBase records
+     * @param string $locale Locale to translate properties to
+     * @return array
+     */
+    private function translateProperties(array $rows, string $locale): array {
+        if (!is_null($this->translation)) {
+            $rows = $this->translation->translateProperties(
+                $locale,
+                'kb',
+                KnowledgeBaseModel::RECORD_TYPE,
+                KnowledgeBaseModel::RECORD_ID_FIELD,
+                $rows,
+                ['name', 'description']
+            );
+        }
+        return $rows;
     }
 
     /**

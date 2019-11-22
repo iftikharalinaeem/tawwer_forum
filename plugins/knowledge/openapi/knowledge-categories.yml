@@ -3,6 +3,14 @@ info:
 paths:
   '/knowledge-categories':
     get:
+      parameters:
+        - description: Locale that the knowledge category' names and urls should be represented in. If fields are not translated the non-translated versions will be returned.
+          in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+          example: fr
       responses:
         '200':
           content:
@@ -230,13 +238,19 @@ paths:
       summary: Delete a knowledge category.
     get:
       parameters:
-      - description: |
-          <p>Knowledge category ID.</p>
+      - description: Knowledge category ID.
         in: path
         name: id
         required: true
         schema:
           type: integer
+      - description: Locale that the knowledge category name and url should be represented in. If fields are not translated the non-translated versions will be returned.
+        in: query
+        name: locale
+        required: false
+        schema:
+          type: string
+        example: fr
       responses:
         '200':
           content:
