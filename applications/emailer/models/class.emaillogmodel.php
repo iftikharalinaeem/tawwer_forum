@@ -69,8 +69,10 @@ class EmailLogModel extends Gdn_Model {
      * {@inheritdoc}
      */
     public function insert($Fields) {
-        $this->serializeFields($Fields);
+        $this->defineSchema();
+        $this->Validation->unapplyRule('Body', 'BodyFormat');
 
+        $this->serializeFields($Fields);
         $r = parent::insert($Fields);
 
         // Delete some old logs.
