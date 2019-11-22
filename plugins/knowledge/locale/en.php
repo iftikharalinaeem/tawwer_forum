@@ -11,6 +11,7 @@ $Definition['Customize SEO'] = 'Customize SEO';
 $Definition['Move'] = 'Move';
 $Definition['Edit article'] = 'Edit article';
 $Definition['Revision History'] = 'Revision History';
+$Definition['This article is not translated yet or it is out of date'] = 'This article is not translated yet or it is out of date';
 
 // Attachment icons.
 $Definition['Attachments: '] = 'Attachments: ';
