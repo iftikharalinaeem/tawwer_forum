@@ -8,7 +8,7 @@ import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { EditorRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -29,6 +29,7 @@ import TitleBar from "@library/headers/TitleBar";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 /**
  * Component representing the the full home page of a help center.
@@ -73,6 +74,7 @@ export class HelpCenterHome extends React.Component<IProps> {
         return (
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
+                <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
                 <Splash
                     action={splashAction}
                     styleOverwrite={{ outerBackgroundImage: bannerImage }}
@@ -80,7 +82,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                 />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar />
+                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}
@@ -108,6 +110,7 @@ export class HelpCenterHome extends React.Component<IProps> {
 
 interface IOwnProps {
     knowledgeBase: IKnowledgeBase;
+    isOnlyKb?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

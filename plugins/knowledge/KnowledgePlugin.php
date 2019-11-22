@@ -35,9 +35,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var \Gdn_Request */
     private $request;
 
-    /** @var Router */
-    private $router;
-
     /** @var SessionInterface */
     private $session;
 
@@ -45,19 +42,16 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * KnowledgePlugin constructor.
      *
      * @param \Gdn_Database $database
-     * @param Router $router
      * @param SessionInterface $session
      * @param \Gdn_Request $request
      */
     public function __construct(
         \Gdn_Database $database,
-        Router $router,
         SessionInterface $session,
         \Gdn_Request $request
     ) {
         parent::__construct();
         $this->database = $database;
-        $this->router = $router;
         $this->session = $session;
         $this->request = $request;
     }
@@ -197,12 +191,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * Ensure the database is configured.
      */
     public function structure() {
-        $this->router->setRoute(
+        $router = \Gdn::getContainer()->get(\Gdn_Router::class);
+        $router->setRoute(
             "kb/sitemap-kb\\.xml(\\.*)",
             "/kb/sitemap-kb/xml$1",
             "Internal"
         );
-        $this->router->setRoute(
+        $router->setRoute(
             "kb/sitemap-index\\.xml",
             "/kb/sitemap-index/xml",
             "Internal"

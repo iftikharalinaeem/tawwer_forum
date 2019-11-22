@@ -24,6 +24,8 @@ import React, { Dispatch } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import Container from "@library/layout/components/Container";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { HomeRoute } from "@knowledge/routes/pageRoutes";
 
 /**
  * Page for editing an article.
@@ -32,6 +34,7 @@ export class EditorPage extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("editorPage");
 
     public render() {
+        const { article } = this.props;
         return (
             <Modal
                 titleID={this.titleID}
@@ -40,6 +43,7 @@ export class EditorPage extends React.Component<IProps> {
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
                 <AnalyticsData uniqueKey={this.id} />
+                <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 {this.renderErrorMessage()}
                 <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
                     {this.renderQueryString()}

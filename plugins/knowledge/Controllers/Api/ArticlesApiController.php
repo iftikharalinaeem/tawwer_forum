@@ -481,6 +481,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $where = [
             "a.knowledgeCategoryID" => $query["knowledgeCategoryID"],
             "ar.locale" => $locale,
+            "a.status" => ArticleModel::STATUS_PUBLISHED,
         ];
 
         $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;

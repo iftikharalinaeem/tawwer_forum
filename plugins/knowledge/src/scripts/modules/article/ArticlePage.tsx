@@ -13,7 +13,7 @@ import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayo
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import ErrorPage from "@knowledge/pages/ErrorPage";
-import { CategoryRoute } from "@knowledge/routes/pageRoutes";
+import { CategoryRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -29,6 +29,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
 import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -66,11 +67,20 @@ export class ArticlePage extends React.Component<IProps, IState> {
             return <NavigationLoadingLayout activeRecord={activeRecord} />;
         }
 
+        const crumbs = article.data?.breadcrumbs;
+        const lastCrumb = crumbs ? crumbs[crumbs.length - 1] ?? null : null;
+
+        const fallbackKbUrl = lastCrumb?.url ?? HomeRoute.url(undefined);
+        const fallbackUrl = this.props.isHomeArticle ? HomeRoute.url(undefined) : fallbackKbUrl;
+        const isAbsoluteKbRoot = this.props.isHomeArticle && this.props.isOnlyKb;
+
         return (
             <DocumentTitle title={article.data.seoName || article.data.name}>
                 <AnalyticsData data={articleEventFields(article.data)} uniqueKey={article.data.articleID} />
+                <FallbackBackUrlSetter url={fallbackUrl} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
+                    useBackButton={!isAbsoluteKbRoot}
                     article={article.data}
                     prevNavArticle={this.props.prevNavArticle}
                     nextNavArticle={this.props.nextNavArticle}
@@ -165,6 +175,8 @@ interface IOwnProps extends IDeviceProps {
     match: match<{
         id: string;
     }>;
+    isOnlyKb?: boolean;
+    isHomeArticle?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
