@@ -93,15 +93,15 @@ class BreadcrumbsTranslationTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test knowledge categories "sort" field calculations when post new articles and categories.
+     * Test breadcrumbs reflect to locale param when GET knowledge-categories api.
      *
      * @param string $knowledgeCategoryKey
      * @param string $locale
      *
      * @depends testPrepareCategoryData
-     * @dataProvider translationsdDataProvider
+     * @dataProvider translationsDataProvider
      */
-    public function testBredcrumbsTranslated(string $knowledgeCategoryKey, string $locale) {
+    public function testBreadcrumbsTranslated(string $knowledgeCategoryKey, string $locale) {
         $kb = self::$preparedCategoryData['knowledgeBase'];
         $cat = self::$preparedCategoryData[$knowledgeCategoryKey];
 
@@ -137,7 +137,7 @@ class BreadcrumbsTranslationTest extends AbstractAPIv2Test {
     /**
      * Test cases data provider
      */
-    public function translationsdDataProvider() {
+    public function translationsDataProvider() {
         return [
             'Level 1' => ['subCat1', 'fr'],
             'Level 2' => ['subCat2', 'es'],
