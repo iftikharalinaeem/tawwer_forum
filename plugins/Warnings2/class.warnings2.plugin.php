@@ -768,11 +768,6 @@ class Warnings2Plugin extends Gdn_Plugin {
     ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
-        if (empty($userID) || empty($recordType) || empty($recordID)) {
-            $errorMsg = $this->getErrorMsg($userID, $recordType, $recordID);
-            throw new Gdn_UserException($errorMsg);
-        }
-
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
             throw notFoundException('User');
@@ -810,6 +805,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
 
             $warningBody = $this->getWarningBody($recordID, $recordType, c('Garden.InputFormatter'));
+            $form->setValue('Body', $warningBody);
         }
 
         if ($form->authenticatedPostBack()) {
