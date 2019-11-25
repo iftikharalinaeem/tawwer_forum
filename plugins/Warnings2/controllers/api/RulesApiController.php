@@ -35,7 +35,7 @@ class RulesApiController extends AbstractApiController {
      * @param int $id
      */
     public function delete($id) {
-        $this->permission();
+        $this->permission('Garden.Settings.Manage');
 
         $in = $this->schema(['id:i' => 'The rule ID.'], 'in')->setDescription('Delete a rule.');
         $in->validate(['id' => $id]);
@@ -46,34 +46,53 @@ class RulesApiController extends AbstractApiController {
     /**
      * Get a rule by id.
      *
-     * @param $ruleID
+     * @param mixed $ruleID
      * @return array
      */
     public function get($ruleID) {
+        $this->permission();
+
         $this->idParamRuleSchema()->validate(['id' => $ruleID]);
-        $out = $this->schema([':a' => $this->ruleSchema()], 'out');
-
-
+        $out = $this->schema($this->fullSchema(), 'out');
         $rule = $this->getRuleByID($ruleID);
+
+        $this->userModel->expandUsers($rule, ['insertUser' => 'InsertUserID', 'updateUser' => 'UpdateUserID']);
+
         return $out->validate($this->normalizeOutput($rule));
     }
 
+    /**
+     * Get the ID input schema.
+     *
+     * @return Schema
+     */
     private function idParamRuleSchema() {
         return $this->schema(['id:i' => 'The rule ID.'], 'in');
     }
 
     /**
-     * Get a list of reaction types.
+     * Get a list of Rules.
      *
-     * @return array
+     * @param $query
+     * @return mixed
      */
-    public function index() {
+    public function index(array $query) {
+        $this->permission();
+
+        $in = $this->schema(['expand?' => ApiUtils::getExpandDefinition(['insertUser', 'updateUser'])], 'in');
         $out = $this->schema([':a' => $this->ruleSchema()], 'out');
+
+        $query = $in->validate($query);
+
         $rows = $this->ruleModel->get();
 
-        foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row);
-        }
+        $this->userModel->expandUsers(
+            $rows,
+            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'updateUser' => 'UpdateUserID'])
+        );
+
+        // Normalize output of every records.
+        $rows = array_map([$this, 'normalizeOutput'], $rows);
 
         return $out->validate($rows);
     }
@@ -84,7 +103,7 @@ class RulesApiController extends AbstractApiController {
      * @param array $schemaRecord Schema record.
      * @return array Return a database record.
      */
-    public function normalizeInput(array $schemaRecord) {
+    public function normalizeInput(array $schemaRecord): array {
         return ApiUtils::convertInputKeys($schemaRecord);
     }
 
@@ -96,7 +115,7 @@ class RulesApiController extends AbstractApiController {
      * @return array
      */
     public function patch($id, array $body) {
-        $this->permission();
+        $this->permission('Garden.Settings.Manage');
 
         $in = $this->postRuleSchema()->setDescription('Update a rule.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -110,7 +129,6 @@ class RulesApiController extends AbstractApiController {
         $this->validateModel($this->ruleModel);
 
         $rule = $this->ruleModel->getID($id);
-        $this->userModel->expandUsers($rule, ['InsertUserID', 'UpdateUserID']);
 
         return $out->validate($this->normalizeOutput($rule));
     }
@@ -118,12 +136,12 @@ class RulesApiController extends AbstractApiController {
     /**
      * Create a rule.
      *
-     * @throws ServerException If the badge could not be created.
      * @param array $body The request body.
      * @return array
+     * @throws ServerException If the badge could not be created.
      */
     public function post(array $body) {
-        $this->permission();
+        $this->permission('Garden.Settings.Manage');
 
         $in = $this->postRuleSchema()->setDescription('Create a rule.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -139,7 +157,6 @@ class RulesApiController extends AbstractApiController {
         }
 
         $rule = $this->ruleModel->getID($id);
-        $this->userModel->expandUsers($rule, ['InsertUserID', 'UpdateUserID']);
 
         return $out->validate($this->normalizeOutput($rule));
     }
@@ -161,7 +178,7 @@ class RulesApiController extends AbstractApiController {
     }
 
     /**
-     * Get the full role schema.
+     * Get the full rule schema.
      *
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
@@ -190,6 +207,8 @@ class RulesApiController extends AbstractApiController {
             'DateUpdated:dt|n' => 'When the rule was last updated.',
             'insertUserID:i' => 'The user that created the rule.',
             'insertUser?' => $this->getUserFragmentSchema(),
+            'updateUserID:i|n' => 'The user that last edited the rule.',
+            'updateUser?' => $this->getUserFragmentSchema()
         ]);
 
         return $schema;
@@ -213,7 +232,6 @@ class RulesApiController extends AbstractApiController {
      * @return array Return a Schema record.
      */
     protected function normalizeOutput(array $dbRecord, array $expand = []): array {
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        return $schemaRecord;
+        return ApiUtils::convertOutputKeys($dbRecord);
     }
 }
