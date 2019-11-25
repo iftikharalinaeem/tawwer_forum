@@ -126,7 +126,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
         let messages = (
             <Permission permission="articles.add">
                 {notifyTranslationFallback && article.data && (
-                    <ArticleUntranslatedMessage articleID={article.data.articleID} />
+                    <ArticleUntranslatedMessage articleID={article.data.articleID} date={article.data.dateUpdated} />
                 )}
                 {article.data && article.data.status === PublishStatus.DELETED && (
                     <ArticleDeletedMessage
