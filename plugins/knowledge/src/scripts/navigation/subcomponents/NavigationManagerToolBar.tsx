@@ -64,7 +64,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                                 c0={<LocaleDisplayer localeContent={props.sourceLocale || " "} />}
                             />
                         }
-                        //  ariaLabel={"You can only add categories in the source locale."}
+                        ariaLabel={"You can only add categories in the source locale."}
                     >
                         <div>
                             <Button

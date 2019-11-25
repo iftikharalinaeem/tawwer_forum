@@ -26,7 +26,7 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
 
     public getTranslationSourceNavigationItems = async (knowledgeBaseID: number) => {
         const state = this.getState();
-        const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
+
         const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
 
         const apiThunk = bindThunkAction(NavigationActions.getTranslationSourceNavigationItemsACs, async () => {
