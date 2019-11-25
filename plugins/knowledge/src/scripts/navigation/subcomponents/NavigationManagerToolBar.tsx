@@ -35,6 +35,20 @@ export default function NavigationManagerToolBar(props: IProps) {
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
     const classesIcon = iconClasses();
 
+    const buttonContents = (
+        <Button
+            baseClass={ButtonTypes.CUSTOM}
+            className={classNames(classes.newFolder, classesNavigationManager.button)}
+            onClick={props.newCategory}
+            ariaLabel={t("New Category")}
+            buttonRef={props.newCategoryButtonRef}
+            disabled={props.newCategoryButtonDisable}
+        >
+            <NewFolderIcon className={classes.icon} />
+            {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
+        </Button>
+    );
+
     return (
         <div className={classes.root}>
             <div className={classes.bar}>
@@ -66,32 +80,10 @@ export default function NavigationManagerToolBar(props: IProps) {
                         }
                         ariaLabel={"You can only add categories in the source locale."}
                     >
-                        <div>
-                            <Button
-                                baseClass={ButtonTypes.CUSTOM}
-                                className={classNames(classes.newFolder, classesNavigationManager.button)}
-                                onClick={props.newCategory}
-                                ariaLabel={t("New Category")}
-                                buttonRef={props.newCategoryButtonRef}
-                                disabled={props.newCategoryButtonDisable}
-                            >
-                                <NewFolderIcon className={classes.icon} />
-                                {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
-                            </Button>
-                        </div>
+                        <div className={"toto"}>{buttonContents}</div>
                     </ToolTip>
                 ) : (
-                    <Button
-                        baseClass={ButtonTypes.CUSTOM}
-                        className={classNames(classes.newFolder, classesNavigationManager.button)}
-                        onClick={props.newCategory}
-                        ariaLabel={t("New Category")}
-                        buttonRef={props.newCategoryButtonRef}
-                        disabled={props.newCategoryButtonDisable}
-                    >
-                        <NewFolderIcon className={classes.icon} />
-                        {!isMobile && <span className={classes.buttonLabel}>{t("New Category")}</span>}
-                    </Button>
+                    { buttonContents }
                 )}
             </div>
             <hr role="separator" className={classes.separator} />
