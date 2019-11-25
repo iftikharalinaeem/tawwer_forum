@@ -108,8 +108,8 @@ function OrganizeCategoriesPage(props: IProps) {
                             {pageTitle}
                             <OrganizeCategoriesTranslator
                                 kbID={props.kbID}
-                                sourceLocale={sourceLocale}
-                                activeLocale={currentLocale}
+                                sourceLocale={sourceLocale || ""}
+                                activeLocale={currentLocale || ""}
                             />
                         </Heading>
                     </DocumentTitle>

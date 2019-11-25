@@ -14,24 +14,24 @@ import NavigationModel, {
 } from "@knowledge/navigation/state/NavigationModel";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
+import Loader from "@library/loaders/Loader";
 
 interface IProps {
     kbID: number;
-    sourceLocale: string | null;
-    activeLocale: string | null;
+    sourceLocale: string;
+    activeLocale: string;
 }
 
 export function OrganizeCategoriesTranslator(props: IProps) {
     const { Translator, shouldDisplay } = useContentTranslator();
     const status = useStatus(props.kbID);
+
     let items = useNavigationCategoriesForKB(props.kbID);
 
     if (!shouldDisplay) {
         return null;
     }
-
     const isLoading = status === LoadStatus.LOADING;
-
     return (
         <Translator
             properties={items.map(navItemToTranslationProperty)}
@@ -66,10 +66,11 @@ function useStatus(kbID: number) {
     return status;
 }
 
-function useNavigationCategoriesForKB(kbID: number) {
+function useNavigationCategoriesForKB(kbID: number): IKbNavigationItem[] {
     const itemsForKbLoadable = useSelector(
         (state: IKnowledgeAppStoreState) => state.knowledge.navigation.translationSourceNavItems,
     );
+
     let itemsForKb: INormalizedNavigationItem[];
 
     const status = useStatus(kbID);

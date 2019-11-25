@@ -43,9 +43,11 @@ export interface INormalizedNavigationItems {
 
 export interface INavigationStoreState {
     translationSourceNavItems: ILoadable<IKbNavigationItem[]>;
-
     navigationItems: INormalizedNavigationItems;
     navigationItemsByKbID: {
+        [kbID: number]: string[];
+    };
+    sourceNavigationItemsByKbID: {
         [kbID: number]: string[];
     };
     submitStatus: LoadStatus;
@@ -99,7 +101,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchStatusesByKbID: [],
         patchTransactionID: null,
         currentError: null,
-        translationSourceNavItems: { status: LoadStatus.PENDING },
+        sourceNavigationItemsByKbID: {},
+        translationSourceNavItems: {
+            status: LoadStatus.PENDING,
+        },
     };
 
     public initialState = NavigationModel.DEFAULT_STATE;
@@ -168,32 +173,31 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             return state;
         })
         .case(NavigationActions.getTranslationSourceNavigationItemsACs.started, (state, payload) => {
-            state.fetchStatusesByKbID[payload.knowledgeBaseID] = LoadStatus.LOADING;
+            state.translationSourceNavItems = {
+                status: LoadStatus.LOADING,
+            };
             return state;
         })
         .case(NavigationActions.getTranslationSourceNavigationItemsACs.done, (state, payload) => {
             const { knowledgeBaseID } = payload.params;
             const normalizedItems = NavigationModel.normalizeData(payload.result);
             state.translationSourceNavItems = {
-                ...state.translationSourceNavItems,
+                status: LoadStatus.SUCCESS,
                 ...normalizedItems,
+                ...state.translationSourceNavItems,
             };
-            state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
-            state.fetchStatusesByKbID[knowledgeBaseID] = LoadStatus.SUCCESS;
 
             // Clean up errors
             if (state.currentError && state.currentError.type === NavigationActionType.GET) {
-                state.currentError = NavigationModel.DEFAULT_STATE.currentError;
+                state.currentError = null;
             }
             return state;
         })
         .case(NavigationActions.getTranslationSourceNavigationItemsACs.failed, (state, payload) => {
-            state.currentError = {
-                type: NavigationActionType.GET,
+            state.translationSourceNavItems = {
+                status: LoadStatus.ERROR,
                 error: payload.error,
-                isLoading: false,
             };
-            state.fetchStatusesByKbID[payload.params.knowledgeBaseID] = LoadStatus.ERROR;
             return state;
         });
 
@@ -211,11 +215,12 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             const { knowledgeBaseID } = payload.params;
             if (state.patchTransactionID === payload.params.transactionID) {
                 const normalizedItems = NavigationModel.normalizeData(payload.result);
+
                 state.navigationItems = {
                     ...state.navigationItems,
                     ...normalizedItems,
                 };
-                state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
+                state.sourceNavigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
                 state.submitStatus = LoadStatus.SUCCESS;
             }
 
@@ -223,6 +228,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             if (state.currentError && state.currentError.type === NavigationActionType.MOVE) {
                 state.currentError = NavigationModel.DEFAULT_STATE.currentError;
             }
+
             return state;
         })
         .case(NavigationActions.patchNavigationFlatACs.failed, (state, payload) => {
@@ -245,6 +251,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
          */
         const handleRenameSuccess = (key: string, newName?: string) => {
             const item = nextState.navigationItems[key];
+
             if (item && newName) {
                 item.name = newName!;
                 delete item.error;

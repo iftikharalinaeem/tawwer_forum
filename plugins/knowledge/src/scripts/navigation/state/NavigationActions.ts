@@ -10,8 +10,6 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { INITIAL_KB_FORM } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import getStore from "@library/redux/getStore";
 const createAction = actionCreatorFactory("@@navigation");
 
 /**
@@ -25,9 +23,11 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
     >("GET_TRANSLATIONSOURCE_NAVIGATION_ITEMS");
 
     public getTranslationSourceNavigationItems = async (knowledgeBaseID: number) => {
-        const state = this.getState();
-
-        const sourceLocale = getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.form.sourceLocale;
+        const kbsByID = this.getState().knowledge.knowledgeBases.knowledgeBasesByID;
+        let sourceLocale = "";
+        if (kbsByID.data) {
+            sourceLocale = kbsByID.data[knowledgeBaseID].sourceLocale;
+        }
 
         const apiThunk = bindThunkAction(NavigationActions.getTranslationSourceNavigationItemsACs, async () => {
             const response = await this.api.get(

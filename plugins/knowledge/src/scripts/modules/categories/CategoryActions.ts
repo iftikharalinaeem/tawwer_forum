@@ -127,6 +127,7 @@ export default class CategoryActions extends ReduxActions {
 
         if (categoryResponse && categoryResponse.data) {
             await this.navigationActions.getNavigationFlat(categoryResponse.data.knowledgeBaseID, true);
+            await this.navigationActions.getTranslationSourceNavigationItems(categoryResponse.data.knowledgeBaseID);
         }
         return categoryResponse;
     };
