@@ -43,7 +43,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
             icon: data.translationStatus === "not-translated" && (
                 <ToolTip
                     label={t("This article is not translated yet or it is out of date")}
-                    ariaLabel={"This article was editied in its source locale."}
+                    ariaLabel={"This article was edited in its source locale."}
                 >
                     <ToolTipIcon>
                         <AlertIcon className={classNames("selectBox-selectedIcon")} />
