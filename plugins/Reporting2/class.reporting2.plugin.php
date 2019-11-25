@@ -195,7 +195,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             // Create excerpt to show in form popup
             $row = getRecord($recordType, $iD);
 
-            $discussionModel = new DiscussionModel();
+            $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
             $row = $discussionModel->fixRow($row);
 
 
