@@ -71,6 +71,23 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
         return $result;
     }
 
+    /**
+     * Generate some content
+     *
+     * @param array $article
+     * @param string $locale
+     * @return \Garden\Http\HttpResponse
+     */
+    private function generateArticleTranslation(array $article,  string $locale) {
+        $articleLocale['locale'] = $locale;
+        $articleLocale['name'] = '0 '.$locale.' '.$article['name'];
+        $articleLocale['body'] = '0 '.$locale.' '.$article['body'];
+        $articleLocale['format'] = 'text';
+
+        $result = $this->api()->patch('/articles/'.$article['articleID'], $articleLocale);
+        return $result;
+    }
+
 
     /**
      * Prepare few knowledge bases and translated content.
@@ -112,7 +129,7 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
 
             self::$content['article'.$i] = $article = $this->api()->post('/articles', [
                 "knowledgeCategoryID" => $cat0["knowledgeCategoryID"],
-                "name" => (5-$i)." Article",
+                "name" => $i." Article",
                 "body" => 'Text',
                 "format" => "text",
             ])->getBody();
@@ -121,9 +138,11 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
             switch ($i) {
                 case 2:
                     $result = $this->generateTranslation($kbCategory, ['name'], 'fr');
+                    $result = $this->generateArticleTranslation($article, 'fr');
                     break;
                 case 3:
                     $result = $this->generateTranslation($kbCategory, ['name'], 'es');
+                    $result = $this->generateArticleTranslation($article, 'es');
                     break;
                 default:
                     //just do no translation
@@ -145,7 +164,6 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
         $navigation = $this->api()->get($path.'?locale='.$locale)
             ->getBody();
         $this->assertEquals(count($order), count($navigation));
-        //die(var_dump($navigation));
         foreach ($navigation as $index => $item) {
             $this->assertStringEndsWith($order[$index]['name'], $item['name']);
             if($item['recordType'] === 'knowledgeCategory') {
@@ -168,10 +186,10 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
                 ['name' => 'Category', 'key' => 'cat2'],
                 ['name' => 'Category', 'key' => 'cat3'],
                 ['name' => 'Category', 'key' => 'cat4'],
-                ['name' => '1 Article', 'key' => 'article4'],
-                ['name' => '2 Article', 'key' => 'article3'],
-                ['name' => '3 Article', 'key' => 'article2'],
-                ['name' => '4 Article', 'key' => 'article1'],
+                ['name' => '1 Article', 'key' => 'article1'],
+                ['name' => '2 Article', 'key' => 'article2'],
+                ['name' => '3 Article', 'key' => 'article3'],
+                ['name' => '4 Article', 'key' => 'article4'],
             ]],
             'GUIDE KB FR' => ['fr', 'kbHelp', [
                 ['name' => 'GUIDE KB', 'key' => 'cat0'],
@@ -179,10 +197,10 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
                 ['name' => 'Category - fr', 'key' => 'cat2'],
                 ['name' => 'Category', 'key' => 'cat3'],
                 ['name' => 'Category', 'key' => 'cat4'],
-                ['name' => '1 Article', 'key' => 'article4'],
-                ['name' => '2 Article', 'key' => 'article3'],
-                ['name' => '3 Article', 'key' => 'article2'],
-                ['name' => '4 Article', 'key' => 'article1'],
+                ['name' => '0 fr 2 Article', 'key' => 'article2'],
+                ['name' => '1 Article', 'key' => 'article1'],
+                ['name' => '3 Article', 'key' => 'article3'],
+                ['name' => '4 Article', 'key' => 'article4'],
             ]],
             'GUIDE KB ES' => ['es', 'kbHelp', [
                 ['name' => 'GUIDE KB', 'key' => 'cat0'],
@@ -190,10 +208,10 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
                 ['name' => 'Category', 'key' => 'cat2'],
                 ['name' => 'Category - es', 'key' => 'cat3'],
                 ['name' => 'Category', 'key' => 'cat4'],
-                ['name' => '1 Article', 'key' => 'article4'],
-                ['name' => '2 Article', 'key' => 'article3'],
-                ['name' => '3 Article', 'key' => 'article2'],
-                ['name' => '4 Article', 'key' => 'article1'],
+                ['name' => '0 es 3 Article', 'key' => 'article3'],
+                ['name' => '1 Article', 'key' => 'article1'],
+                ['name' => '2 Article', 'key' => 'article2'],
+                ['name' => '4 Article', 'key' => 'article4'],
             ]],
         ];
     }
