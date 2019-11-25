@@ -11,6 +11,7 @@ $Definition['Customize SEO'] = 'Customize SEO';
 $Definition['Move'] = 'Move';
 $Definition['Edit article'] = 'Edit article';
 $Definition['Revision History'] = 'Revision History';
+$Definition['Help Menu'] = 'Menu';
 
 // Attachment icons.
 $Definition['Attachments: '] = 'Attachments: ';
