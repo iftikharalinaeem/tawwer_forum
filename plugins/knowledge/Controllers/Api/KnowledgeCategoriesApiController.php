@@ -55,6 +55,8 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param ArticleModel $articleModel
      * @param BreadcrumbModel $breadcrumModel
+     * @param TranslationModel $translationModel
+     * @param LocalesApiController $localeApi
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,
