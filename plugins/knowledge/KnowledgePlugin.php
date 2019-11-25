@@ -151,7 +151,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
     public function base_render_before($sender) {
         $menu  = is_object($sender) ? $sender->Menu ?? null : null;
         if (is_object($menu)) {
-            $menu->addLink('Help', t('Help'), '/kb/', false, ['class' => 'Knowledge']);
+            $menu->addLink('Help', t('Help Menu'), '/kb/', false, ['class' => 'Knowledge']);
         }
     }
 
