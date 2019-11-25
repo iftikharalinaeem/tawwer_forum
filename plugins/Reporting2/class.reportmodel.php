@@ -108,10 +108,8 @@ class ReportModel extends Gdn_Model {
         $recordType = $data['RecordType'];
         $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
-
-        if ($recordType === "discussion") {
-            $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
-        }
+        
+        $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
 
         if (!$reportedRecord) {
             $this->Validation->addValidationResult('RecordID', 'ErrorRecordNotFound');
@@ -141,7 +139,7 @@ class ReportModel extends Gdn_Model {
             // Grab the context discussion for the reported record
             if (strcasecmp($data['RecordType'], 'Comment') == 0) {
                 $contextDiscussion = (array)$discussionModel->getID(val('DiscussionID', $reportedRecord));
-
+                $contextDiscussion = $this->discussionModel->fixRow($contextDiscussion);
                 // Comments get their title adjusted.
                 $contextDiscussion['Name'] = sprintf(t('Re: %s'), $contextDiscussion['Name']);
             } else {
