@@ -249,7 +249,7 @@ describe("EditorPageActions", () => {
     describe("syncDraft()", () => {
         it("can create a new draft", async () => {
             const initialForm: IEditorPageForm = {
-                name: "Test form name",
+                name: "Example Article",
                 body: [{ insert: "Test form body" }],
                 knowledgeCategoryID: null,
             };
@@ -387,6 +387,7 @@ describe("EditorPageActions", () => {
             };
 
             initWithState(initialState);
+
             mockGetEditAPI();
             mockApi
                 .onPatch(`/articles/${article.articleID}`)
@@ -404,6 +405,48 @@ describe("EditorPageActions", () => {
             // Verify query string was removed from previous edit page. Don't want an outdated draft loading.
             const lastPage = history.entries[history.entries.length - 2];
             expect(lastPage.search).toEqual("");
+        });
+
+        it("Can publish a new article when the draft's articleID is not available", async () => {
+            const history = createMemoryHistory();
+            history.push("/kb/articles/432/editor?draftID=1"); // draft ID only used for testing location query string.
+
+            const initialForm: IEditorPageForm = {
+                name: "example-article",
+                body: [{ insert: "Test form body" }],
+                knowledgeCategoryID: null,
+            };
+
+            const initialState: DeepPartial<IKnowledgeAppStoreState> = {
+                knowledge: {
+                    editorPage: {
+                        ...EditorPageModel.INITIAL_STATE,
+                        form: initialForm,
+                        formArticleIDIsDeleted: true,
+                    },
+                    articles: ArticleModel.INITIAL_STATE,
+                },
+            };
+            initWithState(initialState);
+
+            const article = dummyArticle({ name: "example-article", body: '[{ insert: "Test form body" }]' });
+
+            mockApi
+                .onPost(`/articles`)
+                .replyOnce(201, article)
+                .onGet("/knowledge-bases/1/navigation-flat?locale=en")
+                .replyOnce(200, [])
+                .onGet("/articles/1", { params: { locale: "en", expand: "all" } })
+                .replyOnce(200, article);
+            applyAnyFallbackError(mockApi);
+
+            void (await editorPageActions.publish(history));
+
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).toEqual(false);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_RESPONSE)).toEqual(false);
+            expect(mockStore.isActionTypeDispatched(ArticleActions.POST_ARTICLE_RESPONSE)).toEqual(true);
+
+            expect("/kb/articles/1-example-article").toEqual(article.url);
         });
     });
 });
