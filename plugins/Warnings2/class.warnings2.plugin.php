@@ -828,8 +828,6 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->setValue('AttachRecord', true);
         }
 
-        $form->setValue('Body', $warningBody);
-
         $sender->setData('Profile', $user);
         $sender->setData('Title', sprintf(t('Warn %s'), htmlspecialchars(val('Name', $user))));
 
