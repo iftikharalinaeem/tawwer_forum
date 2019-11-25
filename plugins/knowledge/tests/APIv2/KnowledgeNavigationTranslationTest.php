@@ -126,6 +126,7 @@ class KnowledgeNavigationTranslationTest extends AbstractAPIv2Test {
      * Test GET /api/v2/knowledge-bases/{id}/navigation-flat?locale={locale}
      *
      * @param string $locale
+     * @param string $kbKey
      * @param array $order
      * @depends testPrepareGuideKbTranslations
      * @dataProvider navigationKbGuideProvider

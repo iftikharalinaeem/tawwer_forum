@@ -78,7 +78,7 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
      * @param string $locale
      * @return \Garden\Http\HttpResponse
      */
-    private function generateArticleTranslation(array $article,  string $locale) {
+    private function generateArticleTranslation(array $article, string $locale) {
         $articleLocale['locale'] = $locale;
         $articleLocale['name'] = '0 '.$locale.' '.$article['name'];
         $articleLocale['body'] = '0 '.$locale.' '.$article['body'];
@@ -154,6 +154,7 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
      * Test GET /api/v2/knowledge-bases/{id}/navigation-flat?locale={locale}
      *
      * @param string $locale
+     * @param string $kbKey
      * @param array $order
      * @depends testPrepareGuideKbTranslations
      * @dataProvider navigationKbGuideProvider
@@ -166,7 +167,7 @@ class KnowledgeHelpNavigationTranslationTest extends AbstractAPIv2Test {
         $this->assertEquals(count($order), count($navigation));
         foreach ($navigation as $index => $item) {
             $this->assertStringEndsWith($order[$index]['name'], $item['name']);
-            if($item['recordType'] === 'knowledgeCategory') {
+            if ($item['recordType'] === 'knowledgeCategory') {
                 $regExp = '/'.$locale.'\/kb\/categories\/'.self::$content[$order[$index]['key']]['knowledgeCategoryID'].'-/';
             } elseif ($item['recordType'] === 'article') {
                 $regExp = '/'.$locale.'\/kb\/articles\/'.self::$content[$order[$index]['key']]['articleID'].'-/';
