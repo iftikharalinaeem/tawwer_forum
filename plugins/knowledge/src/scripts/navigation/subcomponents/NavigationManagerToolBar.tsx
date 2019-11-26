@@ -88,7 +88,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                         <div className={classNames(classes.newFolder)}>{buttonContents}</div>
                     </ToolTip>
                 ) : (
-                    { buttonContents }
+                    buttonContents
                 )}
             </div>
             <hr role="separator" className={classes.separator} />

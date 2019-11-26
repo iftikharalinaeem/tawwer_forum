@@ -146,11 +146,11 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /**
      * Add the knowledge base "Help" link to the main menu.
      *
-     * @param mixed $sender Sender object.
+     * @param \Gdn_Controller $sender Sender object.
      */
     public function base_render_before($sender) {
         $menu  = is_object($sender) ? $sender->Menu ?? null : null;
-        if (is_object($menu)) {
+        if (is_object($menu) && $this->session->checkPermission('knowledge.kb.view')) {
             $menu->addLink('Help', t('Help Menu', 'Help'), '/kb/', false, ['class' => 'Knowledge']);
         }
     }
