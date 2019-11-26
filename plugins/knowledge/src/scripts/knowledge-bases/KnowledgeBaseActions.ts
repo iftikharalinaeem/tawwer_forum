@@ -11,15 +11,12 @@ import {
     KnowledgeBaseStatus,
     IPostKnowledgeBaseRequest,
     IPatchKnowledgeBaseRequest,
-    IKnowledgeBasesState,
     IKbFormState,
 } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
-import { type } from "os";
-import { ISearchRequestBody } from "@knowledge/@types/api/search";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 interface IKknowledgeBaseParams {
@@ -99,6 +96,10 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
 
         if (form.icon === null) {
             form.icon = "";
+        }
+
+        if (!form.siteSectionGroup) {
+            form.siteSectionGroup = "vanilla";
         }
 
         if (form.knowledgeBaseID != null) {

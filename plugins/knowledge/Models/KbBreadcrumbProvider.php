@@ -34,6 +34,7 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
      *
      * @param KnowledgeCategoryModel $kbCategoryModel
      * @param KnowledgeBaseModel $kbModel
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         KnowledgeCategoryModel $kbCategoryModel,

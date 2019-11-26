@@ -321,7 +321,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options["limit"] ?? self::LIMIT_DEFAULT;
         if ($limit !== false) {
-            $offset = $options["offset"] ?: 0;
+            $offset = $options["offset"] ?? 0;
             $page = $offset / $limit;
         } else {
             $page = false;

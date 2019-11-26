@@ -117,7 +117,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                         onCollapse={this.collapseItem}
                         onExpand={this.expandItem}
                         renderItem={this.renderItem}
-                        isDragEnabled={canEdit ?? !this.state.disabled}
+                        isDragEnabled={!this.state.disabled}
                         offsetPerLevel={24}
                         isNestingEnabled={this.state.allowCombining}
                     />
