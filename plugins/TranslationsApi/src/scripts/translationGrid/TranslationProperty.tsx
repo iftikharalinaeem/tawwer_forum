@@ -96,7 +96,8 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
                                 const { value } = event.target;
                                 props.onTranslationChange(properyKey, value);
                             },
-                            value: translationValue != null ? translationValue : property.sourceText,
+                            value: translationValue,
+                            placeholder: property.sourceText,
                             multiline: isMultiLine,
                             maxLength: property.propertyValidation.maxLength,
                         }}
