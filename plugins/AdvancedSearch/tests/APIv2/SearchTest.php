@@ -6,6 +6,10 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 class SearchTest extends AbstractAPIv2Test {
@@ -30,6 +34,9 @@ class SearchTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
 
+        self::container()->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new \Garden\Container\Reference(ForumBreadcrumbProvider::class)]);
+
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$siteInfo['adminUserID'], false, false);
@@ -51,7 +58,7 @@ class SearchTest extends AbstractAPIv2Test {
         self::$discussion = $discussionsAPIController->post([
             'name' => $tmp,
             'body' => $tmp,
-            'format' => 'markdown',
+            'format' => MarkdownFormat::FORMAT_KEY,
             'categoryID' => self::$category['categoryID'],
         ]);
         self::$discussion['rawBody'] = $tmp;
@@ -69,6 +76,52 @@ class SearchTest extends AbstractAPIv2Test {
         self::$searchResultSchema = $searchAPIController->fullSchema();
 
         $session->end();
+    }
+
+    /**
+     * Test that the expand body parameter works.
+     */
+    public function testExpandBody() {
+        $renderedBody = Gdn::formatService()->renderHTML(self::$discussion['body'], MarkdownFormat::FORMAT_KEY);
+
+        // Default has body for backwards compat.
+        $params = [
+            'query' => self::$discussion['name'],
+        ];
+        $response = $this->api()->get('/search?'.http_build_query($params));
+        $this->assertEquals($renderedBody, $response->getBody()[0]['body']);
+
+        // Explicitly passing expandBody=true works.
+        $params = [
+            'query' => self::$discussion['name'],
+            'expandBody' => true,
+        ];
+        $response = $this->api()->get('/search?'.http_build_query($params));
+        $this->assertEquals($renderedBody, $response->getBody()[0]['body']);
+
+        // Explicitly passing expandBody=false works.
+        $params = [
+            'query' => self::$discussion['name'],
+            'expandBody' => false,
+        ];
+        $response = $this->api()->get('/search?'.http_build_query($params));
+        $this->assertNull($response->getBody()[0]['body'] ?? null);
+    }
+
+    /**
+     * Test that the expand body parameter works.
+     */
+    public function testExpandAll() {
+        // Explicitly passing expandBody=true works.
+        $params = [
+            'query' => self::$discussion['name'],
+            'expand' => ['all'],
+        ];
+        $item = $this->api()->get('/search?'.http_build_query($params))->getBody()[0];
+        $this->assertNotNull($item['body']);
+        $this->assertNotNull($item['insertUser']);
+        $this->assertInternalType('array', $item['breadcrumbs']);
+        $this->assertInstanceOf(Breadcrumb::class, $item['breadcrumbs'][0]);
     }
 
     /**
@@ -206,7 +259,7 @@ class SearchTest extends AbstractAPIv2Test {
     public function testExpandInsertUser() {
         $params = [
             'name' => self::$discussion['name'],
-            'expand' => true,
+            'expand' => ['insertUser'],
         ];
         $response = $this->api()->get('/search?'.http_build_query($params));
         $this->assertEquals(200, $response->getStatusCode());

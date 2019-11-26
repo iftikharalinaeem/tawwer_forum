@@ -13,6 +13,10 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * Class SearchApiController
@@ -43,6 +47,9 @@ class SearchApiController extends AbstractApiController {
     /** @var SearchRecordTypeProviderInterface */
     private $searchRecordTypeProvider;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * SearchApiController constructor.
      *
@@ -56,13 +63,15 @@ class SearchApiController extends AbstractApiController {
         DiscussionModel $discussionModel,
         SearchModel $searchModel,
         UserModel $userModel,
-        SearchRecordTypeProviderInterface $searchRecordTypeProvider
+        SearchRecordTypeProviderInterface $searchRecordTypeProvider,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
         $this->userModel = $userModel;
         $this->searchRecordTypeProvider =$searchRecordTypeProvider;
+        $this->breadcrumbModel = $breadcrumbModel;
     }
 
     /**
@@ -86,13 +95,15 @@ class SearchApiController extends AbstractApiController {
                 'commentID:i?' => 'The id of the comment.',
                 'categoryID:i?' => 'The category containing the record.',
                 'name:s' => 'The title of the record. A comment would be "RE: {DiscussionTitle}".',
-                'body:s' => 'The content of the record.',
+                'url:s' => 'The url for the record',
+                'body:s?' => 'The content of the record.',
                 'score:i' => 'Score of the record.',
                 'insertUserID:i' => 'The user that created the record.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'SearchResult');
         }
 
@@ -218,7 +229,10 @@ class SearchApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => self::LIMIT_MAXIMUM,
                 ],
-                'expand?' => ApiUtils::getExpandDefinition(['insertUser']),
+                'expandBody:b?' => [
+                    'default' => true,
+                ],
+                'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
             ], ['SearchIndex', 'in'])
             ->addValidator('', $validator)
             ->setDescription('Search for records matching specific criteria.');
@@ -255,7 +269,13 @@ class SearchApiController extends AbstractApiController {
         );
 
 
-        $data = array_map([$this, 'normalizeOutput'], $data);
+        $data = array_map(function ($record) use ($query) {
+            return $this->normalizeOutput(
+                $record,
+                $query['expandBody'],
+                $this->isExpandField('breadcrumbs', $query['expand'])
+            );
+        }, $data);
 
         $result = $out->validate($data);
 
@@ -336,22 +356,28 @@ class SearchApiController extends AbstractApiController {
      * Normalize a group database record to match the schema definition.
      *
      * @param array $searchRecord
+     * @param bool $includeBody Whether or not to include the body in the output.
+     * @param bool $includeBreadcrumbs Whether or not to include breadcrumbs in the result.
      * @return array
      */
-    public function normalizeOutput(array $searchRecord): array {
+    public function normalizeOutput(array $searchRecord, bool $includeBody = true, bool $includeBreadcrumbs = false): array {
         $schemaRecord = [
             'recordID' => $searchRecord['PrimaryID'],
+            'url' => $searchRecord['Url'],
             'recordType' => null,
             'type' => null,
             'categoryID' => $searchRecord['CategoryID'],
             'name' => $searchRecord['Title'],
-            'body' => Gdn::formatService()->renderHTML($searchRecord['Summary'], $searchRecord['Format']),
             'score' => $searchRecord['Score'] ?? 0,
             'insertUserID' => $searchRecord['UserID'],
             'dateInserted' => $searchRecord['DateInserted'],
             'updateUserID' => $searchRecord['UpdateUserID'] ?? null,
             'dateUpdated' => $searchRecord['DateUpdated'] ?? null,
         ];
+
+        if ($includeBody) {
+            $schemaRecord['body'] = Gdn::formatService()->renderHTML($searchRecord['Summary'], $searchRecord['Format']);
+        }
 
         $lcfRecordType = lcfirst($searchRecord['RecordType'] ?? '');
         if (in_array($lcfRecordType, $this->fullSchema()->getField('properties.recordType.enum'))) {
@@ -374,6 +400,10 @@ class SearchApiController extends AbstractApiController {
 
         if (isset($searchRecord['User'])) {
             $schemaRecord['insertUser'] = $searchRecord['User'];
+        }
+
+        if ($includeBreadcrumbs && isset($schemaRecord['categoryID'])) {
+            $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
         }
 
         $result = $this->getEventManager()->fireFilter('searchApiController_normalizeOutput', $schemaRecord, $this, $searchRecord, []);
@@ -426,10 +456,11 @@ class SearchApiController extends AbstractApiController {
                 if ($record['RecordType'] === 'Discussion') {
                     $record['UpdateUserID'] = $discussions[$record['PrimaryID']]['UpdateUserID'] ?? null;
                     $record['DateUpdated'] = $discussions[$record['PrimaryID']]['DateUpdated'] ?? null;
+                    $record['Url'] = discussionUrl($discussions[$record['PrimaryID']]);
                 } elseif ($record['RecordType'] === 'Comment') {
                     $record['DiscussionID'] = $record['DiscussionID'] ?? $comments[$record['PrimaryID']]['DiscussionID'] ?? null;
                     $record['UpdateUserID'] = $comments[$record['PrimaryID']]['UpdateUserID'] ?? null;
-                    $record['DateUpdated'] = $comments[$record['PrimaryID']]['DateUpdated'] ?? null;
+                    $record['Url'] = commentUrl($comments[$record['PrimaryID']]);
                 }
             }
         }
