@@ -29,13 +29,9 @@ addComponent("subcommunity-chooser", ChooserWithProvider);
 // New MeBox registration
 
 TitleBar.registerBeforeMeBox(() => {
-    const device = useDevice();
-    if (device === Devices.MOBILE || device === Devices.XS) {
-        return null;
-    }
     return (
         <CommunityFilterContext.Provider value={providerArgs}>
-            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} forceIcon={true} />
         </CommunityFilterContext.Provider>
     );
 });
