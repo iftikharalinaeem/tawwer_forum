@@ -30,6 +30,7 @@ import { articleEventFields } from "../analytics/KnowledgeAnalytics";
 import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { hasPermission } from "@library/features/users/permissionUtils";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -123,10 +124,14 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
     private renderMessages(): React.ReactNode {
         const { article, notifyTranslationFallback } = this.props;
-        let messages = (
-            <Permission permission="articles.add">
+        if (!hasPermission("articles.add")) {
+            return null;
+        }
+
+        return (
+            <>
                 {notifyTranslationFallback && article.data && (
-                    <ArticleUntranslatedMessage articleID={article.data.articleID} />
+                    <ArticleUntranslatedMessage articleID={article.data.articleID} date={article.data.dateUpdated} />
                 )}
                 {article.data && article.data.status === PublishStatus.DELETED && (
                     <ArticleDeletedMessage
@@ -134,10 +139,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
                         isLoading={this.props.restoreStatus === LoadStatus.LOADING}
                     />
                 )}
-            </Permission>
+            </>
         );
-
-        return messages;
     }
 
     private handleRestoreClick = async () => {

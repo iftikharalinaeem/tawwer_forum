@@ -20,7 +20,7 @@ class KnowledgeBasesTranslationTest extends AbstractAPIv2Test {
     /** @var string $translationApi Translation api path */
     protected $translationApi = "/translations";
 
-    protected static $addons = ['vanilla', 'sphinx', 'knowledge', 'translationsapi'];
+    protected static $addons = ['vanilla', 'translationsapi', 'sphinx', 'knowledge'];
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
 

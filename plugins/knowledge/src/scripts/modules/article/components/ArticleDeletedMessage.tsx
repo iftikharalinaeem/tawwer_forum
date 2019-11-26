@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/utility/appUtils";
-import Message from "@knowledge/modules/common/Message";
+import Message from "@library/messages/Message";
 
 interface IProps {
     onRestoreClick: () => void;
@@ -18,14 +18,16 @@ interface IProps {
  */
 export default class ArticleDeletedMessage extends React.Component<IProps> {
     public render() {
-        const { onRestoreClick, isLoading } = this.props;
+        const { onRestoreClick, isLoading = false } = this.props;
         return (
             <Message
+                stringContents={t("This article has been deleted.")}
                 title={t("This article has been deleted.")}
-                text={t("You can see this message because you have special permissions.")}
-                actionHandler={onRestoreClick}
+                contents={t("You can see this message because you have special permissions.")}
+                onConfirm={onRestoreClick}
                 isActionLoading={isLoading}
-                actionTitle={t("Restore")}
+                confirmText={t("Restore")}
+                noIcon={true}
             />
         );
     }

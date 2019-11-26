@@ -7,12 +7,13 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 
 /**
- * Test the /api/v2/knowledge-categories GET endpoints with locale param and translationApi enabled
+ * Test GET /api/v2/knowledge-bases/{id}/navigation-flat endpoint with locale param and translationApi enabled
  */
-class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
+class KnowledgeNavigationTranslationTest extends AbstractAPIv2Test {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-categories";
@@ -20,32 +21,14 @@ class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
     /** @var string $translationApi Translation api path */
     protected $translationApi = "/translations";
 
+    /** @var string $navigationApi Knowledge navigation api path */
+    protected $navigationApi = "/knowledge-bases/{id}/navigation-flat";
+
     protected static $addons = ['vanilla', 'translationsapi', 'sphinx', 'knowledge'];
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
 
-    /**
-     * Grab values for inserting a new knowledge base.
-     *
-     * @param string $name Name of the knowledge base.
-     * @return array
-     */
-    public function kbRecord(string $name = 'Test Knowledge Base'): array {
-        static $knowledgeBaseID = 1;
-
-        $record = [
-            'name' => $name,
-            'description' => $name.' DESCRIPTION',
-            'viewType' => 'guide',
-            'icon' => '',
-            'bannerImage' => '',
-            'sortArticles' => 'manual',
-            'sourceLocale' => 'en',
-            'urlCode' => 'test-kb',
-            'siteSectionGroup' => 'mockSiteSectionGroup-1'
-        ];
-        return $record;
-    }
+    private static $content = [];
 
     /**
      * Grab values for inserting a new knowledge category.
@@ -94,7 +77,7 @@ class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
      *
      * Generate 2 translated knowledge bases, and 2 untranslated knowledge bases.
      */
-    public function testPrepareTranslations() {
+    public function testPrepareGuideKbTranslations() {
         $result = $this->api()->post(
             $this->translationApi,
             [
@@ -104,14 +87,28 @@ class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
             ]
         );
         $this->assertEquals(201, $result->getStatusCode());
-        $kb = $this->kbRecord('ORIGINAL KB');
-        $result = $this->api()->post('/knowledge-bases', $kb);
-        $kb = $this->api()->get('/knowledge-bases/1', $kb)
+        $guideKb = [
+            'name' => 'ORIGINAL GUIDE KB',
+            'description' => 'ORIGINAL GUIDE KB DESCRIPTION',
+            'viewType' => KnowledgeBaseModel::TYPE_GUIDE,
+            'icon' => '',
+            'bannerImage' => '',
+            'sortArticles' => 'manual',
+            'sourceLocale' => 'en',
+            'urlCode' => 'test-kb',
+            'siteSectionGroup' => 'mockSiteSectionGroup-1'
+        ];
+        $result = $this->api()->post('/knowledge-bases', $guideKb)->getBody();
+        $guideKb = $this->api()->get('/knowledge-bases/'.$result['knowledgeBaseID'], $guideKb)
+            ->getBody();
+        self::$content['kbGuide'] = $guideKb;
+        self::$content['cat0'] = $this->api()->get($this->baseUrl.'/'.$guideKb['rootCategoryID'])
             ->getBody();
         for ($i = 1; $i<4; $i++) {
             $kbCategory = $this->kbCategoryRecord();
-            //$kbCategory['parentID'] = $kb['rootCategoryID'];
+            $kbCategory['sort'] = $i;
             $kbCategory = $this->api()->post($this->baseUrl, $kbCategory)->getBody();
+            self::$content['cat'.$i] = $kbCategory;
             switch ($i) {
                 case 1:
                     $result = $this->generateTranslation($kbCategory, ['name'], 'fr');
@@ -126,57 +123,44 @@ class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test GET /api/v2/knowledge-categories/{id}
+     * Test GET /api/v2/knowledge-bases/{id}/navigation-flat?locale={locale}
      *
-     * @param int $id
      * @param string $locale
-     * @depends testPrepareTranslations
-     * @dataProvider translationsDataProvider
+     * @param string $kbKey
+     * @param array $order
+     * @depends testPrepareGuideKbTranslations
+     * @dataProvider navigationKbGuideProvider
      */
-    public function testKnowledgeCategoryIdLocales(int $id, string $locale) {
-        for ($i = 1; $i<5; $i++) {
-            $result = $this->api()->get($this->baseUrl.'/'.$i.'?locale='.$locale)->getBody();
-            if ($i === $id) {
-                $this->assertStringEndsWith(' - '.$locale, $result['name']);
-                $this->assertStringEndsWith('category-'.$locale, $result['url']);
-            } else {
-                $this->assertStringEndsNotWith(' - '.$locale, $result['name']);
-                $this->assertStringEndsNotWith('category-'.$locale, $result['url']);
-            }
-        }
-    }
-
-    /**
-     * Test GET /api/v2/knowledge-categories (index)
-     *
-     * @param int $id
-     * @param string $locale
-     * @depends testPrepareTranslations
-     * @dataProvider translationsDataProvider
-     */
-    public function testKnowledgeCategoryIndexLocales(int $id, string $locale) {
-        $allCategories = $this->api()->get($this->baseUrl.'?locale='.$locale)
+    public function testGuideNavigationTranslation(string $locale, string $kbKey, array $order) {
+        $kb = self::$content[$kbKey];
+        $path = str_replace('{id}', $kb[KnowledgeBaseModel::RECORD_ID_FIELD], $this->navigationApi);
+        $navigation = $this->api()->get($path.'?locale='.$locale)
             ->getBody();
-        $this->assertEquals(4, count($allCategories));
-
-        foreach ($allCategories as $category) {
-            if ($category[KnowledgeCategoryModel::RECORD_ID_FIELD] === $id) {
-                $this->assertStringEndsWith(' - '.$locale, $category['name']);
-                $this->assertStringEndsWith('category-'.$locale, $category['url']);
-            } else {
-                $this->assertStringEndsNotWith(' - '.$locale, $category['name']);
-                $this->assertStringEndsNotWith('category-'.$locale, $category['url']);
-            }
+        $this->assertEquals(count($order), count($navigation));
+        foreach ($navigation as $index => $item) {
+            $this->assertStringEndsWith($order[$index]['name'], $item['name']);
+            $regExp = '/'.$locale.'\/kb\/categories\/'.self::$content[$order[$index]['key']]['knowledgeCategoryID'].'-/';
+            $this->assertRegexp($regExp, $item['url']);
         }
     }
 
     /**
      * Test cases data provider
      */
-    public function translationsDataProvider() {
+    public function navigationKbGuideProvider() {
         return [
-            'French' => [2, 'fr'],
-            'Spanish' => [3, 'es'],
+            'GUIDE KB FR' => ['fr', 'kbGuide', [
+                ['name' => 'GUIDE KB', 'key' => 'cat0'],
+                ['name' => 'Category - fr', 'key' => 'cat1'],
+                ['name' => 'Category', 'key' => 'cat2'],
+                ['name' => 'Category', 'key' => 'cat3']
+            ]],
+            'GUIDE KB ES' => ['es', 'kbGuide', [
+                ['name' => 'GUIDE KB', 'key' => 'cat0'],
+                ['name' => 'Category', 'key' => 'cat1'],
+                ['name' => 'Category - es', 'key' => 'cat2'],
+                ['name' => 'Category', 'key' => 'cat3']
+            ]],
         ];
     }
 }

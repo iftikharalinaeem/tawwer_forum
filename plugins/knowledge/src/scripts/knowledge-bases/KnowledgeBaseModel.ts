@@ -249,7 +249,7 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         })
         .case(KnowledgeBaseActions.postKB_ACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
-            state.knowledgeBasesByID[payload.result.knowledgeBaseID] = payload.result;
+            state.knowledgeBasesByID.data![payload.result.knowledgeBaseID] = payload.result;
             return state;
         })
         .case(KnowledgeBaseActions.patchKB_ACs.started, (state, payload) => {
@@ -292,7 +292,7 @@ export function useKnowledgeBases(status: KnowledgeBaseStatus) {
         if (knowledgeBasesByID.status === LoadStatus.PENDING) {
             getAll(status);
         }
-    }, [knowledgeBasesByID, getAll]);
+    }, [knowledgeBasesByID, getAll, status]);
 
     return knowledgeBasesByID;
 }
