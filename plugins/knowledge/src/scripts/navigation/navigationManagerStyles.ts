@@ -131,7 +131,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
-        paddingTop: globalVars.gutter.size + 35,
+        paddingTop: globalVars.gutter.size + 36,
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
