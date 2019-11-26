@@ -8,7 +8,7 @@ import { translationGridClasses } from "./TranslationGridStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { useLocaleInfo, LocaleDisplayer } from "@vanilla/i18n";
+import { useLocaleInfo, LocaleDisplayer, t } from "@vanilla/i18n";
 
 interface IProps {
     /** Handler for when the locale changes. */
@@ -64,12 +64,12 @@ export function TranslationGridLocaleChooser(props: IProps) {
         <div className={classes.languageDropdown}>
             <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
                 <SelectBox
-                    label={"test"}
-                    widthOfParent={true}
+                    label={t("Locales")}
                     value={selectedOption}
                     onChange={option => props.onChange(option.value)}
                     options={options}
                     buttonClassName={classes.languageDropdownToggle}
+                    renderLeft={false}
                 />
             </div>
         </div>

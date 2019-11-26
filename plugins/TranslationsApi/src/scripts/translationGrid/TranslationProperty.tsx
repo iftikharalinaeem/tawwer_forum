@@ -73,6 +73,7 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
                         <EditIcon
                             className={classNames(classes.icon, { [classes.isFirst]: isFirst })}
                             title={t("You have unsaved changes")}
+                            small={true}
                         />
                     )}
                     {!isEditing && !existingTranslation && (
