@@ -40,6 +40,19 @@ export default function NavigationAdminLinks(props: IProps) {
     const sourceLocale = knowledgeBase.sourceLocale;
     const isDisabled = sourceLocale !== currentLocale;
 
+    const newCategoryButton = (
+        <Button
+            onClick={openModal}
+            buttonRef={categoryButtonRef}
+            baseClass={ButtonTypes.CUSTOM}
+            className={classNames(classes.link)}
+            disabled={isDisabled}
+        >
+            <NewFolderIcon className={classes.linkIcon} />
+            {t("New Category")}
+        </Button>
+    );
+
     return (
         <Permission permission="articles.add">
             <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
@@ -62,37 +75,20 @@ export default function NavigationAdminLinks(props: IProps) {
                             label={
                                 <Translate
                                     source="You can only add categories in the source locale: <0/>."
-                                    c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
+                                    c0={
+                                        <LocaleDisplayer
+                                            localeContent={sourceLocale || " "}
+                                            displayLocale={sourceLocale || " "}
+                                        />
+                                    }
                                 />
                             }
                             ariaLabel={"You can only add categories in the source locale."}
                         >
-                            <span>
-                                {
-                                    <Button
-                                        onClick={openModal}
-                                        buttonRef={categoryButtonRef}
-                                        baseClass={ButtonTypes.CUSTOM}
-                                        className={classNames(classes.link)}
-                                        disabled={isDisabled}
-                                    >
-                                        <NewFolderIcon className={classes.linkIcon} />
-                                        {t("New Category")}
-                                    </Button>
-                                }
-                            </span>
+                            <span>{newCategoryButton}</span>
                         </ToolTip>
                     ) : (
-                        <Button
-                            onClick={openModal}
-                            buttonRef={categoryButtonRef}
-                            baseClass={ButtonTypes.CUSTOM}
-                            className={classNames(classes.link)}
-                            disabled={isDisabled}
-                        >
-                            <NewFolderIcon className={classes.linkIcon} />
-                            {t("New Category")}
-                        </Button>
+                        newCategoryButton
                     )}
                 </li>
             </ul>

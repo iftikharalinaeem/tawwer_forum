@@ -75,12 +75,17 @@ export default function NavigationManagerToolBar(props: IProps) {
                         label={
                             <Translate
                                 source="You can only add categories in the source locale: <0/>."
-                                c0={<LocaleDisplayer localeContent={props.sourceLocale || " "} />}
+                                c0={
+                                    <LocaleDisplayer
+                                        localeContent={props.sourceLocale || " "}
+                                        displayLocale={props.sourceLocale || " "}
+                                    />
+                                }
                             />
                         }
                         ariaLabel={"You can only add categories in the source locale."}
                     >
-                        <div className={"toto"}>{buttonContents}</div>
+                        <div className={classNames(classes.newFolder)}>{buttonContents}</div>
                     </ToolTip>
                 ) : (
                     { buttonContents }
