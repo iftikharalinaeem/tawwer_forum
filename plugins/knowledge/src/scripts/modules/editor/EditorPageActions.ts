@@ -319,6 +319,10 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         if (discussionID) {
             formData.discussionID = discussionID;
         }
+        const { formArticleIDIsDeleted } = this.getState().knowledge.editorPage;
+        if (formArticleIDIsDeleted) {
+            formData.knowledgeCategoryID = null;
+        }
         this.updateForm(formData, true);
     }
 
@@ -394,7 +398,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
             format: Format.RICH,
         };
 
-        if (editorState.article.status === LoadStatus.SUCCESS && editorState.article.data) {
+        if (
+            editorState.article.status === LoadStatus.SUCCESS &&
+            editorState.article.data &&
+            !editorState.formArticleIDIsDeleted
+        ) {
             const isUsingFallbackLocale = editorState.fallbackLocale.locale !== null;
             const { body: prevBody, name: prevName, knowledgeCategoryID: prevCategoryID } = editorState.article.data;
             const { body, name, knowledgeCategoryID, sort } = request;
@@ -499,6 +507,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
             this.queueEditorOps([renderedBody]);
         }
 
+        const { formArticleIDIsDeleted } = this.getState().knowledge.editorPage;
+        if (formArticleIDIsDeleted) {
+            newFormValue.knowledgeCategoryID = null;
+        }
+
         this.updateForm(newFormValue, true);
     }
 
@@ -523,10 +536,11 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
         ]);
 
         if (revision && article) {
+            const { formArticleIDIsDeleted } = this.getState().knowledge.editorPage;
             const formData: Partial<IEditorPageForm> = {
                 name: revision.data.name,
                 body: JSON.parse(revision.data.body),
-                knowledgeCategoryID: article.data.knowledgeCategoryID,
+                knowledgeCategoryID: formArticleIDIsDeleted ? null : article.data.knowledgeCategoryID,
             };
 
             this.updateForm(formData, true);

@@ -6,7 +6,7 @@
 
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
-import { ILoadable, LoadStatus, IApiError } from "@library/@types/api/core";
+import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { DeltaOperation } from "quill/core";
@@ -19,6 +19,7 @@ import { IRevision } from "@knowledge/@types/api/articleRevision";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { EditorQueueItem } from "@rich-editor/editor/context";
 import isEqual from "lodash/isEqual";
+import { t } from "@vanilla/i18n";
 
 export interface IEditorPageForm {
     name: string;
@@ -40,6 +41,7 @@ export interface IEditorPageState {
         knowledgeCategoryID: string | null;
         body: string | null;
     };
+    formArticleIDIsDeleted: boolean;
     formNeedsRefresh: boolean;
     editorOperationsQueue: EditorQueueItem[];
     currentError: IApiError | null;
@@ -135,6 +137,7 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
             knowledgeCategoryID: null,
         },
         formNeedsRefresh: false,
+        formArticleIDIsDeleted: false,
         editorOperationsQueue: [],
         currentError: null,
         revision: {
@@ -266,11 +269,25 @@ export default class EditorPageModel extends ReduxReducer<IEditorPageState> {
      */
     private reduceErrors: ReducerType = (nextState = this.initialState, action) => {
         switch (action.type) {
-            case EditorPageActions.GET_ARTICLE_ERROR:
             case ArticleActions.GET_DRAFT_ERROR:
-            case ArticleActions.GET_REVISION_ERROR:
             case ArticleActions.PATCH_DRAFT_ERROR:
             case ArticleActions.POST_DRAFT_ERROR:
+                nextState.currentError = action.payload;
+                break;
+
+            case EditorPageActions.GET_ARTICLE_ERROR:
+            case ArticleActions.GET_REVISION_ERROR:
+                if (nextState.draft.status !== LoadStatus.PENDING) {
+                    // Draft is currently in use for the editor page.
+                    // We want to supply a better error message of some of the content
+                    // it's based on, it not available anymore.
+
+                    action.payload.message = t("The article this draft is based on is no longer available.");
+
+                    // Clear the categoryID because it may not exist anymore.
+                    nextState.formArticleIDIsDeleted = true;
+                }
+
                 nextState.currentError = action.payload;
                 break;
         }
