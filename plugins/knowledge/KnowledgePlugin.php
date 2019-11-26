@@ -161,7 +161,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param mixed $sender Sender object.
      */
     public function base_afterDiscussionFilters_handler($sender) {
-        echo '<li class="Knowledge">'.anchor(t('Help'), '/kb').'</li> ';
+        if ($this->session->checkPermission('knowledge.kb.view')) {
+            echo '<li class="Knowledge">'.anchor(t('Help Menu', 'Help'), '/kb').'</li> ';
+        }
     }
 
     /**
