@@ -57,7 +57,8 @@ function OrganizeCategoriesPage(props: IProps) {
                     />
                     <div>
                         <Translate
-                            source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
+                            //source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
+                            source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
                             c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
                         />
                     </div>
@@ -66,9 +67,7 @@ function OrganizeCategoriesPage(props: IProps) {
             onConfirm={() => {
                 setWarning(false);
             }}
-            stringContents={t(
-                "You are viewing categories in the source locale. Make sure you name new categories using the source locale.",
-            )}
+            stringContents={t("Certain actions are disabled because they are only avalaible in the source locale.")}
         />
     );
     useEffect(() => {
