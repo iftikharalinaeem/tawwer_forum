@@ -28,6 +28,7 @@ interface IDropdownProps {
     buttonType?: ButtonTypes;
     fullWidth?: boolean;
     buttonClass?: string;
+    forceIcon?: boolean;
 }
 
 export function SubcommunityChooserDropdown(props: IDropdownProps) {
@@ -48,7 +49,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const classes = subcommunityChooserClasses();
 
     let toggleName: React.ReactNode = <GlobeIcon />;
-    if (hasMultipleLocales && subcommunity) {
+    if (hasMultipleLocales && subcommunity && !props.forceIcon) {
         toggleName = `${subcommunity.name} (${subcommunity.locale}) `;
     }
 
