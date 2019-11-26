@@ -162,17 +162,21 @@ class KnowledgeBasesApiController extends AbstractApiController {
             unset($query['siteSectionGroup']);
         }
 
-        $locale = $query['locale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $translateLocale = $query['locale'] ?? null;
         unset($query['locale']);
 
         $rows = $this->knowledgeBaseModel->get($query);
+        if (isset($translateLocale)) {
+            $rows = $this->translateProperties($rows, $translateLocale);
+        }
 
-        $rows = $this->translateProperties($rows, $locale);
-        $rows = array_map(function ($row) use ($expandSiteSections, $locale) {
+        $rows = array_map(function ($row) use ($expandSiteSections, $translateLocale) {
             if ($expandSiteSections) {
                 $this->expandSiteSections($row);
             }
-            $row['locale'] = $locale;
+            if (isset($query['locale'])) {
+                $row['locale'] = $translateLocale;
+            }
             return $this->normalizeOutput($row);
         }, $rows);
 
