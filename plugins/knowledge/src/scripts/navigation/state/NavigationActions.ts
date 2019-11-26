@@ -10,19 +10,41 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 import { getCurrentLocale } from "@vanilla/i18n";
-
 const createAction = actionCreatorFactory("@@navigation");
 
 /**
  * Redux actions for knowledge base navigation data.
  */
 export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreState> {
+    public static getTranslationSourceNavigationItemsACs = createAction.async<
+        { knowledgeBaseID: number },
+        IKbNavigationItem[],
+        IApiError
+    >("GET_TRANSLATIONSOURCE_NAVIGATION_ITEMS");
+
+    public getTranslationSourceNavigationItems = async (knowledgeBaseID: number) => {
+        const kbsByID = this.getState().knowledge.knowledgeBases.knowledgeBasesByID;
+        let sourceLocale = "";
+        if (kbsByID.data) {
+            sourceLocale = kbsByID.data[knowledgeBaseID].sourceLocale;
+        }
+
+        const apiThunk = bindThunkAction(NavigationActions.getTranslationSourceNavigationItemsACs, async () => {
+            const response = await this.api.get(
+                `/knowledge-bases/${knowledgeBaseID}/navigation-flat?locale=${sourceLocale}`,
+            );
+
+            return response.data;
+        })({ knowledgeBaseID });
+
+        return await this.dispatch(apiThunk);
+    };
+
     public static getNavigationFlatACs = createAction.async<
         { knowledgeBaseID: number },
         IKbNavigationItem[],
         IApiError
     >("GET_NAVIGATION_FLAT");
-
     /**
      * Get navigation for a knowledge base in the flat format.
      *
@@ -30,6 +52,7 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
      */
     public getNavigationFlat = async (knowledgeBaseID: number, forceUpdate = false) => {
         const state = this.getState();
+
         const fetchStatus = state.knowledge.navigation.fetchStatusesByKbID[knowledgeBaseID];
 
         if ([LoadStatus.SUCCESS, LoadStatus.LOADING].includes(fetchStatus) && !forceUpdate) {

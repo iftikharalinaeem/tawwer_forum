@@ -41,6 +41,7 @@ import { navigationManagerClasses } from "@knowledge/navigation/navigationManage
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { PublishStatus } from "@library/@types/api/core";
 import CombineAwareTree from "@knowledge/navigation/CombineAwareTree";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 interface IProps extends IActions, INavigationStoreState {
     className?: string;
@@ -83,6 +84,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public render() {
         const classesNavigationManager = navigationManagerClasses();
+        const sourceLocale = this.props.knowledgeBase.sourceLocale;
+        const canEdit = sourceLocale == getCurrentLocale();
+
         return (
             <>
                 <NavigationManagerToolBar
@@ -90,6 +94,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                     expandAll={this.expandAll}
                     newCategory={this.showNewCategoryModal}
                     newCategoryButtonRef={this.newCategoryButtonRef}
+                    newCategoryButtonDisable={!canEdit}
+                    sourceLocale={sourceLocale}
                 />
                 <div
                     ref={this.self}
@@ -127,7 +133,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private renderItem = (params: IRenderItemParams<INormalizedNavigationItem>) => {
         const { provided, item, snapshot } = params;
-
+        const canEdit = this.props.knowledgeBase.sourceLocale == getCurrentLocale();
         const hasChildren = item.children && item.children.length > 0;
         const deleteHandler = (focusButton: HTMLButtonElement) => {
             this.setState({ elementToFocusOnDeleteClose: focusButton });
@@ -149,6 +155,7 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
                 isInRoot={this.isItemInRoot(item.parentID)}
+                canEdit={!canEdit}
             />
         );
     };
@@ -164,7 +171,9 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     public async componentDidMount() {
         const { knowledgeBaseID } = this.props.knowledgeBase;
+
         await this.props.navigationActions.getNavigationFlat(knowledgeBaseID);
+        await this.props.navigationActions.getTranslationSourceNavigationItems(knowledgeBaseID);
     }
 
     /**

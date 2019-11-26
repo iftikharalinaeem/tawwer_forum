@@ -30,7 +30,7 @@ import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTr
 import Message from "@library/messages/Message";
 import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
-import { LocaleDisplayer, getCurrentLocale, useLocaleInfo } from "@vanilla/i18n";
+import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
 import { string } from "prop-types";
 import Container from "@library/layout/components/Container";
@@ -57,7 +57,7 @@ function OrganizeCategoriesPage(props: IProps) {
                     />
                     <div>
                         <Translate
-                            source="You are viewing categories in the source locale: <0/>. Make sure you name new categories using the source locale."
+                            source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
                             c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
                         />
                     </div>
@@ -66,9 +66,7 @@ function OrganizeCategoriesPage(props: IProps) {
             onConfirm={() => {
                 setWarning(false);
             }}
-            stringContents={t(
-                "You are viewing categories in the source locale. Make sure you name new categories using the source locale.",
-            )}
+            stringContents={t("Certain actions are disabled because they are only avalaible in the source locale.")}
         />
     );
     useEffect(() => {
@@ -106,7 +104,11 @@ function OrganizeCategoriesPage(props: IProps) {
                             title={pageTitle}
                         >
                             {pageTitle}
-                            <OrganizeCategoriesTranslator kbID={props.kbID} />
+                            <OrganizeCategoriesTranslator
+                                kbID={props.kbID}
+                                sourceLocale={sourceLocale || ""}
+                                activeLocale={currentLocale || ""}
+                            />
                         </Heading>
                     </DocumentTitle>
                     <NavigationManager knowledgeBase={knowledgeBase.data} />

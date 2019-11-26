@@ -12,7 +12,7 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import reduceReducers from "reduce-reducers";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
-import { INavigationItem, LoadStatus, IApiError } from "@library/@types/api/core";
+import { INavigationItem, LoadStatus, IApiError, ILoadable } from "@library/@types/api/core";
 
 export type ReducerType = KnowledgeReducer<INavigationStoreState>;
 
@@ -42,8 +42,12 @@ export interface INormalizedNavigationItems {
 }
 
 export interface INavigationStoreState {
+    translationSourceNavItems: ILoadable<IKbNavigationItem[]>;
     navigationItems: INormalizedNavigationItems;
     navigationItemsByKbID: {
+        [kbID: number]: string[];
+    };
+    sourceNavigationItemsByKbID: {
         [kbID: number]: string[];
     };
     submitStatus: LoadStatus;
@@ -97,6 +101,10 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
         fetchStatusesByKbID: [],
         patchTransactionID: null,
         currentError: null,
+        sourceNavigationItemsByKbID: {},
+        translationSourceNavItems: {
+            status: LoadStatus.PENDING,
+        },
     };
 
     public initialState = NavigationModel.DEFAULT_STATE;
@@ -154,6 +162,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             }
             return state;
         })
+
         .case(NavigationActions.getNavigationFlatACs.failed, (state, payload) => {
             state.currentError = {
                 type: NavigationActionType.GET,
@@ -161,6 +170,34 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 isLoading: false,
             };
             state.fetchStatusesByKbID[payload.params.knowledgeBaseID] = LoadStatus.ERROR;
+            return state;
+        })
+        .case(NavigationActions.getTranslationSourceNavigationItemsACs.started, (state, payload) => {
+            state.translationSourceNavItems = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(NavigationActions.getTranslationSourceNavigationItemsACs.done, (state, payload) => {
+            const { knowledgeBaseID } = payload.params;
+            const normalizedItems = NavigationModel.normalizeData(payload.result);
+            state.translationSourceNavItems = {
+                status: LoadStatus.SUCCESS,
+                ...normalizedItems,
+                ...state.translationSourceNavItems,
+            };
+
+            // Clean up errors
+            if (state.currentError && state.currentError.type === NavigationActionType.GET) {
+                state.currentError = null;
+            }
+            return state;
+        })
+        .case(NavigationActions.getTranslationSourceNavigationItemsACs.failed, (state, payload) => {
+            state.translationSourceNavItems = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return state;
         });
 
@@ -178,11 +215,12 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             const { knowledgeBaseID } = payload.params;
             if (state.patchTransactionID === payload.params.transactionID) {
                 const normalizedItems = NavigationModel.normalizeData(payload.result);
+
                 state.navigationItems = {
                     ...state.navigationItems,
                     ...normalizedItems,
                 };
-                state.navigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
+                state.sourceNavigationItemsByKbID[knowledgeBaseID] = Object.keys(normalizedItems);
                 state.submitStatus = LoadStatus.SUCCESS;
             }
 
@@ -190,6 +228,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
             if (state.currentError && state.currentError.type === NavigationActionType.MOVE) {
                 state.currentError = NavigationModel.DEFAULT_STATE.currentError;
             }
+
             return state;
         })
         .case(NavigationActions.patchNavigationFlatACs.failed, (state, payload) => {
@@ -212,6 +251,7 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
          */
         const handleRenameSuccess = (key: string, newName?: string) => {
             const item = nextState.navigationItems[key];
+
             if (item && newName) {
                 item.name = newName!;
                 delete item.error;

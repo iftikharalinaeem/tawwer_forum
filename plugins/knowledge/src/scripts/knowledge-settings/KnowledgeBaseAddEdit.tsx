@@ -56,6 +56,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const isEditing = props.kbID != null;
     const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
+    const sourceLocale = form.sourceLocale;
 
     const { kbID } = props;
     useEffect(() => {
@@ -94,8 +95,6 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
     const ProductSelectorFormGroup = getComponent("ProductSelectorFormGroup");
     const titleString = isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base");
-    const sourceLocale = form.sourceLocale;
-
     const { Translator, shouldDisplay } = useContentTranslator();
 
     const errors = formSubmit.error?.response.data?.errors;
