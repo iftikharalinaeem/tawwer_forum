@@ -4,7 +4,7 @@
  */
 
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { ITranslationProperty, LocaleDisplayer } from "@vanilla/i18n";
+import { ITranslationProperty, LocaleDisplayer, getLocales } from "@vanilla/i18n";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
 import { translationGridClasses } from "./TranslationGridStyles";
@@ -35,9 +35,9 @@ export function TranslationGrid(props: ITranslationGrid) {
         existingTranslations,
         onTranslationUpdate,
     );
-
     const classesPanelList = panelListClasses();
     const { properties, inScrollingContainer = false } = props;
+
     const classes = translationGridClasses();
 
     return (

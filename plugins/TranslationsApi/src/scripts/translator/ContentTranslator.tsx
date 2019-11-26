@@ -103,7 +103,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                 }
             }}
             onTranslationUpdate={updateForm}
-            sourceLocale={currentLocale}
+            sourceLocale={props.sourceLocale ? props.sourceLocale : currentLocale}
             existingTranslations={existingTranslations}
         />
     );
@@ -246,15 +246,21 @@ function useExistingTranslations(props: IContentTranslatorProps, ignoreFetch: bo
     return result;
 }
 
-function useFirstNonSourceLocale() {
+function useFirstNonSourceLocale(props: IContentTranslatorProps) {
     const { locales, currentLocale } = useLocaleInfo();
     const thrower = useThrowError();
-    const filtered = locales.filter(locale => locale.localeKey !== currentLocale);
+    let result = "";
+
+    const filtered = locales.filter(locale => locale.localeKey !== props.sourceLocale);
     if (filtered.length === 0) {
         thrower(new Error("<ContentTranslator /> should not be instantiated w/ only 1 locale"));
     }
+    if (props.sourceLocale !== currentLocale) {
+        result = currentLocale || "";
+    } else {
+        result = filtered[0].localeKey;
+    }
 
-    const result = filtered[0].localeKey;
     useDebugValue({
         firstNonSourceLocale: result,
     });
@@ -263,7 +269,8 @@ function useFirstNonSourceLocale() {
 
 function useInitSync(props: IContentTranslatorProps) {
     const { init } = useTranslationActions();
-    const firstLocale = useFirstNonSourceLocale();
+    const firstLocale = useFirstNonSourceLocale(props);
+
     const { resource } = props;
     useEffect(() => {
         init({
