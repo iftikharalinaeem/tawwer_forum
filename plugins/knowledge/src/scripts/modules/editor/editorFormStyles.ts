@@ -119,12 +119,14 @@ export const editorFormClasses = useThemeCache(() => {
         }),
     });
 
-    const conversionNotice = style(
-        "conversionNotice",
-        margins({
+    const conversionNotice = style("conversionNotice", {
+        ...margins({
             top: unit(vars.modernFrame.margin),
         }),
-    );
+        ...paddings({
+            horizontal: 0,
+        }),
+    });
 
     const editor = (topWindowPosition: number) =>
         style("editor", {

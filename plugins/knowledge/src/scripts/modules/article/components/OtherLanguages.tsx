@@ -11,12 +11,14 @@ import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { AlertIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import classNames from "classnames";
 import * as React from "react";
+import { iconClasses } from "@library/icons/iconClasses";
+import { translate } from "@vanilla/i18n/src";
 
 export interface IOtherLangaugesProps {
     articleLocaleData: IArticleLocale[];
@@ -38,20 +40,11 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
     const options: ISelectBoxItem[] = props.articleLocaleData.map((data, index) => {
         return {
             value: data.locale,
-            name: data.locale,
             icon: data.translationStatus === "not-translated" && (
-                <ToolTip
-                    label={
-                        <Translate
-                            source="This article was edited in source locale on <0/>. Edit this article to update its translation and clear this message."
-                            c0={<DateTime timestamp={props.dateUpdated} />}
-                        />
-                    }
-                    ariaLabel={"This article was editied in its source locale."}
-                >
-                    <span>
-                        <AlertIcon className={"selectBox-selectedIcon"} />
-                    </span>
+                <ToolTip label={t("This article is not translated yet or it is out of date.")}>
+                    <ToolTipIcon>
+                        <AlertIcon className={classNames("selectBox-selectedIcon")} />
+                    </ToolTipIcon>
                 </ToolTip>
             ),
             content: <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />,
