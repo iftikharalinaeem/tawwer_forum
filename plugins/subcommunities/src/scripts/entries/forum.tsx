@@ -8,6 +8,10 @@ import { addComponent } from "@library/utility/componentRegistry";
 import { SubcommunityChooserDropdown } from "@subcommunities/chooser/SubcommunityChooser";
 import { getMeta } from "@library/utility/appUtils";
 import { CommunityFilterContext } from "@subcommunities/CommunityFilterContext";
+import { TitleBar } from "@library/headers/TitleBar";
+import { useDevice, Devices } from "@library/layout/DeviceContext";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 
 const providerArgs = {
     hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
@@ -21,3 +25,17 @@ const ChooserWithProvider = props => (
 );
 
 addComponent("subcommunity-chooser", ChooserWithProvider);
+
+// New MeBox registration
+
+TitleBar.registerBeforeMeBox(() => {
+    const device = useDevice();
+    if (device === Devices.MOBILE || device === Devices.XS) {
+        return null;
+    }
+    return (
+        <CommunityFilterContext.Provider value={providerArgs}>
+            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
+        </CommunityFilterContext.Provider>
+    );
+});
