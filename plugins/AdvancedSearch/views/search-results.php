@@ -14,8 +14,8 @@
                 echo $Photo;
             }
 
-            foreach ($Row['ImageUrls'] as $imageUrl) {
-                echo '<div class="ImgExt">'.img($imageUrl).'</div>';
+            if (isset($Row['ImageUrls'][0])){
+                echo '<div class="ImgExt">'.img($Row['ImageUrls'][0]).'</div>';
             }
             ?>
             <div class="Media-Body">
