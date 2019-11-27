@@ -224,10 +224,6 @@ class SamlSSOPlugin extends Gdn_Plugin {
             }
         }
 
-        // Don't overwrite ConnectName if it already exists.
-        if ($this->rval('uid', $profile)) {
-            $form->setFormValue('ConnectName', $this->rval('uid', $profile));
-        }
 
         $roles = $this->rval('roles', $profile);
         if ($roles) {
