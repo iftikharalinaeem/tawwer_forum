@@ -123,16 +123,18 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
     private renderMessages(): React.ReactNode {
         const { article, notifyTranslationFallback } = this.props;
-        if (!hasPermission("articles.add")) {
+        const hasUntranslatedMessage = notifyTranslationFallback && article.data;
+        const hasDeletedMessage = article.data && article.data.status === PublishStatus.DELETED;
+        if (!hasPermission("articles.add") || (!hasUntranslatedMessage && !hasDeletedMessage)) {
             return null;
         }
 
         return (
             <>
-                {notifyTranslationFallback && article.data && (
-                    <ArticleUntranslatedMessage articleID={article.data.articleID} date={article.data.dateUpdated} />
+                {hasUntranslatedMessage && (
+                    <ArticleUntranslatedMessage articleID={article.data!.articleID} date={article.data!.dateUpdated} />
                 )}
-                {article.data && article.data.status === PublishStatus.DELETED && (
+                {hasDeletedMessage && (
                     <ArticleDeletedMessage
                         onRestoreClick={this.handleRestoreClick}
                         isLoading={this.props.restoreStatus === LoadStatus.LOADING}
