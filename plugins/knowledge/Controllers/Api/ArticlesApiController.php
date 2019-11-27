@@ -358,7 +358,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "in")->setDescription("Get a single article draft.");
         $out = $this->schema($this->fullDraftSchema(), "out");
 
-        $draft = $this->draftByID($draftID);
+        $draft = $this->draftByID($draftID, true);
         $draft = (new ArticleDraft($this->formatterService))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
         $this->applyFormatCompatibility($result, 'body', 'format');
@@ -1164,7 +1164,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         $locale = $fields["locale"] ?? null;
-        
+
         if ($articleID !== null) {
             // this means we patch existing Article
             if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
