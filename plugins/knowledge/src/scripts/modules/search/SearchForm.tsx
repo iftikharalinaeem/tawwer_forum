@@ -113,9 +113,8 @@ function useSearchContextValueSync() {
     const { getQueryValuesForDomain, updateQueryValuesForDomain } = useSearchFilters();
     const extraValues = getQueryValuesForDomain(form.domain);
     useEffect(() => {
-        console.log("Sync external to internal", extraValues);
         updateForm(extraValues);
-    }, [extraValues]);
+    }, [updateForm, extraValues]);
 }
 
 function useQueryParamSynchronization() {

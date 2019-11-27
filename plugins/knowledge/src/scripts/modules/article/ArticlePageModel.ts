@@ -90,6 +90,21 @@ export const articlePageReducer = produce(
                     break;
                 case ArticlePageActions.RESET:
                     return ARTICLE_PAGE_INITIAL_STATE;
+                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
+                    if (nextState.articleID === action.meta.articleID) {
+                        nextState.restoreStatus = LoadStatus.LOADING;
+                    }
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
+                    if (nextState.articleID === action.meta.articleID) {
+                        nextState.restoreStatus = LoadStatus.SUCCESS;
+                    }
+                    break;
+                case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
+                    if (nextState.articleID === action.meta.articleID) {
+                        nextState.restoreStatus = LoadStatus.ERROR;
+                    }
+                    break;
             }
 
             return nextState;
