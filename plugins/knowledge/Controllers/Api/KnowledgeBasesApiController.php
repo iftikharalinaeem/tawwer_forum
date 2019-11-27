@@ -174,7 +174,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             if ($expandSiteSections) {
                 $this->expandSiteSections($row);
             }
-            if (isset($query['locale'])) {
+            if (isset($translateLocale)) {
                 $row['locale'] = $translateLocale;
             }
             return $this->normalizeOutput($row);
