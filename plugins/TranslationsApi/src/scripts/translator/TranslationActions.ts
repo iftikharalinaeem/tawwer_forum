@@ -34,8 +34,13 @@ interface IGetTranslationsRequest {
 }
 
 type IGetTranslationsResponse = ITranslationApiItem[];
+
 type IPatchTranslationsRequest = ITranslationApiItem[];
 interface IPatchTranslationsResponse {}
+
+type IPatchRemoveItem = Omit<ITranslationApiItem, "translation">;
+type IPatchRemoveTranslationsRequest = IPatchRemoveItem[];
+interface IPatchRemoveTranslationsResponse {}
 
 export function makeTranslationKey(
     property: Pick<ITranslationApiItem, "propertyName" | "recordType" | "recordID" | "recordKey">,
@@ -65,7 +70,13 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
         IPatchTranslationsRequest,
         IPatchTranslationsResponse,
         IApiError
-    >("PUT");
+    >("PATCH");
+
+    public static patchRemoveTranslationsACs = createAction.async<
+        IPatchRemoveTranslationsRequest,
+        IPatchRemoveTranslationsResponse,
+        IApiError
+    >("PATCH_REMOVE");
 
     ///
     /// Simple actions
@@ -122,9 +133,13 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
      * Publish all form values to the API based on the given properties.
      */
     public publishForm = async (properties: ITranslationProperty[]) => {
-        const { translationLocale } = this.getState().translations;
-        const publishFieldValues: ITranslationApiItem[] = [];
+        const { translationLocale, translationsByLocale } = this.getState().translations;
         const { formTranslations } = this.getState().translations;
+
+        const existingTranslations = translationsByLocale[translationLocale];
+
+        const publishFieldValues: ITranslationApiItem[] = [];
+        const deleteFieldValues: IPatchRemoveItem[] = [];
 
         for (const [key, translation] of Object.entries(formTranslations)) {
             const property = properties.find(prop => {
@@ -132,30 +147,31 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
                 return key === propKey;
             });
 
+            const existingTranslation = existingTranslations.data?.[key] ?? null;
+
             if (property) {
-                publishFieldValues.push({
-                    translationPropertyKey: makeTranslationKey(property),
-                    ...property,
-                    locale: translationLocale!,
-                    translation,
-                });
+                if (existingTranslation && translation === "") {
+                    deleteFieldValues.push({
+                        ...property,
+                        translationPropertyKey: makeTranslationKey(property),
+                        locale: translationLocale,
+                    });
+                } else if (translation !== "") {
+                    publishFieldValues.push({
+                        translationPropertyKey: makeTranslationKey(property),
+                        ...property,
+                        locale: translationLocale!,
+                        translation,
+                    });
+                }
             }
         }
 
-        await this.patchTranslations(publishFieldValues);
-
-        // Simulate getting the saved values back.
-        const firstField = publishFieldValues[0];
-        if (!firstField) {
-            return;
-        }
-
-        this.dispatch(
-            TranslationActions.getTranslationsACs.done({
-                params: { locale: firstField.locale },
-                result: publishFieldValues,
-            }),
-        );
+        const deletePromise =
+            deleteFieldValues.length > 0 ? this.patchRemoveTranslations(deleteFieldValues) : Promise.resolve();
+        const patchPromise =
+            publishFieldValues.length > 0 ? this.patchTranslations(publishFieldValues) : Promise.resolve();
+        await Promise.all([deletePromise, patchPromise]);
     };
 
     /**
@@ -178,6 +194,19 @@ export class TranslationActions extends ReduxActions<ITranslationsGlobalStoreSta
         const { resource } = this.getState().translations;
         const thunk = bindThunkAction(TranslationActions.patchTranslationsACs, async () => {
             const response = await this.api.patch(`/translations/${resource}`, translations);
+            return response.data;
+        })(translations);
+
+        return this.dispatch(thunk);
+    };
+
+    /**
+     * Delete translations using the /api/v2/translations/:resource/remove endpoint.
+     */
+    public patchRemoveTranslations = (translations: IPatchRemoveTranslationsRequest) => {
+        const { resource } = this.getState().translations;
+        const thunk = bindThunkAction(TranslationActions.patchRemoveTranslationsACs, async () => {
+            const response = await this.api.patch(`/translations/${resource}/remove`, translations);
             return response.data;
         })(translations);
 

@@ -9,7 +9,7 @@ import { ITranslationApiItem, TranslationActions } from "./TranslationActions";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import produce from "immer";
 
-interface ITranslationState {
+export interface ITranslationState {
     translationsByLocale: {
         [localeKey: string]: ILoadable<{
             [translationPropertyKey: string]: ITranslationApiItem;
@@ -20,25 +20,25 @@ interface ITranslationState {
         [key: string]: string;
     };
     resource: string | null;
-    translationLocale: string | null;
+    translationLocale: string;
 }
 
 export interface ITranslationsGlobalStoreState extends ICoreStoreState {
     translations: ITranslationState;
 }
 
-const INITIAL_STATE: ITranslationState = {
+export const INITIAL_TRANSLATION_STATE: ITranslationState = {
     translationsByLocale: {},
     submitLoadable: {
         status: LoadStatus.PENDING,
     },
     formTranslations: {},
     resource: null,
-    translationLocale: null,
+    translationLocale: "en",
 };
 
 export const translationReducer = produce(
-    reducerWithInitialState<ITranslationState>(INITIAL_STATE)
+    reducerWithInitialState<ITranslationState>(INITIAL_TRANSLATION_STATE)
         .case(TranslationActions.updateForm, (nextState, payload) => {
             nextState.formTranslations[payload.field] = payload.translation;
             return nextState;
@@ -52,7 +52,7 @@ export const translationReducer = produce(
                 ...nextState,
                 ...payload,
                 formTranslations: {},
-                submitLoadable: INITIAL_STATE.submitLoadable,
+                submitLoadable: INITIAL_TRANSLATION_STATE.submitLoadable,
             };
         })
         .case(TranslationActions.getTranslationsACs.started, (nextState, payload) => {
@@ -65,18 +65,13 @@ export const translationReducer = produce(
             return nextState;
         })
         .case(TranslationActions.getTranslationsACs.done, (nextState, payload) => {
-            const existingTranslations = nextState.translationsByLocale[payload.params.locale];
-            const existingData = existingTranslations.data || {};
             const newData = {};
             for (const item of payload.result) {
                 newData[item.translationPropertyKey] = item;
             }
             nextState.translationsByLocale[payload.params.locale] = {
                 status: LoadStatus.SUCCESS,
-                data: {
-                    ...newData,
-                    ...existingData,
-                },
+                data: newData,
             };
             return nextState;
         })
@@ -93,11 +88,67 @@ export const translationReducer = produce(
         })
         .case(TranslationActions.patchTranslationsACs.done, (nextState, payload) => {
             nextState.submitLoadable.status = LoadStatus.SUCCESS;
+
+            // Clear any errors.
             delete nextState.submitLoadable.error;
+
+            // Clear the form.
             nextState.formTranslations = {};
+
+            // Update our local data.
+            const updateLocale = payload.params[0]?.locale;
+            if (updateLocale) {
+                // Some items were updated. Update them locally.
+                const existingTranslations = nextState.translationsByLocale[updateLocale];
+                const existingData = existingTranslations.data || {};
+                const newData = {};
+                for (const item of payload.params) {
+                    newData[item.translationPropertyKey] = item;
+                }
+                nextState.translationsByLocale[updateLocale] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...existingData,
+                        ...newData,
+                    },
+                };
+            }
+
+            // Update patched
             return nextState;
         })
         .case(TranslationActions.patchTranslationsACs.failed, (nextState, payload) => {
+            nextState.submitLoadable.status = LoadStatus.ERROR;
+            nextState.submitLoadable.error = payload.error;
+            return nextState;
+        })
+        .case(TranslationActions.patchRemoveTranslationsACs.started, (nextState, payload) => {
+            nextState.submitLoadable.status = LoadStatus.LOADING;
+            return nextState;
+        })
+        .case(TranslationActions.patchRemoveTranslationsACs.done, (nextState, payload) => {
+            nextState.submitLoadable.status = LoadStatus.SUCCESS;
+
+            // Clear any errors.
+            delete nextState.submitLoadable.error;
+
+            // Clear the form.
+            nextState.formTranslations = {};
+
+            // Update our local data.
+            const updateLocale = payload.params[0]?.locale;
+            if (updateLocale) {
+                // Some items were updated. Update them locally.
+                const existingTranslations = nextState.translationsByLocale[updateLocale];
+                for (const item of payload.params) {
+                    delete existingTranslations.data![item.translationPropertyKey];
+                }
+            }
+
+            // Update patched
+            return nextState;
+        })
+        .case(TranslationActions.patchRemoveTranslationsACs.failed, (nextState, payload) => {
             nextState.submitLoadable.status = LoadStatus.ERROR;
             nextState.submitLoadable.error = payload.error;
             return nextState;
