@@ -358,7 +358,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "in")->setDescription("Get a single article draft.");
         $out = $this->schema($this->fullDraftSchema(), "out");
 
-        $draft = $this->draftByID($draftID);
+        $draft = $this->draftByID($draftID, true);
         $draft = (new ArticleDraft($this->formatterService))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
         $this->applyFormatCompatibility($result, 'body', 'format');
@@ -800,13 +800,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body["recordType"] = "article";
         $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
 
-        $draft = $this->draftByID($draftID);
+        $draft = $this->draftByID($draftID, true);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
             $this->permission("Garden.Settings.Manage");
         }
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
-        $row = $this->draftByID($draftID);
+        $row = $this->draftByID($draftID, true);
         $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
@@ -1164,7 +1164,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $revision = array_intersect_key($fields, $revisionFields);
 
         $locale = $fields["locale"] ?? null;
-        
+
         if ($articleID !== null) {
             // this means we patch existing Article
             if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
