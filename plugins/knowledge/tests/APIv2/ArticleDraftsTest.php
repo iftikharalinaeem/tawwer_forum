@@ -248,12 +248,12 @@ class ArticleDraftsTest extends AbstractResourceTest {
 
         $record = $this->record();
         $record['recordID'] = $draft['recordID'];
-        $this->expectException(NotFoundException::class);
 
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$draft['draftID']}",
             $record
         );
+        $this->assertEquals(200, $r->getStatusCode());
     }
 
     /**
@@ -261,11 +261,11 @@ class ArticleDraftsTest extends AbstractResourceTest {
      */
     public function testGetDeleted() {
         $draft = $this->prepareDeletedKnowledgeBase(true);
-        $this->expectException(NotFoundException::class);
 
         $r = $this->api()->get(
             "{$this->baseUrl}/{$draft['draftID']}"
         );
+        $this->assertEquals(200, $r->getStatusCode());
     }
 
     /**

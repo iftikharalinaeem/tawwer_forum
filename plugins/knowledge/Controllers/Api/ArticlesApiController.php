@@ -800,13 +800,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body["recordType"] = "article";
         $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
 
-        $draft = $this->draftByID($draftID);
+        $draft = $this->draftByID($draftID, true);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
             $this->permission("Garden.Settings.Manage");
         }
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
-        $row = $this->draftByID($draftID);
+        $row = $this->draftByID($draftID, true);
         $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
