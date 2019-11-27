@@ -19,7 +19,6 @@ import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
-import Permission from "@library/features/users/Permission";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
@@ -30,7 +29,7 @@ import { articleEventFields } from "../analytics/KnowledgeAnalytics";
 import { ArticleUntranslatedMessage } from "@knowledge/modules/article/components/ArticleUntranslatedMessage";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
-import { hasPermission } from "@library/features/users/permissionUtils";
+import { hasPermission } from "@library/features/users/Permission";
 
 interface IState {
     showRestoreDialogue: boolean;
