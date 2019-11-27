@@ -14,7 +14,7 @@
                 echo $Photo;
             }
 
-            if ($Row['ImageUrls'][0]){
+            if (isset($Row['ImageUrls'][0])){
                 echo '<div class="ImgExt">'.img($Row['ImageUrls'][0]).'</div>';
             }
             ?>
